@@ -513,7 +513,7 @@ export default function WalletCurrencySelector({
             onClick={(e) => e.stopPropagation()}
             onFocus={(e) => e.stopPropagation()}
             placeholder={t("ui_search_currency_045b7c357f", "Search currency...")}
-            className="w-full rounded-lg bg-white/5 ring-1 ring-white/10 ring-inset px-2.5 py-2 text-[15px] text-white/85 placeholder:text-white/35 outline-none focus:ring-2 focus:ring-xcannes-green/40" />
+            className="w-full rounded-lg bg-white/5 ring-1 ring-white/10 ring-inset px-2.5 py-2 text-[15px] text-white/85 placeholder:text-white/35 outline-none focus:ring-1 focus:ring-white/20" />
 
           </div>
           <div className="flex-1 min-h-0 overflow-y-auto">
@@ -641,7 +641,7 @@ export default function WalletCurrencySelector({
                         onClick={(e) => e.stopPropagation()}
                         onFocus={(e) => e.stopPropagation()}
                         placeholder={t("ui_search_currency_045b7c357f", "Search currency...")}
-                        className="w-full pl-11 pr-4 py-3 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 transition-all duration-150"
+                        className="w-full pl-11 pr-4 py-3 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-1 focus:ring-white/25 transition-all duration-150"
                       />
                     </div>
                   </div>
