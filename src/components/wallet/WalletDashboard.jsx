@@ -181,19 +181,26 @@ export default function WalletDashboard({
 
   // ── Smooth wallet-switch transition ─────────────────────────
   const [walletSwitchFade, setWalletSwitchFade] = useState(false);
+  const [walletFadePhase, setWalletFadePhase] = useState('idle'); // 'idle' | 'out' | 'in'
   const switchFadeTimerRef = useRef(null);
 
   const handleSwitchWallet = useCallback((addr) => {
     if (!addr || addr === wallet) return;
-    // 1) Fade out immediately (before data changes)
+    // 1) Fast fade-out (150ms)
+    setWalletFadePhase('out');
     setWalletSwitchFade(true);
-    // 2) After content is invisible, perform the actual switch
     clearTimeout(switchFadeTimerRef.current);
     switchFadeTimerRef.current = setTimeout(() => {
+      // 2) Content is now invisible — switch wallet
       switchWallet(addr);
-      // 3) Fade back in after a short pause for data to settle
-      switchFadeTimerRef.current = setTimeout(() => setWalletSwitchFade(false), 250);
-    }, 180); // just enough time for opacity to reach ~0
+      // 3) Slow fade-in after a pause for data to settle
+      switchFadeTimerRef.current = setTimeout(() => {
+        setWalletFadePhase('in');
+        setWalletSwitchFade(false);
+        // Reset phase after fade-in completes
+        switchFadeTimerRef.current = setTimeout(() => setWalletFadePhase('idle'), 550);
+      }, 200);
+    }, 160);
   }, [wallet, switchWallet]);
 
   useEffect(() => {
@@ -1088,7 +1095,14 @@ export default function WalletDashboard({
             : 'flex flex-col'
         }`}
       >
-        <div className={`flex flex-col min-h-0 transition-opacity duration-[600ms] ease-in-out ${walletSwitchFade ? 'opacity-0' : 'opacity-100'}`}>
+        <div
+          className={`flex flex-col min-h-0 ${walletSwitchFade ? 'opacity-0' : 'opacity-100'}`}
+          style={{
+            transitionProperty: 'opacity',
+            transitionDuration: walletFadePhase === 'out' ? '150ms' : walletFadePhase === 'in' ? '500ms' : '500ms',
+            transitionTimingFunction: walletFadePhase === 'out' ? 'ease-in' : 'ease-out',
+          }}
+        >
           {/* Header */}
           <WalletDashboardHeader
             isConnected={isConnected}
