@@ -639,7 +639,7 @@ export default function CurrencyStatement({
         (addr && (counterpartyLabels?.[addr] ?? labelCacheRef.current.get(addr))) ||
         "";
       const name = cachedLabel ? cachedLabel : formatCounterpartyCompact(addr);
-      return name ? `${base} · ${name}` : base;
+      return name ? `${base} de ${name}` : base;
     },
     [
       counterpartyLabels,
