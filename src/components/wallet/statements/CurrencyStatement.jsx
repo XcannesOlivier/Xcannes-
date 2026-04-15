@@ -1904,7 +1904,7 @@ export default function CurrencyStatement({
                 <div className="space-y-4 py-2">
                   {timelineGroups.map((group) => (
                     <div key={group.key}>
-                      <div className="px-4 pt-4 pb-2 text-[11px] font-semibold text-white/50 uppercase tracking-wide">
+                      <div className="px-4 pt-4 pb-2 text-[11px] font-semibold text-white/50 tracking-wide">
                         {group.label}
                       </div>
                       <div className="px-3 pb-2">
