@@ -129,7 +129,7 @@ export default function ModalSelect({
           className={`w-full flex items-center justify-between gap-2 ${
             open && backdropClassName ? "relative z-50" : ""
           } ${open ? "!rounded-b-none" : ""} ${buttonClassName}`}
-          style={open ? { clipPath: "inset(0 0 1px 0)" } : undefined}
+          style={open ? { clipPath: "inset(-1px -1px 1px -1px)" } : undefined}
         >
           <span className="flex items-center gap-2 min-w-0 flex-1">
             {renderIcon(selected?.icon)}
@@ -171,7 +171,7 @@ export default function ModalSelect({
                 ? "opacity-100 scale-y-100 translate-y-0 ease-[cubic-bezier(0.16,1,0.3,1)]"
                 : "opacity-0 scale-y-[0.92] -translate-y-1 ease-[cubic-bezier(0.4,0,1,1)]"
             } ${menuClassName}`}
-            style={{ WebkitOverflowScrolling: "touch", willChange: "transform, opacity" }}
+            style={{ WebkitOverflowScrolling: "touch", willChange: "transform, opacity", clipPath: "inset(1px -1px -1px -1px)" }}
             onMouseDown={(e) => e.stopPropagation()}
             onClick={(e) => e.stopPropagation()}
           >
