@@ -1896,26 +1896,40 @@ export default function GlobalStatement({
               labelClassName="text-lg md:text-xl font-semibold text-white/95"
             />
             {walletAddress ? (
-              <button
-                type="button"
-                onClick={() => setShowFullAddress((v) => !v)}
+              <div className="flex items-center gap-1.5 min-w-0 mt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowFullAddress((v) => !v)}
 	                className={[
-	                  "mt-2 text-xs md:text-sm text-white/55 font-mono text-left w-full",
+	                  "text-xs md:text-sm text-white/55 font-mono text-left min-w-0",
 	                  showFullAddress
 	                    ? "break-all whitespace-normal"
 	                    : "truncate",
 	                ].join(" ")}
-                title={t(
-                  "ui_toggle_full_address",
-                  "Cliquer pour afficher/masquer l'adresse complète",
-                )}
-                aria-label={t(
-                  "ui_toggle_full_address",
-                  "Cliquer pour afficher/masquer l'adresse complète",
-                )}
-              >
-                {showFullAddress ? walletAddress : truncatedWalletAddress}
-              </button>
+                  title={t(
+                    "ui_toggle_full_address",
+                    "Cliquer pour afficher/masquer l'adresse complète",
+                  )}
+                  aria-label={t(
+                    "ui_toggle_full_address",
+                    "Cliquer pour afficher/masquer l'adresse complète",
+                  )}
+                >
+                  {showFullAddress ? walletAddress : truncatedWalletAddress}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => copyToClipboard(walletAddress, t("ui_copied_address", "Adresse copiée"))}
+                  className="shrink-0 text-white/40 hover:text-white/70 transition-colors p-0.5"
+                  title={t("ui_copy_address", "Copier l'adresse")}
+                  aria-label={t("ui_copy_address", "Copier l'adresse")}
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                    <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
+                  </svg>
+                </button>
+              </div>
             ) : null}
           </div>
         </div>
