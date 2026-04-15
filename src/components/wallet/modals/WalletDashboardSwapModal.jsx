@@ -623,7 +623,7 @@ export default function WalletDashboardSwapModal({
 		                      useNativeSelect={false}
 		                      showMobileOptionRight={true}
 		                      iconClassName="text-3xl leading-none"
-		                      backdropClassName="bg-black/65 backdrop-blur-[2.5px]"
+		                      backdropClassName="bg-black/80 backdrop-blur-[4px]"
 		                      buttonClassName="bg-[#101415] ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3.5 text-xl text-white outline-none focus:outline-none cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
 		                      menuClassName={
 		                        noticeVariant === "demo"
@@ -690,7 +690,7 @@ export default function WalletDashboardSwapModal({
 		                      useNativeSelect={false}
 		                      showMobileOptionRight={true}
 		                      iconClassName="text-3xl leading-none"
-		                      backdropClassName="bg-black/65 backdrop-blur-[2.5px]"
+		                      backdropClassName="bg-black/80 backdrop-blur-[4px]"
 		                      buttonClassName="bg-[#101415] ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3.5 text-xl text-white outline-none focus:outline-none cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
 		                      menuClassName={
 		                        noticeVariant === "demo"
