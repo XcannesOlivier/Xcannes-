@@ -148,7 +148,7 @@ export default function ModalSelect({
             toggleMenu();
           }}
           className={`w-full flex items-center justify-between gap-2 ${
-            open && backdropClassName ? "relative z-50" : ""
+            backdropClassName ? (open ? "relative z-50" : "relative z-[41]") : ""
           } ${open ? "!rounded-b-none !ring-0 !shadow-none border border-white/10 border-b-0" : ""} ${buttonClassName}`}
         >
           <span className="flex items-center gap-2 min-w-0 flex-1">
