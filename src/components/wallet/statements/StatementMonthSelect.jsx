@@ -81,18 +81,12 @@ export default function StatementMonthSelect({
       </button>
 
       {open && (
-        <>
-          <div
-            className="fixed inset-0 z-40 bg-black/80 backdrop-blur-[4px]"
-            aria-hidden="true"
-            onClick={(e) => { e.stopPropagation(); updateOpen(false); }}
-          />
-          <div
-            ref={menuRef}
-            role="listbox"
-            className={`absolute z-50 mt-0 w-full max-h-[480px] overflow-y-auto rounded-[10px] border border-white/10 shadow-2xl bg-[#101415] ${menuClassName}`}
-            onClick={(e) => e.stopPropagation()}
-          >
+        <div
+          ref={menuRef}
+          role="listbox"
+          className={`absolute z-50 mt-0 w-full max-h-[480px] overflow-y-auto rounded-[10px] border border-white/10 shadow-2xl bg-[#101415] ${menuClassName}`}
+          onClick={(e) => e.stopPropagation()}
+        >
           {options.map((option) => {
             const isSelected = String(option?.value) === String(value);
             if (isSelected) return null;
@@ -114,7 +108,6 @@ export default function StatementMonthSelect({
             );
           })}
         </div>
-        </>
       )}
     </div>
   );
