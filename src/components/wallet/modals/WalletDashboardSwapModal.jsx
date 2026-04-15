@@ -679,11 +679,15 @@ export default function WalletDashboardSwapModal({
                       options={(swapCurrencyOptionsSanitized || []).map((code) => {
                         const labelLeft = selectLabelByCurrency?.[code] || code;
                         const labelRight = selectLabelRightByCurrency?.[code] || null;
+                        const isNewLine = !existingCurrencyLinesSet.has(code) && code && code !== "USD";
+                        const labelWithHint = isNewLine ? (
+                          <>{labelLeft} <span className="text-[11px] text-white/35 font-normal">{t("ui_new_line_hint_short", "· nouvelle ligne")}</span></>
+                        ) : labelLeft;
                         return {
                           value: code,
                           icon: getIconForCode(code),
                           label: labelLeft,
-                          labelLeft,
+                          labelLeft: labelWithHint,
                           labelRight,
                           labelMobile:
                             selectLabelMobileByCurrency?.[code] || labelLeft,
@@ -702,14 +706,6 @@ export default function WalletDashboardSwapModal({
 		                      }
 		                      selectClassName="xcannes-select w-full bg-[#101415] ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3.5 text-xl text-white outline-none focus:outline-none cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
 		                    />
-		                    {!existingCurrencyLinesSet.has(quoteCode) && quoteCode && quoteCode !== "USD" ? (
-		                      <div className="absolute bottom-1.5 left-3.5 right-3.5 text-[10px] text-xcannes-green/70 truncate pointer-events-none">
-		                        {t(
-		                          "ui_new_currency_line_auto_activate_a1b2c3",
-		                          "New currency — the {{currency}} line will be created automatically.",
-		                        ).replace("{{currency}}", quoteCode)}
-		                      </div>
-		                    ) : null}
 		                  </div>
 
                   <div className="pt-1">
