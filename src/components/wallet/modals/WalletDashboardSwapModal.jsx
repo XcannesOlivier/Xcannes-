@@ -669,7 +669,7 @@ export default function WalletDashboardSwapModal({
 		                    </button>
 		                  </div>
 
-                  <div>
+                  <div className="relative">
                     <div className="text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2 relative z-[41]">
                       {t("ui_to_label_short", "Vers")}
                     </div>
@@ -702,16 +702,15 @@ export default function WalletDashboardSwapModal({
 		                      }
 		                      selectClassName="xcannes-select w-full bg-[#101415] ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3.5 text-xl text-white outline-none focus:outline-none cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
 		                    />
+		                    {!existingCurrencyLinesSet.has(quoteCode) && quoteCode && quoteCode !== "USD" ? (
+		                      <div className="absolute bottom-1.5 left-3.5 right-3.5 text-[10px] text-xcannes-green/70 truncate pointer-events-none">
+		                        {t(
+		                          "ui_new_currency_line_auto_activate_a1b2c3",
+		                          "New currency — the {{currency}} line will be created automatically.",
+		                        ).replace("{{currency}}", quoteCode)}
+		                      </div>
+		                    ) : null}
 		                  </div>
-
-                  {!existingCurrencyLinesSet.has(quoteCode) && quoteCode && quoteCode !== "USD" ? (
-                    <div className="rounded-lg ring-1 ring-xcannes-green/25 ring-inset bg-xcannes-green/10 px-3 py-2 text-xs text-xcannes-green/90">
-                      {t(
-                        "ui_new_currency_line_auto_activate_a1b2c3",
-                        "New currency — the {{currency}} line will be created automatically.",
-                      ).replace("{{currency}}", quoteCode)}
-                    </div>
-                  ) : null}
 
                   <div className="pt-1">
                     <WalletCurrencySelector
