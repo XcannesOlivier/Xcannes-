@@ -719,7 +719,7 @@ export default function WalletDashboardSwapModal({
                         "ui_choose_new_currency_plus",
                         "Ajouter une devise",
                       )}
-                      buttonClassName="inline-flex items-center gap-2 text-base md:text-[15px] leading-snug text-white/70 font-normal ring-1 ring-white/10 ring-inset rounded-[12px] px-2 py-1 hover:text-white hover:ring-white/15 transition-colors"
+                      buttonClassName="inline-flex items-center gap-2 text-base md:text-[15px] leading-snug text-white/70 font-normal ring-1 ring-white/10 ring-inset rounded-[10px] px-2 py-1 hover:text-white hover:ring-white/15 transition-colors"
                       fullscreenPortalTarget={inline ? modalPanelRef.current : null}
                       placeholder={t(
                         "ui_search_all_currencies_c5d6e7f8",

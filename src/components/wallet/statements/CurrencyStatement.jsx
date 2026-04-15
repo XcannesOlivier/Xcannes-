@@ -1709,7 +1709,7 @@ export default function CurrencyStatement({
 	                    type="button"
 	                    onClick={() => setShowFullAddress((v) => !v)}
 	                    className={[
-	                      "text-xs md:text-sm text-xcannes-green/80 font-mono text-left",
+	                      "text-xs md:text-sm text-white/55 font-mono text-left",
 	                      showFullAddress ? "break-all whitespace-normal" : "truncate",
 	                    ].join(" ")}
                     title={t(
@@ -1953,7 +1953,7 @@ export default function CurrencyStatement({
               <button
                 onClick={handleExportPdf}
                 disabled={exportFormat === "pdf"}
-                className="flex-1 md:flex-none px-4 py-2.5 rounded-[20px] text-sm font-semibold transition-colors disabled:opacity-50 bg-transparent md:bg-white/10 md:hover:bg-white/15 text-white/80"
+                className="flex-1 md:flex-none px-4 py-2.5 rounded-[14px] text-sm font-semibold transition-colors disabled:opacity-50 bg-transparent md:bg-white/10 md:hover:bg-white/15 text-white/80"
               >
                 {exportFormat === "pdf" ? (
                   <>
@@ -1977,7 +1977,7 @@ export default function CurrencyStatement({
               </button>
               <button
                 onClick={handlePrint}
-                className="hidden md:inline-flex md:flex-none px-4 py-2.5 rounded-[20px] text-sm font-semibold transition-colors bg-white/10 hover:bg-white/15 text-white/80"
+                className="hidden md:inline-flex md:flex-none px-4 py-2.5 rounded-[14px] text-sm font-semibold transition-colors bg-white/10 hover:bg-white/15 text-white/80"
               >
                 {t("ui_print_1313eff37c", "🖨️ Print")}
               </button>

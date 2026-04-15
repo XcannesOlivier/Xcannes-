@@ -1637,8 +1637,8 @@ export default function WalletDashboardReceiveModal({
 					                            'shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]',
 					                          ].join(' ')}
 					                        >
-					                          <p className="text-[20px] tracking-[0.14em] font-orbitron font-bold text-white mb-3">
-					                            {t('ui_request_generated_card_title', 'DEMANDE DE PAIEMENT')}
+					                          <p className="text-[20px] tracking-normal font-orbitron font-bold text-white mb-3">
+					                            {t('ui_request_generated_card_title', 'Demande de paiement')}
 					                          </p>
 
 					                          <div className="text-white text-[36px] md:text-[42px] font-semibold tracking-tight leading-none">

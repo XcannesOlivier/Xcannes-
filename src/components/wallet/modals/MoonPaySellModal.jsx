@@ -122,7 +122,7 @@ const MoonPaySellModal = ({
   const accentRing60 =
     accentVariant === "fireOrange"
       ? "focus:ring-[#ff6a00]/60"
-      : "focus:ring-xcannes-violet/60";
+      : "focus:ring-white/30";
   const accentBg10 =
     accentVariant === "fireOrange"
       ? "bg-[#ff6a00]/10 text-white"
@@ -1597,7 +1597,7 @@ const MoonPaySellModal = ({
 					            ].join(" ")}
 					          >
 				            <p className="block text-[16px] md:text-base font-orbitron font-bold text-white mb-3">
-                      <span className="text-[20px] tracking-[0.14em] uppercase">
+                      <span className="text-[20px] tracking-normal">
                         {resolvedSelectCryptoTitleOverride ||
                           t(
                             "moonpay_sell_withdraw_title_prefix",
@@ -1648,7 +1648,7 @@ const MoonPaySellModal = ({
 
 		          {/* Currency selector */}
 		          <div className={wizardStep === 1 ? "" : "hidden"}>
-			            <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
+			            <label className="block text-[11px] tracking-[0.22em] text-white/45 mb-2">
 			              {t(
 			                "moonpay_sell_send_currency_label",
 			                "Devise à envoyer",
@@ -2042,7 +2042,7 @@ const MoonPaySellModal = ({
                 </div>
 	          {/* Amount input (étape 1/2) */}
 	            <div className={wizardStep === 1 ? "" : "hidden"}>
-		              <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
+		              <label className="block text-[11px] tracking-[0.22em] text-white/45 mb-2">
 		                {t("moonpay_amount_to_sell", "Montant")}
 		              </label>
 	              <div className="relative">
@@ -2133,7 +2133,7 @@ const MoonPaySellModal = ({
 		            <>
                   <div className="px-1">
                     <div className="mb-4 text-[14px] md:text-[16px] font-semibold tracking-[0.08em] text-white/80">
-                      🏦 {t("ui_send_to_bank_action", "ENVOYER VERS LA BANQUE")}
+                      🏦 {t("ui_send_to_bank_action", "Envoyer vers la banque")}
                     </div>
                     <div className="text-white text-[36px] md:text-[42px] font-semibold tracking-tight leading-none">
                       {summaryAmountLabel}

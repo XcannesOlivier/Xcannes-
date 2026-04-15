@@ -141,7 +141,7 @@ const MoonPayBuyModal = ({
   const accentText80 = accentVariant === 'simpleswapBlue' ? 'text-[#0870f8]/80' : 'text-xcannes-green/80';
   const accentRing25Bg =
     accentVariant === 'simpleswapBlue' ? 'ring-[#0870f8]/25 bg-[#0870f8]' : 'ring-xcannes-green/25 bg-xcannes-green';
-  const accentRing60 = accentVariant === 'simpleswapBlue' ? 'focus:ring-[#0870f8]/60' : 'focus:ring-xcannes-green/60';
+  const accentRing60 = accentVariant === 'simpleswapBlue' ? 'focus:ring-[#0870f8]/60' : 'focus:ring-white/30';
   const accentBg10 =
     accentVariant === 'simpleswapBlue' ? 'bg-[#0870f8]/10 text-white' : 'bg-xcannes-green/10 text-white';
   const accentCheck = accentVariant === 'simpleswapBlue' ? 'text-[#0870f8]' : 'text-xcannes-green';
@@ -1829,8 +1829,8 @@ const MoonPayBuyModal = ({
               <p className="block text-[16px] md:text-base font-orbitron font-bold text-white mb-3">
                 {wizardStep === 1 ? (
                   <>
-                    <span className="text-[20px] tracking-[0.14em]">
-                      {resolvedTitleOverride || t('ui_funds_add_title', 'AUGMENTER VOS SOLDES')}
+                    <span className="text-[20px] tracking-normal">
+                      {resolvedTitleOverride || t('ui_funds_add_title', 'Ajouter des devises')}
                     </span>
                   </>
                 ) : (
@@ -1881,7 +1881,7 @@ const MoonPayBuyModal = ({
           {/* Currency selector */}
           {wizardStep === 1 ? (
             <div>
-              <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
+              <label className="block text-[11px] tracking-[0.22em] text-white/45 mb-2">
                 {t('moonpay_buy_receive_currency_label', 'Devise souhaitée')}
               </label>
               <div className="relative">
@@ -1946,7 +1946,7 @@ const MoonPayBuyModal = ({
                             <div className="flex items-start justify-between gap-3 px-4 py-4 border-b border-white/10">
                               <div className="min-w-0">
                                 <div className="text-white font-semibold text-base leading-tight truncate">
-                                  {t('moonpay_buy_select_asset', 'Augmenter vos soldes')}
+                                  {t('moonpay_buy_select_asset', 'Ajouter des devises')}
                                 </div>
                                 <div className="mt-0.5 text-[11px] text-white/55 truncate">
                                   {t('ui_search', 'Rechercher…')}
@@ -2087,7 +2087,7 @@ const MoonPayBuyModal = ({
                             <div className="flex items-center justify-between gap-3 px-4 py-4">
                               <div className="min-w-0">
                                 <div className="text-white font-semibold text-base leading-tight truncate">
-                                  {t('moonpay_buy_select_asset', 'Augmenter vos soldes')}
+                                  {t('moonpay_buy_select_asset', 'Ajouter des devises')}
                                 </div>
                                 <div className="mt-0.5 text-[11px] text-white/55 truncate">
                                   {t('ui_search', 'Rechercher…')}
@@ -2193,7 +2193,7 @@ const MoonPayBuyModal = ({
 
           {wizardStep === 1 ? (
             <div>
-              <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
+              <label className="block text-[11px] tracking-[0.22em] text-white/45 mb-2">
                 {t('moonpay_buy_selected_asset_amount', 'Montant')}
               </label>
               <div className="relative">
@@ -2226,7 +2226,7 @@ const MoonPayBuyModal = ({
               <>
 	                <div className="px-1">
                   <div className="mb-4 text-[14px] md:text-[16px] font-semibold tracking-[0.08em] text-white/80">
-                    💳 {resolvedTitleOverride || t('ui_funds_add_title', 'AUGMENTER VOS SOLDES')}
+                    💳 {resolvedTitleOverride || t('ui_funds_add_title', 'Ajouter des devises')}
                   </div>
                   <div className="text-white text-[36px] md:text-[42px] font-semibold tracking-tight leading-none">
                     {hasValidTargetAmount
