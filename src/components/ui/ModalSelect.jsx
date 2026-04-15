@@ -131,6 +131,7 @@ export default function ModalSelect({
             visible ? "opacity-100" : "opacity-0"
           } ${backdropClassName}`}
           aria-hidden="true"
+          onPointerDown={(e) => { e.stopPropagation(); }}
           onMouseDown={(e) => { e.stopPropagation(); e.preventDefault(); }}
           onClick={(e) => { e.stopPropagation(); closeMenu(); }}
         />
@@ -184,12 +185,14 @@ export default function ModalSelect({
         {open && (
           <div
             ref={popupRef}
+            data-modal-select-dropdown
             className={`absolute z-50 mt-0 w-full max-h-64 overflow-y-auto rounded-b-lg !ring-0 border border-white/10 border-t-0 shadow-2xl origin-top transition-all duration-[350ms] ${
               visible
                 ? "opacity-100 scale-y-100 translate-y-0 ease-[cubic-bezier(0.16,1,0.3,1)]"
                 : "opacity-0 scale-y-[0.92] -translate-y-1 ease-[cubic-bezier(0.4,0,1,1)]"
             } ${menuClassName}`}
             style={{ WebkitOverflowScrolling: "touch", willChange: "transform, opacity" }}
+            onPointerDown={(e) => e.stopPropagation()}
             onMouseDown={(e) => e.stopPropagation()}
             onClick={(e) => e.stopPropagation()}
           >

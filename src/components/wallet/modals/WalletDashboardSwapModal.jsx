@@ -375,6 +375,7 @@ export default function WalletDashboardSwapModal({
     if (!event?.isPrimary) return false;
     if (event.pointerType === "mouse") return false;
     if (event.target?.closest?.("input,textarea,select")) return false;
+    if (event.target?.closest?.("[data-modal-select-dropdown]")) return false;
 
     if (source === "list") {
       const listEl = overlayListRef.current;
