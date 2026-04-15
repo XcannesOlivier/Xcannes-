@@ -1591,7 +1591,7 @@ const MoonPaySellModal = ({
           {/* From wallet display */}
 					          <div
 					            className={[
-					              "rounded-t-[14px] rounded-b-none px-4 py-4 ring-1 ring-white/10 ring-inset bg-[#101415]",
+					              "rounded-t-[20px] rounded-b-none px-4 py-4 ring-1 ring-white/10 ring-inset bg-[#101415]",
                         wizardStep === 1 ? "" : "hidden",
 					              `shadow-[0_4px_12px_rgba(0,0,0,0.4),${accentGlowShadow},inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]`,
 					            ].join(" ")}
@@ -1665,7 +1665,7 @@ const MoonPaySellModal = ({
 			              }
 				              aria-disabled={wizardStep !== 1}
 				              className={[
-				                "w-full flex items-center justify-between gap-2 bg-[#101415] ring-1 ring-white/15 ring-inset rounded-xl px-4 py-4 text-base text-white/90 focus:outline-none focus:ring-2 transition-all duration-150",
+				                "w-full flex items-center justify-between gap-2 bg-[#101415] ring-1 ring-white/15 ring-inset rounded-[20px] px-4 py-4 text-base text-white/90 focus:outline-none focus:ring-2 transition-all duration-150",
 				                accentRing60,
 				                "shadow-[0_4px_12px_rgba(0,0,0,0.4)]",
 				                wizardStep === 1
@@ -1787,7 +1787,7 @@ const MoonPaySellModal = ({
 			                              onChange={(e) => setCryptoSearch(e.target.value)}
 			                              placeholder={t("ui_search", "Rechercher…")}
 			                              className={[
-			                                "w-full pl-11 pr-4 py-3 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 transition-all duration-150",
+			                                "w-full pl-11 pr-4 py-3 bg-black/30 ring-1 ring-white/15 ring-inset rounded-[20px] text-white focus:outline-none focus:ring-2 transition-all duration-150",
 			                                accentRing60,
 			                              ].join(" ")}
 			                            />
@@ -1887,7 +1887,7 @@ const MoonPaySellModal = ({
                       className={[
                         noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-elevated",
                         "absolute inset-0 flex flex-col min-h-0 overflow-hidden pb-[env(safe-area-inset-bottom)]",
-                        "sm:inset-6 sm:rounded-2xl sm:ring-1 sm:ring-white/10 sm:shadow-2xl",
+                        "sm:inset-6 sm:rounded-[20px] sm:ring-1 sm:ring-white/10 sm:shadow-2xl",
                         "will-change-transform",
                       ].join(" ")}
                       style={{
@@ -1959,7 +1959,7 @@ const MoonPaySellModal = ({
 	                              onChange={(e) => setCryptoSearch(e.target.value)}
 	                              placeholder={t("ui_search", "Rechercher…")}
 	                              className={[
-	                                "w-full pl-11 pr-4 py-3 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 transition-all duration-150",
+	                                "w-full pl-11 pr-4 py-3 bg-black/30 ring-1 ring-white/15 ring-inset rounded-[20px] text-white focus:outline-none focus:ring-2 transition-all duration-150",
 	                                accentRing60,
 	                              ].join(" ")}
 	                            />
@@ -2056,7 +2056,7 @@ const MoonPaySellModal = ({
 		                  inputMode="decimal"
                       readOnly={wizardStep !== 1}
 			                  className={[
-	                        "w-full px-4 py-4 bg-[#101415] ring-1 ring-white/15 ring-inset rounded-xl text-white pr-16 transition-all duration-150",
+	                        "w-full px-4 py-4 bg-[#101415] ring-1 ring-white/15 ring-inset rounded-[20px] text-white pr-16 transition-all duration-150",
 	                        "shadow-[0_4px_12px_rgba(0,0,0,0.4)]",
 	                        wizardStep === 1
 	                          ? ["focus:outline-none focus:ring-2", accentRing60].join(" ")
@@ -2221,7 +2221,7 @@ const MoonPaySellModal = ({
 
                   <div
                     className={[
-                      "mt-3 rounded-[18px] px-4 py-4 md:px-5 md:py-6 ring-1 ring-white/10 ring-inset bg-[#101415]",
+                      "mt-3 rounded-[20px] px-4 py-4 md:px-5 md:py-6 ring-1 ring-white/10 ring-inset bg-[#101415]",
                       "shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]",
                     ].join(" ")}
                   >
@@ -2295,7 +2295,7 @@ const MoonPaySellModal = ({
 		          ) : null}
 
 	          {demoMode ? (
-	            <div className="rounded-lg ring-1 ring-white/10 ring-inset bg-white/[0.03] px-3 py-2 text-[11px] text-white/60">
+	            <div className="rounded-[20px] ring-1 ring-white/10 ring-inset bg-white/[0.03] px-3 py-2 text-[11px] text-white/60">
 	              {t(
                 "moonpay_info_sell_demo_6d1a9c2b7e",
                 "Mode démo : la vente est simulée (pas de virement bancaire).",
@@ -2305,7 +2305,7 @@ const MoonPaySellModal = ({
 
           {/* Error message */}
           {displayError && (
-            <div className="flex items-start gap-2 p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
+            <div className="flex items-start gap-2 p-3 bg-red-500/10 border border-red-500/20 rounded-[20px]">
               <XCircleIcon className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
               <p className="text-sm text-red-400">{displayError}</p>
             </div>
@@ -2317,7 +2317,7 @@ const MoonPaySellModal = ({
             onClick={handleContinue}
             disabled={continueDisabled}
             className={[
-              "md:hidden w-full h-16 rounded-xl text-white text-lg font-semibold transition-all duration-150",
+              "md:hidden w-full h-16 rounded-[20px] text-white text-lg font-semibold transition-all duration-150",
               continueDisabled
                 ? "opacity-45 cursor-not-allowed"
                 : "hover:scale-[1.01] active:scale-[0.98]",
@@ -2339,7 +2339,7 @@ const MoonPaySellModal = ({
             onClick={handleContinue}
             disabled={continueDisabled}
             className={[
-              "hidden md:flex items-center justify-center w-full h-16 rounded-xl text-white text-xl font-semibold transition-all duration-150",
+              "hidden md:flex items-center justify-center w-full h-16 rounded-[20px] text-white text-xl font-semibold transition-all duration-150",
               continueDisabled
                 ? "opacity-45 cursor-not-allowed"
                 : "hover:scale-[1.01] active:scale-[0.98]",
@@ -2425,7 +2425,7 @@ const MoonPaySellModal = ({
           >
           <iframe
             src={iframeUrl}
-            className="w-full h-full rounded-lg"
+            className="w-full h-full rounded-[20px]"
             allow={moonpayIframeAllow}
             allowFullScreen
             title={t("moonpay_widget_title_sell", "MoonPay Sell Widget")}
@@ -2450,7 +2450,7 @@ const MoonPaySellModal = ({
           <button
             type="button"
             onClick={onClose}
-            className="px-6 py-2 bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-semibold rounded-lg transition-all"
+            className="px-6 py-2 bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-semibold rounded-[20px] transition-all"
           >
             {t("close", "Close")}
           </button>
@@ -2479,14 +2479,14 @@ const MoonPaySellModal = ({
                 setError(null);
                 setIframeUrl(null);
               }}
-              className="px-6 py-2 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-lg transition-colors"
+              className="px-6 py-2 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-[20px] transition-colors"
             >
               {t("try_again", "Try Again")}
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-2 bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-semibold rounded-lg transition-all"
+              className="px-6 py-2 bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-semibold rounded-[20px] transition-all"
             >
               {t("close", "Close")}
             </button>
