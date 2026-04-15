@@ -602,10 +602,10 @@ export default function WalletCurrencySelector({
 
                   <div className="flex items-center justify-between gap-3 px-4 py-4">
                     <div className="min-w-0">
-                      <div className="text-white font-semibold text-base leading-tight truncate">
-                        {t("ui_select_currency_title", "Choisir une nouvelle devise")}
+                      <div className="text-white font-semibold text-lg leading-tight truncate">
+                        {t("ui_select_currency_title", "Ajouter une devise")}
                       </div>
-                      <div className="mt-0.5 text-[11px] text-xcannes-green/80 truncate">
+                      <div className="mt-0.5 text-[11px] text-white/50 truncate">
                         {t("ui_select_currency_subtitle", "Code / nom (EUR, GBP…)")}
                       </div>
                     </div>
