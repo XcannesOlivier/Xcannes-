@@ -347,7 +347,7 @@ export default function WalletDashboardReceiveModal({
 	              ? 'bg-xcannes-surface-demo !max-h-64 overflow-y-auto overscroll-contain touch-pan-y'
 	              : 'bg-[rgba(255,255,255,0.02)] !max-h-64 overflow-y-auto overscroll-contain touch-pan-y'
 	          }
-	          backdropClassName="bg-black/35 backdrop-blur-sm"
+	          backdropClassName="bg-black/35"
 	          selectClassName={`xcannes-select w-full ${walletPickerSurfaceClass} ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3 text-base text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 transition-colors duration-150`}
 	        />
 	      </div>

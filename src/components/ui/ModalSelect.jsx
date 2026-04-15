@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import { createPortal } from "react-dom";
 import { isValidElement, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 export default function ModalSelect({
@@ -107,19 +106,16 @@ export default function ModalSelect({
 
   return (
     <>
-      {open && backdropClassName && typeof document !== "undefined"
-        ? createPortal(
-            <div
-              className={`fixed inset-0 z-[10002] transition-opacity duration-[350ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
-                visible ? "opacity-100" : "opacity-0"
-              } ${backdropClassName}`}
-              aria-hidden="true"
-              onMouseDown={(e) => { e.stopPropagation(); e.preventDefault(); }}
-              onClick={(e) => { e.stopPropagation(); closeMenu(); }}
-            />,
-            document.body,
-          )
-        : null}
+      {open && backdropClassName ? (
+        <div
+          className={`fixed inset-0 z-40 transition-opacity duration-[350ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
+            visible ? "opacity-100" : "opacity-0"
+          } ${backdropClassName}`}
+          aria-hidden="true"
+          onMouseDown={(e) => { e.stopPropagation(); e.preventDefault(); }}
+          onClick={(e) => { e.stopPropagation(); closeMenu(); }}
+        />
+      ) : null}
       <div className={customMenuClassName}>
         <button
           type="button"
@@ -131,7 +127,7 @@ export default function ModalSelect({
             toggleMenu();
           }}
           className={`w-full flex items-center justify-between gap-2 ${
-            open && backdropClassName ? "relative z-[10003]" : ""
+            open && backdropClassName ? "relative z-50" : ""
           } ${buttonClassName}`}
         >
           <span className="flex items-center gap-2 min-w-0 flex-1">
@@ -169,7 +165,7 @@ export default function ModalSelect({
         {open && (
           <div
             ref={popupRef}
-            className={`absolute z-[10003] mt-1 w-full max-h-64 overflow-y-auto rounded-lg border border-white/[0.06] shadow-2xl origin-top transition-all duration-[350ms] ${
+            className={`absolute z-50 mt-1 w-full max-h-64 overflow-y-auto rounded-lg border border-white/[0.06] shadow-2xl origin-top transition-all duration-[350ms] ${
               visible
                 ? "opacity-100 scale-y-100 translate-y-0 ease-[cubic-bezier(0.16,1,0.3,1)]"
                 : "opacity-0 scale-y-[0.92] -translate-y-1 ease-[cubic-bezier(0.4,0,1,1)]"
