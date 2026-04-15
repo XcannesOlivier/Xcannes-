@@ -3585,8 +3585,8 @@ export default function WalletDashboardUsdSwapModal({
 		                                              {String(cur?.ticker || "").toUpperCase()}
 		                                              <span className="text-white/50 font-normal">
 		                                                ({String(cur?.network || "").toUpperCase()})
-		                                              </span>{" "}
-		                                              <span className="text-white/55 font-normal text-[13px]">
+		                                              </span>
+		                                              <span className="ml-2 text-white/55 font-normal text-[13px]">
 		                                                {String(cur?.name || "").trim() ||
 		                                                  currencyLabel(cur)}
 		                                              </span>
@@ -3794,8 +3794,8 @@ export default function WalletDashboardUsdSwapModal({
 	                                              {String(cur?.ticker || "").toUpperCase()}
 	                                              <span className="text-white/50 font-normal">
 	                                                ({String(cur?.network || "").toUpperCase()})
-	                                              </span>{" "}
-	                                              <span className="text-white/55 font-normal text-[13px]">
+	                                              </span>
+	                                              <span className="ml-2 text-white/55 font-normal text-[13px]">
 	                                                {String(cur?.name || "").trim() ||
 	                                                  currencyLabel(cur)}
 	                                              </span>
