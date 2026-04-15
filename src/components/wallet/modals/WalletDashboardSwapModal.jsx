@@ -580,7 +580,7 @@ export default function WalletDashboardSwapModal({
                       prefix: `${t("moonpay_from_account", "Depuis le compte")} :`,
                       labelWrap: true,
                       pillClassName:
-                        "bg-elevated px-4 py-3 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]",
+                        "bg-elevated px-4 py-3 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]",
                       prefixClassName:
                         "!text-white/70 text-[16px] md:text-[17px] font-semibold tracking-wide",
                       labelClassName:
