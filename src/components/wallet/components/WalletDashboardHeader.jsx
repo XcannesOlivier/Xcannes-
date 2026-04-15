@@ -284,8 +284,8 @@ export default function WalletDashboardHeader({
       <div className="flex flex-col items-center gap-2 pb-4 md:pb-0">
         {/* Bloc wallet — sélecteur + copier + refresh + paramètres */}
         {isConnected && wallet && (
-          <div className="w-full mt-1 md:mt-0 mb-2 md:mb-0 px-1 md:px-2 flex justify-center md:justify-start">
-	            <div className="relative flex items-center gap-2.5 w-full md:w-auto md:max-w-[520px]">
+          <div className="w-full mt-1 md:mt-0 mb-2 md:mb-0 px-1 md:px-2 flex justify-center md:justify-between">
+	            <div className="relative flex items-center gap-2.5 w-full md:w-full">
 	              {isSwitcherOpen && hasMultipleWallets && (
 	                <div
 	                  className={`fixed inset-0 z-40 bg-gray-600/20 backdrop-blur-[6px] transition-opacity duration-[550ms] ${
@@ -298,7 +298,7 @@ export default function WalletDashboardHeader({
 	                  onClick={(e) => { e.stopPropagation(); closeSwitcher(); }}
 	                />
 	              )}
-	              <div className="flex-1 min-w-0 rounded-md bg-[#0b0f10] px-2.5 md:px-3 py-2 shadow-none relative z-[41]">
+	              <div className="flex-1 md:flex-none min-w-0 rounded-md bg-[#0b0f10] px-2.5 md:px-3 py-2 shadow-none relative z-[41]">
 	                <div className="flex items-start justify-between gap-3" ref={switcherRef}>
                   <div className="min-w-0 flex-1">
                     {/* Wallet name + address — clickable when multi-wallet */}
@@ -419,6 +419,7 @@ export default function WalletDashboardHeader({
               {/* Copier / Refresh removed (mobile UI simplification) */}
 
               {/* Bouton Paramètres (à côté du refresh, même style) */}
+              <div className="md:ml-auto">
               <WalletSettingsDropdown
                 position="inline"
                 isDesktopPanel={isDesktopPanel}
@@ -434,6 +435,7 @@ export default function WalletDashboardHeader({
                 onLoadFawazCurrencies={onLoadFawazCurrencies}
                 onPreferredCurrencyChange={onPreferredCurrencyChange}
               />
+              </div>
             </div>
           </div>
         )}
