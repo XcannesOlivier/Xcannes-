@@ -1323,8 +1323,8 @@ export default function WalletDashboardReceiveModal({
 	                        'shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]',
 	                      ].join(' ')}
 	                    >
-	                      <p className="text-[20px] tracking-[0.14em] font-orbitron font-bold text-white mb-3">
-	                        {t('ui_receive_choice_share_title', 'COORDONNÉES DE RÉCEPTION')}
+	                      <p className="text-[20px] tracking-normal font-orbitron font-bold text-white mb-3">
+	                        {t('ui_receive_account_info_label', 'Informations du compte')}
 	                      </p>
 
 	                      <div className="my-4 h-px bg-white/10" aria-hidden />
@@ -1458,8 +1458,8 @@ export default function WalletDashboardReceiveModal({
 	                        'shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]',
 	                      ].join(' ')}
 	                    >
-	                      <p className="text-[20px] tracking-[0.14em] font-orbitron font-bold text-white mb-3">
-	                        {t('ui_request_create_card_title', 'DEMANDER UN PAIEMENT')}
+	                      <p className="text-[20px] tracking-normal font-orbitron font-bold text-white mb-3">
+	                        {t('ui_request_create_card_title', 'Informations de votre demande')}
 	                      </p>
 
 	                      <div className="my-4 h-px bg-white/10" aria-hidden />
@@ -1517,7 +1517,7 @@ export default function WalletDashboardReceiveModal({
 
 		                      {/* Currency */}
 			                      <div className="pt-2">
-			                        <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
+			                        <label className="block text-[11px] tracking-[0.22em] text-white/45 mb-2">
 			                          {t('ui_currency_1ed55673be', 'Currency')}
 		                        </label>
 			                        <ModalSelect
@@ -1563,7 +1563,7 @@ export default function WalletDashboardReceiveModal({
 	
 		                      {/* Amount */}
 					                      <div className="pt-4">
-					                        <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
+					                        <label className="block text-[11px] tracking-[0.22em] text-white/45 mb-2">
 					                          {t('ui_amount_7668986206', 'Amount')}
 					                        </label>
 					                        <div className="relative">
@@ -1584,7 +1584,7 @@ export default function WalletDashboardReceiveModal({
 
 	                      {/* Message (optional) */}
 			                      <div className="pt-4">
-			                        <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
+			                        <label className="block text-[11px] tracking-[0.22em] text-white/45 mb-2">
 			                          {t('ui_message_optional_label', 'Message (optional)')}
 			                        </label>
 				                        <input
@@ -1653,8 +1653,8 @@ export default function WalletDashboardReceiveModal({
 
 					                          {generatedRequest?.memo ? (
 					                            <div className="mt-2 flex items-baseline gap-2">
-					                              <span className="shrink-0 text-[11px] tracking-[0.12em] uppercase text-white/40">
-					                                {t('ui_memo_label', 'Memo')}
+					                              <span className="shrink-0 text-[11px] tracking-[0.12em] text-white/40">
+					                                {t('ui_memo_label', 'Message')}
 					                              </span>
 					                              <span className="min-w-0 flex-1 text-[13px] text-white/70 break-words">
 					                                {generatedRequest.memo}

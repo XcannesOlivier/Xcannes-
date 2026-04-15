@@ -602,7 +602,7 @@ export default function WalletDashboardSwapModal({
                 {/* ── SECTION 1: Currency selection ───────────────────────── */}
                 <div className="space-y-3">
                   <div>
-                    <div className="text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2 relative z-[41]">
+                    <div className="text-[11px] tracking-[0.22em] text-white/45 mb-2 relative z-[41]">
                       {t("ui_from_label_short", "De")}
                     </div>
 		                    <ModalSelect
@@ -670,7 +670,7 @@ export default function WalletDashboardSwapModal({
 		                  </div>
 
                   <div className="relative">
-                    <div className="text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2 relative z-[41]">
+                    <div className="text-[11px] tracking-[0.22em] text-white/45 mb-2 relative z-[41]">
                       {t("ui_to_label_short", "Vers")}
                     </div>
 		                    <ModalSelect
@@ -719,7 +719,7 @@ export default function WalletDashboardSwapModal({
                         "ui_choose_new_currency_plus",
                         "Ajouter une devise",
                       )}
-                      buttonClassName="inline-flex items-center gap-2 text-base md:text-[15px] leading-snug text-white/70 font-normal ring-1 ring-white/10 ring-inset rounded-[16px] px-2 py-1 hover:text-white hover:ring-white/15 transition-colors"
+                      buttonClassName="inline-flex items-center gap-2 text-base md:text-[15px] leading-snug text-white/70 font-normal ring-1 ring-white/10 ring-inset rounded-[12px] px-2 py-1 hover:text-white hover:ring-white/15 transition-colors"
                       fullscreenPortalTarget={inline ? modalPanelRef.current : null}
                       placeholder={t(
                         "ui_search_all_currencies_c5d6e7f8",
@@ -734,7 +734,7 @@ export default function WalletDashboardSwapModal({
 
                 {/* ── SECTION 2: Amount input ─────────────────────────────── */}
                 <div className="space-y-2">
-                  <div className="text-[11px] tracking-[0.22em] uppercase text-white/45">
+                  <div className="text-[11px] tracking-[0.22em] text-white/45">
                     {t("ui_amount_52a20b2992", "Montant")}
                   </div>
 	                  <TokenAmountInput
@@ -772,7 +772,7 @@ export default function WalletDashboardSwapModal({
                     ) : null}
                     {/* ── SECTION 3: Summary ─────────────────────────────── */}
 	                    <div className="rounded-[20px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-[#101415] shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)] space-y-3">
-                      <div className="text-[11px] tracking-[0.22em] uppercase text-white/45">
+                      <div className="text-[11px] tracking-[0.22em] text-white/45">
                         {t("ui_summary_title_d4e5f6a7b8", "Résumé")}
                       </div>
                       <div className="text-sm text-white/70">

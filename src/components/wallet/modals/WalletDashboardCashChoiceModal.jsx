@@ -117,7 +117,7 @@ export default function WalletDashboardCashChoiceModal({
 
   const sectionHeader = label => (
     <div className="flex items-center gap-3 px-1">
-      <div className="text-[13px] tracking-[0.22em] uppercase text-white/45">{label}</div>
+      <div className="text-[13px] tracking-[0.22em] text-white/45">{label}</div>
       <div className="h-px flex-1 bg-white/10" aria-hidden />
     </div>
   );
