@@ -1333,7 +1333,7 @@ export default function CurrencyStatement({
               {/* Header */}
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <div className="text-[11px] tracking-[0.08em] uppercase text-[#8B98A5]">
+                  <div className="text-[11px] tracking-[0.08em] text-[#8B98A5]">
                     {detailTypeLabel || t("ui_transaction", "Transaction")}
                   </div>
                   <div
@@ -1354,7 +1354,7 @@ export default function CurrencyStatement({
 
               {/* Status & Date */}
               <div className="space-y-3">
-                <div className="text-[11px] tracking-[0.08em] uppercase text-[#8B98A5]">
+                <div className="text-[11px] tracking-[0.08em] text-[#8B98A5]">
                   {t("ui_status_and_date", "Statut & date")}
                 </div>
                 <div className="grid grid-cols-2 gap-3">
@@ -1381,7 +1381,7 @@ export default function CurrencyStatement({
 
                 {detailIsConversion ? (
                   <div className="space-y-2">
-                    <div className="text-[11px] tracking-[0.08em] uppercase text-[#8B98A5]">
+                    <div className="text-[11px] tracking-[0.08em] text-[#8B98A5]">
                       {t("ui_account", "Compte")}
                     </div>
                     <div className="rounded-[20px] border border-white/[0.06] bg-white/[0.03] px-3 py-3">
@@ -1395,7 +1395,7 @@ export default function CurrencyStatement({
                 {/* Counterparty */}
                 {!detailIsConversion && counterpartyAddress ? (
                   <div className="space-y-2">
-                    <div className="text-[11px] tracking-[0.08em] uppercase text-[#8B98A5]">
+                    <div className="text-[11px] tracking-[0.08em] text-[#8B98A5]">
                       {counterpartyTitle}
                     </div>
                     <div className="rounded-[20px] border border-white/[0.06] bg-white/[0.03] px-3 py-3">
@@ -1444,7 +1444,7 @@ export default function CurrencyStatement({
 
               {/* Financial details */}
               <div className="space-y-2">
-                <div className="text-[11px] tracking-[0.08em] uppercase text-[#8B98A5]">
+                <div className="text-[11px] tracking-[0.08em] text-[#8B98A5]">
                   {t("ui_details_label", "Détails")}
                 </div>
                 <div className="rounded-[20px] border border-white/[0.06] bg-white/[0.03] px-3 py-3 space-y-2">
@@ -1498,7 +1498,7 @@ export default function CurrencyStatement({
               {/* Technical */}
               {detailTx?.txHash ? (
                 <div className="space-y-2">
-                  <div className="text-[11px] tracking-[0.08em] uppercase text-[#8B98A5]">
+                  <div className="text-[11px] tracking-[0.08em] text-[#8B98A5]">
                     {t("ui_transaction", "Transaction")}
                   </div>
                   <div className="rounded-[20px] border border-white/[0.06] bg-white/[0.03] px-3 py-3">
