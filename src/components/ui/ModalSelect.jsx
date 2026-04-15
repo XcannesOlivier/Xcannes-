@@ -19,6 +19,7 @@ export default function ModalSelect({
   showMobileOptionRight = false,
   backdropClassName = "",
   disabled = false,
+  hideSelected = false,
 }) {
   const [open, setOpen] = useState(false);
   const [visible, setVisible] = useState(false);
@@ -196,7 +197,7 @@ export default function ModalSelect({
             onMouseDown={(e) => e.stopPropagation()}
             onClick={(e) => e.stopPropagation()}
           >
-            {options.map((opt) => {
+            {options.filter((opt) => !hideSelected || String(opt.value) !== String(value)).map((opt) => {
               const left = opt.labelLeft ?? opt.label;
               const mobileLeft = opt.labelMobile ?? left;
               const optionLeft = showMobileOptionRight ? left : mobileLeft;

@@ -622,6 +622,7 @@ export default function WalletDashboardSwapModal({
                         };
                       })}
 		                      useNativeSelect={false}
+		                      hideSelected
 		                      showMobileOptionRight={true}
 		                      iconClassName="text-3xl leading-none"
 		                      backdropClassName="bg-black/80 backdrop-blur-[4px]"
@@ -689,6 +690,7 @@ export default function WalletDashboardSwapModal({
                         };
                       })}
 		                      useNativeSelect={false}
+		                      hideSelected
 		                      showMobileOptionRight={true}
 		                      iconClassName="text-3xl leading-none"
 		                      backdropClassName="bg-black/80 backdrop-blur-[4px]"
