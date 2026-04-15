@@ -284,8 +284,8 @@ export default function WalletDashboardHeader({
       <div className="flex flex-col items-center gap-2 pb-4 md:pb-0">
         {/* Bloc wallet — sélecteur + copier + refresh + paramètres */}
         {isConnected && wallet && (
-          <div className="w-full mt-1 md:mt-1.5 mb-2 md:mb-3 px-1 md:px-2 flex justify-center">
-	            <div className="relative flex items-center gap-2.5 w-full md:max-w-[520px]">
+          <div className="w-full mt-1 md:mt-0 mb-2 md:mb-0 px-1 md:px-2 flex justify-center md:justify-end">
+	            <div className="relative flex items-center gap-2.5 w-full md:w-auto md:max-w-[520px]">
 	              {isSwitcherOpen && hasMultipleWallets && (
 	                <div
 	                  className={`fixed inset-0 z-40 bg-gray-600/20 backdrop-blur-[6px] transition-opacity duration-[550ms] ${
