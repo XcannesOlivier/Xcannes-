@@ -58,6 +58,25 @@ export default function ModalSelect({
     return () => document.removeEventListener("mousedown", handleClick);
   }, [open, closeMenu]);
 
+  // Block body scroll / swipe on mobile while dropdown is open
+  useEffect(() => {
+    if (!open) return;
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const handleTouchMove = (e) => {
+      // Allow scrolling inside the dropdown list itself
+      if (popupRef.current && popupRef.current.contains(e.target)) return;
+      e.preventDefault();
+    };
+    document.addEventListener("touchmove", handleTouchMove, { passive: false });
+
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      document.removeEventListener("touchmove", handleTouchMove);
+    };
+  }, [open]);
+
   const selected = useMemo(() => {
     return options.find((opt) => String(opt.value) === String(value)) || null;
   }, [options, value]);
