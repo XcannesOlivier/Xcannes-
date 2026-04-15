@@ -333,7 +333,7 @@ export default function WalletDashboardHeader({
                     {/* Multi-wallet dropdown — smooth animated */}
                     {isSwitcherOpen && hasMultipleWallets && (
                       <div
-                        className={`absolute z-50 left-1/2 -translate-x-1/2 top-full mt-2 w-[min(560px,calc(100vw-24px))] rounded-xl bg-elevated border border-white/[0.06] shadow-[0_12px_48px_rgba(0,0,0,0.45)] max-h-[340px] overflow-y-auto overflow-x-hidden origin-top transition-all duration-[550ms] ${
+                        className={`absolute z-50 left-0 top-full mt-2 w-full rounded-xl bg-elevated border border-white/[0.06] shadow-[0_12px_48px_rgba(0,0,0,0.45)] max-h-[340px] overflow-y-auto overflow-x-hidden origin-top transition-all duration-[550ms] ${
                           isSwitcherVisible
                             ? "opacity-100 scale-y-100 translate-y-0 ease-[cubic-bezier(0.16,1,0.3,1)]"
                             : "opacity-0 scale-y-[0.92] -translate-y-1 ease-[cubic-bezier(0.4,0,1,1)]"
@@ -360,7 +360,7 @@ export default function WalletDashboardHeader({
                                 if (!isActive) onSwitchWallet?.(addr);
                                 closeSwitcher();
                               }}
-                              className="w-full text-left px-3.5 py-2.5 flex items-center gap-2.5 transition-colors duration-150 hover:bg-white/[0.06]"
+                              className="w-full text-left px-2.5 md:px-3 py-2.5 flex items-center gap-2 transition-colors duration-150 hover:bg-white/[0.06]"
                             >
                               <span
                                 className={`h-2 w-2 rounded-full shrink-0 transition-colors duration-150 ${
