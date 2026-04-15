@@ -1767,11 +1767,11 @@ export default function CurrencyStatement({
                     menuClassName={modalBgClass}
                   />
                 </div>
-                <div>
+                <div className="text-center">
                   <p className="text-xs text-white/60 mb-1">
                     {t("ui_balance_445d830d72", "Balance")}
                   </p>
-                  <p className="text-lg text-white font-bold">
+                  <p className="text-2xl text-white font-bold">
                     {formatAmountWithSymbolLocal(balance)}
                   </p>
                 </div>
