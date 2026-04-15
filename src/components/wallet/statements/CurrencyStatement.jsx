@@ -1776,7 +1776,7 @@ export default function CurrencyStatement({
                   </p>
                 </div>
                 {estimatedUsd != null && Number.isFinite(estimatedUsd) ? (
-                  <div className="md:ml-auto md:text-right -mt-[3.2rem] text-right md:mt-0">
+                  <div className="md:ml-auto md:text-right -mt-[4rem] text-right md:mt-0">
                     <p className="text-[11px] text-white/40 mb-1">
                       {t("ui_digital_usd_label", "USD numérique")}
                     </p>
