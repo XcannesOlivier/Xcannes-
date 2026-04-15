@@ -60,7 +60,7 @@ export default function StatementMonthSelect({
         }}
         aria-haspopup="listbox"
         aria-expanded={open}
-        className={`statement-select w-full bg-[#101415] border border-white/10 px-3 py-2.5 text-sm text-white cursor-pointer transition-colors duration-150 flex items-center justify-between gap-2 focus-visible:outline-none focus-visible:border-xcannes-green/60 focus-visible:ring-2 focus-visible:ring-xcannes-green/20 ${menuClassName} ${open ? "rounded-t-[10px] rounded-b-none border-b-0" : "rounded-[10px]"}`}
+        className={`statement-select w-full ${menuClassName} border border-white/10 px-3 py-2.5 text-sm text-white cursor-pointer transition-colors duration-150 flex items-center justify-between gap-2 focus-visible:outline-none focus-visible:border-xcannes-green/60 focus-visible:ring-2 focus-visible:ring-xcannes-green/20 ${open ? "rounded-t-[10px] rounded-b-none border-b-0" : "rounded-[10px]"}`}
       >
         <span className="truncate min-w-0 flex-1">
           {selectedOption?.label || ""}
@@ -84,7 +84,7 @@ export default function StatementMonthSelect({
         <div
           ref={menuRef}
           role="listbox"
-          className={`absolute z-50 mt-0 w-full max-h-[480px] overflow-y-auto rounded-b-[10px] rounded-t-none border border-white/10 border-t-0 shadow-2xl bg-[#101415] ${menuClassName}`}
+          className={`absolute z-50 mt-0 w-full max-h-[480px] overflow-y-auto rounded-b-[10px] rounded-t-none border border-white/10 border-t-0 shadow-2xl ${menuClassName}`}
           onClick={(e) => e.stopPropagation()}
         >
           {options.map((option) => {
