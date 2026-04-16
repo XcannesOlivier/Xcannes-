@@ -214,17 +214,17 @@ export default function ModalSelect({
               : ""
           } ${open ? "!rounded-b-none !ring-0 !shadow-none border border-white/10 border-b-0" : ""} ${buttonClassName}`}
         >
-          <span className="flex items-center gap-2 min-w-0 flex-1">
+          <span className={`flex gap-2 min-w-0 flex-1 ${selected?.description && open ? 'items-start' : 'items-center'}`}>
             {renderIcon(selected?.icon)}
-            {selected?.description ? (
-              <span className="flex flex-col min-w-0 flex-1">
+            {selected?.description && open ? (
+              <span className="flex flex-col min-w-0 flex-1 text-left">
                 <span className="truncate md:hidden">
                   {mobileSelectedLabel}
                 </span>
                 <span className="truncate hidden md:inline">
                   {selectedLeft}
                 </span>
-                <span className="font-mono text-[13px] text-emerald-400 leading-snug whitespace-normal break-all">
+                <span className="font-mono text-[13px] text-xcannes-green leading-snug whitespace-normal break-all">
                   {selected.description}
                 </span>
               </span>
@@ -268,12 +268,13 @@ export default function ModalSelect({
               visible
                 ? "opacity-100 scale-y-100 translate-y-0 ease-[cubic-bezier(0.16,1,0.3,1)]"
                 : "opacity-0 scale-y-[0.92] -translate-y-1 ease-[cubic-bezier(0.4,0,1,1)]"
-            } ${menuClassName}`}
+            } ${hideSelected ? 'pt-1' : ''} ${menuClassName}`}
             style={{ WebkitOverflowScrolling: "touch", willChange: "transform, opacity" }}
             onPointerDown={(e) => e.stopPropagation()}
             onMouseDown={(e) => e.stopPropagation()}
             onClick={(e) => e.stopPropagation()}
           >
+            {hideSelected && <div className="border-t border-white/10 mx-3 mb-1" />}
             {options.filter((opt) => !hideSelected || String(opt.value) !== String(value)).map((opt) => {
               const left = opt.labelLeft ?? opt.label;
               const mobileLeft = opt.labelMobile ?? left;
@@ -332,12 +333,13 @@ export default function ModalSelect({
               visible
                 ? "opacity-100 scale-y-100 translate-y-0 ease-[cubic-bezier(0.16,1,0.3,1)]"
                 : "opacity-0 scale-y-[0.92] -translate-y-1 ease-[cubic-bezier(0.4,0,1,1)]"
-            } ${menuClassName}`}
+            } ${hideSelected ? 'pt-1' : ''} ${menuClassName}`}
             style={{ ...(portalStyle || {}), WebkitOverflowScrolling: "touch", willChange: "transform, opacity" }}
             onPointerDown={(e) => e.stopPropagation()}
             onMouseDown={(e) => e.stopPropagation()}
             onClick={(e) => e.stopPropagation()}
           >
+            {hideSelected && <div className="border-t border-white/10 mx-3 mb-1" />}
             {options.filter((opt) => !hideSelected || String(opt.value) !== String(value)).map((opt) => {
               const left = opt.labelLeft ?? opt.label;
               const mobileLeft = opt.labelMobile ?? left;
