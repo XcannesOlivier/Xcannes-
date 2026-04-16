@@ -1563,8 +1563,8 @@ export default function WalletDashboardReceiveModal({
 		                              ? 'bg-xcannes-surface-demo max-h-[320px] overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
 		                              : 'bg-[#101415] max-h-[320px] overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
 		                          }
-			                          buttonClassName={`hover:bg-white/5 ring-1 ring-white/10 ring-inset rounded-[20px] px-3.5 py-3 text-base text-white focus:outline-none cursor-pointer transition-colors duration-150 ${
-			                            noticeVariant === 'demo' ? 'bg-xcannes-surface-demo' : 'bg-white/[0.02]'
+			                          buttonClassName={`ring-1 ring-white/10 ring-inset rounded-[20px] px-3.5 py-3 text-base text-white focus:outline-none cursor-pointer transition-colors duration-150 ${
+			                            noticeVariant === 'demo' ? 'bg-xcannes-surface-demo hover:bg-white/5' : 'bg-[#101415] hover:bg-white/5'
 			                          }`}
 			                          selectClassName={`xcannes-select w-full ring-1 ring-white/10 ring-inset rounded-[20px] px-3.5 py-3 text-base text-white focus:outline-none transition-colors duration-150 ${
 			                            noticeVariant === 'demo' ? 'bg-xcannes-surface-demo' : 'bg-white/[0.02]'
