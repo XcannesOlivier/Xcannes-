@@ -538,8 +538,8 @@ export default function WalletCurrencySelector({
                       }}
                       className="w-full px-3 py-2 text-base text-white/80 hover:bg-white/[0.06] flex items-center gap-2 text-left active:scale-98">
                       <span className="text-lg">{getFlag(c.code)}</span>
-                      <span className="font-mono text-[15px]">{c.code}</span>
-                      <span className="text-[15px] text-white/45 truncate">
+                      <span className="font-mono text-[15px] md:text-[17px]">{c.code}</span>
+                      <span className="text-[15px] md:text-[17px] text-white/45 truncate">
                         {c.name}
                       </span>
                     </button>
