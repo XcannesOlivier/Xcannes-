@@ -177,7 +177,7 @@ export default function ModalSelect({
       {open && backdropClassName ? (
         resolvedPortalTarget ? createPortal(
           <div
-            className={`${isScoped ? 'absolute' : 'fixed'} inset-0 z-[60] transition-opacity duration-[100ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
+            className={`${isScoped ? 'absolute' : 'fixed'} inset-0 z-[60] !mt-0 transition-opacity duration-[100ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
               visible ? "opacity-100" : "opacity-0"
             } ${backdropClassName}`}
             aria-hidden="true"
@@ -314,7 +314,7 @@ export default function ModalSelect({
           <div
             ref={popupRef}
             data-modal-select-dropdown
-            className={`${isScoped ? 'absolute' : 'fixed'} z-[70] max-h-64 overflow-y-auto rounded-b-lg !ring-0 border border-white/10 border-t-0 shadow-2xl origin-top transition-all duration-[100ms] ${
+            className={`${isScoped ? 'absolute' : 'fixed'} z-[70] !mt-0 max-h-64 overflow-y-auto rounded-b-lg !ring-0 border border-white/10 border-t-0 shadow-2xl origin-top transition-all duration-[100ms] ${
               visible
                 ? "opacity-100 scale-y-100 translate-y-0 ease-[cubic-bezier(0.16,1,0.3,1)]"
                 : "opacity-0 scale-y-[0.92] -translate-y-1 ease-[cubic-bezier(0.4,0,1,1)]"
