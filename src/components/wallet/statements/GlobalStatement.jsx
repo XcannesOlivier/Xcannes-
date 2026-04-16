@@ -1448,7 +1448,7 @@ export default function GlobalStatement({
               {/* Header */}
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <div className="text-[11px] tracking-[0.08em] uppercase text-[#8B98A5]">
+                  <div className="text-[11px] tracking-[0.08em] text-[#8B98A5]">
                     {detailIsConversion ? detailConversionHeader : detailTypeLabel}
                   </div>
                   {!detailIsConversion ? (
@@ -1487,7 +1487,7 @@ export default function GlobalStatement({
 
               {/* Status & Date */}
               <div className="space-y-3">
-                <div className="text-[11px] tracking-[0.08em] uppercase text-[#8B98A5]">
+                <div className="text-[11px] tracking-[0.08em] text-[#8B98A5]">
                   {t("ui_status_and_date", "Statut & date")}
                 </div>
                 <div className="grid grid-cols-2 gap-3">
@@ -1514,7 +1514,7 @@ export default function GlobalStatement({
 
               {/* Details */}
               <div className="space-y-2">
-                <div className="text-[11px] tracking-[0.08em] uppercase text-[#8B98A5]">
+                <div className="text-[11px] tracking-[0.08em] text-[#8B98A5]">
                   {t("ui_details", "Détails")}
                 </div>
                 <div className="rounded-[20px] border border-white/[0.06] bg-white/[0.03] px-3 py-3 space-y-2">
@@ -1688,7 +1688,7 @@ export default function GlobalStatement({
               {/* Technical */}
               {detailMovement?.txHash ? (
                 <div className="space-y-2">
-                  <div className="text-[11px] tracking-[0.08em] uppercase text-[#8B98A5]">
+                  <div className="text-[11px] tracking-[0.08em] text-[#8B98A5]">
                     {t("ui_transaction", "Transaction")}
                   </div>
                   <div className="rounded-[20px] border border-white/[0.06] bg-white/[0.03] px-3 py-3">
