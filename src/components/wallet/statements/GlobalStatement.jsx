@@ -1830,65 +1830,44 @@ export default function GlobalStatement({
             </div>
           ) : null}
           <div className="flex items-start justify-between gap-3">
-            <div className="flex items-start gap-3 min-w-0">
+            <div className="flex items-center gap-3 min-w-0">
               <span
-                className="flex-shrink-0 w-9 h-9 md:w-10 md:h-10 mt-0.5 inline-flex items-center justify-center rounded-xl bg-white/5 border border-white/10 text-white/85"
+                className="flex-shrink-0 w-10 h-10 md:w-11 md:h-11 inline-flex items-center justify-center rounded-2xl bg-gradient-to-br from-white/10 to-white/[0.03] border border-white/[0.12] shadow-[0_0_12px_rgba(255,255,255,0.04)] text-white"
                 aria-hidden="true"
                 title={globalTitle}
               >
+                {/* Layered transaction cards + sparkles — artistic icon */}
                 <svg
-                  className="w-5 h-5 md:w-6 md:h-6"
-                  fill="none"
-                  stroke="currentColor"
+                  className="w-[22px] h-[22px] md:w-6 md:h-6"
                   viewBox="0 0 24 24"
-                  strokeWidth={1.8}
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M7 3h10a2 2 0 012 2v14a2 2 0 01-2 2H7a2 2 0 01-2-2V5a2 2 0 012-2z"
-                  />
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M8 8h8"
-                  />
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M8 12h5"
-                  />
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M15.5 14.5a3.5 3.5 0 11-7 0 3.5 3.5 0 017 0z"
-                  />
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M12 14.5V12.8"
-                  />
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M12 14.5l1.4 1.1"
-                  />
+                  {/* Back card */}
+                  <rect x="6" y="2" width="14" height="15" rx="2.5" stroke="currentColor" strokeWidth="1.3" opacity="0.18" />
+                  {/* Middle card */}
+                  <rect x="4" y="4.5" width="14" height="15" rx="2.5" stroke="currentColor" strokeWidth="1.3" opacity="0.38" />
+                  {/* Front card */}
+                  <rect x="2" y="7" width="14" height="15" rx="2.5" stroke="currentColor" strokeWidth="1.4" />
+                  {/* Transaction lines on front card */}
+                  <line x1="5.5" y1="11.2" x2="12.5" y2="11.2" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+                  <line x1="5.5" y1="14" x2="10" y2="14" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+                  <line x1="5.5" y1="16.8" x2="11.5" y2="16.8" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+                  {/* Large sparkle ✦ */}
+                  <path d="M20.2 7l.65 1.35L22.2 9l-1.35.65L20.2 11l-.65-1.35L18.2 9l1.35-.65z" fill="currentColor" opacity="0.85" />
+                  {/* Small sparkle */}
+                  <path d="M18.1 3l.4.8.8.4-.8.4-.4.8-.4-.8-.8-.4.8-.4z" fill="currentColor" opacity="0.45" />
                 </svg>
               </span>
-              <div className="min-w-0">
-                <div className="flex items-center gap-2 min-w-0">
-                  <h2 className="text-lg md:text-xl font-bold text-white min-w-0 inline-flex items-baseline gap-2">
-                    <span className="break-words">
-                      {globalTitle}
-                    </span>
-                  </h2>
-                  {noticeVariant === "demo" ? (
-                    <span className="inline-flex items-center text-white/80 text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
-                      {t("demo_notice_title", "Mode démo")}
-                    </span>
-                  ) : null}
-                </div>
-                <div className="mt-1 min-w-0" />
+              <div className="min-w-0 flex items-center">
+                <h2 className="text-lg md:text-xl font-bold text-white leading-tight">
+                  {globalTitle}
+                </h2>
+                {noticeVariant === "demo" ? (
+                  <span className="ml-2 inline-flex items-center text-white/80 text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
+                    {t("demo_notice_title", "Mode démo")}
+                  </span>
+                ) : null}
               </div>
             </div>
             {/* close via swipe/backdrop */}
