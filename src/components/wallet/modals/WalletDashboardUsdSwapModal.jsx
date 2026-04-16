@@ -3586,7 +3586,8 @@ export default function WalletDashboardUsdSwapModal({
 		                                              <span className="text-white/50 font-normal">
 		                                                ({String(cur?.network || "").toUpperCase()})
 		                                              </span>
-		                                              <span className="ml-2 text-white/55 font-normal text-[13px]">
+		                                              <span className="mx-1.5 text-white/30 font-normal">—</span>
+		                                              <span className="text-white/55 font-normal text-[13px]">
 		                                                {String(cur?.name || "").trim() ||
 		                                                  currencyLabel(cur)}
 		                                              </span>
