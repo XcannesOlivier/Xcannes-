@@ -214,7 +214,7 @@ export default function ModalSelect({
               : ""
           } ${open ? "!rounded-b-none !ring-0 !shadow-none border border-white/10 border-b-0" : ""} ${buttonClassName}`}
         >
-          <span className={`flex gap-2 min-w-0 flex-1 ${selected?.description && open ? 'items-start' : 'items-center'}`}>
+          <span className="flex items-center gap-2 min-w-0 flex-1">
             {renderIcon(selected?.icon)}
             {selected?.description && open ? (
               <span className="flex flex-col min-w-0 flex-1 text-left">
