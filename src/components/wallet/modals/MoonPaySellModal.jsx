@@ -1749,9 +1749,6 @@ const MoonPaySellModal = ({
 			                                  "Envoyer vers la banque",
 			                                )}
 			                            </div>
-			                            <div className="mt-0.5 text-[11px] text-white/55 truncate">
-			                              {t("ui_search", "Rechercher…")}
-			                            </div>
 			                          </div>
 			                          <button
 			                            type="button"
@@ -1921,9 +1918,6 @@ const MoonPaySellModal = ({
 				                                  "Envoyer vers la banque",
 				                                )}
 			                            </div>
-                            <div className="mt-0.5 text-[11px] text-white/55 truncate">
-                              {t("ui_search", "Rechercher…")}
-                            </div>
                           </div>
                           <button
                             type="button"

@@ -1636,7 +1636,7 @@ export default function CurrencyStatement({
                 <span className="block w-12 h-1.5 rounded-full bg-white/20" />
               </div>
             ) : null}
-	          <div className="flex items-start justify-between gap-3 mb-3">
+	          <div className="flex items-start justify-between gap-3 mb-3 relative z-[65]">
 	            {isXrpNetworkView ? (
 	              <button
 	                type="button"

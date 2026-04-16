@@ -1948,9 +1948,6 @@ const MoonPayBuyModal = ({
                                 <div className="text-white font-semibold text-base leading-tight truncate">
                                   {t('moonpay_buy_select_asset', 'Ajouter des devises')}
                                 </div>
-                                <div className="mt-0.5 text-[11px] text-white/55 truncate">
-                                  {t('ui_search', 'Rechercher…')}
-                                </div>
                               </div>
                               <button
                                 type="button"
@@ -2088,9 +2085,6 @@ const MoonPayBuyModal = ({
                               <div className="min-w-0">
                                 <div className="text-white font-semibold text-base leading-tight truncate">
                                   {t('moonpay_buy_select_asset', 'Ajouter des devises')}
-                                </div>
-                                <div className="mt-0.5 text-[11px] text-white/55 truncate">
-                                  {t('ui_search', 'Rechercher…')}
                                 </div>
                               </div>
                               <button

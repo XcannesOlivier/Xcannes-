@@ -571,7 +571,7 @@ export default function WalletDashboardSwapModal({
                   maybeStartOverlayDrag(event, "fixed");
                 }}
               >
-                <div className="flex min-w-0 flex-col gap-1.5 w-full">
+                <div className="flex min-w-0 flex-col gap-1.5 w-full relative z-[65]">
                   <div>
                     {renderWalletMeta?.({
                       variant: "pill",
