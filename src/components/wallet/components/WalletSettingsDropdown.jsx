@@ -678,7 +678,7 @@ export default function WalletSettingsDropdown({
                       window.open("/wallet-app/?action=choice", "_blank");
                     }
                   }}
-                  className="w-full flex items-center gap-3 px-3 py-3 rounded-[10px] border border-white/10 bg-white/3 hover:bg-white/5 hover:border-white/15 transition-colors duration-150 text-left focus-visible:outline-none focus-visible:border-xcannes-green/60 focus-visible:ring-2 focus-visible:ring-xcannes-green/20"
+                  className="w-full flex items-center gap-3 px-3 py-3 rounded-[20px] border border-white/10 bg-white/3 hover:bg-white/5 hover:border-white/15 transition-colors duration-150 text-left focus-visible:outline-none focus-visible:border-xcannes-green/60 focus-visible:ring-2 focus-visible:ring-xcannes-green/20"
                 >
                   <span className="inline-flex h-9 w-9 items-center justify-center rounded-[10px] bg-white/5 border border-white/10 text-white/60 shrink-0">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.8}>
@@ -714,7 +714,7 @@ export default function WalletSettingsDropdown({
                       setIsOpen(false);
                       onOpenXrplActivity?.();
                     }}
-                    className="w-full flex items-center gap-3 px-3 py-3 rounded-[10px] border border-transparent hover:border-white/10 hover:bg-white/5 transition-colors duration-150 text-left focus-visible:outline-none focus-visible:border-xcannes-green/60 focus-visible:ring-2 focus-visible:ring-xcannes-green/20"
+                    className="w-full flex items-center gap-3 px-3 py-3 rounded-[20px] border border-transparent hover:border-white/10 hover:bg-white/5 transition-colors duration-150 text-left focus-visible:outline-none focus-visible:border-xcannes-green/60 focus-visible:ring-2 focus-visible:ring-xcannes-green/20"
                   >
                     <span className="inline-flex h-9 w-9 items-center justify-center rounded-[10px] bg-white/5 border border-white/10 shrink-0">
                       <Image
@@ -751,7 +751,7 @@ export default function WalletSettingsDropdown({
 	                    <div className="px-1.5 pb-2 text-[10px] font-semibold tracking-[0.22em] uppercase text-white/35">
 	                      {t("ui_settings_section_preferences", "Préférences")}
 	                    </div>
-	                    <div className="rounded-[10px] border border-white/10 bg-black/20 p-2.5 focus-within:border-white/20 focus-within:ring-2 focus-within:ring-white/10 transition-colors duration-150">
+	                    <div className="rounded-[20px] border border-white/10 bg-black/20 p-2.5 focus-within:border-white/20 focus-within:ring-2 focus-within:ring-white/10 transition-colors duration-150">
 	                      <PreferredCurrencySelector
 	                        currentCurrency={preferredCurrency}
 	                        topCurrencies={topCurrencies}
@@ -778,7 +778,7 @@ export default function WalletSettingsDropdown({
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => setIsOpen(false)}
-                  className="w-full flex items-center gap-3 px-3 py-3 rounded-[10px] border border-transparent hover:border-white/10 hover:bg-white/5 transition-colors duration-150 text-left focus-visible:outline-none focus-visible:border-xcannes-green/60 focus-visible:ring-2 focus-visible:ring-xcannes-green/20"
+                  className="w-full flex items-center gap-3 px-3 py-3 rounded-[20px] border border-transparent hover:border-white/10 hover:bg-white/5 transition-colors duration-150 text-left focus-visible:outline-none focus-visible:border-xcannes-green/60 focus-visible:ring-2 focus-visible:ring-xcannes-green/20"
                 >
                   <span className="inline-flex h-9 w-9 items-center justify-center rounded-[10px] bg-white/5 border border-white/10 text-white/85 shrink-0">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.8}>
@@ -803,7 +803,7 @@ export default function WalletSettingsDropdown({
                     onOpenInfo?.();
                     setIsOpen(false);
                   }}
-                  className="mt-2 w-full flex items-center gap-3 px-3 py-3 rounded-[10px] border border-transparent hover:border-white/10 hover:bg-white/5 transition-colors duration-150 text-left focus-visible:outline-none focus-visible:border-xcannes-green/60 focus-visible:ring-2 focus-visible:ring-xcannes-green/20"
+                  className="mt-2 w-full flex items-center gap-3 px-3 py-3 rounded-[20px] border border-transparent hover:border-white/10 hover:bg-white/5 transition-colors duration-150 text-left focus-visible:outline-none focus-visible:border-xcannes-green/60 focus-visible:ring-2 focus-visible:ring-xcannes-green/20"
                 >
                   <span className="inline-flex h-9 w-9 items-center justify-center rounded-[10px] bg-white/5 border border-white/10 text-white/85 shrink-0">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.8}>
@@ -832,7 +832,7 @@ export default function WalletSettingsDropdown({
                     }
                     setShowSecurityModal(true);
                   }}
-                  className="mt-2 w-full flex items-center gap-3 px-3 py-3 rounded-[10px] border border-transparent hover:border-white/10 hover:bg-white/5 transition-colors duration-150 text-left focus-visible:outline-none focus-visible:border-xcannes-green/60 focus-visible:ring-2 focus-visible:ring-xcannes-green/20"
+                  className="mt-2 w-full flex items-center gap-3 px-3 py-3 rounded-[20px] border border-transparent hover:border-white/10 hover:bg-white/5 transition-colors duration-150 text-left focus-visible:outline-none focus-visible:border-xcannes-green/60 focus-visible:ring-2 focus-visible:ring-xcannes-green/20"
                 >
                   <span className="inline-flex h-9 w-9 items-center justify-center rounded-[10px] bg-white/5 border border-white/10 text-white/85 shrink-0">
                     <svg
@@ -877,7 +877,7 @@ export default function WalletSettingsDropdown({
                     setHelpOpenIndex(0);
                     setShowHelpModal(true);
                   }}
-                  className="mt-2 w-full flex items-center gap-3 px-3 py-3 rounded-[10px] border border-transparent hover:border-white/10 hover:bg-white/5 transition-colors duration-150 text-left focus-visible:outline-none focus-visible:border-xcannes-green/60 focus-visible:ring-2 focus-visible:ring-xcannes-green/20"
+                  className="mt-2 w-full flex items-center gap-3 px-3 py-3 rounded-[20px] border border-transparent hover:border-white/10 hover:bg-white/5 transition-colors duration-150 text-left focus-visible:outline-none focus-visible:border-xcannes-green/60 focus-visible:ring-2 focus-visible:ring-xcannes-green/20"
                 >
                   <span className="inline-flex h-9 w-9 items-center justify-center rounded-[10px] bg-white/5 border border-white/10 text-white/85 shrink-0">
                     <svg
@@ -916,7 +916,7 @@ export default function WalletSettingsDropdown({
                     }
                     setShowTermsModal(true);
                   }}
-                  className="mt-2 w-full flex items-center gap-3 px-3 py-3 rounded-[10px] border border-transparent hover:border-white/10 hover:bg-white/5 transition-colors duration-150 text-left focus-visible:outline-none focus-visible:border-xcannes-green/60 focus-visible:ring-2 focus-visible:ring-xcannes-green/20"
+                  className="mt-2 w-full flex items-center gap-3 px-3 py-3 rounded-[20px] border border-transparent hover:border-white/10 hover:bg-white/5 transition-colors duration-150 text-left focus-visible:outline-none focus-visible:border-xcannes-green/60 focus-visible:ring-2 focus-visible:ring-xcannes-green/20"
                 >
                   <span className="inline-flex h-9 w-9 items-center justify-center rounded-[10px] bg-white/5 border border-white/10 text-white/85 shrink-0">
                     <svg

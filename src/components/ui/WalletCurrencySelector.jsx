@@ -686,7 +686,7 @@ export default function WalletCurrencySelector({
                             <span className="text-sm font-semibold font-mono whitespace-nowrap">
                               {c.code}
                             </span>
-                            <span className="text-[11px] text-white/55 truncate">
+                            <span className="text-sm text-white/55 truncate">
                               {c.name || c.code}
                             </span>
                           </div>
