@@ -1560,8 +1560,8 @@ export default function WalletDashboardReceiveModal({
 	                          backdropClassName="bg-black/80 backdrop-blur-[4px]"
 		                          menuClassName={
 		                            noticeVariant === 'demo'
-		                              ? 'bg-xcannes-surface-demo !max-h-32 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
-		                              : 'bg-[#101415] !max-h-32 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
+		                              ? 'bg-xcannes-surface-demo max-h-[320px] overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
+		                              : 'bg-[#101415] max-h-[320px] overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
 		                          }
 			                          buttonClassName={`hover:bg-white/5 ring-1 ring-white/10 ring-inset rounded-[20px] px-3.5 py-3 text-base text-white focus:outline-none cursor-pointer transition-colors duration-150 ${
 			                            noticeVariant === 'demo' ? 'bg-xcannes-surface-demo' : 'bg-white/[0.02]'
