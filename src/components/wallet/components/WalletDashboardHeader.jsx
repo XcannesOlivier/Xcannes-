@@ -88,12 +88,17 @@ export default function WalletDashboardHeader({
   const [isSwitcherOpen, setIsSwitcherOpen] = useState(false);
   const [isSwitcherVisible, setIsSwitcherVisible] = useState(false);
   const isSwitcherClosingRef = useRef(false);
+  const didSwitchRef = useRef(false);
   const switcherRef = useRef(null);
   const hasMultipleWallets = walletAddresses.length > 1;
+
+  // Fade-out duration: slow (1500ms) after wallet switch, fast (350ms) otherwise
+  const closeDuration = didSwitchRef.current ? 1500 : 350;
 
   // Smooth open/close with two-phase state (mount → animate in, animate out → unmount)
   const openSwitcher = () => {
     isSwitcherClosingRef.current = false;
+    didSwitchRef.current = false;
     setIsSwitcherOpen(true);
     requestAnimationFrame(() => requestAnimationFrame(() => setIsSwitcherVisible(true)));
   };
@@ -101,11 +106,13 @@ export default function WalletDashboardHeader({
     if (isSwitcherClosingRef.current) return; // already closing
     isSwitcherClosingRef.current = true;
     setIsSwitcherVisible(false);
+    const unmountDelay = didSwitchRef.current ? 1550 : 380;
     // Wait for the CSS transition to finish before unmounting
     setTimeout(() => {
       setIsSwitcherOpen(false);
       isSwitcherClosingRef.current = false;
-    }, 580);
+      didSwitchRef.current = false;
+    }, unmountDelay);
   };
   const toggleSwitcher = () => (isSwitcherOpen && !isSwitcherClosingRef.current ? closeSwitcher() : !isSwitcherOpen ? openSwitcher() : undefined);
   const [labelsByAddress, setLabelsByAddress] = useState({});
@@ -288,11 +295,12 @@ export default function WalletDashboardHeader({
 	            <div className="relative flex items-center gap-2.5 w-full md:w-full">
 	              {isSwitcherOpen && hasMultipleWallets && (
 	                <div
-	                  className={`fixed inset-0 z-40 bg-black/80 backdrop-blur-sm transition-opacity duration-[550ms] ${
+	                  className={`fixed inset-0 z-40 bg-black/80 backdrop-blur-sm transition-opacity ${
 	                    isSwitcherVisible
 	                      ? "opacity-100 ease-[cubic-bezier(0.16,1,0.3,1)]"
 	                      : "opacity-0 ease-[cubic-bezier(0.4,0,1,1)]"
 	                  }`}
+	                  style={{ transitionDuration: `${isSwitcherVisible ? 550 : closeDuration}ms` }}
 	                  aria-hidden="true"
 	                  onMouseDown={(e) => { e.stopPropagation(); e.preventDefault(); }}
 	                  onClick={(e) => { e.stopPropagation(); closeSwitcher(); }}
@@ -366,6 +374,7 @@ export default function WalletDashboardHeader({
                               type="button"
                               onClick={() => {
                                 onSwitchWallet?.(addr);
+                                didSwitchRef.current = true;
                                 closeSwitcher();
                               }}
                               className="w-full text-left px-2.5 md:px-3 py-2.5 flex items-center gap-2 transition-colors duration-150 hover:bg-white/[0.06]"
