@@ -289,7 +289,7 @@ export default function ModalSelect({
                           </span>
                         ) : null}
                       </span>
-                      <span className="text-[11px] text-white/50 leading-tight mt-0.5">
+                      <span className="font-mono text-[13px] text-white/40 leading-snug mt-0.5 whitespace-normal break-all">
                         {description}
                       </span>
                     </span>
@@ -353,7 +353,7 @@ export default function ModalSelect({
                           </span>
                         ) : null}
                       </span>
-                      <span className="text-[11px] text-white/50 leading-tight mt-0.5">
+                      <span className="font-mono text-[13px] text-white/40 leading-snug mt-0.5 whitespace-normal break-all">
                         {description}
                       </span>
                     </span>
