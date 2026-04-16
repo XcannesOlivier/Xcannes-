@@ -3783,7 +3783,7 @@ export default function WalletDashboardUsdSwapModal({
 	                                            setSearch("");
 	                                          }}
 		                                          className={[
-		                                            "w-full flex items-center gap-3 px-4 py-3 text-left border-b border-white/5 last:border-b-0",
+		                                            "w-full flex items-center gap-3 px-4 py-3 text-left border-b border-white/10 last:border-b-0",
 		                                            active
 		                                              ? accentActiveRow
 		                                              : "hover:bg-white/[0.04] text-white/80",
