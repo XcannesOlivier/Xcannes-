@@ -92,8 +92,8 @@ export default function WalletDashboardHeader({
   const switcherRef = useRef(null);
   const hasMultipleWallets = walletAddresses.length > 1;
 
-  // Fade-out duration: slow (1500ms) after wallet switch, fast (350ms) otherwise
-  const closeDuration = didSwitchRef.current ? 1500 : 350;
+  // Fade-out duration: slow (1800ms) after wallet switch, fast (100ms) otherwise
+  const closeDuration = didSwitchRef.current ? 1800 : 100;
 
   // Smooth open/close with two-phase state (mount → animate in, animate out → unmount)
   const openSwitcher = () => {
@@ -106,7 +106,7 @@ export default function WalletDashboardHeader({
     if (isSwitcherClosingRef.current) return; // already closing
     isSwitcherClosingRef.current = true;
     setIsSwitcherVisible(false);
-    const unmountDelay = didSwitchRef.current ? 1550 : 380;
+    const unmountDelay = didSwitchRef.current ? 1850 : 130;
     // Wait for the CSS transition to finish before unmounting
     setTimeout(() => {
       setIsSwitcherOpen(false);
@@ -300,7 +300,7 @@ export default function WalletDashboardHeader({
 	                      ? "opacity-100 ease-[cubic-bezier(0.16,1,0.3,1)]"
 	                      : "opacity-0 ease-[cubic-bezier(0.4,0,1,1)]"
 	                  }`}
-	                  style={{ transitionDuration: `${isSwitcherVisible ? 550 : closeDuration}ms` }}
+	                  style={{ transitionDuration: `${isSwitcherVisible ? 100 : closeDuration}ms` }}
 	                  aria-hidden="true"
 	                  onMouseDown={(e) => { e.stopPropagation(); e.preventDefault(); }}
 	                  onClick={(e) => { e.stopPropagation(); closeSwitcher(); }}
@@ -341,7 +341,7 @@ export default function WalletDashboardHeader({
                     {/* Multi-wallet dropdown — smooth animated */}
                     {isSwitcherOpen && hasMultipleWallets && (
                       <div
-                        className={`absolute z-50 left-0 top-full mt-0 w-full rounded-b-xl bg-[#101415] shadow-[0_12px_48px_rgba(0,0,0,0.45)] max-h-[70vh] md:max-h-[340px] overflow-y-auto overflow-x-hidden origin-top transition-all duration-[550ms] ${
+                        className={`absolute z-50 left-0 top-full mt-0 w-full rounded-b-xl bg-[#101415] shadow-[0_12px_48px_rgba(0,0,0,0.45)] max-h-[70vh] md:max-h-[340px] overflow-y-auto overflow-x-hidden origin-top transition-all duration-[100ms] ${
                           isSwitcherVisible
                             ? "opacity-100 scale-y-100 translate-y-0 ease-[cubic-bezier(0.16,1,0.3,1)]"
                             : "opacity-0 scale-y-[0.92] -translate-y-1 ease-[cubic-bezier(0.4,0,1,1)]"
