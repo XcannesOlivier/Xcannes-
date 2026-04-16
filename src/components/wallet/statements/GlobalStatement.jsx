@@ -2032,18 +2032,14 @@ export default function GlobalStatement({
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
                           <div className="text-[13px] font-medium text-white/90 truncate">
-                            {getMovementTitle(m)}
+                            {isPaymentOut
+                              ? `${t("statement_xrpl_mobile_out", "Envoyé")} ${rowCounterpartyLabel ? `à ${rowCounterpartyLabel}` : ""}`
+                              : isPaymentIn
+                                ? `${t("statement_xrpl_mobile_in", "Reçu")} ${rowCounterpartyLabel ? `de ${rowCounterpartyLabel}` : ""}`
+                                : getMovementTitle(m)}
                           </div>
                           {isPaymentOut || isPaymentIn ? (
                             <>
-                              <div className="mt-0.5 text-[11px] text-white/55 truncate">
-                                {(isPaymentOut
-                                  ? t("ui_recipient_label", "Destinataire")
-                                  : t("ui_sender_label", "Expéditeur")) +
-                                  " : " +
-                                  (rowCounterpartyLabel ||
-                                    t("ui_unknown", "—"))}
-                              </div>
                               <div className="mt-0.5 text-[11px] text-white/45 truncate">
                                 {when || ""}
                               </div>
