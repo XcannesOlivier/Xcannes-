@@ -1557,6 +1557,7 @@ export default function WalletDashboardReceiveModal({
 	                          useNativeSelect={false}
 	                          portal
 	                          portalTarget={overlayListRef.current}
+	                          hideSelected
 	                          backdropClassName="bg-black/80 backdrop-blur-[4px]"
 		                          menuClassName={
 		                            noticeVariant === 'demo'
