@@ -216,19 +216,33 @@ export default function ModalSelect({
         >
           <span className="flex items-center gap-2 min-w-0 flex-1">
             {renderIcon(selected?.icon)}
-            <span className="flex items-center gap-2 min-w-0 flex-1">
-              <span className="truncate md:hidden">
-                {mobileSelectedLabel}
-              </span>
-              <span className="truncate hidden md:inline">
-                {selectedLeft}
-              </span>
-              {selectedRight ? (
-                <span className={`ml-auto text-white/60 tabular-nums ${selectedRightClassName}`}>
-                  {selectedRight}
+            {selected?.description ? (
+              <span className="flex flex-col min-w-0 flex-1">
+                <span className="truncate md:hidden">
+                  {mobileSelectedLabel}
                 </span>
-              ) : null}
-            </span>
+                <span className="truncate hidden md:inline">
+                  {selectedLeft}
+                </span>
+                <span className="font-mono text-[13px] text-emerald-400 leading-snug whitespace-normal break-all">
+                  {selected.description}
+                </span>
+              </span>
+            ) : (
+              <span className="flex items-center gap-2 min-w-0 flex-1">
+                <span className="truncate md:hidden">
+                  {mobileSelectedLabel}
+                </span>
+                <span className="truncate hidden md:inline">
+                  {selectedLeft}
+                </span>
+                {selectedRight ? (
+                  <span className={`ml-auto text-white/60 tabular-nums ${selectedRightClassName}`}>
+                    {selectedRight}
+                  </span>
+                ) : null}
+              </span>
+            )}
           </span>
           <svg
             className={`w-3 h-3 transition-transform duration-[100ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
