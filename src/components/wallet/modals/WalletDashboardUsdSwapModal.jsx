@@ -3783,7 +3783,7 @@ export default function WalletDashboardUsdSwapModal({
 	                                            setSearch("");
 	                                          }}
 		                                          className={[
-		                                            "w-full flex items-center gap-3 px-4 py-3 text-left border-b border-white/10 last:border-b-0",
+		                                            "w-full flex items-center gap-3 px-4 py-3 text-left border-b border-white/5 last:border-b-0",
 		                                            active
 		                                              ? accentActiveRow
 		                                              : "hover:bg-white/[0.04] text-white/80",
@@ -3796,7 +3796,8 @@ export default function WalletDashboardUsdSwapModal({
 	                                              <span className="text-white/50 font-normal">
 	                                                ({String(cur?.network || "").toUpperCase()})
 	                                              </span>
-	                                              <span className="ml-2 text-white/55 font-normal text-[13px]">
+	                                              <span className="mx-1.5 text-white/30 font-normal">—</span>
+	                                              <span className="text-white/55 font-normal text-[13px]">
 	                                                {String(cur?.name || "").trim() ||
 	                                                  currencyLabel(cur)}
 	                                              </span>
