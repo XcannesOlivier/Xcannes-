@@ -1523,7 +1523,14 @@ export default function GlobalStatement({
                       {t("ui_type_label_8b1a4d2c7e", "Type")}
                     </span>
                     <span className="text-sm font-semibold text-white/90">
-                      {String(detailMovement?.kind || "").trim() || "—"}
+                      {(() => {
+                        const k = normalizeKind(detailMovement?.kind);
+                        if (k === "PAYMENT_OUT" || k === "XRPL_PAYMENT_OUT") return t("ui_type_sent", "Envoyé");
+                        if (k === "PAYMENT_IN" || k === "XRPL_PAYMENT_IN") return t("ui_type_received", "Reçu");
+                        if (k === "CONVERSION") return t("ui_type_conversion", "Conversion");
+                        if (k === "RECONCILE") return t("ui_type_reconcile", "Ajustement");
+                        return String(detailMovement?.kind || "").trim() || "—";
+                      })()}
                     </span>
                   </div>
                   {detailIsPaymentSent ? (
