@@ -1339,12 +1339,14 @@ export default function WalletDashboardReceiveModal({
 	                          }}
 	                          options={shareWalletOptions}
 	                          useNativeSelect={false}
+	                          portal
+	                          backdropClassName="bg-black/80 backdrop-blur-[4px]"
 	                          iconClassName="inline-flex items-center justify-center leading-none"
 	                          buttonClassName="w-full bg-transparent rounded-xl pl-0 pr-2 py-2 text-base text-white focus:outline-none cursor-pointer transition-colors duration-150"
 	                          menuClassName={
 	                            noticeVariant === 'demo'
 	                              ? 'bg-xcannes-surface-demo !max-h-64 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
-	                              : 'bg-elevated !max-h-64 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
+	                              : 'bg-[#101415] !max-h-64 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
 	                          }
 	                          selectClassName="xcannes-select w-full bg-transparent rounded-xl pl-0 pr-2 py-2 text-base text-white focus:outline-none transition-colors duration-150"
 	                        />
@@ -1475,13 +1477,13 @@ export default function WalletDashboardReceiveModal({
 	                          options={shareWalletOptions}
 	                          useNativeSelect={false}
 	                          portal
-	                          backdropClassName="bg-black/40"
+	                          backdropClassName="bg-black/80 backdrop-blur-[4px]"
 	                          iconClassName="inline-flex items-center justify-center leading-none"
 	                          buttonClassName="w-full bg-transparent rounded-xl pl-0 pr-2 py-2 text-base text-white focus:outline-none cursor-pointer transition-colors duration-150"
 	                          menuClassName={
 	                            noticeVariant === 'demo'
 	                              ? 'bg-xcannes-surface-demo !max-h-64 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
-	                              : 'bg-elevated !max-h-64 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
+	                              : 'bg-[#101415] !max-h-64 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
 	                          }
 	                          selectClassName="xcannes-select w-full bg-transparent rounded-xl pl-0 pr-2 py-2 text-base text-white focus:outline-none transition-colors duration-150"
 	                        />
@@ -1550,11 +1552,11 @@ export default function WalletDashboardReceiveModal({
 	                          })}
 	                          useNativeSelect={false}
 	                          portal
-	                          backdropClassName="bg-black/40"
+	                          backdropClassName="bg-black/80 backdrop-blur-[4px]"
 		                          menuClassName={
 		                            noticeVariant === 'demo'
 		                              ? 'bg-xcannes-surface-demo !max-h-32 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
-		                              : 'bg-elevated !max-h-32 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
+		                              : 'bg-[#101415] !max-h-32 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
 		                          }
 			                          buttonClassName={`hover:bg-white/5 ring-1 ring-white/10 ring-inset rounded-[20px] px-3.5 py-3 text-base text-white focus:outline-none cursor-pointer transition-colors duration-150 ${
 			                            noticeVariant === 'demo' ? 'bg-xcannes-surface-demo' : 'bg-white/[0.02]'
