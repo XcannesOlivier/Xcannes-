@@ -1456,7 +1456,7 @@ export default function GlobalStatement({
                       className={[
                         "mt-1 text-[22px] md:text-[26px] font-bold font-mono whitespace-nowrap",
                         getMovementUiType(detailMovement) === "debit"
-                          ? "text-red-400"
+                          ? "text-red-500"
                           : getMovementUiType(detailMovement) === "credit"
                             ? "text-xcannes-green"
                             : "text-white/90",
@@ -2070,7 +2070,7 @@ export default function GlobalStatement({
 	                                      className={[
 	                                        "text-[15px] font-semibold font-mono whitespace-nowrap",
 		                                        uiType === "debit"
-		                                          ? "text-red-300"
+		                                          ? "text-red-500"
 		                                          : uiType === "credit"
 		                                            ? "text-xcannes-green"
 		                                            : "text-white/90",

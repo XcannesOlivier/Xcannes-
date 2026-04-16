@@ -1339,7 +1339,7 @@ export default function CurrencyStatement({
                   <div
                     className={`mt-1 text-[22px] md:text-[26px] font-bold font-mono whitespace-nowrap ${
                       detailTx?.type === "debit"
-                        ? "text-red-400"
+                        ? "text-red-500"
                         : "text-xcannes-green"
                     }`}
                   >
@@ -1455,7 +1455,7 @@ export default function CurrencyStatement({
                     <span
                       className={`text-sm font-semibold font-mono ${
                         detailTx?.type === "debit"
-                          ? "text-red-400"
+                          ? "text-red-500"
                           : "text-xcannes-green"
                       }`}
                     >
@@ -1943,7 +1943,7 @@ export default function CurrencyStatement({
                               <div
                                 className={`flex-none max-w-[42%] text-right font-mono font-semibold whitespace-nowrap overflow-hidden text-ellipsis ${
                                   tx?.type === "debit"
-                                    ? "text-red-400"
+                                    ? "text-red-500"
                                     : "text-xcannes-green"
                                 }`}
                               >
