@@ -179,33 +179,11 @@ export default function WalletDashboard({
 
   const { toasts, confirmState, toast, confirm, dismissToast, resolveConfirm } = useWalletToast();
 
-  // ── Smooth wallet-switch transition ─────────────────────────
-  const [walletSwitchFade, setWalletSwitchFade] = useState(false);
-  const [walletFadePhase, setWalletFadePhase] = useState('idle'); // 'idle' | 'out' | 'in'
-  const switchFadeTimerRef = useRef(null);
-
+  // ── Wallet switch (instant) ─────────────────────────────────
   const handleSwitchWallet = useCallback((addr) => {
     if (!addr || addr === wallet) return;
-    // 1) Fast fade-out (150ms)
-    setWalletFadePhase('out');
-    setWalletSwitchFade(true);
-    clearTimeout(switchFadeTimerRef.current);
-    switchFadeTimerRef.current = setTimeout(() => {
-      // 2) Content is now invisible — switch wallet
-      switchWallet(addr);
-      // 3) Slow fade-in after a pause for data to settle
-      switchFadeTimerRef.current = setTimeout(() => {
-        setWalletFadePhase('in');
-        setWalletSwitchFade(false);
-        // Reset phase after fade-in completes
-        switchFadeTimerRef.current = setTimeout(() => setWalletFadePhase('idle'), 550);
-      }, 200);
-    }, 160);
+    switchWallet(addr);
   }, [wallet, switchWallet]);
-
-  useEffect(() => {
-    return () => clearTimeout(switchFadeTimerRef.current);
-  }, []);
 
   // ── Transaction progress modal state ────────────────────────
   const [txProgress, setTxProgress] = useState({
@@ -1095,14 +1073,7 @@ export default function WalletDashboard({
             : 'flex flex-col'
         }`}
       >
-        <div
-          className={`flex flex-col min-h-0 ${walletSwitchFade ? 'opacity-0' : 'opacity-100'}`}
-          style={{
-            transitionProperty: 'opacity',
-            transitionDuration: walletFadePhase === 'out' ? '150ms' : walletFadePhase === 'in' ? '500ms' : '500ms',
-            transitionTimingFunction: walletFadePhase === 'out' ? 'ease-in' : 'ease-out',
-          }}
-        >
+        <div className="flex flex-col min-h-0">
           {/* Header */}
           <WalletDashboardHeader
             isConnected={isConnected}
