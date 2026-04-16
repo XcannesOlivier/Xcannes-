@@ -843,7 +843,7 @@ export default function WalletDashboardUsdSwapModal({
         ));
   const walletSelectorDialogTitle = t(
     "ui_choose_wallet_currency",
-    "Choisir une devise XCANNES",
+    "Choisir une devise",
   );
   const walletSelectorDialogSubtitle = walletTargetSelectionEnabled
     ? t(
@@ -3463,13 +3463,13 @@ export default function WalletDashboardUsdSwapModal({
 		                              >
 		                                <div className="flex items-center justify-between gap-3 px-4 py-4 border-b border-white/10">
 		                                  <div className="min-w-0">
-		                                    <div className="text-white font-semibold text-base leading-tight truncate">
+		                                    <div className="text-white font-semibold text-lg leading-tight truncate">
 		                                      {t(
 		                                        "ui_choose_stablecoin_title",
 		                                        "Choisir un stablecoin USD",
 		                                      )}
 		                                    </div>
-				                                    <div className={`mt-0.5 text-[11px] truncate ${accentText80}`}>
+				                                    <div className="mt-0.5 text-[11px] truncate text-white/50">
 				                                      {t(
 				                                        "ui_choose_stablecoin_subtitle",
 				                                        "Ticker / réseau (USDT, USDC…)",
@@ -3669,13 +3669,13 @@ export default function WalletDashboardUsdSwapModal({
 
 	                                  <div className="flex items-center justify-between gap-3 px-4 py-4">
 	                                    <div className="min-w-0">
-	                                      <div className="text-white font-semibold text-base leading-tight truncate">
+	                                      <div className="text-white font-semibold text-lg leading-tight truncate">
 	                                        {t(
 	                                          "ui_choose_stablecoin_title",
 	                                          "Choisir un stablecoin USD",
 	                                        )}
 	                                      </div>
-			                                      <div className={`mt-0.5 text-[11px] truncate ${accentText80}`}>
+			                                      <div className="mt-0.5 text-[11px] truncate text-white/50">
 			                                        {t(
 			                                          "ui_choose_stablecoin_subtitle",
 			                                          "Ticker / réseau (USDT, USDC…)",
@@ -3860,11 +3860,8 @@ export default function WalletDashboardUsdSwapModal({
                               >
                                 <div className="flex items-center justify-between gap-3 px-4 py-4 border-b border-white/10">
                                   <div className="min-w-0">
-                                    <div className="text-white font-semibold text-base leading-tight truncate">
+                                    <div className="text-white font-semibold text-lg leading-tight truncate">
                                       {walletSelectorDialogTitle}
-                                    </div>
-                                    <div className={`mt-0.5 text-[11px] truncate ${accentText80}`}>
-                                      {walletSelectorDialogSubtitle}
                                     </div>
                                   </div>
                                   <button
@@ -4018,11 +4015,8 @@ export default function WalletDashboardUsdSwapModal({
 
                                   <div className="flex items-center justify-between gap-3 px-4 py-4">
                                     <div className="min-w-0">
-                                      <div className="text-white font-semibold text-base leading-tight truncate">
+                                      <div className="text-white font-semibold text-lg leading-tight truncate">
                                         {walletSelectorDialogTitle}
-                                      </div>
-                                      <div className={`mt-0.5 text-[11px] truncate ${accentText80}`}>
-                                        {walletSelectorDialogSubtitle}
                                       </div>
                                     </div>
                                     <button
