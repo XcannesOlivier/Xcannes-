@@ -22,6 +22,7 @@ export default function ModalSelect({
   disabled = false,
   hideSelected = false,
   portal = false,
+  portalTarget = null,
 }) {
   const [open, setOpen] = useState(false);
   const [visible, setVisible] = useState(false);
@@ -83,8 +84,34 @@ export default function ModalSelect({
   // ── Portal positioning (fixed dropdown rendered at body level) ──
   const [portalStyle, setPortalStyle] = useState(null);
 
+  // Resolve the actual DOM node to portal into
+  const resolvedPortalTarget = portalTarget || (portal ? (typeof document !== 'undefined' ? document.body : null) : null);
+  const isScoped = !!portalTarget; // portalTarget = scoped container (not body)
+
   useEffect(() => {
-    if (!open || !portal) { setPortalStyle(null); return; }
+    if (!open || !resolvedPortalTarget) { setPortalStyle(null); return; }
+    if (isScoped) {
+      // Position relative to scrollable container
+      const update = () => {
+        if (!triggerRef.current || !resolvedPortalTarget) return;
+        const tRect = triggerRef.current.getBoundingClientRect();
+        const cRect = resolvedPortalTarget.getBoundingClientRect();
+        setPortalStyle({
+          position: 'absolute',
+          top: tRect.bottom - cRect.top + resolvedPortalTarget.scrollTop,
+          left: tRect.left - cRect.left + resolvedPortalTarget.scrollLeft,
+          width: tRect.width,
+        });
+      };
+      update();
+      resolvedPortalTarget.addEventListener('scroll', update, { passive: true });
+      window.addEventListener('resize', update);
+      return () => {
+        resolvedPortalTarget.removeEventListener('scroll', update);
+        window.removeEventListener('resize', update);
+      };
+    }
+    // Body-level portal: fixed positioning
     const update = () => {
       if (!triggerRef.current) return;
       const r = triggerRef.current.getBoundingClientRect();
@@ -97,7 +124,7 @@ export default function ModalSelect({
       window.removeEventListener('scroll', update, true);
       window.removeEventListener('resize', update);
     };
-  }, [open, portal]);
+  }, [open, resolvedPortalTarget, isScoped]);
 
   const selected = useMemo(() => {
     return options.find((opt) => String(opt.value) === String(value)) || null;
@@ -148,9 +175,9 @@ export default function ModalSelect({
   return (
     <>
       {open && backdropClassName ? (
-        portal && typeof document !== 'undefined' ? createPortal(
+        resolvedPortalTarget ? createPortal(
           <div
-            className={`fixed inset-0 z-[10049] transition-opacity duration-[100ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
+            className={`${isScoped ? 'absolute' : 'fixed'} inset-0 z-[60] transition-opacity duration-[100ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
               visible ? "opacity-100" : "opacity-0"
             } ${backdropClassName}`}
             aria-hidden="true"
@@ -158,7 +185,7 @@ export default function ModalSelect({
             onMouseDown={(e) => { e.stopPropagation(); e.preventDefault(); }}
             onClick={(e) => { e.stopPropagation(); closeMenu(); }}
           />,
-          document.body
+          resolvedPortalTarget
         ) : (
           <div
             className={`fixed inset-0 z-40 transition-opacity duration-[100ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
@@ -183,9 +210,7 @@ export default function ModalSelect({
           }}
           className={`w-full flex items-center justify-between gap-2 ${
             backdropClassName
-              ? portal
-                ? (open ? "relative z-[10051]" : "relative z-[10050]")
-                : (open ? "relative z-50" : "relative z-[41]")
+              ? (open ? "relative z-[70]" : "relative z-[61]")
               : ""
           } ${open ? "!rounded-b-none !ring-0 !shadow-none border border-white/10 border-b-0" : ""} ${buttonClassName}`}
         >
@@ -285,11 +310,11 @@ export default function ModalSelect({
             })}
           </div>
         )}
-        {open && portal && typeof document !== 'undefined' ? createPortal(
+        {open && portal && resolvedPortalTarget ? createPortal(
           <div
             ref={popupRef}
             data-modal-select-dropdown
-            className={`fixed z-[10050] max-h-64 overflow-y-auto rounded-b-lg !ring-0 border border-white/10 border-t-0 shadow-2xl origin-top transition-all duration-[100ms] ${
+            className={`${isScoped ? 'absolute' : 'fixed'} z-[70] max-h-64 overflow-y-auto rounded-b-lg !ring-0 border border-white/10 border-t-0 shadow-2xl origin-top transition-all duration-[100ms] ${
               visible
                 ? "opacity-100 scale-y-100 translate-y-0 ease-[cubic-bezier(0.16,1,0.3,1)]"
                 : "opacity-0 scale-y-[0.92] -translate-y-1 ease-[cubic-bezier(0.4,0,1,1)]"
@@ -348,7 +373,7 @@ export default function ModalSelect({
               );
             })}
           </div>,
-          document.body
+          resolvedPortalTarget
         ) : null}
       </div>
       {useNativeSelect ? (

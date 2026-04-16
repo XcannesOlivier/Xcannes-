@@ -1340,6 +1340,7 @@ export default function WalletDashboardReceiveModal({
 	                          options={shareWalletOptions}
 	                          useNativeSelect={false}
 	                          portal
+	                          portalTarget={overlayListRef.current}
 	                          backdropClassName="bg-black/80 backdrop-blur-[4px]"
 	                          iconClassName="inline-flex items-center justify-center leading-none"
 	                          buttonClassName="w-full bg-transparent rounded-xl pl-0 pr-2 py-2 text-base text-white focus:outline-none cursor-pointer transition-colors duration-150"
@@ -1477,6 +1478,7 @@ export default function WalletDashboardReceiveModal({
 	                          options={shareWalletOptions}
 	                          useNativeSelect={false}
 	                          portal
+	                          portalTarget={overlayListRef.current}
 	                          backdropClassName="bg-black/80 backdrop-blur-[4px]"
 	                          iconClassName="inline-flex items-center justify-center leading-none"
 	                          buttonClassName="w-full bg-transparent rounded-xl pl-0 pr-2 py-2 text-base text-white focus:outline-none cursor-pointer transition-colors duration-150"
@@ -1552,6 +1554,7 @@ export default function WalletDashboardReceiveModal({
 	                          })}
 	                          useNativeSelect={false}
 	                          portal
+	                          portalTarget={overlayListRef.current}
 	                          backdropClassName="bg-black/80 backdrop-blur-[4px]"
 		                          menuClassName={
 		                            noticeVariant === 'demo'
