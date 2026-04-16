@@ -56,6 +56,12 @@ export default function WalletDashboardSendModal({
   const [autoShowLabelOnce, setAutoShowLabelOnce] = useState(false);
   const [showFullPayreqAddress, setShowFullPayreqAddress] = useState(false);
   const [scanUnavailable, setScanUnavailable] = useState(false);
+  /* ── Scanner swipe-to-close (mobile) ── */
+  const [scanDragging, setScanDragging] = useState(false);
+  const [scanTranslateY, setScanTranslateY] = useState(0);
+  const scanOverlayRef = useRef(null);
+  const scanDragMeta = useRef({ startY: 0, startAt: 0, pointerId: null, lastDelta: 0, pending: false, dragging: false });
+  const scanCloseRequested = useRef(false);
   const [showFullRecipientAccount, setShowFullRecipientAccount] =
     useState(false);
   const savedPickerRef = useRef(null);
@@ -412,6 +418,64 @@ export default function WalletDashboardSendModal({
       setScanUnavailable(false);
     }
   }, [scanActive]);
+
+  /* ── Scanner swipe-to-close reset ── */
+  useEffect(() => {
+    if (scanActive) {
+      scanCloseRequested.current = false;
+      setScanDragging(false);
+      setScanTranslateY(0);
+      scanDragMeta.current = { startY: 0, startAt: 0, pointerId: null, lastDelta: 0, pending: false, dragging: false };
+    } else {
+      setScanDragging(false);
+      if (!scanCloseRequested.current) setScanTranslateY(0);
+      scanDragMeta.current = { startY: 0, startAt: 0, pointerId: null, lastDelta: 0, pending: false, dragging: false };
+    }
+  }, [scanActive]);
+
+  const scanSwipeStart = (event) => {
+    if (!event?.isPrimary) return;
+    if (event.pointerType === "mouse") return;
+    scanDragMeta.current = { startY: event.clientY, startAt: Date.now(), pointerId: event.pointerId, lastDelta: 0, pending: true, dragging: false };
+  };
+  const scanSwipeMove = (event) => {
+    const m = scanDragMeta.current;
+    if (!m.pending && !m.dragging) return;
+    if (m.pointerId !== event.pointerId) return;
+    const delta = event.clientY - m.startY;
+    if (delta <= 0) return;
+    if (!m.dragging) {
+      if (delta < 8) return;
+      try { scanOverlayRef.current?.setPointerCapture?.(event.pointerId); } catch { /* */ }
+      m.dragging = true;
+      setScanDragging(true);
+    }
+    m.lastDelta = delta;
+    setScanTranslateY(delta);
+  };
+  const scanSwipeEnd = (event) => {
+    const m = scanDragMeta.current;
+    if (m.pointerId !== event.pointerId) return;
+    const delta = m.lastDelta || 0;
+    const duration = Math.max(1, Date.now() - (m.startAt || 0));
+    const velocity = delta / duration;
+    const h = typeof window !== "undefined" ? window.innerHeight : 800;
+    const closeDistance = Math.max(220, Math.min(320, h * 0.28));
+    const shouldClose = delta > closeDistance || (delta > closeDistance * 0.6 && velocity > 1.25);
+    m.pending = false;
+    m.dragging = false;
+    setScanDragging(false);
+    if (shouldClose) {
+      if (!scanCloseRequested.current) {
+        scanCloseRequested.current = true;
+        setScanTranslateY(Math.max(delta, h));
+        window.setTimeout(() => { setScanActive(false); }, 180);
+      }
+      return;
+    }
+    setScanTranslateY(0);
+    scanDragMeta.current = { startY: 0, startAt: 0, pointerId: null, lastDelta: 0, pending: false, dragging: false };
+  };
 
   useEffect(() => {
     setShowFullPayreqAddress(false);
@@ -1491,20 +1555,30 @@ export default function WalletDashboardSendModal({
           <div
             className="absolute inset-0 bg-black/90 backdrop-blur-sm"
             onClick={() => setScanActive(false)}
+            style={
+              scanTranslateY > 0
+                ? { opacity: Math.max(0, Math.min(1, 1 - scanTranslateY / 420)) }
+                : undefined
+            }
           />
-          {/* Scanner container */}
-          <div className="relative flex-1 flex flex-col items-center justify-center">
-            {/* Close button */}
-            <button
-              type="button"
-              onClick={() => setScanActive(false)}
-              className="absolute top-4 right-4 z-10 flex items-center justify-center w-10 h-10 text-white/55 hover:text-white/85 transition-colors"
-              aria-label={t("close", "Fermer")}
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
+          {/* Swipeable scanner wrapper */}
+          <div
+            ref={scanOverlayRef}
+            className="relative flex-1 flex flex-col items-center justify-center"
+            style={{
+              transform: `translateY(${Math.max(0, scanTranslateY)}px)`,
+              transition: scanDragging ? "none" : "transform 220ms cubic-bezier(0.2,0,0,1)",
+              willChange: scanTranslateY ? "transform" : undefined,
+            }}
+            onPointerDown={scanSwipeStart}
+            onPointerMove={scanSwipeMove}
+            onPointerUp={scanSwipeEnd}
+            onPointerCancel={scanSwipeEnd}
+          >
+            {/* Swipe bar (mobile only) */}
+            <div className="md:hidden flex justify-center pt-3 pb-2" aria-hidden>
+              <span className="block w-12 h-1.5 rounded-full bg-white/20" />
+            </div>
             {/* Scanner */}
             <div className="flex-1 w-full">
               <QRScanner
