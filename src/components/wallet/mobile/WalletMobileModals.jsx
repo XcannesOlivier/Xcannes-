@@ -341,7 +341,7 @@ export default function WalletMobileModals({
             <div className="fixed inset-0 z-[10100] flex flex-col">
               {/* Backdrop */}
               <div
-                className="absolute inset-0 bg-black/90 backdrop-blur-sm"
+                className="absolute inset-0 bg-[#101415] backdrop-blur-sm"
                 onClick={() => setQrScannerOpen(false)}
                 style={
                   scanTranslateY > 0
@@ -391,7 +391,7 @@ export default function WalletMobileModals({
                     hideTitle={true}
                     enableCamera={true}
                     hideWhenUnavailable
-                    className="bg-black w-full h-full flex flex-col justify-center [&_video]:w-full [&_video]:h-full [&_video]:object-cover"
+                    className="bg-[#101415] w-full h-full flex flex-col justify-center [&_video]:w-full [&_video]:h-full [&_video]:object-cover"
                   />
                 </div>
               </div>

@@ -564,58 +564,18 @@ export default function WalletSettingsDropdown({
                       <span className="block w-12 h-1.5 rounded-full bg-white/20" />
                     </div>
                   </div>
-                  <div className="flex items-center justify-between px-4 pt-2 pb-3">
-                    <div className="min-w-0">
-                      <div className="text-[12px] font-semibold tracking-[0.28em] uppercase text-white">
-                        {t("ui_settings_label", "Paramètres")}
-                      </div>
+                  <div className="flex items-center justify-center px-4 pt-2 pb-3">
+                    <div className="text-[12px] font-semibold tracking-[0.28em] uppercase text-white">
+                      {t("ui_settings_label", "Paramètres")}
                     </div>
-                    <button
-                      type="button"
-                      aria-label={t("close", "Fermer")}
-                      className="h-9 w-9 inline-flex items-center justify-center rounded-lg text-white/60 hover:text-white hover:bg-white/5 active:scale-95 transition"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <svg
-                        className="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        strokeWidth={2}
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M6 18L18 6M6 6l12 12"
-                        />
-                      </svg>
-                    </button>
                   </div>
                 </div>
 
                 {/* Desktop header */}
                 <div className="hidden md:flex items-center justify-between px-4 py-3 border-b border-white/10">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <span className="inline-flex h-6 w-6 items-center justify-center rounded-lg bg-white/5 border border-white/10 text-white/60">
-                      <svg
-                        className="w-3.5 h-3.5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        strokeWidth={1.8}
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.573-1.066z"
-                        />
-                        <circle cx="12" cy="12" r="3" />
-                      </svg>
-                    </span>
-                    <div className="min-w-0">
-                      <div className="text-[12px] font-semibold tracking-[0.28em] uppercase text-white">
-                        {t("ui_settings_label", "Paramètres")}
-                      </div>
+                  <div className="min-w-0">
+                    <div className="text-sm font-semibold text-white">
+                      {t("ui_settings_label", "Paramètres")}
                     </div>
                   </div>
                   <button

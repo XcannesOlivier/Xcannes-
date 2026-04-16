@@ -229,7 +229,7 @@ export default function WalletDashboardHeader({
     if (fromList) return fromList;
     const fromMap = trimmed(labelsByAddress?.[wallet]);
     if (fromMap) return fromMap;
-    return "Wallet";
+    return "Compte";
   }, [labelsByAddress, wallet, walletAddresses, walletLabel]);
 
   // Close dropdowns when clicking outside
@@ -367,7 +367,7 @@ export default function WalletDashboardHeader({
                               : trimmed(w?.label) || trimmed(labelsByAddress?.[addr]);
                           const isActive = addr === wallet;
                           if (isActive) return null;
-                          const displayName = label || `Wallet ${index + 1}`;
+                          const displayName = label || `Compte ${index + 1}`;
                           return (
                             <button
                               key={addr}
