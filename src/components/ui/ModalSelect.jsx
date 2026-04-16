@@ -100,8 +100,7 @@ export default function ModalSelect({
           position: 'absolute',
           top: tRect.bottom - cRect.top + resolvedPortalTarget.scrollTop - 1,
           left: tRect.left - cRect.left + resolvedPortalTarget.scrollLeft,
-          width: tRect.width + 2,
-          marginLeft: -1,
+          width: tRect.width,
         });
       };
       update();
@@ -116,7 +115,7 @@ export default function ModalSelect({
     const update = () => {
       if (!triggerRef.current) return;
       const r = triggerRef.current.getBoundingClientRect();
-      setPortalStyle({ position: 'fixed', top: r.bottom - 1, left: r.left, width: r.width + 2, marginLeft: -1 });
+      setPortalStyle({ position: 'fixed', top: r.bottom - 1, left: r.left, width: r.width });
     };
     update();
     window.addEventListener('scroll', update, true);
