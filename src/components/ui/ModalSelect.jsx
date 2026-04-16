@@ -210,7 +210,7 @@ export default function ModalSelect({
           }}
           className={`w-full flex items-center justify-between gap-2 ${
             backdropClassName
-              ? (open ? "relative z-[70]" : "relative z-[61]")
+              ? (open ? "relative z-[70]" : "relative")
               : ""
           } ${open ? "!rounded-b-none !ring-0 !shadow-none border border-white/10 border-b-0" : ""} ${buttonClassName}`}
         >
