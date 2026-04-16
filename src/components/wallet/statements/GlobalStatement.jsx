@@ -1975,7 +1975,7 @@ export default function GlobalStatement({
                 )}
               </div>
             ) : (
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {recentMovements.map((m, idx) => {
                   const isConversion = normalizeKind(m?.kind) === "CONVERSION";
                   const isPaymentOut =
