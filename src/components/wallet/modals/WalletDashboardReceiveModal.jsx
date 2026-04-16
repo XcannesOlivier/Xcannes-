@@ -1343,7 +1343,7 @@ export default function WalletDashboardReceiveModal({
 	                          portalTarget={overlayListRef.current}
 	                          backdropClassName="bg-black/80 backdrop-blur-[4px]"
 	                          iconClassName="inline-flex items-center justify-center leading-none"
-	                          buttonClassName="w-full bg-transparent rounded-xl pl-0 pr-2 py-2 text-base text-white focus:outline-none cursor-pointer transition-colors duration-150"
+	                          buttonClassName="w-full bg-[#101415] rounded-xl pl-0 pr-2 py-2 text-base text-white focus:outline-none cursor-pointer transition-colors duration-150"
 	                          menuClassName={
 	                            noticeVariant === 'demo'
 	                              ? 'bg-xcannes-surface-demo !max-h-64 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
@@ -1481,7 +1481,7 @@ export default function WalletDashboardReceiveModal({
 	                          portalTarget={overlayListRef.current}
 	                          backdropClassName="bg-black/80 backdrop-blur-[4px]"
 	                          iconClassName="inline-flex items-center justify-center leading-none"
-	                          buttonClassName="w-full bg-transparent rounded-xl pl-0 pr-2 py-2 text-base text-white focus:outline-none cursor-pointer transition-colors duration-150"
+	                          buttonClassName="w-full bg-[#101415] rounded-xl pl-0 pr-2 py-2 text-base text-white focus:outline-none cursor-pointer transition-colors duration-150"
 	                          menuClassName={
 	                            noticeVariant === 'demo'
 	                              ? 'bg-xcannes-surface-demo !max-h-64 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
