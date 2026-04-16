@@ -801,6 +801,7 @@ export default function WalletDashboardSendModal({
 
   const maybeStartOverlayDrag = (event, source) => {
     if (inline) return false;
+    if (scanActive) return false;
     if (!event?.isPrimary) return false;
     if (event.pointerType === "mouse") return false;
     if (event.target?.closest?.("input,textarea,select")) return false;
@@ -827,6 +828,7 @@ export default function WalletDashboardSendModal({
 
   const handleOverlayPointerMove = (event) => {
     if (inline) return;
+    if (scanActive) return;
     const meta = overlayDragMetaRef.current;
     if (!meta?.pending && !meta?.dragging) return;
     if (meta.pointerId !== event.pointerId) return;
@@ -866,6 +868,7 @@ export default function WalletDashboardSendModal({
 
   const handleOverlayPointerEnd = (event) => {
     if (inline) return;
+    if (scanActive) return;
     const meta = overlayDragMetaRef.current;
     if (meta.pointerId !== event.pointerId) return;
 
