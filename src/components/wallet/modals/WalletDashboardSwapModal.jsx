@@ -601,7 +601,7 @@ export default function WalletDashboardSwapModal({
               <div className="flex flex-col gap-4">
                 {/* ── SECTION 1: Currency selection ───────────────────────── */}
                 <div className="space-y-3">
-                  <div>
+                  <div className="relative z-[65]">
                     <div className="text-[11px] tracking-[0.22em] text-white/45 mb-2 relative z-[41]">
                       {t("ui_from_label_short", "De")}
                     </div>
