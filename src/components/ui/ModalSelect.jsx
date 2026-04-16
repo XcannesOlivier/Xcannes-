@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { createPortal } from "react-dom";
 import { isValidElement, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 export default function ModalSelect({
@@ -20,6 +21,7 @@ export default function ModalSelect({
   backdropClassName = "",
   disabled = false,
   hideSelected = false,
+  portal = false,
 }) {
   const [open, setOpen] = useState(false);
   const [visible, setVisible] = useState(false);
@@ -78,6 +80,25 @@ export default function ModalSelect({
     };
   }, [open]);
 
+  // ── Portal positioning (fixed dropdown rendered at body level) ──
+  const [portalStyle, setPortalStyle] = useState(null);
+
+  useEffect(() => {
+    if (!open || !portal) { setPortalStyle(null); return; }
+    const update = () => {
+      if (!triggerRef.current) return;
+      const r = triggerRef.current.getBoundingClientRect();
+      setPortalStyle({ position: 'fixed', top: r.bottom, left: r.left, width: r.width });
+    };
+    update();
+    window.addEventListener('scroll', update, true);
+    window.addEventListener('resize', update);
+    return () => {
+      window.removeEventListener('scroll', update, true);
+      window.removeEventListener('resize', update);
+    };
+  }, [open, portal]);
+
   const selected = useMemo(() => {
     return options.find((opt) => String(opt.value) === String(value)) || null;
   }, [options, value]);
@@ -127,15 +148,28 @@ export default function ModalSelect({
   return (
     <>
       {open && backdropClassName ? (
-        <div
-          className={`fixed inset-0 z-40 transition-opacity duration-[100ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
-            visible ? "opacity-100" : "opacity-0"
-          } ${backdropClassName}`}
-          aria-hidden="true"
-          onPointerDown={(e) => { e.stopPropagation(); }}
-          onMouseDown={(e) => { e.stopPropagation(); e.preventDefault(); }}
-          onClick={(e) => { e.stopPropagation(); closeMenu(); }}
-        />
+        portal && typeof document !== 'undefined' ? createPortal(
+          <div
+            className={`fixed inset-0 z-[10049] transition-opacity duration-[100ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
+              visible ? "opacity-100" : "opacity-0"
+            } ${backdropClassName}`}
+            aria-hidden="true"
+            onPointerDown={(e) => { e.stopPropagation(); }}
+            onMouseDown={(e) => { e.stopPropagation(); e.preventDefault(); }}
+            onClick={(e) => { e.stopPropagation(); closeMenu(); }}
+          />,
+          document.body
+        ) : (
+          <div
+            className={`fixed inset-0 z-40 transition-opacity duration-[100ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
+              visible ? "opacity-100" : "opacity-0"
+            } ${backdropClassName}`}
+            aria-hidden="true"
+            onPointerDown={(e) => { e.stopPropagation(); }}
+            onMouseDown={(e) => { e.stopPropagation(); e.preventDefault(); }}
+            onClick={(e) => { e.stopPropagation(); closeMenu(); }}
+          />
+        )
       ) : null}
       <div className={customMenuClassName}>
         <button
@@ -148,7 +182,11 @@ export default function ModalSelect({
             toggleMenu();
           }}
           className={`w-full flex items-center justify-between gap-2 ${
-            backdropClassName ? (open ? "relative z-50" : "relative z-[41]") : ""
+            backdropClassName
+              ? portal
+                ? (open ? "relative z-[10051]" : "relative z-[10050]")
+                : (open ? "relative z-50" : "relative z-[41]")
+              : ""
           } ${open ? "!rounded-b-none !ring-0 !shadow-none border border-white/10 border-b-0" : ""} ${buttonClassName}`}
         >
           <span className="flex items-center gap-2 min-w-0 flex-1">
@@ -183,7 +221,7 @@ export default function ModalSelect({
             />
           </svg>
         </button>
-        {open && (
+        {open && !portal && (
           <div
             ref={popupRef}
             data-modal-select-dropdown
@@ -247,6 +285,71 @@ export default function ModalSelect({
             })}
           </div>
         )}
+        {open && portal && typeof document !== 'undefined' ? createPortal(
+          <div
+            ref={popupRef}
+            data-modal-select-dropdown
+            className={`fixed z-[10050] max-h-64 overflow-y-auto rounded-b-lg !ring-0 border border-white/10 border-t-0 shadow-2xl origin-top transition-all duration-[100ms] ${
+              visible
+                ? "opacity-100 scale-y-100 translate-y-0 ease-[cubic-bezier(0.16,1,0.3,1)]"
+                : "opacity-0 scale-y-[0.92] -translate-y-1 ease-[cubic-bezier(0.4,0,1,1)]"
+            } ${menuClassName}`}
+            style={{ ...(portalStyle || {}), WebkitOverflowScrolling: "touch", willChange: "transform, opacity" }}
+            onPointerDown={(e) => e.stopPropagation()}
+            onMouseDown={(e) => e.stopPropagation()}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {options.filter((opt) => !hideSelected || String(opt.value) !== String(value)).map((opt) => {
+              const left = opt.labelLeft ?? opt.label;
+              const mobileLeft = opt.labelMobile ?? left;
+              const optionLeft = showMobileOptionRight ? left : mobileLeft;
+              const right = opt.labelRight ?? null;
+              const rightClassName = showMobileOptionRight
+                ? "ml-auto text-white/50 tabular-nums"
+                : "ml-auto text-white/50 tabular-nums hidden md:inline";
+              const description = opt.description ?? null;
+              return (
+              <button
+                key={String(opt.value)}
+                type="button"
+                onClick={() => handleSelect(opt.value)}
+                className={`w-full text-left px-3 py-2 text-sm text-white/80 hover:bg-white/10 ${optionClassName}`}
+              >
+                <span className="flex items-start gap-2">
+                  {renderIcon(opt.icon)}
+                  {description ? (
+                    <span className="flex flex-col min-w-0 flex-1">
+                      <span className="flex items-center gap-2 min-w-0 flex-1">
+                        <span className="truncate md:hidden">{optionLeft}</span>
+                        <span className="truncate hidden md:inline">{left}</span>
+                        {right ? (
+                          <span className={rightClassName}>
+                            {right}
+                          </span>
+                        ) : null}
+                      </span>
+                      <span className="text-[11px] text-white/50 leading-tight mt-0.5">
+                        {description}
+                      </span>
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-2 min-w-0 flex-1">
+                      <span className="truncate md:hidden">{optionLeft}</span>
+                      <span className="truncate hidden md:inline">{left}</span>
+                      {right ? (
+                        <span className={rightClassName}>
+                          {right}
+                        </span>
+                      ) : null}
+                    </span>
+                  )}
+                </span>
+              </button>
+              );
+            })}
+          </div>,
+          document.body
+        ) : null}
       </div>
       {useNativeSelect ? (
       <div className="relative md:hidden">

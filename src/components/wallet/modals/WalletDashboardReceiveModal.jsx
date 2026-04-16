@@ -1474,6 +1474,8 @@ export default function WalletDashboardReceiveModal({
 	                          }}
 	                          options={shareWalletOptions}
 	                          useNativeSelect={false}
+	                          portal
+	                          backdropClassName="bg-black/40"
 	                          iconClassName="inline-flex items-center justify-center leading-none"
 	                          buttonClassName="w-full bg-transparent rounded-xl pl-0 pr-2 py-2 text-base text-white focus:outline-none cursor-pointer transition-colors duration-150"
 	                          menuClassName={
@@ -1547,6 +1549,8 @@ export default function WalletDashboardReceiveModal({
                             };
 	                          })}
 	                          useNativeSelect={false}
+	                          portal
+	                          backdropClassName="bg-black/40"
 		                          menuClassName={
 		                            noticeVariant === 'demo'
 		                              ? 'bg-xcannes-surface-demo !max-h-32 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
