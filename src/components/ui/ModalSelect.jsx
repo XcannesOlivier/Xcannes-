@@ -40,7 +40,7 @@ export default function ModalSelect({
     setTimeout(() => {
       setOpen(false);
       isClosingRef.current = false;
-    }, 380);
+    }, 130);
   }, []);
 
   const toggleMenu = useCallback(() => {
@@ -128,7 +128,7 @@ export default function ModalSelect({
     <>
       {open && backdropClassName ? (
         <div
-          className={`fixed inset-0 z-40 transition-opacity duration-[350ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
+          className={`fixed inset-0 z-40 transition-opacity duration-[100ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
             visible ? "opacity-100" : "opacity-0"
           } ${backdropClassName}`}
           aria-hidden="true"
@@ -168,7 +168,7 @@ export default function ModalSelect({
             </span>
           </span>
           <svg
-            className={`w-3 h-3 transition-transform duration-[350ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
+            className={`w-3 h-3 transition-transform duration-[100ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
               visible ? "rotate-180" : ""
             }`}
             fill="none"
@@ -187,7 +187,7 @@ export default function ModalSelect({
           <div
             ref={popupRef}
             data-modal-select-dropdown
-            className={`absolute z-50 mt-0 w-full max-h-64 overflow-y-auto rounded-b-lg !ring-0 border border-white/10 border-t-0 shadow-2xl origin-top transition-all duration-[350ms] ${
+            className={`absolute z-50 mt-0 w-full max-h-64 overflow-y-auto rounded-b-lg !ring-0 border border-white/10 border-t-0 shadow-2xl origin-top transition-all duration-[100ms] ${
               visible
                 ? "opacity-100 scale-y-100 translate-y-0 ease-[cubic-bezier(0.16,1,0.3,1)]"
                 : "opacity-0 scale-y-[0.92] -translate-y-1 ease-[cubic-bezier(0.4,0,1,1)]"
