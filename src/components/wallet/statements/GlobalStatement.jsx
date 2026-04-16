@@ -1945,7 +1945,7 @@ export default function GlobalStatement({
           {/* Recent transactions */}
           <div className="space-y-2">
             <div className="flex items-end justify-between gap-3">
-              <div className="text-[11px] tracking-[0.22em] uppercase text-white/45">
+              <div className="text-[11px] tracking-[0.08em] text-white/45">
                 {t(
                   "ui_recent_transactions_9b1c7a2d5e",
                   "Dernières transactions",
