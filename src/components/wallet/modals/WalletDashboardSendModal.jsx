@@ -1569,6 +1569,7 @@ export default function WalletDashboardSendModal({
               transform: `translateY(${Math.max(0, scanTranslateY)}px)`,
               transition: scanDragging ? "none" : "transform 220ms cubic-bezier(0.2,0,0,1)",
               willChange: scanTranslateY ? "transform" : undefined,
+              touchAction: "none",
             }}
             onPointerDown={scanSwipeStart}
             onPointerMove={scanSwipeMove}
