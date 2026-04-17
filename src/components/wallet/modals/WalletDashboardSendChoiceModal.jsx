@@ -406,10 +406,7 @@ export default function WalletDashboardSendChoiceModal({
                       dotClassName: "!h-3 !w-3 ring-xcannes-green/20",
                     })}
                   </div>
-                  <h3 className="mt-1 text-[22px] md:text-[24px] font-semibold text-white/95 tracking-tight">
-                    {t('ui_send_choice_title', 'Envoyer')}
-                  </h3>
-                  <p className="mt-2 text-[14px] md:text-[15px] text-white/60 max-w-[34ch] leading-relaxed">
+                  <p className="mt-2 text-[18px] md:text-[20px] font-medium text-white/70 max-w-[34ch] leading-snug tracking-tight">
                     {t('ui_send_choice_subtitle', 'Choisissez comment envoyer vos fonds')}
                   </p>
                 </div>
@@ -563,7 +560,7 @@ export default function WalletDashboardSendChoiceModal({
                               }
                             }}
                             placeholder={t('ui_paste_address_placeholder', 'Coller ou saisir une adresse')}
-                            className="w-full bg-[#101415] ring-1 ring-white/15 ring-inset rounded-[20px] shadow-[0_4px_12px_rgba(0,0,0,0.4)] pl-4 pr-12 py-3 text-sm text-white placeholder:text-white/35 outline-none focus:ring-2 focus:ring-xcannes-green/60"
+                            className="w-full bg-elevated ring-1 ring-white/15 ring-inset rounded-[20px] shadow-[0_4px_12px_rgba(0,0,0,0.4)] pl-4 pr-12 py-3 text-sm text-white placeholder:text-white/35 outline-none focus:ring-2 focus:ring-xcannes-green/60"
                           />
                           {quickscanPasteValue.trim() ? (
                             <button
@@ -584,7 +581,7 @@ export default function WalletDashboardSendChoiceModal({
                           <button
                             type="button"
                             onClick={() => setShowQuickscanSavedPicker(prev => !prev)}
-                            className="w-full flex items-center gap-2 bg-[#101415] ring-1 ring-white/15 ring-inset rounded-[20px] shadow-[0_4px_12px_rgba(0,0,0,0.4)] px-3 py-2.5 text-sm text-white/70 hover:bg-white/[0.03] transition-colors"
+                            className="w-full flex items-center gap-2 bg-elevated ring-1 ring-white/15 ring-inset rounded-[20px] shadow-[0_4px_12px_rgba(0,0,0,0.4)] px-3 py-2.5 text-sm text-white/70 hover:bg-white/[0.03] transition-colors"
                           >
                             <svg className="w-4 h-4 text-white/50 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                               <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
@@ -598,7 +595,7 @@ export default function WalletDashboardSendChoiceModal({
 
                           {/* Saved addresses dropdown */}
                           {showQuickscanSavedPicker ? (
-                            <div className="absolute left-0 right-0 top-full mt-1 z-20 rounded-[20px] ring-1 ring-white/15 ring-inset overflow-hidden shadow-lg bg-[#101415]">
+                            <div className="absolute left-0 right-0 top-full mt-1 z-20 rounded-[20px] ring-1 ring-white/15 ring-inset overflow-hidden shadow-lg bg-elevated">
                               <div className="max-h-44 overflow-y-auto">
                                 {(() => {
                                   const filtered = (savedAddresses || []).filter(entry => {
@@ -738,7 +735,7 @@ export default function WalletDashboardSendChoiceModal({
                               }
                             }}
                             placeholder={t('ui_paste_address_placeholder', 'Coller ou saisir une adresse')}
-                            className="w-full bg-[#101415] ring-1 ring-white/15 ring-inset rounded-[20px] shadow-[0_4px_12px_rgba(0,0,0,0.4)] pl-4 pr-12 py-3 text-sm text-white placeholder:text-white/35 outline-none focus:ring-2 focus:ring-xcannes-green/60"
+                            className="w-full bg-elevated ring-1 ring-white/15 ring-inset rounded-[20px] shadow-[0_4px_12px_rgba(0,0,0,0.4)] pl-4 pr-12 py-3 text-sm text-white placeholder:text-white/35 outline-none focus:ring-2 focus:ring-xcannes-green/60"
                           />
                           {pasteValue.trim() ? (
                             <button
@@ -759,7 +756,7 @@ export default function WalletDashboardSendChoiceModal({
                           <button
                             type="button"
                             onClick={() => setShowSavedPicker(prev => !prev)}
-                            className="w-full flex items-center gap-2 bg-[#101415] ring-1 ring-white/15 ring-inset rounded-[20px] shadow-[0_4px_12px_rgba(0,0,0,0.4)] px-3 py-2.5 text-sm text-white/70 hover:bg-white/[0.03] transition-colors"
+                            className="w-full flex items-center gap-2 bg-elevated ring-1 ring-white/15 ring-inset rounded-[20px] shadow-[0_4px_12px_rgba(0,0,0,0.4)] px-3 py-2.5 text-sm text-white/70 hover:bg-white/[0.03] transition-colors"
                           >
                             <svg className="w-4 h-4 text-white/50 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                               <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
@@ -773,7 +770,7 @@ export default function WalletDashboardSendChoiceModal({
 
                           {/* Saved addresses dropdown */}
                           {showSavedPicker ? (
-                            <div className="absolute left-0 right-0 top-full mt-1 z-20 rounded-[20px] ring-1 ring-white/15 ring-inset overflow-hidden shadow-lg bg-[#101415]">
+                            <div className="absolute left-0 right-0 top-full mt-1 z-20 rounded-[20px] ring-1 ring-white/15 ring-inset overflow-hidden shadow-lg bg-elevated">
                               <div className="max-h-44 overflow-y-auto">
                                 {(() => {
                                   const filtered = (savedAddresses || []).filter(entry => {
@@ -908,7 +905,7 @@ export default function WalletDashboardSendChoiceModal({
                               }
                             }}
                             placeholder={t('ui_paste_payreq_placeholder', 'Coller une demande de paiement')}
-                            className="w-full bg-[#101415] ring-1 ring-white/15 ring-inset rounded-[20px] shadow-[0_4px_12px_rgba(0,0,0,0.4)] pl-4 pr-12 py-3 text-sm text-white placeholder:text-white/35 outline-none focus:ring-2 focus:ring-[#f5a623]/50"
+                            className="w-full bg-elevated ring-1 ring-white/15 ring-inset rounded-[20px] shadow-[0_4px_12px_rgba(0,0,0,0.4)] pl-4 pr-12 py-3 text-sm text-white placeholder:text-white/35 outline-none focus:ring-2 focus:ring-[#f5a623]/50"
                           />
                           {payreqPasteValue.trim() ? (
                             <button
