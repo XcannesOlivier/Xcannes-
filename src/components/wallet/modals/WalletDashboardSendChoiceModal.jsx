@@ -3,7 +3,8 @@
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'next-i18next';
 import { useModalTransition } from '@/hooks/useModalTransition';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
+import { normalizeQrImageFile } from '@/utils/qrImage';
 
 export default function WalletDashboardSendChoiceModal({
   open,
@@ -11,6 +12,11 @@ export default function WalletDashboardSendChoiceModal({
   onChooseQuickScan,
   onChooseSimpleSend,
   onChoosePayRequest,
+  // Props needed for accordion sub-actions
+  handlePaymentRequestScan,
+  setSendDestination,
+  setSendDestinationLabel,
+  toast,
   inline = false,
 }) {
   const { t } = useTranslation('common');
@@ -19,17 +25,110 @@ export default function WalletDashboardSendChoiceModal({
     enabled: shouldAnimate,
   });
 
+  // ── Accordion state ──────────────────────────────────────────
+  const [expandedCard, setExpandedCard] = useState(null); // 'simple' | 'payreq' | null
+  const [pasteValue, setPasteValue] = useState('');
+  const [payreqPasteValue, setPayreqPasteValue] = useState('');
+  const sendFileInputId = 'send-choice-qr-file';
+  const payreqFileInputId = 'payreq-choice-qr-file';
+  const manualQrReaderIdRef = useRef(
+    `choice-qr-reader-${Math.random().toString(36).slice(2, 10)}`,
+  );
+  const manualQrScannerRef = useRef(null);
+
+  useEffect(() => {
+    if (!open) {
+      setExpandedCard(null);
+      setPasteValue('');
+      setPayreqPasteValue('');
+    }
+  }, [open]);
+
+  // ── QR file decode (shared) ──────────────────────────────────
+  const handleManualQrFile = useCallback(async (file, { isPayreq = false } = {}) => {
+    if (!file) return;
+    try {
+      let scanFile = file;
+      try { scanFile = await normalizeQrImageFile(file, { maxDimension: 1600 }); } catch { scanFile = file; }
+      const { Html5Qrcode } = await import('html5-qrcode');
+      const readerId = manualQrReaderIdRef.current;
+      const instance = manualQrScannerRef.current || new Html5Qrcode(readerId);
+      manualQrScannerRef.current = instance;
+      let decodedText;
+      try { decodedText = await instance.scanFile(scanFile, true); }
+      catch {
+        if (scanFile !== file) decodedText = await instance.scanFile(file, true);
+        else throw new Error('decode failed');
+      }
+      try { await instance.clear(); } catch { /* ignore */ }
+      if (decodedText) {
+        if (isPayreq) {
+          handlePaymentRequestScan?.(decodedText);
+          onChoosePayRequest?.();
+        } else {
+          // Check if it looks like a payment request or just an address
+          const looksLikePayreq = /^(xcannes-payreq|xcannes-request)(?::\/\/|:)/i.test(decodedText) ||
+            (decodedText.startsWith('{') && /"to"|"targetCurrency"|"schema"|"payreq"/i.test(decodedText));
+          if (looksLikePayreq) {
+            handlePaymentRequestScan?.(decodedText);
+            onChoosePayRequest?.();
+          } else {
+            setSendDestination?.(decodedText);
+            setSendDestinationLabel?.('');
+            onChooseSimpleSend?.();
+          }
+        }
+      }
+    } catch {
+      toast?.error(t('ui_qr_decode_failed_3b5d7f9a2c', 'Unable to decode this image. Try a clearer screenshot.'));
+    }
+  }, [handlePaymentRequestScan, setSendDestination, setSendDestinationLabel, onChooseSimpleSend, onChoosePayRequest, toast, t]);
+
+  const handleFileUpload = useCallback((inputId, isPayreq) => {
+    const input = document.getElementById(inputId);
+    input?.click();
+  }, []);
+
+  // ── Paste handler for "Envoi simple" ─────────────────────────
+  const looksLikeXrplAddress = (v) => /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(v);
+
+  const handleSimplePasteSubmit = useCallback(() => {
+    const raw = pasteValue.trim();
+    if (!raw) return;
+    if (looksLikeXrplAddress(raw)) {
+      setSendDestination?.(raw);
+      setSendDestinationLabel?.('');
+      onChooseSimpleSend?.();
+    } else {
+      // Try as QR/payreq payload
+      const result = handlePaymentRequestScan?.(raw);
+      if (result?.relayChallenge || result?.navigate) {
+        onClose?.();
+        return;
+      }
+      setSendDestination?.(raw);
+      setSendDestinationLabel?.('');
+      onChooseSimpleSend?.();
+    }
+  }, [pasteValue, setSendDestination, setSendDestinationLabel, onChooseSimpleSend, handlePaymentRequestScan, onClose]);
+
+  // ── Paste handler for "Payer une demande" ────────────────────
+  const handlePayreqPasteSubmit = useCallback(() => {
+    const raw = payreqPasteValue.trim();
+    if (!raw) return;
+    handlePaymentRequestScan?.(raw);
+    onChoosePayRequest?.();
+  }, [payreqPasteValue, handlePaymentRequestScan, onChoosePayRequest]);
+
   // ── Icons ────────────────────────────────────────────────────
   const QuickScanIcon = () => (
     <svg viewBox="0 0 48 48" className="w-9 h-9" fill="none" aria-hidden>
-      {/* QR-code frame */}
       <rect x="10" y="10" width="12" height="12" rx="2" className="stroke-xcannes-green/70" strokeWidth="1.5" fill="none" />
       <rect x="13" y="13" width="6" height="6" rx="1" className="fill-xcannes-green/50" />
       <rect x="26" y="10" width="12" height="12" rx="2" className="stroke-white/50" strokeWidth="1.5" fill="none" />
       <rect x="29" y="13" width="6" height="6" rx="1" className="fill-white/30" />
       <rect x="10" y="26" width="12" height="12" rx="2" className="stroke-white/50" strokeWidth="1.5" fill="none" />
       <rect x="13" y="29" width="6" height="6" rx="1" className="fill-white/30" />
-      {/* scan lines */}
       <path d="M26 30h4m4 0h4" className="stroke-xcannes-green/60" strokeWidth="1.5" strokeLinecap="round" />
       <path d="M26 36h12" className="stroke-white/30" strokeWidth="1.5" strokeLinecap="round" />
     </svg>
@@ -54,8 +153,20 @@ export default function WalletDashboardSendChoiceModal({
     </svg>
   );
 
+  const ChevronIcon = ({ expanded }) => (
+    <svg
+      className={`w-5 h-5 text-white/45 transition-transform duration-200 ${expanded ? 'rotate-90' : ''}`}
+      viewBox="0 0 24 24" fill="none" aria-hidden
+    >
+      <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+
   const cardClassName =
     'w-full text-left rounded-[20px] px-4 py-4 bg-white/[0.02] hover:bg-white/[0.05] active:bg-white/[0.03] ring-1 ring-white/10 ring-inset shadow-[0_8px_26px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-22px_34px_rgba(0,0,0,0.68)] transition-all duration-[140ms] ease-[cubic-bezier(0.4,0,0.2,1)] hover:ring-white/20 hover:-translate-y-px active:translate-y-0 active:scale-[0.99]';
+
+  const accordionBtnClass =
+    'flex items-center gap-2.5 w-full text-left rounded-xl px-3 py-2.5 bg-white/[0.03] hover:bg-white/[0.07] active:bg-white/[0.04] ring-1 ring-white/8 ring-inset transition-colors duration-100';
 
   // ── Swipe-to-close (mobile) ────────────────────────────────
   const [overlayDragging, setOverlayDragging] = useState(false);
@@ -265,6 +376,32 @@ export default function WalletDashboardSendChoiceModal({
               >
                 <div className="flex flex-col gap-5 pb-2">
 
+                  {/* Hidden file inputs for QR image import */}
+                  <input
+                    id={sendFileInputId}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target?.files?.[0];
+                      if (file) handleManualQrFile(file, { isPayreq: false });
+                      e.target.value = '';
+                    }}
+                  />
+                  <input
+                    id={payreqFileInputId}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target?.files?.[0];
+                      if (file) handleManualQrFile(file, { isPayreq: true });
+                      e.target.value = '';
+                    }}
+                  />
+                  {/* Hidden div for html5-qrcode reader */}
+                  <div id={manualQrReaderIdRef.current} className="hidden" />
+
                   {/* ── 1. Quick Scan ───────────────────────── */}
                   <button type="button" onClick={onChooseQuickScan} className={cardClassName}>
                     <div className="flex items-center gap-3">
@@ -287,9 +424,17 @@ export default function WalletDashboardSendChoiceModal({
                     </div>
                   </button>
 
-                  {/* ── 2. Envoi simple ──────────────────────── */}
-                  <button type="button" onClick={onChooseSimpleSend} className={cardClassName}>
-                    <div className="flex items-center gap-3">
+                  {/* ── 2. Envoi simple (accordion) ──────────── */}
+                  <div className={[
+                    'w-full rounded-[20px] bg-white/[0.02] ring-1 ring-inset shadow-[0_8px_26px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-22px_34px_rgba(0,0,0,0.68)] transition-all duration-200',
+                    expandedCard === 'simple' ? 'ring-xcannes-green/30' : 'ring-white/10 hover:ring-white/20',
+                  ].join(' ')}>
+                    {/* Header */}
+                    <button
+                      type="button"
+                      onClick={() => setExpandedCard(prev => prev === 'simple' ? null : 'simple')}
+                      className="w-full text-left px-4 py-4 flex items-center gap-3"
+                    >
                       <div className="w-12 h-12 rounded-[16px] bg-black/30 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
                         <SimpleSendIcon />
                       </div>
@@ -298,20 +443,112 @@ export default function WalletDashboardSendChoiceModal({
                           <p className="text-[18px] md:text-[19px] text-white font-semibold truncate">
                             {t('ui_send_simple_title', 'Envoi simple')}
                           </p>
-                          <svg className="w-5 h-5 text-white/45" viewBox="0 0 24 24" fill="none" aria-hidden>
-                            <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                          </svg>
+                          <ChevronIcon expanded={expandedCard === 'simple'} />
                         </div>
                         <p className="mt-1 text-[15px] md:text-sm leading-snug text-white/60">
                           {t('ui_send_simple_hint', 'Saisissez une adresse et un montant manuellement')}
                         </p>
                       </div>
-                    </div>
-                  </button>
+                    </button>
 
-                  {/* ── 3. Payer une demande ─────────────────── */}
-                  <button type="button" onClick={onChoosePayRequest} className={cardClassName}>
-                    <div className="flex items-center gap-3">
+                    {/* Accordion body */}
+                    <div
+                      className="overflow-hidden transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]"
+                      style={{
+                        maxHeight: expandedCard === 'simple' ? '400px' : '0px',
+                        opacity: expandedCard === 'simple' ? 1 : 0,
+                      }}
+                    >
+                      <div className="px-4 pb-4 pt-1 space-y-3">
+                        {/* Sub-action buttons row */}
+                        <div className="flex gap-2">
+                          {/* Scan QR */}
+                          <button
+                            type="button"
+                            onClick={onChooseQuickScan}
+                            className={accordionBtnClass}
+                            title={t('ui_scan_qr_code_12fa63d927', 'Scan QR Code')}
+                          >
+                            <svg className="w-5 h-5 text-xcannes-green/80 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                            </svg>
+                            <span className="text-[13px] text-white/70">{t('ui_scan_label', 'Scanner')}</span>
+                          </button>
+
+                          {/* Import QR image */}
+                          <button
+                            type="button"
+                            onClick={() => handleFileUpload(sendFileInputId, false)}
+                            className={accordionBtnClass}
+                            title={t('ui_or_upload_a_qr_image_works_e_df6baa8039', 'Charger une image qrcode')}
+                          >
+                            <svg className="w-5 h-5 text-white/60 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M12 4v12m0 0l-3-3m3 3l3-3" />
+                            </svg>
+                            <span className="text-[13px] text-white/70">{t('ui_import_label', 'Importer')}</span>
+                          </button>
+                        </div>
+
+                        {/* Paste input */}
+                        <div className="relative">
+                          <input
+                            type="text"
+                            value={pasteValue}
+                            onChange={(e) => setPasteValue(e.target.value)}
+                            onKeyDown={(e) => { if (e.key === 'Enter') handleSimplePasteSubmit(); }}
+                            onPaste={(e) => {
+                              const text = (e.clipboardData?.getData('text') || '').trim();
+                              if (text) {
+                                e.preventDefault();
+                                setPasteValue(text);
+                                // Auto-submit after short delay to let state update
+                                setTimeout(() => {
+                                  setSendDestination?.(text);
+                                  setSendDestinationLabel?.('');
+                                  onChooseSimpleSend?.();
+                                }, 50);
+                              }
+                            }}
+                            placeholder={t('ui_paste_address_placeholder', 'Coller ou saisir une adresse')}
+                            className="w-full bg-[#101415] ring-1 ring-white/15 ring-inset rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.4)] pl-4 pr-12 py-3 text-sm text-white placeholder:text-white/35 outline-none focus:ring-2 focus:ring-xcannes-green/60"
+                          />
+                          {pasteValue.trim() ? (
+                            <button
+                              type="button"
+                              onClick={handleSimplePasteSubmit}
+                              className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg bg-xcannes-green/20 hover:bg-xcannes-green/30 text-xcannes-green transition-colors"
+                              title={t('ui_go_label', 'Valider')}
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                              </svg>
+                            </button>
+                          ) : null}
+                        </div>
+
+                        {/* Send button */}
+                        <button
+                          type="button"
+                          onClick={onChooseSimpleSend}
+                          className="w-full rounded-xl py-3 bg-xcannes-green/90 hover:bg-xcannes-green text-black font-semibold text-[15px] transition-colors shadow-[0_4px_16px_rgba(0,255,150,0.2)]"
+                        >
+                          {t('ui_send_bee4f9e2f5', 'Send')}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* ── 3. Payer une demande (accordion) ─────── */}
+                  <div className={[
+                    'w-full rounded-[20px] bg-white/[0.02] ring-1 ring-inset shadow-[0_8px_26px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-22px_34px_rgba(0,0,0,0.68)] transition-all duration-200',
+                    expandedCard === 'payreq' ? 'ring-[#f5a623]/30' : 'ring-white/10 hover:ring-white/20',
+                  ].join(' ')}>
+                    {/* Header */}
+                    <button
+                      type="button"
+                      onClick={() => setExpandedCard(prev => prev === 'payreq' ? null : 'payreq')}
+                      className="w-full text-left px-4 py-4 flex items-center gap-3"
+                    >
                       <div className="w-12 h-12 rounded-[16px] bg-black/30 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
                         <PayRequestIcon />
                       </div>
@@ -320,16 +557,98 @@ export default function WalletDashboardSendChoiceModal({
                           <p className="text-[18px] md:text-[19px] text-white font-semibold truncate">
                             {t('ui_send_pay_request_title', 'Payer une demande')}
                           </p>
-                          <svg className="w-5 h-5 text-white/45" viewBox="0 0 24 24" fill="none" aria-hidden>
-                            <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                          </svg>
+                          <ChevronIcon expanded={expandedCard === 'payreq'} />
                         </div>
                         <p className="mt-1 text-[15px] md:text-sm leading-snug text-white/60">
                           {t('ui_send_pay_request_hint', 'Réglez une demande de paiement reçue')}
                         </p>
                       </div>
+                    </button>
+
+                    {/* Accordion body */}
+                    <div
+                      className="overflow-hidden transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]"
+                      style={{
+                        maxHeight: expandedCard === 'payreq' ? '400px' : '0px',
+                        opacity: expandedCard === 'payreq' ? 1 : 0,
+                      }}
+                    >
+                      <div className="px-4 pb-4 pt-1 space-y-3">
+                        {/* Sub-action buttons row */}
+                        <div className="flex gap-2">
+                          {/* Scan QR */}
+                          <button
+                            type="button"
+                            onClick={onChooseQuickScan}
+                            className={accordionBtnClass}
+                            title={t('ui_scan_qr_code_12fa63d927', 'Scan QR Code')}
+                          >
+                            <svg className="w-5 h-5 text-[#f5a623]/80 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                            </svg>
+                            <span className="text-[13px] text-white/70">{t('ui_scan_label', 'Scanner')}</span>
+                          </button>
+
+                          {/* Import QR image */}
+                          <button
+                            type="button"
+                            onClick={() => handleFileUpload(payreqFileInputId, true)}
+                            className={accordionBtnClass}
+                            title={t('ui_or_upload_a_qr_image_works_e_df6baa8039', 'Charger une image qrcode')}
+                          >
+                            <svg className="w-5 h-5 text-white/60 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M12 4v12m0 0l-3-3m3 3l3-3" />
+                            </svg>
+                            <span className="text-[13px] text-white/70">{t('ui_import_label', 'Importer')}</span>
+                          </button>
+                        </div>
+
+                        {/* Paste input */}
+                        <div className="relative">
+                          <input
+                            type="text"
+                            value={payreqPasteValue}
+                            onChange={(e) => setPayreqPasteValue(e.target.value)}
+                            onKeyDown={(e) => { if (e.key === 'Enter') handlePayreqPasteSubmit(); }}
+                            onPaste={(e) => {
+                              const text = (e.clipboardData?.getData('text') || '').trim();
+                              if (text) {
+                                e.preventDefault();
+                                setPayreqPasteValue(text);
+                                setTimeout(() => {
+                                  handlePaymentRequestScan?.(text);
+                                  onChoosePayRequest?.();
+                                }, 50);
+                              }
+                            }}
+                            placeholder={t('ui_paste_payreq_placeholder', 'Coller une demande de paiement')}
+                            className="w-full bg-[#101415] ring-1 ring-white/15 ring-inset rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.4)] pl-4 pr-12 py-3 text-sm text-white placeholder:text-white/35 outline-none focus:ring-2 focus:ring-[#f5a623]/50"
+                          />
+                          {payreqPasteValue.trim() ? (
+                            <button
+                              type="button"
+                              onClick={handlePayreqPasteSubmit}
+                              className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg bg-[#f5a623]/20 hover:bg-[#f5a623]/30 text-[#f5a623] transition-colors"
+                              title={t('ui_go_label', 'Valider')}
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                              </svg>
+                            </button>
+                          ) : null}
+                        </div>
+
+                        {/* Pay button */}
+                        <button
+                          type="button"
+                          onClick={onChoosePayRequest}
+                          className="w-full rounded-xl py-3 bg-[#f5a623]/90 hover:bg-[#f5a623] text-black font-semibold text-[15px] transition-colors shadow-[0_4px_16px_rgba(245,166,35,0.2)]"
+                        >
+                          {t('ui_send_pay_request_title', 'Payer une demande')}
+                        </button>
+                      </div>
                     </div>
-                  </button>
+                  </div>
 
                 </div>
               </div>

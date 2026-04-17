@@ -220,8 +220,11 @@ export default function WalletMobileModals({
               }}
               onChoosePayRequest={() => {
                 setActiveAction("send");
-                // Will open on the payreq tab if available
               }}
+              handlePaymentRequestScan={sendModalProps?.handlePaymentRequestScan}
+              setSendDestination={sendModalProps?.setSendDestination}
+              setSendDestinationLabel={sendModalProps?.setSendDestinationLabel}
+              toast={sendModalProps?.toast}
             />
 
             <WalletDashboardSendModal

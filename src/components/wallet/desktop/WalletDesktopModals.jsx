@@ -159,6 +159,10 @@ export default function WalletDesktopModals({
           onChoosePayRequest={() => {
             setActiveAction("send");
           }}
+          handlePaymentRequestScan={sendModalProps?.handlePaymentRequestScan}
+          setSendDestination={sendModalProps?.setSendDestination}
+          setSendDestinationLabel={sendModalProps?.setSendDestinationLabel}
+          toast={sendModalProps?.toast}
         />
       ) : null}
 
