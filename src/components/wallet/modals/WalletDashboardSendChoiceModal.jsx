@@ -390,7 +390,7 @@ export default function WalletDashboardSendChoiceModal({
                     {t('ui_send_choice_subtitle', 'Choisissez comment envoyer vos fonds')}
                   </h3>
                   <p className="mt-2 text-[14px] md:text-[15px] text-white/60 max-w-[34ch] leading-relaxed">
-                    {t('ui_send_choice_hint', 'Scannez, collez, importez ou choisissez dans votre liste.')}
+                    {t('ui_send_choice_hint', 'Scannez, collez, importez ou choisissez adresse dans votre liste.')}
                   </p>
                   {/* Action chips */}
                   <div className="mt-4 flex items-center gap-2">
