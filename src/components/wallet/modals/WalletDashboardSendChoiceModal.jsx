@@ -31,6 +31,7 @@ export default function WalletDashboardSendChoiceModal({
   // ── Accordion state ──────────────────────────────────────────
   const [expandedCard, setExpandedCard] = useState(null); // 'quickscan' | 'payreq' | null
   const [showSteps, setShowSteps] = useState(false);
+  const [showPayreqSteps, setShowPayreqSteps] = useState(false);
   const [payreqPasteValue, setPayreqPasteValue] = useState('');
   const [quickscanPasteValue, setQuickscanPasteValue] = useState('');
   const [showQuickscanSavedPicker, setShowQuickscanSavedPicker] = useState(false);
@@ -46,6 +47,7 @@ export default function WalletDashboardSendChoiceModal({
     if (!open) {
       setExpandedCard(null);
       setShowSteps(false);
+      setShowPayreqSteps(false);
       setPayreqPasteValue('');
       setQuickscanPasteValue('');
       setShowQuickscanSavedPicker(false);
@@ -346,49 +348,66 @@ export default function WalletDashboardSendChoiceModal({
             </div>
 
             <div className="relative z-10 flex flex-col flex-1 min-h-0">
-              {/* Header (draggable) */}
+              {/* Drag handle (mobile) */}
+              {!inline ? (
+                <div
+                  className="md:hidden flex justify-center pt-3 pb-0"
+                  aria-hidden
+                  onPointerDown={event => { maybeStartOverlayDrag(event, 'fixed'); }}
+                >
+                  <span className="block w-12 h-1.5 rounded-full bg-white/20" />
+                </div>
+              ) : null}
+
+              {/* Wallet meta pill */}
               <div
-                className="border-b border-white/10"
+                className="pt-4 md:pt-3 pb-0 flex justify-center px-4"
                 onPointerDown={event => { maybeStartOverlayDrag(event, 'fixed'); }}
               >
-                {!inline ? (
-                  <div className="md:hidden flex justify-center pt-3 pb-0" aria-hidden>
-                    <span className="block w-12 h-1.5 rounded-full bg-white/20" />
-                  </div>
-                ) : null}
-                <div className="pt-6 md:pt-5 pb-3 flex flex-col items-center text-center px-4">
-                  <div>
-                    {renderWalletMeta?.({
-                      variant: "pill",
-                      className:
-                        "w-full flex justify-center wallet-meta--plus-4 wallet-meta--desktop-gap",
-                      prefix: `${t("moonpay_from_account", "Depuis le compte")} :`,
-                      labelWrap: true,
-                      pillClassName:
-                        "bg-elevated px-4 py-3 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]",
-                      prefixClassName:
-                        "!text-white/70 text-[16px] md:text-[17px] font-semibold tracking-wide",
-                      labelClassName:
-                        "!text-white/95 text-[16px] md:text-[17px] font-semibold",
-                      dotClassName: "!h-3 !w-3 ring-xcannes-green/20",
-                    })}
-                  </div>
-                  <p className="mt-2 text-[18px] md:text-[20px] font-medium text-white/70 max-w-[34ch] leading-snug tracking-tight">
-                    {t('ui_send_choice_subtitle', 'Choisissez comment envoyer vos fonds')}
-                  </p>
-                  <p className="mt-1.5 text-[13px] text-white/50 max-w-[40ch] leading-snug">
-                    {t('ui_send_choice_hint', 'Renseignez l\'adresse ou la demande de paiement du destinataire — scannez, collez, importez ou choisissez dans votre liste.')}
-                  </p>
-                </div>
+                {renderWalletMeta?.({
+                  variant: "pill",
+                  className:
+                    "w-full flex justify-center wallet-meta--plus-4 wallet-meta--desktop-gap",
+                  prefix: `${t("moonpay_from_account", "Depuis le compte")} :`,
+                  labelWrap: true,
+                  pillClassName:
+                    "bg-elevated px-4 py-3 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]",
+                  prefixClassName:
+                    "!text-white/70 text-[16px] md:text-[17px] font-semibold tracking-wide",
+                  labelClassName:
+                    "!text-white/95 text-[16px] md:text-[17px] font-semibold",
+                  dotClassName: "!h-3 !w-3 ring-xcannes-green/20",
+                })}
               </div>
 
-              {/* Cards list */}
-              <div
-                ref={overlayListRef}
-                className="flex-1 min-h-0 overflow-y-auto p-4 md:p-5 [--list-pad:1rem] md:[--list-pad:1.25rem]"
-                onPointerDown={event => { maybeStartOverlayDrag(event, 'list'); }}
-              >
-                <div className="flex flex-col gap-5 pb-2">
+              <div className="flex-1 min-h-0 flex flex-col">
+                {/* Title + subtitle + arrow */}
+                <div
+                  className="pt-6 md:pt-5 pb-3 flex flex-col items-center text-center"
+                  onPointerDown={event => { maybeStartOverlayDrag(event, 'fixed'); }}
+                >
+                  <h3 className="mt-1 text-[22px] md:text-[24px] font-semibold text-white/95 tracking-tight">
+                    {t('ui_send_choice_subtitle', 'Choisissez comment envoyer vos fonds')}
+                  </h3>
+                  <p className="mt-2 text-[14px] md:text-[15px] text-white/60 max-w-[34ch] leading-relaxed">
+                    {t('ui_send_choice_hint', 'Scannez, collez, importez ou choisissez dans votre liste.')}
+                  </p>
+                  <div
+                    className="mt-5 w-12 h-12 rounded-2xl bg-white/5 ring-1 ring-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.45)] flex items-center justify-center text-xcannes-green/90"
+                    aria-hidden="true"
+                  >
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 19V5m0 0l-5 5m5-5l5 5" />
+                    </svg>
+                  </div>
+                </div>
+
+                {/* Cards — vertically centred in remaining space */}
+                <div
+                  ref={overlayListRef}
+                  className="flex-1 min-h-0 flex flex-col justify-center gap-4 py-6 px-4 md:px-5 overflow-y-auto [--list-pad:1rem] md:[--list-pad:1.25rem]"
+                  onPointerDown={event => { maybeStartOverlayDrag(event, 'list'); }}
+                >
 
                   {/* Hidden file inputs for QR image import */}
                   <input
@@ -413,11 +432,6 @@ export default function WalletDashboardSendChoiceModal({
                       e.target.value = '';
                     }}
                   />
-                  {/* Hidden div for html5-qrcode reader */}
-                  <div id={manualQrReaderIdRef.current} className="hidden" />
-
-                  {/* Separator */}
-                  <div className="w-full h-px bg-white/10 my-1" />
 
                   {/* ── 1. Quick Scan (accordion, open by default) ── */}
                   <div
@@ -643,9 +657,6 @@ export default function WalletDashboardSendChoiceModal({
                     </div>
                   </div>
 
-                  {/* Separator */}
-                  <div className="w-full h-px bg-white/10 my-1" />
-
                   {/* ── 2. Payer une demande (accordion) ─────── */}
                   <div className={[
                     'w-full bg-white/[0.02] transition-all duration-200',
@@ -672,6 +683,17 @@ export default function WalletDashboardSendChoiceModal({
                         <p className="mt-1 text-[15px] md:text-sm leading-snug text-white/60">
                           {t('ui_send_pay_request_hint', 'Indiquer la demande de paiement, vérifier et validez')}
                         </p>
+                        {expandedCard === 'payreq' && (
+                          <button
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); setShowPayreqSteps(s => !s); }}
+                            className="mt-1.5 text-[12px] text-[#f5a623]/80 hover:text-[#f5a623] transition-colors duration-150 font-medium"
+                          >
+                            {showPayreqSteps
+                              ? t('ui_hide_steps', 'Masquer les étapes')
+                              : t('ui_show_steps', 'Voir les étapes')}
+                          </button>
+                        )}
                       </div>
                     </button>
 
@@ -684,6 +706,27 @@ export default function WalletDashboardSendChoiceModal({
                       }}
                     >
                       <div className="px-4 pb-4 pt-1 space-y-3">
+
+                        {/* Steps guide (collapsible) */}
+                        <div
+                          className="overflow-hidden transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]"
+                          style={{
+                            maxHeight: showPayreqSteps ? '200px' : '0px',
+                            opacity: showPayreqSteps ? 1 : 0,
+                          }}
+                        >
+                          <ol className="space-y-2 text-[12px] leading-relaxed pb-1">
+                            <li className="flex gap-2">
+                              <span className="flex-shrink-0 w-5 h-5 rounded-full bg-[#f5a623]/15 text-[#f5a623] text-[11px] font-bold flex items-center justify-center">1</span>
+                              <span className="text-white/60">{t('ui_payreq_step_1', 'Renseignez le code ou QR code — scannez, collez, importez.')}</span>
+                            </li>
+                            <li className="flex gap-2">
+                              <span className="flex-shrink-0 w-5 h-5 rounded-full bg-[#f5a623]/15 text-[#f5a623] text-[11px] font-bold flex items-center justify-center">2</span>
+                              <span className="text-white/60">{t('ui_payreq_step_2', 'Vérifiez et validez en toute sécurité.')}</span>
+                            </li>
+                          </ol>
+                        </div>
+
                         {/* Sub-action buttons row */}
                         <div className="flex gap-2">
                           {/* Scan QR */}
@@ -752,6 +795,8 @@ export default function WalletDashboardSendChoiceModal({
                     </div>
                   </div>
 
+                  {/* Hidden div for html5-qrcode reader */}
+                  <div id={manualQrReaderIdRef.current} className="hidden" />
                 </div>
               </div>
             </div>
