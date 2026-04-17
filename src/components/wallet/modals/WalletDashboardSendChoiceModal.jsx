@@ -419,7 +419,7 @@ export default function WalletDashboardSendChoiceModal({
               {/* Cards list */}
               <div
                 ref={overlayListRef}
-                className="flex-1 min-h-0 overflow-y-auto p-4 md:p-5"
+                className="flex-1 min-h-0 overflow-y-auto p-4 md:p-5 [--list-pad:1rem] md:[--list-pad:1.25rem]"
                 onPointerDown={event => { maybeStartOverlayDrag(event, 'list'); }}
               >
                 <div className="flex flex-col gap-5 pb-2">
@@ -462,12 +462,15 @@ export default function WalletDashboardSendChoiceModal({
                   <div id={manualQrReaderIdRef.current} className="hidden" />
 
                   {/* ── 1. Quick Scan (accordion, open by default) ── */}
-                  <div className={[
-                    'w-full bg-white/[0.02] transition-all duration-200',
-                    expandedCard === 'quickscan'
-                      ? 'rounded-none ring-0 shadow-none -mx-4 md:-mx-5 px-0 w-[calc(100%+2rem)] md:w-[calc(100%+2.5rem)]'
-                      : 'rounded-[20px] ring-1 ring-inset ring-white/10 hover:ring-white/20 shadow-[0_8px_26px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-22px_34px_rgba(0,0,0,0.68)]',
-                  ].join(' ')}>
+                  <div
+                    className={[
+                      'bg-white/[0.02] transition-all duration-200',
+                      expandedCard === 'quickscan'
+                        ? 'rounded-none ring-0 shadow-none'
+                        : 'w-full rounded-[20px] ring-1 ring-inset ring-white/10 hover:ring-white/20 shadow-[0_8px_26px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-22px_34px_rgba(0,0,0,0.68)]',
+                    ].join(' ')}
+                    style={expandedCard === 'quickscan' ? { marginLeft: 'calc(-1 * var(--list-pad))', marginRight: 'calc(-1 * var(--list-pad))', width: 'calc(100% + 2 * var(--list-pad))' } : undefined}
+                  >
                     {/* Header */}
                     <button
                       type="button"
