@@ -198,7 +198,7 @@ export default function WalletDashboardSendChoiceModal({
     'w-full text-left rounded-[20px] px-4 py-4 bg-white/[0.02] hover:bg-white/[0.05] active:bg-white/[0.03] ring-1 ring-white/10 ring-inset shadow-[0_8px_26px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-22px_34px_rgba(0,0,0,0.68)] transition-all duration-[140ms] ease-[cubic-bezier(0.4,0,0.2,1)] hover:ring-white/20 hover:-translate-y-px active:translate-y-0 active:scale-[0.99]';
 
   const accordionBtnClass =
-    'flex items-center gap-2.5 w-full text-left rounded-xl px-3 py-2.5 bg-white/[0.03] hover:bg-white/[0.07] active:bg-white/[0.04] transition-colors duration-100';
+    'flex items-center justify-center gap-2.5 w-full rounded-[20px] px-3 py-2.5 bg-white/[0.03] hover:bg-white/[0.07] active:bg-white/[0.04] transition-colors duration-100';
 
   // ── Swipe-to-close (mobile) ────────────────────────────────
   const [overlayDragging, setOverlayDragging] = useState(false);
@@ -510,13 +510,17 @@ export default function WalletDashboardSendChoiceModal({
                           <button
                             type="button"
                             onClick={onChooseQuickScan}
-                            className={accordionBtnClass}
+                            className={`${accordionBtnClass} text-white`}
+                            style={{
+                              background: 'linear-gradient(180deg, rgba(34,154,86,1) 0%, rgba(14,103,58,1) 100%)',
+                              boxShadow: '0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)',
+                            }}
                             title={t('ui_scan_qr_code_12fa63d927', 'Scan QR Code')}
                           >
-                            <svg className="w-5 h-5 text-xcannes-green/80 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                            <svg className="w-5 h-5 text-white flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
                             </svg>
-                            <span className="text-[13px] text-white/70">{t('ui_scan_label', 'Scanner')}</span>
+                            <span className="text-[13px] text-white font-medium">{t('ui_scan_label', 'Scanner')}</span>
                           </button>
 
                           {/* Import QR image */}
@@ -557,7 +561,7 @@ export default function WalletDashboardSendChoiceModal({
                               }
                             }}
                             placeholder={t('ui_paste_address_placeholder', 'Coller ou saisir une adresse')}
-                            className="w-full bg-[#101415] ring-1 ring-white/15 ring-inset rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.4)] pl-4 pr-12 py-3 text-sm text-white placeholder:text-white/35 outline-none focus:ring-2 focus:ring-xcannes-green/60"
+                            className="w-full bg-[#101415] ring-1 ring-white/15 ring-inset rounded-[20px] shadow-[0_4px_12px_rgba(0,0,0,0.4)] pl-4 pr-12 py-3 text-sm text-white placeholder:text-white/35 outline-none focus:ring-2 focus:ring-xcannes-green/60"
                           />
                           {quickscanPasteValue.trim() ? (
                             <button
@@ -578,7 +582,7 @@ export default function WalletDashboardSendChoiceModal({
                           <button
                             type="button"
                             onClick={() => setShowQuickscanSavedPicker(prev => !prev)}
-                            className="w-full flex items-center gap-2 bg-[#101415] ring-1 ring-white/15 ring-inset rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.4)] px-3 py-2.5 text-sm text-white/70 hover:bg-white/[0.03] transition-colors"
+                            className="w-full flex items-center gap-2 bg-[#101415] ring-1 ring-white/15 ring-inset rounded-[20px] shadow-[0_4px_12px_rgba(0,0,0,0.4)] px-3 py-2.5 text-sm text-white/70 hover:bg-white/[0.03] transition-colors"
                           >
                             <svg className="w-4 h-4 text-white/50 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                               <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
@@ -592,7 +596,7 @@ export default function WalletDashboardSendChoiceModal({
 
                           {/* Saved addresses dropdown */}
                           {showQuickscanSavedPicker ? (
-                            <div className="absolute left-0 right-0 top-full mt-1 z-20 rounded-xl ring-1 ring-white/15 ring-inset overflow-hidden shadow-lg bg-[#101415]">
+                            <div className="absolute left-0 right-0 top-full mt-1 z-20 rounded-[20px] ring-1 ring-white/15 ring-inset overflow-hidden shadow-lg bg-[#101415]">
                               <div className="max-h-44 overflow-y-auto">
                                 {(() => {
                                   const filtered = (savedAddresses || []).filter(entry => {
@@ -732,7 +736,7 @@ export default function WalletDashboardSendChoiceModal({
                               }
                             }}
                             placeholder={t('ui_paste_address_placeholder', 'Coller ou saisir une adresse')}
-                            className="w-full bg-[#101415] ring-1 ring-white/15 ring-inset rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.4)] pl-4 pr-12 py-3 text-sm text-white placeholder:text-white/35 outline-none focus:ring-2 focus:ring-xcannes-green/60"
+                            className="w-full bg-[#101415] ring-1 ring-white/15 ring-inset rounded-[20px] shadow-[0_4px_12px_rgba(0,0,0,0.4)] pl-4 pr-12 py-3 text-sm text-white placeholder:text-white/35 outline-none focus:ring-2 focus:ring-xcannes-green/60"
                           />
                           {pasteValue.trim() ? (
                             <button
@@ -753,7 +757,7 @@ export default function WalletDashboardSendChoiceModal({
                           <button
                             type="button"
                             onClick={() => setShowSavedPicker(prev => !prev)}
-                            className="w-full flex items-center gap-2 bg-[#101415] ring-1 ring-white/15 ring-inset rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.4)] px-3 py-2.5 text-sm text-white/70 hover:bg-white/[0.03] transition-colors"
+                            className="w-full flex items-center gap-2 bg-[#101415] ring-1 ring-white/15 ring-inset rounded-[20px] shadow-[0_4px_12px_rgba(0,0,0,0.4)] px-3 py-2.5 text-sm text-white/70 hover:bg-white/[0.03] transition-colors"
                           >
                             <svg className="w-4 h-4 text-white/50 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                               <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
@@ -767,7 +771,7 @@ export default function WalletDashboardSendChoiceModal({
 
                           {/* Saved addresses dropdown */}
                           {showSavedPicker ? (
-                            <div className="absolute left-0 right-0 top-full mt-1 z-20 rounded-xl ring-1 ring-white/15 ring-inset overflow-hidden shadow-lg bg-[#101415]">
+                            <div className="absolute left-0 right-0 top-full mt-1 z-20 rounded-[20px] ring-1 ring-white/15 ring-inset overflow-hidden shadow-lg bg-[#101415]">
                               <div className="max-h-44 overflow-y-auto">
                                 {(() => {
                                   const filtered = (savedAddresses || []).filter(entry => {
@@ -902,7 +906,7 @@ export default function WalletDashboardSendChoiceModal({
                               }
                             }}
                             placeholder={t('ui_paste_payreq_placeholder', 'Coller une demande de paiement')}
-                            className="w-full bg-[#101415] ring-1 ring-white/15 ring-inset rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.4)] pl-4 pr-12 py-3 text-sm text-white placeholder:text-white/35 outline-none focus:ring-2 focus:ring-[#f5a623]/50"
+                            className="w-full bg-[#101415] ring-1 ring-white/15 ring-inset rounded-[20px] shadow-[0_4px_12px_rgba(0,0,0,0.4)] pl-4 pr-12 py-3 text-sm text-white placeholder:text-white/35 outline-none focus:ring-2 focus:ring-[#f5a623]/50"
                           />
                           {payreqPasteValue.trim() ? (
                             <button
