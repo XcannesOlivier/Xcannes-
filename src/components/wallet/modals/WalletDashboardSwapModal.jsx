@@ -602,7 +602,7 @@ export default function WalletDashboardSwapModal({
                 {/* ── SECTION 1: Currency selection ───────────────────────── */}
                 <div className="space-y-3">
                   <div className="relative z-[65]">
-                    <div className="text-[11px] tracking-[0.22em] text-white/45 mb-2 relative z-[41]">
+                    <div className="text-[13px] tracking-[0.22em] text-white/45 mb-2 relative z-[41]">
                       {t("ui_from_label_short", "De")}
                     </div>
 		                    <ModalSelect
@@ -670,7 +670,7 @@ export default function WalletDashboardSwapModal({
 		                  </div>
 
                   <div className="relative">
-                    <div className="text-[11px] tracking-[0.22em] text-white/45 mb-2 relative z-[41]">
+                    <div className="text-[13px] tracking-[0.22em] text-white/45 mb-2 relative z-[41]">
                       {t("ui_to_label_short", "Vers")}
                     </div>
 		                    <ModalSelect
@@ -734,7 +734,7 @@ export default function WalletDashboardSwapModal({
 
                 {/* ── SECTION 2: Amount input ─────────────────────────────── */}
                 <div className="space-y-2">
-                  <div className="text-[11px] tracking-[0.22em] text-white/45">
+                  <div className="text-[13px] tracking-[0.22em] text-white/45">
                     {t("ui_amount_52a20b2992", "Montant")}
                   </div>
 	                  <TokenAmountInput

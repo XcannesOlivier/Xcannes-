@@ -383,7 +383,7 @@ export default function WalletDashboardSendChoiceModal({
               <div className="flex-1 min-h-0 flex flex-col">
                 {/* Title + subtitle + arrow */}
                 <div
-                  className="pt-6 md:pt-5 pb-3 flex flex-col items-center text-center"
+                  className={`pt-6 md:pt-5 pb-3 flex flex-col items-center text-center transition-all duration-300 ${expandedCard ? 'blur-[3px] opacity-40 pointer-events-none' : ''}`}
                   onPointerDown={event => { maybeStartOverlayDrag(event, 'fixed'); }}
                 >
                   <h3 className="mt-1 text-[22px] md:text-[24px] font-semibold text-white/95 tracking-tight">
