@@ -333,7 +333,7 @@ export default function WalletDashboardSendChoiceModal({
     ? ''
     : isClosing ? 'wallet-modal-backdrop-out' : 'wallet-modal-backdrop-in';
   const panelClass = [
-    'relative w-full wallet-modal-panel wallet-cash-modal wallet-modal-no-top-highlight-mobile border-white/10 md:border overflow-hidden flex flex-col pointer-events-auto pb-[env(safe-area-inset-bottom)] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-26px_46px_rgba(0,0,0,0.55)]',
+    'relative w-full wallet-modal-panel wallet-cash-modal wallet-modal-no-top-highlight-mobile border-white/10 md:border overflow-hidden flex flex-col pointer-events-auto pb-[env(safe-area-inset-bottom)]',
     inline ? 'h-full max-h-none rounded-xl' : 'h-screen md:h-auto md:max-w-lg md:max-h-[100vh] rounded-none md:rounded-2xl',
     'bg-elevated',
     inline ? 'wallet-inline-zoom-in' : '',
@@ -375,8 +375,7 @@ export default function WalletDashboardSendChoiceModal({
           >
             {/* Ambient glow */}
             <div className="pointer-events-none absolute inset-0" aria-hidden>
-              <div className="absolute inset-0 bg-[radial-gradient(900px_circle_at_12%_0%,rgba(255,255,255,0.08),transparent_55%),radial-gradient(850px_circle_at_95%_92%,rgba(0,255,150,0.06),transparent_55%)]" />
-              <div className="absolute inset-0 bg-gradient-to-b from-black/0 via-black/10 to-black/55" />
+              <div className="absolute inset-0 bg-[radial-gradient(850px_circle_at_95%_92%,rgba(0,255,150,0.06),transparent_55%)]" />
             </div>
 
             <div className="relative z-10 flex flex-col flex-1 min-h-0">
