@@ -156,7 +156,7 @@ export default function WalletDashboardSendChoiceModal({
 
   const ChevronIcon = ({ expanded }) => (
     <svg
-      className={`w-5 h-5 text-white/45 transition-transform duration-200 ${expanded ? 'rotate-90' : ''}`}
+      className="w-5 h-5 text-white/30 flex-shrink-0"
       viewBox="0 0 24 24" fill="none" aria-hidden
     >
       <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -436,7 +436,7 @@ export default function WalletDashboardSendChoiceModal({
                 {/* Cards — vertically centred in remaining space */}
                 <div
                   ref={overlayListRef}
-                  className="flex-1 min-h-0 flex flex-col justify-center gap-4 py-6 px-4 md:px-5 overflow-y-auto [--list-pad:1rem] md:[--list-pad:1.25rem]"
+                  className="flex-1 min-h-0 flex flex-col justify-center gap-3 py-6 px-4 md:px-5 overflow-y-auto [--list-pad:1rem] md:[--list-pad:1.25rem]"
                   onPointerDown={event => { maybeStartOverlayDrag(event, 'list'); }}
                 >
 
@@ -464,15 +464,9 @@ export default function WalletDashboardSendChoiceModal({
                     }}
                   />
 
-                  {/* ── 1. Quick Scan (accordion, open by default) ── */}
+                  {/* ── 1. Envoi simple (accordion) ── */}
                   <div
-                    className={[
-                      'bg-white/[0.02] transition-all duration-200',
-                      expandedCard === 'quickscan'
-                        ? 'rounded-none ring-0 shadow-none'
-                        : 'w-full rounded-[20px] ring-1 ring-inset ring-white/10 hover:ring-white/20 shadow-[0_8px_26px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-22px_34px_rgba(0,0,0,0.68)]',
-                    ].join(' ')}
-                    style={expandedCard === 'quickscan' ? { marginLeft: 'calc(-1 * var(--list-pad))', marginRight: 'calc(-1 * var(--list-pad))', width: 'calc(100% + 2 * var(--list-pad))' } : undefined}
+                    className="w-full bg-white/[0.02] rounded-[20px] ring-1 ring-inset ring-white/10 hover:ring-white/20 shadow-[0_8px_26px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-22px_34px_rgba(0,0,0,0.68)] transition-all duration-200"
                   >
                     {/* Header */}
                     <button
@@ -486,13 +480,13 @@ export default function WalletDashboardSendChoiceModal({
                         <QuickScanIcon />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <div className="flex items-center justify-between gap-2">
-                          <p className="text-[18px] md:text-[19px] text-white font-semibold truncate">
+                        <div className="flex items-center justify-between gap-3">
+                          <p className="text-[16px] md:text-[17px] text-white/92 font-semibold">
                             {t('ui_send_simple_title', 'Envoi simple')}
                           </p>
-                          <ChevronIcon expanded={expandedCard === 'quickscan'} />
+                          <ChevronIcon />
                         </div>
-                        <p className="mt-1 text-[13px] md:text-[13px] leading-snug text-white">
+                        <p className="mt-1 text-[13px] md:text-[14px] leading-snug text-white/55">
                           {t('ui_send_simple_hint_long', 'Saisissez une adresse, indiquez la devise et le montant.')}
                         </p>
                         {expandedCard === 'quickscan' && (
@@ -690,12 +684,7 @@ export default function WalletDashboardSendChoiceModal({
                   </div>
 
                   {/* ── 2. Payer une demande (accordion) ─────── */}
-                  <div className={[
-                    'w-full bg-white/[0.02] transition-all duration-200',
-                    expandedCard === 'payreq'
-                      ? 'rounded-none ring-0 shadow-none'
-                      : 'rounded-[20px] ring-1 ring-inset ring-white/10 hover:ring-white/20 shadow-[0_8px_26px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-22px_34px_rgba(0,0,0,0.68)]',
-                  ].join(' ')}>
+                  <div className="w-full bg-white/[0.02] rounded-[20px] ring-1 ring-inset ring-white/10 hover:ring-white/20 shadow-[0_8px_26px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-22px_34px_rgba(0,0,0,0.68)] transition-all duration-200">
                     {/* Header */}
                     <button
                       type="button"
@@ -706,13 +695,13 @@ export default function WalletDashboardSendChoiceModal({
                         <PayRequestIcon />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <div className="flex items-center justify-between gap-2">
-                          <p className="text-[18px] md:text-[19px] text-white font-semibold truncate">
+                        <div className="flex items-center justify-between gap-3">
+                          <p className="text-[16px] md:text-[17px] text-white/92 font-semibold">
                             {t('ui_send_pay_request_title', 'Payer une demande')}
                           </p>
-                          <ChevronIcon expanded={expandedCard === 'payreq'} />
+                          <ChevronIcon />
                         </div>
-                        <p className="mt-1 text-[15px] md:text-sm leading-snug text-white/60">
+                        <p className="mt-1 text-[13px] md:text-[14px] leading-snug text-white/55">
                           {t('ui_send_pay_request_hint', 'Réglez une demande reçue après vérification.')}
                         </p>
                         {expandedCard === 'payreq' && (
