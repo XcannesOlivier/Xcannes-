@@ -224,6 +224,8 @@ export default function WalletMobileModals({
               handlePaymentRequestScan={sendModalProps?.handlePaymentRequestScan}
               setSendDestination={sendModalProps?.setSendDestination}
               setSendDestinationLabel={sendModalProps?.setSendDestinationLabel}
+              savedAddresses={sendModalProps?.savedAddresses}
+              currentWalletAddress={sendModalProps?.currentWalletAddress}
               toast={sendModalProps?.toast}
             />
 

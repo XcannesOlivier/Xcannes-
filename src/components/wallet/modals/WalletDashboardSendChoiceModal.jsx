@@ -16,6 +16,8 @@ export default function WalletDashboardSendChoiceModal({
   handlePaymentRequestScan,
   setSendDestination,
   setSendDestinationLabel,
+  savedAddresses,
+  currentWalletAddress,
   toast,
   inline = false,
 }) {
@@ -29,6 +31,8 @@ export default function WalletDashboardSendChoiceModal({
   const [expandedCard, setExpandedCard] = useState(null); // 'simple' | 'payreq' | null
   const [pasteValue, setPasteValue] = useState('');
   const [payreqPasteValue, setPayreqPasteValue] = useState('');
+  const [showSavedPicker, setShowSavedPicker] = useState(false);
+  const normalizedCurrentWallet = String(currentWalletAddress || '').trim();
   const sendFileInputId = 'send-choice-qr-file';
   const payreqFileInputId = 'payreq-choice-qr-file';
   const manualQrReaderIdRef = useRef(
@@ -41,6 +45,7 @@ export default function WalletDashboardSendChoiceModal({
       setExpandedCard(null);
       setPasteValue('');
       setPayreqPasteValue('');
+      setShowSavedPicker(false);
     }
   }, [open]);
 
@@ -455,7 +460,7 @@ export default function WalletDashboardSendChoiceModal({
                     <div
                       className="overflow-hidden transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]"
                       style={{
-                        maxHeight: expandedCard === 'simple' ? '400px' : '0px',
+                        maxHeight: expandedCard === 'simple' ? '600px' : '0px',
                         opacity: expandedCard === 'simple' ? 1 : 0,
                       }}
                     >
@@ -489,19 +494,85 @@ export default function WalletDashboardSendChoiceModal({
                           </button>
                         </div>
 
+                        {/* Destination selector (saved addresses) */}
+                        <div className="relative">
+                          <button
+                            type="button"
+                            onClick={() => setShowSavedPicker(prev => !prev)}
+                            className="w-full flex items-center gap-2 bg-[#101415] ring-1 ring-white/15 ring-inset rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.4)] px-3 py-2.5 text-sm text-white/70 hover:bg-white/[0.03] transition-colors"
+                          >
+                            <svg className="w-4 h-4 text-white/50 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                            </svg>
+                            <span className="flex-1 text-left truncate">
+                              {pasteValue.trim()
+                                ? pasteValue.trim()
+                                : t('ui_import_or_choose_recipient', 'Import or choose address')}
+                            </span>
+                          </button>
+
+                          {/* Saved addresses dropdown */}
+                          {showSavedPicker ? (
+                            <div className="absolute left-0 right-0 top-full mt-1 z-20 rounded-xl ring-1 ring-white/15 ring-inset overflow-hidden shadow-lg bg-[#101415]">
+                              <div className="max-h-44 overflow-y-auto">
+                                {(() => {
+                                  const filtered = (savedAddresses || []).filter(entry => {
+                                    const addr = String(entry?.address || '').trim();
+                                    if (!addr) return false;
+                                    if (normalizedCurrentWallet && addr === normalizedCurrentWallet) return false;
+                                    return true;
+                                  });
+                                  return filtered.length > 0 ? (
+                                    filtered.map((addr, idx) => (
+                                      <button
+                                        key={`${addr.address}-${idx}`}
+                                        type="button"
+                                        onClick={() => {
+                                          const value = String(addr?.address || '').trim();
+                                          if (!value) return;
+                                          const label = String(addr?.onChainLabel || addr?.label || '').trim();
+                                          setPasteValue(value);
+                                          setSendDestination?.(value);
+                                          setSendDestinationLabel?.(label);
+                                          setShowSavedPicker(false);
+                                        }}
+                                        className="w-full text-left px-3 py-2 text-sm text-white/90 hover:bg-white/5 transition-colors"
+                                      >
+                                        <span className="block font-semibold">
+                                          {String(addr?.onChainLabel || addr?.label || '').trim() || t('ui_wallet_unknown', 'Unknown wallet')}
+                                        </span>
+                                        <span className="block font-mono text-xs text-white/60 truncate">
+                                          {addr.address}
+                                        </span>
+                                      </button>
+                                    ))
+                                  ) : (
+                                    <div className="px-3 py-2 text-xs text-white/60">
+                                      {t('ui_no_saved_addresses', 'No saved addresses yet')}
+                                    </div>
+                                  );
+                                })()}
+                              </div>
+                            </div>
+                          ) : null}
+                        </div>
+
                         {/* Paste input */}
                         <div className="relative">
                           <input
                             type="text"
                             value={pasteValue}
-                            onChange={(e) => setPasteValue(e.target.value)}
+                            onChange={(e) => {
+                              setPasteValue(e.target.value);
+                              setShowSavedPicker(false);
+                            }}
                             onKeyDown={(e) => { if (e.key === 'Enter') handleSimplePasteSubmit(); }}
                             onPaste={(e) => {
                               const text = (e.clipboardData?.getData('text') || '').trim();
                               if (text) {
                                 e.preventDefault();
                                 setPasteValue(text);
-                                // Auto-submit after short delay to let state update
+                                setShowSavedPicker(false);
                                 setTimeout(() => {
                                   setSendDestination?.(text);
                                   setSendDestinationLabel?.('');
