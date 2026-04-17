@@ -392,13 +392,44 @@ export default function WalletDashboardSendChoiceModal({
                   <p className="mt-2 text-[14px] md:text-[15px] text-white/60 max-w-[34ch] leading-relaxed">
                     {t('ui_send_choice_hint', 'Scannez, collez, importez ou choisissez dans votre liste.')}
                   </p>
-                  <div
-                    className="mt-5 w-12 h-12 rounded-2xl bg-white/5 ring-1 ring-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.45)] flex items-center justify-center text-xcannes-green/90"
-                    aria-hidden="true"
-                  >
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 19V5m0 0l-5 5m5-5l5 5" />
-                    </svg>
+                  {/* Action chips */}
+                  <div className="mt-4 flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={onChooseQuickScan}
+                      className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-white/[0.06] ring-1 ring-white/10 hover:bg-white/[0.10] active:scale-[0.97] transition-all text-[13px] text-white/80 font-medium"
+                    >
+                      <svg className="w-4 h-4 text-xcannes-green/80" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                      </svg>
+                      {t('ui_scan_label', 'Scanner')}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        /* Focus the paste input inside the quickscan accordion */
+                        setExpandedCard('quickscan');
+                        setTimeout(() => {
+                          document.getElementById('quickscan-paste-input')?.focus();
+                        }, 220);
+                      }}
+                      className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-white/[0.06] ring-1 ring-white/10 hover:bg-white/[0.10] active:scale-[0.97] transition-all text-[13px] text-white/80 font-medium"
+                    >
+                      <svg className="w-4 h-4 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                      </svg>
+                      {t('ui_paste_label', 'Coller')}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleFileUpload(quickscanFileInputId, false)}
+                      className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-white/[0.06] ring-1 ring-white/10 hover:bg-white/[0.10] active:scale-[0.97] transition-all text-[13px] text-white/80 font-medium"
+                    >
+                      <svg className="w-4 h-4 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M12 4v12m0 0l-3-3m3 3l3-3" />
+                      </svg>
+                      {t('ui_import_label', 'Importer')}
+                    </button>
                   </div>
                 </div>
 
@@ -462,7 +493,7 @@ export default function WalletDashboardSendChoiceModal({
                           <ChevronIcon expanded={expandedCard === 'quickscan'} />
                         </div>
                         <p className="mt-1 text-[13px] md:text-[13px] leading-snug text-white">
-                          {t('ui_send_simple_hint_long', 'Saisissez une adresse, indiquez la devise et le montant de votre choix')}
+                          {t('ui_send_simple_hint_long', 'Saisissez une adresse, indiquez la devise et le montant.')}
                         </p>
                         {expandedCard === 'quickscan' && (
                           <button
@@ -552,6 +583,7 @@ export default function WalletDashboardSendChoiceModal({
                         {/* Paste input */}
                         <div className="relative">
                           <input
+                            id="quickscan-paste-input"
                             type="text"
                             value={quickscanPasteValue}
                             onChange={(e) => {
@@ -681,7 +713,7 @@ export default function WalletDashboardSendChoiceModal({
                           <ChevronIcon expanded={expandedCard === 'payreq'} />
                         </div>
                         <p className="mt-1 text-[15px] md:text-sm leading-snug text-white/60">
-                          {t('ui_send_pay_request_hint', 'Indiquer la demande de paiement, vérifier et validez')}
+                          {t('ui_send_pay_request_hint', 'Réglez une demande reçue après vérification.')}
                         </p>
                         {expandedCard === 'payreq' && (
                           <button
@@ -797,6 +829,11 @@ export default function WalletDashboardSendChoiceModal({
 
                   {/* Hidden div for html5-qrcode reader */}
                   <div id={manualQrReaderIdRef.current} className="hidden" />
+
+                  {/* Footer note */}
+                  <p className="text-center text-[12px] text-white/40 leading-relaxed mt-2">
+                    {t('ui_send_fees_note', 'Les frais et détails seront affichés avant confirmation.')}
+                  </p>
                 </div>
               </div>
             </div>
