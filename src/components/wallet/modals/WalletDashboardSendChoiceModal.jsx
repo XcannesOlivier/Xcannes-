@@ -446,8 +446,10 @@ export default function WalletDashboardSendChoiceModal({
 
                   {/* ── 1. Quick Scan (accordion, open by default) ── */}
                   <div className={[
-                    'w-full rounded-[20px] bg-white/[0.02] ring-1 ring-inset shadow-[0_8px_26px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-22px_34px_rgba(0,0,0,0.68)] transition-all duration-200',
-                    expandedCard === 'quickscan' ? 'ring-xcannes-green/30' : 'ring-white/10 hover:ring-white/20',
+                    'w-full bg-white/[0.02] transition-all duration-200',
+                    expandedCard === 'quickscan'
+                      ? 'rounded-none ring-0 shadow-none'
+                      : 'rounded-[20px] ring-1 ring-inset ring-white/10 hover:ring-white/20 shadow-[0_8px_26px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-22px_34px_rgba(0,0,0,0.68)]',
                   ].join(' ')}>
                     {/* Header */}
                     <button
@@ -624,8 +626,10 @@ export default function WalletDashboardSendChoiceModal({
 
                   {/* ── 2. Envoi simple (accordion) ──────────── */}
                   <div className={[
-                    'w-full rounded-[20px] bg-white/[0.02] ring-1 ring-inset shadow-[0_8px_26px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-22px_34px_rgba(0,0,0,0.68)] transition-all duration-200',
-                    expandedCard === 'simple' ? 'ring-xcannes-green/30' : 'ring-white/10 hover:ring-white/20',
+                    'w-full bg-white/[0.02] transition-all duration-200',
+                    expandedCard === 'simple'
+                      ? 'rounded-none ring-0 shadow-none'
+                      : 'rounded-[20px] ring-1 ring-inset ring-white/10 hover:ring-white/20 shadow-[0_8px_26px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-22px_34px_rgba(0,0,0,0.68)]',
                   ].join(' ')}>
                     {/* Header */}
                     <button
@@ -797,8 +801,10 @@ export default function WalletDashboardSendChoiceModal({
 
                   {/* ── 3. Payer une demande (accordion) ─────── */}
                   <div className={[
-                    'w-full rounded-[20px] bg-white/[0.02] ring-1 ring-inset shadow-[0_8px_26px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-22px_34px_rgba(0,0,0,0.68)] transition-all duration-200',
-                    expandedCard === 'payreq' ? 'ring-[#f5a623]/30' : 'ring-white/10 hover:ring-white/20',
+                    'w-full bg-white/[0.02] transition-all duration-200',
+                    expandedCard === 'payreq'
+                      ? 'rounded-none ring-0 shadow-none'
+                      : 'rounded-[20px] ring-1 ring-inset ring-white/10 hover:ring-white/20 shadow-[0_8px_26px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-22px_34px_rgba(0,0,0,0.68)]',
                   ].join(' ')}>
                     {/* Header */}
                     <button
