@@ -165,6 +165,7 @@ export default function WalletDesktopModals({
           savedAddresses={sendModalProps?.savedAddresses}
           currentWalletAddress={sendModalProps?.currentWalletAddress}
           toast={sendModalProps?.toast}
+          renderWalletMeta={sendModalProps?.renderWalletMeta}
         />
       ) : null}
 

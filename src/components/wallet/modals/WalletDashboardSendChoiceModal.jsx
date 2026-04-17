@@ -19,6 +19,7 @@ export default function WalletDashboardSendChoiceModal({
   savedAddresses,
   currentWalletAddress,
   toast,
+  renderWalletMeta,
   inline = false,
 }) {
   const { t } = useTranslation('common');
@@ -197,7 +198,7 @@ export default function WalletDashboardSendChoiceModal({
     'w-full text-left rounded-[20px] px-4 py-4 bg-white/[0.02] hover:bg-white/[0.05] active:bg-white/[0.03] ring-1 ring-white/10 ring-inset shadow-[0_8px_26px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-22px_34px_rgba(0,0,0,0.68)] transition-all duration-[140ms] ease-[cubic-bezier(0.4,0,0.2,1)] hover:ring-white/20 hover:-translate-y-px active:translate-y-0 active:scale-[0.99]';
 
   const accordionBtnClass =
-    'flex items-center gap-2.5 w-full text-left rounded-xl px-3 py-2.5 bg-white/[0.03] hover:bg-white/[0.07] active:bg-white/[0.04] ring-1 ring-white/8 ring-inset transition-colors duration-100';
+    'flex items-center gap-2.5 w-full text-left rounded-xl px-3 py-2.5 bg-white/[0.03] hover:bg-white/[0.07] active:bg-white/[0.04] transition-colors duration-100';
 
   // ── Swipe-to-close (mobile) ────────────────────────────────
   const [overlayDragging, setOverlayDragging] = useState(false);
@@ -390,6 +391,22 @@ export default function WalletDashboardSendChoiceModal({
                   </div>
                 ) : null}
                 <div className="pt-6 md:pt-5 pb-3 flex flex-col items-center text-center px-4">
+                  <div>
+                    {renderWalletMeta?.({
+                      variant: "pill",
+                      className:
+                        "w-full flex justify-center wallet-meta--plus-4 wallet-meta--desktop-gap",
+                      prefix: `${t("moonpay_from_account", "Depuis le compte")} :`,
+                      labelWrap: true,
+                      pillClassName:
+                        "bg-elevated px-4 py-3 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]",
+                      prefixClassName:
+                        "!text-white/70 text-[16px] md:text-[17px] font-semibold tracking-wide",
+                      labelClassName:
+                        "!text-white/95 text-[16px] md:text-[17px] font-semibold",
+                      dotClassName: "!h-3 !w-3 ring-xcannes-green/20",
+                    })}
+                  </div>
                   <h3 className="mt-1 text-[22px] md:text-[24px] font-semibold text-white/95 tracking-tight">
                     {t('ui_send_choice_title', 'Envoyer')}
                   </h3>
@@ -516,6 +533,46 @@ export default function WalletDashboardSendChoiceModal({
                           </button>
                         </div>
 
+                        {/* Paste input */}
+                        <div className="relative">
+                          <input
+                            type="text"
+                            value={quickscanPasteValue}
+                            onChange={(e) => {
+                              setQuickscanPasteValue(e.target.value);
+                              setShowQuickscanSavedPicker(false);
+                            }}
+                            onKeyDown={(e) => { if (e.key === 'Enter') handleQuickscanPasteSubmit(); }}
+                            onPaste={(e) => {
+                              const text = (e.clipboardData?.getData('text') || '').trim();
+                              if (text) {
+                                e.preventDefault();
+                                setQuickscanPasteValue(text);
+                                setShowQuickscanSavedPicker(false);
+                                setTimeout(() => {
+                                  setSendDestination?.(text);
+                                  setSendDestinationLabel?.('');
+                                  onChooseSimpleSend?.();
+                                }, 50);
+                              }
+                            }}
+                            placeholder={t('ui_paste_address_placeholder', 'Coller ou saisir une adresse')}
+                            className="w-full bg-[#101415] ring-1 ring-white/15 ring-inset rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.4)] pl-4 pr-12 py-3 text-sm text-white placeholder:text-white/35 outline-none focus:ring-2 focus:ring-xcannes-green/60"
+                          />
+                          {quickscanPasteValue.trim() ? (
+                            <button
+                              type="button"
+                              onClick={handleQuickscanPasteSubmit}
+                              className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg bg-xcannes-green/20 hover:bg-xcannes-green/30 text-xcannes-green transition-colors"
+                              title={t('ui_go_label', 'Valider')}
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                              </svg>
+                            </button>
+                          ) : null}
+                        </div>
+
                         {/* Destination selector (saved addresses) */}
                         <div className="relative">
                           <button
@@ -577,46 +634,6 @@ export default function WalletDashboardSendChoiceModal({
                                 })()}
                               </div>
                             </div>
-                          ) : null}
-                        </div>
-
-                        {/* Paste input */}
-                        <div className="relative">
-                          <input
-                            type="text"
-                            value={quickscanPasteValue}
-                            onChange={(e) => {
-                              setQuickscanPasteValue(e.target.value);
-                              setShowQuickscanSavedPicker(false);
-                            }}
-                            onKeyDown={(e) => { if (e.key === 'Enter') handleQuickscanPasteSubmit(); }}
-                            onPaste={(e) => {
-                              const text = (e.clipboardData?.getData('text') || '').trim();
-                              if (text) {
-                                e.preventDefault();
-                                setQuickscanPasteValue(text);
-                                setShowQuickscanSavedPicker(false);
-                                setTimeout(() => {
-                                  setSendDestination?.(text);
-                                  setSendDestinationLabel?.('');
-                                  onChooseSimpleSend?.();
-                                }, 50);
-                              }
-                            }}
-                            placeholder={t('ui_paste_address_placeholder', 'Coller ou saisir une adresse')}
-                            className="w-full bg-[#101415] ring-1 ring-white/15 ring-inset rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.4)] pl-4 pr-12 py-3 text-sm text-white placeholder:text-white/35 outline-none focus:ring-2 focus:ring-xcannes-green/60"
-                          />
-                          {quickscanPasteValue.trim() ? (
-                            <button
-                              type="button"
-                              onClick={handleQuickscanPasteSubmit}
-                              className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg bg-xcannes-green/20 hover:bg-xcannes-green/30 text-xcannes-green transition-colors"
-                              title={t('ui_go_label', 'Valider')}
-                            >
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                              </svg>
-                            </button>
                           ) : null}
                         </div>
 
@@ -691,6 +708,46 @@ export default function WalletDashboardSendChoiceModal({
                           </button>
                         </div>
 
+                        {/* Paste input */}
+                        <div className="relative">
+                          <input
+                            type="text"
+                            value={pasteValue}
+                            onChange={(e) => {
+                              setPasteValue(e.target.value);
+                              setShowSavedPicker(false);
+                            }}
+                            onKeyDown={(e) => { if (e.key === 'Enter') handleSimplePasteSubmit(); }}
+                            onPaste={(e) => {
+                              const text = (e.clipboardData?.getData('text') || '').trim();
+                              if (text) {
+                                e.preventDefault();
+                                setPasteValue(text);
+                                setShowSavedPicker(false);
+                                setTimeout(() => {
+                                  setSendDestination?.(text);
+                                  setSendDestinationLabel?.('');
+                                  onChooseSimpleSend?.();
+                                }, 50);
+                              }
+                            }}
+                            placeholder={t('ui_paste_address_placeholder', 'Coller ou saisir une adresse')}
+                            className="w-full bg-[#101415] ring-1 ring-white/15 ring-inset rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.4)] pl-4 pr-12 py-3 text-sm text-white placeholder:text-white/35 outline-none focus:ring-2 focus:ring-xcannes-green/60"
+                          />
+                          {pasteValue.trim() ? (
+                            <button
+                              type="button"
+                              onClick={handleSimplePasteSubmit}
+                              className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg bg-xcannes-green/20 hover:bg-xcannes-green/30 text-xcannes-green transition-colors"
+                              title={t('ui_go_label', 'Valider')}
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                              </svg>
+                            </button>
+                          ) : null}
+                        </div>
+
                         {/* Destination selector (saved addresses) */}
                         <div className="relative">
                           <button
@@ -752,46 +809,6 @@ export default function WalletDashboardSendChoiceModal({
                                 })()}
                               </div>
                             </div>
-                          ) : null}
-                        </div>
-
-                        {/* Paste input */}
-                        <div className="relative">
-                          <input
-                            type="text"
-                            value={pasteValue}
-                            onChange={(e) => {
-                              setPasteValue(e.target.value);
-                              setShowSavedPicker(false);
-                            }}
-                            onKeyDown={(e) => { if (e.key === 'Enter') handleSimplePasteSubmit(); }}
-                            onPaste={(e) => {
-                              const text = (e.clipboardData?.getData('text') || '').trim();
-                              if (text) {
-                                e.preventDefault();
-                                setPasteValue(text);
-                                setShowSavedPicker(false);
-                                setTimeout(() => {
-                                  setSendDestination?.(text);
-                                  setSendDestinationLabel?.('');
-                                  onChooseSimpleSend?.();
-                                }, 50);
-                              }
-                            }}
-                            placeholder={t('ui_paste_address_placeholder', 'Coller ou saisir une adresse')}
-                            className="w-full bg-[#101415] ring-1 ring-white/15 ring-inset rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.4)] pl-4 pr-12 py-3 text-sm text-white placeholder:text-white/35 outline-none focus:ring-2 focus:ring-xcannes-green/60"
-                          />
-                          {pasteValue.trim() ? (
-                            <button
-                              type="button"
-                              onClick={handleSimplePasteSubmit}
-                              className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg bg-xcannes-green/20 hover:bg-xcannes-green/30 text-xcannes-green transition-colors"
-                              title={t('ui_go_label', 'Valider')}
-                            >
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                              </svg>
-                            </button>
                           ) : null}
                         </div>
 

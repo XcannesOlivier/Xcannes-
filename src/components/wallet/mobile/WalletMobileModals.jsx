@@ -227,6 +227,7 @@ export default function WalletMobileModals({
               savedAddresses={sendModalProps?.savedAddresses}
               currentWalletAddress={sendModalProps?.currentWalletAddress}
               toast={sendModalProps?.toast}
+              renderWalletMeta={sendModalProps?.renderWalletMeta}
             />
 
             <WalletDashboardSendModal
