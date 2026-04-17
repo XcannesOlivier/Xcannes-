@@ -632,7 +632,7 @@ export default function WalletDashboardSendChoiceModal({
 
                           {/* Saved addresses dropdown */}
                           {showQuickscanSavedPicker ? (
-                            <div className="absolute left-0 right-0 top-full mt-1 z-20 rounded-[20px] ring-1 ring-white/15 ring-inset overflow-hidden shadow-lg bg-elevated">
+                            <div className="absolute left-0 right-0 top-full mt-1 z-[100] rounded-[20px] ring-1 ring-white/15 ring-inset overflow-hidden shadow-lg bg-elevated">
                               <div className="max-h-44 overflow-y-auto">
                                 {(() => {
                                   const filtered = (savedAddresses || []).filter(entry => {
@@ -816,7 +816,7 @@ export default function WalletDashboardSendChoiceModal({
                   <div id={manualQrReaderIdRef.current} className="hidden" />
 
                   {/* Footer note */}
-                  <p className="text-center text-[12px] text-white/40 leading-relaxed mt-2">
+                  <p className={`text-center text-[12px] text-white/40 leading-relaxed mt-2 transition-all duration-200 ${showSteps ? 'opacity-0 h-0 mt-0 overflow-hidden' : ''}`}>
                     {t('ui_send_fees_note', 'Les détails seront affichés avant confirmation.')}
                   </p>
                 </div>
