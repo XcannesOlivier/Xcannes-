@@ -598,6 +598,9 @@ export default function WalletDashboardSendChoiceModal({
                     </div>
                   </div>
 
+                  {/* Separator */}
+                  <div className="w-full h-px bg-white/10" />
+
                   {/* ── 2. Payer une demande (accordion) ─────── */}
                   <div className={[
                     'w-full bg-white/[0.02] transition-all duration-200',
@@ -608,7 +611,7 @@ export default function WalletDashboardSendChoiceModal({
                     {/* Header */}
                     <button
                       type="button"
-                      onClick={() => setExpandedCard(prev => prev === 'payreq' ? null : 'payreq')}
+                      onClick={() => setExpandedCard(prev => prev === 'payreq' ? 'quickscan' : 'payreq')}
                       className="w-full text-left px-4 py-4 flex items-center gap-3"
                     >
                       <div className="w-12 h-12 rounded-[16px] bg-black/30 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
