@@ -28,12 +28,15 @@ export default function WalletDashboardSendChoiceModal({
   });
 
   // ── Accordion state ──────────────────────────────────────────
-  const [expandedCard, setExpandedCard] = useState(null); // 'simple' | 'payreq' | null
+  const [expandedCard, setExpandedCard] = useState('quickscan'); // 'quickscan' | 'simple' | 'payreq' | null
   const [pasteValue, setPasteValue] = useState('');
   const [payreqPasteValue, setPayreqPasteValue] = useState('');
+  const [quickscanPasteValue, setQuickscanPasteValue] = useState('');
   const [showSavedPicker, setShowSavedPicker] = useState(false);
+  const [showQuickscanSavedPicker, setShowQuickscanSavedPicker] = useState(false);
   const normalizedCurrentWallet = String(currentWalletAddress || '').trim();
   const sendFileInputId = 'send-choice-qr-file';
+  const quickscanFileInputId = 'quickscan-choice-qr-file';
   const payreqFileInputId = 'payreq-choice-qr-file';
   const manualQrReaderIdRef = useRef(
     `choice-qr-reader-${Math.random().toString(36).slice(2, 10)}`,
@@ -42,10 +45,12 @@ export default function WalletDashboardSendChoiceModal({
 
   useEffect(() => {
     if (!open) {
-      setExpandedCard(null);
+      setExpandedCard('quickscan');
       setPasteValue('');
       setPayreqPasteValue('');
+      setQuickscanPasteValue('');
       setShowSavedPicker(false);
+      setShowQuickscanSavedPicker(false);
     }
   }, [open]);
 
@@ -94,8 +99,29 @@ export default function WalletDashboardSendChoiceModal({
     input?.click();
   }, []);
 
-  // ── Paste handler for "Envoi simple" ─────────────────────────
+  // ── Paste handler for "Quick Scan" accordion ────────────────
   const looksLikeXrplAddress = (v) => /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(v);
+
+  const handleQuickscanPasteSubmit = useCallback(() => {
+    const raw = quickscanPasteValue.trim();
+    if (!raw) return;
+    if (looksLikeXrplAddress(raw)) {
+      setSendDestination?.(raw);
+      setSendDestinationLabel?.('');
+      onChooseSimpleSend?.();
+    } else {
+      const result = handlePaymentRequestScan?.(raw);
+      if (result?.relayChallenge || result?.navigate) {
+        onClose?.();
+        return;
+      }
+      setSendDestination?.(raw);
+      setSendDestinationLabel?.('');
+      onChooseSimpleSend?.();
+    }
+  }, [quickscanPasteValue, setSendDestination, setSendDestinationLabel, onChooseSimpleSend, handlePaymentRequestScan, onClose]);
+
+  // ── Paste handler for "Envoi simple" ─────────────────────────
 
   const handleSimplePasteSubmit = useCallback(() => {
     const raw = pasteValue.trim();
@@ -383,6 +409,17 @@ export default function WalletDashboardSendChoiceModal({
 
                   {/* Hidden file inputs for QR image import */}
                   <input
+                    id={quickscanFileInputId}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target?.files?.[0];
+                      if (file) handleManualQrFile(file, { isPayreq: false });
+                      e.target.value = '';
+                    }}
+                  />
+                  <input
                     id={sendFileInputId}
                     type="file"
                     accept="image/*"
@@ -407,9 +444,19 @@ export default function WalletDashboardSendChoiceModal({
                   {/* Hidden div for html5-qrcode reader */}
                   <div id={manualQrReaderIdRef.current} className="hidden" />
 
-                  {/* ── 1. Quick Scan ───────────────────────── */}
-                  <button type="button" onClick={onChooseQuickScan} className={cardClassName}>
-                    <div className="flex items-center gap-3">
+                  {/* ── 1. Quick Scan (accordion, open by default) ── */}
+                  <div className={[
+                    'w-full rounded-[20px] bg-white/[0.02] ring-1 ring-inset shadow-[0_8px_26px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-22px_34px_rgba(0,0,0,0.68)] transition-all duration-200',
+                    expandedCard === 'quickscan' ? 'ring-xcannes-green/30' : 'ring-white/10 hover:ring-white/20',
+                  ].join(' ')}>
+                    {/* Header */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (expandedCard !== 'quickscan') setExpandedCard('quickscan');
+                      }}
+                      className="w-full text-left px-4 py-4 flex items-center gap-3"
+                    >
                       <div className="w-12 h-12 rounded-[16px] bg-black/30 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
                         <QuickScanIcon />
                       </div>
@@ -418,16 +465,162 @@ export default function WalletDashboardSendChoiceModal({
                           <p className="text-[18px] md:text-[19px] text-white font-semibold truncate">
                             {t('ui_send_quick_scan_title', 'Quick Scan')}
                           </p>
-                          <svg className="w-5 h-5 text-white/45" viewBox="0 0 24 24" fill="none" aria-hidden>
-                            <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                          </svg>
+                          {/* Chevron only when closed */}
+                          {expandedCard !== 'quickscan' ? (
+                            <ChevronIcon expanded={false} />
+                          ) : null}
                         </div>
                         <p className="mt-1 text-[15px] md:text-sm leading-snug text-xcannes-green/90">
                           {t('ui_send_quick_scan_hint', 'Scannez un QR code pour envoyer instantanément')}
                         </p>
                       </div>
+                    </button>
+
+                    {/* Accordion body */}
+                    <div
+                      className="overflow-hidden transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]"
+                      style={{
+                        maxHeight: expandedCard === 'quickscan' ? '600px' : '0px',
+                        opacity: expandedCard === 'quickscan' ? 1 : 0,
+                      }}
+                    >
+                      <div className="px-4 pb-4 pt-1 space-y-3">
+                        {/* Sub-action buttons row */}
+                        <div className="flex gap-2">
+                          {/* Scan QR */}
+                          <button
+                            type="button"
+                            onClick={onChooseQuickScan}
+                            className={accordionBtnClass}
+                            title={t('ui_scan_qr_code_12fa63d927', 'Scan QR Code')}
+                          >
+                            <svg className="w-5 h-5 text-xcannes-green/80 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                            </svg>
+                            <span className="text-[13px] text-white/70">{t('ui_scan_label', 'Scanner')}</span>
+                          </button>
+
+                          {/* Import QR image */}
+                          <button
+                            type="button"
+                            onClick={() => handleFileUpload(quickscanFileInputId, false)}
+                            className={accordionBtnClass}
+                            title={t('ui_or_upload_a_qr_image_works_e_df6baa8039', 'Charger une image qrcode')}
+                          >
+                            <svg className="w-5 h-5 text-white/60 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M12 4v12m0 0l-3-3m3 3l3-3" />
+                            </svg>
+                            <span className="text-[13px] text-white/70">{t('ui_import_label', 'Importer')}</span>
+                          </button>
+                        </div>
+
+                        {/* Destination selector (saved addresses) */}
+                        <div className="relative">
+                          <button
+                            type="button"
+                            onClick={() => setShowQuickscanSavedPicker(prev => !prev)}
+                            className="w-full flex items-center gap-2 bg-[#101415] ring-1 ring-white/15 ring-inset rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.4)] px-3 py-2.5 text-sm text-white/70 hover:bg-white/[0.03] transition-colors"
+                          >
+                            <svg className="w-4 h-4 text-white/50 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                            </svg>
+                            <span className="flex-1 text-left truncate">
+                              {quickscanPasteValue.trim()
+                                ? quickscanPasteValue.trim()
+                                : t('ui_import_or_choose_recipient', 'Import or choose address')}
+                            </span>
+                          </button>
+
+                          {/* Saved addresses dropdown */}
+                          {showQuickscanSavedPicker ? (
+                            <div className="absolute left-0 right-0 top-full mt-1 z-20 rounded-xl ring-1 ring-white/15 ring-inset overflow-hidden shadow-lg bg-[#101415]">
+                              <div className="max-h-44 overflow-y-auto">
+                                {(() => {
+                                  const filtered = (savedAddresses || []).filter(entry => {
+                                    const addr = String(entry?.address || '').trim();
+                                    if (!addr) return false;
+                                    if (normalizedCurrentWallet && addr === normalizedCurrentWallet) return false;
+                                    return true;
+                                  });
+                                  return filtered.length > 0 ? (
+                                    filtered.map((addr, idx) => (
+                                      <button
+                                        key={`qs-${addr.address}-${idx}`}
+                                        type="button"
+                                        onClick={() => {
+                                          const value = String(addr?.address || '').trim();
+                                          if (!value) return;
+                                          const label = String(addr?.onChainLabel || addr?.label || '').trim();
+                                          setQuickscanPasteValue(value);
+                                          setSendDestination?.(value);
+                                          setSendDestinationLabel?.(label);
+                                          setShowQuickscanSavedPicker(false);
+                                          onChooseSimpleSend?.();
+                                        }}
+                                        className="w-full text-left px-3 py-2 text-sm text-white/90 hover:bg-white/5 transition-colors"
+                                      >
+                                        <span className="block font-semibold">
+                                          {String(addr?.onChainLabel || addr?.label || '').trim() || t('ui_wallet_unknown', 'Unknown wallet')}
+                                        </span>
+                                        <span className="block font-mono text-xs text-white/60 truncate">
+                                          {addr.address}
+                                        </span>
+                                      </button>
+                                    ))
+                                  ) : (
+                                    <div className="px-3 py-2 text-xs text-white/60">
+                                      {t('ui_no_saved_addresses', 'No saved addresses yet')}
+                                    </div>
+                                  );
+                                })()}
+                              </div>
+                            </div>
+                          ) : null}
+                        </div>
+
+                        {/* Paste input */}
+                        <div className="relative">
+                          <input
+                            type="text"
+                            value={quickscanPasteValue}
+                            onChange={(e) => {
+                              setQuickscanPasteValue(e.target.value);
+                              setShowQuickscanSavedPicker(false);
+                            }}
+                            onKeyDown={(e) => { if (e.key === 'Enter') handleQuickscanPasteSubmit(); }}
+                            onPaste={(e) => {
+                              const text = (e.clipboardData?.getData('text') || '').trim();
+                              if (text) {
+                                e.preventDefault();
+                                setQuickscanPasteValue(text);
+                                setShowQuickscanSavedPicker(false);
+                                setTimeout(() => {
+                                  setSendDestination?.(text);
+                                  setSendDestinationLabel?.('');
+                                  onChooseSimpleSend?.();
+                                }, 50);
+                              }
+                            }}
+                            placeholder={t('ui_paste_address_placeholder', 'Coller ou saisir une adresse')}
+                            className="w-full bg-[#101415] ring-1 ring-white/15 ring-inset rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.4)] pl-4 pr-12 py-3 text-sm text-white placeholder:text-white/35 outline-none focus:ring-2 focus:ring-xcannes-green/60"
+                          />
+                          {quickscanPasteValue.trim() ? (
+                            <button
+                              type="button"
+                              onClick={handleQuickscanPasteSubmit}
+                              className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg bg-xcannes-green/20 hover:bg-xcannes-green/30 text-xcannes-green transition-colors"
+                              title={t('ui_go_label', 'Valider')}
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                              </svg>
+                            </button>
+                          ) : null}
+                        </div>
+
+                      </div>
                     </div>
-                  </button>
+                  </div>
 
                   {/* ── 2. Envoi simple (accordion) ──────────── */}
                   <div className={[
@@ -535,6 +728,7 @@ export default function WalletDashboardSendChoiceModal({
                                           setSendDestination?.(value);
                                           setSendDestinationLabel?.(label);
                                           setShowSavedPicker(false);
+                                          onChooseSimpleSend?.();
                                         }}
                                         className="w-full text-left px-3 py-2 text-sm text-white/90 hover:bg-white/5 transition-colors"
                                       >
@@ -597,14 +791,6 @@ export default function WalletDashboardSendChoiceModal({
                           ) : null}
                         </div>
 
-                        {/* Send button */}
-                        <button
-                          type="button"
-                          onClick={onChooseSimpleSend}
-                          className="w-full rounded-xl py-3 bg-xcannes-green/90 hover:bg-xcannes-green text-black font-semibold text-[15px] transition-colors shadow-[0_4px_16px_rgba(0,255,150,0.2)]"
-                        >
-                          {t('ui_send_bee4f9e2f5', 'Send')}
-                        </button>
                       </div>
                     </div>
                   </div>
@@ -709,14 +895,6 @@ export default function WalletDashboardSendChoiceModal({
                           ) : null}
                         </div>
 
-                        {/* Pay button */}
-                        <button
-                          type="button"
-                          onClick={onChoosePayRequest}
-                          className="w-full rounded-xl py-3 bg-[#f5a623]/90 hover:bg-[#f5a623] text-black font-semibold text-[15px] transition-colors shadow-[0_4px_16px_rgba(245,166,35,0.2)]"
-                        >
-                          {t('ui_send_pay_request_title', 'Payer une demande')}
-                        </button>
                       </div>
                     </div>
                   </div>
