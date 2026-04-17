@@ -29,14 +29,11 @@ export default function WalletDashboardSendChoiceModal({
   });
 
   // ── Accordion state ──────────────────────────────────────────
-  const [expandedCard, setExpandedCard] = useState('quickscan'); // 'quickscan' | 'simple' | 'payreq' | null
-  const [pasteValue, setPasteValue] = useState('');
+  const [expandedCard, setExpandedCard] = useState('quickscan'); // 'quickscan' | 'payreq' | null
   const [payreqPasteValue, setPayreqPasteValue] = useState('');
   const [quickscanPasteValue, setQuickscanPasteValue] = useState('');
-  const [showSavedPicker, setShowSavedPicker] = useState(false);
   const [showQuickscanSavedPicker, setShowQuickscanSavedPicker] = useState(false);
   const normalizedCurrentWallet = String(currentWalletAddress || '').trim();
-  const sendFileInputId = 'send-choice-qr-file';
   const quickscanFileInputId = 'quickscan-choice-qr-file';
   const payreqFileInputId = 'payreq-choice-qr-file';
   const manualQrReaderIdRef = useRef(
@@ -47,10 +44,8 @@ export default function WalletDashboardSendChoiceModal({
   useEffect(() => {
     if (!open) {
       setExpandedCard('quickscan');
-      setPasteValue('');
       setPayreqPasteValue('');
       setQuickscanPasteValue('');
-      setShowSavedPicker(false);
       setShowQuickscanSavedPicker(false);
     }
   }, [open]);
@@ -122,28 +117,6 @@ export default function WalletDashboardSendChoiceModal({
     }
   }, [quickscanPasteValue, setSendDestination, setSendDestinationLabel, onChooseSimpleSend, handlePaymentRequestScan, onClose]);
 
-  // ── Paste handler for "Envoi simple" ─────────────────────────
-
-  const handleSimplePasteSubmit = useCallback(() => {
-    const raw = pasteValue.trim();
-    if (!raw) return;
-    if (looksLikeXrplAddress(raw)) {
-      setSendDestination?.(raw);
-      setSendDestinationLabel?.('');
-      onChooseSimpleSend?.();
-    } else {
-      // Try as QR/payreq payload
-      const result = handlePaymentRequestScan?.(raw);
-      if (result?.relayChallenge || result?.navigate) {
-        onClose?.();
-        return;
-      }
-      setSendDestination?.(raw);
-      setSendDestinationLabel?.('');
-      onChooseSimpleSend?.();
-    }
-  }, [pasteValue, setSendDestination, setSendDestinationLabel, onChooseSimpleSend, handlePaymentRequestScan, onClose]);
-
   // ── Paste handler for "Payer une demande" ────────────────────
   const handlePayreqPasteSubmit = useCallback(() => {
     const raw = payreqPasteValue.trim();
@@ -163,14 +136,6 @@ export default function WalletDashboardSendChoiceModal({
       <rect x="13" y="29" width="6" height="6" rx="1" className="fill-white/30" />
       <path d="M26 30h4m4 0h4" className="stroke-xcannes-green/60" strokeWidth="1.5" strokeLinecap="round" />
       <path d="M26 36h12" className="stroke-white/30" strokeWidth="1.5" strokeLinecap="round" />
-    </svg>
-  );
-
-  const SimpleSendIcon = () => (
-    <svg viewBox="0 0 48 48" className="w-9 h-9" fill="none" aria-hidden>
-      <circle cx="24" cy="24" r="16" className="fill-xcannes-green/10 stroke-xcannes-green/40" strokeWidth="1.5" />
-      <line x1="24" y1="32" x2="24" y2="16" className="stroke-xcannes-green" strokeWidth="2.5" strokeLinecap="round" />
-      <polyline points="18 22 24 16 30 22" className="stroke-xcannes-green" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 
@@ -433,17 +398,6 @@ export default function WalletDashboardSendChoiceModal({
                     }}
                   />
                   <input
-                    id={sendFileInputId}
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={(e) => {
-                      const file = e.target?.files?.[0];
-                      if (file) handleManualQrFile(file, { isPayreq: false });
-                      e.target.value = '';
-                    }}
-                  />
-                  <input
                     id={payreqFileInputId}
                     type="file"
                     accept="image/*"
@@ -481,15 +435,15 @@ export default function WalletDashboardSendChoiceModal({
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center justify-between gap-2">
                           <p className="text-[18px] md:text-[19px] text-white font-semibold truncate">
-                            {t('ui_send_quick_scan_title', 'Quick Scan')}
+                            {t('ui_send_simple_title', 'Envoi simple')}
                           </p>
                           {/* Chevron only when closed */}
                           {expandedCard !== 'quickscan' ? (
                             <ChevronIcon expanded={false} />
                           ) : null}
                         </div>
-                        <p className="mt-1 text-[15px] md:text-sm leading-snug text-xcannes-green/90">
-                          {t('ui_send_quick_scan_hint', 'Scannez un QR code pour envoyer instantanément')}
+                        <p className="mt-1 text-[13px] md:text-[13px] leading-snug text-xcannes-green/90">
+                          {t('ui_send_simple_hint_long', 'Saisissez une adresse, à la prochaine étape indiquez une devise et un montant')}
                         </p>
                       </div>
                     </button>
@@ -644,182 +598,7 @@ export default function WalletDashboardSendChoiceModal({
                     </div>
                   </div>
 
-                  {/* ── 2. Envoi simple (accordion) ──────────── */}
-                  <div className={[
-                    'w-full bg-white/[0.02] transition-all duration-200',
-                    expandedCard === 'simple'
-                      ? 'rounded-none ring-0 shadow-none'
-                      : 'rounded-[20px] ring-1 ring-inset ring-white/10 hover:ring-white/20 shadow-[0_8px_26px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-22px_34px_rgba(0,0,0,0.68)]',
-                  ].join(' ')}>
-                    {/* Header */}
-                    <button
-                      type="button"
-                      onClick={() => setExpandedCard(prev => prev === 'simple' ? null : 'simple')}
-                      className="w-full text-left px-4 py-4 flex items-center gap-3"
-                    >
-                      <div className="w-12 h-12 rounded-[16px] bg-black/30 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
-                        <SimpleSendIcon />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center justify-between gap-2">
-                          <p className="text-[18px] md:text-[19px] text-white font-semibold truncate">
-                            {t('ui_send_simple_title', 'Envoi simple')}
-                          </p>
-                          <ChevronIcon expanded={expandedCard === 'simple'} />
-                        </div>
-                        <p className="mt-1 text-[15px] md:text-sm leading-snug text-white/60">
-                          {t('ui_send_simple_hint', 'Saisissez une adresse et un montant manuellement')}
-                        </p>
-                      </div>
-                    </button>
-
-                    {/* Accordion body */}
-                    <div
-                      className="overflow-hidden transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]"
-                      style={{
-                        maxHeight: expandedCard === 'simple' ? '600px' : '0px',
-                        opacity: expandedCard === 'simple' ? 1 : 0,
-                      }}
-                    >
-                      <div className="px-4 pb-4 pt-1 space-y-3">
-                        {/* Sub-action buttons row */}
-                        <div className="flex gap-2">
-                          {/* Scan QR */}
-                          <button
-                            type="button"
-                            onClick={onChooseQuickScan}
-                            className={accordionBtnClass}
-                            title={t('ui_scan_qr_code_12fa63d927', 'Scan QR Code')}
-                          >
-                            <svg className="w-5 h-5 text-xcannes-green/80 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
-                            </svg>
-                            <span className="text-[13px] text-white/70">{t('ui_scan_label', 'Scanner')}</span>
-                          </button>
-
-                          {/* Import QR image */}
-                          <button
-                            type="button"
-                            onClick={() => handleFileUpload(sendFileInputId, false)}
-                            className={accordionBtnClass}
-                            title={t('ui_or_upload_a_qr_image_works_e_df6baa8039', 'Charger une image qrcode')}
-                          >
-                            <svg className="w-5 h-5 text-white/60 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M12 4v12m0 0l-3-3m3 3l3-3" />
-                            </svg>
-                            <span className="text-[13px] text-white/70">{t('ui_import_label', 'Importer')}</span>
-                          </button>
-                        </div>
-
-                        {/* Paste input */}
-                        <div className="relative">
-                          <input
-                            type="text"
-                            value={pasteValue}
-                            onChange={(e) => {
-                              setPasteValue(e.target.value);
-                              setShowSavedPicker(false);
-                            }}
-                            onKeyDown={(e) => { if (e.key === 'Enter') handleSimplePasteSubmit(); }}
-                            onPaste={(e) => {
-                              const text = (e.clipboardData?.getData('text') || '').trim();
-                              if (text) {
-                                e.preventDefault();
-                                setPasteValue(text);
-                                setShowSavedPicker(false);
-                                setTimeout(() => {
-                                  setSendDestination?.(text);
-                                  setSendDestinationLabel?.('');
-                                  onChooseSimpleSend?.();
-                                }, 50);
-                              }
-                            }}
-                            placeholder={t('ui_paste_address_placeholder', 'Coller ou saisir une adresse')}
-                            className="w-full bg-elevated ring-1 ring-white/15 ring-inset rounded-[20px] shadow-[0_4px_12px_rgba(0,0,0,0.4)] pl-4 pr-12 py-3 text-sm text-white placeholder:text-white/35 outline-none focus:ring-2 focus:ring-xcannes-green/60"
-                          />
-                          {pasteValue.trim() ? (
-                            <button
-                              type="button"
-                              onClick={handleSimplePasteSubmit}
-                              className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg bg-xcannes-green/20 hover:bg-xcannes-green/30 text-xcannes-green transition-colors"
-                              title={t('ui_go_label', 'Valider')}
-                            >
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                              </svg>
-                            </button>
-                          ) : null}
-                        </div>
-
-                        {/* Destination selector (saved addresses) */}
-                        <div className="relative">
-                          <button
-                            type="button"
-                            onClick={() => setShowSavedPicker(prev => !prev)}
-                            className="w-full flex items-center gap-2 bg-elevated ring-1 ring-white/15 ring-inset rounded-[20px] shadow-[0_4px_12px_rgba(0,0,0,0.4)] px-3 py-2.5 text-sm text-white/70 hover:bg-white/[0.03] transition-colors"
-                          >
-                            <svg className="w-4 h-4 text-white/50 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                            </svg>
-                            <span className="flex-1 text-left truncate">
-                              {pasteValue.trim()
-                                ? pasteValue.trim()
-                                : t('ui_import_or_choose_recipient', 'Import or choose address')}
-                            </span>
-                          </button>
-
-                          {/* Saved addresses dropdown */}
-                          {showSavedPicker ? (
-                            <div className="absolute left-0 right-0 top-full mt-1 z-20 rounded-[20px] ring-1 ring-white/15 ring-inset overflow-hidden shadow-lg bg-elevated">
-                              <div className="max-h-44 overflow-y-auto">
-                                {(() => {
-                                  const filtered = (savedAddresses || []).filter(entry => {
-                                    const addr = String(entry?.address || '').trim();
-                                    if (!addr) return false;
-                                    if (normalizedCurrentWallet && addr === normalizedCurrentWallet) return false;
-                                    return true;
-                                  });
-                                  return filtered.length > 0 ? (
-                                    filtered.map((addr, idx) => (
-                                      <button
-                                        key={`${addr.address}-${idx}`}
-                                        type="button"
-                                        onClick={() => {
-                                          const value = String(addr?.address || '').trim();
-                                          if (!value) return;
-                                          const label = String(addr?.onChainLabel || addr?.label || '').trim();
-                                          setPasteValue(value);
-                                          setSendDestination?.(value);
-                                          setSendDestinationLabel?.(label);
-                                          setShowSavedPicker(false);
-                                          onChooseSimpleSend?.();
-                                        }}
-                                        className="w-full text-left px-3 py-2 text-sm text-white/90 hover:bg-white/5 transition-colors"
-                                      >
-                                        <span className="block font-semibold">
-                                          {String(addr?.onChainLabel || addr?.label || '').trim() || t('ui_wallet_unknown', 'Unknown wallet')}
-                                        </span>
-                                        <span className="block font-mono text-xs text-white/60 truncate">
-                                          {addr.address}
-                                        </span>
-                                      </button>
-                                    ))
-                                  ) : (
-                                    <div className="px-3 py-2 text-xs text-white/60">
-                                      {t('ui_no_saved_addresses', 'No saved addresses yet')}
-                                    </div>
-                                  );
-                                })()}
-                              </div>
-                            </div>
-                          ) : null}
-                        </div>
-
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* ── 3. Payer une demande (accordion) ─────── */}
+                  {/* ── 2. Payer une demande (accordion) ─────── */}
                   <div className={[
                     'w-full bg-white/[0.02] transition-all duration-200',
                     expandedCard === 'payreq'
