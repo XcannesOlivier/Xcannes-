@@ -411,7 +411,10 @@ export default function WalletDashboardSendChoiceModal({
                   {/* Hidden div for html5-qrcode reader */}
                   <div id={manualQrReaderIdRef.current} className="hidden" />
 
-                  {/* ── 1. Quick Scan (accordion, open by default) ── */}
+                  {/* Separator */}
+                  <div className="w-full h-px bg-white/10 my-1" />
+
+                  {/* ── 1. Quick Scan (accordion, open by default) ── */}}
                   <div
                     className={[
                       'bg-white/[0.02] transition-all duration-200',
@@ -599,7 +602,7 @@ export default function WalletDashboardSendChoiceModal({
                   </div>
 
                   {/* Separator */}
-                  <div className="w-full h-px bg-white/10" />
+                  <div className="w-full h-px bg-white/10 my-1" />
 
                   {/* ── 2. Payer une demande (accordion) ─────── */}
                   <div className={[
