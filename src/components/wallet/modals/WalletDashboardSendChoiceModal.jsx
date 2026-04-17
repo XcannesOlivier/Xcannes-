@@ -132,13 +132,13 @@ export default function WalletDashboardSendChoiceModal({
   // ── Icons ────────────────────────────────────────────────────
   const QuickScanIcon = () => (
     <svg viewBox="0 0 48 48" className="w-9 h-9" fill="none" aria-hidden>
-      <rect x="10" y="10" width="12" height="12" rx="2" className="stroke-xcannes-green/70" strokeWidth="1.5" fill="none" />
-      <rect x="13" y="13" width="6" height="6" rx="1" className="fill-xcannes-green/50" />
+      <rect x="10" y="10" width="12" height="12" rx="2" className="stroke-white/50" strokeWidth="1.5" fill="none" />
+      <rect x="13" y="13" width="6" height="6" rx="1" className="fill-white/30" />
       <rect x="26" y="10" width="12" height="12" rx="2" className="stroke-white/50" strokeWidth="1.5" fill="none" />
       <rect x="29" y="13" width="6" height="6" rx="1" className="fill-white/30" />
       <rect x="10" y="26" width="12" height="12" rx="2" className="stroke-white/50" strokeWidth="1.5" fill="none" />
       <rect x="13" y="29" width="6" height="6" rx="1" className="fill-white/30" />
-      <path d="M26 30h4m4 0h4" className="stroke-xcannes-green/60" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M26 30h4m4 0h4" className="stroke-white/50" strokeWidth="1.5" strokeLinecap="round" />
       <path d="M26 36h12" className="stroke-white/30" strokeWidth="1.5" strokeLinecap="round" />
     </svg>
   );
@@ -399,7 +399,7 @@ export default function WalletDashboardSendChoiceModal({
                       onClick={onChooseQuickScan}
                       className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-white/[0.06] ring-1 ring-white/10 hover:bg-white/[0.10] active:scale-[0.97] transition-all text-[13px] text-white/80 font-medium"
                     >
-                      <svg className="w-4 h-4 text-xcannes-green/80" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                      <svg className="w-4 h-4 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
                       </svg>
                       {t('ui_scan_label', 'Scanner')}
@@ -436,7 +436,7 @@ export default function WalletDashboardSendChoiceModal({
                 {/* Cards — vertically centred in remaining space */}
                 <div
                   ref={overlayListRef}
-                  className="flex-1 min-h-0 flex flex-col justify-center gap-3 mt-8 px-4 md:px-5 overflow-y-auto [--list-pad:1rem] md:[--list-pad:1.25rem]"
+                  className="flex-1 min-h-0 flex flex-col justify-start gap-3 mt-8 px-4 md:px-5 overflow-y-auto [--list-pad:1rem] md:[--list-pad:1.25rem]"
                   onPointerDown={event => { maybeStartOverlayDrag(event, 'list'); }}
                 >
 
@@ -474,7 +474,7 @@ export default function WalletDashboardSendChoiceModal({
                       onClick={() => {
                         setExpandedCard(prev => prev === 'quickscan' ? null : 'quickscan');
                       }}
-                      className="w-full text-left px-4 pt-4 pb-6 flex items-center gap-3"
+                      className="w-full text-left px-4 py-4 flex items-center gap-3"
                     >
                       <div className="w-12 h-12 rounded-[16px] bg-black/30 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
                         <QuickScanIcon />
@@ -687,7 +687,7 @@ export default function WalletDashboardSendChoiceModal({
                     <button
                       type="button"
                       onClick={() => setExpandedCard(prev => prev === 'payreq' ? null : 'payreq')}
-                      className="w-full text-left px-4 pt-4 pb-6 flex items-center gap-3"
+                      className="w-full text-left px-4 py-4 flex items-center gap-3"
                     >
                       <div className="w-12 h-12 rounded-[16px] bg-black/30 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
                         <PayRequestIcon />
