@@ -577,15 +577,15 @@ export default function WalletDashboardSwapModal({
                       variant: "pill",
                       className:
                         "w-full flex justify-center wallet-meta--plus-4 wallet-meta--desktop-gap",
-                      prefix: `${t("moonpay_from_account", "Depuis le compte")} :`,
-                      labelWrap: true,
+                      prefix: t("moonpay_from_account", "Depuis le compte"),
+                      labelWrap: false,
                       pillClassName:
-                        "bg-elevated px-4 py-3 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]",
+                        "bg-elevated px-6 py-1.5 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)] gap-6",
                       prefixClassName:
-                        "!text-white/70 text-[16px] md:text-[17px] font-semibold tracking-wide",
+                        "!text-white/70 text-[14px] md:text-[15px] font-medium tracking-wide mr-6",
                       labelClassName:
-                        "!text-white/95 text-[16px] md:text-[17px] font-semibold",
-                      dotClassName: "!h-3 !w-3 ring-xcannes-green/20",
+                        "!text-white/95 text-[14px] md:text-[15px] font-semibold",
+                      dotClassName: "!h-3 !w-3 ring-xcannes-green/20 self-center",
                     })}
                   </div>
                   <div className="flex flex-wrap items-center gap-2">

@@ -132,13 +132,13 @@ export default function WalletDashboardSendChoiceModal({
   // ── Icons ────────────────────────────────────────────────────
   const QuickScanIcon = () => (
     <svg viewBox="0 0 48 48" className="w-9 h-9" fill="none" aria-hidden>
-      <rect x="10" y="10" width="12" height="12" rx="2" className="stroke-white/50" strokeWidth="1.5" fill="none" />
-      <rect x="13" y="13" width="6" height="6" rx="1" className="fill-white/30" />
+      <rect x="10" y="10" width="12" height="12" rx="2" className="stroke-xcannes-green/70" strokeWidth="1.5" fill="none" />
+      <rect x="13" y="13" width="6" height="6" rx="1" className="fill-xcannes-green/50" />
       <rect x="26" y="10" width="12" height="12" rx="2" className="stroke-white/50" strokeWidth="1.5" fill="none" />
       <rect x="29" y="13" width="6" height="6" rx="1" className="fill-white/30" />
       <rect x="10" y="26" width="12" height="12" rx="2" className="stroke-white/50" strokeWidth="1.5" fill="none" />
       <rect x="13" y="29" width="6" height="6" rx="1" className="fill-white/30" />
-      <path d="M26 30h4m4 0h4" className="stroke-white/50" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M26 30h4m4 0h4" className="stroke-xcannes-green/60" strokeWidth="1.5" strokeLinecap="round" />
       <path d="M26 36h12" className="stroke-white/30" strokeWidth="1.5" strokeLinecap="round" />
     </svg>
   );
@@ -369,7 +369,7 @@ export default function WalletDashboardSendChoiceModal({
                   className:
                     "w-full flex justify-center wallet-meta--plus-4 wallet-meta--desktop-gap",
                   prefix: t("moonpay_from_account", "Depuis le compte"),
-                  labelWrap: true,
+                  labelWrap: false,
                   pillClassName:
                     "bg-elevated px-6 py-1.5 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)] gap-6",
                   prefixClassName:
@@ -390,7 +390,7 @@ export default function WalletDashboardSendChoiceModal({
                     {t('ui_send_choice_subtitle', 'Choisissez comment envoyer vos fonds')}
                   </h3>
                   <p className="mt-2 text-[14px] md:text-[15px] text-white/60 max-w-[34ch] leading-relaxed">
-                    {t('ui_send_choice_hint', 'Scannez, collez, importez ou choisissez adresse dans votre liste.')}
+                    {t('ui_send_choice_hint', 'Scannez, collez, importez ou choisissez une adresse dans votre liste.')}
                   </p>
                   {/* Action chips */}
                   <div className="mt-8 flex items-center gap-2">
@@ -474,7 +474,7 @@ export default function WalletDashboardSendChoiceModal({
                       onClick={() => {
                         setExpandedCard(prev => prev === 'quickscan' ? null : 'quickscan');
                       }}
-                      className="w-full text-left px-4 py-4 flex items-center gap-3"
+                      className="w-full text-left px-4 py-5 flex items-center gap-3"
                     >
                       <div className="w-12 h-12 rounded-[16px] bg-black/30 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
                         <QuickScanIcon />
@@ -687,7 +687,7 @@ export default function WalletDashboardSendChoiceModal({
                     <button
                       type="button"
                       onClick={() => setExpandedCard(prev => prev === 'payreq' ? null : 'payreq')}
-                      className="w-full text-left px-4 py-4 flex items-center gap-3"
+                      className="w-full text-left px-4 py-5 flex items-center gap-3"
                     >
                       <div className="w-12 h-12 rounded-[16px] bg-black/30 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
                         <PayRequestIcon />
