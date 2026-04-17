@@ -383,7 +383,7 @@ export default function WalletDashboardSendChoiceModal({
               <div className="flex-1 min-h-0 flex flex-col">
                 {/* Title + subtitle + arrow */}
                 <div
-                  className={`pt-6 md:pt-5 pb-3 flex flex-col items-center text-center transition-all duration-300 ${expandedCard ? 'blur-[3px] opacity-40 pointer-events-none' : ''}`}
+                  className={`pt-6 md:pt-5 pb-3 flex flex-col items-center text-center transition-all duration-300 ${expandedCard ? 'blur-[4px] opacity-20 pointer-events-none' : ''}`}
                   onPointerDown={event => { maybeStartOverlayDrag(event, 'fixed'); }}
                 >
                   <h3 className="mt-1 text-[22px] md:text-[24px] font-semibold text-white/95 tracking-tight">
@@ -466,7 +466,7 @@ export default function WalletDashboardSendChoiceModal({
 
                   {/* ── 1. Envoi simple (accordion) ── */}
                   <div
-                    className="w-full bg-white/[0.02] rounded-[20px] ring-1 ring-inset ring-white/10 hover:ring-white/20 shadow-[0_8px_26px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-22px_34px_rgba(0,0,0,0.68)] transition-all duration-200"
+                    className={`w-full bg-white/[0.02] rounded-[20px] ring-1 ring-inset ring-white/10 hover:ring-white/20 shadow-[0_8px_26px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-22px_34px_rgba(0,0,0,0.68)] transition-all duration-300 ${expandedCard === 'payreq' ? 'blur-[4px] opacity-20 pointer-events-none' : ''}`}
                   >
                     {/* Header */}
                     <button
@@ -682,7 +682,7 @@ export default function WalletDashboardSendChoiceModal({
                   </div>
 
                   {/* ── 2. Payer une demande (accordion) ─────── */}
-                  <div className="w-full bg-white/[0.02] rounded-[20px] ring-1 ring-inset ring-white/10 hover:ring-white/20 shadow-[0_8px_26px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-22px_34px_rgba(0,0,0,0.68)] transition-all duration-200">
+                  <div className={`w-full bg-white/[0.02] rounded-[20px] ring-1 ring-inset ring-white/10 hover:ring-white/20 shadow-[0_8px_26px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-22px_34px_rgba(0,0,0,0.68)] transition-all duration-300 ${expandedCard === 'quickscan' ? 'blur-[4px] opacity-20 pointer-events-none' : ''}`}>
                     {/* Header */}
                     <button
                       type="button"
