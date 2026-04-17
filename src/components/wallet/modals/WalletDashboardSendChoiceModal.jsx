@@ -376,7 +376,7 @@ export default function WalletDashboardSendChoiceModal({
                     "!text-white/70 text-[14px] md:text-[15px] font-medium tracking-wide mr-6",
                   labelClassName:
                     "!text-white/95 text-[14px] md:text-[15px] font-semibold",
-                  dotClassName: "!h-3 !w-3 ring-xcannes-green/20",
+                  dotClassName: "!h-3 !w-3 ring-xcannes-green/20 self-center",
                 })}
               </div>
 
@@ -393,7 +393,7 @@ export default function WalletDashboardSendChoiceModal({
                     {t('ui_send_choice_hint', 'Scannez, collez, importez ou choisissez adresse dans votre liste.')}
                   </p>
                   {/* Action chips */}
-                  <div className="mt-4 flex items-center gap-2">
+                  <div className="mt-8 flex items-center gap-2">
                     <button
                       type="button"
                       onClick={onChooseQuickScan}
@@ -436,7 +436,7 @@ export default function WalletDashboardSendChoiceModal({
                 {/* Cards — vertically centred in remaining space */}
                 <div
                   ref={overlayListRef}
-                  className="flex-1 min-h-0 flex flex-col justify-center gap-3 py-6 px-4 md:px-5 overflow-y-auto [--list-pad:1rem] md:[--list-pad:1.25rem]"
+                  className="flex-1 min-h-0 flex flex-col justify-center gap-3 mt-8 px-4 md:px-5 overflow-y-auto [--list-pad:1rem] md:[--list-pad:1.25rem]"
                   onPointerDown={event => { maybeStartOverlayDrag(event, 'list'); }}
                 >
 
@@ -474,18 +474,15 @@ export default function WalletDashboardSendChoiceModal({
                       onClick={() => {
                         setExpandedCard(prev => prev === 'quickscan' ? null : 'quickscan');
                       }}
-                      className="w-full text-left px-4 py-4 flex items-center gap-3"
+                      className="w-full text-left px-4 pt-4 pb-6 flex items-center gap-3"
                     >
                       <div className="w-12 h-12 rounded-[16px] bg-black/30 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
                         <QuickScanIcon />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <div className="flex items-center justify-between gap-3">
-                          <p className="text-[16px] md:text-[17px] text-white/92 font-semibold">
-                            {t('ui_send_simple_title', 'Envoi simple')}
-                          </p>
-                          <ChevronIcon />
-                        </div>
+                        <p className="text-[16px] md:text-[17px] text-white/92 font-semibold">
+                          {t('ui_send_simple_title', 'Envoi simple')}
+                        </p>
                         <p className="mt-1 text-[13px] md:text-[14px] leading-snug text-white/55">
                           {t('ui_send_simple_hint_long', 'Saisissez une adresse, indiquez la devise et le montant.')}
                         </p>
@@ -501,6 +498,7 @@ export default function WalletDashboardSendChoiceModal({
                           </button>
                         )}
                       </div>
+                      <ChevronIcon />
                     </button>
 
                     {/* Accordion body */}
@@ -689,18 +687,15 @@ export default function WalletDashboardSendChoiceModal({
                     <button
                       type="button"
                       onClick={() => setExpandedCard(prev => prev === 'payreq' ? null : 'payreq')}
-                      className="w-full text-left px-4 py-4 flex items-center gap-3"
+                      className="w-full text-left px-4 pt-4 pb-6 flex items-center gap-3"
                     >
                       <div className="w-12 h-12 rounded-[16px] bg-black/30 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
                         <PayRequestIcon />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <div className="flex items-center justify-between gap-3">
-                          <p className="text-[16px] md:text-[17px] text-white/92 font-semibold">
-                            {t('ui_send_pay_request_title', 'Payer une demande')}
-                          </p>
-                          <ChevronIcon />
-                        </div>
+                        <p className="text-[16px] md:text-[17px] text-white/92 font-semibold">
+                          {t('ui_send_pay_request_title', 'Payer une demande')}
+                        </p>
                         <p className="mt-1 text-[13px] md:text-[14px] leading-snug text-white/55">
                           {t('ui_send_pay_request_hint', 'Réglez une demande reçue après vérification.')}
                         </p>
@@ -716,6 +711,7 @@ export default function WalletDashboardSendChoiceModal({
                           </button>
                         )}
                       </div>
+                      <ChevronIcon />
                     </button>
 
                     {/* Accordion body */}
@@ -821,7 +817,7 @@ export default function WalletDashboardSendChoiceModal({
 
                   {/* Footer note */}
                   <p className="text-center text-[12px] text-white/40 leading-relaxed mt-2">
-                    {t('ui_send_fees_note', 'Les frais et détails seront affichés avant confirmation.')}
+                    {t('ui_send_fees_note', 'Les détails seront affichés avant confirmation.')}
                   </p>
                 </div>
               </div>
