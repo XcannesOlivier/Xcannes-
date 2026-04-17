@@ -436,7 +436,7 @@ export default function WalletDashboardSendChoiceModal({
                 {/* Cards — vertically centred in remaining space */}
                 <div
                   ref={overlayListRef}
-                  className="flex-1 min-h-0 flex flex-col justify-start gap-3 mt-8 px-4 md:px-5 overflow-y-auto [--list-pad:1rem] md:[--list-pad:1.25rem]"
+                  className={`flex-1 min-h-0 flex flex-col justify-start gap-3 mt-8 px-4 md:px-5 [--list-pad:1rem] md:[--list-pad:1.25rem] ${showQuickscanSavedPicker ? 'overflow-visible' : 'overflow-y-auto'}`}
                   onPointerDown={event => { maybeStartOverlayDrag(event, 'list'); }}
                 >
 
@@ -503,7 +503,7 @@ export default function WalletDashboardSendChoiceModal({
 
                     {/* Accordion body */}
                     <div
-                      className="overflow-hidden transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]"
+                      className={`transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)] ${expandedCard === 'quickscan' && !showQuickscanSavedPicker ? 'overflow-hidden' : expandedCard === 'quickscan' ? 'overflow-visible' : 'overflow-hidden'}`}
                       style={{
                         maxHeight: expandedCard === 'quickscan' ? '800px' : '0px',
                         opacity: expandedCard === 'quickscan' ? 1 : 0,
