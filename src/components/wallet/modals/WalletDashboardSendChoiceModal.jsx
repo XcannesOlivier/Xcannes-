@@ -414,7 +414,7 @@ export default function WalletDashboardSendChoiceModal({
                   {/* Separator */}
                   <div className="w-full h-px bg-white/10 my-1" />
 
-                  {/* ── 1. Quick Scan (accordion, open by default) ── */}}
+                  {/* ── 1. Quick Scan (accordion, open by default) ── */}
                   <div
                     className={[
                       'bg-white/[0.02] transition-all duration-200',
