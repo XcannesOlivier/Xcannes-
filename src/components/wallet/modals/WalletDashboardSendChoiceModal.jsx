@@ -198,7 +198,7 @@ export default function WalletDashboardSendChoiceModal({
     'w-full text-left rounded-[20px] px-4 py-4 bg-white/[0.02] hover:bg-white/[0.05] active:bg-white/[0.03] ring-1 ring-white/10 ring-inset shadow-[0_8px_26px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-22px_34px_rgba(0,0,0,0.68)] transition-all duration-[140ms] ease-[cubic-bezier(0.4,0,0.2,1)] hover:ring-white/20 hover:-translate-y-px active:translate-y-0 active:scale-[0.99]';
 
   const accordionBtnClass =
-    'flex items-center justify-center gap-2.5 w-full rounded-[20px] px-3 py-2.5 bg-white/[0.03] hover:bg-white/[0.07] active:bg-white/[0.04] transition-colors duration-100';
+    'flex items-center justify-center gap-2.5 w-full rounded-[20px] px-3 py-2.5 bg-elevated hover:bg-white/[0.07] active:bg-white/[0.04] transition-colors duration-100';
 
   // ── Swipe-to-close (mobile) ────────────────────────────────
   const [overlayDragging, setOverlayDragging] = useState(false);
@@ -465,7 +465,7 @@ export default function WalletDashboardSendChoiceModal({
                   <div className={[
                     'w-full bg-white/[0.02] transition-all duration-200',
                     expandedCard === 'quickscan'
-                      ? 'rounded-none ring-0 shadow-none'
+                      ? 'rounded-none ring-0 shadow-none -mx-4 md:-mx-5 px-0 w-[calc(100%+2rem)] md:w-[calc(100%+2.5rem)]'
                       : 'rounded-[20px] ring-1 ring-inset ring-white/10 hover:ring-white/20 shadow-[0_8px_26px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-22px_34px_rgba(0,0,0,0.68)]',
                   ].join(' ')}>
                     {/* Header */}
