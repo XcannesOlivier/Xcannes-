@@ -445,8 +445,8 @@ export default function WalletDashboardSendChoiceModal({
                             <ChevronIcon expanded={false} />
                           ) : null}
                         </div>
-                        <p className="mt-1 text-[13px] md:text-[13px] leading-snug text-xcannes-green/90">
-                          {t('ui_send_simple_hint_long', 'Saisissez une adresse, à la prochaine étape indiquez une devise et un montant')}
+                        <p className="mt-1 text-[13px] md:text-[13px] leading-snug text-white">
+                          {t('ui_send_simple_hint_long', 'Saisissez une adresse, indiquez la devise et le montant de votre choix')}
                         </p>
                       </div>
                     </button>
@@ -455,11 +455,32 @@ export default function WalletDashboardSendChoiceModal({
                     <div
                       className="overflow-hidden transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]"
                       style={{
-                        maxHeight: expandedCard === 'quickscan' ? '600px' : '0px',
+                        maxHeight: expandedCard === 'quickscan' ? '800px' : '0px',
                         opacity: expandedCard === 'quickscan' ? 1 : 0,
                       }}
                     >
                       <div className="px-4 pb-4 pt-1 space-y-3">
+
+                        {/* Steps guide */}
+                        <ol className="space-y-2 text-[12px] leading-relaxed">
+                          <li className="flex gap-2">
+                            <span className="flex-shrink-0 w-5 h-5 rounded-full bg-xcannes-green/15 text-xcannes-green text-[11px] font-bold flex items-center justify-center">1</span>
+                            <span className="text-white/60">{t('ui_step_1', 'Renseignez l\'adresse du destinataire — scannez, collez, importez ou choisissez dans votre liste.')}</span>
+                          </li>
+                          <li className="flex gap-2">
+                            <span className="flex-shrink-0 w-5 h-5 rounded-full bg-xcannes-green/15 text-xcannes-green text-[11px] font-bold flex items-center justify-center">2</span>
+                            <span className="text-white/60">{t('ui_step_2', 'Sélectionnez la devise parmi celles disponibles sur votre compte.')}</span>
+                          </li>
+                          <li className="flex gap-2">
+                            <span className="flex-shrink-0 w-5 h-5 rounded-full bg-xcannes-green/15 text-xcannes-green text-[11px] font-bold flex items-center justify-center">3</span>
+                            <span className="text-white/60">{t('ui_step_3', 'Indiquez le montant à envoyer.')}</span>
+                          </li>
+                          <li className="flex gap-2">
+                            <span className="flex-shrink-0 w-5 h-5 rounded-full bg-xcannes-green/15 text-xcannes-green text-[11px] font-bold flex items-center justify-center">4</span>
+                            <span className="text-white/60">{t('ui_step_4', 'Vérifiez et validez en toute sécurité.')}</span>
+                          </li>
+                        </ol>
+
                         {/* Sub-action buttons row */}
                         <div className="flex gap-2">
                           {/* Scan QR */}
@@ -546,7 +567,7 @@ export default function WalletDashboardSendChoiceModal({
                             <span className="flex-1 text-left truncate">
                               {quickscanPasteValue.trim()
                                 ? quickscanPasteValue.trim()
-                                : t('ui_import_or_choose_recipient', 'Import or choose address')}
+                                : t('ui_choose_recipient', 'Choose address')}
                             </span>
                           </button>
 
