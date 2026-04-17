@@ -12,7 +12,7 @@ export default function WalletDashboardActionRow({ onAction }) {
       <div className="grid grid-cols-4 gap-2 sm:gap-3">
         <button
           type="button"
-          onClick={() => onAction("send")}
+          onClick={() => onAction("sendChoice")}
           className="wallet-action-btn wallet-action-send group"
         >
           <div className="wallet-action-icon">

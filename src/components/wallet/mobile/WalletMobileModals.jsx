@@ -18,6 +18,7 @@ import WalletDashboardPayreqModal from "../modals/WalletDashboardPayreqModal";
 import WalletDashboardReceiveModal from "../modals/WalletDashboardReceiveModal";
 import WalletDashboardSwapModal from "../modals/WalletDashboardSwapModal";
 import WalletDashboardCashChoiceModal from "../modals/WalletDashboardCashChoiceModal";
+import WalletDashboardSendChoiceModal from "../modals/WalletDashboardSendChoiceModal";
 import WalletDashboardUsdSwapModal from "../modals/WalletDashboardUsdSwapModal";
 import WalletDashboardCashModal from "../modals/WalletDashboardCashModal";
 import WalletActivationModal from "../modals/WalletActivationModal";
@@ -205,6 +206,24 @@ export default function WalletMobileModals({
       {typeof document !== "undefined" &&
         createPortal(
           <>
+            <WalletDashboardSendChoiceModal
+              open={activeAction === "sendChoice"}
+              onClose={() => {
+                setActiveAction(null);
+              }}
+              onChooseQuickScan={() => {
+                setActiveAction(null);
+                setQrScannerOpen(true);
+              }}
+              onChooseSimpleSend={() => {
+                setActiveAction("send");
+              }}
+              onChoosePayRequest={() => {
+                setActiveAction("send");
+                // Will open on the payreq tab if available
+              }}
+            />
+
             <WalletDashboardSendModal
               open={activeAction === "send"}
               onClose={() => {

@@ -1036,6 +1036,7 @@ export default function WalletDashboard({
     !isDesktopPanel &&
     (activeAction === 'cash' ||
       activeAction === 'cashChoice' ||
+      activeAction === 'sendChoice' ||
       activeAction === 'cashUsdSwapOut' ||
       activeAction === 'cashUsdSwapIn' ||
       (activeAction === 'swap' && swapState.swapLockedView === 'lines') ||

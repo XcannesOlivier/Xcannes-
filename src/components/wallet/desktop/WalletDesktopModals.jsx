@@ -13,6 +13,7 @@ import WalletDashboardPayreqModal from "../modals/WalletDashboardPayreqModal";
 import WalletDashboardReceiveModal from "../modals/WalletDashboardReceiveModal";
 import WalletDashboardSwapModal from "../modals/WalletDashboardSwapModal";
 import WalletDashboardCashChoiceModal from "../modals/WalletDashboardCashChoiceModal";
+import WalletDashboardSendChoiceModal from "../modals/WalletDashboardSendChoiceModal";
 import WalletDashboardUsdSwapModal from "../modals/WalletDashboardUsdSwapModal";
 import WalletDashboardCashModal from "../modals/WalletDashboardCashModal";
 import WalletActivationModal from "../modals/WalletActivationModal";
@@ -28,6 +29,7 @@ import {
 export default function WalletDesktopModals({
   // visibility flags (calculés par WalletDashboard)
   showInlineQrScanner,
+  showInlineSendChoice,
   showInlineSend,
   showInlinePayreq,
   showInlineReceive,
@@ -138,6 +140,26 @@ export default function WalletDesktopModals({
             className="h-full"
           />
         </div>
+      ) : null}
+
+      {showInlineSendChoice ? (
+        <WalletDashboardSendChoiceModal
+          open
+          inline
+          onClose={() => {
+            setActiveAction(null);
+          }}
+          onChooseQuickScan={() => {
+            setActiveAction(null);
+            setQrScannerOpen(true);
+          }}
+          onChooseSimpleSend={() => {
+            setActiveAction("send");
+          }}
+          onChoosePayRequest={() => {
+            setActiveAction("send");
+          }}
+        />
       ) : null}
 
       {showInlineSend ? (
