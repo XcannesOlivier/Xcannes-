@@ -1384,33 +1384,43 @@ export default function WalletDashboardSendModal({
 
   /* ── Payreq final step – shown when a payment request was scanned ── */
   const payreqFinalStep = hasPaymentRequest ? (
-    <div className="space-y-5">
+    <div className="space-y-6">
+      {/* Title + subtitle */}
+      <div className="text-center space-y-1 pt-1">
+        <h3 className="text-[17px] font-semibold text-white/95">
+          {t("ui_payreq_summary_title", "Résumé de la demande de paiement")}
+        </h3>
+        <p className="text-[13px] text-white/45">
+          {t("ui_payreq_summary_subtitle", "Vérifiez les informations avant d\u2019envoyer")}
+        </p>
+      </div>
+
       {/* Summary lines – flat, no box */}
       <div className="space-y-4">
         <div className="flex items-baseline justify-between gap-4">
-          <span className="text-[13px] text-white/50">{t("ui_beneficiary_label", "Destinataire")}</span>
-          <span className="text-[15px] font-semibold text-white/90 truncate text-right">
+          <span className="text-[15px] text-white/50">{t("ui_beneficiary_label", "Destinataire")}</span>
+          <span className="text-[17px] font-semibold text-white/90 truncate text-right">
             {payreqSelectorLabel || t("ui_wallet_unknown", "Unknown wallet")}
           </span>
         </div>
         <div className="flex items-baseline justify-between gap-4">
-          <span className="text-[13px] text-white/50">{t("ui_address", "Adresse")}</span>
+          <span className="text-[15px] text-white/50">{t("ui_address", "Adresse")}</span>
           <button
             type="button"
             onClick={() => setShowFullPayreqAddress((prev) => !prev)}
-            className="font-mono text-[13px] text-white/70 text-right underline decoration-white/25 underline-offset-2 hover:decoration-white/60 transition-colors truncate max-w-[60%]"
+            className="font-mono text-[15px] text-white/70 text-right underline decoration-white/25 underline-offset-2 hover:decoration-white/60 transition-colors truncate max-w-[60%]"
             title={t("ui_toggle_full_account_number", "Afficher/masquer l'adresse complète")}
           >
             {showFullPayreqAddress ? requestDestination : requestDestinationLabel}
           </button>
         </div>
         <div className="flex items-baseline justify-between gap-4">
-          <span className="text-[13px] text-white/50">{t("ui_currency_label", "Devise")}</span>
-          <span className="text-[15px] text-white/90">{requestCurrencyCode || confirmCurrencyCode || "—"}</span>
+          <span className="text-[15px] text-white/50">{t("ui_currency_label", "Devise")}</span>
+          <span className="text-[17px] text-white/90">{requestCurrencyCode || confirmCurrencyCode || "—"}</span>
         </div>
         <div className="flex items-baseline justify-between gap-4">
-          <span className="text-[13px] text-white/50">{t("ui_amount_52cea2dd3d", "Montant")}</span>
-          <span className="text-xl font-semibold text-white/95">{requestAmountLabel || "—"}</span>
+          <span className="text-[15px] text-white/50">{t("ui_amount_52cea2dd3d", "Montant")}</span>
+          <span className="text-2xl font-semibold text-white/95">{requestAmountLabel || "—"}</span>
         </div>
       </div>
 
