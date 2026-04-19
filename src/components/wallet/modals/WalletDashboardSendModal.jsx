@@ -1384,100 +1384,47 @@ export default function WalletDashboardSendModal({
 
   /* ── Payreq final step – shown when a payment request was scanned ── */
   const payreqFinalStep = hasPaymentRequest ? (
-    <div className="space-y-4">
-      {/* 1) Recipient input */}
-      <div className="space-y-2">
-        <label className="block text-base md:text-lg text-white/60">
-          {t("ui_send_to_label", "Destinataire")}
-        </label>
-        <div className="relative">
-          <input
-            type="text"
-            value={payreqSelectorValue}
-            readOnly
-	            className="w-full bg-[#101415] backdrop-blur-sm ring-1 ring-white/15 ring-inset rounded-xl px-4 pr-4 py-3 text-base text-white/90 outline-none truncate focus:outline-none"
-	          />
-	        </div>
-        {selfSendBlocked ? (
-          <div className="rounded-lg ring-1 ring-orange-400/30 ring-inset bg-orange-400/10 px-3 py-2 text-xs text-orange-200/90">
-            <div className="font-semibold">
-              {t("ui_invalid_recipient_title", "Destinataire invalide")}
-            </div>
-            <div>
-              {t(
-                "ui_cannot_send_to_self",
-                "Vous ne pouvez pas envoyer à votre propre compte.",
-              )}
-            </div>
-          </div>
-        ) : null}
-        {saveAddressBlock}
+    <div className="space-y-5">
+      {/* Summary lines – flat, no box */}
+      <div className="space-y-4">
+        <div className="flex items-baseline justify-between gap-4">
+          <span className="text-[13px] text-white/50">{t("ui_beneficiary_label", "Destinataire")}</span>
+          <span className="text-[15px] font-semibold text-white/90 truncate text-right">
+            {payreqSelectorLabel || t("ui_wallet_unknown", "Unknown wallet")}
+          </span>
+        </div>
+        <div className="flex items-baseline justify-between gap-4">
+          <span className="text-[13px] text-white/50">{t("ui_address", "Adresse")}</span>
+          <button
+            type="button"
+            onClick={() => setShowFullPayreqAddress((prev) => !prev)}
+            className="font-mono text-[13px] text-white/70 text-right underline decoration-white/25 underline-offset-2 hover:decoration-white/60 transition-colors truncate max-w-[60%]"
+            title={t("ui_toggle_full_account_number", "Afficher/masquer l'adresse complète")}
+          >
+            {showFullPayreqAddress ? requestDestination : requestDestinationLabel}
+          </button>
+        </div>
+        <div className="flex items-baseline justify-between gap-4">
+          <span className="text-[13px] text-white/50">{t("ui_currency_label", "Devise")}</span>
+          <span className="text-[15px] text-white/90">{requestCurrencyCode || confirmCurrencyCode || "—"}</span>
+        </div>
+        <div className="flex items-baseline justify-between gap-4">
+          <span className="text-[13px] text-white/50">{t("ui_amount_52cea2dd3d", "Montant")}</span>
+          <span className="text-xl font-semibold text-white/95">{requestAmountLabel || "—"}</span>
+        </div>
       </div>
 
-      {/* 2) Divider */}
-      <div className="h-px bg-white/5 my-2" />
-
-      {/* 3) Summary */}
-      <div className="space-y-2">
-        <div className="text-xs uppercase tracking-wide text-white/60 font-semibold">
-          {t("ui_summary", "Résumé")}
-        </div>
-        <div className="text-[11px] text-white/45">
-          {t(
-            "ui_verify_before_sending",
-            "Vérifiez les informations avant d’envoyer",
-          )}
-        </div>
-	        <div className="rounded-[14px] p-4 space-y-3 ring-1 ring-white/10 ring-inset bg-[#101415] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
-	          <div className="space-y-0.5">
-	            <div className="text-[11px] text-white/45">
-	              {t("ui_beneficiary_label", "Destinataire")}
-	            </div>
-            <div className="text-sm font-semibold text-white/90">
-              {payreqSelectorLabel || t("ui_wallet_unknown", "Unknown wallet")}
-            </div>
+      {selfSendBlocked ? (
+        <div className="rounded-lg ring-1 ring-orange-400/30 ring-inset bg-orange-400/10 px-3 py-2 text-xs text-orange-200/90">
+          <div className="font-semibold">
+            {t("ui_invalid_recipient_title", "Destinataire invalide")}
           </div>
-          <div className="space-y-0.5">
-            <div className="text-[11px] text-white/45">
-              {t("ui_address", "Adresse")}
-            </div>
-            <button
-              type="button"
-              onClick={() => setShowFullPayreqAddress((prev) => !prev)}
-              className={[
-                "font-mono text-xs text-white/80 text-left transition-colors",
-                "underline decoration-white/25 underline-offset-2 hover:decoration-white/60",
-                showFullPayreqAddress ? "break-all" : "",
-              ].join(" ")}
-              title={t(
-                "ui_toggle_full_account_number",
-                "Afficher/masquer l’adresse complète",
-              )}
-            >
-              {showFullPayreqAddress ? requestDestination : requestDestinationLabel}
-            </button>
-          </div>
-          <div className="flex items-start justify-between gap-4">
-            <div className="space-y-0.5">
-              <div className="text-[11px] text-white/45">
-                {t("ui_currency_label", "Devise")}
-              </div>
-              <div className="text-sm text-white/90">
-                {requestCurrencyCode || confirmCurrencyCode || "—"}
-              </div>
-            </div>
-            <div className="text-right space-y-0.5">
-              <div className="text-[11px] text-white/45">
-                {t("ui_amount_52cea2dd3d", "Montant")}
-              </div>
-              <div className="text-lg font-semibold text-white/95">
-                {requestAmountLabel || "—"}
-              </div>
-            </div>
+          <div>
+            {t("ui_cannot_send_to_self", "Vous ne pouvez pas envoyer à votre propre compte.")}
           </div>
         </div>
-
-      </div>
+      ) : null}
+      {saveAddressBlock}
 
       {/* Insufficient balance warning */}
       {insufficientBalance ? (
