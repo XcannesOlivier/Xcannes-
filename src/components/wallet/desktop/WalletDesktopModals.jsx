@@ -177,6 +177,10 @@ export default function WalletDesktopModals({
             resetSendForm?.();
             setActiveAction(null);
           }}
+          onBack={() => {
+            resetSendForm?.();
+            setActiveAction("sendChoice");
+          }}
           {...sendModalProps}
         />
       ) : null}
