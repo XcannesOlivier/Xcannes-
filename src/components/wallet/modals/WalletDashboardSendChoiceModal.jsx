@@ -473,10 +473,10 @@ export default function WalletDashboardSendChoiceModal({
                         <QuickScanIcon />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="text-[18px] md:text-[19px] text-white/92 font-semibold">
+                        <p className="text-[20px] md:text-[21px] text-white/92 font-semibold">
                           {t('ui_send_simple_title', 'Envoi simple')}
                         </p>
-                        <p className="mt-1 text-[14px] md:text-[15px] leading-snug text-white/55">
+                        <p className="mt-1 text-[15px] md:text-[16px] leading-snug text-white/55">
                           {t('ui_send_simple_hint_long', 'Saisissez une adresse, indiquez la devise et le montant.')}
                         </p>
                       </div>
@@ -493,10 +493,10 @@ export default function WalletDashboardSendChoiceModal({
                         <PayRequestIcon />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="text-[18px] md:text-[19px] text-white/92 font-semibold">
+                        <p className="text-[20px] md:text-[21px] text-white/92 font-semibold">
                           {t('ui_send_pay_request_title', 'Payer une demande')}
                         </p>
-                        <p className="mt-1 text-[14px] md:text-[15px] leading-snug text-white/55">
+                        <p className="mt-1 text-[15px] md:text-[16px] leading-snug text-white/55">
                           {t('ui_send_pay_request_hint', 'Réglez une demande reçue après vérification.')}
                         </p>
                       </div>
@@ -560,7 +560,7 @@ export default function WalletDashboardSendChoiceModal({
                 </div>
 
                 {/* Steps toggle */}
-                <button type="button" onClick={() => setShowSteps(s => !s)} className="mb-3 text-[12px] text-xcannes-green/80 hover:text-xcannes-green transition-colors duration-150 font-medium">
+                <button type="button" onClick={() => setShowSteps(s => !s)} className="mb-3 text-[12px] text-xcannes-green/80 hover:text-xcannes-green transition-colors duration-150 font-medium self-start text-left">
                   {showSteps ? t('ui_hide_steps', 'Masquer les étapes') : t('ui_show_steps', 'Voir les étapes')}
                 </button>
 
@@ -579,11 +579,11 @@ export default function WalletDashboardSendChoiceModal({
                   <div className="flex gap-2">
                     <button type="button" onClick={onChooseQuickScan} className={`${accordionBtnClass} text-white`} style={{ background: 'linear-gradient(180deg, rgba(34,154,86,1) 0%, rgba(14,103,58,1) 100%)', boxShadow: '0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)' }} title={t('ui_scan_qr_code_12fa63d927', 'Scan QR Code')}>
                       <svg className="w-5 h-5 text-white flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" /></svg>
-                      <span className="text-[13px] text-white font-medium">{t('ui_scan_label', 'Scanner')}</span>
+                      <span className="text-[15px] text-white font-medium">{t('ui_scan_label', 'Scanner')}</span>
                     </button>
                     <button type="button" onClick={() => handleFileUpload(quickscanFileInputId, false)} className={accordionBtnClass} title={t('ui_or_upload_a_qr_image_works_e_df6baa8039', 'Charger une image qrcode')}>
                       <svg className="w-5 h-5 text-white/60 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M12 4v12m0 0l-3-3m3 3l3-3" /></svg>
-                      <span className="text-[13px] text-white/70">{t('ui_import_label', 'Importer')}</span>
+                      <span className="text-[15px] text-white/70">{t('ui_import_label', 'Importer')}</span>
                     </button>
                   </div>
 
@@ -671,7 +671,7 @@ export default function WalletDashboardSendChoiceModal({
                 </div>
 
                 {/* Steps toggle */}
-                <button type="button" onClick={() => setShowPayreqSteps(s => !s)} className="mb-3 text-[12px] text-[#f5a623]/80 hover:text-[#f5a623] transition-colors duration-150 font-medium">
+                <button type="button" onClick={() => setShowPayreqSteps(s => !s)} className="mb-3 text-[12px] text-[#f5a623]/80 hover:text-[#f5a623] transition-colors duration-150 font-medium self-start text-left">
                   {showPayreqSteps ? t('ui_hide_steps', 'Masquer les étapes') : t('ui_show_steps', 'Voir les étapes')}
                 </button>
 
@@ -688,11 +688,11 @@ export default function WalletDashboardSendChoiceModal({
                   <div className="flex gap-2">
                     <button type="button" onClick={onChooseQuickScan} className={accordionBtnClass} title={t('ui_scan_qr_code_12fa63d927', 'Scan QR Code')}>
                       <svg className="w-5 h-5 text-[#f5a623]/80 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" /></svg>
-                      <span className="text-[13px] text-white/70">{t('ui_scan_label', 'Scanner')}</span>
+                      <span className="text-[15px] text-white/70">{t('ui_scan_label', 'Scanner')}</span>
                     </button>
                     <button type="button" onClick={() => handleFileUpload(payreqFileInputId, true)} className={accordionBtnClass} title={t('ui_or_upload_a_qr_image_works_e_df6baa8039', 'Charger une image qrcode')}>
                       <svg className="w-5 h-5 text-white/60 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M12 4v12m0 0l-3-3m3 3l3-3" /></svg>
-                      <span className="text-[13px] text-white/70">{t('ui_import_label', 'Importer')}</span>
+                      <span className="text-[15px] text-white/70">{t('ui_import_label', 'Importer')}</span>
                     </button>
                   </div>
 
