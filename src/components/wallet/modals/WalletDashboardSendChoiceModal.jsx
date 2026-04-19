@@ -593,27 +593,66 @@ export default function WalletDashboardSendChoiceModal({
                     {quickscanPasteValue.trim() ? (<button type="button" onClick={handleQuickscanPasteSubmit} className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg bg-xcannes-green/20 hover:bg-xcannes-green/30 text-xcannes-green transition-colors" title={t('ui_go_label', 'Valider')}><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg></button>) : null}
                   </div>
 
-                  {/* Saved addresses */}
+                  {/* Saved addresses selector */}
                   <div className="relative">
-                    <button type="button" onClick={() => setShowQuickscanSavedPicker(prev => !prev)} className="w-full flex items-center gap-2 bg-elevated ring-1 ring-white/15 ring-inset rounded-[20px] shadow-[0_4px_12px_rgba(0,0,0,0.4)] px-3 py-2.5 text-sm text-white/70 hover:bg-white/[0.03] transition-colors">
-                      <svg className="w-4 h-4 text-white/50 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
-                      <span className="flex-1 text-left truncate">{quickscanPasteValue.trim() ? quickscanPasteValue.trim() : t('ui_choose_recipient', 'Choose address')}</span>
+                    <button
+                      type="button"
+                      onClick={() => setShowQuickscanSavedPicker(prev => !prev)}
+                      className="w-full flex items-center bg-elevated ring-1 ring-white/15 ring-inset rounded-[20px] shadow-[0_4px_12px_rgba(0,0,0,0.4)] px-4 py-3 text-[14px] text-white/70 hover:bg-white/[0.03] transition-colors"
+                    >
+                      <svg className="w-4 h-4 text-white/40 flex-shrink-0 mr-3" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0" /></svg>
+                      <span className="flex-1 text-left truncate">
+                        {(() => {
+                          if (!quickscanPasteValue.trim()) return t('ui_choose_saved_address', 'Choisir un destinataire enregistré');
+                          const match = (savedAddresses || []).find(a => String(a?.address || '').trim() === quickscanPasteValue.trim());
+                          if (match) return String(match?.onChainLabel || match?.label || '').trim() || quickscanPasteValue.trim();
+                          return quickscanPasteValue.trim();
+                        })()}
+                      </span>
+                      <svg className={`w-4 h-4 text-white/40 flex-shrink-0 ml-2 transition-transform duration-200 ${showQuickscanSavedPicker ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
                     </button>
-                    {showQuickscanSavedPicker ? (
-                      <div className="absolute left-0 right-0 top-full mt-1 z-[100] rounded-[20px] ring-1 ring-white/15 ring-inset overflow-hidden shadow-lg bg-elevated">
-                        <div className="max-h-44 overflow-y-auto">
-                          {(() => {
-                            const filtered = (savedAddresses || []).filter(entry => { const addr = String(entry?.address || '').trim(); if (!addr) return false; if (normalizedCurrentWallet && addr === normalizedCurrentWallet) return false; return true; });
-                            return filtered.length > 0 ? filtered.map((addr, idx) => (
-                              <button key={`qs-${addr.address}-${idx}`} type="button" onClick={() => { const value = String(addr?.address || '').trim(); if (!value) return; const label = String(addr?.onChainLabel || addr?.label || '').trim(); setQuickscanPasteValue(value); setSendDestination?.(value); setSendDestinationLabel?.(label); setShowQuickscanSavedPicker(false); onChooseSimpleSend?.(); }} className="w-full text-left px-3 py-2 text-sm text-white/90 hover:bg-white/5 transition-colors">
-                                <span className="block font-semibold">{String(addr?.onChainLabel || addr?.label || '').trim() || t('ui_wallet_unknown', 'Unknown wallet')}</span>
-                                <span className="block font-mono text-xs text-white/60 truncate">{addr.address}</span>
-                              </button>
-                            )) : (<div className="px-3 py-2 text-xs text-white/60">{t('ui_no_saved_addresses', 'No saved addresses yet')}</div>);
-                          })()}
-                        </div>
+                    <div
+                      className={`absolute left-0 right-0 top-full mt-1.5 z-[100] rounded-2xl ring-1 ring-white/15 ring-inset overflow-hidden shadow-[0_12px_36px_rgba(0,0,0,0.6)] bg-[#1a1f2e] transition-all duration-200 origin-top ${showQuickscanSavedPicker ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-95 pointer-events-none'}`}
+                    >
+                      {/* Header */}
+                      <div className="px-4 py-2.5 border-b border-white/10">
+                        <p className="text-[12px] text-white/40 font-medium uppercase tracking-wider">{t('ui_saved_addresses_label', 'Adresses enregistrées')}</p>
                       </div>
-                    ) : null}
+                      <div className="max-h-52 overflow-y-auto overscroll-contain">
+                        {(() => {
+                          const filtered = (savedAddresses || []).filter(entry => { const addr = String(entry?.address || '').trim(); if (!addr) return false; if (normalizedCurrentWallet && addr === normalizedCurrentWallet) return false; return true; });
+                          return filtered.length > 0 ? filtered.map((addr, idx) => {
+                            const addrStr = String(addr?.address || '').trim();
+                            const label = String(addr?.onChainLabel || addr?.label || '').trim() || t('ui_wallet_unknown', 'Unknown wallet');
+                            const isSelected = quickscanPasteValue.trim() === addrStr;
+                            return (
+                              <button
+                                key={`qs-${addrStr}-${idx}`}
+                                type="button"
+                                onClick={() => { if (!addrStr) return; setQuickscanPasteValue(addrStr); setSendDestination?.(addrStr); setSendDestinationLabel?.(label); setShowQuickscanSavedPicker(false); onChooseSimpleSend?.(); }}
+                                className={`w-full text-left px-4 py-3 flex items-center gap-3 transition-colors ${isSelected ? 'bg-xcannes-green/10' : 'hover:bg-white/[0.04]'} ${idx < filtered.length - 1 ? 'border-b border-white/[0.06]' : ''}`}
+                              >
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-[13px] font-bold ${isSelected ? 'bg-xcannes-green/20 text-xcannes-green' : 'bg-white/[0.06] text-white/50'}`}>
+                                  {label.charAt(0).toUpperCase()}
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                  <p className={`text-[14px] font-semibold truncate ${isSelected ? 'text-xcannes-green' : 'text-white/90'}`}>{label}</p>
+                                  <p className="text-[11px] font-mono text-white/40 truncate mt-0.5">{addrStr}</p>
+                                </div>
+                                {isSelected ? (
+                                  <svg className="w-4 h-4 text-xcannes-green flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clipRule="evenodd" /></svg>
+                                ) : null}
+                              </button>
+                            );
+                          }) : (
+                            <div className="px-4 py-6 text-center">
+                              <svg className="w-8 h-8 text-white/20 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0" /></svg>
+                              <p className="text-[13px] text-white/40">{t('ui_no_saved_addresses', 'Aucune adresse enregistrée')}</p>
+                            </div>
+                          );
+                        })()}
+                      </div>
+                    </div>
                   </div>
 
                   {/* Footer note */}
