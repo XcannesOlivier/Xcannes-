@@ -1188,8 +1188,8 @@ export default function WalletDashboardSendModal({
     moonpaySellPreset
   ) : (
     <div className="space-y-3">
-        {/* ── Destination ── */}
-        {recipientCard}
+        {/* ── Destination (hidden when pre-filled from SendChoice) ── */}
+        {!sendDestination ? recipientCard : null}
 
         {/* ── Devise + Montant (séparés) – masqués en mode payreq ── */}
         {!hasPaymentRequest && (
