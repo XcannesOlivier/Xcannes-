@@ -675,7 +675,7 @@ export default function WalletDashboardSendChoiceModal({
             <div className={inline ? 'relative w-full h-full overflow-hidden flex flex-col bg-elevated rounded-xl' : 'relative w-full wallet-modal-panel wallet-cash-modal border-white/10 md:border overflow-hidden flex flex-col bg-elevated h-screen md:h-auto md:max-h-[80vh] rounded-none md:rounded-2xl pb-[env(safe-area-inset-bottom)]'}>
               {/* Glow */}
               <div className="pointer-events-none absolute inset-0" aria-hidden>
-                <div className="absolute inset-0 bg-[radial-gradient(600px_circle_at_50%_0%,rgba(245,166,35,0.06),transparent_60%)]" />
+                <div className="absolute inset-0 bg-[radial-gradient(600px_circle_at_50%_0%,rgba(245,166,35,0.12),transparent_60%)]" />
               </div>
               <div className="relative z-10 flex flex-col flex-1 min-h-0">
                 {/* Back button */}
