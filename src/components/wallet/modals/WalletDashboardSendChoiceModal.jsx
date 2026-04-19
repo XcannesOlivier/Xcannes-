@@ -612,11 +612,11 @@ export default function WalletDashboardSendChoiceModal({
                       <svg className={`w-4 h-4 text-white/40 flex-shrink-0 ml-2 transition-transform duration-200 ${showQuickscanSavedPicker ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
                     </button>
                     <div
-                      className={`absolute left-0 right-0 top-full mt-1.5 z-[100] rounded-2xl ring-1 ring-white/15 ring-inset overflow-hidden shadow-[0_12px_36px_rgba(0,0,0,0.6)] bg-[#1a1f2e] transition-all duration-200 origin-top ${showQuickscanSavedPicker ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-95 pointer-events-none'}`}
+                      className={`absolute left-0 right-0 top-full mt-1.5 z-[100] rounded-2xl ring-1 ring-white/15 ring-inset overflow-hidden shadow-[0_12px_36px_rgba(0,0,0,0.6)] bg-elevated transition-all duration-200 origin-top ${showQuickscanSavedPicker ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-95 pointer-events-none'}`}
                     >
                       {/* Header */}
                       <div className="px-4 py-2.5 border-b border-white/10">
-                        <p className="text-[12px] text-white/40 font-medium uppercase tracking-wider">{t('ui_saved_addresses_label', 'Adresses enregistrées')}</p>
+                        <p className="text-[12px] text-white/40 font-medium tracking-wide">{t('ui_saved_addresses_label', 'Adresses enregistrées')}</p>
                       </div>
                       <div className="max-h-52 overflow-y-auto overscroll-contain">
                         {(() => {
@@ -632,9 +632,6 @@ export default function WalletDashboardSendChoiceModal({
                                 onClick={() => { if (!addrStr) return; setQuickscanPasteValue(addrStr); setSendDestination?.(addrStr); setSendDestinationLabel?.(label); setShowQuickscanSavedPicker(false); onChooseSimpleSend?.(); }}
                                 className={`w-full text-left px-4 py-3 flex items-center gap-3 transition-colors ${isSelected ? 'bg-xcannes-green/10' : 'hover:bg-white/[0.04]'} ${idx < filtered.length - 1 ? 'border-b border-white/[0.06]' : ''}`}
                               >
-                                <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-[13px] font-bold ${isSelected ? 'bg-xcannes-green/20 text-xcannes-green' : 'bg-white/[0.06] text-white/50'}`}>
-                                  {label.charAt(0).toUpperCase()}
-                                </div>
                                 <div className="min-w-0 flex-1">
                                   <p className={`text-[14px] font-semibold truncate ${isSelected ? 'text-xcannes-green' : 'text-white/90'}`}>{label}</p>
                                   <p className="text-[11px] font-mono text-white/40 truncate mt-0.5">{addrStr}</p>
