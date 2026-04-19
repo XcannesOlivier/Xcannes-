@@ -519,10 +519,10 @@ export default function WalletDashboardSendChoiceModal({
 
       {/* ═══ Sub-modal: Envoi simple ═══ */}
       {subModal === 'quickscan' ? (
-        <div className="fixed inset-0 z-[10100] flex items-end md:items-center justify-center md:px-4 pointer-events-none">
-          <div className="fixed inset-0 bg-black/70 md:backdrop-blur-sm pointer-events-auto wallet-modal-backdrop-in" onClick={() => setSubModal(null)} />
-          <div className="relative z-10 pointer-events-auto w-full md:max-w-lg wallet-modal-lift-in">
-            <div className="relative w-full wallet-modal-panel wallet-cash-modal border-white/10 md:border overflow-hidden flex flex-col bg-elevated h-screen md:h-auto md:max-h-[80vh] rounded-none md:rounded-2xl pb-[env(safe-area-inset-bottom)]">
+        <div className={inline ? 'absolute inset-0 z-50 flex' : 'fixed inset-0 z-[10100] flex items-end md:items-center justify-center md:px-4 pointer-events-none'}>
+          {!inline ? <div className="fixed inset-0 bg-black/70 md:backdrop-blur-sm pointer-events-auto wallet-modal-backdrop-in" onClick={() => setSubModal(null)} /> : null}
+          <div className={inline ? 'w-full h-full' : 'relative z-10 pointer-events-auto w-full md:max-w-lg wallet-modal-lift-in'}>
+            <div className={inline ? 'relative w-full h-full overflow-hidden flex flex-col bg-elevated rounded-xl' : 'relative w-full wallet-modal-panel wallet-cash-modal border-white/10 md:border overflow-hidden flex flex-col bg-elevated h-screen md:h-auto md:max-h-[80vh] rounded-none md:rounded-2xl pb-[env(safe-area-inset-bottom)]'}>
               {/* Glow */}
               <div className="pointer-events-none absolute inset-0" aria-hidden>
                 <div className="absolute inset-0 bg-[radial-gradient(600px_circle_at_50%_0%,rgba(0,255,150,0.08),transparent_60%)]" />
@@ -607,10 +607,10 @@ export default function WalletDashboardSendChoiceModal({
 
       {/* ═══ Sub-modal: Payer une demande ═══ */}
       {subModal === 'payreq' ? (
-        <div className="fixed inset-0 z-[10100] flex items-end md:items-center justify-center md:px-4 pointer-events-none">
-          <div className="fixed inset-0 bg-black/70 md:backdrop-blur-sm pointer-events-auto wallet-modal-backdrop-in" onClick={() => setSubModal(null)} />
-          <div className="relative z-10 pointer-events-auto w-full md:max-w-lg wallet-modal-lift-in">
-            <div className="relative w-full wallet-modal-panel wallet-cash-modal border-white/10 md:border overflow-hidden flex flex-col bg-elevated h-screen md:h-auto md:max-h-[80vh] rounded-none md:rounded-2xl pb-[env(safe-area-inset-bottom)]">
+        <div className={inline ? 'absolute inset-0 z-50 flex' : 'fixed inset-0 z-[10100] flex items-end md:items-center justify-center md:px-4 pointer-events-none'}>
+          {!inline ? <div className="fixed inset-0 bg-black/70 md:backdrop-blur-sm pointer-events-auto wallet-modal-backdrop-in" onClick={() => setSubModal(null)} /> : null}
+          <div className={inline ? 'w-full h-full' : 'relative z-10 pointer-events-auto w-full md:max-w-lg wallet-modal-lift-in'}>
+            <div className={inline ? 'relative w-full h-full overflow-hidden flex flex-col bg-elevated rounded-xl' : 'relative w-full wallet-modal-panel wallet-cash-modal border-white/10 md:border overflow-hidden flex flex-col bg-elevated h-screen md:h-auto md:max-h-[80vh] rounded-none md:rounded-2xl pb-[env(safe-area-inset-bottom)]'}>
               {/* Glow */}
               <div className="pointer-events-none absolute inset-0" aria-hidden>
                 <div className="absolute inset-0 bg-[radial-gradient(600px_circle_at_50%_0%,rgba(245,166,35,0.06),transparent_60%)]" />
