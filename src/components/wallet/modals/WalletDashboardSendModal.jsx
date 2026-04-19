@@ -1207,7 +1207,8 @@ export default function WalletDashboardSendModal({
 	            <ModalSelect
 	              value={selectedSendToken ? selectedSendToken.key : ""}
 	              onChange={setSendAssetKey}
-              options={(augmentedTokens || []).filter((token) => !selectedSendToken || token.key !== selectedSendToken.key).map((token) => {
+              hideSelected
+              options={(augmentedTokens || []).map((token) => {
                 const labelLeft =
                   selectLabelByAssetKey?.[token.key] ||
                   selectLabelByAssetKey?.[token.currency] ||
@@ -1512,7 +1513,7 @@ export default function WalletDashboardSendModal({
       : t("ui_send_504b64a87b", "Send");
 
   const sendActions = (
-    <div className="sticky bottom-0 pt-4 pb-3 mt-auto space-y-2 bg-inherit z-10 relative">
+    <div className="sticky bottom-0 pt-8 pb-3 mt-auto space-y-2 bg-inherit z-10 relative">
       <button
         type="button"
         onClick={(e) => {
