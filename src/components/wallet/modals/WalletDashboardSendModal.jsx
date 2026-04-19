@@ -1196,7 +1196,7 @@ export default function WalletDashboardSendModal({
         {!hasPaymentRequest && (
         <div className={`transition-opacity duration-300 space-y-4 ${hasDestination ? 'opacity-100' : 'opacity-30 pointer-events-none select-none'}`}>
           <div>
-            <div className="flex items-baseline justify-between mb-1.5">
+            <div className="flex items-baseline justify-between mb-1.5 relative z-[65]">
               <label
                 className="text-base md:text-lg text-white/60"
                 title={t("ui_send_asset_tip", "Sélectionnez la devise à envoyer.")}
@@ -1240,8 +1240,8 @@ export default function WalletDashboardSendModal({
 			              buttonClassName="bg-[#101415] ring-1 ring-white/15 ring-inset rounded-[20px] px-4 py-[10px] text-2xl text-white outline-none focus:outline-none appearance-none cursor-pointer shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
 		              menuClassName={
 		                noticeVariant === "demo"
-		                  ? "bg-xcannes-surface-demo border-white/15 ring-1 ring-white/10 max-h-[320px]"
-		                  : "bg-elevated border-white/15 ring-1 ring-white/10 max-h-[320px]"
+		                  ? "bg-xcannes-surface-demo border-white/15 ring-1 ring-white/10 ring-inset max-h-[480px]"
+		                  : "bg-[#101415] border-white/15 ring-1 ring-white/10 ring-inset max-h-[480px]"
 		              }
 			              selectClassName="xcannes-select w-full bg-[#101415] ring-1 ring-white/15 ring-inset rounded-[20px] px-4 py-[10px] text-2xl text-white outline-none focus:outline-none appearance-none cursor-pointer shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
 			            />
@@ -1683,14 +1683,14 @@ export default function WalletDashboardSendModal({
               </div>
             ) : null}
             {/* Back chevron */}
-            <div className="px-1 pt-2 pb-1 flex items-center">
+            <div className="px-1 pt-2 pb-1 flex items-center relative z-[65]">
               <button type="button" onClick={onBack || onClose} className="text-white/70 hover:text-white transition-colors flex items-center gap-1" aria-label={t('ui_back', 'Retour')}>
                 <svg viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5" aria-hidden><path fillRule="evenodd" d="M11.78 3.22a.75.75 0 0 1 0 1.06L7.06 9l4.72 4.72a.75.75 0 1 1-1.06 1.06l-5.25-5.25a.75.75 0 0 1 0-1.06l5.25-5.25a.75.75 0 0 1 1.06 0Z" clipRule="evenodd" /></svg>
                 <span className="hidden md:inline text-[13px] font-medium">{t('ui_back', 'Retour')}</span>
               </button>
             </div>
             <div
-              className="flex items-start justify-between gap-3 mb-5"
+              className="flex items-start justify-between gap-3 mb-5 relative z-[65]"
               onPointerDown={(event) => {
                 maybeStartOverlayDrag(event, "fixed");
               }}
