@@ -1497,51 +1497,61 @@ export default function WalletDashboardSendModal({
     </div>
   ) : null;
 
+  const sendButtonDisabled = sendProcessing ||
+    !canManualSend ||
+    (hasPaymentRequest && insufficientBalance) ||
+    (!hasPaymentRequest && manualInsufficientBalance) ||
+    selfSendBlocked;
+
+  const sendButtonLabel = sendProcessing
+    ? hasMoonpaySellRequest
+      ? t("moonpay_sell_signing_action", "Signature en cours...")
+      : t("ui_sending_3b8c1a7d5e", "Sending...")
+    : hasMoonpaySellRequest
+      ? t("moonpay_sell_sign_submit", "Signer et envoyer")
+      : t("ui_send_504b64a87b", "Send");
+
   const sendActions = (
-    <div className="sticky bottom-0 pt-4 pb-3 mt-auto space-y-2 bg-inherit z-10 relative before:content-[''] before:absolute before:top-0 before:left-0 before:right-0 before:h-px before:bg-white/10">
-      <SwipeConfirmButton
-        label={
-          sendProcessing
-            ? hasMoonpaySellRequest
-              ? t("moonpay_sell_signing_action", "Signature en cours...")
-              : t("ui_sending_3b8c1a7d5e", "Sending...")
-            : hasMoonpaySellRequest
-              ? t("moonpay_sell_sign_submit", "Signer et envoyer")
-              : t("ui_send_504b64a87b", "Send")
-        }
-        onConfirm={handleManualSend}
-        disabled={
-          sendProcessing ||
-          !canManualSend ||
-          (hasPaymentRequest && insufficientBalance) ||
-          (!hasPaymentRequest && manualInsufficientBalance) ||
-          selfSendBlocked
-        }
-        variant="green"
-        className="md:hidden"
-      />
+    <div className="sticky bottom-0 pt-4 pb-3 mt-auto space-y-2 bg-inherit z-10 relative">
       <button
         type="button"
         onClick={(e) => {
           e.stopPropagation();
           handleManualSend();
         }}
-        disabled={
-          sendProcessing ||
-          !canManualSend ||
-          (hasPaymentRequest && insufficientBalance) ||
-          (!hasPaymentRequest && manualInsufficientBalance) ||
-          selfSendBlocked
+        disabled={sendButtonDisabled}
+        className={[
+          "md:hidden w-full h-14 rounded-[20px] text-white text-lg font-semibold transition-all duration-150",
+          sendButtonDisabled
+            ? "opacity-45 cursor-not-allowed"
+            : "hover:scale-[1.01] active:scale-[0.98]",
+        ].join(" ")}
+        style={sendButtonDisabled
+          ? { background: 'linear-gradient(180deg, rgba(34,154,86,0.45) 0%, rgba(14,103,58,0.45) 100%)' }
+          : { background: 'linear-gradient(180deg, rgba(34,154,86,1) 0%, rgba(14,103,58,1) 100%)', boxShadow: '0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)' }
         }
-        className={`hidden md:block w-full text-xl py-4 ${greenActionBtnBase}`}
       >
-        {sendProcessing
-          ? hasMoonpaySellRequest
-            ? t("moonpay_sell_signing_action", "Signature en cours...")
-            : t("ui_sending_3b8c1a7d5e", "Sending...")
-          : hasMoonpaySellRequest
-            ? t("moonpay_sell_sign_submit", "Signer et envoyer")
-            : t("ui_send_504b64a87b", "Send")}
+        {sendButtonLabel}
+      </button>
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          handleManualSend();
+        }}
+        disabled={sendButtonDisabled}
+        className={[
+          "hidden md:flex items-center justify-center w-full h-16 rounded-[20px] text-white text-xl font-semibold transition-all duration-150",
+          sendButtonDisabled
+            ? "opacity-45 cursor-not-allowed"
+            : "hover:scale-[1.01] active:scale-[0.98]",
+        ].join(" ")}
+        style={sendButtonDisabled
+          ? { background: 'linear-gradient(180deg, rgba(34,154,86,0.45) 0%, rgba(14,103,58,0.45) 100%)' }
+          : { background: 'linear-gradient(180deg, rgba(34,154,86,1) 0%, rgba(14,103,58,1) 100%)', boxShadow: '0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)' }
+        }
+      >
+        {sendButtonLabel}
       </button>
     </div>
   );
