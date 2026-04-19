@@ -51,7 +51,7 @@ export default function TokenAmountInput({
 
       </button>
       }
-      <span className={`font-bold text-sm uppercase tracking-wider whitespace-nowrap ${tokenClassName || "text-xcannes-green"}`}>
+      <span className={`font-bold uppercase tracking-wider whitespace-nowrap ${tokenClassName || "text-sm text-xcannes-green"}`}>
         {token}
       </span>
     </div>);

@@ -1498,7 +1498,7 @@ export default function WalletDashboardSendModal({
   ) : null;
 
   const sendActions = (
-    <div className="sticky bottom-0 pt-0 pb-1 -mt-0 space-y-2 bg-inherit z-10 relative before:content-[''] before:absolute before:top-0 before:left-0 before:right-0 before:h-px before:bg-white/10">
+    <div className="sticky bottom-0 pt-4 pb-3 mt-auto space-y-2 bg-inherit z-10 relative before:content-[''] before:absolute before:top-0 before:left-0 before:right-0 before:h-px before:bg-white/10">
       <SwipeConfirmButton
         label={
           sendProcessing
