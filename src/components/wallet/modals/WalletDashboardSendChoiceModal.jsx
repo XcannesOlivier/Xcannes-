@@ -473,10 +473,10 @@ export default function WalletDashboardSendChoiceModal({
                         <QuickScanIcon />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="text-[16px] md:text-[17px] text-white/92 font-semibold">
+                        <p className="text-[18px] md:text-[19px] text-white/92 font-semibold">
                           {t('ui_send_simple_title', 'Envoi simple')}
                         </p>
-                        <p className="mt-1 text-[13px] md:text-[14px] leading-snug text-white/55">
+                        <p className="mt-1 text-[14px] md:text-[15px] leading-snug text-white/55">
                           {t('ui_send_simple_hint_long', 'Saisissez une adresse, indiquez la devise et le montant.')}
                         </p>
                       </div>
@@ -493,10 +493,10 @@ export default function WalletDashboardSendChoiceModal({
                         <PayRequestIcon />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="text-[16px] md:text-[17px] text-white/92 font-semibold">
+                        <p className="text-[18px] md:text-[19px] text-white/92 font-semibold">
                           {t('ui_send_pay_request_title', 'Payer une demande')}
                         </p>
-                        <p className="mt-1 text-[13px] md:text-[14px] leading-snug text-white/55">
+                        <p className="mt-1 text-[14px] md:text-[15px] leading-snug text-white/55">
                           {t('ui_send_pay_request_hint', 'Réglez une demande reçue après vérification.')}
                         </p>
                       </div>
@@ -528,8 +528,15 @@ export default function WalletDashboardSendChoiceModal({
                 <div className="absolute inset-0 bg-[radial-gradient(600px_circle_at_50%_0%,rgba(0,255,150,0.08),transparent_60%)]" />
               </div>
               <div className="relative z-10 flex flex-col flex-1 min-h-0">
+                {/* Back button */}
+                <div className="px-5 pt-4 pb-0 flex items-center">
+                  <button type="button" onClick={() => setSubModal(null)} className="text-white/70 hover:text-white transition-colors flex items-center gap-1" aria-label={t('ui_back', 'Retour')}>
+                    <svg viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5" aria-hidden><path fillRule="evenodd" d="M11.78 3.22a.75.75 0 0 1 0 1.06L7.06 9l4.72 4.72a.75.75 0 1 1-1.06 1.06l-5.25-5.25a.75.75 0 0 1 0-1.06l5.25-5.25a.75.75 0 0 1 1.06 0Z" clipRule="evenodd" /></svg>
+                    <span className="hidden md:inline text-[13px] font-medium">{t('ui_back', 'Retour')}</span>
+                  </button>
+                </div>
                 {/* Wallet meta pill */}
-                <div className="pt-4 pb-0 flex justify-center px-4">
+                <div className="pt-3 pb-0 flex justify-center px-4">
                   {renderWalletMeta?.({
                     variant: 'pill',
                     className: 'w-full flex justify-center wallet-meta--plus-4 wallet-meta--desktop-gap',
@@ -542,13 +549,6 @@ export default function WalletDashboardSendChoiceModal({
                   })}
                 </div>
                 <div className="px-5 pt-4 pb-5 flex flex-col flex-1 min-h-0">
-                {/* Back button */}
-                <div className="flex items-center mb-2">
-                  <button type="button" onClick={() => setSubModal(null)} className="text-white/70 hover:text-white transition-colors flex items-center gap-1" aria-label={t('ui_back', 'Retour')}>
-                    <svg viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5" aria-hidden><path fillRule="evenodd" d="M11.78 3.22a.75.75 0 0 1 0 1.06L7.06 9l4.72 4.72a.75.75 0 1 1-1.06 1.06l-5.25-5.25a.75.75 0 0 1 0-1.06l5.25-5.25a.75.75 0 0 1 1.06 0Z" clipRule="evenodd" /></svg>
-                    <span className="hidden md:inline text-[13px] font-medium">{t('ui_back', 'Retour')}</span>
-                  </button>
-                </div>
                 {/* Title + subtitle (centered) */}
                 <div className="flex flex-col items-center text-center mb-5">
                   <h3 className="mt-1 text-[22px] md:text-[24px] font-semibold text-white/95 tracking-tight">
@@ -615,6 +615,11 @@ export default function WalletDashboardSendChoiceModal({
                       </div>
                     ) : null}
                   </div>
+
+                  {/* Footer note */}
+                  <p className="text-center text-[12px] text-white/40 leading-relaxed mt-4">
+                    {t('ui_send_details_before_confirm', 'Les détails seront affichés avant confirmation.')}
+                  </p>
                 </div>
                 </div>
               </div>
@@ -634,8 +639,15 @@ export default function WalletDashboardSendChoiceModal({
                 <div className="absolute inset-0 bg-[radial-gradient(600px_circle_at_50%_0%,rgba(245,166,35,0.06),transparent_60%)]" />
               </div>
               <div className="relative z-10 flex flex-col flex-1 min-h-0">
+                {/* Back button */}
+                <div className="px-5 pt-4 pb-0 flex items-center">
+                  <button type="button" onClick={() => setSubModal(null)} className="text-white/70 hover:text-white transition-colors flex items-center gap-1" aria-label={t('ui_back', 'Retour')}>
+                    <svg viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5" aria-hidden><path fillRule="evenodd" d="M11.78 3.22a.75.75 0 0 1 0 1.06L7.06 9l4.72 4.72a.75.75 0 1 1-1.06 1.06l-5.25-5.25a.75.75 0 0 1 0-1.06l5.25-5.25a.75.75 0 0 1 1.06 0Z" clipRule="evenodd" /></svg>
+                    <span className="hidden md:inline text-[13px] font-medium">{t('ui_back', 'Retour')}</span>
+                  </button>
+                </div>
                 {/* Wallet meta pill */}
-                <div className="pt-4 pb-0 flex justify-center px-4">
+                <div className="pt-3 pb-0 flex justify-center px-4">
                   {renderWalletMeta?.({
                     variant: 'pill',
                     className: 'w-full flex justify-center wallet-meta--plus-4 wallet-meta--desktop-gap',
@@ -648,13 +660,6 @@ export default function WalletDashboardSendChoiceModal({
                   })}
                 </div>
                 <div className="px-5 pt-4 pb-5 flex flex-col flex-1 min-h-0">
-                {/* Back button */}
-                <div className="flex items-center mb-2">
-                  <button type="button" onClick={() => setSubModal(null)} className="text-white/70 hover:text-white transition-colors flex items-center gap-1" aria-label={t('ui_back', 'Retour')}>
-                    <svg viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5" aria-hidden><path fillRule="evenodd" d="M11.78 3.22a.75.75 0 0 1 0 1.06L7.06 9l4.72 4.72a.75.75 0 1 1-1.06 1.06l-5.25-5.25a.75.75 0 0 1 0-1.06l5.25-5.25a.75.75 0 0 1 1.06 0Z" clipRule="evenodd" /></svg>
-                    <span className="hidden md:inline text-[13px] font-medium">{t('ui_back', 'Retour')}</span>
-                  </button>
-                </div>
                 {/* Title + subtitle (centered) */}
                 <div className="flex flex-col items-center text-center mb-5">
                   <h3 className="mt-1 text-[22px] md:text-[24px] font-semibold text-white/95 tracking-tight">
@@ -696,6 +701,11 @@ export default function WalletDashboardSendChoiceModal({
                     <input type="text" value={payreqPasteValue} onChange={(e) => setPayreqPasteValue(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') handlePayreqPasteSubmit(); }} onPaste={(e) => { const text = (e.clipboardData?.getData('text') || '').trim(); if (text) { e.preventDefault(); setPayreqPasteValue(text); setTimeout(() => { handlePaymentRequestScan?.(text); onChoosePayRequest?.(); }, 50); } }} placeholder={t('ui_paste_payreq_placeholder', 'Coller une demande de paiement')} className="w-full bg-elevated ring-1 ring-white/15 ring-inset rounded-[20px] shadow-[0_4px_12px_rgba(0,0,0,0.4)] pl-4 pr-12 py-3 text-sm text-white placeholder:text-white/35 outline-none focus:ring-2 focus:ring-[#f5a623]/50" />
                     {payreqPasteValue.trim() ? (<button type="button" onClick={handlePayreqPasteSubmit} className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg bg-[#f5a623]/20 hover:bg-[#f5a623]/30 text-[#f5a623] transition-colors" title={t('ui_go_label', 'Valider')}><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg></button>) : null}
                   </div>
+
+                  {/* Footer note */}
+                  <p className="text-center text-[12px] text-white/40 leading-relaxed mt-4">
+                    {t('ui_send_details_before_confirm', 'Les détails seront affichés avant confirmation.')}
+                  </p>
                 </div>
                 </div>
               </div>
