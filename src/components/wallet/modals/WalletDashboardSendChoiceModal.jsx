@@ -527,7 +527,21 @@ export default function WalletDashboardSendChoiceModal({
               <div className="pointer-events-none absolute inset-0" aria-hidden>
                 <div className="absolute inset-0 bg-[radial-gradient(600px_circle_at_50%_0%,rgba(0,255,150,0.08),transparent_60%)]" />
               </div>
-              <div className="relative z-10 flex flex-col flex-1 min-h-0 p-5">
+              <div className="relative z-10 flex flex-col flex-1 min-h-0">
+                {/* Wallet meta pill */}
+                <div className="pt-4 pb-0 flex justify-center px-4">
+                  {renderWalletMeta?.({
+                    variant: 'pill',
+                    className: 'w-full flex justify-center wallet-meta--plus-4 wallet-meta--desktop-gap',
+                    prefix: t('moonpay_from_account', 'Depuis le compte'),
+                    labelWrap: false,
+                    pillClassName: 'bg-elevated px-6 py-1.5 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)] gap-6',
+                    prefixClassName: '!text-white/70 text-[14px] md:text-[15px] font-medium tracking-wide mr-6',
+                    labelClassName: '!text-white/95 text-[14px] md:text-[15px] font-semibold',
+                    dotClassName: '!h-3 !w-3 ring-xcannes-green/20 self-center',
+                  })}
+                </div>
+                <div className="px-5 pt-4 pb-5 flex flex-col flex-1 min-h-0">
                 {/* Back + title */}
                 <div className="flex items-center gap-3 mb-5">
                   <button type="button" onClick={() => setSubModal(null)} className="text-white/70 hover:text-white transition-colors flex items-center justify-center" aria-label={t('ui_back', 'Retour')}>
@@ -599,6 +613,7 @@ export default function WalletDashboardSendChoiceModal({
                     ) : null}
                   </div>
                 </div>
+                </div>
               </div>
             </div>
           </div>
@@ -615,7 +630,21 @@ export default function WalletDashboardSendChoiceModal({
               <div className="pointer-events-none absolute inset-0" aria-hidden>
                 <div className="absolute inset-0 bg-[radial-gradient(600px_circle_at_50%_0%,rgba(245,166,35,0.06),transparent_60%)]" />
               </div>
-              <div className="relative z-10 flex flex-col flex-1 min-h-0 p-5">
+              <div className="relative z-10 flex flex-col flex-1 min-h-0">
+                {/* Wallet meta pill */}
+                <div className="pt-4 pb-0 flex justify-center px-4">
+                  {renderWalletMeta?.({
+                    variant: 'pill',
+                    className: 'w-full flex justify-center wallet-meta--plus-4 wallet-meta--desktop-gap',
+                    prefix: t('moonpay_from_account', 'Depuis le compte'),
+                    labelWrap: false,
+                    pillClassName: 'bg-elevated px-6 py-1.5 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)] gap-6',
+                    prefixClassName: '!text-white/70 text-[14px] md:text-[15px] font-medium tracking-wide mr-6',
+                    labelClassName: '!text-white/95 text-[14px] md:text-[15px] font-semibold',
+                    dotClassName: '!h-3 !w-3 ring-xcannes-green/20 self-center',
+                  })}
+                </div>
+                <div className="px-5 pt-4 pb-5 flex flex-col flex-1 min-h-0">
                 {/* Back + title */}
                 <div className="flex items-center gap-3 mb-5">
                   <button type="button" onClick={() => setSubModal(null)} className="text-white/70 hover:text-white transition-colors flex items-center justify-center" aria-label={t('ui_back', 'Retour')}>
@@ -661,6 +690,7 @@ export default function WalletDashboardSendChoiceModal({
                     <input type="text" value={payreqPasteValue} onChange={(e) => setPayreqPasteValue(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') handlePayreqPasteSubmit(); }} onPaste={(e) => { const text = (e.clipboardData?.getData('text') || '').trim(); if (text) { e.preventDefault(); setPayreqPasteValue(text); setTimeout(() => { handlePaymentRequestScan?.(text); onChoosePayRequest?.(); }, 50); } }} placeholder={t('ui_paste_payreq_placeholder', 'Coller une demande de paiement')} className="w-full bg-elevated ring-1 ring-white/15 ring-inset rounded-[20px] shadow-[0_4px_12px_rgba(0,0,0,0.4)] pl-4 pr-12 py-3 text-sm text-white placeholder:text-white/35 outline-none focus:ring-2 focus:ring-[#f5a623]/50" />
                     {payreqPasteValue.trim() ? (<button type="button" onClick={handlePayreqPasteSubmit} className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg bg-[#f5a623]/20 hover:bg-[#f5a623]/30 text-[#f5a623] transition-colors" title={t('ui_go_label', 'Valider')}><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg></button>) : null}
                   </div>
+                </div>
                 </div>
               </div>
             </div>
