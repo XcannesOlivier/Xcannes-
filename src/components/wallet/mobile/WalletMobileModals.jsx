@@ -236,10 +236,6 @@ export default function WalletMobileModals({
                 resetSendForm?.();
                 setActiveAction(null);
               }}
-              onBack={() => {
-                resetSendForm?.();
-                setActiveAction("sendChoice");
-              }}
               {...sendModalProps}
             />
 

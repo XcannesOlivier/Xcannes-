@@ -12,7 +12,6 @@ import { greenActionBtnBase } from "./walletModalTokens";
 export default function WalletDashboardPayreqModal({
   open,
   onClose,
-  onBack,
   noticeVariant = "preview",
   renderWalletMeta,
   augmentedTokens,
@@ -384,24 +383,6 @@ export default function WalletDashboardPayreqModal({
           >
             ✕
           </button>
-          {onBack ? (
-            <div className="pt-1 pb-1">
-              <button
-                type="button"
-                onClick={onBack}
-                className="text-white/70 hover:text-white transition-colors text-xl flex items-center justify-center"
-                aria-label="Retour"
-              >
-                <svg viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5" aria-hidden>
-                  <path
-                    fillRule="evenodd"
-                    d="M11.78 3.22a.75.75 0 0 1 0 1.06L7.06 9l4.72 4.72a.75.75 0 1 1-1.06 1.06l-5.25-5.25a.75.75 0 0 1 0-1.06l5.25-5.25a.75.75 0 0 1 1.06 0Z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </button>
-            </div>
-          ) : null}
           <div className="flex flex-wrap items-center gap-2 mb-1 pr-6">
             {noticeVariant === "demo" ? (
               <span className="inline-flex items-center text-white/80 text-sm md:text-base font-semibold px-2 py-1 leading-none">
