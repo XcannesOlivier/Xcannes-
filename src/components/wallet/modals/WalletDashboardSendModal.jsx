@@ -1207,7 +1207,7 @@ export default function WalletDashboardSendModal({
 	            <ModalSelect
 	              value={selectedSendToken ? selectedSendToken.key : ""}
 	              onChange={setSendAssetKey}
-              options={(augmentedTokens || []).map((token) => {
+              options={(augmentedTokens || []).filter((token) => !selectedSendToken || token.key !== selectedSendToken.key).map((token) => {
                 const labelLeft =
                   selectLabelByAssetKey?.[token.key] ||
                   selectLabelByAssetKey?.[token.currency] ||
@@ -1315,7 +1315,7 @@ export default function WalletDashboardSendModal({
   /* ── Dynamic summary – visible as soon as a destination address is set ── */
   const inlineSummary = hasDestination ? (
     <div className="space-y-3 transition-all duration-200">
-      <div className="text-[11px] text-white/45">
+      <div className="text-[13px] text-white/45">
         {t(
           "ui_verify_before_sending",
           "Vérifiez les informations avant d’envoyer",
@@ -1668,6 +1668,7 @@ export default function WalletDashboardSendModal({
             <div className="pointer-events-none absolute inset-0" aria-hidden>
               <div className="absolute inset-0 bg-[radial-gradient(600px_circle_at_50%_0%,rgba(0,255,150,0.08),transparent_60%)]" />
             </div>
+            <div className="relative z-10 flex flex-col flex-1 min-h-0">
             {!inline ? (
               <div
                 className="md:hidden flex justify-center -mt-1 pt-1 pb-2"
@@ -1729,7 +1730,9 @@ export default function WalletDashboardSendModal({
                 {hasPaymentRequest ? payreqFinalStep : manualForm}
                 {!hasPaymentRequest && !hasMoonpaySellRequest ? inlineSummary : null}
                 {scannerModal}
+                {sendActions}
               </div>
+            </div>
             </div>
           {inline &&
           savedPickerMenu &&
@@ -1750,7 +1753,6 @@ export default function WalletDashboardSendModal({
                 document.body,
               )
             : null}
-          {sendActions}
           <input
             id={payreqFileInputId}
             type="file"
