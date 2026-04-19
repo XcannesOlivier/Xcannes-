@@ -664,7 +664,7 @@ export default function WalletDashboardSendChoiceModal({
         </div>
       ) : null}
 
-      {/* ═══ Sub-modal: Payer une demande ═══ */}}
+      {/* ═══ Sub-modal: Payer une demande ═══ */}
       {subModal === 'payreq' ? (
         <div className={inline ? 'absolute inset-0 z-50 flex' : 'fixed inset-0 z-[10100] flex items-end md:items-center justify-center md:px-4 pointer-events-none'}>
           {!inline ? <div className="fixed inset-0 bg-black/70 md:backdrop-blur-sm pointer-events-auto wallet-modal-backdrop-in" onClick={() => setSubModal(null)} /> : null}
