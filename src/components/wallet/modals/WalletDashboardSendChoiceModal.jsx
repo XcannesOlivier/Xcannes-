@@ -542,19 +542,21 @@ export default function WalletDashboardSendChoiceModal({
                   })}
                 </div>
                 <div className="px-5 pt-4 pb-5 flex flex-col flex-1 min-h-0">
-                {/* Back + title */}
-                <div className="flex items-center gap-3 mb-5">
+                {/* Back button */}
+                <div className="flex items-center mb-2">
                   <button type="button" onClick={() => setSubModal(null)} className="text-white/70 hover:text-white transition-colors flex items-center gap-1" aria-label={t('ui_back', 'Retour')}>
                     <svg viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5" aria-hidden><path fillRule="evenodd" d="M11.78 3.22a.75.75 0 0 1 0 1.06L7.06 9l4.72 4.72a.75.75 0 1 1-1.06 1.06l-5.25-5.25a.75.75 0 0 1 0-1.06l5.25-5.25a.75.75 0 0 1 1.06 0Z" clipRule="evenodd" /></svg>
                     <span className="hidden md:inline text-[13px] font-medium">{t('ui_back', 'Retour')}</span>
                   </button>
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-10 h-10 rounded-[14px] bg-black/30 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0"><QuickScanIcon /></div>
-                    <div className="min-w-0">
-                      <p className="text-[17px] text-white/92 font-semibold">{t('ui_send_simple_title', 'Envoi simple')}</p>
-                      <p className="text-[13px] leading-snug text-white/55">{t('ui_send_simple_hint_long', 'Saisissez une adresse, indiquez la devise et le montant.')}</p>
-                    </div>
-                  </div>
+                </div>
+                {/* Title + subtitle (centered) */}
+                <div className="flex flex-col items-center text-center mb-5">
+                  <h3 className="mt-1 text-[22px] md:text-[24px] font-semibold text-white/95 tracking-tight">
+                    {t('ui_send_simple_title', 'Envoi simple')}
+                  </h3>
+                  <p className="mt-2 text-[14px] md:text-[15px] text-white/60 max-w-[34ch] leading-relaxed">
+                    {t('ui_send_simple_hint_long', 'Saisissez une adresse, indiquez la devise et le montant.')}
+                  </p>
                 </div>
 
                 {/* Steps toggle */}
@@ -646,19 +648,21 @@ export default function WalletDashboardSendChoiceModal({
                   })}
                 </div>
                 <div className="px-5 pt-4 pb-5 flex flex-col flex-1 min-h-0">
-                {/* Back + title */}
-                <div className="flex items-center gap-3 mb-5">
+                {/* Back button */}
+                <div className="flex items-center mb-2">
                   <button type="button" onClick={() => setSubModal(null)} className="text-white/70 hover:text-white transition-colors flex items-center gap-1" aria-label={t('ui_back', 'Retour')}>
                     <svg viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5" aria-hidden><path fillRule="evenodd" d="M11.78 3.22a.75.75 0 0 1 0 1.06L7.06 9l4.72 4.72a.75.75 0 1 1-1.06 1.06l-5.25-5.25a.75.75 0 0 1 0-1.06l5.25-5.25a.75.75 0 0 1 1.06 0Z" clipRule="evenodd" /></svg>
                     <span className="hidden md:inline text-[13px] font-medium">{t('ui_back', 'Retour')}</span>
                   </button>
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-10 h-10 rounded-[14px] bg-black/30 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0"><PayRequestIcon /></div>
-                    <div className="min-w-0">
-                      <p className="text-[17px] text-white/92 font-semibold">{t('ui_send_pay_request_title', 'Payer une demande')}</p>
-                      <p className="text-[13px] leading-snug text-white/55">{t('ui_send_pay_request_hint', 'Réglez une demande reçue après vérification.')}</p>
-                    </div>
-                  </div>
+                </div>
+                {/* Title + subtitle (centered) */}
+                <div className="flex flex-col items-center text-center mb-5">
+                  <h3 className="mt-1 text-[22px] md:text-[24px] font-semibold text-white/95 tracking-tight">
+                    {t('ui_send_pay_request_title', 'Payer une demande')}
+                  </h3>
+                  <p className="mt-2 text-[14px] md:text-[15px] text-white/60 max-w-[34ch] leading-relaxed">
+                    {t('ui_send_pay_request_hint', 'Réglez une demande reçue après vérification.')}
+                  </p>
                 </div>
 
                 {/* Steps toggle */}
