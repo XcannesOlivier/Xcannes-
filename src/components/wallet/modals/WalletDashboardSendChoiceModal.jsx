@@ -31,7 +31,7 @@ export default function WalletDashboardSendChoiceModal({
   // ── Sub-modal state ──────────────────────────────────────────
   const [subModal, setSubModal] = useState(null); // 'quickscan' | 'payreq' | null
   const [showSteps, setShowSteps] = useState(false);
-  const [showPayreqSteps, setShowPayreqSteps] = useState(false);
+  const [showPayreqSteps, setShowPayreqSteps] = useState(true);
   const [payreqPasteValue, setPayreqPasteValue] = useState('');
   const [quickscanPasteValue, setQuickscanPasteValue] = useState('');
   const [showQuickscanSavedPicker, setShowQuickscanSavedPicker] = useState(false);
@@ -529,14 +529,14 @@ export default function WalletDashboardSendChoiceModal({
               </div>
               <div className="relative z-10 flex flex-col flex-1 min-h-0">
                 {/* Back button */}
-                <div className="px-5 pt-4 pb-0 flex items-center">
+                <div className="px-5 pt-4 pb-2 flex items-center">
                   <button type="button" onClick={() => setSubModal(null)} className="text-white/70 hover:text-white transition-colors flex items-center gap-1" aria-label={t('ui_back', 'Retour')}>
                     <svg viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5" aria-hidden><path fillRule="evenodd" d="M11.78 3.22a.75.75 0 0 1 0 1.06L7.06 9l4.72 4.72a.75.75 0 1 1-1.06 1.06l-5.25-5.25a.75.75 0 0 1 0-1.06l5.25-5.25a.75.75 0 0 1 1.06 0Z" clipRule="evenodd" /></svg>
                     <span className="hidden md:inline text-[13px] font-medium">{t('ui_back', 'Retour')}</span>
                   </button>
                 </div>
                 {/* Wallet meta pill */}
-                <div className="pt-3 pb-0 flex justify-center px-4">
+                <div className="pt-1 pb-2 flex justify-center px-4">
                   {renderWalletMeta?.({
                     variant: 'pill',
                     className: 'w-full flex justify-center wallet-meta--plus-4 wallet-meta--desktop-gap',
@@ -548,9 +548,9 @@ export default function WalletDashboardSendChoiceModal({
                     dotClassName: '!h-3 !w-3 ring-xcannes-green/20 self-center',
                   })}
                 </div>
-                <div className="px-5 pt-4 pb-5 flex flex-col flex-1 min-h-0">
+                <div className="px-5 pt-3 pb-5 flex flex-col flex-1 min-h-0">
                 {/* Title + subtitle (centered) */}
-                <div className="flex flex-col items-center text-center mb-5">
+                <div className="flex flex-col items-center text-center mb-6">
                   <h3 className="mt-1 text-[22px] md:text-[24px] font-semibold text-white/95 tracking-tight">
                     {t('ui_send_simple_title', 'Envoi simple')}
                   </h3>
@@ -560,13 +560,13 @@ export default function WalletDashboardSendChoiceModal({
                 </div>
 
                 {/* Steps toggle */}
-                <button type="button" onClick={() => setShowSteps(s => !s)} className="mb-3 text-[12px] text-xcannes-green/80 hover:text-xcannes-green transition-colors duration-150 font-medium self-start text-left">
+                <button type="button" onClick={() => setShowSteps(s => !s)} className="mb-4 text-[13px] text-xcannes-green/80 hover:text-xcannes-green transition-colors duration-150 font-medium self-start text-left">
                   {showSteps ? t('ui_hide_steps', 'Masquer les étapes') : t('ui_show_steps', 'Voir les étapes')}
                 </button>
 
                 {/* Steps guide (collapsible) */}
                 <div className="overflow-hidden transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]" style={{ maxHeight: showSteps ? '300px' : '0px', opacity: showSteps ? 1 : 0 }}>
-                  <ol className="space-y-2 text-[12px] leading-relaxed pb-3">
+                  <ol className="space-y-2 text-[12px] leading-relaxed pb-4">
                     <li className="flex gap-2"><span className="flex-shrink-0 w-5 h-5 rounded-full bg-xcannes-green/15 text-xcannes-green text-[11px] font-bold flex items-center justify-center">1</span><span className="text-white/60">{t('ui_step_1', 'Renseignez l\'adresse du destinataire — scannez, collez, importez ou choisissez dans votre liste.')}</span></li>
                     <li className="flex gap-2"><span className="flex-shrink-0 w-5 h-5 rounded-full bg-xcannes-green/15 text-xcannes-green text-[11px] font-bold flex items-center justify-center">2</span><span className="text-white/60">{t('ui_step_2', 'Sélectionnez la devise parmi celles disponibles sur votre compte.')}</span></li>
                     <li className="flex gap-2"><span className="flex-shrink-0 w-5 h-5 rounded-full bg-xcannes-green/15 text-xcannes-green text-[11px] font-bold flex items-center justify-center">3</span><span className="text-white/60">{t('ui_step_3', 'Indiquez le montant à envoyer.')}</span></li>
@@ -574,7 +574,7 @@ export default function WalletDashboardSendChoiceModal({
                   </ol>
                 </div>
 
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {/* Sub-action buttons row */}
                   <div className="flex gap-2">
                     <button type="button" onClick={onChooseQuickScan} className={`${accordionBtnClass} text-white`} style={{ background: 'linear-gradient(180deg, rgba(34,154,86,1) 0%, rgba(14,103,58,1) 100%)', boxShadow: '0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)' }} title={t('ui_scan_qr_code_12fa63d927', 'Scan QR Code')}>
@@ -589,7 +589,7 @@ export default function WalletDashboardSendChoiceModal({
 
                   {/* Paste input */}
                   <div className="relative">
-                    <input id="quickscan-paste-input" type="text" value={quickscanPasteValue} onChange={(e) => { setQuickscanPasteValue(e.target.value); setShowQuickscanSavedPicker(false); }} onKeyDown={(e) => { if (e.key === 'Enter') handleQuickscanPasteSubmit(); }} onPaste={(e) => { const text = (e.clipboardData?.getData('text') || '').trim(); if (text) { e.preventDefault(); setQuickscanPasteValue(text); setShowQuickscanSavedPicker(false); setTimeout(() => { setSendDestination?.(text); setSendDestinationLabel?.(''); onChooseSimpleSend?.(); }, 50); } }} placeholder={t('ui_paste_address_placeholder', 'Coller ou saisir une adresse')} className="w-full bg-elevated ring-1 ring-white/15 ring-inset rounded-[20px] shadow-[0_4px_12px_rgba(0,0,0,0.4)] pl-4 pr-12 py-3 text-sm text-white placeholder:text-white/35 outline-none focus:ring-2 focus:ring-xcannes-green/60" />
+                    <input id="quickscan-paste-input" type="text" value={quickscanPasteValue} onChange={(e) => { setQuickscanPasteValue(e.target.value); setShowQuickscanSavedPicker(false); }} onKeyDown={(e) => { if (e.key === 'Enter') handleQuickscanPasteSubmit(); }} onPaste={(e) => { const text = (e.clipboardData?.getData('text') || '').trim(); if (text) { e.preventDefault(); setQuickscanPasteValue(text); setShowQuickscanSavedPicker(false); setTimeout(() => { setSendDestination?.(text); setSendDestinationLabel?.(''); onChooseSimpleSend?.(); }, 50); } }} placeholder={t('ui_paste_address_placeholder', 'Coller ou saisir une adresse')} className="w-full bg-elevated ring-1 ring-white/15 ring-inset rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.4)] pl-4 pr-12 py-3 text-[15px] text-white placeholder:text-white/35 outline-none focus:ring-2 focus:ring-xcannes-green/60" />
                     {quickscanPasteValue.trim() ? (<button type="button" onClick={handleQuickscanPasteSubmit} className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg bg-xcannes-green/20 hover:bg-xcannes-green/30 text-xcannes-green transition-colors" title={t('ui_go_label', 'Valider')}><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg></button>) : null}
                   </div>
 
@@ -653,7 +653,7 @@ export default function WalletDashboardSendChoiceModal({
                   </div>
 
                   {/* Footer note */}
-                  <p className="text-center text-[12px] text-white/40 leading-relaxed mt-4">
+                  <p className="text-center text-[12px] text-white/40 leading-relaxed mt-5">
                     {t('ui_send_details_before_confirm', 'Les détails seront affichés avant confirmation.')}
                   </p>
                 </div>
@@ -664,7 +664,7 @@ export default function WalletDashboardSendChoiceModal({
         </div>
       ) : null}
 
-      {/* ═══ Sub-modal: Payer une demande ═══ */}
+      {/* ═══ Sub-modal: Payer une demande ═══ */}}
       {subModal === 'payreq' ? (
         <div className={inline ? 'absolute inset-0 z-50 flex' : 'fixed inset-0 z-[10100] flex items-end md:items-center justify-center md:px-4 pointer-events-none'}>
           {!inline ? <div className="fixed inset-0 bg-black/70 md:backdrop-blur-sm pointer-events-auto wallet-modal-backdrop-in" onClick={() => setSubModal(null)} /> : null}
@@ -676,14 +676,14 @@ export default function WalletDashboardSendChoiceModal({
               </div>
               <div className="relative z-10 flex flex-col flex-1 min-h-0">
                 {/* Back button */}
-                <div className="px-5 pt-4 pb-0 flex items-center">
+                <div className="px-5 pt-4 pb-2 flex items-center">
                   <button type="button" onClick={() => setSubModal(null)} className="text-white/70 hover:text-white transition-colors flex items-center gap-1" aria-label={t('ui_back', 'Retour')}>
                     <svg viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5" aria-hidden><path fillRule="evenodd" d="M11.78 3.22a.75.75 0 0 1 0 1.06L7.06 9l4.72 4.72a.75.75 0 1 1-1.06 1.06l-5.25-5.25a.75.75 0 0 1 0-1.06l5.25-5.25a.75.75 0 0 1 1.06 0Z" clipRule="evenodd" /></svg>
                     <span className="hidden md:inline text-[13px] font-medium">{t('ui_back', 'Retour')}</span>
                   </button>
                 </div>
                 {/* Wallet meta pill */}
-                <div className="pt-3 pb-0 flex justify-center px-4">
+                <div className="pt-1 pb-2 flex justify-center px-4">
                   {renderWalletMeta?.({
                     variant: 'pill',
                     className: 'w-full flex justify-center wallet-meta--plus-4 wallet-meta--desktop-gap',
@@ -695,9 +695,9 @@ export default function WalletDashboardSendChoiceModal({
                     dotClassName: '!h-3 !w-3 ring-xcannes-green/20 self-center',
                   })}
                 </div>
-                <div className="px-5 pt-4 pb-5 flex flex-col flex-1 min-h-0">
+                <div className="px-5 pt-3 pb-5 flex flex-col flex-1 min-h-0">
                 {/* Title + subtitle (centered) */}
-                <div className="flex flex-col items-center text-center mb-5">
+                <div className="flex flex-col items-center text-center mb-6">
                   <h3 className="mt-1 text-[22px] md:text-[24px] font-semibold text-white/95 tracking-tight">
                     {t('ui_send_pay_request_title', 'Payer une demande')}
                   </h3>
@@ -707,19 +707,19 @@ export default function WalletDashboardSendChoiceModal({
                 </div>
 
                 {/* Steps toggle */}
-                <button type="button" onClick={() => setShowPayreqSteps(s => !s)} className="mb-3 text-[12px] text-[#f5a623]/80 hover:text-[#f5a623] transition-colors duration-150 font-medium self-start text-left">
+                <button type="button" onClick={() => setShowPayreqSteps(s => !s)} className="mb-4 text-[13px] text-[#f5a623]/80 hover:text-[#f5a623] transition-colors duration-150 font-medium self-start text-left">
                   {showPayreqSteps ? t('ui_hide_steps', 'Masquer les étapes') : t('ui_show_steps', 'Voir les étapes')}
                 </button>
 
                 {/* Steps guide (collapsible) */}
                 <div className="overflow-hidden transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]" style={{ maxHeight: showPayreqSteps ? '200px' : '0px', opacity: showPayreqSteps ? 1 : 0 }}>
-                  <ol className="space-y-2 text-[12px] leading-relaxed pb-3">
+                  <ol className="space-y-2 text-[12px] leading-relaxed pb-4">
                     <li className="flex gap-2"><span className="flex-shrink-0 w-5 h-5 rounded-full bg-[#f5a623]/15 text-[#f5a623] text-[11px] font-bold flex items-center justify-center">1</span><span className="text-white/60">{t('ui_payreq_step_1', 'Renseignez le code ou QR code — scannez, collez, importez.')}</span></li>
                     <li className="flex gap-2"><span className="flex-shrink-0 w-5 h-5 rounded-full bg-[#f5a623]/15 text-[#f5a623] text-[11px] font-bold flex items-center justify-center">2</span><span className="text-white/60">{t('ui_payreq_step_2', 'Vérifiez et validez en toute sécurité.')}</span></li>
                   </ol>
                 </div>
 
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {/* Sub-action buttons row */}
                   <div className="flex gap-2">
                     <button type="button" onClick={onChooseQuickScan} className={accordionBtnClass} title={t('ui_scan_qr_code_12fa63d927', 'Scan QR Code')}>
@@ -734,12 +734,12 @@ export default function WalletDashboardSendChoiceModal({
 
                   {/* Paste input */}
                   <div className="relative">
-                    <input type="text" value={payreqPasteValue} onChange={(e) => setPayreqPasteValue(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') handlePayreqPasteSubmit(); }} onPaste={(e) => { const text = (e.clipboardData?.getData('text') || '').trim(); if (text) { e.preventDefault(); setPayreqPasteValue(text); setTimeout(() => { handlePaymentRequestScan?.(text); onChoosePayRequest?.(); }, 50); } }} placeholder={t('ui_paste_payreq_placeholder', 'Coller une demande de paiement')} className="w-full bg-elevated ring-1 ring-white/15 ring-inset rounded-[20px] shadow-[0_4px_12px_rgba(0,0,0,0.4)] pl-4 pr-12 py-3 text-sm text-white placeholder:text-white/35 outline-none focus:ring-2 focus:ring-[#f5a623]/50" />
+                    <input type="text" value={payreqPasteValue} onChange={(e) => setPayreqPasteValue(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') handlePayreqPasteSubmit(); }} onPaste={(e) => { const text = (e.clipboardData?.getData('text') || '').trim(); if (text) { e.preventDefault(); setPayreqPasteValue(text); setTimeout(() => { handlePaymentRequestScan?.(text); onChoosePayRequest?.(); }, 50); } }} placeholder={t('ui_paste_payreq_placeholder', 'Coller une demande de paiement')} className="w-full bg-elevated ring-1 ring-white/15 ring-inset rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.4)] pl-4 pr-12 py-3 text-[15px] text-white placeholder:text-white/35 outline-none focus:ring-2 focus:ring-[#f5a623]/50" />
                     {payreqPasteValue.trim() ? (<button type="button" onClick={handlePayreqPasteSubmit} className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg bg-[#f5a623]/20 hover:bg-[#f5a623]/30 text-[#f5a623] transition-colors" title={t('ui_go_label', 'Valider')}><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg></button>) : null}
                   </div>
 
                   {/* Footer note */}
-                  <p className="text-center text-[12px] text-white/40 leading-relaxed mt-4">
+                  <p className="text-center text-[12px] text-white/40 leading-relaxed mt-5">
                     {t('ui_send_details_before_confirm', 'Les détails seront affichés avant confirmation.')}
                   </p>
                 </div>
