@@ -1202,7 +1202,7 @@ export default function WalletDashboardSendModal({
               >
                 {t("ui_asset_e5170a7a06", "Devise")}
               </label>
-              <span className="text-sm text-white/40">{t("ui_balance_label", "Solde")}</span>
+              <span className="text-sm text-white/40 pr-6">{t("ui_balance_label", "Solde")}</span>
             </div>
 	            <ModalSelect
 	              value={selectedSendToken ? selectedSendToken.key : ""}
@@ -1285,8 +1285,8 @@ export default function WalletDashboardSendModal({
                     selectedSendToken.currency
                   : "USD"
               }
-              tokenClassName="text-white drop-shadow-sm text-2xl md:text-3xl font-bold"
-	              containerClassName="py-5 md:py-6 rounded-[20px] bg-black/30 ring-1 ring-white/20 ring-inset transition-colors duration-150 shadow-[0_6px_20px_rgba(0,0,0,0.5)]"
+              tokenClassName="text-white drop-shadow-sm text-3xl md:text-4xl font-bold"
+	              containerClassName="py-6 md:py-7 rounded-[20px] bg-black/30 ring-2 ring-white/20 ring-inset transition-colors duration-150 shadow-[0_6px_20px_rgba(0,0,0,0.5)]"
 	            />
             {manualInsufficientBalance ? (
               <div className="mt-2 rounded-lg ring-1 ring-orange-400/30 ring-inset bg-orange-400/10 px-3 py-2 text-xs text-orange-200/90">
