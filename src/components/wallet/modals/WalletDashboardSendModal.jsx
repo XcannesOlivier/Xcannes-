@@ -989,9 +989,9 @@ export default function WalletDashboardSendModal({
           onPaste={handlePastePayload}
           placeholder={t("ui_import_or_choose_recipient", "Import or choose address")}
           readOnly={shouldShowLabelInInput}
-		          className={`w-full bg-[#101415] ring-1 ring-white/15 ring-inset rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)] ${
+		          className={`w-full bg-[#101415] ring-1 ring-white/15 ring-inset rounded-[20px] shadow-[0_4px_12px_rgba(0,0,0,0.4)] ${
 		            !hasPaymentRequest ? "pl-8" : "pl-4"
-		          } ${hasPaymentRequest ? "pr-4" : "pr-28"} py-3 text-base text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/80`}
+		          } ${hasPaymentRequest ? "pr-4" : "pr-28"} py-3 text-base text-white outline-none focus:outline-none`}
 		        />
 
         <button
@@ -1107,7 +1107,7 @@ export default function WalletDashboardSendModal({
 
   const moonpaySellPreset = hasMoonpaySellRequest ? (
     <div className="space-y-3">
-      <div className="rounded-[14px] p-4 space-y-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
+      <div className="rounded-[20px] p-4 space-y-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
         <div className="text-xs uppercase tracking-wide text-white/60 font-semibold">
           {t("moonpay_sell_signature_title", "Validation MoonPay")}
         </div>
@@ -1195,12 +1195,15 @@ export default function WalletDashboardSendModal({
         {!hasPaymentRequest && (
         <div className={`transition-opacity duration-300 space-y-4 ${hasDestination ? 'opacity-100' : 'opacity-30 pointer-events-none select-none'}`}>
           <div>
-            <label
-              className="block text-base md:text-lg text-white/60 mb-1.5"
-              title={t("ui_send_asset_tip", "Sélectionnez la devise à envoyer.")}
-            >
-              {t("ui_asset_e5170a7a06", "Devise")}
-            </label>
+            <div className="flex items-baseline justify-between mb-1.5">
+              <label
+                className="text-base md:text-lg text-white/60"
+                title={t("ui_send_asset_tip", "Sélectionnez la devise à envoyer.")}
+              >
+                {t("ui_asset_e5170a7a06", "Devise")}
+              </label>
+              <span className="text-sm text-white/40">{t("ui_balance_label", "Solde")}</span>
+            </div>
 	            <ModalSelect
 	              value={selectedSendToken ? selectedSendToken.key : ""}
 	              onChange={setSendAssetKey}
@@ -1232,13 +1235,13 @@ export default function WalletDashboardSendModal({
 	              showMobileOptionRight={true}
 	              iconClassName="text-3xl leading-none"
 		              backdropClassName="bg-black/45 backdrop-blur-[1.5px]"
-			              buttonClassName="bg-[#101415] ring-1 ring-white/15 ring-inset rounded-xl px-4 py-[18px] text-2xl text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/80 appearance-none cursor-pointer shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
+			              buttonClassName="bg-[#101415] ring-1 ring-white/15 ring-inset rounded-[20px] px-4 py-[18px] text-2xl text-white outline-none focus:outline-none appearance-none cursor-pointer shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
 		              menuClassName={
 		                noticeVariant === "demo"
 		                  ? "bg-xcannes-surface-demo border-white/15 ring-1 ring-white/10 max-h-[320px]"
 		                  : "bg-elevated border-white/15 ring-1 ring-white/10 max-h-[320px]"
 		              }
-			              selectClassName="xcannes-select w-full bg-[#101415] ring-1 ring-white/15 ring-inset rounded-xl px-4 py-[18px] text-2xl text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/80 appearance-none cursor-pointer shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
+			              selectClassName="xcannes-select w-full bg-[#101415] ring-1 ring-white/15 ring-inset rounded-[20px] px-4 py-[18px] text-2xl text-white outline-none focus:outline-none appearance-none cursor-pointer shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
 			            />
 	          </div>
           {sendPaymentRequest?.beneficiaryLabel ? (
@@ -1254,7 +1257,7 @@ export default function WalletDashboardSendModal({
           <div>
             <div className="flex items-center justify-between">
               <label
-                className="block text-base md:text-lg text-white/60 mb-1.5"
+                className="block text-lg md:text-xl text-white/70 font-semibold mb-2"
                 title={t("ui_send_amount_tip", "Saisissez le montant à envoyer.")}
               >
                 {t("ui_amount_52cea2dd3d", "Montant")}
@@ -1282,8 +1285,8 @@ export default function WalletDashboardSendModal({
                     selectedSendToken.currency
                   : "USD"
               }
-              tokenClassName="text-white drop-shadow-sm text-xl"
-	              containerClassName="py-4 rounded-xl bg-black/30 ring-1 ring-white/15 ring-inset focus-within:ring-2 focus-within:ring-xcannes-green/80 transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
+              tokenClassName="text-white drop-shadow-sm text-2xl md:text-3xl font-bold"
+	              containerClassName="py-5 md:py-6 rounded-[20px] bg-black/30 ring-1 ring-white/20 ring-inset transition-colors duration-150 shadow-[0_6px_20px_rgba(0,0,0,0.5)]"
 	            />
             {manualInsufficientBalance ? (
               <div className="mt-2 rounded-lg ring-1 ring-orange-400/30 ring-inset bg-orange-400/10 px-3 py-2 text-xs text-orange-200/90">
@@ -1318,8 +1321,8 @@ export default function WalletDashboardSendModal({
           "Vérifiez les informations avant d’envoyer",
         )}
       </div>
-		      <div className="rounded-[14px] p-4 space-y-4 ring-1 ring-white/10 ring-inset bg-[#101415] shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
-	        <div className="text-xs uppercase tracking-wide text-white/60 font-semibold">
+		      <div className="rounded-[20px] p-4 space-y-4 ring-1 ring-white/10 ring-inset bg-[#101415] shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
+	        <div className="text-xs tracking-wide text-white/60 font-semibold">
 	          {t("ui_send_confirmation_title", "Résumé de l'envoi")}
 		        </div>
 	        <div className="space-y-3 text-sm text-white/80">
@@ -1372,14 +1375,6 @@ export default function WalletDashboardSendModal({
               {confirmAmountLabel || '0'}
             </span>
           </div>
-          <div className="flex items-center justify-between gap-3 pt-2 mt-1 relative before:content-[''] before:absolute before:top-0 before:left-0 before:right-0 before:h-px before:bg-white/10">
-            <span className="text-white/70 font-semibold">
-              {t("ui_total", "Total")}
-            </span>
-            <span className="font-mono text-white/90 font-semibold">
-              {confirmAmountLabel || "0"}
-            </span>
-          </div>
         </div>
       </div>
     </div>
@@ -1398,7 +1393,7 @@ export default function WalletDashboardSendModal({
             type="text"
             value={payreqSelectorValue}
             readOnly
-	            className="w-full bg-[#101415] backdrop-blur-sm ring-1 ring-white/15 ring-inset rounded-xl px-4 pr-4 py-3 text-base text-white/90 outline-none truncate focus:outline-none focus:ring-2 focus:ring-xcannes-green/80"
+	            className="w-full bg-[#101415] backdrop-blur-sm ring-1 ring-white/15 ring-inset rounded-xl px-4 pr-4 py-3 text-base text-white/90 outline-none truncate focus:outline-none"
 	          />
 	        </div>
         {selfSendBlocked ? (
@@ -1659,6 +1654,10 @@ export default function WalletDashboardSendModal({
               if (!inline) e.stopPropagation();
             }}
           >
+            {/* Ambient glow */}
+            <div className="pointer-events-none absolute inset-0" aria-hidden>
+              <div className="absolute inset-0 bg-[radial-gradient(600px_circle_at_50%_0%,rgba(0,255,150,0.08),transparent_60%)]" />
+            </div>
             {!inline ? (
               <div
                 className="md:hidden flex justify-center -mt-1 pt-1 pb-2"
@@ -1689,15 +1688,15 @@ export default function WalletDashboardSendModal({
 	                    variant: "pill",
 	                    className:
 	                      "w-full flex justify-center wallet-meta--plus-4 wallet-meta--desktop-gap",
-	                    prefix: `${t("moonpay_from_account", "Depuis le compte")} :`,
-	                    labelWrap: true,
+	                    prefix: t("moonpay_from_account", "Depuis le compte"),
+	                    labelWrap: false,
 	                    pillClassName:
-	                      "bg-elevated px-4 py-3 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]",
+	                      "bg-elevated px-6 py-1.5 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)] gap-6",
 	                    prefixClassName:
-	                      "!text-white/70 text-[16px] md:text-[17px] font-semibold tracking-wide",
+	                      "!text-white/70 text-[14px] md:text-[15px] font-medium tracking-wide mr-6",
 	                    labelClassName:
-	                      "!text-white/95 text-[16px] md:text-[17px] font-semibold",
-	                    dotClassName: "!h-3 !w-3 ring-xcannes-green/20",
+	                      "!text-white/95 text-[14px] md:text-[15px] font-semibold",
+	                    dotClassName: "!h-3 !w-3 ring-xcannes-green/20 self-center",
 	                  })}
                 </div>
                 <div className="flex flex-wrap items-center gap-2">

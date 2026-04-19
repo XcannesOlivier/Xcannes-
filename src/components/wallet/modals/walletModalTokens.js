@@ -10,7 +10,7 @@
 
 /** Primary green action button — with disabled states. */
 export const greenActionBtnBase = [
-  "rounded-lg border border-transparent",
+  "rounded-[20px] border border-transparent",
   "bg-xcannes-btn-green text-white font-semibold",
   "transition-all duration-[120ms] ease-[cubic-bezier(0.4,0,0.2,1)]",
   "hover:bg-xcannes-btn-green-hover hover:-translate-y-px",
@@ -21,7 +21,7 @@ export const greenActionBtnBase = [
 
 /** Same green action button without disabled-state classes (e.g. Receive). */
 export const greenActionBtnMuted = [
-  "rounded-lg border border-transparent",
+  "rounded-[20px] border border-transparent",
   "bg-xcannes-btn-green text-white font-semibold",
   "transition-all duration-[120ms] ease-[cubic-bezier(0.4,0,0.2,1)]",
   "hover:bg-xcannes-btn-green-hover hover:-translate-y-px",
@@ -30,7 +30,7 @@ export const greenActionBtnMuted = [
 
 /** Neutral blue action button — with disabled states. */
 export const blueNeutralActionBtnBase = [
-  "rounded-lg border border-transparent",
+  "rounded-[20px] border border-transparent",
   "bg-xcannes-blue text-white font-semibold",
   "transition-all duration-[120ms] ease-[cubic-bezier(0.4,0,0.2,1)]",
   "hover:bg-xcannes-blue/40 hover:-translate-y-px",
@@ -41,7 +41,7 @@ export const blueNeutralActionBtnBase = [
 
 /** Violet action button (MoonPay vibe) — with disabled states. */
 export const violetActionBtnBase = [
-  "rounded-lg border border-transparent",
+  "rounded-[20px] border border-transparent",
   "bg-xcannes-violet text-white font-semibold",
   "transition-all duration-[120ms] ease-[cubic-bezier(0.4,0,0.2,1)]",
   "hover:bg-xcannes-violet-weight hover:-translate-y-px",
@@ -52,7 +52,7 @@ export const violetActionBtnBase = [
 
 /** SimpleSwap blue action button — with disabled states. */
 export const simpleSwapBlueActionBtnBase = [
-  "rounded-lg border border-transparent",
+  "rounded-[20px] border border-transparent",
   "bg-[#0870f8] text-white font-semibold",
   "transition-all duration-[120ms] ease-[cubic-bezier(0.4,0,0.2,1)]",
   "hover:bg-[#0765df] hover:-translate-y-px",
@@ -63,7 +63,7 @@ export const simpleSwapBlueActionBtnBase = [
 
 /** Fire orange action button — with disabled states. */
 export const fireOrangeActionBtnBase = [
-  "rounded-lg border border-transparent",
+  "rounded-[20px] border border-transparent",
   "bg-[#ff6a00] text-white font-semibold",
   "transition-all duration-[120ms] ease-[cubic-bezier(0.4,0,0.2,1)]",
   "hover:bg-[#e85f00] hover:-translate-y-px",
@@ -74,7 +74,7 @@ export const fireOrangeActionBtnBase = [
 
 /** Binance yellow action button — with disabled states. */
 export const binanceYellowActionBtnBase = [
-  "rounded-lg border border-transparent",
+  "rounded-[20px] border border-transparent",
   "bg-[#F0B90B] text-black font-semibold",
   "transition-all duration-[120ms] ease-[cubic-bezier(0.4,0,0.2,1)]",
   "hover:bg-[#D9A80A] hover:-translate-y-px",
