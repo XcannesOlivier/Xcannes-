@@ -1235,18 +1235,12 @@ export default function WalletDashboardReceiveModal({
                       maybeStartOverlayDrag(event, 'fixed');
                     }}
                   >
-                    <h3 className="mt-1 text-[22px] md:text-[24px] font-semibold text-white/95 tracking-tight">
+                    <h3 className="mt-1 text-[26px] md:text-[28px] font-semibold text-white/95 tracking-tight">
                       {t('ui_receive_choice_decision_title', 'Comment voulez-vous recevoir ?')}
                     </h3>
                     <p className="mt-2 text-[14px] md:text-[15px] text-white/60 max-w-[34ch] leading-relaxed">
                       {t('ui_receive_choice_decision_subtitle', 'Partagez votre QR ou créez une demande avec le montant')}
                     </p>
-                    <div
-                      className="mt-5 w-12 h-12 rounded-2xl bg-white/5 ring-1 ring-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.45)] flex items-center justify-center text-xcannes-green/90"
-                      aria-hidden="true"
-                    >
-                      <ArrowDownIcon className="w-6 h-6" />
-                    </div>
                   </div>
 
                   <div className="flex-1 min-h-0 flex flex-col justify-center gap-4 py-6">
@@ -1264,12 +1258,12 @@ export default function WalletDashboardReceiveModal({
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between gap-3">
-                            <div className="text-[16px] md:text-[17px] font-semibold text-white/92">
+                            <div className="text-[20px] md:text-[21px] font-semibold text-white/92">
                               {t('ui_receive_choice_share_title', 'Coordonnées de réception')}
                             </div>
                             <ChevronRightIcon className="w-5 h-5 text-white/30" />
                           </div>
-                          <div className="mt-2 text-[13px] md:text-[14px] text-white/55 leading-relaxed">
+                          <div className="mt-1 text-[15px] md:text-[16px] text-white/55 leading-snug">
                             {t(
                               'ui_receive_choice_share_desc',
                               'Affichez le QR code et l’adresse de réception associés à votre compte.',
@@ -1293,12 +1287,12 @@ export default function WalletDashboardReceiveModal({
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between gap-3">
-                            <div className="text-[16px] md:text-[17px] font-semibold text-white/92">
+                            <div className="text-[20px] md:text-[21px] font-semibold text-white/92">
                               {t('ui_receive_choice_request_title', 'Demander un paiement')}
                             </div>
                             <ChevronRightIcon className="w-5 h-5 text-white/30" />
                           </div>
-                          <div className="mt-2 text-[13px] md:text-[14px] text-white/55 leading-relaxed">
+                          <div className="mt-1 text-[15px] md:text-[16px] text-white/55 leading-snug">
                             {t(
                               'ui_receive_choice_request_desc',
                               'Définissez un montant, une devise et un message optionnel.',
@@ -1674,7 +1668,7 @@ export default function WalletDashboardReceiveModal({
 					                        </div>
 
 					                        {/* ── Actions ── */}
-			                        <div className="grid grid-cols-2 gap-3">
+			                        <div className="grid grid-cols-[1fr_1.8fr] gap-3">
 			                          <button
 			                            type="button"
 	                            onClick={async e => {
@@ -1682,7 +1676,7 @@ export default function WalletDashboardReceiveModal({
 	                              await handleCopyQr(true);
 	                            }}
 	                            className={[
-	                              'w-full h-12 rounded-[20px] bg-[#101415] ring-1 ring-white/10 ring-inset text-white/85 text-sm font-semibold',
+	                              'w-full h-11 rounded-[20px] bg-[#101415] ring-1 ring-white/10 ring-inset text-white/85 text-xs font-semibold',
 	                              'shadow-[0_4px_12px_rgba(0,0,0,0.4)] hover:ring-white/20 hover:bg-white/[0.04] transition-all duration-[140ms] active:scale-[0.99]',
 	                            ].join(' ')}
 	                          >
@@ -1694,10 +1688,10 @@ export default function WalletDashboardReceiveModal({
 	                              e.stopPropagation();
 	                              await handleShareQr(true);
 	                            }}
-	                            className="w-full h-12 rounded-[20px] text-white font-semibold transition-all duration-150 inline-flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-[0.98]"
+	                            className="w-full h-11 rounded-[20px] text-white text-[17px] font-bold tracking-wide py-2 px-6 transition-all duration-150 inline-flex items-center justify-center gap-2.5 hover:scale-[1.01] active:scale-[0.98]"
 	                            style={{ background: 'linear-gradient(180deg, rgba(34,154,86,1) 0%, rgba(14,103,58,1) 100%)', boxShadow: '0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)' }}
 	                          >
-	                            <ShareIcon className="w-4 h-4" />
+	                            <ShareIcon className="w-5 h-5" />
 			                            <span>{shareActionLabel}</span>
 			                          </button>
 			                        </div>
