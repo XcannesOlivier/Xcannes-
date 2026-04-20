@@ -1527,7 +1527,7 @@ export default function DemoCurrencyStatement({
               )}
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2 min-w-0">
-                  <h2 className="text-lg md:text-xl font-bold text-white min-w-0 inline-flex items-baseline gap-2">
+                  <h2 className="text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight min-w-0 inline-flex items-baseline gap-2">
                     <span className="truncate">
                       {currencyDescription || displayCurrency}
                     </span>
@@ -1558,7 +1558,7 @@ export default function DemoCurrencyStatement({
               ) : null}
             </div>
             <div>
-              <p className="text-xs text-white/60 mb-1">
+              <p className="text-[20px] md:text-[21px] text-white/60 mb-1">
                 {t("ui_statement_period_6dedec11d9", "Statement Period")}
               </p>
               {/* Month Selector - Version simplifiée */}
@@ -1579,7 +1579,7 @@ export default function DemoCurrencyStatement({
             <div>
               <div className="flex items-start justify-between gap-3">
                 <div className="pl-1">
-                  <p className="text-xs text-white/60 mb-1">
+                  <p className="text-[20px] md:text-[21px] text-white/60 mb-1">
                     {t("ui_balance_445d830d72", "Balance")}
                   </p>
                   <p className="text-sm text-white font-semibold">

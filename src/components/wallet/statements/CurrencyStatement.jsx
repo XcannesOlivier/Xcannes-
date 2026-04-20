@@ -1677,7 +1677,7 @@ export default function CurrencyStatement({
               )}
 	              <div className="min-w-0 flex-1">
 	                <div className="flex items-center gap-2 min-w-0">
-	                  <h2 className="text-lg md:text-xl font-bold text-white min-w-0 inline-flex items-baseline gap-2">
+                    <h2 className="text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight min-w-0 inline-flex items-baseline gap-2">
 	                    <span className="truncate">
 	                      {headerTitle}
                     </span>
@@ -1753,6 +1753,7 @@ export default function CurrencyStatement({
                 <div>
                   <StatementMonthSelect
                     label={t("ui_statement_period_6dedec11d9", "Statement Period")}
+                    labelClassName="text-[20px] md:text-[21px] text-white/60 mb-1"
                     value={selectedMonth}
                     onOpenChange={setPeriodDropdownOpen}
                     onChange={(nextValue) => {
@@ -1768,7 +1769,7 @@ export default function CurrencyStatement({
                   />
                 </div>
                 <div className="text-center md:text-center">
-                  <p className="text-xs text-white/60 mb-1">
+                  <p className="text-[20px] md:text-[21px] text-white/60 mb-1">
                     {t("ui_balance_445d830d72", "Balance")}
                   </p>
                   <p className="text-2xl text-white font-bold">

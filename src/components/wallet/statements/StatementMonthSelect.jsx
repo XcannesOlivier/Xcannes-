@@ -8,6 +8,7 @@ export default function StatementMonthSelect({
   options = [],
   menuClassName = "bg-elevated",
   label = "",
+  labelClassName = "text-xs text-white/60 mb-1",
   onOpenChange,
 }) {
   const [open, setOpen] = useState(false);
@@ -46,7 +47,7 @@ export default function StatementMonthSelect({
   return (
     <div className={`relative ${open ? "z-50" : ""}`}>
       {label ? (
-        <p className="text-xs text-white/60 mb-1">{label}</p>
+        <p className={labelClassName}>{label}</p>
       ) : null}
       <button
         type="button"
