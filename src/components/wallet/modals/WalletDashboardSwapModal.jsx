@@ -680,25 +680,42 @@ export default function WalletDashboardSwapModal({
 		                    />
 		                  </div>
 
-		                  {/* ── Rate line + Amount input (between selectors) ── */}
-		                  <div className={`relative z-[65] transition-all duration-200 ${baseDropdownOpen ? 'opacity-0 max-h-0 overflow-hidden !my-0' : 'opacity-100 max-h-[260px]'}`}>
-		                    <div className="flex items-center gap-3 px-2 pb-2 text-white/55">
-		                      <span className="h-px flex-1 bg-white/12" />
+		                  {/* ── Rate line + swap button + Amount input ── */}
+		                  <div className={`relative z-[65] transition-all duration-200 ${baseDropdownOpen ? 'opacity-0 max-h-0 overflow-hidden !my-0' : 'opacity-100'}`}>
+		                    {/* Rate line */}
+		                    <div className="flex items-center gap-3 px-2 pb-3 text-white/55">
+		                      <span className="h-px flex-1 bg-gradient-to-r from-transparent to-white/20" />
 		                      <span className="text-[12px] md:text-[13px] tracking-[0.01em] whitespace-nowrap">
 		                        {Number.isFinite(inlineUnitRate)
-		                          ? `↕ 1 ${getDisplayCurrencyCode(baseCode || "USD")} = ${Number(
+		                          ? `1 ${getDisplayCurrencyCode(baseCode || "USD")} = ${Number(
 		                              inlineUnitRate,
 		                            ).toLocaleString(locale, {
 		                              minimumFractionDigits: 2,
 		                              maximumFractionDigits: 2,
 		                            })} ${getDisplayCurrencyCode(quoteCode || "EUR")}`
-		                          : "↕ 1 USD = 0.84 EUR"}
+		                          : "1 USD = 0.84 EUR"}
 		                      </span>
-		                      <span className="h-px flex-1 bg-white/12" />
+		                      <span className="h-px flex-1 bg-gradient-to-l from-transparent to-white/20" />
 		                    </div>
-		                    <div className="absolute top-8 left-4 text-[11px] tracking-[0.18em] uppercase text-white/40 z-10">
-		                      {t("ui_amount_52a20b2992", "Montant")}
+		                    {/* Swap button centered above the amount block */}
+		                    <div className="relative flex justify-center -mb-4 z-10">
+		                      <button
+		                        type="button"
+		                        onClick={() => {
+		                          const prev = convertBaseCurrency;
+		                          setConvertBaseCurrency(convertQuoteCurrency);
+		                          setConvertQuoteCurrency(prev);
+		                        }}
+		                        className="w-9 h-9 rounded-full bg-[#2979ff] hover:bg-[#448aff] active:scale-95 transition-all duration-150 flex items-center justify-center shadow-[0_4px_14px_rgba(41,121,255,0.55)]"
+		                        aria-label="Inverser les devises"
+		                      >
+		                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+		                          <path d="M6 2L6 14M6 14L3 11M6 14L9 11" stroke="white" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/>
+		                          <path d="M12 16L12 4M12 4L9 7M12 4L15 7" stroke="white" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/>
+		                        </svg>
+		                      </button>
 		                    </div>
+		                    {/* Amount input */}
 		                    <TokenAmountInput
 		                      value={convertAmount}
 		                      onChange={setConvertAmount}
@@ -709,7 +726,7 @@ export default function WalletDashboardSwapModal({
 		                        "USD"
 		                      }
 		                      tokenClassName="text-white drop-shadow-sm text-4xl md:text-5xl font-bold"
-		                      containerClassName="pt-12 pb-6 md:pt-12 md:pb-6 rounded-[20px] bg-gradient-to-b from-white/[0.05] to-black/45 ring-1 ring-white/25 ring-inset transition-colors duration-150 shadow-[0_8px_22px_rgba(0,0,0,0.5)] [&_input]:!text-4xl [&_input]:md:!text-5xl"
+		                      containerClassName="pt-6 pb-6 rounded-[18px] bg-[#111518] ring-1 ring-white/10 ring-inset transition-colors duration-150 shadow-[0_4px_18px_rgba(0,0,0,0.6)] [&_input]:!text-4xl [&_input]:md:!text-5xl"
 		                    />
 		                  </div>
 
@@ -801,104 +818,42 @@ export default function WalletDashboardSwapModal({
                       </div>
                     ) : null}
                     {/* ── SECTION 3: Summary ─────────────────────────────── */}
-	                    <div className="rounded-[20px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-[#101415] shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)] overflow-hidden transition-all duration-300 ease-in-out" style={{ maxHeight: Number.isFinite(amountValue) && amountValue > 0 ? '400px' : '44px' }}>
-                      <div className="flex items-center justify-between">
-                        <span className="text-[11px] tracking-[0.22em] text-white/45">
-                          {t("ui_summary_title_d4e5f6a7b8", "Résumé")}
-                        </span>
-                        {!(Number.isFinite(amountValue) && amountValue > 0) && (
-                          <span className="flex items-center gap-[3px] ml-2">
-                            <span className="w-[4px] h-[4px] rounded-full bg-white/25 animate-[summaryDot_1.4s_ease-in-out_infinite]" />
-                            <span className="w-[4px] h-[4px] rounded-full bg-white/25 animate-[summaryDot_1.4s_ease-in-out_0.2s_infinite]" />
-                            <span className="w-[4px] h-[4px] rounded-full bg-white/25 animate-[summaryDot_1.4s_ease-in-out_0.4s_infinite]" />
+                    {(Number.isFinite(amountValue) && amountValue > 0) && (
+                    <div className="rounded-[16px] overflow-hidden bg-[#0f1318] ring-1 ring-white/10 ring-inset divide-y divide-white/8">
+                      {/* Row: Frais */}
+                      {previewMeta?.spreadFeeRlusd > 0 && (
+                        <div className="flex items-center justify-between px-4 py-3">
+                          <span className="text-sm text-white/55">{t("statement_conversion_fee_label", "Frais")}</span>
+                          <span className="text-sm text-white/80 font-medium">
+                            {formatAmountWithSymbol(locale, previewMeta.spreadFeeRlusd, "USD", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                           </span>
-                        )}
-                      </div>
-                      <style jsx>{`
-                        @keyframes summaryDot {
-                          0%, 80%, 100% { opacity: 0.25; transform: scale(0.85); }
-                          40% { opacity: 0.7; transform: scale(1.15); }
-                        }
-                      `}</style>
-                      <div className={`space-y-3 transition-opacity duration-300 ${Number.isFinite(amountValue) && amountValue > 0 ? 'opacity-100 mt-3' : 'opacity-0'}`}>
-                      <div className="text-sm text-white/70">
-                        {t("ui_you_receive", "Vous recevez")}
-                      </div>
-                      {Number.isFinite(previewAmount) &&
-                      previewAmount > 0 &&
-                      Number.isFinite(amountValue) &&
-                      amountValue > 0 &&
-                      baseCode &&
-                      quoteCode ? (
-                        <>
-                          <div className="text-2xl font-semibold text-white">
-                            {formatAmountWithSymbolLocal(previewAmount, quoteCode, {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2,
-                            })}
-                          </div>
-                          {previewMeta?.route === "allocation" &&
-                          previewMeta?.isFx &&
-                          previewMeta?.spreadFeeRlusd > 0 ? (
-                            <div className="flex items-baseline justify-between pt-2 mt-2 relative before:content-[''] before:absolute before:top-0 before:left-0 before:right-0 before:h-px before:bg-white/10">
-                              <div className="text-sm text-white/60">
-                              {t("statement_conversion_fee_label", "Frais")}
-                              {" : "}
-                              {formatAmountWithSymbol(locale, previewMeta.spreadFeeRlusd, "USD", {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                              })}
-                              </div>
-                              {Number.isFinite(Number(previewMeta?.unitRate)) &&
-                              previewMeta?.unitRate > 0 ? (
-                                <div className="text-xs text-white/50 md:hidden">
-                                  {`1 ${getDisplayCurrencyCode(baseCode)} = ${Number(
-                                    previewMeta.unitRate,
-                                  ).toLocaleString(locale, {
-                                    minimumFractionDigits: 2,
-                                    maximumFractionDigits: 2,
-                                  })} ${getDisplayCurrencyCode(quoteCode)}`}
-                                </div>
-                              ) : null}
-                            </div>
-                          ) : null}
-                          {Number.isFinite(Number(previewMeta?.unitRate)) &&
-                          previewMeta?.unitRate > 0 ? (
-                            <div className="text-xs text-white/50 hidden md:block">
-                              {`1 ${getDisplayCurrencyCode(baseCode)} = ${Number(
-                                previewMeta.unitRate,
-                              ).toLocaleString(locale, {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                              })} ${getDisplayCurrencyCode(quoteCode)}`}
-                            </div>
-                          ) : null}
-                        </>
-                      ) : (
-                        <div className="text-base text-white/40">—</div>
+                        </div>
                       )}
-                      </div>
+                      {/* Row: Taux de change */}
+                      {Number.isFinite(Number(previewMeta?.unitRate)) && previewMeta?.unitRate > 0 && baseCode && quoteCode && (
+                        <div className="flex items-center justify-between px-4 py-3">
+                          <span className="text-sm text-white/55">{t("ui_exchange_rate_label", "Taux de change")}</span>
+                          <span className="text-sm text-white/80 font-medium">
+                            {`1 ${getDisplayCurrencyCode(baseCode)} = ${Number(previewMeta.unitRate).toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 4 })} ${getDisplayCurrencyCode(quoteCode)}`}
+                          </span>
+                        </div>
+                      )}
+                      {/* Row: Total reçu */}
+                      {Number.isFinite(previewAmount) && previewAmount > 0 && quoteCode && (
+                        <div className="flex items-center justify-between px-4 py-3">
+                          <span className="text-sm text-white/55">{t("ui_total_received_label", "Total reçu")}</span>
+                          <span className="text-sm text-white font-semibold">
+                            {formatAmountWithSymbolLocal(previewAmount, quoteCode, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </span>
+                        </div>
+                      )}
                     </div>
-
-                    {previewState.status === "loading" ? (
-                      <div className="text-xs text-white/60">
-                        {t(
-                          "ui_loading_market_data_1d5d6ed3c4",
-                          "Refreshing market data...",
-                        )}
-                      </div>
-                    ) : null}
+                    )}
 
                     {previewState.status === "error" ? (
                       <div className="rounded-lg ring-1 ring-red-500/30 ring-inset bg-red-500/10 px-3 py-2 text-xs text-red-200">
                         {previewState.error}
                       </div>
-                    ) : null}
-
-                    {convertPreview ? (
-                      <p className="text-xs text-white/60">
-                        {convertPreview}
-                      </p>
                     ) : null}
                   </div>
 
@@ -915,48 +870,29 @@ export default function WalletDashboardSwapModal({
                       {t("wallet_connect_cta", "Connect wallet")}
                     </button>
                   ) : (
-                    <>
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleConvertAction();
-                        }}
-                        disabled={convertButtonDisabled}
-                        className={[
-                          "md:hidden w-full h-14 rounded-[20px] text-white text-lg font-semibold transition-all duration-150",
-                          convertButtonDisabled
-                            ? "opacity-45 cursor-not-allowed"
-                            : "hover:scale-[1.01] active:scale-[0.98]",
-                        ].join(" ")}
-                        style={convertButtonDisabled
-                          ? { background: 'linear-gradient(180deg, rgba(34,154,86,0.45) 0%, rgba(14,103,58,0.45) 100%)' }
-                          : { background: 'linear-gradient(180deg, rgba(34,154,86,1) 0%, rgba(14,103,58,1) 100%)', boxShadow: '0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)' }
-                        }
-                      >
-                        {convertButtonLabel}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleConvertAction();
-                        }}
-                        disabled={convertButtonDisabled}
-                        className={[
-                          "hidden md:flex items-center justify-center w-full h-16 rounded-[20px] text-white text-xl font-semibold transition-all duration-150",
-                          convertButtonDisabled
-                            ? "opacity-45 cursor-not-allowed"
-                            : "hover:scale-[1.01] active:scale-[0.98]",
-                        ].join(" ")}
-                        style={convertButtonDisabled
-                          ? { background: 'linear-gradient(180deg, rgba(34,154,86,0.45) 0%, rgba(14,103,58,0.45) 100%)' }
-                          : { background: 'linear-gradient(180deg, rgba(34,154,86,1) 0%, rgba(14,103,58,1) 100%)', boxShadow: '0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)' }
-                        }
-                      >
-                        {convertButtonLabel}
-                      </button>
-                    </>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleConvertAction();
+                      }}
+                      disabled={convertButtonDisabled}
+                      className={[
+                        "w-full h-14 rounded-[20px] text-white text-lg font-semibold transition-all duration-150",
+                        convertButtonDisabled
+                          ? "opacity-45 cursor-not-allowed"
+                          : "hover:scale-[1.01] active:scale-[0.98]",
+                      ].join(" ")}
+                      style={convertButtonDisabled
+                        ? { background: 'linear-gradient(180deg, #1a4fa0 0%, #123870 100%)' }
+                        : { background: 'linear-gradient(180deg, #2979ff 0%, #1a56c4 100%)', boxShadow: '0 8px 24px rgba(41,121,255,0.38), inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -10px 18px rgba(0,0,0,0.22)' }
+                      }
+                    >
+                      {convertProcessing
+                        ? convertButtonLabel
+                        : `${t("ui_convert_cta_fr", "Convertir")}${Number.isFinite(amountValue) && amountValue > 0 && baseCode ? ` ${Number(amountValue).toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${getDisplayCurrencyCode(baseCode)}` : ""}`
+                      }
+                    </button>
                   )}
                 </div>
               </div>
