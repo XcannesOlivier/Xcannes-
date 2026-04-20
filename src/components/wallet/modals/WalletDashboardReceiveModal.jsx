@@ -1619,7 +1619,7 @@ export default function WalletDashboardReceiveModal({
 					                        <div className="w-full flex flex-col items-center bg-[#232829] rounded-[20px] pt-5 pb-2 md:pt-8 md:pb-5">
 				                          <div
 				                            ref={requestQrContainerRef}
-				                            className="w-[280px] md:w-[260px] aspect-square rounded-none p-3 cursor-pointer border-[20px] border-black"
+				                            className="w-[240px] md:w-[260px] aspect-square rounded-none p-3 cursor-pointer border-[20px] border-black"
 				                            style={{ backgroundColor: '#E8E8E8' }}
 				                            onClick={() => setQrZoomValue(requestQrValue)}
 				                          >
