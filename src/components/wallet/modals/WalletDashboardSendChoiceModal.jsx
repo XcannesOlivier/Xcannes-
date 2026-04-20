@@ -576,16 +576,56 @@ export default function WalletDashboardSendChoiceModal({
 
                 <div className="space-y-4">
                   {/* Sub-action buttons row */}
-                  <div className="flex gap-2">
-                    <button type="button" onClick={onChooseQuickScan} className={`${accordionBtnClass} text-white`} style={{ background: 'linear-gradient(180deg, rgba(34,154,86,1) 0%, rgba(14,103,58,1) 100%)', boxShadow: '0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)' }} title={t('ui_scan_qr_code_12fa63d927', 'Scan QR Code')}>
-                      <svg className="w-5 h-5 text-white flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" /></svg>
-                      <span className="text-[15px] text-white font-medium">{t('ui_scan_label', 'Scanner')}</span>
+                  {/* Mobile: Scanner prominent | Desktop: Importer prominent */}
+                  <div className="send-choice-actions flex gap-2">
+                    <button
+                      type="button"
+                      onClick={onChooseQuickScan}
+                      className={`${accordionBtnClass} send-choice-scan-btn flex-[1.4] md:flex-[0.8] text-white`}
+                      title={t('ui_scan_qr_code_12fa63d927', 'Scan QR Code')}
+                    >
+                      <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" /></svg>
+                      <span className="text-[15px] md:text-[14px] font-medium md:font-normal">{t('ui_scan_label', 'Scanner')}</span>
                     </button>
-                    <button type="button" onClick={() => handleFileUpload(quickscanFileInputId, false)} className={accordionBtnClass} title={t('ui_or_upload_a_qr_image_works_e_df6baa8039', 'Charger une image qrcode')}>
-                      <svg className="w-5 h-5 text-white/60 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M12 4v12m0 0l-3-3m3 3l3-3" /></svg>
-                      <span className="text-[15px] text-white/70">{t('ui_import_label', 'Importer')}</span>
+                    <button
+                      type="button"
+                      onClick={() => handleFileUpload(quickscanFileInputId, false)}
+                      className={`${accordionBtnClass} send-choice-import-btn flex-[0.8] md:flex-[1.4]`}
+                      title={t('ui_or_upload_a_qr_image_works_e_df6baa8039', 'Charger une image qrcode')}
+                    >
+                      <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M12 4v12m0 0l-3-3m3 3l3-3" /></svg>
+                      <span className="text-[14px] md:text-[15px]">{t('ui_import_label', 'Importer')}</span>
                     </button>
                   </div>
+                  <style jsx>{`
+                    /* Mobile: Scanner = green hero, Importer = subtle */
+                    .send-choice-scan-btn {
+                      background: linear-gradient(180deg, rgba(34,154,86,1) 0%, rgba(14,103,58,1) 100%);
+                      box-shadow: 0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28);
+                      color: #fff;
+                    }
+                    .send-choice-scan-btn svg { color: #fff; }
+                    .send-choice-scan-btn span { color: #fff; }
+                    .send-choice-import-btn { color: rgba(255,255,255,0.7); }
+                    .send-choice-import-btn svg { color: rgba(255,255,255,0.6); }
+                    .send-choice-import-btn span { color: rgba(255,255,255,0.7); }
+                    /* Desktop: Importer = green hero, Scanner = subtle */
+                    @media (min-width: 768px) {
+                      .send-choice-scan-btn {
+                        background: rgba(255,255,255,0.07) !important;
+                        box-shadow: none !important;
+                      }
+                      .send-choice-scan-btn svg { color: rgba(255,255,255,0.6); }
+                      .send-choice-scan-btn span { color: rgba(255,255,255,0.7); }
+                      .send-choice-import-btn {
+                        background: linear-gradient(180deg, rgba(34,154,86,1) 0%, rgba(14,103,58,1) 100%) !important;
+                        box-shadow: 0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28) !important;
+                        color: #fff;
+                      }
+                      .send-choice-import-btn svg { color: #fff; }
+                      .send-choice-import-btn span { color: #fff; font-weight: 500; }
+                    }
+                  `}</style>
 
                   {/* Paste input */}
                   <div className="relative">
