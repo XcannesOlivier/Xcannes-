@@ -599,8 +599,17 @@ export default function WalletDashboardSwapModal({
               </div>
             <div className="wallet-tab-unfold-in">
               <div className="flex flex-col gap-4">
+                {/* ── Title / subtitle – hidden when summary is expanded ── */}
+                <div className={`text-center overflow-hidden transition-all duration-300 ease-in-out ${Number.isFinite(amountValue) && amountValue > 0 ? 'max-h-0 opacity-0 mt-0 mb-0' : 'max-h-[120px] opacity-100'}`}>
+                  <h3 className="text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight">
+                    {t("ui_convert_title_main", "Convertissez vos devises")}
+                  </h3>
+                  <p className="mt-2 text-[14px] md:text-[15px] text-white/60 max-w-[34ch] mx-auto leading-relaxed">
+                    {t("ui_convert_subtitle_main", "Sélectionnez les devises, indiquez le montant, vérifiez le résumé.")}
+                  </p>
+                </div>
                 {/* ── SECTION 1: Currency selection ───────────────────────── */}
-                <div className="space-y-3">
+                <div className={`transition-all duration-300 ${Number.isFinite(amountValue) && amountValue > 0 ? 'space-y-1' : 'space-y-3'}`}>
                   <div className="relative z-[65]">
                     <div className="text-[13px] tracking-[0.22em] text-white/45 mb-2 relative z-[41]">
                       {t("ui_from_label_short", "De")}
@@ -636,7 +645,7 @@ export default function WalletDashboardSwapModal({
 		                    />
 		                  </div>
 
-		                  <div className="flex justify-center py-1 relative z-[41]">
+		                  <div className={`flex justify-center relative z-[41] transition-all duration-300 ${Number.isFinite(amountValue) && amountValue > 0 ? 'py-0' : 'py-1'}`}>
 		                    <button
 		                      type="button"
 		                      onClick={(e) => {
