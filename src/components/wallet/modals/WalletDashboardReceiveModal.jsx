@@ -1317,12 +1317,12 @@ export default function WalletDashboardReceiveModal({
 	                  <div className="space-y-5 pt-2">
 
 	                    {/* ── Centered wallet pill (style "Depuis le compte") ── */}
-	                    <div className="flex justify-center pt-1 pb-1">
+	                    <div className="flex justify-center pt-1 pb-1 relative z-[70]">
 	                      <div className="relative">
 	                        {/* Visible pill */}
 	                        <div className={`inline-flex items-center gap-6 bg-elevated px-6 py-1.5 rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)] ${hasMultipleWallets ? 'cursor-pointer' : ''}`}>
 	                          <span className="text-white/70 text-[14px] md:text-[15px] font-medium tracking-wide">
-	                            {t('ui_receive_account_info_label', 'Depuis le compte')}
+	                            {t('ui_receive_account_info_label', 'Choisissez le compte')}
 	                          </span>
 	                          <span className="h-3 w-3 rounded-full bg-xcannes-green ring-4 ring-xcannes-green/20 shrink-0" aria-hidden />
 	                          <span className="text-white/95 text-[14px] md:text-[15px] font-semibold">
@@ -1365,7 +1365,7 @@ export default function WalletDashboardReceiveModal({
 	                    </div>
 
 	                    {/* ── QR Code ── */}
-	                    <div className="w-full flex flex-col items-center bg-[#232829] rounded-[20px] py-5 md:pt-8 md:pb-5">
+	                    <div className="w-full flex flex-col items-center bg-[#232829] rounded-[20px] pt-10 pb-5 md:pt-16 md:pb-5">
 	                        <div
 	                          ref={receiveQrContainerRef}
 	                          className="w-[280px] md:w-[260px] aspect-square rounded-none p-3 cursor-pointer border-[20px] border-black"
