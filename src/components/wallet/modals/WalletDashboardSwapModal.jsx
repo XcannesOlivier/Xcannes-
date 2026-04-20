@@ -626,13 +626,13 @@ export default function WalletDashboardSwapModal({
 		                      showMobileOptionRight={true}
 		                      iconClassName="text-3xl leading-none"
 		                      backdropClassName="bg-black/80 backdrop-blur-[4px]"
-		                      buttonClassName="bg-[#101415] ring-1 ring-white/10 ring-inset rounded-[20px] px-3.5 py-1.5 text-xl text-white outline-none focus:outline-none cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
+		                      buttonClassName="bg-[#101415] ring-1 ring-white/10 ring-inset rounded-[14px] px-3.5 py-1.5 text-xl text-white outline-none focus:outline-none cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
 		                      menuClassName={
 		                        noticeVariant === "demo"
 		                          ? "bg-xcannes-surface-demo border-white/15 ring-1 ring-white/10 ring-inset max-h-[520px]"
 		                          : "bg-[#101415] border-white/15 ring-1 ring-white/10 ring-inset max-h-[520px]"
 		                      }
-		                      selectClassName="xcannes-select w-full bg-[#101415] ring-1 ring-white/10 ring-inset rounded-[20px] px-3.5 py-1.5 text-xl text-white outline-none focus:outline-none cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
+		                      selectClassName="xcannes-select w-full bg-[#101415] ring-1 ring-white/10 ring-inset rounded-[14px] px-3.5 py-1.5 text-xl text-white outline-none focus:outline-none cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
 		                    />
 		                  </div>
 
@@ -698,13 +698,13 @@ export default function WalletDashboardSwapModal({
 		                      showMobileOptionRight={true}
 		                      iconClassName="text-3xl leading-none"
 		                      backdropClassName="bg-black/80 backdrop-blur-[4px]"
-		                      buttonClassName="bg-[#101415] ring-1 ring-white/10 ring-inset rounded-[20px] px-3.5 py-1.5 text-xl text-white outline-none focus:outline-none cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
+		                      buttonClassName="bg-[#101415] ring-1 ring-white/10 ring-inset rounded-[14px] px-3.5 py-1.5 text-xl text-white outline-none focus:outline-none cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
 		                      menuClassName={
 		                        noticeVariant === "demo"
 		                          ? "bg-xcannes-surface-demo border-white/15 ring-1 ring-white/10 ring-inset max-h-[320px]"
 		                          : "bg-[#101415] border-white/15 ring-1 ring-white/10 ring-inset max-h-[320px]"
 		                      }
-		                      selectClassName="xcannes-select w-full bg-[#101415] ring-1 ring-white/10 ring-inset rounded-[20px] px-3.5 py-1.5 text-xl text-white outline-none focus:outline-none cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
+		                      selectClassName="xcannes-select w-full bg-[#101415] ring-1 ring-white/10 ring-inset rounded-[14px] px-3.5 py-1.5 text-xl text-white outline-none focus:outline-none cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
 		                    />
 		                  </div>
 
@@ -746,8 +746,8 @@ export default function WalletDashboardSwapModal({
                       convertBaseCurrency ||
                       "USD"
 	                    }
-	                    tokenClassName="text-white text-base"
-	                    containerClassName="rounded-[20px] px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
+	                    tokenClassName="text-white drop-shadow-sm text-4xl md:text-5xl font-bold"
+	                    containerClassName="py-8 md:py-9 rounded-[20px] bg-black/30 ring-2 ring-white/20 ring-inset transition-colors duration-150 shadow-[0_6px_20px_rgba(0,0,0,0.5)] [&_input]:!text-4xl [&_input]:md:!text-5xl"
 	                  />
 	                </div>
 
@@ -771,10 +771,26 @@ export default function WalletDashboardSwapModal({
                       </div>
                     ) : null}
                     {/* ── SECTION 3: Summary ─────────────────────────────── */}
-	                    <div className="rounded-[20px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-[#101415] shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)] space-y-3">
-                      <div className="text-[11px] tracking-[0.22em] text-white/45">
-                        {t("ui_summary_title_d4e5f6a7b8", "Résumé")}
+	                    <div className="rounded-[20px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-[#101415] shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)] overflow-hidden transition-all duration-300 ease-in-out" style={{ maxHeight: Number.isFinite(amountValue) && amountValue > 0 ? '400px' : '44px' }}>
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] tracking-[0.22em] text-white/45">
+                          {t("ui_summary_title_d4e5f6a7b8", "Résumé")}
+                        </span>
+                        {!(Number.isFinite(amountValue) && amountValue > 0) && (
+                          <span className="flex items-center gap-[3px] ml-2">
+                            <span className="w-[4px] h-[4px] rounded-full bg-white/25 animate-[summaryDot_1.4s_ease-in-out_infinite]" />
+                            <span className="w-[4px] h-[4px] rounded-full bg-white/25 animate-[summaryDot_1.4s_ease-in-out_0.2s_infinite]" />
+                            <span className="w-[4px] h-[4px] rounded-full bg-white/25 animate-[summaryDot_1.4s_ease-in-out_0.4s_infinite]" />
+                          </span>
+                        )}
                       </div>
+                      <style jsx>{`
+                        @keyframes summaryDot {
+                          0%, 80%, 100% { opacity: 0.25; transform: scale(0.85); }
+                          40% { opacity: 0.7; transform: scale(1.15); }
+                        }
+                      `}</style>
+                      <div className={`space-y-3 transition-opacity duration-300 ${Number.isFinite(amountValue) && amountValue > 0 ? 'opacity-100 mt-3' : 'opacity-0'}`}>
                       <div className="text-sm text-white/70">
                         {t("ui_you_receive", "Vous recevez")}
                       </div>
@@ -831,6 +847,7 @@ export default function WalletDashboardSwapModal({
                       ) : (
                         <div className="text-base text-white/40">—</div>
                       )}
+                      </div>
                     </div>
 
                     {previewState.status === "loading" ? (
