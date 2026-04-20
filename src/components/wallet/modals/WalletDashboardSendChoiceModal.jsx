@@ -34,6 +34,7 @@ export default function WalletDashboardSendChoiceModal({
   const [showPayreqSteps, setShowPayreqSteps] = useState(true);
   const [payreqPasteValue, setPayreqPasteValue] = useState('');
   const [payreqSelfSendError, setPayreqSelfSendError] = useState(false);
+  const [simpleSendSelfError, setSimpleSendSelfError] = useState(false);
   const [quickscanPasteValue, setQuickscanPasteValue] = useState('');
   const [showQuickscanSavedPicker, setShowQuickscanSavedPicker] = useState(false);
   const normalizedCurrentWallet = String(currentWalletAddress || '').trim();
@@ -51,6 +52,7 @@ export default function WalletDashboardSendChoiceModal({
       setShowPayreqSteps(false);
       setPayreqPasteValue('');
       setPayreqSelfSendError(false);
+      setSimpleSendSelfError(false);
       setQuickscanPasteValue('');
       setShowQuickscanSavedPicker(false);
     }
@@ -112,6 +114,7 @@ export default function WalletDashboardSendChoiceModal({
             handlePaymentRequestScan?.(decodedText);
             onChoosePayRequest?.();
           } else {
+            if (normalizedCurrentWallet && decodedText.trim() === normalizedCurrentWallet) { setSimpleSendSelfError(true); return; }
             setSendDestination?.(decodedText);
             setSendDestinationLabel?.('');
             onChooseSimpleSend?.();
@@ -134,6 +137,8 @@ export default function WalletDashboardSendChoiceModal({
   const handleQuickscanPasteSubmit = useCallback(() => {
     const raw = quickscanPasteValue.trim();
     if (!raw) return;
+    if (normalizedCurrentWallet && raw === normalizedCurrentWallet) { setSimpleSendSelfError(true); return; }
+    setSimpleSendSelfError(false);
     if (looksLikeXrplAddress(raw)) {
       setSendDestination?.(raw);
       setSendDestinationLabel?.('');
@@ -148,7 +153,7 @@ export default function WalletDashboardSendChoiceModal({
       setSendDestinationLabel?.('');
       onChooseSimpleSend?.();
     }
-  }, [quickscanPasteValue, setSendDestination, setSendDestinationLabel, onChooseSimpleSend, handlePaymentRequestScan, onClose]);
+  }, [quickscanPasteValue, setSendDestination, setSendDestinationLabel, onChooseSimpleSend, handlePaymentRequestScan, onClose, normalizedCurrentWallet]);
 
   // ── Paste handler for "Payer une demande" ────────────────────
   const handlePayreqPasteSubmit = useCallback(() => {
@@ -660,9 +665,17 @@ export default function WalletDashboardSendChoiceModal({
 
                   {/* Paste input */}
                   <div className="relative">
-                    <input id="quickscan-paste-input" type="text" value={quickscanPasteValue} onChange={(e) => { setQuickscanPasteValue(e.target.value); setShowQuickscanSavedPicker(false); }} onKeyDown={(e) => { if (e.key === 'Enter') handleQuickscanPasteSubmit(); }} onPaste={(e) => { const text = (e.clipboardData?.getData('text') || '').trim(); if (text) { e.preventDefault(); setQuickscanPasteValue(text); setShowQuickscanSavedPicker(false); setTimeout(() => { setSendDestination?.(text); setSendDestinationLabel?.(''); onChooseSimpleSend?.(); }, 50); } }} placeholder={t('ui_paste_address_placeholder', 'Coller ou saisir une adresse')} className="w-full bg-elevated ring-1 ring-white/15 ring-inset rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.4)] pl-4 pr-12 py-3 text-[15px] text-white placeholder:text-white/35 outline-none focus:ring-2 focus:ring-xcannes-green/60" />
+                    <input id="quickscan-paste-input" type="text" value={quickscanPasteValue} onChange={(e) => { setQuickscanPasteValue(e.target.value); setShowQuickscanSavedPicker(false); setSimpleSendSelfError(false); }} onKeyDown={(e) => { if (e.key === 'Enter') handleQuickscanPasteSubmit(); }} onPaste={(e) => { const text = (e.clipboardData?.getData('text') || '').trim(); if (text) { e.preventDefault(); setQuickscanPasteValue(text); setShowQuickscanSavedPicker(false); if (normalizedCurrentWallet && text === normalizedCurrentWallet) { setSimpleSendSelfError(true); return; } setSimpleSendSelfError(false); setTimeout(() => { setSendDestination?.(text); setSendDestinationLabel?.(''); onChooseSimpleSend?.(); }, 50); } }} placeholder={t('ui_paste_address_placeholder', 'Coller ou saisir une adresse')} className="w-full bg-elevated ring-1 ring-white/15 ring-inset rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.4)] pl-4 pr-12 py-3 text-[15px] text-white placeholder:text-white/35 outline-none focus:ring-2 focus:ring-xcannes-green/60" />
                     {quickscanPasteValue.trim() ? (<button type="button" onClick={handleQuickscanPasteSubmit} className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg bg-xcannes-green/20 hover:bg-xcannes-green/30 text-xcannes-green transition-colors" title={t('ui_go_label', 'Valider')}><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg></button>) : null}
                   </div>
+
+                  {/* Self-send error */}
+                  {simpleSendSelfError && (
+                    <div className="rounded-lg ring-1 ring-orange-400/30 ring-inset bg-orange-400/10 px-3 py-2.5 text-xs text-orange-200/90 mt-3">
+                      <div className="font-semibold">{t('ui_invalid_recipient_title', 'Destinataire invalide')}</div>
+                      <div className="mt-0.5 text-orange-200/70">{t('ui_cannot_send_to_self', 'Vous ne pouvez pas envoyer à votre propre compte.')}</div>
+                    </div>
+                  )}
 
                   {/* Saved addresses selector */}
                   <div className="relative">
