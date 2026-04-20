@@ -24,6 +24,7 @@ export default function ModalSelect({
   portal = false,
   portalTarget = null,
   onOpenChange = null,
+  menuFooter = null,
 }) {
   const [open, setOpen] = useState(false);
   const [visible, setVisible] = useState(false);
@@ -328,6 +329,11 @@ export default function ModalSelect({
               </button>
               );
             })}
+            {menuFooter ? (
+              <div className="border-t border-white/10 px-2 py-2">
+                {menuFooter}
+              </div>
+            ) : null}
           </div>
         )}
         {open && portal && resolvedPortalTarget ? createPortal(
@@ -393,6 +399,11 @@ export default function ModalSelect({
               </button>
               );
             })}
+            {menuFooter ? (
+              <div className="border-t border-white/10 px-2 py-2">
+                {menuFooter}
+              </div>
+            ) : null}
           </div>,
           resolvedPortalTarget
         ) : null}

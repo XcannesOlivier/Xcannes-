@@ -732,26 +732,6 @@ export default function WalletDashboardSwapModal({
                       <div className="text-[13px] tracking-[0.22em] text-white/45">
                         {t("ui_convert_to_label", "Vous recevez")}
                       </div>
-                      <WalletCurrencySelector
-                        value=""
-                        onChange={(code) => {
-                          if (code) setConvertQuoteCurrency(code);
-                        }}
-                        triggerVariant="text"
-                        triggerLabel={t(
-                          "ui_choose_new_currency_plus",
-                          "Ajouter une devise",
-                        )}
-                        buttonClassName="inline-flex items-center text-[12px] md:text-[13px] leading-none text-white/65 font-normal ring-1 ring-white/10 ring-inset rounded-[9px] px-2 py-1 hover:text-white hover:ring-white/15 transition-colors"
-                        fullscreenPortalTarget={inline ? modalPanelRef.current : null}
-                        placeholder={t(
-                          "ui_search_all_currencies_c5d6e7f8",
-                          "Search all currencies...",
-                        )}
-                        excludeCodes={["USD", "RLUSD", "XRP"]}
-                        showQuickAdd={false}
-                        fullscreen={true}
-                      />
                     </div>
 		                    <ModalSelect
 		                      value={convertQuoteCurrency}
@@ -781,9 +761,31 @@ export default function WalletDashboardSwapModal({
 		                      buttonClassName="bg-[#101415] ring-1 ring-white/10 ring-inset rounded-[14px] px-3.5 py-1.5 text-xl text-white outline-none focus:outline-none cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
 		                      menuClassName={
 		                        noticeVariant === "demo"
-		                          ? "bg-xcannes-surface-demo border-white/15 ring-1 ring-white/10 ring-inset max-h-[320px]"
-		                          : "bg-[#101415] border-white/15 ring-1 ring-white/10 ring-inset max-h-[320px]"
+                              ? "bg-xcannes-surface-demo border-white/15 ring-1 ring-white/10 ring-inset max-h-[220px]"
+                              : "bg-[#101415] border-white/15 ring-1 ring-white/10 ring-inset max-h-[220px]"
 		                      }
+                          menuFooter={(
+                            <WalletCurrencySelector
+                              value=""
+                              onChange={(code) => {
+                                if (code) setConvertQuoteCurrency(code);
+                              }}
+                              triggerVariant="text"
+                              triggerLabel={t(
+                                "ui_choose_new_currency_plus_account",
+                                "+ Ajouter une devise au compte",
+                              )}
+                              buttonClassName="w-full inline-flex items-center justify-center text-[12px] md:text-[13px] leading-none text-white/70 font-normal ring-1 ring-white/10 ring-inset rounded-[9px] px-2 py-1.5 hover:text-white hover:ring-white/15 transition-colors"
+                              fullscreenPortalTarget={inline ? modalPanelRef.current : null}
+                              placeholder={t(
+                                "ui_search_all_currencies_c5d6e7f8",
+                                "Search all currencies...",
+                              )}
+                              excludeCodes={["USD", "RLUSD", "XRP"]}
+                              showQuickAdd={false}
+                              fullscreen={true}
+                            />
+                          )}
 		                      selectClassName="xcannes-select w-full bg-[#101415] ring-1 ring-white/10 ring-inset rounded-[14px] px-3.5 py-1.5 text-xl text-white outline-none focus:outline-none cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
 		                    />
 		                  </div>
@@ -811,14 +813,14 @@ export default function WalletDashboardSwapModal({
                     {/* ── SECTION 3: Summary ─────────────────────────────── */}
                     <div className="rounded-[16px] overflow-hidden">
                       {/* Row: Frais */}
-                      <div className="flex items-center justify-between px-4 py-3">
+                      <div className="flex items-center justify-between px-4 py-2">
                         <span className="text-sm text-white/55">{t("statement_conversion_fee_label", "Frais")}</span>
                         <span className="text-sm text-white/80 font-medium">
                           {formatAmountWithSymbol(locale, Number(previewMeta?.spreadFeeRlusd || 0), "USD", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </span>
                       </div>
                       {/* Row: Taux de change */}
-                      <div className="flex items-center justify-between px-4 py-3">
+                      <div className="flex items-center justify-between px-4 py-2">
                         <span className="text-sm text-white/55">{t("ui_exchange_rate_label", "Taux de change")}</span>
                         <span className="text-sm text-white/80 font-medium">
                           {Number.isFinite(Number(previewMeta?.unitRate)) && previewMeta?.unitRate > 0 && baseCode && quoteCode
@@ -829,9 +831,9 @@ export default function WalletDashboardSwapModal({
                         </span>
                       </div>
                       {/* Row: Total reçu */}
-                      <div className="flex items-center justify-between px-4 py-3 border-t border-white/10">
-                        <span className="text-sm text-white/55">{t("ui_total_received_label", "Total reçu")}</span>
-                        <span className="text-sm text-white font-semibold">
+                      <div className="flex items-center justify-between px-4 pt-3 pb-2 mt-1 border-t border-white/20">
+                        <span className="text-base md:text-lg text-white/90">{t("ui_total_received_label", "Total reçu")}</span>
+                        <span className="text-xl md:text-2xl text-white font-semibold">
                           {quoteCode
                             ? formatAmountWithSymbolLocal(
                                 Number.isFinite(previewAmount) && previewAmount > 0 ? previewAmount : 0,
