@@ -741,7 +741,7 @@ export default function WalletDashboardSendChoiceModal({
                 <div className="px-5 pt-3 pb-5 flex flex-col flex-1 min-h-0">
                 {/* Title + subtitle (centered) */}
                 <div className="flex flex-col items-center text-center mb-6">
-                  <h3 className="mt-1 text-[22px] md:text-[24px] font-semibold text-white/95 tracking-tight">
+                  <h3 className="mt-1 text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight">
                     {t('ui_send_pay_request_title', 'Payer une demande')}
                   </h3>
                   <p className="mt-2 text-[14px] md:text-[15px] text-white/60 max-w-[34ch] leading-relaxed">
@@ -764,20 +764,50 @@ export default function WalletDashboardSendChoiceModal({
 
                 <div className="space-y-4">
                   {/* Sub-action buttons row */}
-                  <div className="flex gap-2">
-                    <button type="button" onClick={onChooseQuickScan} className={accordionBtnClass} title={t('ui_scan_qr_code_12fa63d927', 'Scan QR Code')}>
-                      <svg className="w-5 h-5 text-[#f5a623]/80 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" /></svg>
-                      <span className="text-[15px] text-white/70">{t('ui_scan_label', 'Scanner')}</span>
+                  {/* Mobile: Scanner prominent | Desktop: Importer prominent */}
+                  <div className="payreq-choice-actions flex gap-2">
+                    <button type="button" onClick={onChooseQuickScan} className={`${accordionBtnClass} payreq-scan-btn flex-[1.4] md:flex-[0.8]`} title={t('ui_scan_qr_code_12fa63d927', 'Scan QR Code')}>
+                      <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" /></svg>
+                      <span>{t('ui_scan_label', 'Scanner')}</span>
                     </button>
-                    <button type="button" onClick={() => handleFileUpload(payreqFileInputId, true)} className={accordionBtnClass} title={t('ui_or_upload_a_qr_image_works_e_df6baa8039', 'Charger une image qrcode')}>
-                      <svg className="w-5 h-5 text-white/60 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M12 4v12m0 0l-3-3m3 3l3-3" /></svg>
-                      <span className="text-[15px] text-white/70">{t('ui_import_label', 'Importer')}</span>
+                    <button type="button" onClick={() => handleFileUpload(payreqFileInputId, true)} className={`${accordionBtnClass} payreq-import-btn flex-[0.8] md:flex-[1.4]`} title={t('ui_or_upload_a_qr_image_works_e_df6baa8039', 'Charger une image qrcode')}>
+                      <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M12 4v12m0 0l-3-3m3 3l3-3" /></svg>
+                      <span>{t('ui_import_label', 'Importer')}</span>
                     </button>
                   </div>
+                  <style jsx>{`
+                    /* Mobile: Scanner = orange hero, bigger icon+text | Importer = subtle */
+                    .payreq-scan-btn {
+                      background: linear-gradient(180deg, rgba(245,166,35,0.9) 0%, rgba(180,110,10,1) 100%);
+                      box-shadow: 0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28);
+                      color: #fff;
+                    }
+                    .payreq-scan-btn svg { color: #fff; width: 1.4rem; height: 1.4rem; }
+                    .payreq-scan-btn span { color: #fff; font-size: 18px; font-weight: 700; }
+                    .payreq-import-btn { color: rgba(255,255,255,0.7); }
+                    .payreq-import-btn svg { color: rgba(255,255,255,0.5); width: 1.15rem; height: 1.15rem; }
+                    .payreq-import-btn span { color: rgba(255,255,255,0.55); font-size: 13.5px; font-weight: 400; }
+                    /* Desktop: Importer = orange hero, bigger icon+text | Scanner = subtle */
+                    @media (min-width: 768px) {
+                      .payreq-scan-btn {
+                        background: rgba(255,255,255,0.07) !important;
+                        box-shadow: none !important;
+                      }
+                      .payreq-scan-btn svg { color: rgba(255,255,255,0.5); width: 1.15rem; height: 1.15rem; }
+                      .payreq-scan-btn span { color: rgba(255,255,255,0.55); font-size: 13.5px; font-weight: 400; }
+                      .payreq-import-btn {
+                        background: linear-gradient(180deg, rgba(245,166,35,0.9) 0%, rgba(180,110,10,1) 100%) !important;
+                        box-shadow: 0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28) !important;
+                        color: #fff;
+                      }
+                      .payreq-import-btn svg { color: #fff; width: 1.4rem; height: 1.4rem; }
+                      .payreq-import-btn span { color: #fff; font-size: 18px; font-weight: 700; }
+                    }
+                  `}</style>
 
                   {/* Paste input */}
                   <div className="relative">
-                    <input type="text" value={payreqPasteValue} onChange={(e) => setPayreqPasteValue(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') handlePayreqPasteSubmit(); }} onPaste={(e) => { const text = (e.clipboardData?.getData('text') || '').trim(); if (text) { e.preventDefault(); setPayreqPasteValue(text); setTimeout(() => { handlePaymentRequestScan?.(text); onChoosePayRequest?.(); }, 50); } }} placeholder={t('ui_paste_payreq_placeholder', 'Coller une demande de paiement')} className="w-full bg-elevated ring-1 ring-white/15 ring-inset rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.4)] pl-4 pr-12 py-3 text-[15px] text-white placeholder:text-white/35 outline-none focus:ring-2 focus:ring-[#f5a623]/50" />
+                    <input type="text" value={payreqPasteValue} onChange={(e) => setPayreqPasteValue(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') handlePayreqPasteSubmit(); }} onPaste={(e) => { const text = (e.clipboardData?.getData('text') || '').trim(); if (text) { e.preventDefault(); setPayreqPasteValue(text); setTimeout(() => { handlePaymentRequestScan?.(text); onChoosePayRequest?.(); }, 50); } }} placeholder={t('ui_paste_payreq_placeholder', 'Coller une demande de paiement')} className="w-full bg-elevated ring-1 ring-white/15 ring-inset rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.4)] pl-4 pr-12 py-3 text-[15.5px] text-white placeholder:text-white/80 outline-none focus:ring-2 focus:ring-[#f5a623]/50" />
                     {payreqPasteValue.trim() ? (<button type="button" onClick={handlePayreqPasteSubmit} className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg bg-[#f5a623]/20 hover:bg-[#f5a623]/30 text-[#f5a623] transition-colors" title={t('ui_go_label', 'Valider')}><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg></button>) : null}
                   </div>
 
