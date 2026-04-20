@@ -703,7 +703,7 @@ export default function WalletDashboardSwapModal({
 		                          setConvertBaseCurrency(convertQuoteCurrency);
 		                          setConvertQuoteCurrency(prev);
 		                        }}
-                            className="w-9 h-9 rounded-full bg-gradient-to-b from-[#229a56] to-[#0e673a] hover:brightness-105 active:scale-95 transition-all duration-150 flex items-center justify-center shadow-[0_8px_18px_rgba(14,103,58,0.5),inset_0_1px_0_rgba(255,255,255,0.14),inset_0_-8px_14px_rgba(0,0,0,0.22)]"
+                            className="w-9 h-9 rounded-full bg-[#111518] hover:bg-[#151b1f] active:scale-95 transition-all duration-150 flex items-center justify-center shadow-[0_8px_18px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.10),inset_0_-8px_14px_rgba(0,0,0,0.28)]"
 		                        aria-label="Inverser les devises"
 		                      >
 		                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -723,7 +723,7 @@ export default function WalletDashboardSwapModal({
 		                        "USD"
 		                      }
 		                      tokenClassName="text-white drop-shadow-sm text-4xl md:text-5xl font-bold"
-		                      containerClassName="pt-6 pb-6 rounded-[18px] bg-[#111518] ring-1 ring-white/10 ring-inset transition-colors duration-150 shadow-[0_4px_18px_rgba(0,0,0,0.6)] [&_input]:!text-4xl [&_input]:md:!text-5xl"
+                          containerClassName="pt-6 pb-6 rounded-[18px] bg-[#111518] ring-1 ring-white/10 ring-inset transition-colors duration-150 shadow-[0_4px_18px_rgba(0,0,0,0.6),0_0_28px_rgba(34,154,86,0.22)] [&_input]:!text-4xl [&_input]:md:!text-5xl"
 		                    />
 		                  </div>
 
@@ -775,7 +775,7 @@ export default function WalletDashboardSwapModal({
                                 "ui_choose_new_currency_plus_account",
                                 "+ Ajouter une devise au compte",
                               )}
-                              buttonClassName="w-full inline-flex items-center justify-center text-[12px] md:text-[13px] leading-none text-white/70 font-normal ring-1 ring-white/10 ring-inset rounded-[9px] px-2 py-1.5 hover:text-white hover:ring-white/15 transition-colors"
+                              buttonClassName="w-full inline-flex items-center justify-center text-[14px] md:text-[15px] leading-tight text-white/85 font-medium ring-1 ring-white/15 ring-inset rounded-[10px] px-3 py-2 hover:text-white hover:ring-white/25 transition-colors"
                               fullscreenPortalTarget={inline ? modalPanelRef.current : null}
                               placeholder={t(
                                 "ui_search_all_currencies_c5d6e7f8",
@@ -830,10 +830,13 @@ export default function WalletDashboardSwapModal({
                               : "1 USD = 0.84 EUR"}
                         </span>
                       </div>
+                      <div className="px-3">
+                        <div className="h-[2px] bg-white/45 rounded-full" />
+                      </div>
                       {/* Row: Total reçu */}
-                      <div className="flex items-center justify-between px-4 pt-3 pb-2 mt-1 border-t border-white/20">
-                        <span className="text-base md:text-lg text-white/90">{t("ui_total_received_label", "Total reçu")}</span>
-                        <span className="text-xl md:text-2xl text-white font-semibold">
+                      <div className="flex items-center justify-between px-4 pt-3 pb-2">
+                        <span className="text-lg md:text-xl text-white">{t("ui_total_received_label", "Total reçu")}</span>
+                        <span className="text-2xl md:text-3xl text-white font-bold">
                           {quoteCode
                             ? formatAmountWithSymbolLocal(
                                 Number.isFinite(previewAmount) && previewAmount > 0 ? previewAmount : 0,
