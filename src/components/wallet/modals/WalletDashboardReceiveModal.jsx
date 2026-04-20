@@ -1323,11 +1323,9 @@ export default function WalletDashboardReceiveModal({
 	                        'shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]',
 	                      ].join(' ')}
 	                    >
-	                      <p className="text-[20px] tracking-normal font-orbitron font-bold text-white mb-3">
-	                        {t('ui_receive_account_info_label', 'Informations du compte')}
+	                      <p className="text-[12px] tracking-normal font-orbitron font-bold text-white mb-3">
+	                        {t('ui_receive_account_info_label', 'Selectionnez le compte')}
 	                      </p>
-
-	                      <div className="my-4 h-px bg-white/10" aria-hidden />
 
 	                      {hasMultipleWallets ? (
 	                        <ModalSelect
