@@ -598,31 +598,27 @@ export default function WalletDashboardSendChoiceModal({
                     </button>
                   </div>
                   <style jsx>{`
-                    /* Mobile: Scanner = green hero, bigger icon+text | Importer = subtle, smaller */
+                    /* Mobile: Scanner = green hero, bigger text | Importer = subtle, smaller text */
                     .send-choice-scan-btn {
                       background: linear-gradient(180deg, rgba(34,154,86,1) 0%, rgba(14,103,58,1) 100%);
                       box-shadow: 0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28);
                       color: #fff;
                     }
-                    .send-choice-scan-btn svg { color: #fff; width: 1.5rem; height: 1.5rem; }
                     .send-choice-scan-btn span { color: #fff; font-size: 16px; font-weight: 600; }
                     .send-choice-import-btn { color: rgba(255,255,255,0.7); }
-                    .send-choice-import-btn svg { color: rgba(255,255,255,0.5); width: 1.1rem; height: 1.1rem; }
                     .send-choice-import-btn span { color: rgba(255,255,255,0.55); font-size: 13px; font-weight: 400; }
-                    /* Desktop: Importer = green hero, bigger icon+text | Scanner = subtle, smaller */
+                    /* Desktop: Importer = green hero, bigger text | Scanner = subtle, smaller text */
                     @media (min-width: 768px) {
                       .send-choice-scan-btn {
                         background: rgba(255,255,255,0.07) !important;
                         box-shadow: none !important;
                       }
-                      .send-choice-scan-btn svg { color: rgba(255,255,255,0.5); width: 1.1rem; height: 1.1rem; }
                       .send-choice-scan-btn span { color: rgba(255,255,255,0.55); font-size: 13px; font-weight: 400; }
                       .send-choice-import-btn {
                         background: linear-gradient(180deg, rgba(34,154,86,1) 0%, rgba(14,103,58,1) 100%) !important;
                         box-shadow: 0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28) !important;
                         color: #fff;
                       }
-                      .send-choice-import-btn svg { color: #fff; width: 1.5rem; height: 1.5rem; }
                       .send-choice-import-btn span { color: #fff; font-size: 16px; font-weight: 600; }
                     }
                   `}</style>
