@@ -1211,7 +1211,7 @@ export default function WalletDashboardReceiveModal({
                   {isDesktop ? <span className="text-sm text-white/80">{t('ui_back', 'Retour')}</span> : null}
                 </button>
 
-                <h2 className="mt-5 text-[22px] md:text-[24px] font-semibold text-white/95 tracking-tight">
+                <h2 className="mt-8 text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight">
                   {headerTitle}
                 </h2>
 
@@ -1433,72 +1433,52 @@ export default function WalletDashboardReceiveModal({
 		                <>
 		                  {/* SECTION 2 — CREATE REQUEST */}
 		                  <div className="space-y-2 pt-2">
-	                    {/* ── Header card wallet (match "Coordonnées de réception" style) ── */}
-	                    <div
-	                      className={[
-	                        'rounded-[20px] px-4 py-4 ring-1 ring-white/10 ring-inset border-b border-white/20 bg-[#101415]',
-	                        'shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]',
-	                      ].join(' ')}
-	                    >
-	                      <p className="text-[20px] tracking-normal font-orbitron font-bold text-white mb-3">
-	                        {t('ui_request_create_card_title', 'Informations de votre demande')}
-	                      </p>
-
-	                      <div className="my-4 h-px bg-white/10" aria-hidden />
-
-	                      {hasMultipleWallets ? (
-	                        <ModalSelect
-	                          value={wallet}
-	                          onChange={next => {
-	                            const addr = trimmed(next);
-	                            if (!addr || addr === wallet) return;
-	                            onSwitchWallet?.(addr);
-	                          }}
-	                          options={shareWalletOptions}
-	                          useNativeSelect={false}
-	                          portal
-	                          portalTarget={overlayListRef.current}
-	                          hideSelected
-	                          backdropClassName="bg-black/80 backdrop-blur-[4px]"
-	                          iconClassName="inline-flex items-center justify-center leading-none"
-	                          buttonClassName="w-full bg-[#101415] rounded-xl px-3 pr-2 py-2 text-base text-white focus:outline-none cursor-pointer transition-colors duration-150"
-	                          menuClassName={
-	                            noticeVariant === 'demo'
-	                              ? 'bg-xcannes-surface-demo !max-h-64 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
-	                              : 'bg-[#101415] !max-h-64 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
-	                          }
-	                          selectClassName="xcannes-select w-full bg-transparent rounded-xl pl-0 pr-2 py-2 text-base text-white focus:outline-none transition-colors duration-150"
-	                        />
-	                      ) : (
-	                        <div className="flex items-center gap-2 mb-1">
-	                          <span
-	                            className="h-3 w-3 rounded-full bg-xcannes-green ring-4 ring-xcannes-green/25 shrink-0 animate-pulse"
-	                            aria-hidden
-	                          />
-	                          <p className="min-w-0 text-[16px] md:text-[17px] text-white font-semibold truncate">
-	                            {activeWalletLabel || t('nav_wallet', 'Wallet')}
-	                          </p>
-	                        </div>
-	                      )}
-
-	                      {wallet ? (
-	                        <div className="mt-0.5 flex items-start gap-2">
-	                          <span className="min-w-0 flex-1 text-left font-mono text-[14px] md:text-[15px] text-white/70">
-	                            {shortAddress(wallet, 8, 6)}
+	                    {/* ── Centered wallet pill (style "Choisissez le compte") ── */}
+	                    <div className="flex justify-center pt-1 pb-1 relative z-[70]">
+	                      <div className="relative">
+	                        {/* Visible pill */}
+	                        <div className={`inline-flex items-center gap-6 bg-elevated px-6 py-1.5 rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)] ${hasMultipleWallets ? 'cursor-pointer' : ''}`}>
+	                          <span className="text-white/70 text-[14px] md:text-[15px] font-medium tracking-wide">
+	                            {t('ui_receive_account_info_label', 'Choisissez le compte')}
 	                          </span>
-	                          <button
-	                            type="button"
-	                            onClick={async e => {
-	                              e.stopPropagation();
-	                              await handleCopyWalletAddress();
-	                            }}
-	                            className="shrink-0 rounded-md px-2 py-1 text-[11px] md:text-xs font-semibold ring-1 ring-white/10 bg-elevated text-white/70 hover:text-white hover:ring-white/20 transition-colors"
-	                            aria-label={t('ui_copy_address', "Copier l'adresse")}
-	                          >
-	                            {t('ui_copy', 'Copier')}
-	                          </button>
+	                          <span className="h-3 w-3 rounded-full bg-xcannes-green ring-4 ring-xcannes-green/20 shrink-0" aria-hidden />
+	                          <span className="text-white/95 text-[14px] md:text-[15px] font-semibold">
+	                            {activeWalletLabel || t('nav_wallet', 'Wallet')}
+	                          </span>
+	                          {hasMultipleWallets && (
+	                            <svg className="w-3 h-3 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+	                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+	                            </svg>
+	                          )}
 	                        </div>
-	                      ) : null}
+	                        {/* Invisible ModalSelect overlay for wallet switching */}
+	                        {hasMultipleWallets && (
+	                          <div className="absolute inset-0 z-10">
+	                            <ModalSelect
+	                              value={wallet}
+	                              onChange={next => {
+	                                const addr = trimmed(next);
+	                                if (!addr || addr === wallet) return;
+	                                onSwitchWallet?.(addr);
+	                              }}
+	                              options={shareWalletOptions}
+	                              useNativeSelect={false}
+	                              portal
+	                              portalTarget={overlayListRef.current}
+	                              hideSelected
+	                              backdropClassName="bg-black/80 backdrop-blur-[4px]"
+	                              iconClassName="inline-flex items-center justify-center leading-none"
+	                              buttonClassName="w-full h-full opacity-0 cursor-pointer rounded-full"
+	                              menuClassName={
+	                                noticeVariant === 'demo'
+	                                  ? 'bg-xcannes-surface-demo !max-h-64 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
+	                                  : 'bg-[#101415] !max-h-64 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
+	                              }
+	                              selectClassName="xcannes-select w-full bg-transparent rounded-xl pl-0 pr-2 py-2 text-base text-white focus:outline-none transition-colors duration-150"
+	                            />
+	                          </div>
+	                        )}
+	                      </div>
 	                    </div>
 
 		                      {/* Currency */}
