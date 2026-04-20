@@ -33,6 +33,7 @@ export default function WalletDashboardSendChoiceModal({
   const [showSteps, setShowSteps] = useState(false);
   const [showPayreqSteps, setShowPayreqSteps] = useState(true);
   const [payreqPasteValue, setPayreqPasteValue] = useState('');
+  const [payreqSelfSendError, setPayreqSelfSendError] = useState(false);
   const [quickscanPasteValue, setQuickscanPasteValue] = useState('');
   const [showQuickscanSavedPicker, setShowQuickscanSavedPicker] = useState(false);
   const normalizedCurrentWallet = String(currentWalletAddress || '').trim();
@@ -49,10 +50,36 @@ export default function WalletDashboardSendChoiceModal({
       setShowSteps(false);
       setShowPayreqSteps(false);
       setPayreqPasteValue('');
+      setPayreqSelfSendError(false);
       setQuickscanPasteValue('');
       setShowQuickscanSavedPicker(false);
     }
   }, [open]);
+
+  // ── Extract destination from raw payreq data ─────────────────
+  const extractPayreqDestination = useCallback((raw) => {
+    const str = String(raw || '').trim();
+    // Try prefixed format: xcannes-payreq://BASE64
+    const prefixMatch = str.match(/^(xcannes-payreq|xcannes-request)(?:\/\/|:)([\s\S]+)$/i);
+    let payload = str;
+    if (prefixMatch) {
+      try {
+        const b64 = String(prefixMatch[2] || '').replace(/\s+/g, '').trim();
+        const padded = b64.replace(/-/g, '+').replace(/_/g, '/') + '==='.slice((b64.length + 3) % 4);
+        payload = Buffer.from(padded, 'base64').toString('utf8');
+      } catch { /* fallthrough */ }
+    }
+    try {
+      const obj = JSON.parse(payload);
+      return String(obj?.to || obj?.t || '').trim();
+    } catch { return ''; }
+  }, []);
+
+  const isPayreqSelfSend = useCallback((raw) => {
+    if (!normalizedCurrentWallet) return false;
+    const dest = extractPayreqDestination(raw);
+    return Boolean(dest && dest === normalizedCurrentWallet);
+  }, [normalizedCurrentWallet, extractPayreqDestination]);
 
   // ── QR file decode (shared) ──────────────────────────────────
   const handleManualQrFile = useCallback(async (file, { isPayreq = false } = {}) => {
@@ -73,13 +100,15 @@ export default function WalletDashboardSendChoiceModal({
       try { await instance.clear(); } catch { /* ignore */ }
       if (decodedText) {
         if (isPayreq) {
+          if (isPayreqSelfSend(decodedText)) { setPayreqSelfSendError(true); return; }
           handlePaymentRequestScan?.(decodedText);
           onChoosePayRequest?.();
         } else {
           // Check if it looks like a payment request or just an address
-          const looksLikePayreq = /^(xcannes-payreq|xcannes-request)(?::\/\/|:)/i.test(decodedText) ||
+          const looksLikePayreq = /^(xcannes-payreq|xcannes-request)(?:://|:)/i.test(decodedText) ||
             (decodedText.startsWith('{') && /"to"|"targetCurrency"|"schema"|"payreq"/i.test(decodedText));
           if (looksLikePayreq) {
+            if (isPayreqSelfSend(decodedText)) { setPayreqSelfSendError(true); return; }
             handlePaymentRequestScan?.(decodedText);
             onChoosePayRequest?.();
           } else {
@@ -92,7 +121,7 @@ export default function WalletDashboardSendChoiceModal({
     } catch {
       toast?.error(t('ui_qr_decode_failed_3b5d7f9a2c', 'Unable to decode this image. Try a clearer screenshot.'));
     }
-  }, [handlePaymentRequestScan, setSendDestination, setSendDestinationLabel, onChooseSimpleSend, onChoosePayRequest, toast, t]);
+  }, [handlePaymentRequestScan, setSendDestination, setSendDestinationLabel, onChooseSimpleSend, onChoosePayRequest, isPayreqSelfSend, toast, t]);
 
   const handleFileUpload = useCallback((inputId, isPayreq) => {
     const input = document.getElementById(inputId);
@@ -125,9 +154,11 @@ export default function WalletDashboardSendChoiceModal({
   const handlePayreqPasteSubmit = useCallback(() => {
     const raw = payreqPasteValue.trim();
     if (!raw) return;
+    if (isPayreqSelfSend(raw)) { setPayreqSelfSendError(true); return; }
+    setPayreqSelfSendError(false);
     handlePaymentRequestScan?.(raw);
     onChoosePayRequest?.();
-  }, [payreqPasteValue, handlePaymentRequestScan, onChoosePayRequest]);
+  }, [payreqPasteValue, handlePaymentRequestScan, onChoosePayRequest, isPayreqSelfSend]);
 
   // ── Icons ────────────────────────────────────────────────────
   const QuickScanIcon = () => (
@@ -807,9 +838,17 @@ export default function WalletDashboardSendChoiceModal({
 
                   {/* Paste input */}
                   <div className="relative">
-                    <input type="text" value={payreqPasteValue} onChange={(e) => setPayreqPasteValue(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') handlePayreqPasteSubmit(); }} onPaste={(e) => { const text = (e.clipboardData?.getData('text') || '').trim(); if (text) { e.preventDefault(); setPayreqPasteValue(text); setTimeout(() => { handlePaymentRequestScan?.(text); onChoosePayRequest?.(); }, 50); } }} placeholder={t('ui_paste_payreq_placeholder', 'Coller une demande de paiement')} className="w-full bg-elevated ring-1 ring-white/15 ring-inset rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.4)] pl-4 pr-12 py-3 text-[15.5px] text-white placeholder:text-white/80 outline-none focus:ring-2 focus:ring-[#f5a623]/50" />
+                    <input type="text" value={payreqPasteValue} onChange={(e) => { setPayreqPasteValue(e.target.value); setPayreqSelfSendError(false); }} onKeyDown={(e) => { if (e.key === 'Enter') handlePayreqPasteSubmit(); }} onPaste={(e) => { const text = (e.clipboardData?.getData('text') || '').trim(); if (text) { e.preventDefault(); setPayreqPasteValue(text); if (isPayreqSelfSend(text)) { setPayreqSelfSendError(true); return; } setPayreqSelfSendError(false); setTimeout(() => { handlePaymentRequestScan?.(text); onChoosePayRequest?.(); }, 50); } }} placeholder={t('ui_paste_payreq_placeholder', 'Coller une demande de paiement')} className="w-full bg-elevated ring-1 ring-white/15 ring-inset rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.4)] pl-4 pr-12 py-3 text-[15.5px] text-white placeholder:text-white/80 outline-none focus:ring-2 focus:ring-[#f5a623]/50" />
                     {payreqPasteValue.trim() ? (<button type="button" onClick={handlePayreqPasteSubmit} className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg bg-[#f5a623]/20 hover:bg-[#f5a623]/30 text-[#f5a623] transition-colors" title={t('ui_go_label', 'Valider')}><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg></button>) : null}
                   </div>
+
+                  {/* Self-send error */}
+                  {payreqSelfSendError && (
+                    <div className="rounded-lg ring-1 ring-orange-400/30 ring-inset bg-orange-400/10 px-3 py-2.5 text-xs text-orange-200/90 mt-3">
+                      <div className="font-semibold">{t('ui_invalid_recipient_title', 'Destinataire invalide')}</div>
+                      <div className="mt-0.5 text-orange-200/70">{t('ui_cannot_send_to_self', 'Vous ne pouvez pas envoyer à votre propre compte.')}</div>
+                    </div>
+                  )}
 
                   {/* Footer note */}
                   <p className="text-center text-[12px] text-white/40 leading-relaxed mt-5">
