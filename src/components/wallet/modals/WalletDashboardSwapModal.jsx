@@ -881,7 +881,7 @@ export default function WalletDashboardSwapModal({
                     ) : null}
                   </div>
 
-                <div className="pt-1 md:pt-5 mt-1 md:mt-3">
+                <div className="pt-1 md:pt-3 mt-0 md:mt-1">
                   {!isConnected && !isPreviewMode ? (
                     <button
                       type="button"
