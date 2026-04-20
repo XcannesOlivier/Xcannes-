@@ -25,6 +25,7 @@ export default function ModalSelect({
   portalTarget = null,
   onOpenChange = null,
   menuFooter = null,
+  openButtonClassName = "",
 }) {
   const [open, setOpen] = useState(false);
   const [visible, setVisible] = useState(false);
@@ -216,7 +217,7 @@ export default function ModalSelect({
             backdropClassName
               ? (open ? "relative z-[70]" : "relative")
               : ""
-          } ${open ? "!rounded-b-none !ring-0 !shadow-none border border-white/10 border-b-0" : ""} ${buttonClassName}`}
+          } ${open ? "!rounded-b-none !ring-0 !shadow-none border border-white/10 border-b-0" : ""} ${open ? openButtonClassName : ""} ${buttonClassName}`}
         >
           <span className={`flex gap-2 min-w-0 flex-1 ${selected?.description && open ? 'items-start' : 'items-center'}`}>
             {selected?.description && open ? (
@@ -330,7 +331,7 @@ export default function ModalSelect({
               );
             })}
             {menuFooter ? (
-              <div className="border-t border-white/10 px-2 py-2">
+              <div className="border-t border-white/8 px-2 py-1">
                 {menuFooter}
               </div>
             ) : null}
@@ -400,7 +401,7 @@ export default function ModalSelect({
               );
             })}
             {menuFooter ? (
-              <div className="border-t border-white/10 px-2 py-2">
+              <div className="border-t border-white/8 px-2 py-1">
                 {menuFooter}
               </div>
             ) : null}

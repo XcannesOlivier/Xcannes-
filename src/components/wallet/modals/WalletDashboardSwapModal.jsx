@@ -680,9 +680,9 @@ export default function WalletDashboardSwapModal({
 		                  {/* ── Rate line + swap button + Amount input ── */}
 		                  <div className={`relative z-[65] transition-all duration-200 ${baseDropdownOpen ? 'opacity-0 max-h-0 overflow-hidden !my-0' : 'opacity-100'}`}>
 		                    {/* Rate line */}
-		                    <div className="flex items-center gap-3 px-2 pb-3 text-white/55">
+                        <div className="flex items-center gap-3 px-2 pb-2 text-white/45">
 		                      <span className="h-px flex-1 bg-gradient-to-r from-transparent to-white/20" />
-		                      <span className="text-[12px] md:text-[13px] tracking-[0.01em] whitespace-nowrap">
+                          <span className="relative -top-px text-[11px] md:text-[12px] tracking-[0.02em] whitespace-nowrap leading-none">
 		                        {Number.isFinite(inlineUnitRate)
 		                          ? `1 ${getDisplayCurrencyCode(baseCode || "USD")} = ${Number(
 		                              inlineUnitRate,
@@ -695,7 +695,7 @@ export default function WalletDashboardSwapModal({
 		                      <span className="h-px flex-1 bg-gradient-to-l from-transparent to-white/20" />
 		                    </div>
 		                    {/* Swap button centered above the amount block */}
-		                    <div className="relative flex justify-center -mb-4 z-10">
+                        <div className="relative flex justify-center -mt-0.5 -mb-4 z-10">
 		                      <button
 		                        type="button"
 		                        onClick={() => {
@@ -759,6 +759,8 @@ export default function WalletDashboardSwapModal({
 		                      iconClassName="text-3xl leading-none"
 		                      backdropClassName="bg-black/80 backdrop-blur-[4px]"
 		                      buttonClassName="bg-[#101415] ring-1 ring-white/10 ring-inset rounded-[14px] px-3.5 py-1.5 text-xl text-white outline-none focus:outline-none cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
+                          openButtonClassName="!bg-[#151c22] ring-1 ring-white/20 shadow-[0_8px_18px_rgba(0,0,0,0.45)]"
+                          optionClassName="py-2.5 md:py-3"
 		                      menuClassName={
 		                        noticeVariant === "demo"
                               ? "bg-xcannes-surface-demo border-white/15 ring-1 ring-white/10 ring-inset max-h-[220px]"
@@ -775,7 +777,7 @@ export default function WalletDashboardSwapModal({
                                 "ui_choose_new_currency_plus_account",
                                 "+ Ajouter une devise au compte",
                               )}
-                              buttonClassName="w-full inline-flex items-center justify-center text-[14px] md:text-[15px] leading-tight text-white/85 font-medium ring-1 ring-white/15 ring-inset rounded-[10px] px-3 py-2 hover:text-white hover:ring-white/25 transition-colors"
+                              buttonClassName="w-full inline-flex items-center justify-center text-[12.5px] md:text-[13px] leading-tight text-white/50 font-normal rounded-[8px] px-3 py-1.5 hover:text-white/75 transition-colors"
                               fullscreenPortalTarget={inline ? modalPanelRef.current : null}
                               placeholder={t(
                                 "ui_search_all_currencies_c5d6e7f8",
@@ -830,11 +832,11 @@ export default function WalletDashboardSwapModal({
                               : "1 USD = 0.84 EUR"}
                         </span>
                       </div>
-                      <div className="px-3 mt-4">
+                      <div className="px-3 mt-5 mb-2">
                         <div className="h-[1.5px] bg-white/45 rounded-full" />
                       </div>
                       {/* Row: Total reçu */}
-                      <div className="flex items-center justify-between px-4 pt-[3px] pb-2">
+                      <div className="flex items-center justify-between px-4 pt-2 pb-2">
                         <span className="text-lg md:text-xl text-white">{t("ui_total_received_label", "Total reçu")}</span>
                         <span className="text-2xl md:text-3xl text-white font-bold">
                           {quoteCode
