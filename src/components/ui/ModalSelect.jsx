@@ -23,6 +23,7 @@ export default function ModalSelect({
   hideSelected = false,
   portal = false,
   portalTarget = null,
+  onOpenChange = null,
 }) {
   const [open, setOpen] = useState(false);
   const [visible, setVisible] = useState(false);
@@ -33,8 +34,9 @@ export default function ModalSelect({
   const openMenu = useCallback(() => {
     isClosingRef.current = false;
     setOpen(true);
+    onOpenChange?.(true);
     requestAnimationFrame(() => requestAnimationFrame(() => setVisible(true)));
-  }, []);
+  }, [onOpenChange]);
 
   const closeMenu = useCallback(() => {
     if (isClosingRef.current) return;
@@ -42,9 +44,10 @@ export default function ModalSelect({
     setVisible(false);
     setTimeout(() => {
       setOpen(false);
+      onOpenChange?.(false);
       isClosingRef.current = false;
     }, 130);
-  }, []);
+  }, [onOpenChange]);
 
   const toggleMenu = useCallback(() => {
     if (open && !isClosingRef.current) closeMenu();

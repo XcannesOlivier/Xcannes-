@@ -305,6 +305,7 @@ export default function WalletDashboardSwapModal({
 
   const [overlayDragging, setOverlayDragging] = useState(false);
   const [overlayTranslateY, setOverlayTranslateY] = useState(0);
+  const [baseDropdownOpen, setBaseDropdownOpen] = useState(false);
   const overlayRef = useRef(null);
   const overlayListRef = useRef(null);
   const overlayDragMetaRef = useRef({
@@ -609,7 +610,7 @@ export default function WalletDashboardSwapModal({
                   </p>
                 </div>
                 {/* ── SECTION 1: Currency selection ───────────────────────── */}
-                <div className={`transition-all duration-300 ${Number.isFinite(amountValue) && amountValue > 0 ? 'space-y-1' : 'space-y-3'}`}>
+                <div className="space-y-3">
                   <div className="relative z-[65]">
                     <div className="flex items-center justify-between mb-2 relative z-[41]">
                       <div className="text-[13px] tracking-[0.22em] text-white/45">
@@ -622,6 +623,7 @@ export default function WalletDashboardSwapModal({
 		                    <ModalSelect
 		                      value={convertBaseCurrency}
 		                      onChange={setConvertBaseCurrency}
+		                      onOpenChange={setBaseDropdownOpen}
                       options={(swapCurrencyOptionsSanitized || []).map((code) => {
                         const labelLeft = selectLabelByCurrency?.[code] || code;
                         const labelRight = selectLabelRightByCurrency?.[code] || null;
@@ -651,7 +653,7 @@ export default function WalletDashboardSwapModal({
 		                  </div>
 
 		                  {/* ── Amount input (between selectors) ── */}
-		                  <div className="relative z-[65]">
+		                  <div className={`relative z-[65] transition-all duration-200 ${baseDropdownOpen ? 'opacity-0 max-h-0 overflow-hidden !my-0' : 'opacity-100 max-h-[200px]'}`}>
 		                    <div className="absolute top-2 left-4 text-[11px] tracking-[0.18em] uppercase text-white/40 z-10">
 		                      {t("ui_amount_52a20b2992", "Montant")}
 		                    </div>
