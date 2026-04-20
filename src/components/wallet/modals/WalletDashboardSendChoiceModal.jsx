@@ -551,7 +551,7 @@ export default function WalletDashboardSendChoiceModal({
                 <div className="px-5 pt-3 pb-5 flex flex-col flex-1 min-h-0">
                 {/* Title + subtitle (centered) */}
                 <div className="flex flex-col items-center text-center mb-6">
-                  <h3 className="mt-1 text-[22px] md:text-[24px] font-semibold text-white/95 tracking-tight">
+                  <h3 className="mt-1 text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight">
                     {t('ui_send_simple_title', 'Envoi simple')}
                   </h3>
                   <p className="mt-2 text-[14px] md:text-[15px] text-white/60 max-w-[34ch] leading-relaxed">
