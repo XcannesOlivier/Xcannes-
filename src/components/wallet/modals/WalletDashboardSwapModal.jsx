@@ -615,8 +615,8 @@ export default function WalletDashboardSwapModal({
                       <div className="text-[13px] tracking-[0.22em] text-white/45">
                         {t("ui_convert_from_label", "Vous envoyez")}
                       </div>
-                      <div className="text-[11px] tracking-[0.15em] text-white/35 uppercase pr-1">
-                        {t("ui_balance_label_soldes", "Soldes")}
+                      <div className="text-[11px] tracking-[0.15em] text-white/25 pr-3">
+                        {t("ui_balance_label_solde", "Solde")}
                       </div>
                     </div>
 		                    <ModalSelect
@@ -674,8 +674,8 @@ export default function WalletDashboardSwapModal({
                       <div className="text-[13px] tracking-[0.22em] text-white/45">
                         {t("ui_convert_to_label", "Vous recevez")}
                       </div>
-                      <div className="text-[11px] tracking-[0.15em] text-white/35 uppercase pr-1">
-                        {t("ui_balance_label_soldes", "Soldes")}
+                      <div className="text-[11px] tracking-[0.15em] text-white/25 pr-3">
+                        {t("ui_balance_label_solde", "Solde")}
                       </div>
                     </div>
 		                    <ModalSelect
