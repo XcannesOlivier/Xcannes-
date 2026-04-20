@@ -628,8 +628,8 @@ export default function WalletDashboardSwapModal({
               </div>
             <div className="wallet-tab-unfold-in">
               <div className="flex flex-col gap-4">
-                {/* ── Title / subtitle – hidden when summary is expanded ── */}
-                <div className={`text-center overflow-hidden transition-all duration-300 ease-in-out ${Number.isFinite(amountValue) && amountValue > 0 ? 'max-h-0 opacity-0 mt-0 mb-0' : 'max-h-[120px] opacity-100'}`}>
+                {/* ── Title / subtitle ── */}
+                <div className="text-center">
                   <h3 className="text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight">
                     {t("ui_convert_title_main", "Convertissez vos devises")}
                   </h3>
@@ -643,9 +643,6 @@ export default function WalletDashboardSwapModal({
                     <div className="flex items-center justify-between mb-2 relative z-[41]">
                       <div className="text-[13px] tracking-[0.22em] text-white/45">
                         {t("ui_convert_from_label", "Vous envoyez")}
-                      </div>
-                      <div className="text-[11px] tracking-[0.15em] text-white/25 pr-3">
-                        {t("ui_balance_label_solde", "Solde")}
                       </div>
                     </div>
 		                    <ModalSelect
@@ -706,7 +703,7 @@ export default function WalletDashboardSwapModal({
 		                          setConvertBaseCurrency(convertQuoteCurrency);
 		                          setConvertQuoteCurrency(prev);
 		                        }}
-		                        className="w-9 h-9 rounded-full bg-[#2979ff] hover:bg-[#448aff] active:scale-95 transition-all duration-150 flex items-center justify-center shadow-[0_4px_14px_rgba(41,121,255,0.55)]"
+                            className="w-9 h-9 rounded-full bg-gradient-to-b from-[#229a56] to-[#0e673a] hover:brightness-105 active:scale-95 transition-all duration-150 flex items-center justify-center shadow-[0_8px_18px_rgba(14,103,58,0.5),inset_0_1px_0_rgba(255,255,255,0.14),inset_0_-8px_14px_rgba(0,0,0,0.22)]"
 		                        aria-label="Inverser les devises"
 		                      >
 		                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -734,9 +731,6 @@ export default function WalletDashboardSwapModal({
                     <div className="flex items-center justify-between mb-2 relative z-[41]">
                       <div className="text-[13px] tracking-[0.22em] text-white/45">
                         {t("ui_convert_to_label", "Vous recevez")}
-                      </div>
-                      <div className="text-[11px] tracking-[0.15em] text-white/25 pr-3">
-                        {t("ui_balance_label_solde", "Solde")}
                       </div>
                     </div>
 		                    <ModalSelect
@@ -818,37 +812,39 @@ export default function WalletDashboardSwapModal({
                       </div>
                     ) : null}
                     {/* ── SECTION 3: Summary ─────────────────────────────── */}
-                    {(Number.isFinite(amountValue) && amountValue > 0) && (
-                    <div className="rounded-[16px] overflow-hidden bg-[#0f1318] ring-1 ring-white/10 ring-inset divide-y divide-white/8">
+                    <div className="rounded-[16px] overflow-hidden bg-[#0f1318] ring-1 ring-white/10 ring-inset">
                       {/* Row: Frais */}
-                      {previewMeta?.spreadFeeRlusd > 0 && (
-                        <div className="flex items-center justify-between px-4 py-3">
-                          <span className="text-sm text-white/55">{t("statement_conversion_fee_label", "Frais")}</span>
-                          <span className="text-sm text-white/80 font-medium">
-                            {formatAmountWithSymbol(locale, previewMeta.spreadFeeRlusd, "USD", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                          </span>
-                        </div>
-                      )}
+                      <div className="flex items-center justify-between px-4 py-3">
+                        <span className="text-sm text-white/55">{t("statement_conversion_fee_label", "Frais")}</span>
+                        <span className="text-sm text-white/80 font-medium">
+                          {formatAmountWithSymbol(locale, Number(previewMeta?.spreadFeeRlusd || 0), "USD", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </span>
+                      </div>
                       {/* Row: Taux de change */}
-                      {Number.isFinite(Number(previewMeta?.unitRate)) && previewMeta?.unitRate > 0 && baseCode && quoteCode && (
-                        <div className="flex items-center justify-between px-4 py-3">
-                          <span className="text-sm text-white/55">{t("ui_exchange_rate_label", "Taux de change")}</span>
-                          <span className="text-sm text-white/80 font-medium">
-                            {`1 ${getDisplayCurrencyCode(baseCode)} = ${Number(previewMeta.unitRate).toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 4 })} ${getDisplayCurrencyCode(quoteCode)}`}
-                          </span>
-                        </div>
-                      )}
+                      <div className="flex items-center justify-between px-4 py-3">
+                        <span className="text-sm text-white/55">{t("ui_exchange_rate_label", "Taux de change")}</span>
+                        <span className="text-sm text-white/80 font-medium">
+                          {Number.isFinite(Number(previewMeta?.unitRate)) && previewMeta?.unitRate > 0 && baseCode && quoteCode
+                            ? `1 ${getDisplayCurrencyCode(baseCode)} = ${Number(previewMeta.unitRate).toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 4 })} ${getDisplayCurrencyCode(quoteCode)}`
+                            : Number.isFinite(inlineUnitRate) && baseCode && quoteCode
+                              ? `1 ${getDisplayCurrencyCode(baseCode)} = ${Number(inlineUnitRate).toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 4 })} ${getDisplayCurrencyCode(quoteCode)}`
+                              : "1 USD = 0.84 EUR"}
+                        </span>
+                      </div>
                       {/* Row: Total reçu */}
-                      {Number.isFinite(previewAmount) && previewAmount > 0 && quoteCode && (
-                        <div className="flex items-center justify-between px-4 py-3">
-                          <span className="text-sm text-white/55">{t("ui_total_received_label", "Total reçu")}</span>
-                          <span className="text-sm text-white font-semibold">
-                            {formatAmountWithSymbolLocal(previewAmount, quoteCode, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                          </span>
-                        </div>
-                      )}
+                      <div className="flex items-center justify-between px-4 py-3 border-t border-white/10">
+                        <span className="text-sm text-white/55">{t("ui_total_received_label", "Total reçu")}</span>
+                        <span className="text-sm text-white font-semibold">
+                          {quoteCode
+                            ? formatAmountWithSymbolLocal(
+                                Number.isFinite(previewAmount) && previewAmount > 0 ? previewAmount : 0,
+                                quoteCode,
+                                { minimumFractionDigits: 2, maximumFractionDigits: 2 },
+                              )
+                            : "—"}
+                        </span>
+                      </div>
                     </div>
-                    )}
 
                     {previewState.status === "error" ? (
                       <div className="rounded-lg ring-1 ring-red-500/30 ring-inset bg-red-500/10 px-3 py-2 text-xs text-red-200">
@@ -884,8 +880,8 @@ export default function WalletDashboardSwapModal({
                           : "hover:scale-[1.01] active:scale-[0.98]",
                       ].join(" ")}
                       style={convertButtonDisabled
-                        ? { background: 'linear-gradient(180deg, #1a4fa0 0%, #123870 100%)' }
-                        : { background: 'linear-gradient(180deg, #2979ff 0%, #1a56c4 100%)', boxShadow: '0 8px 24px rgba(41,121,255,0.38), inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -10px 18px rgba(0,0,0,0.22)' }
+                        ? { background: 'linear-gradient(180deg, rgba(34,154,86,0.45) 0%, rgba(14,103,58,0.45) 100%)' }
+                        : { background: 'linear-gradient(180deg, rgba(34,154,86,1) 0%, rgba(14,103,58,1) 100%)', boxShadow: '0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)' }
                       }
                     >
                       {convertProcessing
