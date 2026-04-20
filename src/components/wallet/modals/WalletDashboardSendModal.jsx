@@ -1287,8 +1287,8 @@ export default function WalletDashboardSendModal({
                     selectedSendToken.currency
                   : "USD"
               }
-              tokenClassName="text-white drop-shadow-sm text-3xl md:text-4xl font-bold"
-	              containerClassName="py-6 md:py-7 rounded-[20px] bg-black/30 ring-2 ring-white/20 ring-inset transition-colors duration-150 shadow-[0_6px_20px_rgba(0,0,0,0.5)]"
+              tokenClassName="text-white drop-shadow-sm text-4xl md:text-5xl font-bold"
+	              containerClassName="py-8 md:py-9 rounded-[20px] bg-black/30 ring-2 ring-white/20 ring-inset transition-colors duration-150 shadow-[0_6px_20px_rgba(0,0,0,0.5)] [&_input]:!text-4xl [&_input]:md:!text-5xl"
 	            />
             {manualInsufficientBalance ? (
               <div className="mt-2 rounded-lg ring-1 ring-orange-400/30 ring-inset bg-orange-400/10 px-3 py-2 text-xs text-orange-200/90">
@@ -1315,6 +1315,7 @@ export default function WalletDashboardSendModal({
   );
 
   /* ── Dynamic summary – visible as soon as a destination address is set ── */
+  const summaryExpanded = Boolean(selectedSendToken && summaryAmount > 0);
   const inlineSummary = hasDestination ? (
     <div className="space-y-3 transition-all duration-200">
       <div className="text-[13px] text-white/45">
@@ -1327,7 +1328,11 @@ export default function WalletDashboardSendModal({
 	        <div className="text-xs tracking-wide text-white/60 font-semibold">
 	          {t("ui_send_confirmation_title", "Résumé de l'envoi")}
 		        </div>
-	        <div className="space-y-3 text-sm text-white/80">
+	        <div
+	          className="overflow-hidden transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]"
+	          style={{ maxHeight: summaryExpanded ? '400px' : '0px', opacity: summaryExpanded ? 1 : 0 }}
+	        >
+	        <div className="space-y-3 text-sm text-white/80 pt-1">
 	          <div className="grid grid-cols-[auto,1fr] gap-x-3 gap-y-1 items-start">
 	            <div className="text-white/60 shrink-0">
 	              {t("ui_beneficiary_label", "Destinataire")}
@@ -1377,6 +1382,7 @@ export default function WalletDashboardSendModal({
               {confirmAmountLabel || '0'}
             </span>
           </div>
+        </div>
         </div>
       </div>
     </div>
