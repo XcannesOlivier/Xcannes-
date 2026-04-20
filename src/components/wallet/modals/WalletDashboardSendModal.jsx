@@ -1443,7 +1443,7 @@ export default function WalletDashboardSendModal({
           <span className="text-[17px] text-white/90">{requestCurrencyCode || confirmCurrencyCode || "—"}</span>
         </div>
         <div className="flex items-baseline justify-between gap-4">
-          <span className="text-[15px] text-white/50">{t("ui_amount_52cea2dd3d", "Montant")}</span>
+          <span className="text-[17px] text-white/80">{t("ui_amount_52cea2dd3d", "Montant")}</span>
           <span className="text-2xl font-semibold text-white/95">{requestAmountLabel || "—"}</span>
         </div>
       </div>
