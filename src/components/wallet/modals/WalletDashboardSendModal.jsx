@@ -1410,11 +1410,11 @@ export default function WalletDashboardSendModal({
   const payreqFinalStep = hasPaymentRequest ? (
     <div className="space-y-6">
       {/* Title + subtitle */}
-      <div className="text-center space-y-1 pt-1">
-        <h3 className="text-[17px] font-semibold text-white/95">
+      <div className="text-center space-y-2 pt-1">
+        <h3 className="text-[26px] md:text-[28px] font-semibold text-white/95 tracking-tight">
           {t("ui_payreq_summary_title", "Résumé de la demande de paiement")}
         </h3>
-        <p className="text-[13px] text-white/45">
+        <p className="text-[14px] md:text-[15px] text-white/60 max-w-[34ch] mx-auto leading-relaxed">
           {t("ui_payreq_summary_subtitle", "Vérifiez les informations avant d\u2019envoyer")}
         </p>
       </div>
