@@ -611,8 +611,13 @@ export default function WalletDashboardSwapModal({
                 {/* ── SECTION 1: Currency selection ───────────────────────── */}
                 <div className={`transition-all duration-300 ${Number.isFinite(amountValue) && amountValue > 0 ? 'space-y-1' : 'space-y-3'}`}>
                   <div className="relative z-[65]">
-                    <div className="text-[13px] tracking-[0.22em] text-white/45 mb-2 relative z-[41]">
-                      {t("ui_convert_from_label", "Vous envoyez")}
+                    <div className="flex items-center justify-between mb-2 relative z-[41]">
+                      <div className="text-[13px] tracking-[0.22em] text-white/45">
+                        {t("ui_convert_from_label", "Vous envoyez")}
+                      </div>
+                      <div className="text-[11px] tracking-[0.15em] text-white/35 uppercase pr-1">
+                        {t("ui_balance_label_soldes", "Soldes")}
+                      </div>
                     </div>
 		                    <ModalSelect
 		                      value={convertBaseCurrency}
@@ -646,8 +651,8 @@ export default function WalletDashboardSwapModal({
 		                  </div>
 
 		                  {/* ── Amount input (between selectors) ── */}
-		                  <div className="space-y-2">
-		                    <div className="text-[13px] tracking-[0.22em] text-white/45">
+		                  <div className="relative z-[65]">
+		                    <div className="absolute top-2 left-4 text-[11px] tracking-[0.18em] uppercase text-white/40 z-10">
 		                      {t("ui_amount_52a20b2992", "Montant")}
 		                    </div>
 		                    <TokenAmountInput
@@ -660,13 +665,18 @@ export default function WalletDashboardSwapModal({
 		                        "USD"
 		                      }
 		                      tokenClassName="text-white drop-shadow-sm text-4xl md:text-5xl font-bold"
-		                      containerClassName="py-8 md:py-9 rounded-[20px] bg-black/30 ring-2 ring-white/20 ring-inset transition-colors duration-150 shadow-[0_6px_20px_rgba(0,0,0,0.5)] [&_input]:!text-4xl [&_input]:md:!text-5xl"
+		                      containerClassName="pt-10 pb-6 md:pt-11 md:pb-7 rounded-[20px] bg-black/30 ring-2 ring-white/20 ring-inset transition-colors duration-150 shadow-[0_6px_20px_rgba(0,0,0,0.5)] [&_input]:!text-4xl [&_input]:md:!text-5xl"
 		                    />
 		                  </div>
 
                   <div className="relative">
-                    <div className="text-[13px] tracking-[0.22em] text-white/45 mb-2 relative z-[41]">
-                      {t("ui_convert_to_label", "Vous recevez")}
+                    <div className="flex items-center justify-between mb-2 relative z-[41]">
+                      <div className="text-[13px] tracking-[0.22em] text-white/45">
+                        {t("ui_convert_to_label", "Vous recevez")}
+                      </div>
+                      <div className="text-[11px] tracking-[0.15em] text-white/35 uppercase pr-1">
+                        {t("ui_balance_label_soldes", "Soldes")}
+                      </div>
                     </div>
 		                    <ModalSelect
 		                      value={convertQuoteCurrency}
