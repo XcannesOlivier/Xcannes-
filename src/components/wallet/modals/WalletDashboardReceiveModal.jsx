@@ -1565,8 +1565,8 @@ export default function WalletDashboardReceiveModal({
 				                          onChange={e => setRequestMemo(e.target.value.slice(0, 40))}
 				                          maxLength={40}
 				                          placeholder={t('ui_request_memo_placeholder', 'Objet de la demande')}
-				                          className={`w-full ring-1 ring-white/10 ring-inset rounded-[20px] px-3.5 py-2 text-base text-white placeholder:text-white/25 focus:outline-none transition-colors duration-150 ${
-				                            noticeVariant === 'demo' ? 'bg-xcannes-surface-demo' : 'bg-white/[0.02]'
+				                          className={`w-full ring-1 ring-white/10 ring-inset rounded-[12px] px-3.5 py-2 text-base text-white placeholder:text-white/25 focus:outline-none transition-colors duration-150 ${
+				                            noticeVariant === 'demo' ? 'bg-xcannes-surface-demo' : 'bg-[#101415]'
 				                          }`}
 				                        />
 				                      </div>
