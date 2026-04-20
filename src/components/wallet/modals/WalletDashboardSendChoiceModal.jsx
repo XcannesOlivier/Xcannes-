@@ -105,7 +105,7 @@ export default function WalletDashboardSendChoiceModal({
           onChoosePayRequest?.();
         } else {
           // Check if it looks like a payment request or just an address
-          const looksLikePayreq = /^(xcannes-payreq|xcannes-request)(?:://|:)/i.test(decodedText) ||
+          const looksLikePayreq = /^(xcannes-payreq|xcannes-request)(?::\/\/|:)/i.test(decodedText) ||
             (decodedText.startsWith('{') && /"to"|"targetCurrency"|"schema"|"payreq"/i.test(decodedText));
           if (looksLikePayreq) {
             if (isPayreqSelfSend(decodedText)) { setPayreqSelfSendError(true); return; }
