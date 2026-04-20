@@ -612,7 +612,7 @@ export default function WalletDashboardSwapModal({
                 <div className={`transition-all duration-300 ${Number.isFinite(amountValue) && amountValue > 0 ? 'space-y-1' : 'space-y-3'}`}>
                   <div className="relative z-[65]">
                     <div className="text-[13px] tracking-[0.22em] text-white/45 mb-2 relative z-[41]">
-                      {t("ui_from_label_short", "De")}
+                      {t("ui_convert_from_label", "Vous envoyez")}
                     </div>
 		                    <ModalSelect
 		                      value={convertBaseCurrency}
@@ -645,42 +645,28 @@ export default function WalletDashboardSwapModal({
 		                    />
 		                  </div>
 
-		                  <div className={`flex justify-center relative z-[41] transition-all duration-300 ${Number.isFinite(amountValue) && amountValue > 0 ? 'py-0' : 'py-1'}`}>
-		                    <button
-		                      type="button"
-		                      onClick={(e) => {
-	                        e.stopPropagation();
-	                        const prevBase = convertBaseCurrency;
-	                        const prevQuote = convertQuoteCurrency;
-                        if (!prevBase || !prevQuote) return;
-                        setConvertBaseCurrency(prevQuote);
-		                        setConvertQuoteCurrency(prevBase);
-		                      }}
-		                      className="p-2 md:p-4 flex items-center justify-center text-white/80 hover:text-white transition-colors duration-150"
-		                      aria-label={t("ui_swap_currencies", "Inverser")}
-		                      title={t("ui_swap_currencies", "Inverser")}
-		                    >
-		                      <svg
-		                        className="w-7 h-7"
-		                        viewBox="0 0 24 24"
-		                        fill="none"
-		                        stroke="currentColor"
-		                        strokeWidth="2"
-		                        strokeLinecap="round"
-		                        strokeLinejoin="round"
-		                        aria-hidden
-		                      >
-		                        <polyline points="17 1 21 5 17 9" />
-		                        <path d="M3 11V9a4 4 0 0 1 4-4h14" />
-		                        <polyline points="7 23 3 19 7 15" />
-		                        <path d="M21 13v2a4 4 0 0 1-4 4H3" />
-		                      </svg>
-		                    </button>
+		                  {/* ── Amount input (between selectors) ── */}
+		                  <div className="space-y-2">
+		                    <div className="text-[13px] tracking-[0.22em] text-white/45">
+		                      {t("ui_amount_52a20b2992", "Montant")}
+		                    </div>
+		                    <TokenAmountInput
+		                      value={convertAmount}
+		                      onChange={setConvertAmount}
+		                      placeholder="0.0000"
+		                      token={
+		                        selectLabelByCurrency?.[convertBaseCurrency] ||
+		                        convertBaseCurrency ||
+		                        "USD"
+		                      }
+		                      tokenClassName="text-white drop-shadow-sm text-4xl md:text-5xl font-bold"
+		                      containerClassName="py-8 md:py-9 rounded-[20px] bg-black/30 ring-2 ring-white/20 ring-inset transition-colors duration-150 shadow-[0_6px_20px_rgba(0,0,0,0.5)] [&_input]:!text-4xl [&_input]:md:!text-5xl"
+		                    />
 		                  </div>
 
                   <div className="relative">
                     <div className="text-[13px] tracking-[0.22em] text-white/45 mb-2 relative z-[41]">
-                      {t("ui_to_label_short", "Vers")}
+                      {t("ui_convert_to_label", "Vous recevez")}
                     </div>
 		                    <ModalSelect
 		                      value={convertQuoteCurrency}
@@ -739,25 +725,6 @@ export default function WalletDashboardSwapModal({
                       fullscreen={true}
                     />
                   </div>
-	                </div>
-
-                {/* ── SECTION 2: Amount input ─────────────────────────────── */}
-                <div className="space-y-2">
-                  <div className="text-[13px] tracking-[0.22em] text-white/45">
-                    {t("ui_amount_52a20b2992", "Montant")}
-                  </div>
-	                  <TokenAmountInput
-	                    value={convertAmount}
-	                    onChange={setConvertAmount}
-	                    placeholder="0.0000"
-                    token={
-                      selectLabelByCurrency?.[convertBaseCurrency] ||
-                      convertBaseCurrency ||
-                      "USD"
-	                    }
-	                    tokenClassName="text-white drop-shadow-sm text-4xl md:text-5xl font-bold"
-	                    containerClassName="py-8 md:py-9 rounded-[20px] bg-black/30 ring-2 ring-white/20 ring-inset transition-colors duration-150 shadow-[0_6px_20px_rgba(0,0,0,0.5)] [&_input]:!text-4xl [&_input]:md:!text-5xl"
-	                  />
 	                </div>
 
                   <div className="space-y-2">
