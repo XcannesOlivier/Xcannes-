@@ -656,7 +656,7 @@ export default function WalletDashboardSwapModal({
                         setConvertBaseCurrency(prevQuote);
 		                        setConvertQuoteCurrency(prevBase);
 		                      }}
-		                      className="p-4 flex items-center justify-center text-white/80 hover:text-white transition-colors duration-150"
+		                      className="p-2 md:p-4 flex items-center justify-center text-white/80 hover:text-white transition-colors duration-150"
 		                      aria-label={t("ui_swap_currencies", "Inverser")}
 		                      title={t("ui_swap_currencies", "Inverser")}
 		                    >
@@ -717,7 +717,7 @@ export default function WalletDashboardSwapModal({
 		                    />
 		                  </div>
 
-                  <div className="pt-1">
+                  <div className="pt-1 flex justify-end">
                     <WalletCurrencySelector
                       value=""
                       onChange={(code) => {
