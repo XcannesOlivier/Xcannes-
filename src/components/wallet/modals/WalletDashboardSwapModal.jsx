@@ -900,8 +900,6 @@ export default function WalletDashboardSwapModal({
                   )}
                 </div>
               </div>
-
-              </div>
             </div>
           </div>
           </div>
