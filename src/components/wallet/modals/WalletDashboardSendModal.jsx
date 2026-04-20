@@ -1195,7 +1195,7 @@ export default function WalletDashboardSendModal({
         {/* ── Devise + Montant (séparés) – masqués en mode payreq ── */}
         {!hasPaymentRequest && (
         <div className={`transition-opacity duration-300 space-y-4 ${hasDestination ? 'opacity-100' : 'opacity-30 pointer-events-none select-none'}`}>
-          <h3 className="text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight text-center">
+          <h3 className="text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight text-left md:text-center">
             {t("ui_send_devise_hint", "Indiquez la devise, le montant, vérifiez et envoyez.")}
           </h3>
           <div>
