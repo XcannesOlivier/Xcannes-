@@ -1622,30 +1622,41 @@ export default function WalletDashboardReceiveModal({
 					                            'shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]',
 					                          ].join(' ')}
 					                        >
-					                          <p className="text-[20px] tracking-normal font-orbitron font-bold text-white mb-3">
+					                          <p className="text-[15px] tracking-normal font-medium text-white/60 mb-4">
 					                            {t('ui_request_generated_card_title', 'Résumé de votre demande')}
 					                          </p>
 
-					                          <div className="text-white text-[36px] md:text-[42px] font-semibold tracking-tight leading-none">
-					                            {requestDisplayAmountLabel}
-					                          </div>
-
-					                          <div className="mt-3 text-[13px] text-white/55">
-					                            {requestDateParts.date && requestDateParts.time
-					                              ? `${requestDateParts.date} · ${requestDateParts.time}`
-					                              : requestDateLabel || '—'}
-					                          </div>
-
-					                          {generatedRequest?.memo ? (
-					                            <div className="mt-2 flex items-baseline gap-2">
-					                              <span className="shrink-0 text-[11px] tracking-[0.12em] text-white/40">
-					                                {t('ui_memo_label', 'Message')}
-					                              </span>
-					                              <span className="min-w-0 flex-1 text-[13px] text-white/70 break-words">
-					                                {generatedRequest.memo}
+					                          <div className="space-y-3">
+					                            <div className="flex items-baseline justify-between">
+					                              <span className="text-[15px] text-white/50 font-medium">{t('ui_amount_label_short', 'Montant')}</span>
+					                              <span className="text-white text-[36px] md:text-[42px] font-semibold tracking-tight leading-none">
+					                                {requestDisplayAmountLabel}
 					                              </span>
 					                            </div>
-					                          ) : null}
+
+					                            <div className="h-px bg-white/10" aria-hidden />
+
+					                            <div className="flex items-baseline justify-between">
+					                              <span className="text-[15px] text-white/50 font-medium">{t('ui_date_time_label', 'Date & Heure')}</span>
+					                              <span className="text-[15px] text-white/80 font-medium">
+					                                {requestDateParts.date && requestDateParts.time
+					                                  ? `${requestDateParts.date} · ${requestDateParts.time}`
+					                                  : requestDateLabel || '—'}
+					                              </span>
+					                            </div>
+
+					                            {generatedRequest?.memo ? (
+					                              <>
+					                                <div className="h-px bg-white/10" aria-hidden />
+					                                <div className="flex items-baseline justify-between">
+					                                  <span className="text-[15px] text-white/50 font-medium">{t('ui_memo_label', 'Message')}</span>
+					                                  <span className="text-[15px] text-white/80 font-medium break-words text-right max-w-[60%]">
+					                                    {generatedRequest.memo}
+					                                  </span>
+					                                </div>
+					                              </>
+					                            ) : null}
+					                          </div>
 					                        </div>
 
 					                        {/* ── QR Code ── */}
