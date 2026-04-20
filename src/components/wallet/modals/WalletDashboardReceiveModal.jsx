@@ -1565,7 +1565,7 @@ export default function WalletDashboardReceiveModal({
 				                          onChange={e => setRequestMemo(e.target.value.slice(0, 40))}
 				                          maxLength={40}
 				                          placeholder={t('ui_request_memo_placeholder', 'Objet de la demande')}
-				                          className={`w-full ring-1 ring-white/10 ring-inset rounded-[20px] px-3.5 py-3 text-base text-white focus:outline-none transition-colors duration-150 ${
+				                          className={`w-full ring-1 ring-white/10 ring-inset rounded-[20px] px-3.5 py-2 text-base text-white placeholder:text-white/25 focus:outline-none transition-colors duration-150 ${
 				                            noticeVariant === 'demo' ? 'bg-xcannes-surface-demo' : 'bg-white/[0.02]'
 				                          }`}
 				                        />
@@ -1600,6 +1600,19 @@ export default function WalletDashboardReceiveModal({
 	                <>
 		                  {/* SECTION 3 — REQUEST QR */}
 		                  <div className="space-y-5 pt-2">
+
+	                    {/* ── Static wallet pill (style "Depuis le compte") ── */}
+	                    <div className="flex justify-center pt-1 pb-1">
+	                      <div className="inline-flex items-center gap-6 bg-elevated px-6 py-1.5 rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]">
+	                        <span className="text-white/70 text-[14px] md:text-[15px] font-medium tracking-wide">
+	                          {t('moonpay_from_account', 'Depuis le compte')}
+	                        </span>
+	                        <span className="h-3 w-3 rounded-full bg-xcannes-green ring-4 ring-xcannes-green/20 shrink-0" aria-hidden />
+	                        <span className="text-white/95 text-[14px] md:text-[15px] font-semibold">
+	                          {activeWalletLabel || t('nav_wallet', 'Wallet')}
+	                        </span>
+	                      </div>
+	                    </div>
 				                    {hasGeneratedRequest ? (
 					                      <>
 					                        {/* ── Header card (match "Augmenter vos soldes" style) ── */}
@@ -1610,7 +1623,7 @@ export default function WalletDashboardReceiveModal({
 					                          ].join(' ')}
 					                        >
 					                          <p className="text-[20px] tracking-normal font-orbitron font-bold text-white mb-3">
-					                            {t('ui_request_generated_card_title', 'Demande de paiement')}
+					                            {t('ui_request_generated_card_title', 'Résumé de votre demande')}
 					                          </p>
 
 					                          <div className="text-white text-[36px] md:text-[42px] font-semibold tracking-tight leading-none">
@@ -1631,34 +1644,6 @@ export default function WalletDashboardReceiveModal({
 					                              <span className="min-w-0 flex-1 text-[13px] text-white/70 break-words">
 					                                {generatedRequest.memo}
 					                              </span>
-					                            </div>
-					                          ) : null}
-
-					                          <div className="my-4 h-px bg-white/10" aria-hidden />
-
-					                          <div className="flex items-center gap-2 mb-1">
-					                            <span
-					                              className="h-3 w-3 rounded-full bg-xcannes-green ring-4 ring-xcannes-green/25 shrink-0 animate-pulse"
-					                              aria-hidden
-					                            />
-					                            <p className="min-w-0 text-[16px] md:text-[17px] text-white font-semibold truncate">
-					                              {activeWalletLabel || t('nav_wallet', 'Wallet')}
-					                            </p>
-					                          </div>
-
-					                          {wallet ? (
-					                            <div className="mt-0.5 flex items-start gap-2">
-					                              <span className="min-w-0 flex-1 text-left font-mono text-[14px] md:text-[15px] text-white/70">
-					                                {shortAddress(wallet, 8, 6)}
-					                              </span>
-					                              <button
-					                                type="button"
-					                                onClick={() => { navigator.clipboard?.writeText(wallet); }}
-					                                className="shrink-0 rounded-md px-2 py-1 text-[11px] md:text-xs font-semibold ring-1 ring-white/10 bg-elevated text-white/70 hover:text-white hover:ring-white/20 transition-colors"
-					                                aria-label={t('ui_copy_address', "Copier l'adresse")}
-					                              >
-					                                {t('ui_copy', 'Copier')}
-					                              </button>
 					                            </div>
 					                          ) : null}
 					                        </div>
