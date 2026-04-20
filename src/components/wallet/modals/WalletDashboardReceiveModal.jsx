@@ -1318,43 +1318,51 @@ export default function WalletDashboardReceiveModal({
 
 	                    {/* ── Centered wallet pill (style "Depuis le compte") ── */}
 	                    <div className="flex justify-center pt-1 pb-1">
-	                      <div className="inline-flex items-center gap-6 bg-elevated px-6 py-1.5 rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]">
-	                        <span className="text-white/70 text-[14px] md:text-[15px] font-medium tracking-wide">
-	                          {t('ui_receive_account_info_label', 'Depuis le compte')}
-	                        </span>
-	                        <span className="h-3 w-3 rounded-full bg-xcannes-green ring-4 ring-xcannes-green/20 shrink-0" aria-hidden />
-	                        <span className="text-white/95 text-[14px] md:text-[15px] font-semibold">
-	                          {activeWalletLabel || t('nav_wallet', 'Wallet')}
-	                        </span>
+	                      <div className="relative">
+	                        {/* Visible pill */}
+	                        <div className={`inline-flex items-center gap-6 bg-elevated px-6 py-1.5 rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)] ${hasMultipleWallets ? 'cursor-pointer' : ''}`}>
+	                          <span className="text-white/70 text-[14px] md:text-[15px] font-medium tracking-wide">
+	                            {t('ui_receive_account_info_label', 'Depuis le compte')}
+	                          </span>
+	                          <span className="h-3 w-3 rounded-full bg-xcannes-green ring-4 ring-xcannes-green/20 shrink-0" aria-hidden />
+	                          <span className="text-white/95 text-[14px] md:text-[15px] font-semibold">
+	                            {activeWalletLabel || t('nav_wallet', 'Wallet')}
+	                          </span>
+	                          {hasMultipleWallets && (
+	                            <svg className="w-3 h-3 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+	                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+	                            </svg>
+	                          )}
+	                        </div>
+	                        {/* Invisible ModalSelect overlay for wallet switching */}
+	                        {hasMultipleWallets && (
+	                          <div className="absolute inset-0 z-10">
+	                            <ModalSelect
+	                              value={wallet}
+	                              onChange={next => {
+	                                const addr = trimmed(next);
+	                                if (!addr || addr === wallet) return;
+	                                onSwitchWallet?.(addr);
+	                              }}
+	                              options={shareWalletOptions}
+	                              useNativeSelect={false}
+	                              portal
+	                              portalTarget={overlayListRef.current}
+	                              hideSelected
+	                              backdropClassName="bg-black/80 backdrop-blur-[4px]"
+	                              iconClassName="inline-flex items-center justify-center leading-none"
+	                              buttonClassName="w-full h-full opacity-0 cursor-pointer rounded-full"
+	                              menuClassName={
+	                                noticeVariant === 'demo'
+	                                  ? 'bg-xcannes-surface-demo !max-h-64 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
+	                                  : 'bg-[#101415] !max-h-64 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
+	                              }
+	                              selectClassName="xcannes-select w-full bg-transparent rounded-xl pl-0 pr-2 py-2 text-base text-white focus:outline-none transition-colors duration-150"
+	                            />
+	                          </div>
+	                        )}
 	                      </div>
 	                    </div>
-
-	                    {hasMultipleWallets ? (
-	                      <div className="flex justify-center">
-	                        <ModalSelect
-	                          value={wallet}
-	                          onChange={next => {
-	                            const addr = trimmed(next);
-	                            if (!addr || addr === wallet) return;
-	                            onSwitchWallet?.(addr);
-	                          }}
-	                          options={shareWalletOptions}
-	                          useNativeSelect={false}
-	                          portal
-	                          portalTarget={overlayListRef.current}
-	                          hideSelected
-	                          backdropClassName="bg-black/80 backdrop-blur-[4px]"
-	                          iconClassName="inline-flex items-center justify-center leading-none"
-	                          buttonClassName="w-full bg-[#101415] rounded-xl px-3 pr-2 py-2 text-base text-white focus:outline-none cursor-pointer transition-colors duration-150"
-	                          menuClassName={
-	                            noticeVariant === 'demo'
-	                              ? 'bg-xcannes-surface-demo !max-h-64 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
-	                              : 'bg-[#101415] !max-h-64 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
-	                          }
-	                          selectClassName="xcannes-select w-full bg-transparent rounded-xl pl-0 pr-2 py-2 text-base text-white focus:outline-none transition-colors duration-150"
-	                        />
-	                      </div>
-	                    ) : null}
 
 	                    {/* ── QR Code ── */}
 	                    <div className="w-full flex flex-col items-center bg-[#232829] rounded-[20px] py-5 md:pt-8 md:pb-5">
