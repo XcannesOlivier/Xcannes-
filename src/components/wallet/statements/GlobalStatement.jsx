@@ -1930,21 +1930,6 @@ export default function GlobalStatement({
         >
           {/* Recent transactions */}
           <div className="space-y-2">
-            <div className="flex items-end justify-between gap-3">
-              <div className="text-[11px] tracking-[0.08em] text-white/45">
-                {t(
-                  "ui_recent_transactions_9b1c7a2d5e",
-                  "Dernières transactions",
-                )}
-              </div>
-              <div className="text-xs text-white/45">
-                {t("ui_last_n_2c7a1d9b5e", {
-                  defaultValue: "{{count}} dernières",
-                  count: MAX_RECENT_TRANSACTIONS,
-                })}
-              </div>
-            </div>
-
             {movementsLoading ? (
               <div className="rounded-[20px] px-3 py-3 ring-1 ring-white/10 ring-inset bg-white/5 text-sm text-white/70">
                 {t("ui_loading_1386baebe9", "Loading…")}
