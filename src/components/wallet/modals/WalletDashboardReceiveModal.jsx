@@ -1481,9 +1481,14 @@ export default function WalletDashboardReceiveModal({
 
 		                      {/* Currency */}
 			                      <div className="pt-2">
-			                        <label className="block text-[11px] tracking-[0.22em] text-white/45 mb-2">
-			                          {t('ui_currency_1ed55673be', 'Currency')}
-		                        </label>
+			                        <div className="flex items-center justify-between mb-2 px-3.5">
+			                          <label className="block text-[11px] tracking-[0.22em] text-white/45">
+			                            {t('ui_currency_1ed55673be', 'Currency')}
+			                          </label>
+			                          <span className="text-[11px] tracking-[0.22em] text-white/45">
+			                            {t('ui_balance_label', 'Solde')}
+			                          </span>
+			                        </div>
 			                        <ModalSelect
 		                          value={requestCurrency}
 		                          onChange={setRequestCurrency}
@@ -1520,9 +1525,10 @@ export default function WalletDashboardReceiveModal({
 		                              ? 'bg-xcannes-surface-demo max-h-[320px] overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
 		                              : 'bg-[#101415] max-h-[320px] overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
 		                          }
-			                          buttonClassName={`ring-1 ring-white/10 ring-inset rounded-[20px] px-3.5 py-3 text-base text-white focus:outline-none cursor-pointer ${
+			                          buttonClassName={`ring-1 ring-white/10 ring-inset rounded-[20px] px-3.5 py-3 text-lg text-white focus:outline-none cursor-pointer ${
 			                            noticeVariant === 'demo' ? 'bg-xcannes-surface-demo' : 'bg-[#101415]'
 			                          }`}
+			                          iconClassName="text-xl leading-none"
 			                          selectClassName={`xcannes-select w-full ring-1 ring-white/10 ring-inset rounded-[20px] px-3.5 py-3 text-base text-white focus:outline-none transition-colors duration-150 ${
 			                            noticeVariant === 'demo' ? 'bg-xcannes-surface-demo' : 'bg-white/[0.02]'
 			                          }`}
@@ -1531,20 +1537,18 @@ export default function WalletDashboardReceiveModal({
 	
 		                      {/* Amount */}
 					                      <div className="pt-4">
-					                        <label className="block text-[11px] tracking-[0.22em] text-white/45 mb-2">
-					                          {t('ui_amount_7668986206', 'Amount')}
+					                        <label className="block text-lg md:text-xl text-white/70 font-semibold mb-2">
+					                          {t('ui_amount_7668986206', 'Montant')}
 					                        </label>
-					                        <div className="relative">
+					                        <div className="relative rounded-[20px] bg-black/30 ring-2 ring-white/20 ring-inset shadow-[0_6px_20px_rgba(0,0,0,0.5)] py-8 md:py-9 px-5">
 					                          <input
 					                            type="number"
 					                            value={requestAmount}
 					                            onChange={e => setRequestAmount(e.target.value)}
-					                            placeholder="0.00"
-					                            className={`xcannes-no-spinner w-full ring-1 ring-white/10 ring-inset rounded-[20px] px-3.5 py-3 pr-16 text-lg font-semibold text-white focus:outline-none transition-colors duration-150 ${
-					                              noticeVariant === 'demo' ? 'bg-xcannes-surface-demo' : 'bg-white/[0.02]'
-					                            }`}
+					                            placeholder="0.0000"
+					                            className={`xcannes-no-spinner w-full bg-transparent text-4xl md:text-5xl font-bold text-white focus:outline-none`}
 					                          />
-					                          <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[12px] font-semibold text-white/70">
+					                          <span className="pointer-events-none absolute right-5 top-1/2 -translate-y-1/2 text-4xl md:text-5xl font-bold text-white drop-shadow-sm">
 					                            {requestCurrencyCode || 'USD'}
 					                          </span>
 					                        </div>
