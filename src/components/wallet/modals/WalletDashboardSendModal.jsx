@@ -1318,7 +1318,7 @@ export default function WalletDashboardSendModal({
   );
 
   /* ── Dynamic summary – visible as soon as a destination address is set ── */
-  const summaryExpanded = Boolean(selectedSendToken && summaryAmount > 0);
+  const summaryExpanded = Boolean(selectedSendToken && summaryAmount > 0 && !manualInsufficientBalance && !insufficientBalance);
   const inlineSummary = hasDestination ? (
     <div className="space-y-3 transition-all duration-200">
       <div className="text-[13px] text-white/45">
@@ -1327,7 +1327,7 @@ export default function WalletDashboardSendModal({
           "Vérifiez les informations avant d’envoyer",
         )}
       </div>
-		      <div className="rounded-[20px] p-4 space-y-4 ring-1 ring-white/10 ring-inset bg-[#101415] shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
+		      <div className={`rounded-[20px] ring-1 ring-white/10 ring-inset transition-all duration-300 ${summaryExpanded ? 'p-4 space-y-4 bg-[#101415] shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]' : 'px-4 py-2.5 bg-[#101415]/60 shadow-[0_2px_8px_rgba(0,0,0,0.25)] opacity-60'}`}>
 	        <div className="flex items-center justify-between">
 	          <span className="text-xs tracking-wide text-white/60 font-semibold">
 	            {t("ui_send_confirmation_title", "Résumé de l'envoi")}
