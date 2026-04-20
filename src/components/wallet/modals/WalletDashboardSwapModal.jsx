@@ -196,6 +196,34 @@ export default function WalletDashboardSwapModal({
     });
   };
 
+  const inlineUnitRate = useMemo(() => {
+    if (!baseCode || !quoteCode || baseCode === quoteCode) return null;
+    if (conversionRoute.type !== "allocation") return null;
+
+    const isPeggedToUsd = (code) => code === "RLUSD" || code === "USD";
+    const rlusdPerBase = isPeggedToUsd(baseCode)
+      ? 1
+      : Number(rlusdPerUnitRates?.[baseCode]);
+    const rlusdPerQuote = isPeggedToUsd(quoteCode)
+      ? 1
+      : Number(rlusdPerUnitRates?.[quoteCode]);
+
+    if (!Number.isFinite(rlusdPerBase) || rlusdPerBase <= 0) return null;
+    if (!Number.isFinite(rlusdPerQuote) || rlusdPerQuote <= 0) return null;
+
+    const unitRateGross = rlusdPerBase / rlusdPerQuote;
+    const spread = computeSpreadQuote({
+      base: baseCode,
+      quote: quoteCode,
+      amountRlusd: rlusdPerBase,
+    });
+    const unitRateNet = isFxConversion(baseCode, quoteCode)
+      ? unitRateGross * (1 - Number(spread?.spreadFraction || 0))
+      : unitRateGross;
+
+    return Number.isFinite(unitRateNet) && unitRateNet > 0 ? unitRateNet : null;
+  }, [baseCode, conversionRoute.type, quoteCode, rlusdPerUnitRates]);
+
   useEffect(() => {
     if (!open) return;
     setPreviewState({ status: "idle", error: null });
@@ -652,9 +680,23 @@ export default function WalletDashboardSwapModal({
 		                    />
 		                  </div>
 
-		                  {/* ── Amount input (between selectors) ── */}
-		                  <div className={`relative z-[65] transition-all duration-200 ${baseDropdownOpen ? 'opacity-0 max-h-0 overflow-hidden !my-0' : 'opacity-100 max-h-[200px]'}`}>
-		                    <div className="absolute top-2 left-4 text-[11px] tracking-[0.18em] uppercase text-white/40 z-10">
+		                  {/* ── Rate line + Amount input (between selectors) ── */}
+		                  <div className={`relative z-[65] transition-all duration-200 ${baseDropdownOpen ? 'opacity-0 max-h-0 overflow-hidden !my-0' : 'opacity-100 max-h-[260px]'}`}>
+		                    <div className="flex items-center gap-3 px-2 pb-2 text-white/55">
+		                      <span className="h-px flex-1 bg-white/12" />
+		                      <span className="text-[12px] md:text-[13px] tracking-[0.01em] whitespace-nowrap">
+		                        {Number.isFinite(inlineUnitRate)
+		                          ? `↕ 1 ${getDisplayCurrencyCode(baseCode || "USD")} = ${Number(
+		                              inlineUnitRate,
+		                            ).toLocaleString(locale, {
+		                              minimumFractionDigits: 2,
+		                              maximumFractionDigits: 2,
+		                            })} ${getDisplayCurrencyCode(quoteCode || "EUR")}`
+		                          : "↕ 1 USD = 0.84 EUR"}
+		                      </span>
+		                      <span className="h-px flex-1 bg-white/12" />
+		                    </div>
+		                    <div className="absolute top-8 left-4 text-[11px] tracking-[0.18em] uppercase text-white/40 z-10">
 		                      {t("ui_amount_52a20b2992", "Montant")}
 		                    </div>
 		                    <TokenAmountInput
@@ -667,7 +709,7 @@ export default function WalletDashboardSwapModal({
 		                        "USD"
 		                      }
 		                      tokenClassName="text-white drop-shadow-sm text-4xl md:text-5xl font-bold"
-		                      containerClassName="pt-10 pb-6 md:pt-11 md:pb-7 rounded-[20px] bg-black/30 ring-2 ring-white/20 ring-inset transition-colors duration-150 shadow-[0_6px_20px_rgba(0,0,0,0.5)] [&_input]:!text-4xl [&_input]:md:!text-5xl"
+		                      containerClassName="pt-12 pb-6 md:pt-12 md:pb-6 rounded-[20px] bg-gradient-to-b from-white/[0.05] to-black/45 ring-1 ring-white/25 ring-inset transition-colors duration-150 shadow-[0_8px_22px_rgba(0,0,0,0.5)] [&_input]:!text-4xl [&_input]:md:!text-5xl"
 		                    />
 		                  </div>
 
