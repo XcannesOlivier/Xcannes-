@@ -605,7 +605,7 @@ export default function WalletDashboardSendChoiceModal({
                       color: #fff;
                     }
                     .send-choice-scan-btn svg { color: #fff; width: 1.4rem; height: 1.4rem; }
-                    .send-choice-scan-btn span { color: #fff; font-size: 15.5px; font-weight: 600; }
+                    .send-choice-scan-btn span { color: #fff; font-size: 18px; font-weight: 700; }
                     .send-choice-import-btn { color: rgba(255,255,255,0.7); }
                     .send-choice-import-btn svg { color: rgba(255,255,255,0.5); width: 1.15rem; height: 1.15rem; }
                     .send-choice-import-btn span { color: rgba(255,255,255,0.55); font-size: 13.5px; font-weight: 400; }
@@ -623,7 +623,7 @@ export default function WalletDashboardSendChoiceModal({
                         color: #fff;
                       }
                       .send-choice-import-btn svg { color: #fff; width: 1.4rem; height: 1.4rem; }
-                      .send-choice-import-btn span { color: #fff; font-size: 15.5px; font-weight: 600; }
+                      .send-choice-import-btn span { color: #fff; font-size: 18px; font-weight: 700; }
                     }
                   `}</style>
 
