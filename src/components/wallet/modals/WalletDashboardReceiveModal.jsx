@@ -1615,51 +1615,7 @@ export default function WalletDashboardReceiveModal({
 	                    </div>
 				                    {hasGeneratedRequest ? (
 					                      <>
-					                        {/* ── Header card (match "Augmenter vos soldes" style) ── */}
-					                        <div
-					                          className={[
-					                            'rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset border-b border-white/20 bg-[#101415]',
-					                            'shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]',
-					                          ].join(' ')}
-					                        >
-					                          <p className="text-[15px] tracking-normal font-medium text-white/60 mb-4">
-					                            {t('ui_request_generated_card_title', 'Résumé de votre demande')}
-					                          </p>
-
-					                          <div className="space-y-3">
-					                            <div className="flex items-baseline justify-between">
-					                              <span className="text-[15px] text-white/50 font-medium">{t('ui_amount_label_short', 'Montant')}</span>
-					                              <span className="text-white text-[36px] md:text-[42px] font-semibold tracking-tight leading-none">
-					                                {requestDisplayAmountLabel}
-					                              </span>
-					                            </div>
-
-					                            <div className="h-px bg-white/10" aria-hidden />
-
-					                            <div className="flex items-baseline justify-between">
-					                              <span className="text-[15px] text-white/50 font-medium">{t('ui_date_time_label', 'Date & Heure')}</span>
-					                              <span className="text-[15px] text-white/80 font-medium">
-					                                {requestDateParts.date && requestDateParts.time
-					                                  ? `${requestDateParts.date} · ${requestDateParts.time}`
-					                                  : requestDateLabel || '—'}
-					                              </span>
-					                            </div>
-
-					                            {generatedRequest?.memo ? (
-					                              <>
-					                                <div className="h-px bg-white/10" aria-hidden />
-					                                <div className="flex items-baseline justify-between">
-					                                  <span className="text-[15px] text-white/50 font-medium">{t('ui_memo_label', 'Message')}</span>
-					                                  <span className="text-[15px] text-white/80 font-medium break-words text-right max-w-[60%]">
-					                                    {generatedRequest.memo}
-					                                  </span>
-					                                </div>
-					                              </>
-					                            ) : null}
-					                          </div>
-					                        </div>
-
-					                        {/* ── QR Code ── */}
+					                        {/* ── QR Code (primary action — first) ── */}
 					                        <div className="w-full flex flex-col items-center bg-[#232829] rounded-[20px] pt-5 pb-2 md:pt-8 md:pb-5">
 				                          <div
 				                            ref={requestQrContainerRef}
@@ -1688,6 +1644,33 @@ export default function WalletDashboardReceiveModal({
 				                            </svg>
 				                            Agrandir
 				                          </button>
+					                        </div>
+
+					                        {/* ── Amount (standalone, centered) ── */}
+					                        <div className="text-center">
+					                          <div className="text-white text-[40px] md:text-[48px] font-bold tracking-tight leading-none">
+					                            {requestDisplayAmountLabel}
+					                          </div>
+					                        </div>
+
+					                        {/* ── Details (date, message) ── */}
+					                        <div className="flex flex-col gap-1 px-1">
+					                          <div className="flex items-center justify-between">
+					                            <span className="text-[13px] text-white/40 font-medium">{t('ui_date_time_label', 'Date & Heure')}</span>
+					                            <span className="text-[13px] text-white/60 font-medium">
+					                              {requestDateParts.date && requestDateParts.time
+					                                ? `${requestDateParts.date} · ${requestDateParts.time}`
+					                                : requestDateLabel || '—'}
+					                            </span>
+					                          </div>
+					                          {generatedRequest?.memo ? (
+					                            <div className="flex items-center justify-between">
+					                              <span className="text-[13px] text-white/40 font-medium">{t('ui_memo_label', 'Message')}</span>
+					                              <span className="text-[13px] text-white/60 font-medium">
+					                                {generatedRequest.memo}
+					                              </span>
+					                            </div>
+					                          ) : null}
 					                        </div>
 
 					                        {/* ── Actions ── */}
