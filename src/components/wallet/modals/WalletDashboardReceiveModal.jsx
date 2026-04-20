@@ -1323,7 +1323,7 @@ export default function WalletDashboardReceiveModal({
 	                        'shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]',
 	                      ].join(' ')}
 	                    >
-	                      <p className="text-[12px] tracking-normal font-orbitron font-bold text-white mb-3">
+	                      <p className="text-[14px] tracking-normal font-orbitron font-medium text-white mb-3">
 	                        {t('ui_receive_account_info_label', 'Selectionnez le compte')}
 	                      </p>
 
@@ -1388,7 +1388,7 @@ export default function WalletDashboardReceiveModal({
 	                    <div className="w-full flex flex-col items-center bg-[#232829] rounded-[20px] py-5 md:pt-8 md:pb-5">
 	                        <div
 	                          ref={receiveQrContainerRef}
-	                          className="w-[220px] md:w-[200px] aspect-square rounded-none p-3 cursor-pointer border-[20px] border-black"
+	                          className="w-[280px] md:w-[260px] aspect-square rounded-none p-3 cursor-pointer border-[20px] border-black"
 	                          style={{ backgroundColor: '#E8E8E8' }}
 	                          onClick={() => setQrZoomValue(receiveQrValue)}
 	                        >
@@ -1405,10 +1405,10 @@ export default function WalletDashboardReceiveModal({
 	                      <button
 	                        type="button"
 	                        onClick={() => setQrZoomValue(receiveQrValue)}
-	                        className="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] text-white/50 hover:text-white/80 transition-colors duration-150"
+	                        className="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[14px] text-white/50 hover:text-white/80 transition-colors duration-150"
 	                        aria-label="Agrandir le QR code"
 	                      >
-	                        <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+	                        <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
 	                          <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
 	                        </svg>
 	                        Agrandir
@@ -1705,7 +1705,7 @@ export default function WalletDashboardReceiveModal({
 					                        <div className="w-full flex flex-col items-center bg-[#232829] rounded-[20px] pt-5 pb-2 md:pt-8 md:pb-5">
 				                          <div
 				                            ref={requestQrContainerRef}
-				                            className="w-[220px] md:w-[200px] aspect-square rounded-none p-3 cursor-pointer border-[20px] border-black"
+				                            className="w-[280px] md:w-[260px] aspect-square rounded-none p-3 cursor-pointer border-[20px] border-black"
 				                            style={{ backgroundColor: '#E8E8E8' }}
 				                            onClick={() => setQrZoomValue(requestQrValue)}
 				                          >
@@ -1722,10 +1722,10 @@ export default function WalletDashboardReceiveModal({
 				                          <button
 				                            type="button"
 				                            onClick={() => setQrZoomValue(requestQrValue)}
-				                            className="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] text-white/50 hover:text-white/80 transition-colors duration-150"
+				                            className="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[14px] text-white/50 hover:text-white/80 transition-colors duration-150"
 				                            aria-label="Agrandir le QR code"
 				                          >
-				                            <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+				                            <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
 				                              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
 				                            </svg>
 				                            Agrandir
