@@ -1678,13 +1678,13 @@ export default function DemoCurrencyStatement({
                   )}
                 </div>
               ) : (
-                <div className="space-y-4 py-2">
+                <div className="space-y-1 py-1">
                   {timelineGroups.map((group) => (
                     <div key={group.key}>
-                      <div className="px-4 pt-4 pb-2 text-[11px] font-semibold text-white/50 uppercase tracking-wide">
+                      <div className="px-4 pt-2 pb-1 text-[11px] font-semibold text-white/50 uppercase tracking-wide">
                         {group.label}
                       </div>
-                      <div className="pb-2">
+                      <div className="pb-1">
                         {group.transactions.map((tx, idx) => {
                           const transactionId =
                             tx?.id || tx?.txHash || `${group.key}-${idx}`;
@@ -1699,14 +1699,14 @@ export default function DemoCurrencyStatement({
                                 ref={isHighlighted ? highlightRowRef : null}
                                 onClick={() => openTxDetails(tx)}
                                 className={[
-                                  "w-full flex items-center gap-2 text-left px-3 py-3 transition-colors duration-150",
+                                  "w-full flex items-center gap-1.5 text-left px-3 py-2 transition-colors duration-150",
                                   isHighlighted
                                     ? "text-white"
                                     : "text-white/90 hover:text-white",
                                 ].join(" ")}
                               >
-                                <div className="w-8 h-8 rounded-full bg-black/20 ring-1 ring-white/10 ring-inset flex items-center justify-center text-white/60 flex-none shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
-                                  <span className="text-sm leading-none">
+                                <div className="w-7 h-7 rounded-full bg-black/20 ring-1 ring-white/10 ring-inset flex items-center justify-center text-white/60 flex-none shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
+                                  <span className="text-[13px] leading-none text-white/85">
                                     {getTimelineIcon(tx)}
                                   </span>
                                 </div>
@@ -1732,7 +1732,7 @@ export default function DemoCurrencyStatement({
                                 </div>
                               </button>
                               {!isLast ? (
-                                <div className="h-px bg-white/10 ml-14 mr-3" />
+                                <div className="h-px bg-white/10 ml-12 mr-3" />
                               ) : null}
                             </div>
                           );
