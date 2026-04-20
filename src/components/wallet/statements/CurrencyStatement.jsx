@@ -1753,7 +1753,7 @@ export default function CurrencyStatement({
                 <div>
                   <StatementMonthSelect
                     label={t("ui_statement_period_6dedec11d9", "Statement Period")}
-                    labelClassName="text-[20px] md:text-[21px] text-white/60 mb-1"
+                    labelClassName="text-[20px] md:text-[21px] text-white/85 font-medium mb-1 text-center md:text-left"
                     value={selectedMonth}
                     onOpenChange={setPeriodDropdownOpen}
                     onChange={(nextValue) => {

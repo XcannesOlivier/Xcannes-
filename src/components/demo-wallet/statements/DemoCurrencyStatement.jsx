@@ -1558,7 +1558,7 @@ export default function DemoCurrencyStatement({
               ) : null}
             </div>
             <div>
-              <p className="text-[20px] md:text-[21px] text-white/60 mb-1">
+              <p className="text-[20px] md:text-[21px] text-white/85 font-medium mb-1 text-center md:text-left">
                 {t("ui_statement_period_6dedec11d9", "Statement Period")}
               </p>
               {/* Month Selector - Version simplifiée */}

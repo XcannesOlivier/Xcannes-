@@ -1860,7 +1860,7 @@ export default function GlobalStatement({
                 </svg>
               </span>
               <div className="min-w-0 flex items-center">
-                <h2 className="text-lg md:text-xl font-bold text-white leading-tight">
+                <h2 className="text-[20px] md:text-[21px] font-bold text-white leading-tight">
                   {globalTitle}
                 </h2>
                 {noticeVariant === "demo" ? (
@@ -1961,7 +1961,7 @@ export default function GlobalStatement({
                 )}
               </div>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-1.5">
                 {recentMovements.map((m, idx) => {
                   const isConversion = normalizeKind(m?.kind) === "CONVERSION";
                   const isPaymentOut =
@@ -2008,12 +2008,12 @@ export default function GlobalStatement({
                       key={key}
                       type="button"
                       onClick={() => openMovementDetails(m)}
-	                      className={[
-	                        "w-full text-left rounded-[20px] px-3 py-3 ring-1 ring-inset bg-[#101415] shadow-[inset_0_1px_0_rgba(255,255,255,0.05),inset_0_-14px_22px_rgba(0,0,0,0.5)] transition-colors duration-150",
-	                        isLatest
-	                          ? "ring-xcannes-green/30 transform-gpu scale-[1.02] origin-center drop-shadow-[0_10px_18px_rgba(0,0,0,0.55)] transition-transform duration-150"
-	                          : "ring-white/10",
-	                      ].join(" ")}
+                        className={[
+                          "w-full text-left rounded-[20px] px-3 transition-colors duration-150",
+                          isLatest
+                            ? "py-3 ring-1 ring-inset bg-[#101415] shadow-[inset_0_1px_0_rgba(255,255,255,0.05),inset_0_-14px_22px_rgba(0,0,0,0.5)] ring-xcannes-green/30 transform-gpu scale-[1.02] origin-center drop-shadow-[0_10px_18px_rgba(0,0,0,0.55)] transition-transform duration-150"
+                            : "py-2 ring-0 bg-transparent shadow-none",
+                        ].join(" ")}
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">

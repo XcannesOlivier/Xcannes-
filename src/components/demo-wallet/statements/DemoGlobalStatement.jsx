@@ -700,7 +700,7 @@ export default function DemoGlobalStatement({
               />
               <div className="min-w-0">
                 <div className="flex items-center gap-2 min-w-0">
-                  <h2 className="text-lg md:text-xl font-bold text-white min-w-0 inline-flex items-baseline gap-2">
+                  <h2 className="text-[20px] md:text-[21px] font-bold text-white min-w-0 inline-flex items-baseline gap-2">
                     <span className="break-words">
                       {t(
                         "ui_global_statement_13e29aa8aa",
