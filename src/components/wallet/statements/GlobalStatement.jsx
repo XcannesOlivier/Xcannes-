@@ -1860,7 +1860,7 @@ export default function GlobalStatement({
                 </svg>
               </span>
               <div className="min-w-0 flex items-center">
-                <h2 className="text-[20px] md:text-[21px] font-bold text-white leading-tight">
+                <h2 className="text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight leading-tight">
                   {globalTitle}
                 </h2>
                 {noticeVariant === "demo" ? (
