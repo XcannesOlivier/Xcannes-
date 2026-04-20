@@ -723,7 +723,7 @@ export default function WalletDashboardSwapModal({
 		                        "USD"
 		                      }
 		                      tokenClassName="text-white drop-shadow-sm text-4xl md:text-5xl font-bold"
-                          containerClassName="pt-6 pb-6 rounded-[18px] bg-[#111518] ring-1 ring-white/10 ring-inset transition-colors duration-150 shadow-[0_4px_18px_rgba(0,0,0,0.6),0_0_28px_rgba(34,154,86,0.22)] [&_input]:!text-4xl [&_input]:md:!text-5xl"
+                          containerClassName="pt-6 pb-6 rounded-[18px] bg-[#111518] ring-1 ring-white/10 ring-inset transition-colors duration-150 shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(34,154,86,0.12),inset_0_-14px_24px_rgba(0,0,0,0.30)] [&_input]:!text-4xl [&_input]:md:!text-5xl"
 		                    />
 		                  </div>
 
@@ -813,14 +813,14 @@ export default function WalletDashboardSwapModal({
                     {/* ── SECTION 3: Summary ─────────────────────────────── */}
                     <div className="rounded-[16px] overflow-hidden">
                       {/* Row: Frais */}
-                      <div className="flex items-center justify-between px-4 py-2">
+                      <div className="flex items-center justify-between px-4 pt-2 pb-1">
                         <span className="text-sm text-white/55">{t("statement_conversion_fee_label", "Frais")}</span>
                         <span className="text-sm text-white/80 font-medium">
                           {formatAmountWithSymbol(locale, Number(previewMeta?.spreadFeeRlusd || 0), "USD", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </span>
                       </div>
                       {/* Row: Taux de change */}
-                      <div className="flex items-center justify-between px-4 py-2">
+                      <div className="flex items-center justify-between px-4 pt-1 pb-2">
                         <span className="text-sm text-white/55">{t("ui_exchange_rate_label", "Taux de change")}</span>
                         <span className="text-sm text-white/80 font-medium">
                           {Number.isFinite(Number(previewMeta?.unitRate)) && previewMeta?.unitRate > 0 && baseCode && quoteCode
@@ -830,11 +830,11 @@ export default function WalletDashboardSwapModal({
                               : "1 USD = 0.84 EUR"}
                         </span>
                       </div>
-                      <div className="px-3">
-                        <div className="h-[2px] bg-white/45 rounded-full" />
+                      <div className="px-3 mt-4">
+                        <div className="h-[1.5px] bg-white/45 rounded-full" />
                       </div>
                       {/* Row: Total reçu */}
-                      <div className="flex items-center justify-between px-4 pt-3 pb-2">
+                      <div className="flex items-center justify-between px-4 pt-[3px] pb-2">
                         <span className="text-lg md:text-xl text-white">{t("ui_total_received_label", "Total reçu")}</span>
                         <span className="text-2xl md:text-3xl text-white font-bold">
                           {quoteCode
