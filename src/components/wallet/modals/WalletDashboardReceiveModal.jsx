@@ -1211,7 +1211,7 @@ export default function WalletDashboardReceiveModal({
                   {isDesktop ? <span className="text-sm text-white/80">{t('ui_back', 'Retour')}</span> : null}
                 </button>
 
-                <h2 className="mt-1 text-[22px] md:text-[24px] font-semibold text-white/95 tracking-tight">
+                <h2 className="mt-5 text-[22px] md:text-[24px] font-semibold text-white/95 tracking-tight">
                   {headerTitle}
                 </h2>
 
@@ -1365,7 +1365,7 @@ export default function WalletDashboardReceiveModal({
 	                    </div>
 
 	                    {/* ── QR Code ── */}
-	                    <div className="w-full flex flex-col items-center bg-[#232829] rounded-[20px] pt-10 pb-5 md:pt-16 md:pb-5">
+	                    <div className="w-full flex flex-col items-center bg-[#232829] rounded-[20px] pt-16 pb-5 md:pt-16 md:pb-5">
 	                        <div
 	                          ref={receiveQrContainerRef}
 	                          className="w-[280px] md:w-[260px] aspect-square rounded-none p-3 cursor-pointer border-[20px] border-black"
