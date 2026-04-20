@@ -386,7 +386,7 @@ export default function WalletDashboardSendChoiceModal({
                   className="pt-6 md:pt-5 pb-3 flex flex-col items-center text-center"
                   onPointerDown={event => { maybeStartOverlayDrag(event, 'fixed'); }}
                 >
-                  <h3 className="mt-1 text-[22px] md:text-[24px] font-semibold text-white/95 tracking-tight">
+                  <h3 className="mt-1 text-[26px] md:text-[28px] font-semibold text-white/95 tracking-tight">
                     {t('ui_send_choice_subtitle', 'Choisissez comment envoyer vos fonds')}
                   </h3>
                   <p className="mt-2 text-[14px] md:text-[15px] text-white/60 max-w-[34ch] leading-relaxed">
