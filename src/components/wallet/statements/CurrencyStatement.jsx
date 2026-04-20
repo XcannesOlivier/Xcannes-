@@ -1915,43 +1915,50 @@ export default function CurrencyStatement({
                           const isHighlighted =
                             highlightedTransactionId &&
                             transactionId === highlightedTransactionId;
+                          const isLast = idx === group.transactions.length - 1;
                           return (
-                            <button
-                              key={transactionId}
-                              type="button"
-                              ref={isHighlighted ? highlightRowRef : null}
-                              onClick={() => openTxDetails(tx)}
-                              className={[
-                                "w-full flex items-center gap-2 text-left px-3 py-3 rounded-[20px] ring-1 ring-white/10 ring-inset",
-                                "bg-[#101415]",
-                                "shadow-[inset_0_1px_0_rgba(255,255,255,0.04),inset_0_-12px_18px_rgba(0,0,0,0.45)]",
-                                "transition-colors duration-150",
-                                isHighlighted
-                                  ? "ring-xcannes-green/25"
-                                  : "hover:bg-[#12181a]",
-                              ].join(" ")}
-                            >
-                              <div className="w-8 h-8 rounded-full bg-black/20 ring-1 ring-white/10 ring-inset flex items-center justify-center text-white/60 flex-none shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
-                                <span className="text-sm leading-none">
-                                  {getTimelineIcon(tx)}
-                                </span>
-                              </div>
-                              <div className="min-w-0 flex-1">
-                                <div className="text-sm text-white/90 break-words overflow-hidden [display:-webkit-box] [-webkit-line-clamp:2] [-webkit-box-orient:vertical]">
-                                  {getTimelineLabel(tx)}
-                                </div>
-                              </div>
-                              <div
-                                className={`flex-none max-w-[42%] text-right font-mono font-semibold whitespace-nowrap overflow-hidden text-ellipsis ${
-                                  tx?.type === "debit"
-                                    ? "text-red-400"
-                                    : "text-xcannes-green"
-                                }`}
+                            <div key={transactionId}>
+                              <button
+                                type="button"
+                                ref={isHighlighted ? highlightRowRef : null}
+                                onClick={() => openTxDetails(tx)}
+                                className={[
+                                  "w-full flex items-center gap-2 text-left px-3 py-3 transition-colors duration-150",
+                                  isHighlighted
+                                    ? "text-white"
+                                    : "text-white/90 hover:text-white",
+                                ].join(" ")}
                               >
-                                {tx?.type === "debit" ? "−" : "+"}
-                                {formatAmountRlusdAsLocal(tx?.amount)}
-                              </div>
-                            </button>
+                                <div className="w-8 h-8 rounded-full bg-black/20 ring-1 ring-white/10 ring-inset flex items-center justify-center text-white/60 flex-none shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
+                                  <span className="text-sm leading-none">
+                                    {getTimelineIcon(tx)}
+                                  </span>
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                  <div className="text-sm text-white/90 break-words overflow-hidden [display:-webkit-box] [-webkit-line-clamp:2] [-webkit-box-orient:vertical]">
+                                    {getTimelineLabel(tx)}
+                                  </div>
+                                </div>
+                                <div className="flex-none max-w-[48%] flex items-center justify-end gap-2">
+                                  <div
+                                    className={`text-right font-mono font-semibold whitespace-nowrap overflow-hidden text-ellipsis ${
+                                      tx?.type === "debit"
+                                        ? "text-red-400"
+                                        : "text-xcannes-green"
+                                    }`}
+                                  >
+                                    {tx?.type === "debit" ? "−" : "+"}
+                                    {formatAmountRlusdAsLocal(tx?.amount)}
+                                  </div>
+                                  <span className="text-[14px] leading-none text-white/35">
+                                    ›
+                                  </span>
+                                </div>
+                              </button>
+                              {!isLast ? (
+                                <div className="h-px bg-white/10 ml-14 mr-3" />
+                              ) : null}
+                            </div>
                           );
                         })}
                       </div>
