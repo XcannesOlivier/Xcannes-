@@ -1365,7 +1365,7 @@ export default function WalletDashboardReceiveModal({
 	                    </div>
 
 	                    {/* ── QR Code ── */}
-	                    <div className="w-full flex flex-col items-center bg-[#232829] rounded-[20px] pt-16 pb-5 md:pt-16 md:pb-5">
+	                    <div className="w-full flex flex-col items-center bg-[#232829] rounded-[20px] pt-16 pb-5 md:pt-20 md:pb-10">
 	                        <div
 	                          ref={receiveQrContainerRef}
 	                          className="w-[280px] md:w-[260px] aspect-square rounded-none p-3 cursor-pointer border-[20px] border-black"
@@ -1395,8 +1395,6 @@ export default function WalletDashboardReceiveModal({
 	                      </button>
 	                    </div>
 
-	                    <div className="hidden md:block h-px bg-white/10" />
-
 	                    {/* ── Actions ── */}
 	                    <div className="grid grid-cols-[1fr_1.8fr] gap-3">
 	                      <button
@@ -1418,10 +1416,10 @@ export default function WalletDashboardReceiveModal({
 	                          e.stopPropagation();
 	                          await handleShareQr(false);
 	                        }}
-	                        className="w-full h-11 rounded-[20px] text-white text-[15px] font-bold tracking-wide py-2 px-6 transition-all duration-150 inline-flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-[0.98]"
+	                        className="w-full h-11 rounded-[20px] text-white text-[17px] font-bold tracking-wide py-2 px-6 transition-all duration-150 inline-flex items-center justify-center gap-2.5 hover:scale-[1.01] active:scale-[0.98]"
 	                        style={{ background: 'linear-gradient(180deg, rgba(34,154,86,1) 0%, rgba(14,103,58,1) 100%)', boxShadow: '0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)' }}
 	                      >
-	                        <ShareIcon className="w-4 h-4" />
+	                        <ShareIcon className="w-5 h-5" />
 	                        <span>{shareActionLabel}</span>
 	                      </button>
 	                    </div>
