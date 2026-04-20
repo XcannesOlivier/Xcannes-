@@ -732,6 +732,26 @@ export default function WalletDashboardSwapModal({
                       <div className="text-[13px] tracking-[0.22em] text-white/45">
                         {t("ui_convert_to_label", "Vous recevez")}
                       </div>
+                      <WalletCurrencySelector
+                        value=""
+                        onChange={(code) => {
+                          if (code) setConvertQuoteCurrency(code);
+                        }}
+                        triggerVariant="text"
+                        triggerLabel={t(
+                          "ui_choose_new_currency_plus",
+                          "Ajouter une devise",
+                        )}
+                        buttonClassName="inline-flex items-center text-[12px] md:text-[13px] leading-none text-white/65 font-normal ring-1 ring-white/10 ring-inset rounded-[9px] px-2 py-1 hover:text-white hover:ring-white/15 transition-colors"
+                        fullscreenPortalTarget={inline ? modalPanelRef.current : null}
+                        placeholder={t(
+                          "ui_search_all_currencies_c5d6e7f8",
+                          "Search all currencies...",
+                        )}
+                        excludeCodes={["USD", "RLUSD", "XRP"]}
+                        showQuickAdd={false}
+                        fullscreen={true}
+                      />
                     </div>
 		                    <ModalSelect
 		                      value={convertQuoteCurrency}
@@ -767,29 +787,6 @@ export default function WalletDashboardSwapModal({
 		                      selectClassName="xcannes-select w-full bg-[#101415] ring-1 ring-white/10 ring-inset rounded-[14px] px-3.5 py-1.5 text-xl text-white outline-none focus:outline-none cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
 		                    />
 		                  </div>
-
-                  <div className="pt-1 flex justify-end">
-                    <WalletCurrencySelector
-                      value=""
-                      onChange={(code) => {
-                        if (code) setConvertQuoteCurrency(code);
-                      }}
-                      triggerVariant="text"
-                      triggerLabel={t(
-                        "ui_choose_new_currency_plus",
-                        "Ajouter une devise",
-                      )}
-                      buttonClassName="inline-flex items-center gap-2 text-base md:text-[15px] leading-snug text-white/70 font-normal ring-1 ring-white/10 ring-inset rounded-[10px] px-2 py-1 hover:text-white hover:ring-white/15 transition-colors"
-                      fullscreenPortalTarget={inline ? modalPanelRef.current : null}
-                      placeholder={t(
-                        "ui_search_all_currencies_c5d6e7f8",
-                        "Search all currencies...",
-                      )}
-                      excludeCodes={["USD", "RLUSD", "XRP"]}
-                      showQuickAdd={false}
-                      fullscreen={true}
-                    />
-                  </div>
 	                </div>
 
                   <div className="space-y-2">
@@ -812,7 +809,7 @@ export default function WalletDashboardSwapModal({
                       </div>
                     ) : null}
                     {/* ── SECTION 3: Summary ─────────────────────────────── */}
-                    <div className="rounded-[16px] overflow-hidden bg-[#0f1318] ring-1 ring-white/10 ring-inset">
+                    <div className="rounded-[16px] overflow-hidden">
                       {/* Row: Frais */}
                       <div className="flex items-center justify-between px-4 py-3">
                         <span className="text-sm text-white/55">{t("statement_conversion_fee_label", "Frais")}</span>
