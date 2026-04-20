@@ -1195,6 +1195,9 @@ export default function WalletDashboardSendModal({
         {/* ── Devise + Montant (séparés) – masqués en mode payreq ── */}
         {!hasPaymentRequest && (
         <div className={`transition-opacity duration-300 space-y-4 ${hasDestination ? 'opacity-100' : 'opacity-30 pointer-events-none select-none'}`}>
+          <p className="text-[14px] md:text-[15px] text-white/60 max-w-[34ch] leading-relaxed">
+            {t("ui_send_devise_hint", "Indiquez la devise, le montant, vérifiez et envoyez.")}
+          </p>
           <div>
             <div className="flex items-baseline justify-between mb-1.5 relative z-[65]">
               <label
@@ -1325,9 +1328,24 @@ export default function WalletDashboardSendModal({
         )}
       </div>
 		      <div className="rounded-[20px] p-4 space-y-4 ring-1 ring-white/10 ring-inset bg-[#101415] shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
-	        <div className="text-xs tracking-wide text-white/60 font-semibold">
-	          {t("ui_send_confirmation_title", "Résumé de l'envoi")}
+	        <div className="flex items-center justify-between">
+	          <span className="text-xs tracking-wide text-white/60 font-semibold">
+	            {t("ui_send_confirmation_title", "Résumé de l'envoi")}
+	          </span>
+	          {!summaryExpanded && (
+	            <span className="flex items-center gap-[3px] ml-2">
+	              <span className="w-[4px] h-[4px] rounded-full bg-white/25 animate-[summaryDot_1.4s_ease-in-out_infinite]" />
+	              <span className="w-[4px] h-[4px] rounded-full bg-white/25 animate-[summaryDot_1.4s_ease-in-out_0.2s_infinite]" />
+	              <span className="w-[4px] h-[4px] rounded-full bg-white/25 animate-[summaryDot_1.4s_ease-in-out_0.4s_infinite]" />
+	            </span>
+	          )}
 		        </div>
+	        <style jsx>{`
+	          @keyframes summaryDot {
+	            0%, 80%, 100% { opacity: 0.25; transform: scale(0.85); }
+	            40% { opacity: 0.7; transform: scale(1.15); }
+	          }
+	        `}</style>
 	        <div
 	          className="overflow-hidden transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]"
 	          style={{ maxHeight: summaryExpanded ? '400px' : '0px', opacity: summaryExpanded ? 1 : 0 }}
