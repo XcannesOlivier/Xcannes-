@@ -1583,25 +1583,27 @@ export default function WalletDashboardReceiveModal({
 				                        />
 				                      </div>
 
-                      <button
-                        type="button"
-                        onClick={e => {
-                          e.stopPropagation();
-                          handleGenerateRequest();
-                        }}
-                        disabled={generateButtonDisabled}
-                        className={[
-                          'w-full h-14 mt-10 rounded-[20px] text-white text-lg font-semibold transition-all duration-150',
-                          generateButtonDisabled
-                            ? 'opacity-45 cursor-not-allowed'
-                            : 'hover:scale-[1.01] active:scale-[0.98]',
-                        ].join(' ')}
-                        style={generateButtonDisabled
-                          ? { background: 'linear-gradient(180deg, rgba(34,154,86,0.45) 0%, rgba(14,103,58,0.45) 100%)' }
-                          : { background: 'linear-gradient(180deg, rgba(34,154,86,1) 0%, rgba(14,103,58,1) 100%)', boxShadow: '0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)' }}
-                      >
-                        {t('ui_generate_request_fr', 'Générer la demande')}
-                      </button>
+                      <div className="pt-12">
+                        <button
+                          type="button"
+                          onClick={e => {
+                            e.stopPropagation();
+                            handleGenerateRequest();
+                          }}
+                          disabled={generateButtonDisabled}
+                          className={[
+                            'w-full h-14 rounded-[20px] text-white text-lg font-semibold transition-all duration-150',
+                            generateButtonDisabled
+                              ? 'opacity-45 cursor-not-allowed'
+                              : 'hover:scale-[1.01] active:scale-[0.98]',
+                          ].join(' ')}
+                          style={generateButtonDisabled
+                            ? { background: 'linear-gradient(180deg, rgba(34,154,86,0.45) 0%, rgba(14,103,58,0.45) 100%)' }
+                            : { background: 'linear-gradient(180deg, rgba(34,154,86,1) 0%, rgba(14,103,58,1) 100%)', boxShadow: '0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)' }}
+                        >
+                          {t('ui_generate_request_fr', 'Générer la demande')}
+                        </button>
+                      </div>
 
 	                      {generateError ? (
 	                        <div className="mt-2 text-xs text-red-300 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
