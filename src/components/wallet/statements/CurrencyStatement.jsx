@@ -1689,6 +1689,12 @@ export default function CurrencyStatement({
                   ) : null}
 
 	                </div>
+                  <p className="mt-1 text-[13px] md:text-[14px] text-white/55 leading-relaxed">
+                    {t(
+                      "ui_currency_statement_subtitle_periods",
+                      "Affiche les transactions de la devise sélectionnée pour différentes périodes.",
+                    )}
+                  </p>
 	              </div>
 	            </div>
               {/* close via swipe/backdrop */}
@@ -1704,7 +1710,7 @@ export default function CurrencyStatement({
               }}
             />
           )}
-          <div className={`grid grid-cols-1 md:grid-cols-3 gap-3 ${periodDropdownOpen ? "relative z-[60]" : ""}`}>
+          <div className={`grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3 items-start ${periodDropdownOpen ? "relative z-[60]" : ""}`}>
             <div className={`${isInlineDesktop ? "md:col-span-3" : ""} ${periodDropdownOpen ? "relative z-[60]" : ""}`}>
                 <div className="my-3 md:my-4 flex justify-center">
                   <div className="relative w-full md:max-w-[420px]">
@@ -1769,7 +1775,7 @@ export default function CurrencyStatement({
                 <div>
                   <StatementMonthSelect
                     label={t("ui_statement_period_6dedec11d9", "Statement Period")}
-                    labelClassName="text-[22px] md:text-[21px] text-white/85 font-medium mb-1 text-center md:text-left"
+                    labelClassName="text-[18px] md:text-[21px] text-white/85 font-medium mb-1 text-left"
                     value={selectedMonth}
                     onOpenChange={(open) => {
                       setPeriodDropdownOpen(open);
@@ -1787,16 +1793,29 @@ export default function CurrencyStatement({
                     menuClassName={modalBgClass}
                   />
                 </div>
-                <div className="text-center md:text-center">
-                  <p className="text-[20px] md:text-[21px] text-white/60 mb-1">
+                <div className="text-right md:text-center">
+                  <p className="text-[18px] md:text-[21px] text-white/60 mb-1">
                     {t("ui_balance_445d830d72", "Balance")}
                   </p>
-                  <p className="text-2xl text-white font-bold">
+                  <p className="text-[38px] leading-none md:text-2xl text-white font-bold">
                     {formatAmountWithSymbolLocal(balance)}
                   </p>
+                  {estimatedUsd != null && Number.isFinite(estimatedUsd) ? (
+                    <div className="mt-1 md:hidden text-right">
+                      <p className="text-[11px] text-white/40 mb-1">
+                        {t("ui_digital_usd_label", "USD numérique")}
+                      </p>
+                      <p className="text-[12px] text-white/50">
+                        ≈ {formatAmountWithSymbol(locale, estimatedUsd, "RLUSD", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
+                      </p>
+                    </div>
+                  ) : null}
                 </div>
                 {estimatedUsd != null && Number.isFinite(estimatedUsd) ? (
-                  <div className="md:ml-auto md:text-right -mt-[4rem] text-right md:mt-0">
+                  <div className="hidden md:block md:ml-auto md:text-right">
                     <p className="text-[11px] text-white/40 mb-1">
                       {t("ui_digital_usd_label", "USD numérique")}
                     </p>
