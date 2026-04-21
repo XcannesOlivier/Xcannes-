@@ -1507,10 +1507,11 @@ export default function WalletDashboardReceiveModal({
   		                          onOpenChange={setRequestCurrencyDropdownOpen}
 	                          options={(augmentedTokens || []).map(token => {
                             const currencyUpper = String(token.currency || '').toUpperCase();
-                            const labelLeft =
+                            const labelLeftText =
                               selectLabelByCurrency?.[token.currency] ||
                               selectLabelByCurrency?.[currencyUpper] ||
                               token.currency;
+                            const labelLeft = <span className="md:text-[1.12em]">{labelLeftText}</span>;
                               const labelRightRaw =
                               selectLabelRightByCurrency?.[token.currency] ||
                               selectLabelRightByCurrency?.[currencyUpper] ||
@@ -1534,19 +1535,20 @@ export default function WalletDashboardReceiveModal({
                               value: token.currency,
                               icon:
                                 selectIconByCurrency?.[token.currency] || selectIconByCurrency?.[currencyUpper] || null,
-                              label: labelLeft,
+                              label: labelLeftText,
                               labelLeft,
                               labelRight,
                               labelMobile:
                                 selectLabelMobileByCurrency?.[token.currency] ||
                                 selectLabelMobileByCurrency?.[currencyUpper] ||
-                                labelLeft,
+                                labelLeftText,
                             };
 	                          })}
 	                          useNativeSelect={false}
 	                          portal
 	                          portalTarget={overlayListRef.current}
 	                          hideSelected
+	                          showMobileOptionRight={true}
 	                          backdropClassName="bg-black/80 backdrop-blur-[4px]"
 		                          menuClassName={
 		                            noticeVariant === 'demo'

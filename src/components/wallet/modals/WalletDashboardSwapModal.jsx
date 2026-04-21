@@ -652,7 +652,7 @@ export default function WalletDashboardSwapModal({
 		                      onOpenChange={setBaseDropdownOpen}
                       options={(swapCurrencyOptionsSanitized || []).map((code) => {
                         const labelLeftText = selectLabelByCurrency?.[code] || code;
-                        const labelLeft = <span className="md:text-[1.08em]">{labelLeftText}</span>;
+                        const labelLeft = <span className="md:text-[1.12em]">{labelLeftText}</span>;
                         const labelRightRaw = selectLabelRightByCurrency?.[code] || null;
                         const isSelected = String(code) === String(convertBaseCurrency || "");
                         const labelRight =
@@ -755,7 +755,7 @@ export default function WalletDashboardSwapModal({
                       onOpenChange={setQuoteDropdownOpen}
                       options={(swapCurrencyOptionsSanitized || []).map((code) => {
                         const labelLeftText = selectLabelByCurrency?.[code] || code;
-                        const labelLeft = <span className="md:text-[1.08em]">{labelLeftText}</span>;
+                        const labelLeft = <span className="md:text-[1.12em]">{labelLeftText}</span>;
                         const labelRightRaw = selectLabelRightByCurrency?.[code] || null;
                         const isSelected = String(code) === String(convertQuoteCurrency || "");
                         const labelRight =
