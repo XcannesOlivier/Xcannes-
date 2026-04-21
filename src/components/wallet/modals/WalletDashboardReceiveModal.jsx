@@ -1546,7 +1546,7 @@ export default function WalletDashboardReceiveModal({
                                       }}
                                       step="0.01"
                                       placeholder="0.00"
-                                      className="xcannes-no-spinner w-full bg-transparent text-4xl md:text-5xl font-bold text-white placeholder:text-white/25 focus:outline-none"
+                                      className="xcannes-no-spinner w-full bg-transparent text-4xl md:text-5xl font-bold text-white placeholder:text-white/35 focus:outline-none"
 					                          />
 					                          <span className="pointer-events-none absolute right-5 top-1/2 -translate-y-1/2 text-4xl md:text-5xl font-bold text-white drop-shadow-sm">
 					                            {requestCurrencyCode || 'USD'}
@@ -1577,7 +1577,7 @@ export default function WalletDashboardReceiveModal({
                           e.stopPropagation();
                           handleGenerateRequest();
                         }}
-                        className="w-full h-16 rounded-[20px] text-white text-lg font-semibold transition-all duration-150 hover:scale-[1.01] active:scale-[0.98]"
+                        className="w-full h-14 mt-10 rounded-[20px] text-white text-lg font-semibold transition-all duration-150 hover:scale-[1.01] active:scale-[0.98]"
                         style={{ background: 'linear-gradient(180deg, rgba(34,154,86,1) 0%, rgba(14,103,58,1) 100%)', boxShadow: '0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)' }}
                       >
                         {t('ui_generate_request_fr', 'Générer la demande')}
