@@ -138,7 +138,7 @@ export default function CurrencyStatement({
   const [filter, setFilter] = useState("all");
   const [exportFormat, setExportFormat] = useState(null);
   const [selectedMonth, setSelectedMonth] = useState(0);
-  const [showFullAddress, setShowFullAddress] = useState(false);
+  const [accountDropdownOpen, setAccountDropdownOpen] = useState(false);
   const [periodDropdownOpen, setPeriodDropdownOpen] = useState(false);
   const [isMobileDate, setIsMobileDate] = useState(false);
   const [highlightedTransactionId, setHighlightedTransactionId] =
@@ -1695,58 +1695,75 @@ export default function CurrencyStatement({
 	          </div>
 
           {/* Account Info dans le header */}
-          {periodDropdownOpen && (
+          {(periodDropdownOpen || accountDropdownOpen) && (
             <div
               className="fixed inset-0 z-[55] bg-black/80 backdrop-blur-[4px]"
               aria-hidden="true"
-              onClick={() => setPeriodDropdownOpen(false)}
+              onClick={() => {
+                setPeriodDropdownOpen(false);
+                setAccountDropdownOpen(false);
+              }}
             />
           )}
-          <div className={`grid grid-cols-1 md:grid-cols-3 gap-3 ${periodDropdownOpen ? "relative z-[60]" : ""}`}>
-            <div className={`${isInlineDesktop ? "md:col-span-3" : ""} ${periodDropdownOpen ? "relative z-[60]" : ""}`}>
-	              <div className="min-w-0 space-y-0.5 rounded-[20px] border border-white/10 px-3 py-2 bg-[#101415] shadow-[0_4px_12px_rgba(0,0,0,0.4)]">
-                <WalletActiveLabel
-                  prefix={t("ui_current_account_prefix", "Compte actuel :")}
-                  label={walletLabel || t("nav_wallet", "Wallet")}
-                  className="text-sm text-white font-semibold"
-                  prefixClassName="text-white/55 font-medium"
-                  labelClassName="text-white font-semibold"
-                />
-	                {walletAddress ? (
-	                  <div className="flex items-center gap-1.5 min-w-0">
-	                    <button
-	                      type="button"
-	                      onClick={() => setShowFullAddress((v) => !v)}
-	                      className={[
-	                        "text-xs md:text-sm text-white/55 font-mono text-left min-w-0",
-	                        showFullAddress ? "break-all whitespace-normal" : "truncate",
-	                      ].join(" ")}
-                      title={t(
-                        "ui_toggle_full_address",
-                        "Cliquer pour afficher/masquer l'adresse complète",
-                      )}
-                      aria-label={t(
-                        "ui_toggle_full_address",
-                        "Cliquer pour afficher/masquer l'adresse complète",
-                      )}
-                    >
-                      {showFullAddress ? walletAddress : truncatedWalletAddress}
-                    </button>
+          <div className={`grid grid-cols-1 md:grid-cols-3 gap-3 ${(periodDropdownOpen || accountDropdownOpen) ? "relative z-[60]" : ""}`}>
+            <div className={`${isInlineDesktop ? "md:col-span-3" : ""} ${(periodDropdownOpen || accountDropdownOpen) ? "relative z-[60]" : ""}`}>
+	              <div className="flex justify-center">
+                  <div className="relative w-full md:max-w-[420px]">
                     <button
                       type="button"
-                      onClick={() => copyToClipboard(walletAddress, t("ui_copied_address", "Adresse copiée"))}
-                      className="shrink-0 text-white/40 hover:text-white/70 transition-colors p-0.5"
-                      title={t("ui_copy_address", "Copier l'adresse")}
-                      aria-label={t("ui_copy_address", "Copier l'adresse")}
+                      onClick={() => setAccountDropdownOpen((prev) => !prev)}
+                      className={`w-full inline-flex items-center justify-center gap-3 px-6 py-1.5 bg-[#101415] ${accountDropdownOpen ? "rounded-t-[16px] rounded-b-none ring-1 ring-white/20 ring-inset" : "rounded-[16px]"} shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)] transition-colors`}
+                      aria-haspopup="menu"
+                      aria-expanded={accountDropdownOpen}
+                      title={t("ui_current_account_prefix", "Compte actuel")}
                     >
-                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-                        <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
+                      <span className="text-[14px] md:text-[15px] font-medium tracking-wide text-white/70 mr-2">
+                        {t("ui_current_account_prefix", "Compte actuel")}
+                      </span>
+                      <WalletActiveLabel
+                        prefix=""
+                        label={walletLabel || t("nav_wallet", "Wallet")}
+                        labelWrap={false}
+                        className="inline-flex items-center"
+                        labelClassName="!text-white/95 text-[14px] md:text-[15px] font-semibold"
+                        dotClassName="!h-3 !w-3 ring-xcannes-green/20 self-center"
+                      />
+                      <svg
+                        className={`w-3 h-3 text-white/70 transition-transform duration-150 ${accountDropdownOpen ? "rotate-180" : ""}`}
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        aria-hidden="true"
+                      >
+                        <path d="M6 9l6 6 6-6" />
                       </svg>
                     </button>
+                    {accountDropdownOpen && walletAddress ? (
+                      <div className="absolute left-0 right-0 top-full z-[70] -mt-px rounded-b-[16px] border border-white/10 border-t-0 bg-[#101415] px-3 py-2 shadow-[0_8px_18px_rgba(0,0,0,0.45)]">
+                        <div className="flex items-center gap-1.5 min-w-0">
+                          <span className="text-xs md:text-sm text-white/55 font-mono truncate min-w-0" title={walletAddress}>
+                            {truncatedWalletAddress}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => copyToClipboard(walletAddress, t("ui_copied_address", "Adresse copiée"))}
+                            className="shrink-0 text-white/40 hover:text-white/70 transition-colors p-0.5"
+                            title={t("ui_copy_address", "Copier l'adresse")}
+                            aria-label={t("ui_copy_address", "Copier l'adresse")}
+                          >
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                              <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+                    ) : null}
                   </div>
-                ) : null}
-              </div>
+                </div>
             </div>
             {!isXrpNetworkView ? (
               <>
@@ -1755,7 +1772,10 @@ export default function CurrencyStatement({
                     label={t("ui_statement_period_6dedec11d9", "Statement Period")}
                     labelClassName="text-[22px] md:text-[21px] text-white/85 font-medium mb-1 text-center md:text-left"
                     value={selectedMonth}
-                    onOpenChange={setPeriodDropdownOpen}
+                    onOpenChange={(open) => {
+                      setPeriodDropdownOpen(open);
+                      if (open) setAccountDropdownOpen(false);
+                    }}
                     onChange={(nextValue) => {
                       if (nextValue === "archives") {
                         setSelectedMonth("archives");
