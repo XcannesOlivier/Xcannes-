@@ -678,11 +678,11 @@ export default function WalletDashboardSwapModal({
 		                      iconClassName="text-3xl leading-none"
 		                      backdropClassName="bg-black/80 backdrop-blur-[4px]"
                           buttonClassName="bg-[#101415] ring-1 ring-white/10 ring-inset rounded-[14px] px-3.5 py-2 text-xl text-white outline-none focus:outline-none cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
-                          openButtonClassName="!bg-white/10 !border !border-white/40 !border-b-0 !ring-1 !ring-white/40 !shadow-[inset_0_0_0_1px_rgba(255,255,255,0.20),0_8px_18px_rgba(0,0,0,0.45)]"
+                          openButtonClassName="!bg-white/10 !border !border-white/10 !border-b-0 !ring-1 !ring-white/10 !shadow-[0_8px_18px_rgba(0,0,0,0.45)]"
 		                      menuClassName={
 		                        noticeVariant === "demo"
-                              ? "bg-xcannes-surface-demo !border-white/35 !ring-1 !ring-white/30 ring-inset max-h-[520px]"
-                              : "bg-[#101415] !border-white/35 !ring-1 !ring-white/30 ring-inset max-h-[520px]"
+                              ? "bg-xcannes-surface-demo !border-white/10 !ring-1 !ring-white/10 ring-inset max-h-[520px]"
+                              : "bg-[#101415] !border-white/10 !ring-1 !ring-white/10 ring-inset max-h-[520px]"
 		                      }
                           selectClassName="xcannes-select w-full bg-[#101415] ring-1 ring-white/10 ring-inset rounded-[14px] px-3.5 py-2 text-xl text-white outline-none focus:outline-none cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
 		                    />
@@ -780,12 +780,12 @@ export default function WalletDashboardSwapModal({
 		                      iconClassName="text-3xl leading-none"
 		                      backdropClassName="bg-black/80 backdrop-blur-[4px]"
                           buttonClassName="bg-[#101415] ring-1 ring-white/10 ring-inset rounded-[14px] px-3.5 py-2 text-xl text-white outline-none focus:outline-none cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
-                          openButtonClassName="!bg-white/10 !border !border-white/40 !border-b-0 !ring-1 !ring-white/40 !shadow-[inset_0_0_0_1px_rgba(255,255,255,0.20),0_8px_18px_rgba(0,0,0,0.45)]"
+                          openButtonClassName="!bg-white/10 !border !border-white/10 !border-b-0 !ring-1 !ring-white/10 !shadow-[0_8px_18px_rgba(0,0,0,0.45)]"
                           optionClassName="py-2.5 md:py-3"
 		                      menuClassName={
 		                        noticeVariant === "demo"
-                              ? "bg-xcannes-surface-demo !border-white/35 !ring-1 !ring-white/30 ring-inset max-h-[220px]"
-                              : "bg-[#101415] !border-white/35 !ring-1 !ring-white/30 ring-inset max-h-[220px]"
+                              ? "bg-xcannes-surface-demo !border-white/10 !ring-1 !ring-white/10 ring-inset max-h-[220px]"
+                              : "bg-[#101415] !border-white/10 !ring-1 !ring-white/10 ring-inset max-h-[220px]"
 		                      }
                           menuFooter={(
                             <WalletCurrencySelector
