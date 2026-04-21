@@ -645,11 +645,6 @@ export default function WalletDashboardSwapModal({
                       <div className="text-[13px] tracking-[0.22em] text-white/45">
                         {t("ui_convert_from_label", "Vous envoyez")}
                       </div>
-                      {baseDropdownOpen ? (
-                        <div className="text-[11px] text-white/40">
-                          {t("ui_hide_balances_hint_aa12", "Masquer les soldes")}
-                        </div>
-                      ) : null}
                     </div>
 		                    <ModalSelect
 		                      value={convertBaseCurrency}
@@ -683,6 +678,7 @@ export default function WalletDashboardSwapModal({
 		                      iconClassName="text-3xl leading-none"
 		                      backdropClassName="bg-black/80 backdrop-blur-[4px]"
 		                      buttonClassName="bg-[#101415] ring-1 ring-white/10 ring-inset rounded-[14px] px-3.5 py-1.5 text-xl text-white outline-none focus:outline-none cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
+                          openButtonClassName="!bg-[#151c22] ring-1 ring-white/20 shadow-[0_8px_18px_rgba(0,0,0,0.45)]"
 		                      menuClassName={
 		                        noticeVariant === "demo"
 		                          ? "bg-xcannes-surface-demo border-white/15 ring-1 ring-white/10 ring-inset max-h-[520px]"
@@ -747,11 +743,6 @@ export default function WalletDashboardSwapModal({
                       <div className="text-[13px] tracking-[0.22em] text-white/45">
                         {t("ui_convert_to_label", "Vous recevez")}
                       </div>
-                      {quoteDropdownOpen ? (
-                        <div className="text-[11px] text-white/40">
-                          {t("ui_hide_balances_hint_aa12", "Masquer les soldes")}
-                        </div>
-                      ) : null}
                     </div>
 		                    <ModalSelect
 		                      value={convertQuoteCurrency}
