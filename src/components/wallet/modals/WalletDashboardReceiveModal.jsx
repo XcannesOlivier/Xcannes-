@@ -1534,11 +1534,17 @@ export default function WalletDashboardReceiveModal({
 					                        <label className="block text-lg md:text-xl text-white/70 font-semibold mb-2">
 					                          {t('ui_amount_7668986206', 'Montant')}
 					                        </label>
-                                  <div className="relative rounded-[18px] bg-[#111518] ring-1 ring-white/10 ring-inset transition-colors duration-150 shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30)] pt-5 pb-5 px-5">
+                                  <div className="relative rounded-[18px] bg-[#101415] ring-1 ring-white/10 ring-inset transition-colors duration-150 shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30)] pt-5 pb-5 px-5">
 					                          <input
 					                            type="number"
 					                            value={requestAmount}
-					                            onChange={e => setRequestAmount(e.target.value)}
+                                      onChange={e => {
+                                        const normalized = String(e.target.value || '').replace(',', '.');
+                                        if (normalized === '' || /^\d*\.?\d{0,2}$/.test(normalized)) {
+                                          setRequestAmount(normalized);
+                                        }
+                                      }}
+                                      step="0.01"
 					                            placeholder="0.0000"
                                       className="xcannes-no-spinner w-full bg-transparent text-4xl md:text-5xl font-bold text-white placeholder:text-white/25 focus:outline-none"
 					                          />
@@ -1564,10 +1570,6 @@ export default function WalletDashboardReceiveModal({
 				                          }`}
 				                        />
 				                      </div>
-
-                      <div className="py-5">
-                        <div className="h-px bg-white/10" />
-                      </div>
 
                       <button
                         type="button"
