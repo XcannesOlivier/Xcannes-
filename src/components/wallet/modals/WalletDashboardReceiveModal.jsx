@@ -1443,7 +1443,7 @@ export default function WalletDashboardReceiveModal({
                         <div className="flex justify-center pt-1 pb-1 relative z-[85]">
 	                      <div className="relative">
 	                        {/* Visible pill */}
-                            <div className={`inline-flex items-center gap-6 bg-elevated px-6 py-1.5 rounded-full ${requestCurrencyDropdownOpen ? 'shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_10px_rgba(255,255,255,0.16)]' : 'shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]'} ${requestWalletDropdownOpen ? 'ring-1 ring-white/20 ring-inset' : ''} ${hasMultipleWallets ? 'cursor-pointer' : ''}`}>
+                            <div className={`inline-flex items-center gap-6 bg-elevated px-6 py-1.5 ${requestWalletDropdownOpen ? 'rounded-t-full rounded-b-none' : 'rounded-full'} ${requestCurrencyDropdownOpen ? 'shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_10px_rgba(255,255,255,0.16)]' : 'shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]'} ${requestWalletDropdownOpen ? 'ring-1 ring-white/20 ring-inset' : ''} ${hasMultipleWallets ? 'cursor-pointer' : ''}`}>
 	                          <span className="text-white/70 text-[14px] md:text-[15px] font-medium tracking-wide">
 	                            {t('ui_receive_account_info_label', 'Choisissez le compte')}
 	                          </span>
@@ -1477,9 +1477,9 @@ export default function WalletDashboardReceiveModal({
 	                              iconClassName="inline-flex items-center justify-center leading-none"
 	                              buttonClassName="w-full h-full opacity-0 cursor-pointer rounded-full"
 	                              menuClassName={
-	                                noticeVariant === 'demo'
-                                    ? 'bg-xcannes-surface-demo !max-h-64 overflow-y-auto overscroll-contain touch-pan-y !border-white/20 !ring-1 !ring-white/20 ring-inset'
-                                    : 'bg-[#101415] !max-h-64 overflow-y-auto overscroll-contain touch-pan-y !border-white/20 !ring-1 !ring-white/20 ring-inset'
+                                  noticeVariant === 'demo'
+                                    ? 'bg-xcannes-surface-demo !-mt-px !max-h-64 overflow-y-auto overscroll-contain touch-pan-y !border-white/20 !ring-1 !ring-white/20 ring-inset'
+                                    : 'bg-[#101415] !-mt-px !max-h-64 overflow-y-auto overscroll-contain touch-pan-y !border-white/20 !ring-1 !ring-white/20 ring-inset'
 	                              }
 	                              selectClassName="xcannes-select w-full bg-transparent rounded-xl pl-0 pr-2 py-2 text-base text-white focus:outline-none transition-colors duration-150"
 	                            />
