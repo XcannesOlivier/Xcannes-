@@ -567,19 +567,6 @@ export default function WalletDashboardSendChoiceModal({
                     <span className="hidden md:inline text-[13px] font-medium">{t('ui_back', 'Retour')}</span>
                   </button>
                 </div>
-                {/* Wallet meta pill */}
-                <div className="pt-1 pb-2 flex justify-center px-4">
-                  {renderWalletMeta?.({
-                    variant: 'pill',
-                    className: 'w-full flex justify-center wallet-meta--plus-4 wallet-meta--desktop-gap',
-                    prefix: t('moonpay_from_account', 'Depuis le compte'),
-                    labelWrap: false,
-                    pillClassName: 'bg-elevated px-6 py-1.5 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)] gap-6',
-                    prefixClassName: '!text-white/70 text-[14px] md:text-[15px] font-medium tracking-wide mr-6',
-                    labelClassName: '!text-white/95 text-[14px] md:text-[15px] font-semibold',
-                    dotClassName: '!h-3 !w-3 ring-xcannes-green/20 self-center',
-                  })}
-                </div>
                 <div className="px-5 pt-3 pb-5 flex flex-col flex-1 min-h-0">
                 {/* Title + subtitle (centered) */}
                 <div className="flex flex-col items-center text-center mb-6">
@@ -589,6 +576,19 @@ export default function WalletDashboardSendChoiceModal({
                   <p className="mt-2 text-[14px] md:text-[15px] text-white/60 max-w-[34ch] leading-relaxed">
                     {t('ui_send_simple_hint_long', 'Saisissez une adresse, indiquez la devise et le montant.')}
                   </p>
+                  {/* Wallet meta pill */}
+                  <div className="mt-4 flex justify-center px-4 w-full">
+                    {renderWalletMeta?.({
+                      variant: 'pill',
+                      className: 'w-full flex justify-center wallet-meta--plus-4 wallet-meta--desktop-gap',
+                      prefix: t('moonpay_from_account', 'Depuis le compte'),
+                      labelWrap: false,
+                      pillClassName: 'bg-elevated px-6 py-1.5 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)] gap-6',
+                      prefixClassName: '!text-white/70 text-[14px] md:text-[15px] font-medium tracking-wide mr-6',
+                      labelClassName: '!text-white/95 text-[14px] md:text-[15px] font-semibold',
+                      dotClassName: '!h-3 !w-3 ring-xcannes-green/20 self-center',
+                    })}
+                  </div>
                 </div>
 
                 {/* Steps toggle */}
@@ -765,19 +765,6 @@ export default function WalletDashboardSendChoiceModal({
                     <span className="hidden md:inline text-[13px] font-medium">{t('ui_back', 'Retour')}</span>
                   </button>
                 </div>
-                {/* Wallet meta pill */}
-                <div className="pt-1 pb-2 flex justify-center px-4">
-                  {renderWalletMeta?.({
-                    variant: 'pill',
-                    className: 'w-full flex justify-center wallet-meta--plus-4 wallet-meta--desktop-gap',
-                    prefix: t('moonpay_from_account', 'Depuis le compte'),
-                    labelWrap: false,
-                    pillClassName: 'bg-elevated px-6 py-1.5 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)] gap-6',
-                    prefixClassName: '!text-white/70 text-[14px] md:text-[15px] font-medium tracking-wide mr-6',
-                    labelClassName: '!text-white/95 text-[14px] md:text-[15px] font-semibold',
-                    dotClassName: '!h-3 !w-3 ring-xcannes-green/20 self-center',
-                  })}
-                </div>
                 <div className="px-5 pt-3 pb-5 flex flex-col flex-1 min-h-0">
                 {/* Title + subtitle (centered) */}
                 <div className="flex flex-col items-center text-center mb-6">
@@ -787,6 +774,19 @@ export default function WalletDashboardSendChoiceModal({
                   <p className="mt-2 text-[14px] md:text-[15px] text-white/60 max-w-[34ch] leading-relaxed">
                     {t('ui_send_pay_request_hint', 'Réglez une demande reçue après vérification.')}
                   </p>
+                  {/* Wallet meta pill */}
+                  <div className="mt-4 flex justify-center px-4 w-full">
+                    {renderWalletMeta?.({
+                      variant: 'pill',
+                      className: 'w-full flex justify-center wallet-meta--plus-4 wallet-meta--desktop-gap',
+                      prefix: t('moonpay_from_account', 'Depuis le compte'),
+                      labelWrap: false,
+                      pillClassName: 'bg-elevated px-6 py-1.5 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)] gap-6',
+                      prefixClassName: '!text-white/70 text-[14px] md:text-[15px] font-medium tracking-wide mr-6',
+                      labelClassName: '!text-white/95 text-[14px] md:text-[15px] font-semibold',
+                      dotClassName: '!h-3 !w-3 ring-xcannes-green/20 self-center',
+                    })}
+                  </div>
                 </div>
 
                 {/* Steps toggle */}

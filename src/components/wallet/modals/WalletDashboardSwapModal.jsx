@@ -602,22 +602,6 @@ export default function WalletDashboardSwapModal({
                 }}
               >
                 <div className="flex min-w-0 flex-col gap-1.5 w-full relative z-[65]">
-                  <div>
-                    {renderWalletMeta?.({
-                      variant: "pill",
-                      className: "w-full flex justify-center wallet-meta--plus-4 wallet-meta--desktop-gap relative z-[85]",
-                      prefix: t("moonpay_from_account", "Depuis le compte"),
-                      labelWrap: false,
-                      pillClassName: `bg-elevated px-6 py-1.5 gap-6 ${baseDropdownOpen || quoteDropdownOpen
-                        ? "shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_10px_rgba(255,255,255,0.16)]"
-                        : "shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]"}`,
-                      prefixClassName:
-                        "!text-white/70 text-[14px] md:text-[15px] font-medium tracking-wide mr-6",
-                      labelClassName:
-                        "!text-white/95 text-[14px] md:text-[15px] font-semibold",
-                      dotClassName: "!h-3 !w-3 ring-xcannes-green/20 self-center",
-                    })}
-                  </div>
                   <div className="flex flex-wrap items-center gap-2">
                     {noticeVariant === "demo" ? (
                       <span className="inline-flex items-center text-white/80 text-sm md:text-base font-semibold px-2 py-1 leading-none">
@@ -637,6 +621,22 @@ export default function WalletDashboardSwapModal({
                   <p className="mt-2 text-[14px] md:text-[15px] text-white/60 max-w-[34ch] mx-auto leading-relaxed">
                     {t("ui_convert_subtitle_main", "Sélectionnez les devises, indiquez le montant, vérifiez le résumé.")}
                   </p>
+                  <div className="mt-4 flex justify-center relative z-[65]">
+                    {renderWalletMeta?.({
+                      variant: "pill",
+                      className: "w-full flex justify-center wallet-meta--plus-4 wallet-meta--desktop-gap relative z-[85]",
+                      prefix: t("moonpay_from_account", "Depuis le compte"),
+                      labelWrap: false,
+                      pillClassName: `bg-elevated px-6 py-1.5 gap-6 ${baseDropdownOpen || quoteDropdownOpen
+                        ? "shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_10px_rgba(255,255,255,0.16)]"
+                        : "shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]"}`,
+                      prefixClassName:
+                        "!text-white/70 text-[14px] md:text-[15px] font-medium tracking-wide mr-6",
+                      labelClassName:
+                        "!text-white/95 text-[14px] md:text-[15px] font-semibold",
+                      dotClassName: "!h-3 !w-3 ring-xcannes-green/20 self-center",
+                    })}
+                  </div>
                 </div>
                 {/* ── SECTION 1: Currency selection ───────────────────────── */}
                 <div className="space-y-3">

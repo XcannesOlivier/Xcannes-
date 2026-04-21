@@ -1198,6 +1198,22 @@ export default function WalletDashboardSendModal({
           <h3 className="text-[24px] md:text-[34px] font-bold text-white/95 tracking-tight text-center leading-snug">
             {t("ui_send_devise_hint", "Indiquez la devise, le montant, vérifiez et envoyez.")}
           </h3>
+          <div className="flex justify-center">
+            {renderWalletMeta?.({
+              variant: "pill",
+              className:
+                "w-full flex justify-center wallet-meta--plus-4 wallet-meta--desktop-gap",
+              prefix: t("moonpay_from_account", "Depuis le compte"),
+              labelWrap: false,
+              pillClassName:
+                "bg-elevated px-6 py-1.5 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)] gap-6",
+              prefixClassName:
+                "!text-white/70 text-[14px] md:text-[15px] font-medium tracking-wide mr-6",
+              labelClassName:
+                "!text-white/95 text-[14px] md:text-[15px] font-semibold",
+              dotClassName: "!h-3 !w-3 ring-xcannes-green/20 self-center",
+            })}
+          </div>
           <div>
             <div className="flex items-baseline justify-between mb-1.5 relative z-[65]">
               <label
@@ -1417,6 +1433,22 @@ export default function WalletDashboardSendModal({
         <p className="text-[14px] md:text-[15px] text-white/60 max-w-[34ch] mx-auto leading-relaxed">
           {t("ui_payreq_summary_subtitle", "Vérifiez les informations avant d\u2019envoyer")}
         </p>
+        <div className="mt-4 flex justify-center">
+          {renderWalletMeta?.({
+            variant: "pill",
+            className:
+              "w-full flex justify-center wallet-meta--plus-4 wallet-meta--desktop-gap",
+            prefix: t("moonpay_from_account", "Depuis le compte"),
+            labelWrap: false,
+            pillClassName:
+              "bg-elevated px-6 py-1.5 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)] gap-6",
+            prefixClassName:
+              "!text-white/70 text-[14px] md:text-[15px] font-medium tracking-wide mr-6",
+            labelClassName:
+              "!text-white/95 text-[14px] md:text-[15px] font-semibold",
+            dotClassName: "!h-3 !w-3 ring-xcannes-green/20 self-center",
+          })}
+        </div>
       </div>
 
       {/* Summary lines – flat, no box */}
@@ -1677,22 +1709,6 @@ export default function WalletDashboardSendModal({
               }}
             >
               <div className="flex min-w-0 flex-col gap-1.5 w-full">
-                <div>
-	                  {renderWalletMeta?.({
-	                    variant: "pill",
-	                    className:
-	                      "w-full flex justify-center wallet-meta--plus-4 wallet-meta--desktop-gap",
-	                    prefix: t("moonpay_from_account", "Depuis le compte"),
-	                    labelWrap: false,
-	                    pillClassName:
-	                      "bg-elevated px-6 py-1.5 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)] gap-6",
-	                    prefixClassName:
-	                      "!text-white/70 text-[14px] md:text-[15px] font-medium tracking-wide mr-6",
-	                    labelClassName:
-	                      "!text-white/95 text-[14px] md:text-[15px] font-semibold",
-	                    dotClassName: "!h-3 !w-3 ring-xcannes-green/20 self-center",
-	                  })}
-                </div>
                 <div className="flex flex-wrap items-center gap-2">
                   {noticeVariant === "demo" ? (
                     <span className="inline-flex items-center text-white/80 text-sm md:text-base font-semibold px-2 py-1 leading-none">
