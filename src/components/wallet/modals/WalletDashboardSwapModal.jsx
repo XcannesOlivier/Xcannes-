@@ -334,6 +334,7 @@ export default function WalletDashboardSwapModal({
   const [overlayDragging, setOverlayDragging] = useState(false);
   const [overlayTranslateY, setOverlayTranslateY] = useState(0);
   const [baseDropdownOpen, setBaseDropdownOpen] = useState(false);
+  const [quoteDropdownOpen, setQuoteDropdownOpen] = useState(false);
   const overlayRef = useRef(null);
   const overlayListRef = useRef(null);
   const overlayDragMetaRef = useRef({
@@ -644,6 +645,11 @@ export default function WalletDashboardSwapModal({
                       <div className="text-[13px] tracking-[0.22em] text-white/45">
                         {t("ui_convert_from_label", "Vous envoyez")}
                       </div>
+                      {baseDropdownOpen ? (
+                        <div className="text-[11px] text-white/40">
+                          {t("ui_hide_balances_hint_aa12", "Masquer les soldes")}
+                        </div>
+                      ) : null}
                     </div>
 		                    <ModalSelect
 		                      value={convertBaseCurrency}
@@ -651,7 +657,16 @@ export default function WalletDashboardSwapModal({
 		                      onOpenChange={setBaseDropdownOpen}
                       options={(swapCurrencyOptionsSanitized || []).map((code) => {
                         const labelLeft = selectLabelByCurrency?.[code] || code;
-                        const labelRight = selectLabelRightByCurrency?.[code] || null;
+                        const labelRightRaw = selectLabelRightByCurrency?.[code] || null;
+                        const isSelected = String(code) === String(convertBaseCurrency || "");
+                        const labelRight =
+                          !baseDropdownOpen && isSelected
+                            ? (
+                              <span className="text-[10px] md:text-[11px] text-white/38 tracking-[0.01em]">
+                                {t("ui_view_balances_hint_aa12", "Voir les soldes")}
+                              </span>
+                            )
+                            : labelRightRaw;
                         return {
                           value: code,
                           icon: getIconForCode(code),
@@ -732,13 +747,28 @@ export default function WalletDashboardSwapModal({
                       <div className="text-[13px] tracking-[0.22em] text-white/45">
                         {t("ui_convert_to_label", "Vous recevez")}
                       </div>
+                      {quoteDropdownOpen ? (
+                        <div className="text-[11px] text-white/40">
+                          {t("ui_hide_balances_hint_aa12", "Masquer les soldes")}
+                        </div>
+                      ) : null}
                     </div>
 		                    <ModalSelect
 		                      value={convertQuoteCurrency}
 		                      onChange={setConvertQuoteCurrency}
+                      onOpenChange={setQuoteDropdownOpen}
                       options={(swapCurrencyOptionsSanitized || []).map((code) => {
                         const labelLeft = selectLabelByCurrency?.[code] || code;
-                        const labelRight = selectLabelRightByCurrency?.[code] || null;
+                        const labelRightRaw = selectLabelRightByCurrency?.[code] || null;
+                        const isSelected = String(code) === String(convertQuoteCurrency || "");
+                        const labelRight =
+                          !quoteDropdownOpen && isSelected
+                            ? (
+                              <span className="text-[10px] md:text-[11px] text-white/38 tracking-[0.01em]">
+                                {t("ui_view_balances_hint_aa12", "Voir les soldes")}
+                              </span>
+                            )
+                            : labelRightRaw;
                         const isNewLine = !existingCurrencyLinesSet.has(code) && code && code !== "USD";
                         const labelWithHint = isNewLine ? (
                           <>{labelLeft} <span className="text-[11px] text-white/35 font-normal">{t("ui_new_currency_line_auto_activate_a1b2c3", "the {{currency}} line will be created automatically.").replace("{{currency}}", code)}</span></>
