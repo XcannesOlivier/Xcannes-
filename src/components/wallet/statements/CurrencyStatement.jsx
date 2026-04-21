@@ -1695,18 +1695,17 @@ export default function CurrencyStatement({
 	          </div>
 
           {/* Account Info dans le header */}
-          {(periodDropdownOpen || accountDropdownOpen) && (
+          {periodDropdownOpen && (
             <div
               className="fixed inset-0 z-[55] bg-black/80 backdrop-blur-[4px]"
               aria-hidden="true"
               onClick={() => {
                 setPeriodDropdownOpen(false);
-                setAccountDropdownOpen(false);
               }}
             />
           )}
-          <div className={`grid grid-cols-1 md:grid-cols-3 gap-3 ${(periodDropdownOpen || accountDropdownOpen) ? "relative z-[60]" : ""}`}>
-            <div className={`${isInlineDesktop ? "md:col-span-3" : ""} ${(periodDropdownOpen || accountDropdownOpen) ? "relative z-[60]" : ""}`}>
+          <div className={`grid grid-cols-1 md:grid-cols-3 gap-3 ${periodDropdownOpen ? "relative z-[60]" : ""}`}>
+            <div className={`${isInlineDesktop ? "md:col-span-3" : ""} ${periodDropdownOpen ? "relative z-[60]" : ""}`}>
 	              <div className="flex justify-center">
                   <div className="relative w-full md:max-w-[420px]">
                     <button
@@ -1742,7 +1741,7 @@ export default function CurrencyStatement({
                       </svg>
                     </button>
                     {accountDropdownOpen && walletAddress ? (
-                      <div className="absolute left-0 right-0 top-full z-[70] -mt-px rounded-b-[16px] border border-white/10 border-t-0 bg-[#101415] px-3 py-2 shadow-[0_8px_18px_rgba(0,0,0,0.45)]">
+                      <div className="w-full -mt-px rounded-b-[16px] border border-white/10 border-t-0 bg-[#101415] px-3 py-2 shadow-[0_8px_18px_rgba(0,0,0,0.45)]">
                         <div className="flex items-center gap-1.5 min-w-0">
                           <span className="text-xs md:text-sm text-white/55 font-mono truncate min-w-0" title={walletAddress}>
                             {truncatedWalletAddress}

@@ -1873,15 +1873,7 @@ export default function GlobalStatement({
             {/* close via swipe/backdrop */}
           </div>
 
-          {accountDropdownOpen ? (
-            <div
-              className="fixed inset-0 z-[10202] bg-black/80 backdrop-blur-[4px]"
-              aria-hidden="true"
-              onClick={() => setAccountDropdownOpen(false)}
-            />
-          ) : null}
-
-	          <div className="mt-4 flex justify-center relative z-[10203]">
+	          <div className="mt-4 flex justify-center">
             <div className="relative w-full md:max-w-[420px]">
               <button
                 type="button"
@@ -1916,7 +1908,7 @@ export default function GlobalStatement({
                 </svg>
               </button>
               {accountDropdownOpen && walletAddress ? (
-                <div className="absolute left-0 right-0 top-full z-[10204] -mt-px rounded-b-[16px] border border-white/10 border-t-0 bg-[#101415] px-3 py-2 shadow-[0_8px_18px_rgba(0,0,0,0.45)]">
+                <div className="w-full -mt-px rounded-b-[16px] border border-white/10 border-t-0 bg-[#101415] px-3 py-2 shadow-[0_8px_18px_rgba(0,0,0,0.45)]">
                   <div className="flex items-center gap-1.5 min-w-0">
                     <span className="text-xs md:text-sm text-white/55 font-mono truncate min-w-0" title={walletAddress}>
                       {truncatedWalletAddress}
