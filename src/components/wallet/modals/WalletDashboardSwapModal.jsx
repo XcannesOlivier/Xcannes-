@@ -651,7 +651,8 @@ export default function WalletDashboardSwapModal({
 		                      onChange={setConvertBaseCurrency}
 		                      onOpenChange={setBaseDropdownOpen}
                       options={(swapCurrencyOptionsSanitized || []).map((code) => {
-                        const labelLeft = selectLabelByCurrency?.[code] || code;
+                        const labelLeftText = selectLabelByCurrency?.[code] || code;
+                        const labelLeft = <span className="md:text-[1.08em]">{labelLeftText}</span>;
                         const labelRightRaw = selectLabelRightByCurrency?.[code] || null;
                         const isSelected = String(code) === String(convertBaseCurrency || "");
                         const labelRight =
@@ -669,11 +670,11 @@ export default function WalletDashboardSwapModal({
                         return {
                           value: code,
                           icon: getIconForCode(code),
-                          label: labelLeft,
+                          label: labelLeftText,
                           labelLeft,
                           labelRight,
                           labelMobile:
-                            selectLabelMobileByCurrency?.[code] || labelLeft,
+                            selectLabelMobileByCurrency?.[code] || labelLeftText,
                         };
                       })}
 		                      useNativeSelect={false}
@@ -753,7 +754,8 @@ export default function WalletDashboardSwapModal({
 		                      onChange={setConvertQuoteCurrency}
                       onOpenChange={setQuoteDropdownOpen}
                       options={(swapCurrencyOptionsSanitized || []).map((code) => {
-                        const labelLeft = selectLabelByCurrency?.[code] || code;
+                        const labelLeftText = selectLabelByCurrency?.[code] || code;
+                        const labelLeft = <span className="md:text-[1.08em]">{labelLeftText}</span>;
                         const labelRightRaw = selectLabelRightByCurrency?.[code] || null;
                         const isSelected = String(code) === String(convertQuoteCurrency || "");
                         const labelRight =
@@ -775,11 +777,11 @@ export default function WalletDashboardSwapModal({
                         return {
                           value: code,
                           icon: getIconForCode(code),
-                          label: labelLeft,
+                          label: labelLeftText,
                           labelLeft: labelWithHint,
                           labelRight,
                           labelMobile:
-                            selectLabelMobileByCurrency?.[code] || labelLeft,
+                            selectLabelMobileByCurrency?.[code] || labelLeftText,
                         };
                       })}
 		                      useNativeSelect={false}

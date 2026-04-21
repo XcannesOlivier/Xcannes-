@@ -1554,11 +1554,11 @@ export default function WalletDashboardReceiveModal({
                                   : 'bg-[#101415] max-h-[320px] overflow-y-auto overscroll-contain touch-pan-y !border-white/10 !ring-1 !ring-white/10 ring-inset'
 		                          }
                               openButtonClassName="!bg-white/10 !border !border-white/10 !border-b-0 !ring-1 !ring-white/10 !shadow-none"
-			                          buttonClassName={`ring-1 ring-white/10 ring-inset rounded-[20px] px-3.5 py-3 text-lg text-white focus:outline-none cursor-pointer ${
+                              buttonClassName={`ring-1 ring-white/10 ring-inset rounded-[20px] px-3.5 py-3 text-xl md:text-2xl text-white focus:outline-none cursor-pointer ${
 			                            noticeVariant === 'demo' ? 'bg-xcannes-surface-demo' : 'bg-[#101415]'
 			                          }`}
-			                          iconClassName="text-xl leading-none"
-			                          selectClassName={`xcannes-select w-full ring-1 ring-white/10 ring-inset rounded-[20px] px-3.5 py-3 text-base text-white focus:outline-none transition-colors duration-150 ${
+                              iconClassName="text-3xl leading-none"
+                              selectClassName={`xcannes-select w-full ring-1 ring-white/10 ring-inset rounded-[20px] px-3.5 py-3 text-xl md:text-2xl text-white focus:outline-none transition-colors duration-150 ${
 			                            noticeVariant === 'demo' ? 'bg-xcannes-surface-demo' : 'bg-white/[0.02]'
 			                          }`}
 			                        />
