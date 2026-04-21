@@ -621,10 +621,10 @@ export default function WalletDashboardSwapModal({
                   <p className="mt-2 text-[14px] md:text-[15px] text-white/60 max-w-[34ch] mx-auto leading-relaxed">
                     {t("ui_convert_subtitle_main", "Sélectionnez les devises, indiquez le montant, vérifiez le résumé.")}
                   </p>
-                  <div className="mt-4 flex justify-center relative z-[65]">
+                  <div className="mt-4 flex justify-center relative z-[120]">
                     {renderWalletMeta?.({
                       variant: "pill",
-                      className: "w-full flex justify-center wallet-meta--plus-4 wallet-meta--desktop-gap relative z-[85]",
+                      className: "w-full flex justify-center wallet-meta--plus-4 wallet-meta--desktop-gap relative z-[120]",
                       prefix: t("moonpay_from_account", "Depuis le compte"),
                       labelWrap: false,
                       pillClassName: `bg-elevated px-6 py-1.5 gap-6 ${baseDropdownOpen || quoteDropdownOpen
@@ -681,15 +681,15 @@ export default function WalletDashboardSwapModal({
 		                      hideSelected
 		                      showMobileOptionRight={true}
 		                      iconClassName="text-3xl leading-none"
-		                      backdropClassName="bg-black/80 backdrop-blur-[4px]"
-                          buttonClassName="bg-[#101415] ring-1 ring-white/10 ring-inset rounded-[14px] px-3.5 py-2 text-xl md:text-2xl text-white outline-none focus:outline-none cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
+                          backdropClassName="bg-black/80 backdrop-blur-[4px] !z-[55]"
+                          buttonClassName="bg-[#101415] ring-1 ring-white/10 ring-inset rounded-[14px] px-3.5 py-1.5 md:py-2 text-xl md:text-2xl text-white outline-none focus:outline-none cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
                           openButtonClassName="!bg-white/10 !border !border-white/10 !border-b-0 !ring-1 !ring-white/10 !shadow-[0_8px_18px_rgba(0,0,0,0.45)]"
 		                      menuClassName={
 		                        noticeVariant === "demo"
                               ? "bg-xcannes-surface-demo !border-white/10 !ring-1 !ring-white/10 ring-inset max-h-[520px]"
                               : "bg-[#101415] !border-white/10 !ring-1 !ring-white/10 ring-inset max-h-[520px]"
 		                      }
-                          selectClassName="xcannes-select w-full bg-[#101415] ring-1 ring-white/10 ring-inset rounded-[14px] px-3.5 py-2 text-xl md:text-2xl text-white outline-none focus:outline-none cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
+                          selectClassName="xcannes-select w-full bg-[#101415] ring-1 ring-white/10 ring-inset rounded-[14px] px-3.5 py-1.5 md:py-2 text-xl md:text-2xl text-white outline-none focus:outline-none cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
 		                    />
 		                  </div>
 
@@ -788,7 +788,7 @@ export default function WalletDashboardSwapModal({
 		                      hideSelected
 		                      showMobileOptionRight={true}
 		                      iconClassName="text-3xl leading-none"
-		                      backdropClassName="bg-black/80 backdrop-blur-[4px]"
+                          backdropClassName="bg-black/80 backdrop-blur-[4px] !z-[55]"
                           buttonClassName="bg-[#101415] ring-1 ring-white/10 ring-inset rounded-[14px] px-3.5 py-2 text-xl md:text-2xl text-white outline-none focus:outline-none cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
                           openButtonClassName="!bg-white/10 !border !border-white/10 !border-b-0 !ring-1 !ring-white/10 !shadow-[0_8px_18px_rgba(0,0,0,0.45)]"
                           optionClassName="py-2.5 md:py-3"

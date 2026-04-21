@@ -65,6 +65,7 @@ export default function WalletDashboardSendModal({
   const scanCloseRequested = useRef(false);
   const [showFullRecipientAccount, setShowFullRecipientAccount] =
     useState(false);
+  const [sendAssetDropdownOpen, setSendAssetDropdownOpen] = useState(false);
   const savedPickerRef = useRef(null);
   const savedMenuRef = useRef(null);
   const destinationInputRef = useRef(null);
@@ -1198,15 +1199,17 @@ export default function WalletDashboardSendModal({
           <h3 className="text-[24px] md:text-[34px] font-bold text-white/95 tracking-tight text-center leading-snug">
             {t("ui_send_devise_hint", "Indiquez la devise, le montant, vérifiez et envoyez.")}
           </h3>
-          <div className="flex justify-center">
+          <div className="flex justify-center relative z-[65]">
             {renderWalletMeta?.({
               variant: "pill",
               className:
-                "w-full flex justify-center wallet-meta--plus-4 wallet-meta--desktop-gap",
+                "w-full flex justify-center wallet-meta--plus-4 wallet-meta--desktop-gap relative z-[85]",
               prefix: t("moonpay_from_account", "Depuis le compte"),
               labelWrap: false,
               pillClassName:
-                "bg-elevated px-6 py-1.5 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)] gap-6",
+                `bg-elevated px-6 py-1.5 gap-6 ${sendAssetDropdownOpen
+                  ? "shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_10px_rgba(255,255,255,0.16)]"
+                  : "shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]"}`,
               prefixClassName:
                 "!text-white/70 text-[14px] md:text-[15px] font-medium tracking-wide mr-6",
               labelClassName:
@@ -1227,6 +1230,7 @@ export default function WalletDashboardSendModal({
 	            <ModalSelect
 	              value={selectedSendToken ? selectedSendToken.key : ""}
 	              onChange={setSendAssetKey}
+                onOpenChange={setSendAssetDropdownOpen}
               hideSelected
               options={(augmentedTokens || []).map((token) => {
                 const labelLeft =
