@@ -1711,7 +1711,7 @@ export default function CurrencyStatement({
                     <button
                       type="button"
                       onClick={() => setAccountDropdownOpen((prev) => !prev)}
-                      className={`w-full inline-flex items-center justify-center gap-3 px-6 py-1.5 bg-[#101415] ${accountDropdownOpen ? "rounded-t-[16px] rounded-b-none ring-1 ring-white/20 ring-inset" : "rounded-[16px]"} shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)] transition-colors`}
+                      className={`w-full inline-flex items-center justify-center gap-3 px-6 py-1.5 bg-[#101415] border border-white/10 ${accountDropdownOpen ? "rounded-t-[16px] rounded-b-none border-b-0" : "rounded-[16px]"} shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)] transition-colors`}
                       aria-haspopup="menu"
                       aria-expanded={accountDropdownOpen}
                       title={t("ui_current_account_prefix", "Compte actuel")}
@@ -1741,7 +1741,7 @@ export default function CurrencyStatement({
                       </svg>
                     </button>
                     {accountDropdownOpen && walletAddress ? (
-                      <div className="w-full -mt-px rounded-b-[16px] border border-white/10 border-t-0 bg-[#101415] px-3 py-2 shadow-[0_8px_18px_rgba(0,0,0,0.45)]">
+                      <div className="w-full -mt-px rounded-b-none border border-white/10 border-t-0 bg-[#101415] px-3 py-2 shadow-[0_8px_18px_rgba(0,0,0,0.45)]">
                         <div className="flex items-center gap-1.5 min-w-0">
                           <span className="text-xs md:text-sm text-white/55 font-mono truncate min-w-0" title={walletAddress}>
                             {truncatedWalletAddress}
