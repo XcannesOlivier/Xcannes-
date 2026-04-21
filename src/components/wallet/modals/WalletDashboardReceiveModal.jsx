@@ -186,6 +186,7 @@ export default function WalletDashboardReceiveModal({
   const [copyToast, setCopyToast] = useState('');
   const copyToastTimerRef = useRef(null);
   const autoCloseTimerRef = useRef(null);
+  const [requestWalletDropdownOpen, setRequestWalletDropdownOpen] = useState(false);
   const [requestCurrencyDropdownOpen, setRequestCurrencyDropdownOpen] = useState(false);
 	  const receiveQrContainerRef = useRef(null);
 	  const requestQrContainerRef = useRef(null);
@@ -1442,7 +1443,7 @@ export default function WalletDashboardReceiveModal({
                         <div className="flex justify-center pt-1 pb-1 relative z-[85]">
 	                      <div className="relative">
 	                        {/* Visible pill */}
-                            <div className={`inline-flex items-center gap-6 bg-elevated px-6 py-1.5 rounded-full ${requestCurrencyDropdownOpen ? 'shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_10px_rgba(255,255,255,0.16)]' : 'shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]'} ${hasMultipleWallets ? 'cursor-pointer' : ''}`}>
+                            <div className={`inline-flex items-center gap-6 bg-elevated px-6 py-1.5 rounded-full ${requestCurrencyDropdownOpen ? 'shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_10px_rgba(255,255,255,0.16)]' : 'shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]'} ${requestWalletDropdownOpen ? 'ring-1 ring-white/20 ring-inset' : ''} ${hasMultipleWallets ? 'cursor-pointer' : ''}`}>
 	                          <span className="text-white/70 text-[14px] md:text-[15px] font-medium tracking-wide">
 	                            {t('ui_receive_account_info_label', 'Choisissez le compte')}
 	                          </span>
@@ -1466,6 +1467,7 @@ export default function WalletDashboardReceiveModal({
 	                                if (!addr || addr === wallet) return;
 	                                onSwitchWallet?.(addr);
 	                              }}
+                                onOpenChange={setRequestWalletDropdownOpen}
 	                              options={shareWalletOptions}
 	                              useNativeSelect={false}
 	                              portal
@@ -1476,8 +1478,8 @@ export default function WalletDashboardReceiveModal({
 	                              buttonClassName="w-full h-full opacity-0 cursor-pointer rounded-full"
 	                              menuClassName={
 	                                noticeVariant === 'demo'
-	                                  ? 'bg-xcannes-surface-demo !max-h-64 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
-	                                  : 'bg-[#101415] !max-h-64 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
+                                    ? 'bg-xcannes-surface-demo !max-h-64 overflow-y-auto overscroll-contain touch-pan-y !border-white/20 !ring-1 !ring-white/20 ring-inset'
+                                    : 'bg-[#101415] !max-h-64 overflow-y-auto overscroll-contain touch-pan-y !border-white/20 !ring-1 !ring-white/20 ring-inset'
 	                              }
 	                              selectClassName="xcannes-select w-full bg-transparent rounded-xl pl-0 pr-2 py-2 text-base text-white focus:outline-none transition-colors duration-150"
 	                            />
