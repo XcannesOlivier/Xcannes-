@@ -1534,13 +1534,13 @@ export default function WalletDashboardReceiveModal({
 					                        <label className="block text-lg md:text-xl text-white/70 font-semibold mb-2">
 					                          {t('ui_amount_7668986206', 'Montant')}
 					                        </label>
-					                        <div className="relative rounded-[20px] bg-black/30 ring-2 ring-white/20 ring-inset shadow-[0_6px_20px_rgba(0,0,0,0.5)] py-8 md:py-9 px-5">
+                                  <div className="relative rounded-[18px] bg-[#111518] ring-1 ring-white/10 ring-inset transition-colors duration-150 shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30)] pt-5 pb-5 px-5">
 					                          <input
 					                            type="number"
 					                            value={requestAmount}
 					                            onChange={e => setRequestAmount(e.target.value)}
 					                            placeholder="0.0000"
-					                            className={`xcannes-no-spinner w-full bg-transparent text-4xl md:text-5xl font-bold text-white focus:outline-none`}
+                                      className="xcannes-no-spinner w-full bg-transparent text-4xl md:text-5xl font-bold text-white placeholder:text-white/25 focus:outline-none"
 					                          />
 					                          <span className="pointer-events-none absolute right-5 top-1/2 -translate-y-1/2 text-4xl md:text-5xl font-bold text-white drop-shadow-sm">
 					                            {requestCurrencyCode || 'USD'}
