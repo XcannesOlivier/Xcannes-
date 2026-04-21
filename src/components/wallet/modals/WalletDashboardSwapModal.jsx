@@ -657,8 +657,12 @@ export default function WalletDashboardSwapModal({
                         const labelRight =
                           !baseDropdownOpen && isSelected
                             ? (
-                              <span className="text-[10px] md:text-[11px] text-white/38 tracking-[0.01em]">
-                                {t("ui_view_balances_hint_aa12", "Afficher les soldes")}
+                              <span className="inline-flex items-center gap-1 text-[10px] md:text-[11px] text-white/38 tracking-[0.01em]">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true" className="opacity-80">
+                                  <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6Z" stroke="currentColor" strokeWidth="1.7"/>
+                                  <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.7"/>
+                                </svg>
+                                <span>{t("ui_balances_short_label_aa12", "Soldes")}</span>
                               </span>
                             )
                             : labelRightRaw;
@@ -755,8 +759,12 @@ export default function WalletDashboardSwapModal({
                         const labelRight =
                           !quoteDropdownOpen && isSelected
                             ? (
-                              <span className="text-[10px] md:text-[11px] text-white/38 tracking-[0.01em]">
-                                {t("ui_view_balances_hint_aa12", "Afficher les soldes")}
+                              <span className="inline-flex items-center gap-1 text-[10px] md:text-[11px] text-white/38 tracking-[0.01em]">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true" className="opacity-80">
+                                  <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6Z" stroke="currentColor" strokeWidth="1.7"/>
+                                  <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.7"/>
+                                </svg>
+                                <span>{t("ui_balances_short_label_aa12", "Soldes")}</span>
                               </span>
                             )
                             : labelRightRaw;
@@ -854,7 +862,7 @@ export default function WalletDashboardSwapModal({
                         </span>
                       </div>
                       <div className="px-3 mt-5 mb-2">
-                        <div className="h-[1.5px] bg-white/45 rounded-full" />
+                        <div className="h-[1.25px] bg-white/45 rounded-full" />
                       </div>
                       {/* Row: Total reçu */}
                       <div className="flex items-center justify-between px-4 pt-2 pb-2">
