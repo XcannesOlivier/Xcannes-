@@ -186,6 +186,7 @@ export default function WalletDashboardReceiveModal({
   const [copyToast, setCopyToast] = useState('');
   const copyToastTimerRef = useRef(null);
   const autoCloseTimerRef = useRef(null);
+  const [requestCurrencyDropdownOpen, setRequestCurrencyDropdownOpen] = useState(false);
 	  const receiveQrContainerRef = useRef(null);
 	  const requestQrContainerRef = useRef(null);
 	  const [qrZoomValue, setQrZoomValue] = useState(null);
@@ -1491,23 +1492,36 @@ export default function WalletDashboardReceiveModal({
 			                          <label className="block text-[11px] tracking-[0.22em] text-white/45">
 			                            {t('ui_currency_1ed55673be', 'Currency')}
 			                          </label>
-			                          <span className="text-[11px] tracking-[0.22em] text-white/45">
-			                            {t('ui_balance_label', 'Solde')}
-			                          </span>
 			                        </div>
 			                        <ModalSelect
 		                          value={requestCurrency}
 		                          onChange={setRequestCurrency}
+  		                          onOpenChange={setRequestCurrencyDropdownOpen}
 	                          options={(augmentedTokens || []).map(token => {
                             const currencyUpper = String(token.currency || '').toUpperCase();
                             const labelLeft =
                               selectLabelByCurrency?.[token.currency] ||
                               selectLabelByCurrency?.[currencyUpper] ||
                               token.currency;
-                            const labelRight =
+                              const labelRightRaw =
                               selectLabelRightByCurrency?.[token.currency] ||
                               selectLabelRightByCurrency?.[currencyUpper] ||
                               null;
+                              const isSelected =
+                                String(token.currency || '').toUpperCase() ===
+                                String(requestCurrency || '').toUpperCase();
+                              const labelRight =
+                                !requestCurrencyDropdownOpen && isSelected
+                                  ? (
+                                    <span className="inline-flex items-center gap-1 text-[10px] md:text-[11px] text-white/38 tracking-[0.01em]">
+                                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true" className="opacity-80">
+                                        <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6Z" stroke="currentColor" strokeWidth="1.7"/>
+                                        <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.7"/>
+                                      </svg>
+                                      <span>{t('ui_balances_short_label_aa12', 'Soldes')}</span>
+                                    </span>
+                                  )
+                                  : labelRightRaw;
                             return {
                               value: token.currency,
                               icon:
