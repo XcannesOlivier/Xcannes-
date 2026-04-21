@@ -1743,8 +1743,8 @@ export default function CurrencyStatement({
                     {accountDropdownOpen && walletAddress ? (
                       <div className="w-full -mt-px rounded-b-none border border-white/10 border-t-0 bg-[#101415] px-3 py-2 shadow-[0_8px_18px_rgba(0,0,0,0.45)]">
                         <div className="flex items-center gap-1.5 min-w-0">
-                          <span className="text-xs md:text-sm text-white/55 font-mono truncate min-w-0" title={walletAddress}>
-                            {truncatedWalletAddress}
+                          <span className="text-xs md:text-sm text-white/55 font-mono break-all whitespace-normal min-w-0" title={walletAddress}>
+                            {walletAddress}
                           </span>
                           <button
                             type="button"

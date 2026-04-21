@@ -1829,38 +1829,10 @@ export default function GlobalStatement({
               <span className="block w-12 h-1.5 rounded-full bg-white/20" />
             </div>
           ) : null}
-          <div className="flex items-start justify-between gap-3">
-            <div className="flex items-center gap-3 min-w-0">
-              <span
-                className="hidden md:inline-flex flex-shrink-0 w-10 h-10 md:w-11 md:h-11 items-center justify-center rounded-2xl bg-gradient-to-br from-white/10 to-white/[0.03] border border-white/[0.12] shadow-[0_0_12px_rgba(255,255,255,0.04)] text-white"
-                aria-hidden="true"
-                title={globalTitle}
-              >
-                {/* Layered transaction cards + sparkles — artistic icon */}
-                <svg
-                  className="w-[22px] h-[22px] md:w-6 md:h-6"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  {/* Back card */}
-                  <rect x="6" y="2" width="14" height="15" rx="2.5" stroke="currentColor" strokeWidth="1.3" opacity="0.18" />
-                  {/* Middle card */}
-                  <rect x="4" y="4.5" width="14" height="15" rx="2.5" stroke="currentColor" strokeWidth="1.3" opacity="0.38" />
-                  {/* Front card */}
-                  <rect x="2" y="7" width="14" height="15" rx="2.5" stroke="currentColor" strokeWidth="1.4" />
-                  {/* Transaction lines on front card */}
-                  <line x1="5.5" y1="11.2" x2="12.5" y2="11.2" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
-                  <line x1="5.5" y1="14" x2="10" y2="14" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
-                  <line x1="5.5" y1="16.8" x2="11.5" y2="16.8" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
-                  {/* Large sparkle ✦ */}
-                  <path d="M20.2 7l.65 1.35L22.2 9l-1.35.65L20.2 11l-.65-1.35L18.2 9l1.35-.65z" fill="currentColor" opacity="0.85" />
-                  {/* Small sparkle */}
-                  <path d="M18.1 3l.4.8.8.4-.8.4-.4.8-.4-.8-.8-.4.8-.4z" fill="currentColor" opacity="0.45" />
-                </svg>
-              </span>
-              <div className="min-w-0 flex items-center">
-                <h2 className="text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight leading-tight">
+          <div className="flex justify-center">
+            <div className="min-w-0 flex flex-col items-center justify-center text-center">
+              <div className="flex items-center justify-center">
+                <h2 className="text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight leading-tight text-center">
                   {globalTitle}
                 </h2>
                 {noticeVariant === "demo" ? (
@@ -1869,6 +1841,12 @@ export default function GlobalStatement({
                   </span>
                 ) : null}
               </div>
+              <p className="mt-2 text-[14px] md:text-[15px] text-white/60 max-w-[52ch] leading-relaxed">
+                {t(
+                  "ui_global_statement_subtitle_recent_20",
+                  "Consultez vos 20 transactions les plus récentes et sélectionnez une transaction pour voir le détail.",
+                )}
+              </p>
             </div>
             {/* close via swipe/backdrop */}
           </div>
@@ -1910,8 +1888,8 @@ export default function GlobalStatement({
               {accountDropdownOpen && walletAddress ? (
                 <div className="w-full -mt-px rounded-b-none border border-white/10 border-t-0 bg-[#101415] px-3 py-2 shadow-[0_8px_18px_rgba(0,0,0,0.45)]">
                   <div className="flex items-center gap-1.5 min-w-0">
-                    <span className="text-xs md:text-sm text-white/55 font-mono truncate min-w-0" title={walletAddress}>
-                      {truncatedWalletAddress}
+                    <span className="text-xs md:text-sm text-white/55 font-mono break-all whitespace-normal min-w-0" title={walletAddress}>
+                      {walletAddress}
                     </span>
                     <button
                       type="button"
@@ -2008,7 +1986,7 @@ export default function GlobalStatement({
                         className={[
                           "w-full text-left rounded-[20px] px-3 transition-colors duration-150",
                           isLatest
-                            ? "py-3 ring-1 ring-inset bg-[#101415] shadow-[inset_0_1px_0_rgba(255,255,255,0.05),inset_0_-14px_22px_rgba(0,0,0,0.5)] ring-xcannes-green/30 transform-gpu scale-[1.02] origin-center drop-shadow-[0_10px_18px_rgba(0,0,0,0.55)] transition-transform duration-150"
+                            ? "py-3 ring-2 ring-inset bg-[#101415] shadow-[inset_0_1px_0_rgba(255,255,255,0.08),inset_0_-14px_22px_rgba(0,0,0,0.5)] ring-white/45 transform-gpu scale-[1.03] origin-center drop-shadow-[0_10px_18px_rgba(0,0,0,0.55)] transition-transform duration-150"
                             : "py-2 ring-0 bg-transparent shadow-none",
                         ].join(" ")}
                     >
