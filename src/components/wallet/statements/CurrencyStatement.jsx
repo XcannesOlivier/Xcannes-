@@ -1706,7 +1706,7 @@ export default function CurrencyStatement({
           )}
           <div className={`grid grid-cols-1 md:grid-cols-3 gap-3 ${periodDropdownOpen ? "relative z-[60]" : ""}`}>
             <div className={`${isInlineDesktop ? "md:col-span-3" : ""} ${periodDropdownOpen ? "relative z-[60]" : ""}`}>
-	              <div className="flex justify-center">
+                <div className="my-3 md:my-4 flex justify-center">
                   <div className="relative w-full md:max-w-[420px]">
                     <button
                       type="button"
@@ -1948,8 +1948,8 @@ export default function CurrencyStatement({
                                     : "text-white/90 hover:text-white",
                                 ].join(" ")}
                               >
-                                <div className="w-7 h-7 rounded-full bg-black/20 ring-1 ring-white/10 ring-inset flex items-center justify-center text-white/60 flex-none shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
-                                  <span className="text-[13px] leading-none text-white/85">
+                                <div className="w-7 h-7 flex items-center justify-center text-white/85 flex-none">
+                                  <span className="text-[15px] leading-none text-white/95">
                                     {getTimelineIcon(tx)}
                                   </span>
                                 </div>
@@ -1969,7 +1969,7 @@ export default function CurrencyStatement({
                                     {tx?.type === "debit" ? "−" : "+"}
                                     {formatAmountRlusdAsLocal(tx?.amount)}
                                   </div>
-                                  <span className="text-[14px] leading-none text-white/35">
+                                  <span className="text-[16px] leading-none text-white/35">
                                     ›
                                   </span>
                                 </div>

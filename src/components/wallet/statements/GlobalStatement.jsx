@@ -1851,7 +1851,7 @@ export default function GlobalStatement({
             {/* close via swipe/backdrop */}
           </div>
 
-	          <div className="mt-4 flex justify-center">
+            <div className="mt-6 mb-4 flex justify-center">
             <div className="relative w-full md:max-w-[420px]">
               <button
                 type="button"
