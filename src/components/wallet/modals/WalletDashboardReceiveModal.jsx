@@ -359,6 +359,18 @@ export default function WalletDashboardReceiveModal({
     return requestCurrencyCode !== 'XRP' && requestCurrencyCode !== 'RLUSD' && requestCurrencyCode !== 'USD';
   }, [requestCurrencyCode, selectedRequestToken?.isTrustlineOnly]);
 
+  const generateButtonDisabled = useMemo(() => {
+    const amount = Number.parseFloat(requestAmount || '0');
+    if (!Number.isFinite(amount) || amount <= 0) return true;
+    if (!trimmed(wallet)) return true;
+
+    const targetCurrencyUpper = String(requestCurrencyCode || 'USD').toUpperCase();
+    if (targetCurrencyUpper === 'USD' || targetCurrencyUpper === 'RLUSD') return false;
+
+    const rate = Number(rlusdPerUnitRates?.[targetCurrencyUpper]);
+    return !Number.isFinite(rate) || rate <= 0;
+  }, [requestAmount, requestCurrencyCode, rlusdPerUnitRates, trimmed, wallet]);
+
   const handleGenerateRequest = () => {
     setGenerateError(null);
 
@@ -1577,8 +1589,16 @@ export default function WalletDashboardReceiveModal({
                           e.stopPropagation();
                           handleGenerateRequest();
                         }}
-                        className="w-full h-14 mt-10 rounded-[20px] text-white text-lg font-semibold transition-all duration-150 hover:scale-[1.01] active:scale-[0.98]"
-                        style={{ background: 'linear-gradient(180deg, rgba(34,154,86,1) 0%, rgba(14,103,58,1) 100%)', boxShadow: '0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)' }}
+                        disabled={generateButtonDisabled}
+                        className={[
+                          'w-full h-14 mt-10 rounded-[20px] text-white text-lg font-semibold transition-all duration-150',
+                          generateButtonDisabled
+                            ? 'opacity-45 cursor-not-allowed'
+                            : 'hover:scale-[1.01] active:scale-[0.98]',
+                        ].join(' ')}
+                        style={generateButtonDisabled
+                          ? { background: 'linear-gradient(180deg, rgba(34,154,86,0.45) 0%, rgba(14,103,58,0.45) 100%)' }
+                          : { background: 'linear-gradient(180deg, rgba(34,154,86,1) 0%, rgba(14,103,58,1) 100%)', boxShadow: '0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)' }}
                       >
                         {t('ui_generate_request_fr', 'Générer la demande')}
                       </button>
