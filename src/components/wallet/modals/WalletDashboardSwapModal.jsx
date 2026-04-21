@@ -723,7 +723,7 @@ export default function WalletDashboardSwapModal({
 		                        "USD"
 		                      }
 		                      tokenClassName="text-white drop-shadow-sm text-4xl md:text-5xl font-bold"
-                          containerClassName="pt-6 pb-6 rounded-[18px] bg-[#111518] ring-1 ring-white/10 ring-inset transition-colors duration-150 shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(34,154,86,0.12),inset_0_-14px_24px_rgba(0,0,0,0.30)] [&_input]:!text-4xl [&_input]:md:!text-5xl"
+                          containerClassName="pt-6 pb-6 rounded-[18px] bg-[#111518] ring-1 ring-white/10 ring-inset transition-colors duration-150 shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30)] [&_input]:!text-4xl [&_input]:md:!text-5xl"
 		                    />
 		                  </div>
 

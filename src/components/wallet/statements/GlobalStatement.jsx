@@ -1832,7 +1832,7 @@ export default function GlobalStatement({
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-center gap-3 min-w-0">
               <span
-                className="flex-shrink-0 w-10 h-10 md:w-11 md:h-11 inline-flex items-center justify-center rounded-2xl bg-gradient-to-br from-white/10 to-white/[0.03] border border-white/[0.12] shadow-[0_0_12px_rgba(255,255,255,0.04)] text-white"
+                className="hidden md:inline-flex flex-shrink-0 w-10 h-10 md:w-11 md:h-11 items-center justify-center rounded-2xl bg-gradient-to-br from-white/10 to-white/[0.03] border border-white/[0.12] shadow-[0_0_12px_rgba(255,255,255,0.04)] text-white"
                 aria-hidden="true"
                 title={globalTitle}
               >

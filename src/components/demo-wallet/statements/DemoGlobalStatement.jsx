@@ -696,7 +696,7 @@ export default function DemoGlobalStatement({
                 alt={t("ui_statement_a87c93acb8", "Statement")}
                 width={32}
                 height={32}
-                className="flex-shrink-0 w-7 h-7 md:w-8 md:h-8 mt-0.5"
+                className="hidden md:block flex-shrink-0 w-7 h-7 md:w-8 md:h-8 mt-0.5"
               />
               <div className="min-w-0">
                 <div className="flex items-center gap-2 min-w-0">

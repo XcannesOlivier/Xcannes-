@@ -1509,7 +1509,7 @@ export default function DemoCurrencyStatement({
                     alt={displayCurrency}
                     width={32}
                     height={32}
-                    className="flex-shrink-0 w-7 h-7 md:w-8 md:h-8 rounded-md"
+                    className="flex-shrink-0 w-8 h-8 md:w-8 md:h-8 rounded-md"
                   />
                 ) : (
                   <Image
@@ -1517,11 +1517,11 @@ export default function DemoCurrencyStatement({
                     alt={displayCurrency}
                     width={32}
                     height={32}
-                    className="flex-shrink-0 w-7 h-7 md:w-8 md:h-8 rounded-md"
+                    className="flex-shrink-0 w-8 h-8 md:w-8 md:h-8 rounded-md"
                   />
                 )
               ) : (
-                <span className="text-2xl md:text-3xl flex-shrink-0">
+                <span className="text-3xl md:text-3xl flex-shrink-0">
                   {getCurrencyFlag(displayCurrency)}
                 </span>
               )}
@@ -1558,7 +1558,7 @@ export default function DemoCurrencyStatement({
               ) : null}
             </div>
             <div>
-              <p className="text-[20px] md:text-[21px] text-white/85 font-medium mb-1 text-center md:text-left">
+              <p className="text-[22px] md:text-[21px] text-white/85 font-medium mb-1 text-center md:text-left">
                 {t("ui_statement_period_6dedec11d9", "Statement Period")}
               </p>
               {/* Month Selector - Version simplifiée */}
