@@ -1437,12 +1437,12 @@ export default function WalletDashboardReceiveModal({
 		              {receiveView === 'request' ? (
 		                <>
 		                  {/* SECTION 2 — CREATE REQUEST */}
-		                  <div className="space-y-2 pt-2">
+                      <div className="space-y-2 pt-2">
 	                    {/* ── Centered wallet pill (style "Choisissez le compte") ── */}
-	                    <div className="flex justify-center pt-1 pb-1 relative z-[70]">
+                        <div className="flex justify-center pt-1 pb-1 relative z-[85]">
 	                      <div className="relative">
 	                        {/* Visible pill */}
-	                        <div className={`inline-flex items-center gap-6 bg-elevated px-6 py-1.5 rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)] ${hasMultipleWallets ? 'cursor-pointer' : ''}`}>
+                            <div className={`inline-flex items-center gap-6 bg-elevated px-6 py-1.5 rounded-full ${requestCurrencyDropdownOpen ? 'shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_10px_rgba(255,255,255,0.16)]' : 'shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]'} ${hasMultipleWallets ? 'cursor-pointer' : ''}`}>
 	                          <span className="text-white/70 text-[14px] md:text-[15px] font-medium tracking-wide">
 	                            {t('ui_receive_account_info_label', 'Choisissez le compte')}
 	                          </span>
@@ -1542,9 +1542,10 @@ export default function WalletDashboardReceiveModal({
 	                          backdropClassName="bg-black/80 backdrop-blur-[4px]"
 		                          menuClassName={
 		                            noticeVariant === 'demo'
-		                              ? 'bg-xcannes-surface-demo max-h-[320px] overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
-		                              : 'bg-[#101415] max-h-[320px] overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
+                                  ? 'bg-xcannes-surface-demo max-h-[320px] overflow-y-auto overscroll-contain touch-pan-y !border-white/10 !ring-1 !ring-white/10 ring-inset'
+                                  : 'bg-[#101415] max-h-[320px] overflow-y-auto overscroll-contain touch-pan-y !border-white/10 !ring-1 !ring-white/10 ring-inset'
 		                          }
+                              openButtonClassName="!bg-white/10 !border !border-white/10 !border-b-0 !ring-1 !ring-white/10 !shadow-none"
 			                          buttonClassName={`ring-1 ring-white/10 ring-inset rounded-[20px] px-3.5 py-3 text-lg text-white focus:outline-none cursor-pointer ${
 			                            noticeVariant === 'demo' ? 'bg-xcannes-surface-demo' : 'bg-[#101415]'
 			                          }`}
