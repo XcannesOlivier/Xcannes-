@@ -2015,7 +2015,7 @@ const MoonPaySellModal = ({
 		                {t("moonpay_amount_to_sell", "Montant")}
 		              </div>
 	              <div className={[
-	                'relative flex items-center gap-3 px-5 pt-5 pb-5 rounded-[18px] bg-[#111518] ring-1 ring-white/10 ring-inset transition-all duration-200',
+	                'relative flex items-center gap-3 px-5 pt-5 pb-5 rounded-[18px] bg-black/40 backdrop-blur-sm ring-1 ring-white/10 ring-inset transition-all duration-200',
 	                'shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30)]',
 	                'focus-within:ring-white/25 focus-within:shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30),0_0_0_1px_rgba(255,255,255,0.10),0_0_24px_rgba(255,255,255,0.06)]',
 	              ].join(' ')}>
