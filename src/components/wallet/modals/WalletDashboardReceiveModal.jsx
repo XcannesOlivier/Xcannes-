@@ -1430,8 +1430,8 @@ export default function WalletDashboardReceiveModal({
 	                          e.stopPropagation();
 	                          await handleShareQr(false);
 	                        }}
-                          className="w-full h-11 rounded-[20px] bg-[#232829] ring-1 ring-white/10 ring-inset text-white text-[17px] font-bold tracking-wide py-2 px-6 transition-all duration-150 inline-flex items-center justify-center gap-2.5 hover:ring-white/20 hover:bg-[#2a2f30] active:scale-[0.98]"
-                          style={{ boxShadow: '0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.06), inset 0 -12px 20px rgba(0,0,0,0.18)' }}
+                          className="w-full h-11 rounded-[20px] bg-[#101415] ring-1 ring-white/10 ring-inset text-white text-[17px] font-bold tracking-wide py-2 px-6 transition-all duration-150 inline-flex items-center justify-center gap-2.5 hover:ring-white/20 hover:bg-white/[0.04] active:scale-[0.98]"
+                          style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.4)' }}
 	                      >
 	                        <ShareIcon className="w-5 h-5" />
 	                        <span>{shareActionLabel}</span>
@@ -1737,8 +1737,8 @@ export default function WalletDashboardReceiveModal({
 	                              e.stopPropagation();
 	                              await handleShareQr(true);
 	                            }}
-                              className="w-full h-11 rounded-[20px] bg-[#232829] ring-1 ring-white/10 ring-inset text-white text-[17px] font-bold tracking-wide py-2 px-6 transition-all duration-150 inline-flex items-center justify-center gap-2.5 hover:ring-white/20 hover:bg-[#2a2f30] active:scale-[0.98]"
-                              style={{ boxShadow: '0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.06), inset 0 -12px 20px rgba(0,0,0,0.18)' }}
+                              className="w-full h-11 rounded-[20px] bg-[#101415] ring-1 ring-white/10 ring-inset text-white text-[17px] font-bold tracking-wide py-2 px-6 transition-all duration-150 inline-flex items-center justify-center gap-2.5 hover:ring-white/20 hover:bg-white/[0.04] active:scale-[0.98]"
+                              style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.4)' }}
 	                          >
 	                            <ShareIcon className="w-5 h-5" />
 			                            <span>{shareActionLabel}</span>
