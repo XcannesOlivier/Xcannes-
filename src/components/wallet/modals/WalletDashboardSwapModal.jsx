@@ -618,8 +618,8 @@ export default function WalletDashboardSwapModal({
                   <h3 className="text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight">
                     {t("ui_convert_title_main", "Convertissez vos devises")}
                   </h3>
-                  <p className="mt-2 text-[14px] md:text-[15px] text-white/60 max-w-[34ch] mx-auto leading-relaxed">
-                    {t("ui_convert_subtitle_main", "Sélectionnez les devises, indiquez le montant, vérifiez le résumé.")}
+                  <p className="mt-2 text-[14px] md:text-[15px] text-white/80 max-w-[34ch] mx-auto leading-relaxed">
+                    {t("ui_convert_subtitle_main", "Convertissez instantanément entre vos devises.")}
                   </p>
                   <div className="mt-4 flex justify-center relative z-[120]">
                     {renderWalletMeta?.({
