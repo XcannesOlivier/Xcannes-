@@ -839,7 +839,7 @@ export default function WalletDashboardUsdSwapModal({
         )
       : t(
           "ui_swap_subtitle_out",
-          "Recevez un stablecoin USD (multi-chain) sur une autre adresse via SimpleSwap.",
+          "Choisissez une devise, le montant, le stablecoin souhaité puis l'adresse de votre wallet de réception.",
         ));
   const walletSelectorDialogTitle = t(
     "ui_choose_wallet_currency",
@@ -2960,7 +2960,7 @@ export default function WalletDashboardUsdSwapModal({
                   walletInlineSelectionEnabled ? (
                     <div className="px-4 pt-2 pb-4 text-center">
                       <h3 className="text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight mb-4">
-                        {flowTitleDisplay}
+                        {flowTitle}
                       </h3>
                       <div className="flex justify-center">
                         <div className="inline-flex items-center gap-6 bg-elevated px-6 py-1.5 rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]">
@@ -2976,6 +2976,9 @@ export default function WalletDashboardUsdSwapModal({
                           </span>
                         </div>
                       </div>
+                      <p className="mt-2 text-[14px] md:text-[15px] text-white/80 max-w-[34ch] mx-auto leading-relaxed">
+                        {flowSubtitle}
+                      </p>
                     </div>
                   ) : (
                     <div
@@ -3016,11 +3019,11 @@ export default function WalletDashboardUsdSwapModal({
                         {flowTitleDisplay}
                       </h3>
                     ) : null}
-                    <p
-                      className={`${walletInlineSelectionEnabled ? "" : "mt-1 "}text-[15px] md:text-sm leading-snug text-white/85`}
-                    >
-                      {flowSubtitle}
-                    </p>
+                    {!walletInlineSelectionEnabled ? (
+                      <p className="mt-1 text-[15px] md:text-sm leading-snug text-white/85">
+                        {flowSubtitle}
+                      </p>
+                    ) : null}
                   </div>
                 ) : null}
 

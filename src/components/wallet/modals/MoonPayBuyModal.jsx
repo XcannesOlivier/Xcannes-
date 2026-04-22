@@ -1838,6 +1838,16 @@ const MoonPayBuyModal = ({
                   </span>
                 </div>
               </div>
+              {!demoMode && !useSimpleSwapPartner ? (
+                <p className="mt-2 text-[14px] md:text-[15px] text-white/80 max-w-[36ch] mx-auto leading-relaxed">
+                  {highlightPaymentMethods(
+                    t(
+                      'moonpay_info_buy_live_3c8a1d6b2f',
+                      'Vous serez redirigé vers un partenaire sécurisé pour finaliser le paiement.\nMoyens acceptés : carte bancaire, Apple Pay, Google Pay, virement.',
+                    ),
+                  )}
+                </p>
+              ) : null}
             </div>
           ) : null}
 
@@ -2311,23 +2321,13 @@ const MoonPayBuyModal = ({
             ) : (
               <>
                 <div className="hidden md:block h-px bg-white/10 my-4" />
-                <p className="whitespace-pre-line">
-                  {useSimpleSwapPartner
-                    ? t(
-                        'ui_simpleswap_choose_conversion_stablecoin_and_network_0c0b2b64d1',
-                        'Vous choisirez le stablecoin de conversion (USDC, USDT…)\net le réseau sur la page suivante (SimpleSwap)',
-                      )
-                    : highlightPaymentMethods(
-                        t(
-                          'moonpay_info_buy_live_3c8a1d6b2f',
-                          'Vous serez redirigé vers un partenaire sécurisé pour finaliser le paiement.\nMoyens acceptés : carte bancaire, Apple Pay, Google Pay, virement.',
-                        ),
-                      )}
-                </p>
-                {!useSimpleSwapPartner ? (
-                  <div className="mt-1 text-[11px] md:text-xs text-white/45">
-                    {t('moonpay_buy_partner_location_note', 'Le partenaire proposé dépend de votre localisation.')}
-                  </div>
+                {useSimpleSwapPartner ? (
+                  <p className="whitespace-pre-line">
+                    {t(
+                      'ui_simpleswap_choose_conversion_stablecoin_and_network_0c0b2b64d1',
+                      'Vous choisirez le stablecoin de conversion (USDC, USDT…)\net le réseau sur la page suivante (SimpleSwap)',
+                    )}
+                  </p>
                 ) : null}
                 <div className="hidden md:block h-px bg-white/10 my-4" />
               </>

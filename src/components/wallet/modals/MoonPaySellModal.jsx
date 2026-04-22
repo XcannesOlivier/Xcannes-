@@ -1608,6 +1608,17 @@ const MoonPaySellModal = ({
                 </span>
               </div>
             </div>
+            {isBankSellFlow ? (
+              <p className="mt-2 text-[14px] md:text-[15px] text-white/80 max-w-[36ch] mx-auto leading-relaxed">
+                {highlightPhrases(
+                  t(
+                    "moonpay_sell_bank_partner_notice",
+                    "Le retrait sera effectué via un partenaire sécurisé (virement bancaire, carte ou PayPal selon votre pays).",
+                  ),
+                  ["virement bancaire, carte ou PayPal"],
+                )}
+              </p>
+            ) : null}
           </div>
 
 		          {/* Currency selector */}
@@ -2066,15 +2077,6 @@ const MoonPaySellModal = ({
 	                ) : isBankSellFlow ? (
 	                  <div className="px-1">
 	                    <div className="hidden md:block h-px bg-white/10 my-4" />
-	                    <p className="text-[15px] md:text-sm leading-snug text-white/85 whitespace-pre-line">
-	                      {highlightPhrases(
-	                        t(
-	                          "moonpay_sell_bank_partner_notice",
-	                          "Le retrait sera effectué via un partenaire sécurisé (virement bancaire, carte ou PayPal selon votre pays).",
-	                        ),
-	                        ["virement bancaire, carte ou PayPal"],
-	                      )}
-	                    </p>
 	                    <p className="mt-1 text-[11px] md:text-xs text-white/45">
 	                      {t(
 	                        "moonpay_sell_partner_location_note",
