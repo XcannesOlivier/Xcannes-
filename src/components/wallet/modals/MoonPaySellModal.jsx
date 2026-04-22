@@ -1590,10 +1590,21 @@ const MoonPaySellModal = ({
 
           {/* Title + Wallet pill */}
           <div className={["px-4 pt-2 pb-4 text-center", wizardStep === 1 ? "" : "hidden"].join(" ")}>
-            <h3 className="text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight mb-4">
+            <h3 className="text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight mb-2">
               {resolvedSelectCryptoTitleOverride ||
                 t("moonpay_sell_withdraw_title_prefix", "Envoyer vers la banque")}
             </h3>
+            {isBankSellFlow ? (
+              <p className="mb-4 text-[14px] md:text-[15px] text-white/80 leading-relaxed">
+                {highlightPhrases(
+                  t(
+                    "moonpay_sell_bank_partner_notice",
+                    "Le retrait sera effectué via un partenaire sécurisé (virement bancaire, carte ou PayPal selon votre pays).",
+                  ),
+                  ["virement bancaire, carte ou PayPal"],
+                )}
+              </p>
+            ) : null}
             <div className="flex justify-center">
               <div className="inline-flex items-center gap-6 bg-elevated px-6 py-1.5 rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]">
                 <span className="text-white/70 text-[14px] md:text-[15px] font-medium tracking-wide">
@@ -1608,17 +1619,6 @@ const MoonPaySellModal = ({
                 </span>
               </div>
             </div>
-            {isBankSellFlow ? (
-              <p className="mt-2 text-[14px] md:text-[15px] text-white/80 max-w-[36ch] mx-auto leading-relaxed">
-                {highlightPhrases(
-                  t(
-                    "moonpay_sell_bank_partner_notice",
-                    "Le retrait sera effectué via un partenaire sécurisé (virement bancaire, carte ou PayPal selon votre pays).",
-                  ),
-                  ["virement bancaire, carte ou PayPal"],
-                )}
-              </p>
-            ) : null}
           </div>
 
 		          {/* Currency selector */}

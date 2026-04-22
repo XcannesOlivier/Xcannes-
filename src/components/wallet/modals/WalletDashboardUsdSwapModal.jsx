@@ -2959,9 +2959,12 @@ export default function WalletDashboardUsdSwapModal({
                 {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE || walletTargetSelectionEnabled ? (
                   walletInlineSelectionEnabled ? (
                     <div className="px-4 pt-2 pb-4 text-center">
-                      <h3 className="text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight mb-4">
+                      <h3 className="text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight mb-2">
                         {flowTitle}
                       </h3>
+                      <p className="mb-4 text-[14px] md:text-[15px] text-white/80 leading-relaxed">
+                        {flowSubtitle}
+                      </p>
                       <div className="flex justify-center">
                         <div className="inline-flex items-center gap-6 bg-elevated px-6 py-1.5 rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]">
                           <span className="text-white/70 text-[14px] md:text-[15px] font-medium tracking-wide">
@@ -2976,9 +2979,6 @@ export default function WalletDashboardUsdSwapModal({
                           </span>
                         </div>
                       </div>
-                      <p className="mt-2 text-[14px] md:text-[15px] text-white/80 max-w-[34ch] mx-auto leading-relaxed">
-                        {flowSubtitle}
-                      </p>
                     </div>
                   ) : (
                     <div

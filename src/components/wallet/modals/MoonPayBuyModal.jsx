@@ -1821,9 +1821,19 @@ const MoonPayBuyModal = ({
           {/* Title + Wallet pill */}
           {wizardStep === 1 ? (
             <div className="px-4 pt-2 pb-4 text-center">
-              <h3 className="text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight mb-4">
+              <h3 className="text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight mb-2">
                 {resolvedTitleOverride || t('ui_funds_add_title', 'Ajouter des devises')}
               </h3>
+              {!demoMode && !useSimpleSwapPartner ? (
+                <p className="mb-4 text-[14px] md:text-[15px] text-white/80 leading-relaxed">
+                  {highlightPaymentMethods(
+                    t(
+                      'moonpay_info_buy_live_3c8a1d6b2f',
+                      'Vous serez redirigé vers un partenaire sécurisé pour finaliser le paiement.\nMoyens acceptés : carte bancaire, Apple Pay, Google Pay, virement.',
+                    ),
+                  )}
+                </p>
+              ) : null}
               <div className="flex justify-center">
                 <div className="inline-flex items-center gap-6 bg-elevated px-6 py-1.5 rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]">
                   <span className="text-white/70 text-[14px] md:text-[15px] font-medium tracking-wide">
@@ -1838,16 +1848,6 @@ const MoonPayBuyModal = ({
                   </span>
                 </div>
               </div>
-              {!demoMode && !useSimpleSwapPartner ? (
-                <p className="mt-2 text-[14px] md:text-[15px] text-white/80 max-w-[36ch] mx-auto leading-relaxed">
-                  {highlightPaymentMethods(
-                    t(
-                      'moonpay_info_buy_live_3c8a1d6b2f',
-                      'Vous serez redirigé vers un partenaire sécurisé pour finaliser le paiement.\nMoyens acceptés : carte bancaire, Apple Pay, Google Pay, virement.',
-                    ),
-                  )}
-                </p>
-              ) : null}
             </div>
           ) : null}
 
