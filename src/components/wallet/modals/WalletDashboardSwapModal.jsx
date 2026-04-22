@@ -919,14 +919,22 @@ export default function WalletDashboardSwapModal({
                       }}
                       disabled={convertButtonDisabled}
                       className={[
-                        "w-full h-14 rounded-[20px] text-white text-lg font-semibold transition-all duration-150",
+                        "w-full h-14 rounded-[20px] text-white text-lg font-semibold transition-all duration-200 tracking-[-0.01em]",
                         convertButtonDisabled
-                          ? "opacity-45 cursor-not-allowed"
-                          : "hover:scale-[1.01] active:scale-[0.98]",
+                          ? "cursor-not-allowed"
+                          : "hover:scale-[1.01] hover:brightness-110 active:scale-[0.98] active:brightness-95",
                       ].join(" ")}
                       style={convertButtonDisabled
-                        ? { background: 'linear-gradient(180deg, rgba(34,154,86,0.45) 0%, rgba(14,103,58,0.45) 100%)' }
-                        : { background: 'linear-gradient(180deg, rgba(34,154,86,1) 0%, rgba(14,103,58,1) 100%)', boxShadow: '0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)' }
+                        ? {
+                            background: 'linear-gradient(180deg, rgba(34,154,86,0.28) 0%, rgba(14,103,58,0.28) 100%)',
+                            boxShadow: 'none',
+                            color: 'rgba(255,255,255,0.35)',
+                            letterSpacing: '0.02em',
+                          }
+                        : {
+                            background: 'linear-gradient(180deg, #2da861 0%, #0d6b3a 100%)',
+                            boxShadow: '0 8px 24px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.07) inset, inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -10px 18px rgba(0,0,0,0.22), 0 0 18px rgba(34,180,90,0.18)',
+                          }
                       }
                     >
                       {convertProcessing
