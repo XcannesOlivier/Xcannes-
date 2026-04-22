@@ -25,6 +25,7 @@ export default function ModalSelect({
   portalTarget = null,
   onOpenChange = null,
   menuFooter = null,
+  menuHeader = null,
   openButtonClassName = "",
 }) {
   const [open, setOpen] = useState(false);
@@ -281,6 +282,11 @@ export default function ModalSelect({
             onMouseDown={(e) => e.stopPropagation()}
             onClick={(e) => e.stopPropagation()}
           >
+            {menuHeader ? (
+              <div className="flex items-center justify-end px-3 pt-2 pb-1">
+                <span className="text-[11px] uppercase tracking-widest text-white/30 font-medium">{menuHeader}</span>
+              </div>
+            ) : null}
             {hideSelected && <div className="border-t border-white/10 mx-3 mb-1" />}
             {options.filter((opt) => !hideSelected || String(opt.value) !== String(value)).map((opt) => {
               const left = opt.labelLeft ?? opt.label;
@@ -288,8 +294,8 @@ export default function ModalSelect({
               const optionLeft = showMobileOptionRight ? left : mobileLeft;
               const right = opt.labelRight ?? null;
               const rightClassName = showMobileOptionRight
-                ? "ml-auto text-white/50 tabular-nums"
-                : "ml-auto text-white/50 tabular-nums hidden md:inline";
+                ? "ml-auto text-white/30 tabular-nums"
+                : "ml-auto text-white/30 tabular-nums hidden md:inline";
               const description = opt.description ?? null;
               return (
               <button
@@ -351,6 +357,11 @@ export default function ModalSelect({
             onMouseDown={(e) => e.stopPropagation()}
             onClick={(e) => e.stopPropagation()}
           >
+            {menuHeader ? (
+              <div className="flex items-center justify-end px-3 pt-2 pb-1">
+                <span className="text-[11px] text-white/30 font-normal">{menuHeader}</span>
+              </div>
+            ) : null}
             {hideSelected && <div className="border-t border-white/10 mx-3 mb-1" />}
             {options.filter((opt) => !hideSelected || String(opt.value) !== String(value)).map((opt) => {
               const left = opt.labelLeft ?? opt.label;
@@ -358,8 +369,8 @@ export default function ModalSelect({
               const optionLeft = showMobileOptionRight ? left : mobileLeft;
               const right = opt.labelRight ?? null;
               const rightClassName = showMobileOptionRight
-                ? "ml-auto text-white/50 tabular-nums"
-                : "ml-auto text-white/50 tabular-nums hidden md:inline";
+                ? "ml-auto text-white/30 tabular-nums"
+                : "ml-auto text-white/30 tabular-nums hidden md:inline";
               const description = opt.description ?? null;
               return (
               <button
