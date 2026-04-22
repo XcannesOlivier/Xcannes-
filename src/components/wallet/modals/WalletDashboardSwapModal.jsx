@@ -335,6 +335,7 @@ export default function WalletDashboardSwapModal({
   const [overlayTranslateY, setOverlayTranslateY] = useState(0);
   const [baseDropdownOpen, setBaseDropdownOpen] = useState(false);
   const [quoteDropdownOpen, setQuoteDropdownOpen] = useState(false);
+  const [swapRotating, setSwapRotating] = useState(false);
   const overlayRef = useRef(null);
   const overlayListRef = useRef(null);
   const overlayDragMetaRef = useRef({
@@ -715,16 +716,28 @@ export default function WalletDashboardSwapModal({
 		                      <button
 		                        type="button"
 		                        onClick={() => {
+		                          setSwapRotating(true);
+		                          setTimeout(() => setSwapRotating(false), 420);
 		                          const prev = convertBaseCurrency;
 		                          setConvertBaseCurrency(convertQuoteCurrency);
 		                          setConvertQuoteCurrency(prev);
 		                        }}
-                            className="w-9 h-9 rounded-full bg-[#111518] hover:bg-[#151b1f] active:scale-95 transition-all duration-150 flex items-center justify-center shadow-[0_8px_18px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.10),inset_0_-8px_14px_rgba(0,0,0,0.28)]"
+                            className={`w-9 h-9 rounded-full bg-[#0e1214] hover:bg-[#141a1e] active:scale-95 flex items-center justify-center ring-1 ring-white/10 ring-inset transition-all duration-200 shadow-[0_4px_12px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.08)] hover:ring-white/20 hover:shadow-[0_4px_16px_rgba(0,0,0,0.55),0_0_8px_rgba(255,255,255,0.04)] ${swapRotating ? 'scale-90' : ''}`}
 		                        aria-label="Inverser les devises"
 		                      >
-		                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-		                          <path d="M6 2L6 14M6 14L3 11M6 14L9 11" stroke="white" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/>
-		                          <path d="M12 16L12 4M12 4L9 7M12 4L15 7" stroke="white" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/>
+		                        <svg
+		                          width="16"
+		                          height="16"
+		                          viewBox="0 0 16 16"
+		                          fill="none"
+		                          xmlns="http://www.w3.org/2000/svg"
+		                          style={{
+		                            transform: swapRotating ? 'rotate(180deg)' : 'rotate(0deg)',
+		                            transition: 'transform 380ms cubic-bezier(0.34,1.56,0.64,1)',
+		                          }}
+		                        >
+		                          <path d="M5.5 2v9.5M5.5 11.5L3 9M5.5 11.5L8 9" stroke="rgba(255,255,255,0.75)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+		                          <path d="M10.5 14V4.5M10.5 4.5L8 7M10.5 4.5L13 7" stroke="rgba(255,255,255,0.75)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
 		                        </svg>
 		                      </button>
 		                    </div>
