@@ -1826,11 +1826,11 @@ const MoonPayBuyModal = ({
                 {resolvedTitleOverride || t('ui_funds_add_title', 'Acheter des devises')}
               </h3>
               {!demoMode && !useSimpleSwapPartner ? (
-                <div className="mb-4 flex items-center justify-center gap-2 flex-wrap">
-                  <span className="text-[13px] text-white/55">
+                <div className="mb-4 flex flex-col items-center gap-2">
+                  <span className="text-[15px] md:text-[16px] font-medium text-white/70">
                     {t('moonpay_info_buy_live_3c8a1d6b2f', 'Transactions sécurisées via')}
                   </span>
-                  <span className="inline-flex items-center gap-1.5">
+                  <div className="flex items-center justify-center gap-1.5">
                     <PaymentLogo
                       src="/assets/payment-logos/moonpay.png"
                       alt="MoonPay"
@@ -1845,7 +1845,12 @@ const MoonPayBuyModal = ({
                       containerClassName="bg-black/40"
                       widthClassName="w-[90px]"
                     />
-                  </span>
+                  </div>
+                  <p className="text-[12px] text-white/40 text-center">
+                    {highlightPaymentMethods(
+                      t('moonpay_buy_payment_methods_list', 'Moyens acceptés : carte bancaire, Apple Pay, Google Pay, virement.')
+                    )}
+                  </p>
                 </div>
               ) : null}
               <div className="flex justify-center">
@@ -2136,6 +2141,9 @@ const MoonPayBuyModal = ({
           >
             {continueLabel}
           </button>
+          <p className="text-center text-[11px] md:text-xs text-white/40 mt-1">
+            {t('moonpay_buy_partner_location_note_cta', 'Le partenaire proposé dépend de votre localisation.')}
+          </p>
         </div>
       )}
 

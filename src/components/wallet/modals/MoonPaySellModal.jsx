@@ -1433,7 +1433,7 @@ const MoonPaySellModal = ({
 	                String(currency || "").toUpperCase(),
 	            })
 	          : t("ui_send_to_bank_action", "Envoyer vers la banque")
-	        : t("ui_next_step", "Étape suivante");
+	        : t("ui_continue", "Continuer");
   const continueDisabled =
     wizardStep === 1
       ? loading || !hasValidAmount || !selectedToken || conversionMissing
@@ -1596,15 +1596,33 @@ const MoonPaySellModal = ({
                 t("moonpay_sell_withdraw_title_prefix", "Envoyer vers la banque")}
             </h3>
             {isBankSellFlow ? (
-              <p className="mb-4 text-[14px] md:text-[15px] text-white/80 leading-relaxed">
-                {highlightPhrases(
-                  t(
-                    "moonpay_sell_bank_partner_notice",
-                    "Le retrait sera effectué via un partenaire sécurisé (virement bancaire, carte ou PayPal selon votre pays).",
-                  ),
-                  ["virement bancaire, carte ou PayPal"],
-                )}
-              </p>
+              <div className="mb-4 flex flex-col items-center gap-2">
+                <span className="text-[15px] md:text-[16px] font-medium text-white/70">
+                  {t("moonpay_sell_bank_partner_notice_title", "Le retrait sera effectué via")}
+                </span>
+                <div className="flex items-center justify-center gap-1.5">
+                  <PaymentLogo
+                    src="/assets/payment-logos/moonpay.png"
+                    alt="MoonPay"
+                    fallback="MoonPay"
+                    containerClassName="bg-white/90"
+                    widthClassName="w-[90px]"
+                  />
+                  <PaymentLogo
+                    src="/assets/payment-logos/topper.svg"
+                    alt="Topper"
+                    fallback="Topper"
+                    containerClassName="bg-black/40"
+                    widthClassName="w-[90px]"
+                  />
+                </div>
+                <p className="text-[12px] text-white/40 text-center">
+                  {t("moonpay_sell_bank_partner_notice", "par")} {highlightPhrases(
+                    t("moonpay_sell_bank_methods", "virement bancaire, carte ou PayPal selon votre pays"),
+                    ["virement bancaire, carte ou PayPal"],
+                  )}.
+                </p>
+              </div>
             ) : null}
             <div className="flex justify-center">
               <div className="inline-flex items-center gap-6 bg-elevated px-6 py-1.5 rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]">
@@ -1737,14 +1755,12 @@ const MoonPaySellModal = ({
 	                  </p>
 	                ) : isBankSellFlow ? (
 	                  <div className="px-1">
-	                    <div className="hidden md:block h-px bg-white/10 my-4" />
 	                    <p className="mt-1 text-[11px] md:text-xs text-white/45">
 	                      {t(
 	                        "moonpay_sell_partner_location_note",
 	                        "Le partenaire proposé dépend de votre localisation.",
 	                      )}
 	                    </p>
-	                    <div className="hidden md:block h-px bg-white/10 my-4" />
 	                  </div>
 	                ) : null}
 	              </>
@@ -1977,53 +1993,9 @@ const MoonPaySellModal = ({
           >
             {continueLabel}
           </button>
-		          <div className="mt-2 flex items-center justify-center gap-2 text-[11px] md:text-xs text-white/60">
-		            <span>
-		              {isSendToWalletFlow
-		                ? t(
-		                    "ui_simpleswap_secure_partner_note_f1d7a9c2b3",
-		                    "Conversion sécurisé via",
-		                  )
-		                : t(
-		                    "moonpay_buy_secure_partner_note",
-		                    "Paiement sécurisé via",
-		                  )}
-		            </span>
-		            <span
-		              className="inline-flex items-center gap-1.5"
-		              aria-label={t(
-		                "moonpay_buy_payment_methods",
-		                "Partenaires et moyens de paiement",
-		              )}
-		            >
-		              {isSendToWalletFlow ? (
-		                <PaymentLogo
-		                  src="/assets/payment-logos/simpleswap.jpeg"
-		                  alt="SimpleSwap"
-		                  fallback="SimpleSwap"
-		                  containerClassName="bg-white/90"
-		                  widthClassName="w-[140px]"
-		                />
-		              ) : (
-		                <>
-		                  <PaymentLogo
-		                    src="/assets/payment-logos/moonpay.png"
-		                    alt="MoonPay"
-		                    fallback="MoonPay"
-		                    containerClassName="bg-white/90"
-		                    widthClassName="w-[110px]"
-		                  />
-		                  <PaymentLogo
-		                    src="/assets/payment-logos/topper.svg"
-		                    alt="Topper"
-		                    fallback="Topper"
-		                    containerClassName="bg-black/40"
-		                    widthClassName="w-[110px]"
-		                  />
-		                </>
-		              )}
-		            </span>
-		          </div>
+          <p className="text-center text-[11px] md:text-xs text-white/40 mt-1">
+            {t('moonpay_sell_partner_location_note_cta', 'Le partenaire proposé dépend de votre localisation.')}
+          </p>
 	        </div>
 	      )}
 
