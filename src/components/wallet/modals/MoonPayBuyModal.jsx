@@ -1821,7 +1821,7 @@ const MoonPayBuyModal = ({
 
           {/* Title + Wallet pill */}
           {wizardStep === 1 ? (
-            <div className="px-4 pt-2 pb-4 text-center">
+            <div className="relative z-[65] px-4 pt-2 pb-4 text-center">
               <h3 className="text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight mb-2">
                 {resolvedTitleOverride || t('ui_funds_add_title', 'Ajouter des devises')}
               </h3>
@@ -1861,16 +1861,29 @@ const MoonPayBuyModal = ({
               <ModalSelect
                 value={currency}
                 onChange={(val) => setCurrency(String(val || '').toUpperCase())}
+                onOpenChange={setAssetDropdownOpen}
                 options={(supportedCurrencies || []).map((opt) => {
                   const labelLeftText = opt.labelLeft || opt.label || opt.code;
+                  const isSelected = String(opt.code) === String(currency || '');
+                  const labelRight = !assetDropdownOpen && isSelected
+                    ? (
+                      <span className="inline-flex items-center gap-[3px] text-[10px] text-white/30 tracking-normal font-normal">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" aria-hidden="true" className="opacity-50 shrink-0">
+                          <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6Z" stroke="currentColor" strokeWidth="1.5"/>
+                          <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.5"/>
+                        </svg>
+                        <span>{t('ui_balances_short_label_aa12', 'Soldes')}</span>
+                      </span>
+                    )
+                    : (opt.amountLabel
+                        ? opt.amountLabel
+                        : null);
                   return {
                     value: opt.code,
                     icon: opt.icon,
                     label: labelLeftText,
                     labelLeft: <span className="md:text-[1.12em]">{labelLeftText}</span>,
-                    labelRight: opt.amountLabel
-                      ? <span className="inline-flex items-center gap-[3px] text-[10px] text-white/30 tracking-normal font-normal">{opt.amountLabel}</span>
-                      : null,
+                    labelRight,
                     labelMobile: opt.labelMobile || labelLeftText,
                   };
                 })}
@@ -1879,11 +1892,11 @@ const MoonPayBuyModal = ({
                 showMobileOptionRight={true}
                 iconClassName="text-3xl leading-none"
                 optionClassName="py-2.5 md:py-3 !text-xl md:!text-2xl"
-                menuHeader={t('moonpay_buy_receive_currency_label', 'Vous achetez')}
+                menuHeader={t('ui_your_balances_header', 'Vos soldes')}
                 backdropClassName="bg-black/80 backdrop-blur-[4px] !z-[45]"
                 buttonClassName="bg-gradient-to-b from-[#101415] to-[#0d1214] ring-1 ring-white/[0.07] ring-inset rounded-[14px] px-3.5 py-1.5 md:py-2 text-xl md:text-2xl text-white outline-none focus:outline-none cursor-pointer transition-all duration-150 shadow-[0_2px_8px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.06)]"
                 openButtonClassName="!bg-white/10 !border !border-white/10 !border-b-0 !ring-1 !ring-white/10 !shadow-[0_8px_18px_rgba(0,0,0,0.45)]"
-                menuClassName={noticeVariant === 'demo' ? 'bg-xcannes-surface-demo !border-white/10 !ring-1 !ring-white/10 ring-inset max-h-[520px]' : 'bg-[#101415] !border-white/10 !ring-1 !ring-white/10 ring-inset max-h-[520px]'}
+                menuClassName={noticeVariant === 'demo' ? 'bg-xcannes-surface-demo !border-white/10 !ring-1 !ring-white/10 ring-inset max-h-[450px]' : 'bg-[#101415] !border-white/10 !ring-1 !ring-white/10 ring-inset max-h-[450px]'}
                 selectClassName="xcannes-select w-full bg-[#101415] ring-1 ring-white/10 ring-inset rounded-[14px] px-3.5 py-1.5 md:py-2 text-xl md:text-2xl text-white outline-none focus:outline-none cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
               />
             </div>

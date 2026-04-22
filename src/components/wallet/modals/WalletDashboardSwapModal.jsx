@@ -615,7 +615,7 @@ export default function WalletDashboardSwapModal({
             <div className="wallet-tab-unfold-in">
               <div className="flex flex-col gap-4">
                 {/* ── Title / subtitle ── */}
-                <div className="text-center">
+                <div className="text-center relative z-[65]">
                   <h3 className="text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight">
                     {t("ui_convert_title_main", "Convertissez vos devises")}
                   </h3>
@@ -689,8 +689,8 @@ export default function WalletDashboardSwapModal({
                           openButtonClassName="!bg-white/10 !border !border-white/10 !border-b-0 !ring-1 !ring-white/10 !shadow-[0_8px_18px_rgba(0,0,0,0.45)]"
 		                      menuClassName={
 		                        noticeVariant === "demo"
-                              ? "bg-xcannes-surface-demo !border-white/10 !ring-1 !ring-white/10 ring-inset max-h-[520px]"
-                              : "bg-[#101415] !border-white/10 !ring-1 !ring-white/10 ring-inset max-h-[520px]"
+                              ? "bg-xcannes-surface-demo !border-white/10 !ring-1 !ring-white/10 ring-inset max-h-[450px]"
+                              : "bg-[#101415] !border-white/10 !ring-1 !ring-white/10 ring-inset max-h-[450px]"
 		                      }
                           selectClassName="xcannes-select w-full bg-[#101415] ring-1 ring-white/10 ring-inset rounded-[14px] px-3.5 py-1.5 md:py-2 text-xl md:text-2xl text-white outline-none focus:outline-none cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
 		                    />
@@ -762,8 +762,8 @@ export default function WalletDashboardSwapModal({
 		                    />
 		                  </div>
 
-                  <div className="relative">
-                    <div className="flex items-center justify-between mb-2 relative z-[41]">
+                  <div className={quoteDropdownOpen ? "relative z-[65]" : "relative"}>
+                    <div className={`flex items-center justify-between mb-2 relative ${quoteDropdownOpen ? "z-[65]" : "z-[41]"}`}>
                       <div className="text-[13px] tracking-normal font-medium text-white/55">
                         {t("ui_convert_to_label", "Vous recevez")}
                       </div>
@@ -814,8 +814,8 @@ export default function WalletDashboardSwapModal({
                           menuHeader={t("ui_your_balances_header", "Vos soldes")}
 		                      menuClassName={
 		                        noticeVariant === "demo"
-                              ? "bg-xcannes-surface-demo !border-white/10 !ring-1 !ring-white/10 ring-inset max-h-[220px]"
-                              : "bg-[#101415] !border-white/10 !ring-1 !ring-white/10 ring-inset max-h-[220px]"
+                              ? "bg-xcannes-surface-demo !border-white/10 !ring-1 !ring-white/10 ring-inset max-h-[250px]"
+                              : "bg-[#101415] !border-white/10 !ring-1 !ring-white/10 ring-inset max-h-[250px]"
 		                      }
                           menuFooter={(
                             <WalletCurrencySelector
