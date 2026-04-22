@@ -1710,8 +1710,8 @@ export default function CurrencyStatement({
               }}
             />
           )}
-          <div className={`grid grid-cols-1 md:grid-cols-3 gap-3 ${periodDropdownOpen ? "relative z-[60]" : ""}`}>
-            <div className={`${isInlineDesktop ? "md:col-span-3" : ""} ${periodDropdownOpen ? "relative z-[60]" : ""}`}>
+          <div className={`grid grid-cols-2 md:grid-cols-3 gap-3 ${periodDropdownOpen ? "relative z-[60]" : ""}`}>
+            <div className={`col-span-2 ${isInlineDesktop ? "md:col-span-3" : ""} ${periodDropdownOpen ? "relative z-[60]" : ""}`}>
                 <div className="my-3 md:my-4 flex justify-center">
                   <div className="relative w-full md:max-w-[420px]">
                     <button
@@ -1802,7 +1802,7 @@ export default function CurrencyStatement({
                   </p>
                 </div>
                 {estimatedUsd != null && Number.isFinite(estimatedUsd) ? (
-                  <div className="hidden md:block md:ml-auto md:text-right -mt-[4rem] text-right md:mt-0">
+                  <div className="md:ml-auto md:text-right text-right md:mt-0">
                     <p className="text-[11px] text-white/40 mb-1">
                       {t("ui_digital_usd_label", "USD numérique")}
                     </p>
