@@ -722,12 +722,16 @@ export default function WalletDashboardSwapModal({
 		                          setConvertBaseCurrency(convertQuoteCurrency);
 		                          setConvertQuoteCurrency(prev);
 		                        }}
-                            className={`w-9 h-9 rounded-full bg-[#0e1214] hover:bg-[#141a1e] active:scale-95 flex items-center justify-center ring-1 ring-white/10 ring-inset transition-all duration-200 shadow-[0_4px_12px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.08)] hover:ring-white/20 hover:shadow-[0_4px_16px_rgba(0,0,0,0.55),0_0_8px_rgba(255,255,255,0.04)] ${swapRotating ? 'scale-90' : ''}`}
+                            className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 active:scale-90 hover:brightness-125 ${swapRotating ? 'scale-90' : ''}`}
+                            style={{
+                              background: 'linear-gradient(160deg, #1c2428 0%, #0c1012 100%)',
+                              boxShadow: '0 0 0 1px rgba(255,255,255,0.09), 0 6px 18px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.11), inset 0 -6px 12px rgba(0,0,0,0.35)',
+                            }}
 		                        aria-label="Inverser les devises"
 		                      >
 		                        <svg
-		                          width="16"
-		                          height="16"
+		                          width="15"
+		                          height="15"
 		                          viewBox="0 0 16 16"
 		                          fill="none"
 		                          xmlns="http://www.w3.org/2000/svg"
@@ -736,8 +740,8 @@ export default function WalletDashboardSwapModal({
 		                            transition: 'transform 380ms cubic-bezier(0.34,1.56,0.64,1)',
 		                          }}
 		                        >
-		                          <path d="M5.5 2v9.5M5.5 11.5L3 9M5.5 11.5L8 9" stroke="rgba(255,255,255,0.75)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-		                          <path d="M10.5 14V4.5M10.5 4.5L8 7M10.5 4.5L13 7" stroke="rgba(255,255,255,0.75)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+		                          <path d="M5.5 2v9.5M5.5 11.5L3 9M5.5 11.5L8 9" stroke="rgba(255,255,255,0.65)" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+		                          <path d="M10.5 14V4.5M10.5 4.5L8 7M10.5 4.5L13 7" stroke="rgba(255,255,255,0.65)" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
 		                        </svg>
 		                      </button>
 		                    </div>
