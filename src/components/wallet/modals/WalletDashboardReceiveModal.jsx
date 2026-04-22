@@ -856,11 +856,11 @@ export default function WalletDashboardReceiveModal({
   const requestDisplayAmount = generatedRequest?.displayAmount ?? Number.parseFloat(requestAmount || '0');
   const requestDisplayAmountLabel = Number.isFinite(Number(requestDisplayAmount))
     ? formatAmountWithSymbol(locale, Number(requestDisplayAmount), requestDisplayCurrency, {
-        minimumFractionDigits: 0,
+        minimumFractionDigits: 2,
         maximumFractionDigits: 2,
       })
     : formatAmountWithSymbol(locale, 0, requestDisplayCurrency, {
-        minimumFractionDigits: 0,
+        minimumFractionDigits: 2,
         maximumFractionDigits: 2,
       });
 	  const requestDateLabel = useMemo(() => {

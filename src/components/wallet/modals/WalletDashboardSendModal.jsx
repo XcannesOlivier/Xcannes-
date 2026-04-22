@@ -1360,70 +1360,41 @@ export default function WalletDashboardSendModal({
       <div className="text-[13px] text-white/45">
         {t(
           "ui_verify_before_sending",
-          "Vérifiez les informations avant d’envoyer",
+          "Vérifiez les informations avant d'envoyer",
         )}
       </div>
-		      <div className="rounded-[20px] ring-1 ring-white/10 ring-inset transition-all duration-300 p-4 space-y-4 bg-[#101415] shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
-	        <div className="flex items-center justify-between">
-	          <span className="text-xs tracking-wide text-white/60 font-semibold">
-	            {t("ui_send_confirmation_title", "Résumé de l'envoi")}
-	          </span>
-		        </div>
-	        <div
-	          className="overflow-hidden transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]"
-	          style={{ maxHeight: '400px', opacity: 1 }}
-	        >
-	        <div className="space-y-3 text-sm text-white/80 pt-1">
-	          <div className="grid grid-cols-[auto,1fr] gap-x-3 gap-y-1 items-start">
-	            <div className="text-white/60 shrink-0">
-	              {t("ui_beneficiary_label", "Destinataire")}
-	            </div>
-	            <div className="min-w-0 text-right">
-	              <div className="font-semibold text-white/90 truncate">
-	                {resolvedDestinationLabel ||
-	                  t("ui_wallet_unknown", "Unknown wallet")}
-	              </div>
-	            </div>
-	            {normalizedDestination ? (
-	              <>
-	                <div className="text-white/50 shrink-0 text-[12px]">
-	                  {t("ui_account_number_label", "N° de Compte")}:
-	                </div>
-	                <div className="min-w-0 text-right">
-	                  <button
-	                    type="button"
-	                    onClick={() =>
-	                      setShowFullRecipientAccount((prev) => !prev)
-	                    }
-	                    className={[
-		                      "font-mono text-[12px] text-xcannes-green/80 hover:text-xcannes-green/95 transition-colors",
-		                      "underline decoration-white/25 underline-offset-2 hover:decoration-white/60",
-	                      showFullRecipientAccount
-	                        ? "break-all"
-	                        : "inline-block truncate max-w-[240px]",
-	                    ].join(" ")}
-	                    title={t(
-	                      "ui_toggle_full_account_number",
-	                      "Afficher/masquer l’adresse complète",
-	                    )}
-	                  >
-	                    {showFullRecipientAccount
-	                      ? normalizedDestination
-	                      : compactDestinationLabel}
-	                  </button>
-	                </div>
-	              </>
-	            ) : null}
-	          </div>
-          <div className="flex items-center justify-between gap-3">
-            <span className="text-white/60">
-              {t("ui_amount_52cea2dd3d", "Montant")}
+      <div className="rounded-[16px] overflow-hidden">
+        <div className="flex flex-col gap-0.5 px-6 pt-2 pb-2">
+          <span className="text-[11px] md:text-[12.5px] text-white/40 font-normal">
+            {t("ui_beneficiary_label", "Destinataire")} —{" "}
+            <span className="text-white/70 font-semibold">
+              {resolvedDestinationLabel || t("ui_wallet_unknown", "Unknown wallet")}
             </span>
-            <span className={`font-mono ${summaryAmount > 0 ? 'text-white/90' : 'text-white/40'}`}>
-              {confirmAmountLabel || '0'}
+          </span>
+          {normalizedDestination ? (
+            <span className="text-[11px] md:text-[12.5px] text-white/40 font-normal tabular-nums">
+              {t("ui_account_number_label", "N° de Compte")} —{" "}
+              <button
+                type="button"
+                onClick={() => setShowFullRecipientAccount((prev) => !prev)}
+                className="font-mono text-xcannes-green/80 hover:text-xcannes-green/95 transition-colors underline decoration-white/25 underline-offset-2 hover:decoration-white/60"
+                title={t("ui_toggle_full_account_number", "Afficher/masquer l'adresse complète")}
+              >
+                {showFullRecipientAccount ? normalizedDestination : compactDestinationLabel}
+              </button>
             </span>
-          </div>
+          ) : null}
         </div>
+        <div className="px-3 mt-3 mb-0">
+          <div className="h-px bg-white/45 rounded-full" />
+        </div>
+        <div className="flex items-center justify-between px-4 pt-4 pb-4 mt-0.5 mx-1 mb-1 rounded-[12px]">
+          <span className="text-[15px] md:text-[16px] text-white/45 font-normal tracking-[0.02em]">
+            {t("ui_amount_52cea2dd3d", "Montant")}
+          </span>
+          <span className={"text-3xl md:text-4xl font-bold tracking-tight " + (summaryAmount > 0 ? "text-white" : "text-white/30")}>
+            {confirmAmountLabel || '0'}
+          </span>
         </div>
       </div>
     </div>
