@@ -1800,8 +1800,8 @@ const MoonPayBuyModal = ({
       {/* Form */}
       {step === 'form' && (
         <div className={wizardStep === 2 ? 'space-y-4 md:space-y-5' : 'space-y-5'}>
-          <div className="relative flex items-center">
-            {wizardStep === 2 ? (
+          {wizardStep === 2 ? (
+            <div className="relative flex items-center">
               <button
                 type="button"
                 onClick={() => {
@@ -1814,9 +1814,9 @@ const MoonPayBuyModal = ({
                 <ChevronLeftIcon className="w-5 h-5" aria-hidden="true" />
                 <span className="text-sm">{t('ui_back', 'Retour')}</span>
               </button>
-            ) : null}
-            <div className="ml-auto" />
-          </div>
+              <div className="ml-auto" />
+            </div>
+          ) : null}
 
           {/* Title + Wallet pill */}
           {wizardStep === 1 ? (
