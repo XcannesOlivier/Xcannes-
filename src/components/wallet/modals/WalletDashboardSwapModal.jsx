@@ -863,7 +863,7 @@ export default function WalletDashboardSwapModal({
                     {/* ── SECTION 3: Summary ─────────────────────────────── */}
                     <div className="rounded-[16px] overflow-hidden">
                       {/* Rows: Frais + Taux — note technique discrète */}
-                      <div className="flex flex-col gap-0.5 px-4 pt-2 pb-2">
+                      <div className="flex flex-col gap-0.5 px-6 pt-2 pb-2">
                         <span className="text-[11px] md:text-[12.5px] text-white/40 font-normal tabular-nums">
                           {t("statement_conversion_fee_label", "Frais")} —{" "}
                           {formatAmountWithSymbol(locale, Number(previewMeta?.spreadFeeRlusd || 0), "USD", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -883,10 +883,9 @@ export default function WalletDashboardSwapModal({
                       {/* Row: Total reçu */}
                       <div
                         className="flex items-center justify-between px-4 pt-4 pb-4 mt-0.5 mx-1 mb-1 rounded-[12px]"
-                        style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.015) 100%)' }}
                       >
                         <div className="flex flex-col gap-0.5">
-                          <span className="text-[11px] text-white/30 font-normal uppercase tracking-[0.08em]">{t("ui_total_received_label", "Total reçu")}</span>
+                          <span className="text-[13px] md:text-[14px] text-white/30 font-normal tracking-[0.02em]">{t("ui_total_received_label", "Total reçu")}</span>
                         </div>
                         <span className="text-3xl md:text-4xl text-white font-bold tracking-tight">
                           {quoteCode
@@ -935,10 +934,10 @@ export default function WalletDashboardSwapModal({
                       ].join(" ")}
                       style={convertButtonDisabled
                         ? {
-                            background: 'linear-gradient(180deg, rgba(34,154,86,0.28) 0%, rgba(14,103,58,0.28) 100%)',
-                            boxShadow: 'none',
-                            color: 'rgba(255,255,255,0.35)',
-                            letterSpacing: '0.02em',
+                            background: 'linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.03) 100%)',
+                            boxShadow: '0 0 0 1px rgba(255,255,255,0.07) inset',
+                            color: 'rgba(255,255,255,0.28)',
+                            letterSpacing: '0.01em',
                           }
                         : {
                             background: 'linear-gradient(180deg, #2da861 0%, #0d6b3a 100%)',
