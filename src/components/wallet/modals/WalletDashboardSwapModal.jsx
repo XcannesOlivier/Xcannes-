@@ -860,11 +860,11 @@ export default function WalletDashboardSwapModal({
                     <div className="rounded-[16px] overflow-hidden">
                       {/* Rows: Frais + Taux — note technique discrète */}
                       <div className="flex flex-col gap-0.5 px-4 pt-2 pb-2">
-                        <span className="text-[11px] text-white/38 font-normal tabular-nums">
+                        <span className="text-[11px] md:text-[12.5px] text-white/40 font-normal tabular-nums">
                           {t("statement_conversion_fee_label", "Frais")} —{" "}
                           {formatAmountWithSymbol(locale, Number(previewMeta?.spreadFeeRlusd || 0), "USD", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </span>
-                        <span className="text-[11px] text-white/38 font-normal tabular-nums">
+                        <span className="text-[11px] md:text-[12.5px] text-white/40 font-normal tabular-nums">
                           {t("ui_exchange_rate_label", "Taux")} —{" "}
                           {Number.isFinite(Number(previewMeta?.unitRate)) && previewMeta?.unitRate > 0 && baseCode && quoteCode
                             ? `1 ${getDisplayCurrencyCode(baseCode)} = ${Number(previewMeta.unitRate).toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 4 })} ${getDisplayCurrencyCode(quoteCode)}`
@@ -878,7 +878,7 @@ export default function WalletDashboardSwapModal({
                       </div>
                       {/* Row: Total reçu */}
                       <div className="flex items-baseline justify-between px-4 pt-4 pb-3">
-                        <span className="text-[12px] text-white/40 font-normal tracking-wide">{t("ui_total_received_label", "Total reçu")}</span>
+                        <span className="text-[13px] md:text-[15px] text-white/40 font-normal tracking-wide">{t("ui_total_received_label", "Total reçu")}</span>
                         <span className="text-3xl md:text-4xl text-white font-bold tracking-tight">
                           {quoteCode
                             ? formatAmountWithSymbolLocal(
