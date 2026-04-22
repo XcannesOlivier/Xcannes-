@@ -740,8 +740,8 @@ export default function WalletDashboardSwapModal({
 		                            transition: 'transform 380ms cubic-bezier(0.34,1.56,0.64,1)',
 		                          }}
 		                        >
-		                          <path d="M5.5 2v9.5M5.5 11.5L3 9M5.5 11.5L8 9" stroke="rgba(255,255,255,0.65)" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
-		                          <path d="M10.5 14V4.5M10.5 4.5L8 7M10.5 4.5L13 7" stroke="rgba(255,255,255,0.65)" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+		                          <path d="M5 2v9.5M5 11.5L2.5 9M5 11.5L7.5 9" stroke="rgba(255,255,255,0.65)" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+		                          <path d="M11 14V4.5M11 4.5L8.5 7M11 4.5L13.5 7" stroke="rgba(255,255,255,0.65)" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
 		                        </svg>
 		                      </button>
 		                    </div>
@@ -877,12 +877,17 @@ export default function WalletDashboardSwapModal({
                               : "1 USD = 0.84 EUR"}
                         </span>
                       </div>
-                      <div className="px-3 mt-3 mb-1">
-                        <div className="h-px bg-white/15 rounded-full" />
+                      <div className="px-3 mt-3 mb-0">
+                        <div className="h-px bg-white/10 rounded-full" />
                       </div>
                       {/* Row: Total reçu */}
-                      <div className="flex items-baseline justify-between px-4 pt-4 pb-3">
-                        <span className="text-[13px] md:text-[15px] text-white/40 font-normal tracking-wide">{t("ui_total_received_label", "Total reçu")}</span>
+                      <div
+                        className="flex items-center justify-between px-4 pt-4 pb-4 mt-0.5 mx-1 mb-1 rounded-[12px]"
+                        style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.015) 100%)' }}
+                      >
+                        <div className="flex flex-col gap-0.5">
+                          <span className="text-[11px] text-white/30 font-normal uppercase tracking-[0.08em]">{t("ui_total_received_label", "Total reçu")}</span>
+                        </div>
                         <span className="text-3xl md:text-4xl text-white font-bold tracking-tight">
                           {quoteCode
                             ? formatAmountWithSymbolLocal(
