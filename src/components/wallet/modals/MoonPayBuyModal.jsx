@@ -1818,62 +1818,25 @@ const MoonPayBuyModal = ({
             <div className="ml-auto" />
           </div>
 
-          {/* Wallet + Title (merged) */}
-	          {wizardStep === 1 ? (
-	            <div
-	              className={[
-	                'rounded-t-[20px] rounded-b-none px-4 py-4 ring-1 ring-white/10 ring-inset bg-[#101415]',
-	                'shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]',
-	              ].join(' ')}
-	            >
-              <p className="block text-[16px] md:text-base font-orbitron font-bold text-white mb-3">
-                {wizardStep === 1 ? (
-                  <>
-                    <span className="text-[20px] tracking-normal">
-                      {resolvedTitleOverride || t('ui_funds_add_title', 'Ajouter des devises')}
-                    </span>
-                  </>
-                ) : (
-                  <>
-                    <span className="text-[20px] tracking-[0.14em]">
-                      {t('moonpay_buy_asset_details_prefix', 'Détails de la transaction')}
-                    </span>
-                  </>
-                )}
+          {/* Title + Wallet pill */}
+          {wizardStep === 1 ? (
+            <div className="px-4 pt-2 pb-4">
+              <p className="block text-[20px] font-orbitron font-bold text-white mb-4 tracking-normal">
+                {resolvedTitleOverride || t('ui_funds_add_title', 'Ajouter des devises')}
               </p>
-              {String(walletLabel || '').trim() ? (
-                <div className="flex items-center gap-2 mb-1">
+              <div className="flex justify-center">
+                <div className="inline-flex items-center gap-6 bg-elevated px-6 py-1.5 rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]">
+                  <span className="text-white/70 text-[14px] md:text-[15px] font-medium tracking-wide">
+                    {t('moonpay_from_account', 'Depuis le compte')}
+                  </span>
                   <span
                     className={['h-3 w-3 rounded-full ring-4 shrink-0 animate-pulse', accentRing25Bg].join(' ')}
                     aria-hidden
                   />
-                  <p className="min-w-0 text-[16px] md:text-[17px] text-white font-semibold truncate">{walletLabel}</p>
+                  <span className="text-white/95 text-[14px] md:text-[15px] font-semibold">
+                    {walletLabel || 'XCANNES'}
+                  </span>
                 </div>
-              ) : null}
-              <div className="mt-0.5 flex items-start gap-2">
-                <button
-                  type="button"
-                  onClick={() => setWalletAddressExpanded(prev => !prev)}
-                  aria-expanded={walletAddressExpanded}
-                  title={walletAddress}
-                  className={[
-                    'min-w-0 flex-1 text-left font-mono md:tracking-[0.06em] transition-colors',
-                    walletAddressExpanded
-                      ? 'text-[14px] md:text-[15px] break-all'
-                      : 'text-[14px] md:text-[15px] whitespace-nowrap',
-                    'text-white/70 hover:text-white',
-                  ].join(' ')}
-                >
-                  {walletAddressExpanded ? walletAddress : truncateMiddle(walletAddress)}
-                </button>
-                <button
-                  type="button"
-                  onClick={handleCopyWalletAddress}
-                  className="shrink-0 rounded-md px-2 py-1 text-[11px] md:text-xs font-semibold ring-1 ring-white/10 bg-elevated text-white/70 hover:text-white hover:ring-white/20 transition-colors"
-                  aria-label={t('ui_copy_address', 'Copier')}
-                >
-                  {walletAddressCopied ? t('ui_copied', 'Copié') : t('ui_copy', 'Copier')}
-                </button>
               </div>
             </div>
           ) : null}
