@@ -1650,7 +1650,7 @@ export default function CurrencyStatement({
 	                <ChevronLeftIcon className="w-6 h-6" aria-hidden="true" />
 	              </button>
 	            ) : null}
-	            <div className="flex items-center gap-2 md:gap-3 min-w-0 flex-1">
+              <div className="flex items-start gap-2 md:gap-3 min-w-0 flex-1">
 	              {CRYPTO_ICONS?.[displayCurrency] ? (
 	                isSvgIcon(CRYPTO_ICONS[displayCurrency]) ? (
 	                  // eslint-disable-next-line @next/next/no-img-element
@@ -1803,11 +1803,11 @@ export default function CurrencyStatement({
                 </div>
                 {estimatedUsd != null && Number.isFinite(estimatedUsd) ? (
                   <div className="md:ml-auto md:text-right text-right md:mt-0">
-                    <p className="text-[11px] text-white/40 mb-1">
+                    <p className="text-[11px] text-white/40 mb-1 hidden md:block">
                       {t("ui_digital_usd_label", "USD numérique")}
                     </p>
                     <p className="text-[12px] text-white/50">
-                      ≈ {formatAmountWithSymbol(locale, estimatedUsd, "RLUSD", {
+                      <span className="md:hidden text-white/40 mr-1">{t("ui_digital_usd_label", "USD numérique")}</span>≈ {formatAmountWithSymbol(locale, estimatedUsd, "RLUSD", {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
                       })}
@@ -1994,18 +1994,6 @@ export default function CurrencyStatement({
             </div>
           </div>
 
-          {hasMore && (
-            <button
-              type="button"
-              onClick={() => onLoadMore && onLoadMore()}
-              disabled={loadingMore}
-              className="w-full px-4 py-2.5 rounded-[20px] text-sm font-semibold transition-colors disabled:opacity-50 bg-white/10 hover:bg-white/15 text-white/80"
-            >
-              {loadingMore
-                ? t("ui_loading_1386baebe9", "Loading…")
-                : t("ui_load_more_3f7a1c9d5b", "Load more")}
-            </button>
-          )}
             </>
           )}
         </div>

@@ -218,20 +218,49 @@ export default function WalletDashboardStatementModals({
       setCurrencyBalanceAfterNext(null);
 
       try {
-        const data = await fetchStatement({
-          address: backendWalletAddress,
-          currencyCode: code,
-          limit: 100,
-        });
-        setCurrencyTransactions(
-          Array.isArray(data?.transactions) ? data.transactions : [],
-        );
-        setCurrencyStatementMonths(
-          Array.isArray(data?.statementMonths) ? data.statementMonths : [],
-        );
-        setCurrencyHasMore(Boolean(data?.hasMore));
-        setCurrencyCursorNext(data?.cursorNext || null);
-        setCurrencyBalanceAfterNext(data?.balanceAfterRlusdNext ?? null);
+        const allTransactions = [];
+        let allStatementMonths = [];
+        let nextCursor = null;
+        let nextBalanceAfterRlusd = null;
+        let hasMore = false;
+        let pageCount = 0;
+
+        do {
+          const data = await fetchStatement({
+            address: backendWalletAddress,
+            currencyCode: code,
+            limit: 100,
+            ...(nextCursor
+              ? {
+                  cursor: nextCursor,
+                  balanceAfterRlusd: nextBalanceAfterRlusd,
+                }
+              : {}),
+          });
+
+          const pageTransactions = Array.isArray(data?.transactions)
+            ? data.transactions
+            : [];
+          allTransactions.push(...pageTransactions);
+
+          if (
+            allStatementMonths.length === 0 &&
+            Array.isArray(data?.statementMonths)
+          ) {
+            allStatementMonths = data.statementMonths;
+          }
+
+          hasMore = Boolean(data?.hasMore);
+          nextCursor = data?.cursorNext || null;
+          nextBalanceAfterRlusd = data?.balanceAfterRlusdNext ?? null;
+          pageCount += 1;
+        } while (hasMore && nextCursor && pageCount < 20);
+
+        setCurrencyTransactions(allTransactions);
+        setCurrencyStatementMonths(allStatementMonths);
+        setCurrencyHasMore(false);
+        setCurrencyCursorNext(null);
+        setCurrencyBalanceAfterNext(null);
       } catch (err) {
         console.error("[wallet/statement] currency load error:", err);
         setCurrencyError(
