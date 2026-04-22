@@ -1225,7 +1225,6 @@ export default function WalletDashboardSendModal({
               >
                 {t("ui_asset_e5170a7a06", "Devise")}
               </label>
-              <span className="text-sm text-white/40 pr-6">{t("ui_balance_label", "Solde")}</span>
             </div>
 	            <ModalSelect
 	              value={selectedSendToken ? selectedSendToken.key : ""}
@@ -1233,27 +1232,41 @@ export default function WalletDashboardSendModal({
                 onOpenChange={setSendAssetDropdownOpen}
               hideSelected
               options={(augmentedTokens || []).map((token) => {
-                const labelLeft =
+                const labelLeftText =
                   selectLabelByAssetKey?.[token.key] ||
                   selectLabelByAssetKey?.[token.currency] ||
                   token.currency;
-                const labelRight =
+                const labelLeft = <span className="md:text-[1.12em]">{labelLeftText}</span>;
+                const labelRightRaw =
                   selectLabelRightByAssetKey?.[token.key] ||
                   selectLabelRightByAssetKey?.[token.currency] ||
                   null;
+                const isSelected = String(token.key) === String(selectedSendToken?.key || "");
+                const labelRight =
+                  !sendAssetDropdownOpen && isSelected
+                    ? (
+                      <span className="inline-flex items-center gap-[3px] text-[10px] text-white/30 tracking-normal font-normal">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" aria-hidden="true" className="opacity-50 shrink-0">
+                          <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6Z" stroke="currentColor" strokeWidth="1.5"/>
+                          <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.5"/>
+                        </svg>
+                        <span>{t("ui_balances_short_label_aa12", "Soldes")}</span>
+                      </span>
+                    )
+                    : labelRightRaw;
                 return {
                   value: token.key,
                   icon:
                     selectIconByAssetKey?.[token.key] ||
                     selectIconByAssetKey?.[token.currency] ||
                     null,
-                  label: labelLeft,
+                  label: labelLeftText,
                   labelLeft,
                   labelRight,
                   labelMobile:
                     selectLabelMobileByAssetKey?.[token.key] ||
                     selectLabelMobileByAssetKey?.[token.currency] ||
-                    labelLeft,
+                    labelLeftText,
                 };
 	              })}
 	              useNativeSelect={false}
@@ -1283,15 +1296,15 @@ export default function WalletDashboardSendModal({
             </div>
           ) : null}
           <div>
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between mb-2">
               <label
-                className="block text-lg md:text-xl text-white/70 font-semibold mb-2"
+                className="text-[13px] tracking-normal font-medium text-white/55"
                 title={t("ui_send_amount_tip", "Saisissez le montant à envoyer.")}
               >
                 {t("ui_amount_52cea2dd3d", "Montant")}
               </label>
               {showCalculatedAmountLabel ? (
-                <span className="mb-1 inline-flex items-center rounded-full ring-1 ring-amber-300/30 ring-inset bg-amber-300/10 px-2 py-1 text-[10px] text-amber-200/90">
+                <span className="inline-flex items-center rounded-full ring-1 ring-amber-300/30 ring-inset bg-amber-300/10 px-2 py-1 text-[10px] text-amber-200/90">
                   {t("ui_calculated_amount_label", "Montant calculé")}
                 </span>
               ) : null}
@@ -1306,16 +1319,16 @@ export default function WalletDashboardSendModal({
                     ? selectedSendToken.value
                     : undefined
               }
-              placeholder="0.0000"
+              placeholder="0.00"
               token={
                 selectedSendToken
                   ? selectLabelByAssetKey?.[selectedSendToken.currency] ||
                     selectedSendToken.currency
                   : "USD"
               }
-              tokenClassName="text-white drop-shadow-sm text-4xl md:text-5xl font-bold"
-	              containerClassName="py-8 md:py-9 rounded-[20px] bg-black/30 ring-2 ring-white/20 ring-inset transition-colors duration-150 shadow-[0_6px_20px_rgba(0,0,0,0.5)] [&_input]:!text-4xl [&_input]:md:!text-5xl"
-	            />
+              tokenClassName="text-white/70 drop-shadow-sm text-2xl md:text-3xl font-semibold"
+              containerClassName="pt-5 pb-5 rounded-[18px] bg-[#111518] ring-1 ring-white/10 ring-inset transition-all duration-200 shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30)] focus-within:ring-white/25 focus-within:shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30),0_0_0_1px_rgba(255,255,255,0.10),0_0_24px_rgba(255,255,255,0.06)] [&_input]:!text-4xl [&_input]:md:!text-5xl [&_input]:font-bold [&_input]:placeholder:text-white/20"
+            />
             {manualInsufficientBalance ? (
               <div className="mt-2 rounded-lg ring-1 ring-orange-400/30 ring-inset bg-orange-400/10 px-3 py-2 text-xs text-orange-200/90">
                 <div className="font-semibold">
@@ -1341,7 +1354,7 @@ export default function WalletDashboardSendModal({
   );
 
   /* ── Dynamic summary – visible as soon as a destination address is set ── */
-  const summaryExpanded = Boolean(selectedSendToken && summaryAmount > 0 && !manualInsufficientBalance && !insufficientBalance);
+  const summaryExpanded = true;
   const inlineSummary = hasDestination ? (
     <div className="space-y-3 transition-all duration-200">
       <div className="text-[13px] text-white/45">
@@ -1350,28 +1363,15 @@ export default function WalletDashboardSendModal({
           "Vérifiez les informations avant d’envoyer",
         )}
       </div>
-		      <div className={`rounded-[20px] ring-1 ring-white/10 ring-inset transition-all duration-300 ${summaryExpanded ? 'p-4 space-y-4 bg-[#101415] shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]' : 'px-4 py-2.5 bg-[#101415]/60 shadow-[0_2px_8px_rgba(0,0,0,0.25)] opacity-60'}`}>
+		      <div className="rounded-[20px] ring-1 ring-white/10 ring-inset transition-all duration-300 p-4 space-y-4 bg-[#101415] shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
 	        <div className="flex items-center justify-between">
 	          <span className="text-xs tracking-wide text-white/60 font-semibold">
 	            {t("ui_send_confirmation_title", "Résumé de l'envoi")}
 	          </span>
-	          {!summaryExpanded && (
-	            <span className="flex items-center gap-[3px] ml-2">
-	              <span className="w-[4px] h-[4px] rounded-full bg-white/25 animate-[summaryDot_1.4s_ease-in-out_infinite]" />
-	              <span className="w-[4px] h-[4px] rounded-full bg-white/25 animate-[summaryDot_1.4s_ease-in-out_0.2s_infinite]" />
-	              <span className="w-[4px] h-[4px] rounded-full bg-white/25 animate-[summaryDot_1.4s_ease-in-out_0.4s_infinite]" />
-	            </span>
-	          )}
 		        </div>
-	        <style jsx>{`
-	          @keyframes summaryDot {
-	            0%, 80%, 100% { opacity: 0.25; transform: scale(0.85); }
-	            40% { opacity: 0.7; transform: scale(1.15); }
-	          }
-	        `}</style>
 	        <div
 	          className="overflow-hidden transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]"
-	          style={{ maxHeight: summaryExpanded ? '400px' : '0px', opacity: summaryExpanded ? 1 : 0 }}
+	          style={{ maxHeight: '400px', opacity: 1 }}
 	        >
 	        <div className="space-y-3 text-sm text-white/80 pt-1">
 	          <div className="grid grid-cols-[auto,1fr] gap-x-3 gap-y-1 items-start">

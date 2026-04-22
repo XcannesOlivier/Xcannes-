@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import useIsDesktop from '../hooks/useIsDesktop';
 import { QRCodeCanvas } from 'qrcode.react';
 import ModalSelect from '@/components/ui/ModalSelect';
+import TokenAmountInput from '@/components/ui/TokenAmountInput';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'next-i18next';
 import { XRPL_KNOWN_ISSUERS } from '@/utils/xrpl';
@@ -1568,27 +1569,17 @@ export default function WalletDashboardReceiveModal({
 	
 		                      {/* Amount */}
 					                      <div className="pt-4">
-					                        <label className="block text-lg md:text-xl text-white/70 font-semibold mb-2">
+					                        <label className="block text-[13px] tracking-normal font-medium text-white/55 mb-2">
 					                          {t('ui_amount_7668986206', 'Montant')}
 					                        </label>
-                                  <div className="relative flex items-center gap-3 bg-black/40 backdrop-blur-sm border-2 border-white/15 rounded-[18px] px-5 pt-5 pb-5 bg-[#111518] ring-1 ring-white/10 ring-inset transition-colors duration-150 shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30)]">
-					                          <input
-					                            type="number"
-					                            value={requestAmount}
-                                      onChange={e => {
-                                        const normalized = String(e.target.value || '').replace(',', '.');
-                                        if (normalized === '' || /^\d*\.?\d{0,2}$/.test(normalized)) {
-                                          setRequestAmount(normalized);
-                                        }
-                                      }}
-                                      step="0.01"
-                                      placeholder="0.00"
-                                      className="xcannes-no-spinner w-full bg-transparent text-4xl md:text-5xl font-bold text-white placeholder:text-white/35 focus:outline-none"
-					                          />
-					                          <span className="pointer-events-none absolute right-5 top-1/2 -translate-y-1/2 text-4xl md:text-5xl font-bold text-white drop-shadow-sm">
-					                            {requestCurrencyCode || 'USD'}
-					                          </span>
-					                        </div>
+                                  <TokenAmountInput
+                                    value={requestAmount}
+                                    onChange={setRequestAmount}
+                                    placeholder="0.00"
+                                    token={requestCurrencyCode || 'USD'}
+                                    tokenClassName="text-white/70 drop-shadow-sm text-2xl md:text-3xl font-semibold"
+                                    containerClassName="pt-5 pb-5 rounded-[18px] bg-[#111518] ring-1 ring-white/10 ring-inset transition-all duration-200 shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30)] focus-within:ring-white/25 focus-within:shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30),0_0_0_1px_rgba(255,255,255,0.10),0_0_24px_rgba(255,255,255,0.06)] [&_input]:!text-4xl [&_input]:md:!text-5xl [&_input]:font-bold [&_input]:placeholder:text-white/20"
+                                  />
 					                      </div>
 
 	                      {/* Message (optional) */}
