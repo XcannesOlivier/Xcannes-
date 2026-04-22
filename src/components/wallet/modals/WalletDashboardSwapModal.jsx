@@ -878,14 +878,14 @@ export default function WalletDashboardSwapModal({
                         </span>
                       </div>
                       <div className="px-3 mt-3 mb-0">
-                        <div className="h-px bg-white/10 rounded-full" />
+                        <div className="h-px bg-white/45 rounded-full" />
                       </div>
                       {/* Row: Total reçu */}
                       <div
                         className="flex items-center justify-between px-4 pt-4 pb-4 mt-0.5 mx-1 mb-1 rounded-[12px]"
                       >
                         <div className="flex flex-col gap-0.5">
-                          <span className="text-[13px] md:text-[14px] text-white/30 font-normal tracking-[0.02em]">{t("ui_total_received_label", "Total reçu")}</span>
+                          <span className="text-[15px] md:text-[16px] text-white/45 font-normal tracking-[0.02em]">{t("ui_total_received_label", "Total reçu")}</span>
                         </div>
                         <span className="text-3xl md:text-4xl text-white font-bold tracking-tight">
                           {quoteCode
@@ -934,9 +934,9 @@ export default function WalletDashboardSwapModal({
                       ].join(" ")}
                       style={convertButtonDisabled
                         ? {
-                            background: 'linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.03) 100%)',
-                            boxShadow: '0 0 0 1px rgba(255,255,255,0.07) inset',
-                            color: 'rgba(255,255,255,0.28)',
+                            background: 'linear-gradient(180deg, rgba(34,154,86,0.42) 0%, rgba(14,103,58,0.42) 100%)',
+                            boxShadow: '0 0 0 1px rgba(255,255,255,0.06) inset',
+                            color: 'rgba(255,255,255,0.40)',
                             letterSpacing: '0.01em',
                           }
                         : {
