@@ -1688,7 +1688,7 @@ const MoonPayBuyModal = ({
       ? t('moonpay_action_simulate_buy_5a1c9d7b3e', 'Simulate buy')
       : wizardStep === 2
         ? t('moonpay_action_continue_buy_8d2a1c6b9f', 'Continuer')
-        : t('ui_next_step', 'Étape suivante');
+        : t('ui_next_step', 'Continuer');
   const continueDisabled =
     wizardStep === 1
       ? loading || !hasValidTargetAmount || conversionMissing
@@ -1823,17 +1823,30 @@ const MoonPayBuyModal = ({
           {wizardStep === 1 ? (
             <div className="relative z-[65] px-4 pt-2 pb-4 text-center">
               <h3 className="text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight mb-2">
-                {resolvedTitleOverride || t('ui_funds_add_title', 'Ajouter des devises')}
+                {resolvedTitleOverride || t('ui_funds_add_title', 'Acheter des devises')}
               </h3>
               {!demoMode && !useSimpleSwapPartner ? (
-                <p className="mb-4 text-[14px] md:text-[15px] text-white/80 leading-relaxed">
-                  {highlightPaymentMethods(
-                    t(
-                      'moonpay_info_buy_live_3c8a1d6b2f',
-                      'Vous serez redirigé vers un partenaire sécurisé pour finaliser le paiement.\nMoyens acceptés : carte bancaire, Apple Pay, Google Pay, virement.',
-                    ),
-                  )}
-                </p>
+                <div className="mb-4 flex items-center justify-center gap-2 flex-wrap">
+                  <span className="text-[13px] text-white/55">
+                    {t('moonpay_info_buy_live_3c8a1d6b2f', 'Transactions sécurisées via')}
+                  </span>
+                  <span className="inline-flex items-center gap-1.5">
+                    <PaymentLogo
+                      src="/assets/payment-logos/moonpay.png"
+                      alt="MoonPay"
+                      fallback="MoonPay"
+                      containerClassName="bg-white/90"
+                      widthClassName="w-[90px]"
+                    />
+                    <PaymentLogo
+                      src="/assets/payment-logos/topper.svg"
+                      alt="Topper"
+                      fallback="Topper"
+                      containerClassName="bg-black/40"
+                      widthClassName="w-[90px]"
+                    />
+                  </span>
+                </div>
               ) : null}
               <div className="flex justify-center">
                 <div className="inline-flex items-center gap-6 bg-elevated px-6 py-1.5 rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]">
@@ -1922,7 +1935,7 @@ const MoonPayBuyModal = ({
                   inputMode="decimal"
                   readOnly={wizardStep !== 1}
                   className={[
-                    'xcannes-no-number-spin flex-1 min-w-0 bg-transparent text-white text-4xl md:text-5xl font-bold placeholder:text-white/20 focus:outline-none transition-all duration-150',
+                    'xcannes-no-number-spin flex-1 min-w-0 bg-transparent text-white text-4xl md:text-5xl font-bold placeholder:text-white/35 focus:outline-none transition-all duration-150',
                     wizardStep !== 1 ? 'cursor-default opacity-95' : '',
                   ].join(' ')}
                 />
@@ -1938,7 +1951,7 @@ const MoonPayBuyModal = ({
               <>
 	                <div className="px-1">
                   <div className="mb-4 text-[14px] md:text-[16px] font-semibold tracking-[0.08em] text-white/80">
-                    💳 {resolvedTitleOverride || t('ui_funds_add_title', 'Ajouter des devises')}
+                    💳 {resolvedTitleOverride || t('ui_funds_add_title', 'Acheter des devises')}
                   </div>
                   <div className="text-white text-[36px] md:text-[42px] font-semibold tracking-tight leading-none">
                     {hasValidTargetAmount
@@ -2094,13 +2107,13 @@ const MoonPayBuyModal = ({
             }}
             disabled={continueDisabled}
             className={[
-              "md:hidden w-full h-16 rounded-[20px] text-white text-lg font-semibold transition-all duration-150",
+              "md:hidden w-full h-14 rounded-[20px] text-white text-lg font-semibold transition-all duration-200 tracking-[-0.01em]",
               continueDisabled
                 ? "opacity-45 cursor-not-allowed"
                 : "hover:scale-[1.01] active:scale-[0.98]",
             ].join(" ")}
             style={continueDisabled
-              ? { background: 'linear-gradient(180deg, rgba(34,154,86,0.45) 0%, rgba(14,103,58,0.45) 100%)' }
+              ? { background: 'linear-gradient(180deg, rgba(34,154,86,0.65) 0%, rgba(14,103,58,0.65) 100%)' }
               : { background: 'linear-gradient(180deg, rgba(34,154,86,1) 0%, rgba(14,103,58,1) 100%)', boxShadow: '0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)' }
             }
           >
@@ -2111,56 +2124,18 @@ const MoonPayBuyModal = ({
             onClick={handleContinue}
             disabled={continueDisabled}
             className={[
-              "hidden md:flex items-center justify-center w-full h-16 rounded-[20px] text-white text-xl font-semibold transition-all duration-150",
+              "hidden md:flex items-center justify-center w-full h-14 rounded-[20px] text-white text-lg font-semibold transition-all duration-200 tracking-[-0.01em]",
               continueDisabled
                 ? "opacity-45 cursor-not-allowed"
                 : "hover:scale-[1.01] active:scale-[0.98]",
             ].join(" ")}
             style={continueDisabled
-              ? { background: 'linear-gradient(180deg, rgba(34,154,86,0.45) 0%, rgba(14,103,58,0.45) 100%)' }
+              ? { background: 'linear-gradient(180deg, rgba(34,154,86,0.65) 0%, rgba(14,103,58,0.65) 100%)' }
               : { background: 'linear-gradient(180deg, rgba(34,154,86,1) 0%, rgba(14,103,58,1) 100%)', boxShadow: '0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)' }
             }
           >
             {continueLabel}
           </button>
-          <div className="mt-2 flex items-center justify-center gap-2 text-[11px] md:text-xs text-white/60">
-            <span>
-              {useSimpleSwapPartner
-                ? t('ui_simpleswap_secure_partner_note_f1d7a9c2b3', 'Conversion sécurisé via')
-                : t('moonpay_buy_secure_partner_note', 'Paiement sécurisé via')}
-            </span>
-            <span
-              className="inline-flex items-center gap-1.5"
-              aria-label={t('moonpay_buy_payment_methods', 'Partenaires et moyens de paiement')}
-            >
-              {useSimpleSwapPartner ? (
-                <PaymentLogo
-                  src="/assets/payment-logos/simpleswap.jpeg"
-                  alt="SimpleSwap"
-                  fallback="SimpleSwap"
-                  containerClassName="bg-white/90"
-                  widthClassName="w-[140px]"
-                />
-              ) : (
-                <>
-                  <PaymentLogo
-                    src="/assets/payment-logos/moonpay.png"
-                    alt="MoonPay"
-                    fallback="MoonPay"
-                    containerClassName="bg-white/90"
-                    widthClassName="w-[110px]"
-                  />
-                  <PaymentLogo
-                    src="/assets/payment-logos/topper.svg"
-                    alt="Topper"
-                    fallback="Topper"
-                    containerClassName="bg-black/40"
-                    widthClassName="w-[110px]"
-                  />
-                </>
-              )}
-            </span>
-          </div>
         </div>
       )}
 

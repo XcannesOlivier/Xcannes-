@@ -1938,15 +1938,15 @@ const MoonPaySellModal = ({
             onClick={handleContinue}
             disabled={continueDisabled}
             className={[
-              "md:hidden w-full h-16 rounded-[20px] text-white text-lg font-semibold transition-all duration-150",
+              "md:hidden w-full h-14 rounded-[20px] text-white text-lg font-semibold transition-all duration-200 tracking-[-0.01em]",
               continueDisabled
                 ? "opacity-45 cursor-not-allowed"
                 : "hover:scale-[1.01] active:scale-[0.98]",
             ].join(" ")}
             style={continueDisabled
               ? { background: isSendToWalletFlow
-                  ? 'linear-gradient(180deg, rgba(255,106,0,0.45) 0%, rgba(232,95,0,0.45) 100%)'
-                  : 'linear-gradient(180deg, rgba(124,58,237,0.45) 0%, rgba(91,33,182,0.45) 100%)' }
+                  ? 'linear-gradient(180deg, rgba(255,106,0,0.65) 0%, rgba(232,95,0,0.65) 100%)'
+                  : 'linear-gradient(180deg, rgba(124,58,237,0.65) 0%, rgba(91,33,182,0.65) 100%)' }
               : { background: isSendToWalletFlow
                   ? 'linear-gradient(180deg, rgba(255,106,0,1) 0%, rgba(232,95,0,1) 100%)'
                   : 'linear-gradient(180deg, rgba(124,58,237,1) 0%, rgba(91,33,182,1) 100%)',
@@ -1960,15 +1960,15 @@ const MoonPaySellModal = ({
             onClick={handleContinue}
             disabled={continueDisabled}
             className={[
-              "hidden md:flex items-center justify-center w-full h-16 rounded-[20px] text-white text-xl font-semibold transition-all duration-150",
+              "hidden md:flex items-center justify-center w-full h-14 rounded-[20px] text-white text-lg font-semibold transition-all duration-200 tracking-[-0.01em]",
               continueDisabled
                 ? "opacity-45 cursor-not-allowed"
                 : "hover:scale-[1.01] active:scale-[0.98]",
             ].join(" ")}
             style={continueDisabled
               ? { background: isSendToWalletFlow
-                  ? 'linear-gradient(180deg, rgba(255,106,0,0.45) 0%, rgba(232,95,0,0.45) 100%)'
-                  : 'linear-gradient(180deg, rgba(124,58,237,0.45) 0%, rgba(91,33,182,0.45) 100%)' }
+                  ? 'linear-gradient(180deg, rgba(255,106,0,0.65) 0%, rgba(232,95,0,0.65) 100%)'
+                  : 'linear-gradient(180deg, rgba(124,58,237,0.65) 0%, rgba(91,33,182,0.65) 100%)' }
               : { background: isSendToWalletFlow
                   ? 'linear-gradient(180deg, rgba(255,106,0,1) 0%, rgba(232,95,0,1) 100%)'
                   : 'linear-gradient(180deg, rgba(124,58,237,1) 0%, rgba(91,33,182,1) 100%)',
