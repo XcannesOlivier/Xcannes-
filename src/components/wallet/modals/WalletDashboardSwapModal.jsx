@@ -858,26 +858,27 @@ export default function WalletDashboardSwapModal({
                     ) : null}
                     {/* ── SECTION 3: Summary ─────────────────────────────── */}
                     <div className="rounded-[16px] overflow-hidden">
-                      {/* Row: Frais */}
-                      <div className="flex items-center justify-between px-4 pt-2 pb-1">
-                        <span className="text-sm text-white/55">{t("statement_conversion_fee_label", "Frais")}</span>
-                        <span className="text-sm text-white/80 font-medium">
-                          {formatAmountWithSymbol(locale, Number(previewMeta?.spreadFeeRlusd || 0), "USD", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                        </span>
+                      {/* Rows: Frais + Taux — note technique discrète */}
+                      <div className="flex flex-col gap-1 px-4 pt-2 pb-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[11px] text-white/35 font-normal">{t("statement_conversion_fee_label", "Frais")}</span>
+                          <span className="text-[11px] text-white/45 font-normal tabular-nums">
+                            {formatAmountWithSymbol(locale, Number(previewMeta?.spreadFeeRlusd || 0), "USD", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-[11px] text-white/35 font-normal">{t("ui_exchange_rate_label", "Taux")}</span>
+                          <span className="text-[11px] text-white/45 font-normal tabular-nums">
+                            {Number.isFinite(Number(previewMeta?.unitRate)) && previewMeta?.unitRate > 0 && baseCode && quoteCode
+                              ? `1 ${getDisplayCurrencyCode(baseCode)} = ${Number(previewMeta.unitRate).toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 4 })} ${getDisplayCurrencyCode(quoteCode)}`
+                              : Number.isFinite(inlineUnitRate) && baseCode && quoteCode
+                                ? `1 ${getDisplayCurrencyCode(baseCode)} = ${Number(inlineUnitRate).toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 4 })} ${getDisplayCurrencyCode(quoteCode)}`
+                                : "1 USD = 0.84 EUR"}
+                          </span>
+                        </div>
                       </div>
-                      {/* Row: Taux de change */}
-                      <div className="flex items-center justify-between px-4 pt-1 pb-2">
-                        <span className="text-sm text-white/55">{t("ui_exchange_rate_label", "Taux de change")}</span>
-                        <span className="text-sm text-white/80 font-medium">
-                          {Number.isFinite(Number(previewMeta?.unitRate)) && previewMeta?.unitRate > 0 && baseCode && quoteCode
-                            ? `1 ${getDisplayCurrencyCode(baseCode)} = ${Number(previewMeta.unitRate).toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 4 })} ${getDisplayCurrencyCode(quoteCode)}`
-                            : Number.isFinite(inlineUnitRate) && baseCode && quoteCode
-                              ? `1 ${getDisplayCurrencyCode(baseCode)} = ${Number(inlineUnitRate).toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 4 })} ${getDisplayCurrencyCode(quoteCode)}`
-                              : "1 USD = 0.84 EUR"}
-                        </span>
-                      </div>
-                      <div className="px-3 mt-5 mb-2">
-                        <div className="h-[1.25px] bg-white/45 rounded-full" />
+                      <div className="px-3 mt-3 mb-1">
+                        <div className="h-px bg-white/15 rounded-full" />
                       </div>
                       {/* Row: Total reçu */}
                       <div className="flex items-center justify-between px-4 pt-2 pb-2">
