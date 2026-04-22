@@ -1521,7 +1521,7 @@ export default function DemoCurrencyStatement({
                   />
                 )
               ) : (
-                <span className="text-3xl md:text-3xl flex-shrink-0">
+                <span className="text-3xl md:text-3xl flex-shrink-0 leading-none inline-block translate-y-[8px]">
                   {getCurrencyFlag(displayCurrency)}
                 </span>
               )}

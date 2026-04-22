@@ -1671,7 +1671,7 @@ export default function CurrencyStatement({
                   />
                 )
               ) : (
-                  <span className="text-3xl md:text-3xl flex-shrink-0 leading-none mt-[4px]">
+                  <span className="text-3xl md:text-3xl flex-shrink-0 leading-none inline-block translate-y-[8px]">
                   {getCurrencyFlag(displayCurrency)}
                 </span>
               )}
