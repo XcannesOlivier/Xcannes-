@@ -682,6 +682,7 @@ export default function WalletDashboardSwapModal({
 		                      hideSelected
 		                      showMobileOptionRight={true}
 		                      iconClassName="text-3xl leading-none"
+                          optionClassName="py-2.5 md:py-3 !text-xl md:!text-2xl"
                           backdropClassName="bg-black/80 backdrop-blur-[4px] !z-[45]"
                           buttonClassName="bg-gradient-to-b from-[#141a1e] to-[#0d1214] ring-1 ring-white/[0.07] ring-inset rounded-[14px] px-3.5 py-1.5 md:py-2 text-xl md:text-2xl text-white outline-none focus:outline-none cursor-pointer transition-all duration-150 shadow-[0_2px_8px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.06)]"
                           openButtonClassName="!bg-white/10 !border !border-white/10 !border-b-0 !ring-1 !ring-white/10 !shadow-[0_8px_18px_rgba(0,0,0,0.45)]"
@@ -808,7 +809,7 @@ export default function WalletDashboardSwapModal({
                           backdropClassName="bg-black/80 backdrop-blur-[4px] !z-[45]"
                           buttonClassName="bg-gradient-to-b from-[#141a1e] to-[#0d1214] ring-1 ring-white/[0.07] ring-inset rounded-[14px] px-3.5 py-2 text-xl md:text-2xl text-white outline-none focus:outline-none cursor-pointer transition-all duration-150 shadow-[0_2px_8px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.06)]"
                           openButtonClassName="!bg-white/10 !border !border-white/10 !border-b-0 !ring-1 !ring-white/10 !shadow-[0_8px_18px_rgba(0,0,0,0.45)]"
-                          optionClassName="py-2.5 md:py-3"
+                          optionClassName="py-2.5 md:py-3 !text-xl md:!text-2xl"
 		                      menuClassName={
 		                        noticeVariant === "demo"
                               ? "bg-xcannes-surface-demo !border-white/10 !ring-1 !ring-white/10 ring-inset max-h-[220px]"
