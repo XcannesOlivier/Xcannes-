@@ -1258,7 +1258,6 @@ export default function WalletDashboardSendModal({
 	              })}
 	              useNativeSelect={false}
 	              showMobileOptionRight={true}
-	              hideSelected
 	              iconClassName="text-3xl leading-none"
 	              optionClassName="py-2.5 md:py-3 !text-xl md:!text-2xl"
 	              menuHeader={t("ui_your_balances_header", "Vos soldes")}
