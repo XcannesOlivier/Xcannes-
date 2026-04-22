@@ -642,7 +642,7 @@ export default function WalletDashboardSwapModal({
                 <div className="space-y-3">
                   <div className="relative z-[65]">
                     <div className="flex items-center justify-between mb-2 relative z-[41]">
-                      <div className="text-[13px] tracking-[0.22em] text-white/45">
+                      <div className="text-[13px] tracking-normal font-medium text-white/55">
                         {t("ui_convert_from_label", "Vous envoyez")}
                       </div>
                     </div>
@@ -745,7 +745,7 @@ export default function WalletDashboardSwapModal({
 
                   <div className="relative">
                     <div className="flex items-center justify-between mb-2 relative z-[41]">
-                      <div className="text-[13px] tracking-[0.22em] text-white/45">
+                      <div className="text-[13px] tracking-normal font-medium text-white/55">
                         {t("ui_convert_to_label", "Vous recevez")}
                       </div>
                     </div>
