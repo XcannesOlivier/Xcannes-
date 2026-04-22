@@ -1659,7 +1659,7 @@ export default function CurrencyStatement({
                     alt={displayCurrency}
                     width={32}
                     height={32}
-                    className="flex-shrink-0 w-8 h-8 md:w-8 md:h-8 rounded-md"
+                      className="flex-shrink-0 w-8 h-8 md:w-8 md:h-8 rounded-md mt-[2px]"
                   />
                 ) : (
                   <Image
@@ -1667,11 +1667,11 @@ export default function CurrencyStatement({
                     alt={displayCurrency}
                     width={32}
                     height={32}
-                    className="flex-shrink-0 w-8 h-8 md:w-8 md:h-8 rounded-md"
+                      className="flex-shrink-0 w-8 h-8 md:w-8 md:h-8 rounded-md mt-[2px]"
                   />
                 )
               ) : (
-                <span className="text-3xl md:text-3xl flex-shrink-0">
+                  <span className="text-3xl md:text-3xl flex-shrink-0 leading-none mt-[2px]">
                   {getCurrencyFlag(displayCurrency)}
                 </span>
               )}
@@ -1802,7 +1802,7 @@ export default function CurrencyStatement({
                   </p>
                 </div>
                 {estimatedUsd != null && Number.isFinite(estimatedUsd) ? (
-                  <div className="md:ml-auto md:text-right text-right md:mt-0">
+                  <div className="col-start-2 md:col-start-auto md:ml-auto md:text-right text-right md:mt-0">
                     <p className="text-[11px] text-white/40 mb-1 hidden md:block">
                       {t("ui_digital_usd_label", "USD numérique")}
                     </p>
