@@ -659,10 +659,10 @@ export default function WalletDashboardSwapModal({
                         const labelRight =
                           !baseDropdownOpen && isSelected
                             ? (
-                              <span className="inline-flex items-center gap-1 text-[10px] md:text-[11px] text-white/38 tracking-[0.01em]">
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true" className="opacity-80">
-                                  <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6Z" stroke="currentColor" strokeWidth="1.7"/>
-                                  <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.7"/>
+                              <span className="inline-flex items-center gap-[3px] text-[10px] text-white/30 tracking-normal font-normal">
+                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" aria-hidden="true" className="opacity-50 shrink-0">
+                                  <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6Z" stroke="currentColor" strokeWidth="1.5"/>
+                                  <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.5"/>
                                 </svg>
                                 <span>{t("ui_balances_short_label_aa12", "Soldes")}</span>
                               </span>
@@ -683,7 +683,7 @@ export default function WalletDashboardSwapModal({
 		                      showMobileOptionRight={true}
 		                      iconClassName="text-3xl leading-none"
                           backdropClassName="bg-black/80 backdrop-blur-[4px] !z-[55]"
-                          buttonClassName="bg-[#101415] ring-1 ring-white/10 ring-inset rounded-[14px] px-3.5 py-1.5 md:py-2 text-xl md:text-2xl text-white outline-none focus:outline-none cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
+                          buttonClassName="bg-gradient-to-b from-[#141a1e] to-[#0d1214] ring-1 ring-white/[0.07] ring-inset rounded-[14px] px-3.5 py-1.5 md:py-2 text-xl md:text-2xl text-white outline-none focus:outline-none cursor-pointer transition-all duration-150 shadow-[0_2px_8px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.06)]"
                           openButtonClassName="!bg-white/10 !border !border-white/10 !border-b-0 !ring-1 !ring-white/10 !shadow-[0_8px_18px_rgba(0,0,0,0.45)]"
 		                      menuClassName={
 		                        noticeVariant === "demo"
@@ -774,10 +774,10 @@ export default function WalletDashboardSwapModal({
                         const labelRight =
                           !quoteDropdownOpen && isSelected
                             ? (
-                              <span className="inline-flex items-center gap-1 text-[10px] md:text-[11px] text-white/38 tracking-[0.01em]">
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true" className="opacity-80">
-                                  <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6Z" stroke="currentColor" strokeWidth="1.7"/>
-                                  <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.7"/>
+                              <span className="inline-flex items-center gap-[3px] text-[10px] text-white/30 tracking-normal font-normal">
+                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" aria-hidden="true" className="opacity-50 shrink-0">
+                                  <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6Z" stroke="currentColor" strokeWidth="1.5"/>
+                                  <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.5"/>
                                 </svg>
                                 <span>{t("ui_balances_short_label_aa12", "Soldes")}</span>
                               </span>
@@ -802,7 +802,7 @@ export default function WalletDashboardSwapModal({
 		                      showMobileOptionRight={true}
 		                      iconClassName="text-3xl leading-none"
                           backdropClassName="bg-black/80 backdrop-blur-[4px] !z-[55]"
-                          buttonClassName="bg-[#101415] ring-1 ring-white/10 ring-inset rounded-[14px] px-3.5 py-2 text-xl md:text-2xl text-white outline-none focus:outline-none cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
+                          buttonClassName="bg-gradient-to-b from-[#141a1e] to-[#0d1214] ring-1 ring-white/[0.07] ring-inset rounded-[14px] px-3.5 py-2 text-xl md:text-2xl text-white outline-none focus:outline-none cursor-pointer transition-all duration-150 shadow-[0_2px_8px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.06)]"
                           openButtonClassName="!bg-white/10 !border !border-white/10 !border-b-0 !ring-1 !ring-white/10 !shadow-[0_8px_18px_rgba(0,0,0,0.45)]"
                           optionClassName="py-2.5 md:py-3"
 		                      menuClassName={
