@@ -13,6 +13,9 @@ export default function TokenAmountInput({
     const raw = e.target.value.replace(",", ".").replace(/[^0-9.]/g, "");
     if (raw.split(".").length > 2) return; // une seule virgule
     if (raw.length > 0 && isNaN(Number(raw))) return;
+    // Limiter à 2 chiffres après la virgule
+    const parts = raw.split(".");
+    if (parts.length === 2 && parts[1].length > 2) return;
 
     if (onChange) {
       onChange(raw);
