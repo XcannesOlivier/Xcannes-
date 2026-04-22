@@ -1549,18 +1549,18 @@ export default function WalletDashboardReceiveModal({
 	                          portalTarget={overlayListRef.current}
 	                          hideSelected
 	                          showMobileOptionRight={true}
-	                          backdropClassName="bg-black/80 backdrop-blur-[4px]"
+	                          backdropClassName="bg-black/80 backdrop-blur-[4px] !z-[45]"
+	                          iconClassName="text-3xl leading-none"
+	                          optionClassName="py-2.5 md:py-3 !text-xl md:!text-2xl"
+	                          menuHeader={t("ui_your_balances_header", "Vos soldes")}
 		                          menuClassName={
 		                            noticeVariant === 'demo'
                                   ? 'bg-xcannes-surface-demo max-h-[320px] overflow-y-auto overscroll-contain touch-pan-y !border-white/10 !ring-1 !ring-white/10 ring-inset'
                                   : 'bg-[#101415] max-h-[320px] overflow-y-auto overscroll-contain touch-pan-y !border-white/10 !ring-1 !ring-white/10 ring-inset'
 		                          }
-                              openButtonClassName="!bg-white/10 !border !border-white/10 !border-b-0 !ring-1 !ring-white/10 !shadow-none"
-                              buttonClassName={`ring-1 ring-white/10 ring-inset rounded-[20px] px-3.5 py-3 text-xl md:text-2xl text-white focus:outline-none cursor-pointer ${
-			                            noticeVariant === 'demo' ? 'bg-xcannes-surface-demo' : 'bg-[#101415]'
-			                          }`}
-                              iconClassName="text-3xl leading-none"
-                              selectClassName={`xcannes-select w-full ring-1 ring-white/10 ring-inset rounded-[20px] px-3.5 py-3 text-xl md:text-2xl text-white focus:outline-none transition-colors duration-150 ${
+                              openButtonClassName="!bg-white/10 !border !border-white/10 !border-b-0 !ring-1 !ring-white/10 !shadow-[0_8px_18px_rgba(0,0,0,0.45)]"
+                              buttonClassName={`bg-gradient-to-b from-[#101415] to-[#0d1214] ring-1 ring-white/[0.07] ring-inset rounded-[14px] px-3.5 py-1.5 md:py-2 text-xl md:text-2xl text-white outline-none focus:outline-none cursor-pointer transition-all duration-150 shadow-[0_2px_8px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.06)]`}
+                              selectClassName={`xcannes-select w-full ring-1 ring-white/10 ring-inset rounded-[14px] px-3.5 py-1.5 md:py-2 text-xl md:text-2xl text-white focus:outline-none transition-colors duration-150 ${
 			                            noticeVariant === 'demo' ? 'bg-xcannes-surface-demo' : 'bg-white/[0.02]'
 			                          }`}
 			                        />
