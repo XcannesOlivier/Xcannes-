@@ -22,6 +22,14 @@ export default function TokenAmountInput({
     }
   };
 
+  const handleBlur = () => {
+    if (!onChange || value === "" || value == null) return;
+    const num = Number(value);
+    if (!isNaN(num)) {
+      onChange(num.toFixed(2));
+    }
+  };
+
   const handleMaxClick = () => {
     if (max == null || !onChange) return;
     const next = String(max);
@@ -39,6 +47,7 @@ export default function TokenAmountInput({
         placeholder={placeholder}
         value={value ?? ""}
         onChange={handleInput}
+        onBlur={handleBlur}
         onClick={(e) => e.stopPropagation()}
         onFocus={(e) => e.stopPropagation()} />
 
