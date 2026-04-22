@@ -1197,8 +1197,11 @@ export default function WalletDashboardSendModal({
         {!hasPaymentRequest && (
         <div className={`transition-opacity duration-300 space-y-4 ${hasDestination ? 'opacity-100' : 'opacity-30 pointer-events-none select-none'}`}>
           <h3 className="text-[24px] md:text-[34px] font-bold text-white/95 tracking-tight text-center leading-snug">
-            {t("ui_send_devise_hint", "Indiquez la devise, le montant, vérifiez et envoyez.")}
+            {t("ui_send_modal_title", "Envoi simple")}
           </h3>
+          <p className="text-[14px] md:text-[15px] text-white/55 text-center leading-relaxed -mt-2">
+            {t("ui_send_devise_hint", "Saisissez une adresse, scannez, collez, importez ou choisissez la dans vos destinataires.")}
+          </p>
           <div className="flex justify-center relative z-[65]">
             {renderWalletMeta?.({
               variant: "pill",
@@ -1357,22 +1360,16 @@ export default function WalletDashboardSendModal({
   const summaryExpanded = true;
   const inlineSummary = hasDestination ? (
     <div className="space-y-3 transition-all duration-200">
-      <div className="text-[13px] text-white/45">
-        {t(
-          "ui_verify_before_sending",
-          "Vérifiez les informations avant d'envoyer",
-        )}
-      </div>
       <div className="rounded-[16px] overflow-hidden">
-        <div className="flex flex-col gap-0.5 px-6 pt-2 pb-2">
-          <span className="text-[11px] md:text-[12.5px] text-white/40 font-normal">
+        <div className="flex flex-col gap-1 px-6 pt-3 pb-2">
+          <span className="text-[13px] md:text-[14px] text-white/45 font-normal">
             {t("ui_beneficiary_label", "Destinataire")} —{" "}
-            <span className="text-white/70 font-semibold">
+            <span className="text-white/85 font-semibold">
               {resolvedDestinationLabel || t("ui_wallet_unknown", "Unknown wallet")}
             </span>
           </span>
           {normalizedDestination ? (
-            <span className="text-[11px] md:text-[12.5px] text-white/40 font-normal tabular-nums">
+            <span className="text-[13px] md:text-[14px] text-white/45 font-normal tabular-nums">
               {t("ui_account_number_label", "N° de Compte")} —{" "}
               <button
                 type="button"

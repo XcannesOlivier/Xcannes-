@@ -509,7 +509,7 @@ export default function WalletDashboardSendChoiceModal({
                           {t('ui_send_simple_title', 'Envoi simple')}
                         </p>
                         <p className="mt-1 text-[15px] md:text-[16px] leading-snug text-white/55">
-                          {t('ui_send_simple_hint_long', 'Saisissez une adresse, indiquez la devise et le montant.')}
+                          {t('ui_send_simple_hint_long', 'Saisissez une adresse, scannez, collez, importez ou choisissez la dans vos destinataires.')}
                         </p>
                       </div>
                       <ChevronIcon />
@@ -573,8 +573,8 @@ export default function WalletDashboardSendChoiceModal({
                   <h3 className="mt-1 text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight">
                     {t('ui_send_simple_title', 'Envoi simple')}
                   </h3>
-                  <p className="mt-2 text-[14px] md:text-[15px] text-white/60 max-w-[34ch] leading-relaxed">
-                    {t('ui_send_simple_hint_long', 'Saisissez une adresse, indiquez la devise et le montant.')}
+                  <p className="mt-2 text-[14px] md:text-[15px] text-white/60 max-w-[40ch] leading-relaxed">
+                    {t('ui_send_simple_hint_long', 'Saisissez une adresse, scannez, collez, importez ou choisissez la dans vos destinataires.')}
                   </p>
                   {/* Wallet meta pill */}
                   <div className="mt-4 flex justify-center px-4 w-full">
@@ -630,32 +630,25 @@ export default function WalletDashboardSendChoiceModal({
                     </button>
                   </div>
                   <style jsx>{`
-                    /* Mobile: Scanner = green hero, bigger icon+text | Importer = subtle, smaller */
                     .send-choice-scan-btn {
-                      background: linear-gradient(180deg, rgba(34,154,86,1) 0%, rgba(14,103,58,1) 100%);
-                      box-shadow: 0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28);
-                      color: #fff;
+                      background: transparent;
+                      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12);
+                      color: rgba(255,255,255,0.75);
                     }
-                    .send-choice-scan-btn svg { color: #fff; width: 1.4rem; height: 1.4rem; }
-                    .send-choice-scan-btn span { color: #fff; font-size: 18px; font-weight: 700; }
-                    .send-choice-import-btn { color: rgba(255,255,255,0.7); }
-                    .send-choice-import-btn svg { color: rgba(255,255,255,0.5); width: 1.15rem; height: 1.15rem; }
-                    .send-choice-import-btn span { color: rgba(255,255,255,0.55); font-size: 13.5px; font-weight: 400; }
-                    /* Desktop: Importer = green hero, bigger icon+text | Scanner = subtle, smaller */
+                    .send-choice-scan-btn:hover { background: rgba(255,255,255,0.04); }
+                    .send-choice-scan-btn svg { color: rgba(255,255,255,0.55); width: 1.15rem; height: 1.15rem; }
+                    .send-choice-scan-btn span { color: rgba(255,255,255,0.75); font-size: 15px; font-weight: 500; }
+                    .send-choice-import-btn {
+                      background: transparent;
+                      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12);
+                      color: rgba(255,255,255,0.75);
+                    }
+                    .send-choice-import-btn:hover { background: rgba(255,255,255,0.04); }
+                    .send-choice-import-btn svg { color: rgba(255,255,255,0.55); width: 1.15rem; height: 1.15rem; }
+                    .send-choice-import-btn span { color: rgba(255,255,255,0.75); font-size: 15px; font-weight: 500; }
                     @media (min-width: 768px) {
-                      .send-choice-scan-btn {
-                        background: rgba(255,255,255,0.07) !important;
-                        box-shadow: none !important;
-                      }
-                      .send-choice-scan-btn svg { color: rgba(255,255,255,0.5); width: 1.15rem; height: 1.15rem; }
-                      .send-choice-scan-btn span { color: rgba(255,255,255,0.55); font-size: 13.5px; font-weight: 400; }
-                      .send-choice-import-btn {
-                        background: linear-gradient(180deg, rgba(34,154,86,1) 0%, rgba(14,103,58,1) 100%) !important;
-                        box-shadow: 0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28) !important;
-                        color: #fff;
-                      }
-                      .send-choice-import-btn svg { color: #fff; width: 1.4rem; height: 1.4rem; }
-                      .send-choice-import-btn span { color: #fff; font-size: 18px; font-weight: 700; }
+                      .send-choice-scan-btn span { font-size: 14px; }
+                      .send-choice-import-btn span { font-size: 15px; }
                     }
                   `}</style>
 
@@ -816,32 +809,25 @@ export default function WalletDashboardSendChoiceModal({
                     </button>
                   </div>
                   <style jsx>{`
-                    /* Mobile: Scanner = orange hero, bigger icon+text | Importer = subtle */
                     .payreq-scan-btn {
-                      background: linear-gradient(180deg, rgba(245,166,35,0.9) 0%, rgba(180,110,10,1) 100%);
-                      box-shadow: 0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28);
-                      color: #fff;
+                      background: transparent;
+                      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12);
+                      color: rgba(255,255,255,0.75);
                     }
-                    .payreq-scan-btn svg { color: #fff; width: 1.4rem; height: 1.4rem; }
-                    .payreq-scan-btn span { color: #fff; font-size: 18px; font-weight: 700; }
-                    .payreq-import-btn { color: rgba(255,255,255,0.7); }
-                    .payreq-import-btn svg { color: rgba(255,255,255,0.5); width: 1.15rem; height: 1.15rem; }
-                    .payreq-import-btn span { color: rgba(255,255,255,0.55); font-size: 13.5px; font-weight: 400; }
-                    /* Desktop: Importer = orange hero, bigger icon+text | Scanner = subtle */
+                    .payreq-scan-btn:hover { background: rgba(255,255,255,0.04); }
+                    .payreq-scan-btn svg { color: rgba(255,255,255,0.55); width: 1.15rem; height: 1.15rem; }
+                    .payreq-scan-btn span { color: rgba(255,255,255,0.75); font-size: 15px; font-weight: 500; }
+                    .payreq-import-btn {
+                      background: transparent;
+                      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12);
+                      color: rgba(255,255,255,0.75);
+                    }
+                    .payreq-import-btn:hover { background: rgba(255,255,255,0.04); }
+                    .payreq-import-btn svg { color: rgba(255,255,255,0.55); width: 1.15rem; height: 1.15rem; }
+                    .payreq-import-btn span { color: rgba(255,255,255,0.75); font-size: 15px; font-weight: 500; }
                     @media (min-width: 768px) {
-                      .payreq-scan-btn {
-                        background: rgba(255,255,255,0.07) !important;
-                        box-shadow: none !important;
-                      }
-                      .payreq-scan-btn svg { color: rgba(255,255,255,0.5); width: 1.15rem; height: 1.15rem; }
-                      .payreq-scan-btn span { color: rgba(255,255,255,0.55); font-size: 13.5px; font-weight: 400; }
-                      .payreq-import-btn {
-                        background: linear-gradient(180deg, rgba(245,166,35,0.9) 0%, rgba(180,110,10,1) 100%) !important;
-                        box-shadow: 0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28) !important;
-                        color: #fff;
-                      }
-                      .payreq-import-btn svg { color: #fff; width: 1.4rem; height: 1.4rem; }
-                      .payreq-import-btn span { color: #fff; font-size: 18px; font-weight: 700; }
+                      .payreq-scan-btn span { font-size: 14px; }
+                      .payreq-import-btn span { font-size: 15px; }
                     }
                   `}</style>
 
