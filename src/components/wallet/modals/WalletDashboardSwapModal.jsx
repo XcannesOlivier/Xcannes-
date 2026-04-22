@@ -859,31 +859,27 @@ export default function WalletDashboardSwapModal({
                     {/* ── SECTION 3: Summary ─────────────────────────────── */}
                     <div className="rounded-[16px] overflow-hidden">
                       {/* Rows: Frais + Taux — note technique discrète */}
-                      <div className="flex flex-col gap-1 px-4 pt-2 pb-2">
-                        <div className="flex items-center justify-between">
-                          <span className="text-[11px] text-white/35 font-normal">{t("statement_conversion_fee_label", "Frais")}</span>
-                          <span className="text-[11px] text-white/45 font-normal tabular-nums">
-                            {formatAmountWithSymbol(locale, Number(previewMeta?.spreadFeeRlusd || 0), "USD", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                          </span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-[11px] text-white/35 font-normal">{t("ui_exchange_rate_label", "Taux")}</span>
-                          <span className="text-[11px] text-white/45 font-normal tabular-nums">
-                            {Number.isFinite(Number(previewMeta?.unitRate)) && previewMeta?.unitRate > 0 && baseCode && quoteCode
-                              ? `1 ${getDisplayCurrencyCode(baseCode)} = ${Number(previewMeta.unitRate).toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 4 })} ${getDisplayCurrencyCode(quoteCode)}`
-                              : Number.isFinite(inlineUnitRate) && baseCode && quoteCode
-                                ? `1 ${getDisplayCurrencyCode(baseCode)} = ${Number(inlineUnitRate).toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 4 })} ${getDisplayCurrencyCode(quoteCode)}`
-                                : "1 USD = 0.84 EUR"}
-                          </span>
-                        </div>
+                      <div className="flex flex-col gap-0.5 px-4 pt-2 pb-2">
+                        <span className="text-[11px] text-white/38 font-normal tabular-nums">
+                          {t("statement_conversion_fee_label", "Frais")} —{" "}
+                          {formatAmountWithSymbol(locale, Number(previewMeta?.spreadFeeRlusd || 0), "USD", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </span>
+                        <span className="text-[11px] text-white/38 font-normal tabular-nums">
+                          {t("ui_exchange_rate_label", "Taux")} —{" "}
+                          {Number.isFinite(Number(previewMeta?.unitRate)) && previewMeta?.unitRate > 0 && baseCode && quoteCode
+                            ? `1 ${getDisplayCurrencyCode(baseCode)} = ${Number(previewMeta.unitRate).toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 4 })} ${getDisplayCurrencyCode(quoteCode)}`
+                            : Number.isFinite(inlineUnitRate) && baseCode && quoteCode
+                              ? `1 ${getDisplayCurrencyCode(baseCode)} = ${Number(inlineUnitRate).toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 4 })} ${getDisplayCurrencyCode(quoteCode)}`
+                              : "1 USD = 0.84 EUR"}
+                        </span>
                       </div>
                       <div className="px-3 mt-3 mb-1">
                         <div className="h-px bg-white/15 rounded-full" />
                       </div>
                       {/* Row: Total reçu */}
-                      <div className="flex items-center justify-between px-4 pt-2 pb-2">
-                        <span className="text-lg md:text-xl text-white">{t("ui_total_received_label", "Total reçu")}</span>
-                        <span className="text-2xl md:text-3xl text-white font-bold">
+                      <div className="flex items-baseline justify-between px-4 pt-4 pb-3">
+                        <span className="text-[12px] text-white/40 font-normal tracking-wide">{t("ui_total_received_label", "Total reçu")}</span>
+                        <span className="text-3xl md:text-4xl text-white font-bold tracking-tight">
                           {quoteCode
                             ? formatAmountWithSymbolLocal(
                                 Number.isFinite(previewAmount) && previewAmount > 0 ? previewAmount : 0,
