@@ -1588,63 +1588,27 @@ const MoonPaySellModal = ({
             <div className="ml-auto" />
           </div>
 
-          {/* From wallet display */}
-					          <div
-					            className={[
-					              "rounded-t-[20px] rounded-b-none px-4 py-4 ring-1 ring-white/10 ring-inset bg-[#101415]",
-                        wizardStep === 1 ? "" : "hidden",
-					              `shadow-[0_4px_12px_rgba(0,0,0,0.4),${accentGlowShadow},inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]`,
-					            ].join(" ")}
-					          >
-				            <p className="block text-[16px] md:text-base font-orbitron font-bold text-white mb-3">
-                      <span className="text-[20px] tracking-normal">
-                        {resolvedSelectCryptoTitleOverride ||
-                          t(
-                            "moonpay_sell_withdraw_title_prefix",
-                            "Envoyer vers la banque",
-                          )}
-                      </span>
-					            </p>
-		            {String(walletLabel || "").trim() ? (
-		              <div className="flex items-center gap-2 mb-1">
-		                <span
-		                  className={[
-		                    "h-3 w-3 rounded-full ring-4 shrink-0 animate-pulse",
-		                    accentRing25Bg,
-		                  ].join(" ")}
-		                  aria-hidden
-		                />
-		                <p className="min-w-0 text-[16px] md:text-[17px] text-white font-semibold truncate">
-		                  {walletLabel}
-		                </p>
-		              </div>
-		            ) : null}
-                  <div className="mt-0.5 flex items-start gap-2">
-			            <button
-                    type="button"
-                    onClick={() => setWalletAddressExpanded((prev) => !prev)}
-                    aria-expanded={walletAddressExpanded}
-                    title={walletAddress}
-			              className={[
-			                "min-w-0 flex-1 text-left font-mono md:tracking-[0.06em] transition-colors",
-                      walletAddressExpanded
-                        ? "text-[14px] md:text-[15px] break-all"
-                        : "text-[14px] md:text-[15px] whitespace-nowrap",
-			                "text-white/70 hover:text-white",
-			              ].join(" ")}
-			            >
-			              {walletAddressExpanded ? walletAddress : truncateMiddle(walletAddress)}
-					            </button>
-                  <button
-                    type="button"
-                    onClick={handleCopyWalletAddress}
-                    className="shrink-0 rounded-md px-2 py-1 text-[11px] md:text-xs font-semibold ring-1 ring-white/10 bg-elevated text-white/70 hover:text-white hover:ring-white/20 transition-colors"
-                    aria-label={t("ui_copy_address", "Copier")}
-                  >
-                    {walletAddressCopied ? t("ui_copied", "Copié") : t("ui_copy", "Copier")}
-                  </button>
-                  </div>
-					          </div>
+          {/* Title + Wallet pill */}
+          <div className={["px-4 pt-2 pb-4 text-center", wizardStep === 1 ? "" : "hidden"].join(" ")}>
+            <h3 className="text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight mb-4">
+              {resolvedSelectCryptoTitleOverride ||
+                t("moonpay_sell_withdraw_title_prefix", "Envoyer vers la banque")}
+            </h3>
+            <div className="flex justify-center">
+              <div className="inline-flex items-center gap-6 bg-elevated px-6 py-1.5 rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]">
+                <span className="text-white/70 text-[14px] md:text-[15px] font-medium tracking-wide">
+                  {t("moonpay_from_account", "Depuis le compte")}
+                </span>
+                <span
+                  className={["h-3 w-3 rounded-full ring-4 shrink-0 animate-pulse", accentRing25Bg].join(" ")}
+                  aria-hidden
+                />
+                <span className="text-white/95 text-[14px] md:text-[15px] font-semibold">
+                  {walletLabel || "XCANNES"}
+                </span>
+              </div>
+            </div>
+          </div>
 
 		          {/* Currency selector */}
 		          <div className={wizardStep === 1 ? "" : "hidden"}>
