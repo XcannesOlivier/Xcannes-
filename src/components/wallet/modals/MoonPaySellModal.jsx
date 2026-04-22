@@ -2011,29 +2011,30 @@ const MoonPaySellModal = ({
                 </div>
 	          {/* Amount input (étape 1/2) */}
 	            <div className={wizardStep === 1 ? "" : "hidden"}>
-		              <label className="block text-[11px] tracking-[0.22em] text-white/45 mb-2">
+		              <div className="text-[13px] tracking-normal font-medium text-white/55 mb-2">
 		                {t("moonpay_amount_to_sell", "Montant")}
-		              </label>
-	              <div className="relative">
+		              </div>
+	              <div className={[
+	                'relative flex items-center gap-3 px-5 pt-5 pb-5 rounded-[18px] bg-[#111518] ring-1 ring-white/10 ring-inset transition-all duration-200',
+	                'shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30)]',
+	                'focus-within:ring-white/25 focus-within:shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30),0_0_0_1px_rgba(255,255,255,0.10),0_0_24px_rgba(255,255,255,0.06)]',
+	              ].join(' ')}>
 		                <input
 		                  type="text"
 		                  value={amount}
 		                  onChange={
                         wizardStep === 1 ? (e) => setAmount(e.target.value) : undefined
                       }
-		                  placeholder={t("ui_enter_amount_placeholder", "Entrez un montant")}
+		                  placeholder={t("ui_enter_amount_placeholder_zero", "0.00")}
 		                  inputMode="decimal"
                       readOnly={wizardStep !== 1}
 			                  className={[
-	                        "w-full px-4 py-4 bg-[#101415] ring-1 ring-white/15 ring-inset rounded-[20px] text-white pr-16 transition-all duration-150",
-	                        "shadow-[0_4px_12px_rgba(0,0,0,0.4)]",
-	                        wizardStep === 1
-	                          ? ["focus:outline-none focus:ring-2", accentRing60].join(" ")
-	                          : "cursor-default opacity-95",
+	                        "flex-1 min-w-0 bg-transparent text-white text-4xl md:text-5xl font-bold placeholder:text-white/20 focus:outline-none transition-all duration-150",
+	                        wizardStep !== 1 ? "cursor-default opacity-95" : "",
 	                      ].join(" ")}
 			                />
 
-	                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-white text-sm font-semibold">
+	                <span className="shrink-0 text-white/70 drop-shadow-sm text-2xl md:text-3xl font-semibold">
 	                  {currency}
 	                </span>
 	              </div>
