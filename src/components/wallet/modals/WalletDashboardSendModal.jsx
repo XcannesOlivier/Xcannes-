@@ -1200,7 +1200,7 @@ export default function WalletDashboardSendModal({
             {t("ui_send_modal_title", "Envoi simple")}
           </h3>
           <p className="text-[14px] md:text-[15px] text-white/55 text-center leading-relaxed -mt-2">
-            {t("ui_send_devise_hint", "Saisissez une adresse, scannez, collez, importez ou choisissez la dans vos destinataires.")}
+            {t("ui_send_devise_hint", "Indiquez la devise, le montant, vérifiez et envoyez.")}
           </p>
           <div className="flex justify-center relative z-[65]">
             {renderWalletMeta?.({

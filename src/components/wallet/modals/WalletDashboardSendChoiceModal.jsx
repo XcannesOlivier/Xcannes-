@@ -509,7 +509,7 @@ export default function WalletDashboardSendChoiceModal({
                           {t('ui_send_simple_title', 'Envoi simple')}
                         </p>
                         <p className="mt-1 text-[15px] md:text-[16px] leading-snug text-white/55">
-                          {t('ui_send_simple_hint_long', 'Saisissez une adresse, scannez, collez, importez ou choisissez la dans vos destinataires.')}
+                          {t('ui_send_simple_hint_long', 'Saisissez une adresse, indiquez la devise et le montant.')}
                         </p>
                       </div>
                       <ChevronIcon />
@@ -574,7 +574,7 @@ export default function WalletDashboardSendChoiceModal({
                     {t('ui_send_simple_title', 'Envoi simple')}
                   </h3>
                   <p className="mt-2 text-[14px] md:text-[15px] text-white/60 max-w-[40ch] leading-relaxed">
-                    {t('ui_send_simple_hint_long', 'Saisissez une adresse, scannez, collez, importez ou choisissez la dans vos destinataires.')}
+                    {t('ui_send_simple_hint_long', 'Saisissez une adresse, scannez, collez, importez ou choisissez dans vos destinataires.')}
                   </p>
                   {/* Wallet meta pill */}
                   <div className="mt-4 flex justify-center px-4 w-full">
