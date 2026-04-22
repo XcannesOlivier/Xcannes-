@@ -621,20 +621,20 @@ export default function WalletDashboardSwapModal({
                   <p className="mt-2 text-[14px] md:text-[15px] text-white/80 max-w-[34ch] mx-auto leading-relaxed">
                     {t("ui_convert_subtitle_main", "Convertissez instantanément entre vos devises.")}
                   </p>
-                  <div className="mt-4 flex justify-center relative z-[120]">
+                  <div className="mt-2 flex justify-center relative z-[120]">
                     {renderWalletMeta?.({
                       variant: "pill",
                       className: "w-full flex justify-center wallet-meta--plus-4 wallet-meta--desktop-gap relative z-[120]",
                       prefix: t("moonpay_from_account", "Depuis le compte"),
                       labelWrap: false,
-                      pillClassName: `bg-elevated px-6 py-1.5 gap-6 ${baseDropdownOpen || quoteDropdownOpen
+                      pillClassName: `bg-elevated px-5 py-1 gap-4 ${baseDropdownOpen || quoteDropdownOpen
                         ? "shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_10px_rgba(255,255,255,0.16)]"
                         : "shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]"}`,
                       prefixClassName:
-                        "!text-white/70 text-[14px] md:text-[15px] font-medium tracking-wide mr-6",
+                        "!text-white/45 text-[12px] md:text-[13px] font-normal tracking-wide mr-4",
                       labelClassName:
-                        "!text-white/95 text-[14px] md:text-[15px] font-semibold",
-                      dotClassName: "!h-3 !w-3 ring-xcannes-green/20 self-center",
+                        "!text-white/90 text-[14px] md:text-[15px] font-semibold",
+                      dotClassName: "!h-2.5 !w-2.5 ring-xcannes-green/20 self-center",
                     })}
                   </div>
                 </div>
