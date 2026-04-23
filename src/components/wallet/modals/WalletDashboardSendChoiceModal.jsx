@@ -380,7 +380,8 @@ export default function WalletDashboardSendChoiceModal({
           >
             {/* Ambient glow */}
             <div className="pointer-events-none absolute inset-0" aria-hidden>
-              <div className="absolute inset-0 bg-[radial-gradient(850px_circle_at_95%_92%,rgba(0,255,150,0.06),transparent_55%)]" />
+              <div className="absolute inset-0 bg-[radial-gradient(900px_circle_at_12%_0%,rgba(255,255,255,0.08),transparent_55%),radial-gradient(850px_circle_at_95%_92%,rgba(0,255,150,0.06),transparent_55%)]" />
+              <div className="absolute inset-0 bg-gradient-to-b from-black/0 via-black/10 to-black/55" />
             </div>
 
             <div className="relative z-10 flex flex-col flex-1 min-h-0">
@@ -499,40 +500,52 @@ export default function WalletDashboardSendChoiceModal({
                   <button
                     type="button"
                     onClick={() => setSubModal('quickscan')}
-                    className="w-full text-left bg-white/[0.02] rounded-[20px] ring-1 ring-inset ring-white/10 hover:ring-white/20 shadow-[0_8px_26px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-22px_34px_rgba(0,0,0,0.68)] transition-all duration-[140ms] ease-[cubic-bezier(0.4,0,0.2,1)] hover:-translate-y-px active:translate-y-0 active:scale-[0.99] px-4 py-5 flex items-center gap-3"
+                    className={cardClassName}
                   >
+                    <div className="flex items-center gap-3">
                       <div className="w-12 h-12 rounded-[16px] bg-black/30 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
                         <QuickScanIcon />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="text-[20px] md:text-[21px] text-white/92 font-semibold">
-                          {t('ui_send_simple_title', 'Envoi simple')}
-                        </p>
-                        <p className="mt-1 text-[15px] md:text-[16px] leading-snug text-white/55">
+                        <div className="flex items-center justify-between gap-2">
+                          <p className="text-[18px] md:text-[19px] text-white font-semibold truncate">
+                            {t('ui_send_simple_title', 'Envoi simple')}
+                          </p>
+                          <svg className="w-5 h-5 text-white/45 flex-shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden>
+                            <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        </div>
+                        <p className="mt-1 text-[15px] md:text-sm leading-snug text-xcannes-green/90">
                           {t('ui_send_simple_hint_long', 'Saisissez une adresse, indiquez la devise et le montant.')}
                         </p>
                       </div>
-                      <ChevronIcon />
+                    </div>
                   </button>
 
                   {/* ── 2. Payer une demande ── */}
                   <button
                     type="button"
                     onClick={() => setSubModal('payreq')}
-                    className="w-full text-left bg-white/[0.02] rounded-[20px] ring-1 ring-inset ring-white/10 hover:ring-white/20 shadow-[0_8px_26px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-22px_34px_rgba(0,0,0,0.68)] transition-all duration-[140ms] ease-[cubic-bezier(0.4,0,0.2,1)] hover:-translate-y-px active:translate-y-0 active:scale-[0.99] px-4 py-5 flex items-center gap-3"
+                    className={cardClassName}
                   >
+                    <div className="flex items-center gap-3">
                       <div className="w-12 h-12 rounded-[16px] bg-black/30 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
                         <PayRequestIcon />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="text-[20px] md:text-[21px] text-white/92 font-semibold">
-                          {t('ui_send_pay_request_title', 'Payer une demande')}
-                        </p>
-                        <p className="mt-1 text-[15px] md:text-[16px] leading-snug text-white/55">
+                        <div className="flex items-center justify-between gap-2">
+                          <p className="text-[18px] md:text-[19px] text-white font-semibold truncate">
+                            {t('ui_send_pay_request_title', 'Payer une demande')}
+                          </p>
+                          <svg className="w-5 h-5 text-white/45 flex-shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden>
+                            <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        </div>
+                        <p className="mt-1 text-[15px] md:text-sm leading-snug text-white/60">
                           {t('ui_send_pay_request_hint', 'Réglez une demande reçue après vérification.')}
                         </p>
                       </div>
-                      <ChevronIcon />
+                    </div>
                   </button>
 
                   {/* Hidden div for html5-qrcode reader */}
