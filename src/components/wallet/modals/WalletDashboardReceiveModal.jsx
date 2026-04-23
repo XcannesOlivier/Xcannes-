@@ -1424,6 +1424,10 @@ export default function WalletDashboardReceiveModal({
 	                          await handleShareQr(false);
 	                        }}
                           className="w-full h-11 rounded-[20px] bg-[#101415] text-white text-[17px] font-bold tracking-wide py-2 px-6 transition-all duration-[140ms] inline-flex items-center justify-center gap-2.5 hover:bg-white/[0.04] scale-[1.04] active:scale-[0.98]"
+                          style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(255,255,255,0.10), inset 0 1px 0 rgba(255,255,255,0.06), inset 0 -8px 16px rgba(0,0,0,0.25)' }}
+	                      >
+	                        <ShareIcon className="w-5 h-5" />
+	                        <span>{shareActionLabel}</span>
 	                      </button>
 	                    </div>
 	                  </div>
