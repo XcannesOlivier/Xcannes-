@@ -88,15 +88,7 @@ const QrIcon = ({ className = '' }) => (
     className={className}
     aria-hidden="true"
   >
-    <path d="M7 7h1v1H7V7Z" />
-    <path d="M16 7h1v1h-1V7Z" />
-    <path d="M7 16h1v1H7v-1Z" />
-    <path d="M4 4h6v6H4V4Z" />
-    <path d="M14 4h6v6h-6V4Z" />
-    <path d="M4 14h6v6H4v-6Z" />
-    <path d="M14 14h2v2h-2v-2Z" />
-    <path d="M18 14h2v6h-6v-2" />
-    <path d="M14 18h2" />
+    <path d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
   </svg>
 );
 
@@ -1192,7 +1184,7 @@ export default function WalletDashboardReceiveModal({
             onClick={e => {
               if (!inline) e.stopPropagation();
             }}
-            style={{ backgroundImage: 'radial-gradient(900px circle at 12% 0%, rgba(255,255,255,0.07) 0%, transparent 55%), radial-gradient(850px circle at 95% 92%, rgba(0,255,150,0.025) 0%, transparent 55%)' }}
+            style={{ backgroundImage: 'radial-gradient(900px circle at 12% 0%, rgba(255,255,255,0.07) 0%, transparent 55%)' }}
             onPointerDown={event => {
               if (!disableSwipeToClose) maybeStartOverlayDrag(event, 'list');
             }}
@@ -1283,7 +1275,7 @@ export default function WalletDashboardReceiveModal({
                             </div>
                             <ChevronRightIcon className="w-5 h-5 text-white/45" />
                           </div>
-                          <div className="mt-1 text-[15px] md:text-sm leading-snug text-xcannes-green/90">
+                          <div className="mt-1 text-[15px] md:text-sm leading-snug text-white/60">
                             {t(
                               'ui_receive_choice_share_desc',
                               'Affichez le QR code et l’adresse de réception associés à votre compte.',

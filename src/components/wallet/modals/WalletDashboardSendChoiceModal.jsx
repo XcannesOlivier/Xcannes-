@@ -515,7 +515,7 @@ export default function WalletDashboardSendChoiceModal({
                             <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                           </svg>
                         </div>
-                        <p className="mt-1 text-[15px] md:text-sm leading-snug text-xcannes-green/90">
+                        <p className="mt-1 text-[15px] md:text-sm leading-snug text-white/60">
                           {t('ui_send_simple_hint_long', 'Saisissez une adresse, indiquez la devise et le montant.')}
                         </p>
                       </div>
