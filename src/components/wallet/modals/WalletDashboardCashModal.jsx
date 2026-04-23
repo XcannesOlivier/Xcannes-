@@ -51,6 +51,8 @@ export default function WalletDashboardCashModal({
   const { t } = useTranslation("common");
   const moonpayEnabled = MOONPAY_UI_ENABLED;
   const topperEnabled = TOPPER_UI_ENABLED;
+  const cashSwipeBarRef = useRef(null);
+  const cashSwipeDragStartY = useRef(null);
   const forceSimpleSwapBuy =
     String(buyPrefill?.partnerOverride || "").trim().toLowerCase() === "simpleswap";
   const forceSimpleSwapSell = String(sellDestinationMode || "").trim().toLowerCase() ===
@@ -148,6 +150,42 @@ export default function WalletDashboardCashModal({
   }, [walletMenuOpen]);
 
   if (!shouldRender) return null;
+
+  // Swipe bar: touch events sur l'élément hors du container scrollable
+  // Doit être en dehors des hooks conditionnels — on attache/détache via l'effet ci-dessous
+  // (définition de l'effet après le early return est invalide, on utilise useRef + callback ref à la place)
+
+  const cashSwipeBarCallbackRef = (el) => {
+    if (cashSwipeBarRef.current === el) return;
+    // Détacher les anciens listeners
+    if (cashSwipeBarRef.current) {
+      cashSwipeBarRef.current.removeEventListener('touchstart', cashSwipeBarRef.current._onTouchStart);
+      cashSwipeBarRef.current.removeEventListener('touchmove', cashSwipeBarRef.current._onTouchMove);
+      cashSwipeBarRef.current.removeEventListener('touchend', cashSwipeBarRef.current._onTouchEnd);
+    }
+    cashSwipeBarRef.current = el;
+    if (!el) return;
+    const onTouchStart = (e) => {
+      cashSwipeDragStartY.current = e.touches[0].clientY;
+    };
+    const onTouchMove = (e) => {
+      if (cashSwipeDragStartY.current === null) return;
+      const dy = e.touches[0].clientY - cashSwipeDragStartY.current;
+      if (dy > 8) e.preventDefault();
+    };
+    const onTouchEnd = (e) => {
+      if (cashSwipeDragStartY.current === null) return;
+      const dy = e.changedTouches[0].clientY - cashSwipeDragStartY.current;
+      cashSwipeDragStartY.current = null;
+      if (dy > 40) onClose();
+    };
+    el._onTouchStart = onTouchStart;
+    el._onTouchMove = onTouchMove;
+    el._onTouchEnd = onTouchEnd;
+    el.addEventListener('touchstart', onTouchStart, { passive: true });
+    el.addEventListener('touchmove', onTouchMove, { passive: false });
+    el.addEventListener('touchend', onTouchEnd, { passive: true });
+  };
 
   const forcedProvider = forceSimpleSwapBuy || forceSimpleSwapSell ? "moonpay" : rampProvider;
   const rampActive = forcedProvider === "topper" ? topperActive : moonpayActive;
@@ -324,6 +362,17 @@ export default function WalletDashboardCashModal({
 		              </div>
 		            </div>
 	          )}
+
+		          {/* Swipe bar mobile — hors du container scrollable, visible uniquement sur buy/sell sans iframe */}
+          {!rampActive && (cashModalTab === "buy" || cashModalTab === "sell") ? (
+            <div
+              ref={cashSwipeBarCallbackRef}
+              className="md:hidden flex justify-center pt-3 pb-1 cursor-grab select-none"
+              aria-hidden
+            >
+              <span className="block w-12 h-1.5 rounded-full bg-white/20" />
+            </div>
+          ) : null}
 
 		          {/* Contenu selon l'onglet actif */}
 					          <div

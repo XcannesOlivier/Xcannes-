@@ -151,36 +151,6 @@ const MoonPayBuyModal = ({
   const modalPanelRef = useRef(null);
   const contentRootRef = useRef(null);
   const swipeDragStartY = useRef(null);
-  const swipeBarRef = useRef(null);
-
-  // Swipe bar: touch listeners avec passive:false pour bypasser le scroll container
-  useEffect(() => {
-    if (!embedded) return;
-    const el = swipeBarRef.current;
-    if (!el) return;
-    const onTouchStart = (e) => {
-      swipeDragStartY.current = e.touches[0].clientY;
-    };
-    const onTouchMove = (e) => {
-      if (swipeDragStartY.current === null) return;
-      const dy = e.touches[0].clientY - swipeDragStartY.current;
-      if (dy > 10) e.preventDefault();
-    };
-    const onTouchEnd = (e) => {
-      if (swipeDragStartY.current === null) return;
-      const dy = e.changedTouches[0].clientY - swipeDragStartY.current;
-      swipeDragStartY.current = null;
-      if (dy > 40) onClose();
-    };
-    el.addEventListener('touchstart', onTouchStart, { passive: true });
-    el.addEventListener('touchmove', onTouchMove, { passive: false });
-    el.addEventListener('touchend', onTouchEnd, { passive: true });
-    return () => {
-      el.removeEventListener('touchstart', onTouchStart);
-      el.removeEventListener('touchmove', onTouchMove);
-      el.removeEventListener('touchend', onTouchEnd);
-    };
-  }, [embedded, onClose]);
   const [iframeUrl, setIframeUrl] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -1853,17 +1823,7 @@ const MoonPayBuyModal = ({
           {/* Title + Wallet pill */}
           {wizardStep === 1 ? (
             <div className="relative z-[65] px-4 pt-2 pb-4 text-center">
-              {/* Mobile: swipe bar pour revenir à "Gérer vos fonds" (embedded) */}
-              {embedded ? (
-                <div
-                  ref={swipeBarRef}
-                  className="md:hidden flex justify-center mb-3 -mt-1 cursor-grab select-none py-3"
-                  aria-hidden
-                >
-                  <span className="block w-12 h-1.5 rounded-full bg-white/20" />
-                </div>
-              ) : null}
-              {/* Desktop: bouton ← Retour vers "Gérer vos fonds" (embedded) */}
+              {/* Desktop: bouton ← Retour vers "Gérer vos fonds" (embedded) */}}
               {embedded ? (
                 <button
                   type="button"
