@@ -1591,7 +1591,7 @@ export default function WalletDashboardReceiveModal({
 				                        />
 				                      </div>
 
-                      <div className="pt-12">
+                      <div className="pt-4">
                         <button
                           type="button"
                           onClick={e => {
@@ -1618,6 +1618,11 @@ export default function WalletDashboardReceiveModal({
 	                          {generateError}
 	                        </div>
 	                      ) : null}
+	                      {/* Bottom spacer — request view only, neutralise safe-area et ajoute 16px fixe */}
+	                      <div
+	                        className="md:hidden"
+	                        style={{ paddingBottom: 'calc(16px - env(safe-area-inset-bottom, 0px))' }}
+	                      />
 	                  </div>
 	                </>
 	              ) : null}
