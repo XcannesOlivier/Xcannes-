@@ -732,18 +732,23 @@ export default function WalletDashboardSwapModal({
 		                        aria-label="Inverser les devises"
 		                      >
 		                        <svg
-		                          width="15"
-		                          height="15"
-		                          viewBox="0 0 16 16"
+		                          width="16"
+		                          height="16"
+		                          viewBox="0 0 24 24"
 		                          fill="none"
-		                          xmlns="http://www.w3.org/2000/svg"
+		                          stroke="rgba(255,255,255,0.65)"
+		                          strokeWidth="2"
+		                          strokeLinecap="round"
+		                          strokeLinejoin="round"
 		                          style={{
 		                            transform: swapRotating ? 'rotate(180deg)' : 'rotate(0deg)',
 		                            transition: 'transform 380ms cubic-bezier(0.34,1.56,0.64,1)',
 		                          }}
 		                        >
-		                          <path d="M5 2v9.5M5 11.5L2.5 9M5 11.5L7.5 9" stroke="rgba(255,255,255,0.65)" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
-		                          <path d="M11 14V4.5M11 4.5L8.5 7M11 4.5L13.5 7" stroke="rgba(255,255,255,0.65)" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+		                          <polyline points="17 1 21 5 17 9" />
+		                          <path d="M3 11V9a4 4 0 0 1 4-4h14" />
+		                          <polyline points="7 23 3 19 7 15" />
+		                          <path d="M21 13v2a4 4 0 0 1-4 4H3" />
 		                        </svg>
 		                      </button>
 		                    </div>
