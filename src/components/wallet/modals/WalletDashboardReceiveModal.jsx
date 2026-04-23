@@ -1202,7 +1202,7 @@ export default function WalletDashboardReceiveModal({
             ) : null}
             {receiveView !== 'choice' ? (
               <div
-                className="relative z-[65] pt-2 pb-3 flex flex-col items-center text-center"
+                className="relative z-[65] pt-2 md:pt-0 pb-3 flex flex-col items-center text-center"
                 onPointerDown={event => {
                   if (!disableSwipeToClose) maybeStartOverlayDrag(event, 'fixed');
                 }}
@@ -1213,14 +1213,14 @@ export default function WalletDashboardReceiveModal({
 	                    e.stopPropagation();
 	                    switchReceiveView(receiveView === 'request_qr' ? 'request' : 'choice');
 	                  }}
-	                  className={`absolute left-0 top-3 shrink-0 h-9 rounded-xl bg-transparent border border-transparent hover:bg-white/5 text-white/80 transition-colors duration-150 items-center ${
-	                    isDesktop ? 'inline-flex px-2.5 gap-1.5' : 'hidden'
+	                  className={`absolute left-0 top-3 md:top-[-10px] shrink-0 h-9 rounded-xl bg-transparent border border-transparent hover:bg-white/5 text-white/50 transition-colors duration-150 items-center ${
+	                    isDesktop ? 'inline-flex px-[5px] gap-[5px]' : 'hidden'
 	                  }`}
 	                  aria-label={t('ui_back', 'Retour')}
                   title={t('ui_back', 'Retour')}
                 >
-                  <ChevronLeftIcon className="w-5 h-5" />
-                  {isDesktop ? <span className="text-sm text-white/80">{t('ui_back', 'Retour')}</span> : null}
+                  <ChevronLeftIcon className="w-4 h-4" />
+                  {isDesktop ? <span className="text-[10px] text-white/50">{t('ui_back', 'Retour')}</span> : null}
                 </button>
 
                 <h2 className={`${receiveView === 'request' ? 'mt-[69px]' : 'mt-0'} md:mt-8 text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight`}>
