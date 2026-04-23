@@ -145,6 +145,7 @@ const MoonPaySellModal = ({
   const displayError =
     error && /api\.sandbox\.moonpay\.com/i.test(error) ? null : error;
   const pendingAutoStartRef = useRef(false);
+  const swipeDragStartY = useRef(null);
   const isEmbeddedPwa =
     typeof window !== "undefined" &&
     new URLSearchParams(window.location.search).get("embedded") === "pwa";
@@ -1591,6 +1592,37 @@ const MoonPaySellModal = ({
 
           {/* Title + Wallet pill */}
           <div className={["relative z-[65] px-4 pt-2 pb-4 text-center", wizardStep === 1 ? "" : "hidden"].join(" ")}>
+              {/* Mobile: swipe bar pour revenir à "Gérer vos fonds" (embedded) */}
+              {embedded ? (
+                <div
+                  className="md:hidden flex justify-center mb-3 -mt-1 cursor-grab touch-none select-none"
+                  aria-hidden
+                  onPointerDown={(e) => {
+                    swipeDragStartY.current = e.clientY;
+                    e.currentTarget.setPointerCapture(e.pointerId);
+                  }}
+                  onPointerUp={(e) => {
+                    const dy = e.clientY - (swipeDragStartY.current ?? e.clientY);
+                    swipeDragStartY.current = null;
+                    if (dy > 50) onClose();
+                  }}
+                  onPointerCancel={() => { swipeDragStartY.current = null; }}
+                >
+                  <span className="block w-12 h-1.5 rounded-full bg-white/20" />
+                </div>
+              ) : null}
+              {/* Desktop: bouton ← Retour vers "Gérer vos fonds" (embedded) */}
+              {embedded ? (
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="hidden md:inline-flex absolute left-0 top-2 items-center gap-2 text-white/70 hover:text-white transition-colors"
+                  aria-label={t("back", "Back")}
+                >
+                  <ChevronLeftIcon className="w-5 h-5" aria-hidden="true" />
+                  <span className="text-sm">{t("ui_back", "Retour")}</span>
+                </button>
+              ) : null}
             <h3 className="text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight mb-1">
               {resolvedSelectCryptoTitleOverride ||
                 t("moonpay_sell_withdraw_title_prefix", "Envoyer vers la banque")}
