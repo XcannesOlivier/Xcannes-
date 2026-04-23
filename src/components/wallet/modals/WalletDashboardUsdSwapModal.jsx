@@ -441,7 +441,7 @@ export default function WalletDashboardUsdSwapModal({
   const { shouldRender, isClosing } = useModalTransition(open, {
     enabled: shouldAnimate,
   });
-  const swipeEnabled = false;
+  const swipeEnabled = !inline;
 
   const [step, setStep] = useState("form"); // form | address | pending | deposit
   const [direction, setDirection] = useState(SWAP_DIRECTIONS.RLUSD_TO_STABLE);
@@ -2630,7 +2630,7 @@ export default function WalletDashboardUsdSwapModal({
       <div className={wrapperClass}>
         <div
           ref={modalOverlayRef}
-          className={inline ? "w-full h-full flex" : "pointer-events-auto w-full"}
+          className={inline ? "w-full h-full flex" : "pointer-events-auto w-full h-full"}
           style={
             swipeEnabled
               ? {
@@ -2669,7 +2669,7 @@ export default function WalletDashboardUsdSwapModal({
             >
               {!inline ? (
                 swipeEnabled ? (
-                  <div className="md:hidden flex justify-center pt-3 pb-0" aria-hidden>
+                  <div className="md:hidden flex justify-center pt-4 pb-3 cursor-grab select-none" aria-hidden>
                     <span className="block w-12 h-1.5 rounded-full bg-white/20" />
                   </div>
                 ) : null
@@ -2679,7 +2679,7 @@ export default function WalletDashboardUsdSwapModal({
 	                    <button
 	                      type="button"
                   onClick={handleHeaderBack}
-                  className="wallet-modal-close text-white/70 hover:text-white transition-colors text-xl flex items-center justify-center"
+                  className="wallet-modal-close text-white/70 hover:text-white transition-colors text-xl hidden md:flex items-center justify-center"
                   aria-label={t("ui_back", "Retour")}
                 >
                   <svg
