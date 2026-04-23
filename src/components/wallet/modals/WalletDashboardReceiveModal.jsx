@@ -1372,7 +1372,7 @@ export default function WalletDashboardReceiveModal({
 	                    </div>
 
 	                    {/* ── QR Code ── */}
-	                    <div className="w-full flex flex-col items-center bg-[#232829] rounded-[20px] pt-16 pb-5 md:pt-20 md:pb-10">
+	                    <div className="w-full flex flex-col items-center bg-[#232829] rounded-[20px] pt-16 pb-5 md:pt-20 md:pb-10 shadow-[0_8px_30px_rgba(0,0,0,0.45)]">
 	                        <div
 	                          ref={receiveQrContainerRef}
 	                          className="w-[280px] md:w-[260px] aspect-square rounded-none p-3 cursor-pointer border-[20px] border-black"
@@ -1642,7 +1642,7 @@ export default function WalletDashboardReceiveModal({
 				                    {hasGeneratedRequest ? (
 					                      <>
 					                        {/* ── QR Code (primary action — first) ── */}
-					                        <div className="w-full flex flex-col items-center bg-[#232829] rounded-[20px] pt-5 pb-2 md:pt-8 md:pb-5">
+					                        <div className="w-full flex flex-col items-center bg-[#232829] rounded-[20px] pt-5 pb-2 md:pt-8 md:pb-5 shadow-[0_8px_30px_rgba(0,0,0,0.45)]">
 				                          <div
 				                            ref={requestQrContainerRef}
 				                            className="w-[240px] md:w-[260px] aspect-square rounded-none p-3 cursor-pointer border-[20px] border-black"

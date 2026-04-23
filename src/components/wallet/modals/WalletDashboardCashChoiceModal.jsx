@@ -383,7 +383,7 @@ export default function WalletDashboardCashChoiceModal({
                   </div>
                 ) : null}
 	                <div className="pt-6 md:pt-5 pb-3 flex flex-col items-center text-center px-4">
-                    <h3 className="mt-1 text-[22px] md:text-[24px] font-semibold text-white/95 tracking-tight">
+                    <h3 className="mt-1 text-[30px] md:text-[32px] font-semibold text-white/95 tracking-tight">
                       {t('ui_funds_manage_title', 'Gérer vos fonds')}
                     </h3>
                     {noticeVariant === 'demo' ? (
