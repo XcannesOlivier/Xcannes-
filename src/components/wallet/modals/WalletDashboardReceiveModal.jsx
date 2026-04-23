@@ -1437,7 +1437,7 @@ export default function WalletDashboardReceiveModal({
 		              {receiveView === 'request' ? (
 		                <>
 		                  {/* SECTION 2 — CREATE REQUEST */}
-                      <div className="space-y-2 pt-2">
+                      <div className="flex flex-col gap-2 pt-2 flex-1">
 	                    {/* ── Centered wallet pill (style "Choisissez le compte") ── */}
                         <div className="flex justify-center pt-1 pb-1 relative z-[85]">
 	                      <div className="relative">
@@ -1591,7 +1591,7 @@ export default function WalletDashboardReceiveModal({
 				                        />
 				                      </div>
 
-                      <div className="pt-4">
+                      <div className="mt-auto pt-6">
                         <button
                           type="button"
                           onClick={e => {
