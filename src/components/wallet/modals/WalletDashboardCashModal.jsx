@@ -203,17 +203,7 @@ export default function WalletDashboardCashModal({
 			                    : "items-start p-4",
 			                ].join(" ")}
 			              >
-					                {cashModalTab === "buy" || cashModalTab === "sell" ? (
-					                  <button
-				                    type="button"
-				                    onClick={onClose}
-				                    className="wallet-modal-close -ml-1 w-10 h-10 flex items-center justify-center rounded-lg text-white/70 hover:text-white hover:bg-white/5 transition-colors"
-			                    aria-label={t("back", "Back")}
-			                  >
-			                    <ChevronLeftIcon className="w-6 h-6" aria-hidden="true" />
-			                  </button>
-			                ) : null}
-		                <div className="flex min-w-0 flex-1 flex-col gap-1.5 md:flex-row md:items-center md:gap-2">
+					                <div className="flex min-w-0 flex-1 flex-col gap-1.5 md:flex-row md:items-center md:gap-2">
 		                  {showWalletMeta ? (
 		                    <div>{renderWalletMeta?.("pr-8")}</div>
 		                  ) : null}
