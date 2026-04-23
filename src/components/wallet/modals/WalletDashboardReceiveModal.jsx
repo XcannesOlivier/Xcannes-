@@ -1087,7 +1087,7 @@ export default function WalletDashboardReceiveModal({
 
   const canNativeShare = !isDesktop && typeof navigator !== 'undefined' && typeof navigator.share === 'function';
   const shareActionLabel = canNativeShare ? t('ui_share_qr_cta', 'Partager') : t('ui_download', 'Télécharger');
-  const disableSwipeToClose = !inline && !isDesktop && (receiveView === 'share' || receiveView === 'request' || receiveView === 'request_qr');
+  const disableSwipeToClose = false;
 
   const headerTitle =
     receiveView === 'choice'
