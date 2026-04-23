@@ -1184,7 +1184,7 @@ export default function WalletDashboardReceiveModal({
             onClick={e => {
               if (!inline) e.stopPropagation();
             }}
-            style={{ backgroundImage: 'radial-gradient(400px circle at 12% 0%, rgba(255,255,255,0.06) 0%, transparent 50%), radial-gradient(600px circle at 50% 25%, rgba(0,255,150,0.04) 0%, transparent 60%)' }}
+            style={{ backgroundImage: 'radial-gradient(400px circle at 12% 0%, rgba(255,255,255,0.06) 0%, transparent 50%), radial-gradient(600px circle at 100% 75%, rgba(0,255,150,0.06) 0%, transparent 60%)' }}
             onPointerDown={event => {
               if (!disableSwipeToClose) maybeStartOverlayDrag(event, 'list');
             }}

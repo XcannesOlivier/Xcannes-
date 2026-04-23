@@ -380,7 +380,7 @@ export default function WalletDashboardSendChoiceModal({
           >
             {/* Ambient glow */}
             <div className="pointer-events-none absolute inset-0" aria-hidden>
-              <div className="absolute inset-0 bg-[radial-gradient(900px_circle_at_12%_0%,rgba(255,255,255,0.08),transparent_55%),radial-gradient(850px_circle_at_95%_92%,rgba(0,255,150,0.06),transparent_55%)]" />
+              <div className="absolute inset-0 bg-[radial-gradient(900px_circle_at_12%_0%,rgba(255,255,255,0.08),transparent_55%),radial-gradient(600px_circle_at_100%_50%,rgba(0,255,150,0.06),transparent_60%)]" />
               <div className="absolute inset-0 bg-gradient-to-b from-black/0 via-black/10 to-black/55" />
             </div>
 
