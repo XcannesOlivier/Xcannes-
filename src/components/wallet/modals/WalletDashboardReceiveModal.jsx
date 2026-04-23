@@ -1202,7 +1202,7 @@ export default function WalletDashboardReceiveModal({
             ) : null}
             {receiveView !== 'choice' ? (
               <div
-                className="relative z-[65] pt-4 pb-3 flex flex-col items-center text-center"
+                className="relative z-[65] pt-2 pb-3 flex flex-col items-center text-center"
                 onPointerDown={event => {
                   if (!disableSwipeToClose) maybeStartOverlayDrag(event, 'fixed');
                 }}
@@ -1223,7 +1223,7 @@ export default function WalletDashboardReceiveModal({
                   {isDesktop ? <span className="text-sm text-white/80">{t('ui_back', 'Retour')}</span> : null}
                 </button>
 
-                <h2 className="mt-2 md:mt-8 text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight">
+                <h2 className="mt-0 md:mt-8 text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight">
                   {headerTitle}
                 </h2>
 
