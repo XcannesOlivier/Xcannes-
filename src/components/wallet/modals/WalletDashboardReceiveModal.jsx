@@ -1108,7 +1108,7 @@ export default function WalletDashboardReceiveModal({
 
   const choiceCardBaseClassName =
     // Match the "CashChoice" action button background (wallet-actions.css).
-    'relative w-full text-left rounded-[20px] px-4 py-4 bg-white/[0.02] hover:bg-white/[0.05] active:bg-white/[0.03] ring-1 ring-white/10 ring-inset shadow-[0_8px_26px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-22px_34px_rgba(0,0,0,0.68)] transition-all duration-[140ms] ease-[cubic-bezier(0.4,0,0.2,1)] hover:ring-white/20 hover:-translate-y-px active:translate-y-0 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-xcannes-green/60';
+    'relative w-full text-left rounded-[20px] px-4 py-[18px] bg-white/[0.02] hover:bg-white/[0.05] active:bg-white/[0.03] ring-1 ring-white/10 ring-inset shadow-[0_8px_26px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-22px_34px_rgba(0,0,0,0.68)] transition-all duration-[140ms] ease-[cubic-bezier(0.4,0,0.2,1)] hover:ring-white/20 hover:-translate-y-px active:translate-y-0 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-xcannes-green/60';
   const choiceCardGreenClassName = choiceCardBaseClassName;
   const choiceCardNeutralClassName = choiceCardBaseClassName;
 
@@ -1242,7 +1242,7 @@ export default function WalletDashboardReceiveModal({
               {receiveView === 'choice' ? (
                 <div className="flex-1 min-h-0 flex flex-col">
                   <div
-                    className="pt-6 md:pt-5 pb-3 flex flex-col items-center text-center"
+                    className="pt-[80px] md:pt-5 pb-0 flex flex-col items-center text-center"
                     onPointerDown={event => {
                       maybeStartOverlayDrag(event, 'fixed');
                     }}
@@ -1255,7 +1255,7 @@ export default function WalletDashboardReceiveModal({
                     </p>
                   </div>
 
-                  <div className="flex-1 min-h-0 flex flex-col justify-center gap-4 py-6">
+                  <div className="flex-1 min-h-0 flex flex-col justify-center gap-5 pt-[10px] pb-6">
                     <button
                       type="button"
                       className={choiceCardGreenClassName}
@@ -1265,7 +1265,7 @@ export default function WalletDashboardReceiveModal({
                       }}
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-[16px] bg-black/30 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0 text-xcannes-green/90">
+                        <div className="w-13 h-13 rounded-[16px] bg-black/30 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0 text-xcannes-green/90">
                           <QrIcon className="w-6 h-6" />
                         </div>
                         <div className="flex-1 min-w-0">
@@ -1294,7 +1294,7 @@ export default function WalletDashboardReceiveModal({
                       }}
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-[16px] bg-black/30 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0 text-white/85">
+                        <div className="w-13 h-13 rounded-[16px] bg-black/30 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0 text-white/85">
                           <RequestIcon className="w-6 h-6" />
                         </div>
                         <div className="flex-1 min-w-0">
