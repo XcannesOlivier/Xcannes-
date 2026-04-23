@@ -51,8 +51,17 @@ export default function WalletDashboardCashModal({
   const { t } = useTranslation("common");
   const moonpayEnabled = MOONPAY_UI_ENABLED;
   const topperEnabled = TOPPER_UI_ENABLED;
-  const cashSwipeBarRef = useRef(null);
-  const cashSwipeDragStartY = useRef(null);
+  // Overlay drag system (swipe-to-close)
+  const [overlayDragging, setOverlayDragging] = useState(false);
+  const [overlayTranslateY, setOverlayTranslateY] = useState(0);
+  const overlayRef = useRef(null);
+  const overlayListRef = useRef(null); // alias de cashContentRootRef pour le lock scroll
+  const closeRequestedRef = useRef(false);
+  const overlayDragMetaRef = useRef({
+    startY: 0, startAt: 0, pointerId: null, lastDelta: 0,
+    pending: false, source: null, dragging: false,
+    scrollLocked: false, lockedOverflowY: '',
+  });
   const forceSimpleSwapBuy =
     String(buyPrefill?.partnerOverride || "").trim().toLowerCase() === "simpleswap";
   const forceSimpleSwapSell = String(sellDestinationMode || "").trim().toLowerCase() ===
@@ -149,43 +158,93 @@ export default function WalletDashboardCashModal({
     };
   }, [walletMenuOpen]);
 
-  if (!shouldRender) return null;
-
-  // Swipe bar: touch events sur l'élément hors du container scrollable
-  // Doit être en dehors des hooks conditionnels — on attache/détache via l'effet ci-dessous
-  // (définition de l'effet après le early return est invalide, on utilise useRef + callback ref à la place)
-
-  const cashSwipeBarCallbackRef = (el) => {
-    if (cashSwipeBarRef.current === el) return;
-    // Détacher les anciens listeners
-    if (cashSwipeBarRef.current) {
-      cashSwipeBarRef.current.removeEventListener('touchstart', cashSwipeBarRef.current._onTouchStart);
-      cashSwipeBarRef.current.removeEventListener('touchmove', cashSwipeBarRef.current._onTouchMove);
-      cashSwipeBarRef.current.removeEventListener('touchend', cashSwipeBarRef.current._onTouchEnd);
+  // Reset drag state à l'ouverture/fermeture
+  const _dragResetMeta = { startY:0, startAt:0, pointerId:null, lastDelta:0, pending:false, source:null, dragging:false, scrollLocked:false, lockedOverflowY:'' };
+  useEffect(() => {
+    if (open) {
+      closeRequestedRef.current = false;
+      setOverlayDragging(false);
+      setOverlayTranslateY(0);
+      overlayDragMetaRef.current = { ..._dragResetMeta };
+    } else {
+      try {
+        const listEl = overlayListRef.current;
+        const meta = overlayDragMetaRef.current;
+        if (listEl && meta?.scrollLocked) listEl.style.overflowY = meta.lockedOverflowY;
+      } catch { /* ignore */ }
+      setOverlayDragging(false);
+      if (!closeRequestedRef.current) setOverlayTranslateY(0);
+      overlayDragMetaRef.current = { ..._dragResetMeta };
     }
-    cashSwipeBarRef.current = el;
-    if (!el) return;
-    const onTouchStart = (e) => {
-      cashSwipeDragStartY.current = e.touches[0].clientY;
-    };
-    const onTouchMove = (e) => {
-      if (cashSwipeDragStartY.current === null) return;
-      const dy = e.touches[0].clientY - cashSwipeDragStartY.current;
-      if (dy > 8) e.preventDefault();
-    };
-    const onTouchEnd = (e) => {
-      if (cashSwipeDragStartY.current === null) return;
-      const dy = e.changedTouches[0].clientY - cashSwipeDragStartY.current;
-      cashSwipeDragStartY.current = null;
-      if (dy > 40) onClose();
-    };
-    el._onTouchStart = onTouchStart;
-    el._onTouchMove = onTouchMove;
-    el._onTouchEnd = onTouchEnd;
-    el.addEventListener('touchstart', onTouchStart, { passive: true });
-    el.addEventListener('touchmove', onTouchMove, { passive: false });
-    el.addEventListener('touchend', onTouchEnd, { passive: true });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
+
+  const maybeStartOverlayDrag = (event, source) => {
+    if (inline) return false;
+    if (!event?.isPrimary) return false;
+    if (event.pointerType === 'mouse') return false;
+    if (event.target?.closest?.('input,textarea,select,button')) return false;
+    if (source === 'list') {
+      const listEl = overlayListRef.current;
+      if (!listEl || listEl.scrollTop > 0) return false;
+    }
+    overlayDragMetaRef.current = { startY: event.clientY, startAt: Date.now(), pointerId: event.pointerId, lastDelta: 0, pending: true, source, dragging: false, scrollLocked: false, lockedOverflowY: '' };
+    return true;
   };
+
+  const handleOverlayPointerMove = (event) => {
+    if (inline) return;
+    const meta = overlayDragMetaRef.current;
+    if (!meta?.pending && !meta?.dragging) return;
+    if (meta.pointerId !== event.pointerId) return;
+    const delta = event.clientY - meta.startY;
+    if (delta <= 0) return;
+    if (!meta.dragging) {
+      if (delta < 8) return;
+      try { overlayRef.current?.setPointerCapture?.(event.pointerId); } catch { /* ignore */ }
+      if (meta.source === 'list') {
+        const listEl = overlayListRef.current;
+        if (listEl && listEl.scrollTop <= 0) {
+          try { meta.lockedOverflowY = listEl.style.overflowY; meta.scrollLocked = true; listEl.style.overflowY = 'hidden'; listEl.scrollTop = 0; } catch { /* ignore */ }
+        }
+      }
+      meta.dragging = true;
+      setOverlayDragging(true);
+    }
+    meta.lastDelta = delta;
+    setOverlayTranslateY(delta);
+  };
+
+  const handleOverlayPointerEnd = (event) => {
+    if (inline) return;
+    const meta = overlayDragMetaRef.current;
+    if (meta.pointerId !== event.pointerId) return;
+    const delta = meta.lastDelta || 0;
+    const duration = Math.max(1, Date.now() - (meta.startAt || 0));
+    const velocity = delta / duration;
+    const height = typeof window !== 'undefined' ? window.innerHeight : 800;
+    const closeDistance = Math.max(180, Math.min(280, height * 0.25));
+    const shouldClose = delta > closeDistance || (delta > closeDistance * 0.5 && velocity > 1.2);
+    overlayDragMetaRef.current.pending = false;
+    overlayDragMetaRef.current.dragging = false;
+    setOverlayDragging(false);
+    // release scroll lock
+    if (meta.source === 'list' && meta.scrollLocked) {
+      try { if (overlayListRef.current) overlayListRef.current.style.overflowY = meta.lockedOverflowY; } catch { /* ignore */ }
+    }
+    if (shouldClose) {
+      if (!closeRequestedRef.current) {
+        closeRequestedRef.current = true;
+        setOverlayTranslateY(Math.max(delta, height));
+        window.setTimeout(() => { onClose?.(); }, 180);
+      }
+      return;
+    }
+    setOverlayTranslateY(0);
+    overlayDragMetaRef.current = { ..._dragResetMeta };
+  };
+
+  if (!shouldRender) return null;
 
   const forcedProvider = forceSimpleSwapBuy || forceSimpleSwapSell ? "moonpay" : rampProvider;
   const rampActive = forcedProvider === "topper" ? topperActive : moonpayActive;
@@ -219,11 +278,24 @@ export default function WalletDashboardCashModal({
             isClosing ? "wallet-modal-backdrop-out" : "wallet-modal-backdrop-in"
           }`}
           onClick={onClose}
+          style={overlayTranslateY > 0 ? { opacity: Math.max(0, Math.min(1, 1 - overlayTranslateY / 420)) } : undefined}
         />
       ) : null}
 
       {/* Modal */}
       <div className={wrapperClass}>
+        <div
+          ref={overlayRef}
+          className={inline ? "w-full h-full flex" : "pointer-events-auto w-full"}
+          style={{
+            transform: `translateY(${Math.max(0, overlayTranslateY)}px)`,
+            transition: overlayDragging ? "none" : "transform 220ms cubic-bezier(0.2,0,0,1)",
+            willChange: overlayTranslateY ? "transform" : undefined,
+          }}
+          onPointerMove={handleOverlayPointerMove}
+          onPointerUp={handleOverlayPointerEnd}
+          onPointerCancel={handleOverlayPointerEnd}
+        >
 	        <div
 	          className={panelClass}
 	          onClick={(e) => {
@@ -363,12 +435,12 @@ export default function WalletDashboardCashModal({
 		            </div>
 	          )}
 
-		          {/* Swipe bar mobile — hors du container scrollable, visible uniquement sur buy/sell sans iframe */}
+		          {/* Swipe bar mobile — grande zone tactile au-dessus du contenu scrollable */}
           {!rampActive && (cashModalTab === "buy" || cashModalTab === "sell") ? (
             <div
-              ref={cashSwipeBarCallbackRef}
-              className="md:hidden flex justify-center pt-3 pb-1 cursor-grab select-none"
+              className="md:hidden flex justify-center pt-4 pb-3 cursor-grab select-none"
               aria-hidden
+              onPointerDown={(e) => maybeStartOverlayDrag(e, 'fixed')}
             >
               <span className="block w-12 h-1.5 rounded-full bg-white/20" />
             </div>
@@ -376,13 +448,12 @@ export default function WalletDashboardCashModal({
 
 		          {/* Contenu selon l'onglet actif */}
 					          <div
-					            ref={cashContentRootRef}
+					            ref={(el) => { cashContentRootRef.current = el; overlayListRef.current = el; }}
 					            className={`${
-					              // MoonPay iframe already has its own margins/padding inside the widget.
-					              // Remove horizontal padding here to avoid double side-margins.
-				              rampActive ? "px-0 py-0" : "p-4 md:p-5"
+					              rampActive ? "px-0 py-0" : "p-4 md:p-5"
 				            } relative z-0 overflow-y-auto overscroll-contain flex-1 min-h-0`}
 				            style={{ WebkitOverflowScrolling: "touch" }}
+				            onPointerDown={(e) => maybeStartOverlayDrag(e, 'list')}
 				          >
             <div key={cashModalTab} className="wallet-tab-unfold-in h-full">
               {rampEnabled ? (
@@ -478,6 +549,7 @@ export default function WalletDashboardCashModal({
             </div>
           </div>
         </div>
+        </div> {/* /overlayRef */}
       </div>
     </>
   );
