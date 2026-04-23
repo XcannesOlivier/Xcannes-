@@ -97,16 +97,16 @@ const RequestIcon = ({ className = '' }) => (
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
-    strokeWidth="2"
+    strokeWidth="1.5"
     strokeLinecap="round"
     strokeLinejoin="round"
     className={className}
     aria-hidden="true"
   >
-    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6Z" />
-    <path d="M14 2v6h6" />
-    <path d="M8 13h8" />
-    <path d="M8 17h5" />
+    <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7l-5-5Z" />
+    <path d="M15 2v5h5" />
+    <path d="M12 10v6" />
+    <path d="M10 11.5c0-.83.67-1.5 2-1.5s2 .67 2 1.5-.9 1.3-2 1.5c-1.1.2-2 .67-2 1.5 0 .83.67 1.5 2 1.5s2-.67 2-1.5" />
   </svg>
 );
 
@@ -1184,7 +1184,7 @@ export default function WalletDashboardReceiveModal({
             onClick={e => {
               if (!inline) e.stopPropagation();
             }}
-            style={{ backgroundImage: 'radial-gradient(400px circle at 12% 0%, rgba(255,255,255,0.06) 0%, transparent 50%), radial-gradient(600px circle at 100% 75%, rgba(0,255,150,0.06) 0%, transparent 60%)' }}
+            style={{ backgroundImage: 'radial-gradient(400px circle at 12% 0%, rgba(0,255,150,0.07) 0%, transparent 50%), radial-gradient(600px circle at 100% 75%, rgba(0,255,150,0.06) 0%, transparent 60%)' }}
             onPointerDown={event => {
               if (!disableSwipeToClose) maybeStartOverlayDrag(event, 'list');
             }}
