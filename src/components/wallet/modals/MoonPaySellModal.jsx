@@ -1591,37 +1591,36 @@ const MoonPaySellModal = ({
 
           {/* Title + Wallet pill */}
           <div className={["relative z-[65] px-4 pt-2 pb-4 text-center", wizardStep === 1 ? "" : "hidden"].join(" ")}>
-            <h3 className="text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight mb-2">
+            <h3 className="text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight mb-1">
               {resolvedSelectCryptoTitleOverride ||
                 t("moonpay_sell_withdraw_title_prefix", "Envoyer vers la banque")}
             </h3>
             {isBankSellFlow ? (
               <div className="mb-4 flex flex-col items-center gap-2">
-                <span className="text-[15px] md:text-[16px] font-medium text-white/70">
-                  {t("moonpay_sell_bank_partner_notice_title", "Le retrait sera effectué via")}
-                </span>
-                <div className="flex items-center justify-center gap-1.5">
-                  <PaymentLogo
-                    src="/assets/payment-logos/moonpay.png"
-                    alt="MoonPay"
-                    fallback="MoonPay"
-                    containerClassName="bg-white/90"
-                    widthClassName="w-[90px]"
-                  />
-                  <PaymentLogo
-                    src="/assets/payment-logos/topper.svg"
-                    alt="Topper"
-                    fallback="Topper"
-                    containerClassName="bg-black/40"
-                    widthClassName="w-[90px]"
-                  />
-                </div>
-                <p className="text-[12px] text-white/40 text-center">
-                  {t("moonpay_sell_bank_partner_notice", "par")} {highlightPhrases(
-                    t("moonpay_sell_bank_methods", "virement bancaire, carte ou PayPal selon votre pays"),
-                    ["virement bancaire, carte ou PayPal"],
-                  )}.
+                <p className="mt-2 text-[14px] md:text-[15px] text-white/80 max-w-[34ch] mx-auto leading-relaxed text-center">
+                  {t("moonpay_sell_bank_partner_notice", "par")} {t("moonpay_sell_bank_methods", "virement bancaire, carte ou PayPal selon votre pays")}.
                 </p>
+                <div className="mt-3 flex flex-col items-center gap-2">
+                  <span className="text-[15px] md:text-[16px] font-medium text-white/70">
+                    {t("moonpay_sell_bank_partner_notice_title", "Le retrait sera effectué via")}
+                  </span>
+                  <div className="flex items-center justify-center gap-1.5">
+                    <PaymentLogo
+                      src="/assets/payment-logos/moonpay.png"
+                      alt="MoonPay"
+                      fallback="MoonPay"
+                      containerClassName="bg-white/90"
+                      widthClassName="w-[90px]"
+                    />
+                    <PaymentLogo
+                      src="/assets/payment-logos/topper.svg"
+                      alt="Topper"
+                      fallback="Topper"
+                      containerClassName="bg-black/40"
+                      widthClassName="w-[90px]"
+                    />
+                  </div>
+                </div>
               </div>
             ) : null}
             <div className="flex justify-center">

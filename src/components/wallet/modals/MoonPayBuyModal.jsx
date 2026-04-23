@@ -1822,35 +1822,35 @@ const MoonPayBuyModal = ({
           {/* Title + Wallet pill */}
           {wizardStep === 1 ? (
             <div className="relative z-[65] px-4 pt-2 pb-4 text-center">
-              <h3 className="text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight mb-2">
+              <h3 className="text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight mb-1">
                 {resolvedTitleOverride || t('ui_funds_add_title', 'Acheter des devises')}
               </h3>
               {!demoMode && !useSimpleSwapPartner ? (
                 <div className="mb-4 flex flex-col items-center gap-2">
-                  <span className="text-[15px] md:text-[16px] font-medium text-white/70">
-                    {t('moonpay_info_buy_live_3c8a1d6b2f', 'Transactions sécurisées via')}
-                  </span>
-                  <div className="flex items-center justify-center gap-1.5">
-                    <PaymentLogo
-                      src="/assets/payment-logos/moonpay.png"
-                      alt="MoonPay"
-                      fallback="MoonPay"
-                      containerClassName="bg-white/90"
-                      widthClassName="w-[90px]"
-                    />
-                    <PaymentLogo
-                      src="/assets/payment-logos/topper.svg"
-                      alt="Topper"
-                      fallback="Topper"
-                      containerClassName="bg-black/40"
-                      widthClassName="w-[90px]"
-                    />
-                  </div>
-                  <p className="text-[12px] text-white/40 text-center">
-                    {highlightPaymentMethods(
-                      t('moonpay_buy_payment_methods_list', 'Moyens acceptés : carte bancaire, Apple Pay, Google Pay, virement.')
-                    )}
+                  <p className="mt-2 text-[14px] md:text-[15px] text-white/80 max-w-[34ch] mx-auto leading-relaxed text-center">
+                    {t('moonpay_buy_payment_methods_list', 'Moyens acceptés : carte bancaire, Apple Pay, Google Pay, virement.')}
                   </p>
+                  <div className="mt-3 flex flex-col items-center gap-2">
+                    <span className="text-[15px] md:text-[16px] font-medium text-white/70">
+                      {t('moonpay_info_buy_live_3c8a1d6b2f', 'Transactions sécurisées via')}
+                    </span>
+                    <div className="flex items-center justify-center gap-1.5">
+                      <PaymentLogo
+                        src="/assets/payment-logos/moonpay.png"
+                        alt="MoonPay"
+                        fallback="MoonPay"
+                        containerClassName="bg-white/90"
+                        widthClassName="w-[90px]"
+                      />
+                      <PaymentLogo
+                        src="/assets/payment-logos/topper.svg"
+                        alt="Topper"
+                        fallback="Topper"
+                        containerClassName="bg-black/40"
+                        widthClassName="w-[90px]"
+                      />
+                    </div>
+                  </div>
                 </div>
               ) : null}
               <div className="flex justify-center">
