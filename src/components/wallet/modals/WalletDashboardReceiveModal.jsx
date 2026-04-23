@@ -1223,7 +1223,7 @@ export default function WalletDashboardReceiveModal({
                   {isDesktop ? <span className="text-sm text-white/80">{t('ui_back', 'Retour')}</span> : null}
                 </button>
 
-                <h2 className="mt-[54px] md:mt-8 text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight">
+                <h2 className="mt-[69px] md:mt-8 text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight">
                   {headerTitle}
                 </h2>
 
@@ -1591,7 +1591,7 @@ export default function WalletDashboardReceiveModal({
 				                        />
 				                      </div>
 
-                      <div className="mt-auto pt-6 pb-[70px] md:pb-0">
+                      <div className="mt-auto pt-6 pb-[85px] md:pb-0">
                         <button
                           type="button"
                           onClick={e => {
