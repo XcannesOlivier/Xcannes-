@@ -2680,7 +2680,7 @@ export default function WalletDashboardUsdSwapModal({
                     <button
                       type="button"
                       onClick={handleHeaderBack}
-                      className="wallet-modal-close text-white/70 hover:text-white transition-colors text-xl flex items-center justify-center"
+                      className="wallet-modal-close wallet-modal-close--force text-white/70 hover:text-white transition-colors text-xl flex items-center justify-center"
                       aria-label={t("ui_back", "Retour")}
                     >
                       <svg viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5" aria-hidden>
