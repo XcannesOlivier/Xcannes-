@@ -1242,7 +1242,7 @@ export default function WalletDashboardReceiveModal({
               {receiveView === 'choice' ? (
                 <div className="flex-1 min-h-0 flex flex-col">
                   <div
-                    className="pt-[80px] md:pt-5 pb-0 flex flex-col items-center text-center"
+                    className="pt-[80px] md:pt-[96px] pb-0 flex flex-col items-center text-center"
                     onPointerDown={event => {
                       maybeStartOverlayDrag(event, 'fixed');
                     }}
