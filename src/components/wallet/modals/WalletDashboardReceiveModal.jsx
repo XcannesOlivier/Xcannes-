@@ -1591,7 +1591,7 @@ export default function WalletDashboardReceiveModal({
 				                        />
 				                      </div>
 
-                      <div className="mt-auto pt-6 pb-[85px] md:pb-0">
+                      <div className="mt-auto md:mt-6 pt-6 pb-[85px] md:pb-0">
                         <button
                           type="button"
                           onClick={e => {
