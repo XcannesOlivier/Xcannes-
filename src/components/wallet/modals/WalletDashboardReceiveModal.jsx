@@ -1189,7 +1189,7 @@ export default function WalletDashboardReceiveModal({
               if (!disableSwipeToClose) maybeStartOverlayDrag(event, 'list');
             }}
           >
-            {!inline && receiveView === 'choice' ? (
+            {!inline ? (
               <div
                 className={`md:hidden flex justify-center -mt-1 pt-1 ${receiveView === 'choice' ? 'pb-4' : 'pb-2'}`}
                 aria-hidden
@@ -1213,8 +1213,8 @@ export default function WalletDashboardReceiveModal({
 	                    e.stopPropagation();
 	                    switchReceiveView(receiveView === 'request_qr' ? 'request' : 'choice');
 	                  }}
-	                  className={`absolute left-0 top-3 shrink-0 h-9 rounded-xl bg-transparent border border-transparent hover:bg-white/5 text-white/80 transition-colors duration-150 inline-flex items-center ${
-	                    isDesktop ? 'px-2.5 gap-1.5' : 'w-9 justify-center'
+	                  className={`absolute left-0 top-3 shrink-0 h-9 rounded-xl bg-transparent border border-transparent hover:bg-white/5 text-white/80 transition-colors duration-150 items-center ${
+	                    isDesktop ? 'inline-flex px-2.5 gap-1.5' : 'hidden'
 	                  }`}
 	                  aria-label={t('ui_back', 'Retour')}
                   title={t('ui_back', 'Retour')}
