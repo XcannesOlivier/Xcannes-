@@ -1220,10 +1220,10 @@ export default function WalletDashboardReceiveModal({
                   title={t('ui_back', 'Retour')}
                 >
                   <ChevronLeftIcon className="w-4 h-4" />
-                  {isDesktop ? <span className="text-[10px] text-white/50">{t('ui_back', 'Retour')}</span> : null}
+                  {isDesktop ? <span className="text-xs text-white/50">{t('ui_back', 'Retour')}</span> : null}
                 </button>
 
-                <h2 className={`${receiveView === 'request' ? 'mt-[69px]' : 'mt-0'} md:mt-8 text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight`}>
+                <h2 className={`${receiveView === 'request' ? 'mt-[69px]' : 'mt-0'} md:mt-[65px] text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight`}>
                   {headerTitle}
                 </h2>
 
