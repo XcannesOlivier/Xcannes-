@@ -286,7 +286,7 @@ export default function WalletDashboardCashModal({
       <div className={wrapperClass}>
         <div
           ref={overlayRef}
-          className={inline ? "w-full h-full flex" : "pointer-events-auto w-full"}
+          className={inline ? "w-full h-full flex" : "pointer-events-auto w-full h-full"}
           style={{
             transform: `translateY(${Math.max(0, overlayTranslateY)}px)`,
             transition: overlayDragging ? "none" : "transform 220ms cubic-bezier(0.2,0,0,1)",
