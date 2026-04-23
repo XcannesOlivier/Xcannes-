@@ -1809,7 +1809,7 @@ const MoonPayBuyModal = ({
                   setReviewTimestamp(null);
                   setWizardStep(1);
                 }}
-                className="hidden md:inline-flex md:absolute md:left-0 md:-top-2 items-center gap-2 text-white/70 hover:text-white transition-colors"
+                className="inline-flex absolute left-0 -top-2 items-center gap-2 text-white/70 hover:text-white transition-colors"
                 aria-label={t('back', 'Back')}
               >
                 <ChevronLeftIcon className="w-5 h-5" aria-hidden="true" />
@@ -2121,26 +2121,13 @@ const MoonPayBuyModal = ({
             {continueLabel}
           </button>
           {!demoMode && !useSimpleSwapPartner ? (
-            <div className="flex flex-col items-center gap-1.5 mt-3">
+            <div className="flex items-center justify-center gap-1 mt-3">
               <span className="text-[11px] text-white/45">
                 {t('moonpay_info_buy_live_3c8a1d6b2f', 'Transactions sécurisées via')}
               </span>
-              <div className="flex items-center justify-center gap-1.5">
-                <PaymentLogo
-                  src="/assets/payment-logos/moonpay.png"
-                  alt="MoonPay"
-                  fallback="MoonPay"
-                  containerClassName="bg-white/90"
-                  widthClassName="w-[70px]"
-                />
-                <PaymentLogo
-                  src="/assets/payment-logos/topper.svg"
-                  alt="Topper"
-                  fallback="Topper"
-                  containerClassName="bg-black/40"
-                  widthClassName="w-[70px]"
-                />
-              </div>
+              <span className="text-[13px] font-semibold text-white/80">MoonPay</span>
+              <span className="text-[11px] text-white/45">et/ou</span>
+              <span className="text-[13px] font-semibold text-white/80">Topper</span>
             </div>
           ) : null}
           <p className="text-center text-[11px] md:text-xs text-white/40 mt-2">
@@ -2347,40 +2334,39 @@ const MoonPayBuyModal = ({
           <div className="pointer-events-none absolute top-0 inset-x-0 h-[280px]" aria-hidden>
             <div className="absolute inset-0 bg-[radial-gradient(350px_circle_at_50%_0%,rgba(34,154,86,0.28),transparent_70%)]" />
           </div>
-          {/* Header */}
-          <div className="flex items-center gap-3 p-4 md:p-5 border-b border-white/10">
-            {step !== 'iframe' && (
-              <button
-                type="button"
-                onClick={() => {
-                  if (step === 'form' && wizardStep > 1) {
-                    setWizardStep(prev => Math.max(1, prev - 1));
-                    return;
-                  }
-                  handleUserClose();
-                }}
-                className="wallet-modal-close -ml-1 w-10 h-10 flex items-center justify-center rounded-[20px] text-white/70 hover:text-white hover:bg-white/5 transition-colors"
-                aria-label={t('back', 'Back')}
-              >
-                <ChevronLeftIcon className="w-6 h-6" aria-hidden="true" />
-              </button>
-            )}
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-2 flex-wrap">
-                <h3 className="text-lg md:text-xl font-orbitron font-bold text-white">
-                  {t('ui_buy_crypto_with_fiat_f09c7b4228', 'Buy Crypto with Fiat')}
-                </h3>
-                {noticeVariant === 'demo' ? (
-                  <span className="inline-flex items-center text-white/80 text-xs md:text-sm font-semibold px-2 py-1 leading-none">
-                    {t('demo_notice_title', 'Mode démo')}
-                  </span>
-                ) : null}
+
+          {/* Header — visible uniquement pendant l'iframe */}
+          {step === 'iframe' && (
+            <div className="flex items-center gap-3 p-4 md:p-5 border-b border-white/10">
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h3 className="text-lg md:text-xl font-orbitron font-bold text-white">
+                    {t('ui_buy_crypto_with_fiat_f09c7b4228', 'Buy Crypto with Fiat')}
+                  </h3>
+                  {noticeVariant === 'demo' ? (
+                    <span className="inline-flex items-center text-white/80 text-xs md:text-sm font-semibold px-2 py-1 leading-none">
+                      {t('demo_notice_title', 'Mode démo')}
+                    </span>
+                  ) : null}
+                </div>
+                <p className="text-xs text-white/60 mt-1">
+                  {t('ui_powered_by_moonpay_secure_ch_0bcfb2aeb5', 'Powered by MoonPay • Secure checkout')}
+                </p>
               </div>
-              <p className="text-xs text-white/60 mt-1">
-                {t('ui_powered_by_moonpay_secure_ch_0bcfb2aeb5', 'Powered by MoonPay • Secure checkout')}
-              </p>
             </div>
-          </div>
+          )}
+
+          {/* Bouton fermer flottant — steps form/loading/error/success (pas iframe) */}
+          {step !== 'iframe' && (
+            <button
+              type="button"
+              onClick={handleUserClose}
+              className="absolute top-4 right-4 z-20 text-white/60 hover:text-white transition-colors bg-transparent rounded-full w-10 h-10 flex items-center justify-center hover:bg-white/5"
+              aria-label={t('close', 'Fermer')}
+            >
+              <span aria-hidden className="text-xl leading-none">✕</span>
+            </button>
+          )}
 
           {/* Content */}
           {renderContent()}

@@ -1579,7 +1579,7 @@ const MoonPaySellModal = ({
               <button
                 type="button"
                 onClick={() => setWizardStep(1)}
-                className="hidden md:inline-flex md:absolute md:left-0 md:-top-2 items-center gap-2 text-white/70 hover:text-white transition-colors"
+                className="inline-flex absolute left-0 -top-2 items-center gap-2 text-white/70 hover:text-white transition-colors"
                 aria-label={t("back", "Back")}
               >
                 <ChevronLeftIcon className="w-5 h-5" aria-hidden="true" />
@@ -1955,26 +1955,13 @@ const MoonPaySellModal = ({
             {continueLabel}
           </button>
           {!demoMode && isBankSellFlow ? (
-            <div className="flex flex-col items-center gap-1.5 mt-3">
+            <div className="flex items-center justify-center gap-1 mt-3">
               <span className="text-[11px] text-white/45">
                 {t("moonpay_sell_bank_partner_notice_title", "Le retrait sera effectué via")}
               </span>
-              <div className="flex items-center justify-center gap-1.5">
-                <PaymentLogo
-                  src="/assets/payment-logos/moonpay.png"
-                  alt="MoonPay"
-                  fallback="MoonPay"
-                  containerClassName="bg-white/90"
-                  widthClassName="w-[70px]"
-                />
-                <PaymentLogo
-                  src="/assets/payment-logos/topper.svg"
-                  alt="Topper"
-                  fallback="Topper"
-                  containerClassName="bg-black/40"
-                  widthClassName="w-[70px]"
-                />
-              </div>
+              <span className="text-[13px] font-semibold text-white/80">MoonPay</span>
+              <span className="text-[11px] text-white/45">et/ou</span>
+              <span className="text-[13px] font-semibold text-white/80">Topper</span>
             </div>
           ) : null}
           <p className="text-center text-[11px] md:text-xs text-white/40 mt-2">
@@ -2109,9 +2096,10 @@ const MoonPaySellModal = ({
 	            onClick={handleUserClose}
 	            className={`absolute ${
 	              step === "iframe" ? "top-1 right-1 md:top-2 md:right-2" : "top-4 right-4"
-	            } z-20 wallet-modal-close text-white/70 hover:text-white transition-colors text-xl bg-transparent rounded-full w-10 h-10 flex items-center justify-center`}
+	            } z-20 text-white/60 hover:text-white transition-colors bg-transparent rounded-full w-10 h-10 flex items-center justify-center hover:bg-white/5`}
+	            aria-label={t('close', 'Fermer')}
 	          >
-	            ✕
+	            <span aria-hidden className="text-xl leading-none">✕</span>
 	          </button>
 
 	          {/* Content */}
