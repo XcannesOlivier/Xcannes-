@@ -1117,9 +1117,8 @@ export default function WalletDashboardReceiveModal({
   const choiceCardBaseClassName =
     // Match the "CashChoice" action button background (wallet-actions.css).
     'relative w-full text-left rounded-[20px] px-4 py-4 bg-white/[0.02] hover:bg-white/[0.05] active:bg-white/[0.03] ring-1 ring-white/10 ring-inset shadow-[0_8px_26px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-22px_34px_rgba(0,0,0,0.68)] transition-all duration-[140ms] ease-[cubic-bezier(0.4,0,0.2,1)] hover:ring-white/20 hover:-translate-y-px active:translate-y-0 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-xcannes-green/60';
-  // Keep the first choice visually "primary" without changing the base background.
-  const choiceCardGreenClassName = `${choiceCardBaseClassName} ring-xcannes-green/15 hover:ring-xcannes-green/25 shadow-[0_-12px_36px_rgba(0,200,120,0.12),0_8px_26px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-22px_34px_rgba(0,0,0,0.68)]`;
-  const choiceCardNeutralClassName = `${choiceCardBaseClassName}`;
+  const choiceCardGreenClassName = choiceCardBaseClassName;
+  const choiceCardNeutralClassName = choiceCardBaseClassName;
 
   const content = (
     <>
@@ -1193,6 +1192,7 @@ export default function WalletDashboardReceiveModal({
             onClick={e => {
               if (!inline) e.stopPropagation();
             }}
+            style={{ backgroundImage: 'radial-gradient(900px circle at 12% 0%, rgba(255,255,255,0.07) 0%, transparent 55%), radial-gradient(850px circle at 95% 92%, rgba(0,255,150,0.05) 0%, transparent 55%)' }}
             onPointerDown={event => {
               if (!disableSwipeToClose) maybeStartOverlayDrag(event, 'list');
             }}
@@ -1272,18 +1272,18 @@ export default function WalletDashboardReceiveModal({
                         switchReceiveView('share');
                       }}
                     >
-                      <div className="flex items-start gap-4">
-                        <div className="w-12 h-12 rounded-2xl bg-white/5 ring-1 ring-white/10 flex items-center justify-center text-xcannes-green/90">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-[16px] bg-black/30 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0 text-xcannes-green/90">
                           <QrIcon className="w-6 h-6" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between gap-3">
-                            <div className="text-[20px] md:text-[21px] font-semibold text-white/92">
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="text-[18px] md:text-[19px] font-semibold text-white truncate">
                               {t('ui_receive_choice_share_title', 'Coordonnées de réception')}
                             </div>
-                            <ChevronRightIcon className="w-5 h-5 text-white/30" />
+                            <ChevronRightIcon className="w-5 h-5 text-white/45" />
                           </div>
-                          <div className="mt-1 text-[15px] md:text-[16px] text-white/55 leading-snug">
+                          <div className="mt-1 text-[15px] md:text-sm leading-snug text-xcannes-green/90">
                             {t(
                               'ui_receive_choice_share_desc',
                               'Affichez le QR code et l’adresse de réception associés à votre compte.',
@@ -1301,18 +1301,18 @@ export default function WalletDashboardReceiveModal({
                         switchReceiveView('request');
                       }}
                     >
-                      <div className="flex items-start gap-4">
-                        <div className="w-12 h-12 rounded-2xl bg-white/5 ring-1 ring-white/10 flex items-center justify-center text-white/85">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-[16px] bg-black/30 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0 text-white/85">
                           <RequestIcon className="w-6 h-6" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between gap-3">
-                            <div className="text-[20px] md:text-[21px] font-semibold text-white/92">
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="text-[18px] md:text-[19px] font-semibold text-white truncate">
                               {t('ui_receive_choice_request_title', 'Demander un paiement')}
                             </div>
-                            <ChevronRightIcon className="w-5 h-5 text-white/30" />
+                            <ChevronRightIcon className="w-5 h-5 text-white/45" />
                           </div>
-                          <div className="mt-1 text-[15px] md:text-[16px] text-white/55 leading-snug">
+                          <div className="mt-1 text-[15px] md:text-sm leading-snug text-white/60">
                             {t(
                               'ui_receive_choice_request_desc',
                               'Définissez un montant, une devise et un message optionnel.',
