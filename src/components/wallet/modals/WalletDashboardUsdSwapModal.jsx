@@ -2654,8 +2654,8 @@ export default function WalletDashboardUsdSwapModal({
             }}
           >
             {/* Ambient glow */}
-            <div className="pointer-events-none absolute inset-0" aria-hidden>
-              <div className={`absolute inset-0 ${isBinanceYellow ? 'bg-[radial-gradient(600px_circle_at_50%_0%,rgba(240,185,11,0.13),transparent_60%)]' : 'bg-[radial-gradient(600px_circle_at_50%_0%,rgba(8,112,248,0.15),transparent_60%)]'}`} />
+            <div className="pointer-events-none absolute top-0 inset-x-0 h-[280px]" aria-hidden>
+              <div className={`absolute inset-0 ${isBinanceYellow ? 'bg-[radial-gradient(350px_circle_at_50%_0%,rgba(240,185,11,0.13),transparent_70%)]' : 'bg-[radial-gradient(350px_circle_at_50%_0%,rgba(8,112,248,0.15),transparent_70%)]'}`} />
             </div>
             <div
               className="border-b border-white/10"

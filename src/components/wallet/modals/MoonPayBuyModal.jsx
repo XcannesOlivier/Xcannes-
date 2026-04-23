@@ -2344,8 +2344,8 @@ const MoonPayBuyModal = ({
           onClick={e => e.stopPropagation()}
         >
           {/* Ambient glow */}
-          <div className="pointer-events-none absolute inset-0" aria-hidden>
-            <div className="absolute inset-0 bg-[radial-gradient(600px_circle_at_50%_0%,rgba(34,154,86,0.22),transparent_60%)]" />
+          <div className="pointer-events-none absolute top-0 inset-x-0 h-[280px]" aria-hidden>
+            <div className="absolute inset-0 bg-[radial-gradient(350px_circle_at_50%_0%,rgba(34,154,86,0.28),transparent_70%)]" />
           </div>
           {/* Header */}
           <div className="flex items-center gap-3 p-4 md:p-5 border-b border-white/10">
