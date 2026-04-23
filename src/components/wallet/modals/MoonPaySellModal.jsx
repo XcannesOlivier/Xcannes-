@@ -1580,7 +1580,7 @@ const MoonPaySellModal = ({
               <button
                 type="button"
                 onClick={() => setWizardStep(1)}
-                className="inline-flex absolute left-0 -top-2 items-center gap-2 text-white/70 hover:text-white transition-colors"
+                className="hidden md:inline-flex md:absolute md:left-0 md:-top-2 items-center gap-2 text-white/70 hover:text-white transition-colors"
                 aria-label={t("back", "Back")}
               >
                 <ChevronLeftIcon className="w-5 h-5" aria-hidden="true" />
