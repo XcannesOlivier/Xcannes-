@@ -1596,31 +1596,10 @@ const MoonPaySellModal = ({
                 t("moonpay_sell_withdraw_title_prefix", "Envoyer vers la banque")}
             </h3>
             {isBankSellFlow ? (
-              <div className="mb-4 flex flex-col items-center gap-2">
+              <div className="mb-4 flex flex-col items-center">
                 <p className="mt-2 text-[14px] md:text-[15px] text-white/80 max-w-[34ch] mx-auto leading-relaxed text-center">
                   {t("moonpay_sell_bank_partner_notice", "par")} {t("moonpay_sell_bank_methods", "virement bancaire, carte ou PayPal selon votre pays")}.
                 </p>
-                <div className="mt-3 flex flex-col items-center gap-2">
-                  <span className="text-[15px] md:text-[16px] font-medium text-white/70">
-                    {t("moonpay_sell_bank_partner_notice_title", "Le retrait sera effectué via")}
-                  </span>
-                  <div className="flex items-center justify-center gap-1.5">
-                    <PaymentLogo
-                      src="/assets/payment-logos/moonpay.png"
-                      alt="MoonPay"
-                      fallback="MoonPay"
-                      containerClassName="bg-white/90"
-                      widthClassName="w-[90px]"
-                    />
-                    <PaymentLogo
-                      src="/assets/payment-logos/topper.svg"
-                      alt="Topper"
-                      fallback="Topper"
-                      containerClassName="bg-black/40"
-                      widthClassName="w-[90px]"
-                    />
-                  </div>
-                </div>
               </div>
             ) : null}
             <div className="flex justify-center">
@@ -1706,7 +1685,7 @@ const MoonPaySellModal = ({
 		                  inputMode="decimal"
                       readOnly={wizardStep !== 1}
 			                  className={[
-	                        "flex-1 min-w-0 bg-transparent text-white text-4xl md:text-5xl font-bold placeholder:text-white/20 focus:outline-none transition-all duration-150",
+	                        "flex-1 min-w-0 bg-transparent text-white text-4xl md:text-5xl font-bold placeholder:text-white/35 focus:outline-none transition-all duration-150",
 	                        wizardStep !== 1 ? "cursor-default opacity-95" : "",
 	                      ].join(" ")}
 			                />
@@ -1752,15 +1731,6 @@ const MoonPaySellModal = ({
 	                      ["(USDC, USDT…)", "SimpleSwap)"],
 	                    )}
 	                  </p>
-	                ) : isBankSellFlow ? (
-	                  <div className="px-1">
-	                    <p className="mt-1 text-[11px] md:text-xs text-white/45">
-	                      {t(
-	                        "moonpay_sell_partner_location_note",
-	                        "Le partenaire proposé dépend de votre localisation.",
-	                      )}
-	                    </p>
-	                  </div>
 	                ) : null}
 	              </>
 	            ) : null}
@@ -1918,14 +1888,6 @@ const MoonPaySellModal = ({
 			                  "✔ Tout est automatique — vous validez simplement",
 			                )}
 			              </p>
-                    {!isOtherBlockchainsDestination ? (
-                      <p className="mt-1 text-[11px] md:text-xs text-white/45">
-                        {t(
-                          "moonpay_sell_partner_location_note",
-                          "Le partenaire proposé dépend de votre localisation.",
-                        )}
-                      </p>
-                    ) : null}
                   </div>
 		            </>
 		          ) : null}
@@ -1992,7 +1954,30 @@ const MoonPaySellModal = ({
           >
             {continueLabel}
           </button>
-          <p className="text-center text-[11px] md:text-xs text-white/40 mt-1">
+          {!demoMode && isBankSellFlow ? (
+            <div className="flex flex-col items-center gap-1.5 mt-3">
+              <span className="text-[11px] text-white/45">
+                {t("moonpay_sell_bank_partner_notice_title", "Le retrait sera effectué via")}
+              </span>
+              <div className="flex items-center justify-center gap-1.5">
+                <PaymentLogo
+                  src="/assets/payment-logos/moonpay.png"
+                  alt="MoonPay"
+                  fallback="MoonPay"
+                  containerClassName="bg-white/90"
+                  widthClassName="w-[70px]"
+                />
+                <PaymentLogo
+                  src="/assets/payment-logos/topper.svg"
+                  alt="Topper"
+                  fallback="Topper"
+                  containerClassName="bg-black/40"
+                  widthClassName="w-[70px]"
+                />
+              </div>
+            </div>
+          ) : null}
+          <p className="text-center text-[11px] md:text-xs text-white/40 mt-2">
             {t('moonpay_sell_partner_location_note_cta', 'Le partenaire proposé dépend de votre localisation.')}
           </p>
 	        </div>
@@ -2115,6 +2100,10 @@ const MoonPaySellModal = ({
 	          } ${isClosing ? "wallet-modal-lift-out" : "wallet-modal-lift-in"}`}
 	          onClick={(e) => e.stopPropagation()}
 	        >
+	          {/* Ambient glow */}
+	          <div className="pointer-events-none absolute inset-0 z-0" aria-hidden>
+	            <div className="absolute inset-0 bg-[radial-gradient(600px_circle_at_50%_0%,rgba(124,58,237,0.15),transparent_60%)]" />
+	          </div>
 	          <button
 	            type="button"
 	            onClick={handleUserClose}
