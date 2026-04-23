@@ -2347,7 +2347,7 @@ const MoonPayBuyModal = ({
           <div className="pointer-events-none absolute inset-0 z-0" aria-hidden>
             <div className="absolute inset-0 bg-[radial-gradient(600px_circle_at_50%_0%,rgba(34,154,86,0.15),transparent_60%)]" />
           </div>
-          {/* Header */}}
+          {/* Header */}
           <div className="flex items-center gap-3 p-4 md:p-5 border-b border-white/10">
             {step !== 'iframe' && (
               <button
