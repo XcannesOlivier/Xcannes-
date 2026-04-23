@@ -1210,20 +1210,19 @@ export default function WalletDashboardReceiveModal({
             ) : null}
             {receiveView !== 'choice' ? (
               <div
-                className="relative z-[65] flex flex-col"
+                className="relative z-[65] pt-4 pb-3 flex flex-col items-center text-center"
                 onPointerDown={event => {
                   if (!disableSwipeToClose) maybeStartOverlayDrag(event, 'fixed');
                 }}
               >
-                <div className="px-5 pt-4 pb-2 flex items-center">
 	                <button
 	                  type="button"
 	                  onClick={e => {
 	                    e.stopPropagation();
 	                    switchReceiveView(receiveView === 'request_qr' ? 'request' : 'choice');
 	                  }}
-	                  className={`shrink-0 text-white/55 hover:text-white transition-colors inline-flex items-center ${
-	                    isDesktop ? 'gap-1.5' : 'w-9 justify-center'
+	                  className={`absolute left-0 top-3 shrink-0 h-9 rounded-xl bg-transparent border border-transparent hover:bg-white/5 text-white/80 transition-colors duration-150 inline-flex items-center ${
+	                    isDesktop ? 'px-2.5 gap-1.5' : 'w-9 justify-center'
 	                  }`}
 	                  aria-label={t('ui_back', 'Retour')}
                   title={t('ui_back', 'Retour')}
@@ -1231,10 +1230,8 @@ export default function WalletDashboardReceiveModal({
                   <ChevronLeftIcon className="w-5 h-5" />
                   {isDesktop ? <span className="text-sm text-white/80">{t('ui_back', 'Retour')}</span> : null}
                 </button>
-                </div>
 
-                <div className="pt-2 pb-3 flex flex-col items-center text-center">
-                <h2 className="mt-1 text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight">
+                <h2 className="mt-8 text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight">
                   {headerTitle}
                 </h2>
 
@@ -1247,7 +1244,6 @@ export default function WalletDashboardReceiveModal({
                 <p className="mt-2 text-[14px] md:text-[15px] text-white/60 max-w-[34ch] leading-relaxed">
                   {headerSubtitle}
                 </p>
-                </div>
               </div>
             ) : null}
             <div className="flex-1 min-h-0 flex flex-col">
