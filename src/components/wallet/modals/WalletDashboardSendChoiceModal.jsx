@@ -750,7 +750,7 @@ export default function WalletDashboardSendChoiceModal({
                     <button
                       type="button"
                       onClick={() => setShowQuickscanSavedPicker(prev => !prev)}
-                      className="w-full flex items-center bg-elevated ring-1 ring-white/15 ring-inset rounded-[20px] shadow-[0_4px_12px_rgba(0,0,0,0.4)] px-4 py-3 text-[15.5px] text-white/80 hover:bg-white/[0.03] transition-colors"
+                      className="w-full flex items-center bg-gradient-to-b from-[#101415] to-[#0d1214] ring-1 ring-white/[0.07] ring-inset rounded-[20px] shadow-[0_2px_8px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.06)] px-4 py-3 text-[15.5px] text-white/80 hover:bg-white/[0.03] transition-colors"
                     >
                       <svg className="w-5 h-5 text-white/50 flex-shrink-0 mr-3" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0" /></svg>
                       <span className="flex-1 text-left truncate">
