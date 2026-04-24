@@ -225,12 +225,14 @@ export default function WalletDashboardSendChoiceModal({
   const handleSubModalPointerDown = (event) => {
     if (inline) return;
     if (!event?.isPrimary || event.pointerType === 'mouse') return;
+    event.stopPropagation();
     subModalDragRef.current = { startY: event.clientY, startAt: Date.now(), pointerId: event.pointerId, lastDelta: 0, dragging: false };
   };
   const handleSubModalPointerMove = (event) => {
     if (inline) return;
     const meta = subModalDragRef.current;
     if (meta.pointerId !== event.pointerId) return;
+    event.stopPropagation();
     const delta = event.clientY - meta.startY;
     if (delta <= 0) return;
     if (!meta.dragging) {
@@ -245,6 +247,7 @@ export default function WalletDashboardSendChoiceModal({
     if (inline) return;
     const meta = subModalDragRef.current;
     if (meta.pointerId !== event.pointerId) return;
+    event.stopPropagation();
     const delta = meta.lastDelta || 0;
     const duration = Math.max(1, Date.now() - (meta.startAt || 0));
     const velocity = delta / duration;
@@ -254,7 +257,7 @@ export default function WalletDashboardSendChoiceModal({
     subModalDragRef.current = { startY: 0, startAt: 0, pointerId: null, lastDelta: 0, dragging: false };
     if (shouldClose) {
       setSubModalTranslateY(Math.max(delta, height));
-      window.setTimeout(() => { setSubModalTranslateY(0); setSubModal(null); }, 180);
+      window.setTimeout(() => { setSubModalTranslateY(0); setSubModal(null); onClose?.(); }, 180);
     } else {
       setSubModalTranslateY(0);
     }
@@ -618,6 +621,7 @@ export default function WalletDashboardSendChoiceModal({
               ref={subModalRef}
               className={inline ? 'relative w-full h-full overflow-hidden flex flex-col bg-elevated rounded-xl' : 'relative w-full wallet-modal-panel wallet-cash-modal border-white/10 md:border overflow-hidden flex flex-col bg-elevated h-screen md:h-auto md:max-h-[80vh] rounded-none md:rounded-2xl pb-[env(safe-area-inset-bottom)]'}
               style={!inline && subModalTranslateY ? { transform: `translateY(${subModalTranslateY}px)`, transition: subModalDragRef.current.dragging ? 'none' : 'transform 0.18s ease' } : undefined}
+              onPointerDown={handleSubModalPointerDown}
               onPointerMove={handleSubModalPointerMove}
               onPointerUp={handleSubModalPointerEnd}
               onPointerCancel={handleSubModalPointerEnd}
@@ -632,7 +636,6 @@ export default function WalletDashboardSendChoiceModal({
                   <div
                     className="md:hidden flex justify-center -mt-1 pt-1 pb-2"
                     aria-hidden
-                    onPointerDown={handleSubModalPointerDown}
                   >
                     <span className="block w-12 h-1.5 rounded-full bg-white/20" />
                   </div>
