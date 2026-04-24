@@ -253,7 +253,7 @@ export default function WalletDashboardHeader({
 
   return (
     <div
-      className="panel-header flex flex-col shrink-0 rounded-[18px] bg-[#111518] shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30)] px-3 pt-3 pb-4 md:px-5 md:pt-4 md:pb-5"
+      className="panel-header flex flex-col shrink-0 bg-[#111518] shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30)] px-3 pt-3 pb-4 md:px-5 md:pt-4 md:pb-5"
     >
       {/* Titres discrets en haut */}
       <div className="flex items-center justify-between mb-0 md:mb-3">
