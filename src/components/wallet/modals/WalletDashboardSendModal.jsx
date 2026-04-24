@@ -769,6 +769,13 @@ export default function WalletDashboardSendModal({
       setOverlayDragging(false);
       setOverlayTranslateY(0);
       overlayDragMetaRef.current = resetMeta;
+      // Reset scroll position so the swipe guard (scrollTop > 0) n'est pas déclenché
+      // au premier rendu quand sendDestination est pré-rempli depuis un sous-modal.
+      requestAnimationFrame(() => {
+        try {
+          if (scrollContainerRef.current) scrollContainerRef.current.scrollTop = 0;
+        } catch { /* ignore */ }
+      });
       return;
     }
 
