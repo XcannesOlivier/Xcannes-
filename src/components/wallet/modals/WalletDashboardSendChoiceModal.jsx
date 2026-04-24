@@ -403,9 +403,11 @@ export default function WalletDashboardSendChoiceModal({
           className={`fixed inset-0 z-[10000] bg-black/80 md:backdrop-blur-sm ${backdropAnimClass}`}
           onClick={onClose}
           style={
-            overlayTranslateY > 0
-              ? { opacity: Math.max(0, Math.min(1, 1 - overlayTranslateY / 420)) }
-              : undefined
+            subModalTranslateY > 0
+              ? { opacity: 0 }
+              : overlayTranslateY > 0
+                ? { opacity: Math.max(0, Math.min(1, 1 - overlayTranslateY / 420)) }
+                : undefined
           }
         />
       ) : null}
@@ -419,6 +421,7 @@ export default function WalletDashboardSendChoiceModal({
             transform: `translateY(${Math.max(0, overlayTranslateY)}px)`,
             transition: overlayDragging ? 'none' : 'transform 220ms cubic-bezier(0.2,0,0,1)',
             willChange: overlayTranslateY ? 'transform' : undefined,
+            visibility: subModalTranslateY > 0 ? 'hidden' : undefined,
           }}
           onPointerMove={handleOverlayPointerMove}
           onPointerUp={handleOverlayPointerEnd}
@@ -615,7 +618,7 @@ export default function WalletDashboardSendChoiceModal({
       {/* ═══ Sub-modal: Envoi simple ═══ */}
       {subModal === 'quickscan' ? (
         <div className={inline ? 'absolute inset-0 z-50 flex' : 'fixed inset-0 z-[10100] flex items-end md:items-center justify-center md:px-4 pointer-events-none'}>
-          {!inline ? <div className="fixed inset-0 bg-black/70 md:backdrop-blur-sm pointer-events-auto wallet-modal-backdrop-in" onClick={() => setSubModal(null)} /> : null}
+          {!inline ? <div className="fixed inset-0 bg-black/70 md:backdrop-blur-sm pointer-events-auto wallet-modal-backdrop-in" onClick={() => setSubModal(null)} style={subModalTranslateY > 0 ? { opacity: Math.max(0, 1 - subModalTranslateY / 300) } : undefined} /> : null}
           <div className={inline ? 'w-full h-full' : 'relative z-10 pointer-events-auto w-full md:max-w-lg wallet-modal-lift-in'}>
             <div
               ref={subModalRef}
