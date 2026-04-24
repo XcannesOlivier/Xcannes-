@@ -1583,6 +1583,7 @@ export default function WalletDashboardReceiveModal({
 					                        <label className="block text-[13px] tracking-normal font-medium text-white/55 mb-2">
 					                          {t('ui_amount_7668986206', 'Montant')}
 					                        </label>
+                                  <div className="bg-[#111518] rounded-[18px]">
                                   <TokenAmountInput
                                     value={requestAmount}
                                     onChange={setRequestAmount}
@@ -1591,6 +1592,7 @@ export default function WalletDashboardReceiveModal({
                                     tokenClassName="text-white/70 drop-shadow-sm text-2xl md:text-3xl font-semibold"
                                     containerClassName="pt-5 pb-5 rounded-[18px] bg-[#111518] ring-1 ring-white/10 ring-inset transition-all duration-200 shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30)] focus-within:ring-white/25 focus-within:shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30),0_0_0_1px_rgba(255,255,255,0.10),0_0_24px_rgba(255,255,255,0.06)] wallet-amount-shimmer [&_input]:!text-4xl [&_input]:md:!text-5xl [&_input]:font-bold [&_input]:placeholder:text-white/35"
                                   />
+                                  </div>
 					                      </div>
 
 	                      {/* Message (optional) */}
@@ -1598,6 +1600,7 @@ export default function WalletDashboardReceiveModal({
 			                        <label className="block text-[11px] tracking-[0.22em] text-white/45 mb-2">
 			                          {t('ui_message_optional_label', 'Message (optional)')}
 			                        </label>
+	                        <div className="bg-[#101415] rounded-[12px]">
 				                        <input
 			                          type="text"
 				                          value={requestMemo}
@@ -1608,6 +1611,7 @@ export default function WalletDashboardReceiveModal({
 				                            noticeVariant === 'demo' ? 'bg-xcannes-surface-demo' : 'bg-[#101415]'
 				                          }`}
 				                        />
+                        </div>
 				                      </div>
 
                       <div className="mt-auto md:mt-6 pt-6 pb-[85px] md:pb-0">
