@@ -1201,6 +1201,7 @@ export default function WalletDashboardReceiveModal({
                   <div className="absolute inset-0 bg-[radial-gradient(400px_circle_at_88%_0%,rgba(255,255,255,0.07),transparent_50%)]" />
                   <div className="absolute inset-0 md:hidden bg-[radial-gradient(900px_circle_at_100%_75%,rgba(0,255,150,0.06),transparent_60%)]" />
                   <div className="absolute inset-0 hidden md:block bg-[radial-gradient(1300px_circle_at_100%_75%,rgba(0,255,150,0.06),transparent_60%)]" />
+                  <div className="absolute inset-0 bg-[radial-gradient(700px_circle_at_0%_100%,rgba(0,255,150,0.04),transparent_65%)]" />
                 </>
               )}
             </div>
@@ -1339,7 +1340,7 @@ export default function WalletDashboardReceiveModal({
                     <div className="absolute inset-0 bg-[radial-gradient(620px_circle_at_100%_75%,rgba(0,255,150,0.09),transparent_58%)]" />
                   </div>
 	                  {/* SECTION 1 — RECEIVE FUNDS */}
-	                  <div className="space-y-5 pt-2">
+	                  <div className="space-y-5 pt-2 relative z-[2]">
 
 	                    {/* ── Centered wallet pill (style "Depuis le compte") ── */}
                       <div className="flex justify-center pt-1 pb-1 relative z-[85]">
@@ -1583,7 +1584,7 @@ export default function WalletDashboardReceiveModal({
 					                        <label className="block text-[13px] tracking-normal font-medium text-white/55 mb-2">
 					                          {t('ui_amount_7668986206', 'Montant')}
 					                        </label>
-                                  <div className="bg-[#111518] rounded-[18px]">
+                                  <div className="relative z-[2] bg-[#111518] rounded-[18px]">
                                   <TokenAmountInput
                                     value={requestAmount}
                                     onChange={setRequestAmount}
@@ -1600,7 +1601,7 @@ export default function WalletDashboardReceiveModal({
 			                        <label className="block text-[11px] tracking-[0.22em] text-white/45 mb-2">
 			                          {t('ui_message_optional_label', 'Message (optional)')}
 			                        </label>
-	                        <div className="bg-[#101415] rounded-[12px]">
+	                        <div className="relative z-[2] bg-[#101415] rounded-[12px]">
 				                        <input
 			                          type="text"
 				                          value={requestMemo}
@@ -1652,7 +1653,7 @@ export default function WalletDashboardReceiveModal({
 	                    <div className="absolute inset-0 bg-[radial-gradient(620px_circle_at_100%_75%,rgba(0,255,150,0.09),transparent_58%)]" />
 	                  </div>
 		                  {/* SECTION 3 — REQUEST QR */}
-		                  <div className="space-y-5 pt-2">
+		                  <div className="space-y-5 pt-2 relative z-[2]">
 
 	                    {/* ── Static wallet pill (style "Depuis le compte") ── */}
 	                    <div className="flex justify-center pt-1 pb-1">
