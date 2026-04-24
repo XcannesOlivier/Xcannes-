@@ -219,7 +219,45 @@ export default function WalletDashboardSendChoiceModal({
 
   const subModalRef = useRef(null);
 
-  useEffect(() => {
+  // Swipe natif pour le sous-modal (window listeners – fiable quelle que soit la hiérarchie DOM)
+  const subSwipeMeta = useRef(null);
+  const handleSubModalPillDown = useCallback((event) => {
+    if (inline) return;
+    if (!event?.isPrimary || event.pointerType === 'mouse') return;
+    subSwipeMeta.current = { startY: event.clientY, startAt: Date.now(), pointerId: event.pointerId, lastDeltaY: 0, dragging: false };
+
+    const onMove = (e) => {
+      if (!subSwipeMeta.current || e.pointerId !== subSwipeMeta.current.pointerId) return;
+      const delta = e.clientY - subSwipeMeta.current.startY;
+      if (delta <= 0) return;
+      subSwipeMeta.current.lastDeltaY = delta;
+      setOverlayTranslateY(delta);
+      setOverlayDragging(true);
+    };
+    const onEnd = (e) => {
+      if (!subSwipeMeta.current || e.pointerId !== subSwipeMeta.current.pointerId) return;
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onEnd);
+      window.removeEventListener('pointercancel', onEnd);
+      const delta = subSwipeMeta.current.lastDeltaY || 0;
+      const duration = Math.max(1, Date.now() - subSwipeMeta.current.startAt);
+      const velocity = delta / duration;
+      const height = typeof window !== 'undefined' ? window.innerHeight : 800;
+      const closeDistance = Math.max(220, Math.min(320, height * 0.28));
+      const shouldClose = delta > closeDistance || (delta > closeDistance * 0.6 && velocity > 1.25);
+      subSwipeMeta.current = null;
+      setOverlayDragging(false);
+      if (shouldClose) {
+        setOverlayTranslateY(Math.max(delta, height));
+        window.setTimeout(() => { onClose?.(); }, 180);
+      } else {
+        setOverlayTranslateY(0);
+      }
+    };
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onEnd);
+    window.addEventListener('pointercancel', onEnd);
+  }, [inline, onClose]);
     const resetMeta = {
       startY: 0, startAt: 0, pointerId: null, lastDelta: 0,
       pending: false, source: null, dragging: false,
@@ -573,9 +611,6 @@ export default function WalletDashboardSendChoiceModal({
               ref={subModalRef}
               className={inline ? 'relative w-full h-full overflow-hidden flex flex-col bg-elevated rounded-xl' : 'relative w-full wallet-modal-panel wallet-cash-modal border-white/10 md:border overflow-hidden flex flex-col bg-elevated h-screen md:h-auto md:max-h-[80vh] rounded-none md:rounded-2xl pb-[env(safe-area-inset-bottom)]'}
               style={!inline && overlayTranslateY ? { transform: `translateY(${Math.max(0, overlayTranslateY)}px)`, transition: overlayDragging ? 'none' : 'transform 220ms cubic-bezier(0.2,0,0,1)' } : undefined}
-              onPointerMove={handleOverlayPointerMove}
-              onPointerUp={handleOverlayPointerEnd}
-              onPointerCancel={handleOverlayPointerEnd}
             >
               {/* Glow */}
               <div className="pointer-events-none absolute inset-0" aria-hidden>
@@ -587,7 +622,7 @@ export default function WalletDashboardSendChoiceModal({
                   <div
                     className="md:hidden flex justify-center -mt-1 pt-1 pb-2"
                     aria-hidden
-                    onPointerDown={event => { maybeStartOverlayDrag(event, 'fixed'); }}
+                    onPointerDown={handleSubModalPillDown}
                   >
                     <span className="block w-12 h-1.5 rounded-full bg-white/20" />
                   </div>
