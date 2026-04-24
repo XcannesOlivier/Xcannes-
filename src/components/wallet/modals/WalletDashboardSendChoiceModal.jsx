@@ -642,7 +642,7 @@ export default function WalletDashboardSendChoiceModal({
                     <span className="text-[13px] font-medium">{t('ui_back', 'Retour')}</span>
                   </button>
                 </div>
-                <div className="px-5 pt-[84px] md:pt-3 pb-5 flex flex-col flex-1 min-h-0">
+                <div className="px-5 pt-[134px] pb-5 flex flex-col flex-1 min-h-0">
                 {/* Title + subtitle (centered) */}
                 <div className="flex flex-col items-center text-center mb-6">
                   <h3 className="mt-1 text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight">
@@ -843,7 +843,7 @@ export default function WalletDashboardSendChoiceModal({
                     <span className="text-[13px] font-medium">{t('ui_back', 'Retour')}</span>
                   </button>
                 </div>
-                <div className="px-5 pt-[84px] md:pt-3 pb-5 flex flex-col flex-1 min-h-0">
+                <div className="px-5 pt-[134px] pb-5 flex flex-col flex-1 min-h-0">
                 {/* Title + subtitle (centered) */}
                 <div className="flex flex-col items-center text-center mb-6">
                   <h3 className="mt-1 text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight">
