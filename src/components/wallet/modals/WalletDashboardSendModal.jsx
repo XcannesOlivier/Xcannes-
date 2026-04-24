@@ -1305,7 +1305,7 @@ export default function WalletDashboardSendModal({
               </span>
             </div>
           ) : null}
-          <div className="relative z-[2] bg-[#111518] rounded-[18px]">
+          <div className="relative z-[2]">
             <div className="flex items-center justify-between mb-2">
               <label
                 className="text-[13px] tracking-normal font-medium text-white/55"
@@ -1319,6 +1319,7 @@ export default function WalletDashboardSendModal({
                 </span>
               ) : null}
             </div>
+            <div className="bg-[#111518] rounded-[18px]">
             <TokenAmountInput
               value={sendAmount}
               onChange={setSendAmount}
@@ -1339,6 +1340,7 @@ export default function WalletDashboardSendModal({
               tokenClassName="text-white/70 drop-shadow-sm text-2xl md:text-3xl font-semibold"
               containerClassName="pt-5 pb-5 rounded-[18px] bg-[#111518] ring-1 ring-white/10 ring-inset transition-all duration-200 shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30)] focus-within:ring-white/25 focus-within:shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30),0_0_0_1px_rgba(255,255,255,0.10),0_0_24px_rgba(255,255,255,0.06)] wallet-amount-shimmer [&_input]:!text-4xl [&_input]:md:!text-5xl [&_input]:font-bold [&_input]:placeholder:text-white/35"
             />
+            </div>
             {manualInsufficientBalance ? (
               <div className="mt-2 rounded-lg ring-1 ring-orange-400/30 ring-inset bg-orange-400/10 px-3 py-2 text-xs text-orange-200/90">
                 <div className="font-semibold">
@@ -1665,8 +1667,8 @@ export default function WalletDashboardSendModal({
           >
             {/* Ambient glow */}
             <div className="pointer-events-none absolute inset-0" aria-hidden>
-              <div className={`absolute inset-0 md:hidden ${hasPaymentRequest ? 'bg-[radial-gradient(700px_circle_at_100%_50%,rgba(245,166,35,0.12),transparent_60%)]' : 'bg-[radial-gradient(700px_circle_at_100%_50%,rgba(0,255,150,0.12),transparent_60%)]'}`} />
-              <div className={`absolute inset-0 hidden md:block ${hasPaymentRequest ? 'bg-[radial-gradient(1000px_circle_at_100%_50%,rgba(245,166,35,0.12),transparent_60%)]' : 'bg-[radial-gradient(1000px_circle_at_100%_50%,rgba(0,255,150,0.12),transparent_60%)]'}`} />
+              <div className={`absolute inset-0 md:hidden ${hasPaymentRequest ? 'bg-[radial-gradient(700px_circle_at_100%_50%,rgba(245,166,35,0.07),transparent_60%)]' : 'bg-[radial-gradient(700px_circle_at_100%_50%,rgba(0,255,150,0.07),transparent_60%)]'}`} />
+              <div className={`absolute inset-0 hidden md:block ${hasPaymentRequest ? 'bg-[radial-gradient(1000px_circle_at_100%_50%,rgba(245,166,35,0.07),transparent_60%)]' : 'bg-[radial-gradient(1000px_circle_at_100%_50%,rgba(0,255,150,0.07),transparent_60%)]'}`} />
             </div>
             <div className="relative z-10 flex flex-col flex-1 min-h-0">
             {!inline ? (
