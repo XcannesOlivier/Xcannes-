@@ -620,7 +620,7 @@ export default function WalletDashboardSendChoiceModal({
           <div className={inline ? 'w-full h-full' : 'relative z-10 pointer-events-auto w-full md:max-w-lg wallet-modal-lift-in'}>
             <div
               ref={subModalRef}
-              className={inline ? 'relative w-full h-full overflow-hidden flex flex-col bg-elevated rounded-xl' : 'relative w-full wallet-modal-panel wallet-cash-modal border-white/10 md:border overflow-hidden flex flex-col bg-elevated h-screen md:h-auto md:max-h-[80vh] rounded-none md:rounded-2xl pb-[env(safe-area-inset-bottom)]'}
+              className={inline ? 'relative w-full h-full overflow-hidden flex flex-col bg-elevated rounded-xl' : 'relative w-full wallet-modal-panel wallet-cash-modal border-white/10 md:border overflow-hidden flex flex-col bg-elevated h-screen md:h-auto md:max-h-[80vh] rounded-none md:rounded-2xl pb-[env(safe-area-inset-bottom)] shadow-[6px_12px_40px_rgba(255,255,255,0.04),0_0_0_1px_rgba(255,255,255,0.03)]'}
               style={!inline && overlayTranslateY ? { transform: `translateY(${Math.max(0, overlayTranslateY)}px)`, transition: overlayDragging ? 'none' : 'transform 220ms cubic-bezier(0.2,0,0,1)' } : undefined}
               onPointerDown={handleSubModalPillDown}
             >
@@ -821,7 +821,7 @@ export default function WalletDashboardSendChoiceModal({
           {!inline ? <div className="fixed inset-0 bg-black/70 md:backdrop-blur-sm pointer-events-auto wallet-modal-backdrop-in" onClick={() => setSubModal(null)} style={overlayTranslateY > 0 ? { opacity: Math.max(0, 1 - overlayTranslateY / 420) } : undefined} /> : null}
           <div className={inline ? 'w-full h-full' : 'relative z-10 pointer-events-auto w-full md:max-w-lg wallet-modal-lift-in'}>
             <div
-              className={inline ? 'relative w-full h-full overflow-hidden flex flex-col bg-elevated rounded-xl' : 'relative w-full wallet-modal-panel wallet-cash-modal border-white/10 md:border overflow-hidden flex flex-col bg-elevated h-screen md:h-auto md:max-h-[80vh] rounded-none md:rounded-2xl pb-[env(safe-area-inset-bottom)]'}
+              className={inline ? 'relative w-full h-full overflow-hidden flex flex-col bg-elevated rounded-xl' : 'relative w-full wallet-modal-panel wallet-cash-modal border-white/10 md:border overflow-hidden flex flex-col bg-elevated h-screen md:h-auto md:max-h-[80vh] rounded-none md:rounded-2xl pb-[env(safe-area-inset-bottom)] shadow-[6px_12px_40px_rgba(255,255,255,0.04),0_0_0_1px_rgba(255,255,255,0.03)]'}
               style={!inline && overlayTranslateY ? { transform: `translateY(${Math.max(0, overlayTranslateY)}px)`, transition: overlayDragging ? 'none' : 'transform 220ms cubic-bezier(0.2,0,0,1)' } : undefined}
               onPointerDown={handleSubModalPillDown}
             >
@@ -862,7 +862,7 @@ export default function WalletDashboardSendChoiceModal({
                       pillClassName: 'bg-elevated px-6 py-1.5 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)] gap-6',
                       prefixClassName: '!text-white/70 text-[14px] md:text-[15px] font-medium tracking-wide mr-6',
                       labelClassName: '!text-white/95 text-[14px] md:text-[15px] font-semibold',
-                      dotClassName: '!h-3 !w-3 ring-xcannes-green/20 self-center',
+                      dotClassName: '!h-3 !w-3 !bg-[#f5a623] ring-[#f5a623]/20 self-center',
                     })}
                   </div>
                 </div>

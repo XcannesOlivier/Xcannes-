@@ -1196,7 +1196,7 @@ export default function WalletDashboardSendModal({
         {/* ── Devise + Montant (séparés) – masqués en mode payreq ── */}
         {!hasPaymentRequest && (
         <div className={`transition-opacity duration-300 space-y-4 ${hasDestination ? 'opacity-100' : 'opacity-30 pointer-events-none select-none'}`}>
-          <h3 className="text-[24px] md:text-[34px] font-bold text-white/95 tracking-tight text-center leading-snug">
+          <h3 className="text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight text-center leading-snug">
             {t("ui_send_modal_title", "Envoi simple")}
           </h3>
           <p className="text-[14px] md:text-[15px] text-white/55 text-center leading-relaxed -mt-2">
@@ -1643,6 +1643,7 @@ export default function WalletDashboardSendModal({
               ? "none"
               : "transform 220ms cubic-bezier(0.2,0,0,1)",
             willChange: overlayTranslateY ? "transform" : undefined,
+            touchAction: inline ? undefined : "none",
           }}
           onPointerMove={handleOverlayPointerMove}
           onPointerUp={handleOverlayPointerEnd}
@@ -1661,7 +1662,7 @@ export default function WalletDashboardSendModal({
             <div className="relative z-10 flex flex-col flex-1 min-h-0">
             {!inline ? (
               <div
-                className="md:hidden flex justify-center pt-0 pb-0"
+                className="md:hidden flex justify-center pt-0 pb-0 touch-none"
                 aria-hidden
                 onPointerDown={(event) => {
                   maybeStartOverlayDrag(event, "fixed");
@@ -1678,7 +1679,7 @@ export default function WalletDashboardSendModal({
               </button>
             </div>
             <div
-              className={`flex items-start justify-between gap-3 relative z-[65] ${hasPaymentRequest ? 'mb-[110px] md:mb-[116px]' : 'mb-[54px] md:mb-[60px]'}`}
+              className={`flex items-start justify-between gap-3 relative z-[65] touch-none ${hasPaymentRequest ? 'mb-[110px] md:mb-[116px]' : 'mb-[54px] md:mb-[60px]'}`}
               onPointerDown={(event) => {
                 maybeStartOverlayDrag(event, "fixed");
               }}
@@ -1696,6 +1697,7 @@ export default function WalletDashboardSendModal({
             <div
               ref={scrollContainerRef}
               className="flex-1 overflow-y-auto -mx-4 px-4 md:-mx-5 md:px-5"
+              style={{ touchAction: 'pan-y' }}
               onPointerDown={(event) => {
                 maybeStartOverlayDrag(event, "list");
               }}
