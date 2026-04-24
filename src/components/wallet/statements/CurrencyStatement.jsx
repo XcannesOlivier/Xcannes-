@@ -1616,6 +1616,7 @@ export default function CurrencyStatement({
                 transition: overlayDragging
                   ? "none"
                   : "transform 220ms cubic-bezier(0.2,0,0,1)",
+                opacity: overlayTranslateY > 0 ? Math.max(0, Math.min(1, 1 - overlayTranslateY / 420)) : undefined,
                 willChange: overlayTranslateY ? "transform" : undefined,
               }
             : {}),
