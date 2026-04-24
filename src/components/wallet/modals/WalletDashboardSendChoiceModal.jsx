@@ -256,6 +256,7 @@ export default function WalletDashboardSendChoiceModal({
       setOverlayDragging(false);
       if (shouldClose) {
         setOverlayTranslateY(Math.max(delta, height));
+        closeRequestedRef.current = true;
         window.setTimeout(() => { onClose?.(); }, 180);
       } else {
         setOverlayTranslateY(0);
