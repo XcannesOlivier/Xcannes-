@@ -1305,7 +1305,7 @@ export default function WalletDashboardSendModal({
               </span>
             </div>
           ) : null}
-          <div>
+          <div className="relative z-[2]">
             <div className="flex items-center justify-between mb-2">
               <label
                 className="text-[13px] tracking-normal font-medium text-white/55"
@@ -1665,7 +1665,8 @@ export default function WalletDashboardSendModal({
           >
             {/* Ambient glow */}
             <div className="pointer-events-none absolute inset-0" aria-hidden>
-              <div className={`absolute inset-0 ${hasPaymentRequest ? 'bg-[radial-gradient(600px_circle_at_100%_50%,rgba(245,166,35,0.12),transparent_60%)]' : 'bg-[radial-gradient(600px_circle_at_100%_50%,rgba(0,255,150,0.12),transparent_60%)]'}`} />
+              <div className={`absolute inset-0 md:hidden ${hasPaymentRequest ? 'bg-[radial-gradient(700px_circle_at_100%_50%,rgba(245,166,35,0.12),transparent_60%)]' : 'bg-[radial-gradient(700px_circle_at_100%_50%,rgba(0,255,150,0.12),transparent_60%)]'}`} />
+              <div className={`absolute inset-0 hidden md:block ${hasPaymentRequest ? 'bg-[radial-gradient(1000px_circle_at_100%_50%,rgba(245,166,35,0.12),transparent_60%)]' : 'bg-[radial-gradient(1000px_circle_at_100%_50%,rgba(0,255,150,0.12),transparent_60%)]'}`} />
             </div>
             <div className="relative z-10 flex flex-col flex-1 min-h-0">
             {!inline ? (
