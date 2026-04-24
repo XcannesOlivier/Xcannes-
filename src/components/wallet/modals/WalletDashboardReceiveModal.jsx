@@ -1185,11 +1185,25 @@ export default function WalletDashboardReceiveModal({
             onClick={e => {
               if (!inline) e.stopPropagation();
             }}
-            style={{ backgroundImage: 'radial-gradient(400px circle at 88% 0%, rgba(255,255,255,0.07) 0%, transparent 50%), radial-gradient(600px circle at 100% 75%, rgba(0,255,150,0.06) 0%, transparent 60%)' }}
             onPointerDown={event => {
               if (!disableSwipeToClose) maybeStartOverlayDrag(event, 'list');
             }}
           >
+            {/* Ambient glow */}
+            <div className="pointer-events-none absolute inset-0" aria-hidden>
+              {!hasGeneratedRequest ? (
+                <>
+                  <div className="absolute inset-0 md:hidden bg-[radial-gradient(700px_circle_at_100%_50%,rgba(0,255,150,0.07),transparent_60%)]" />
+                  <div className="absolute inset-0 hidden md:block bg-[radial-gradient(1000px_circle_at_100%_50%,rgba(0,255,150,0.07),transparent_60%)]" />
+                </>
+              ) : (
+                <>
+                  <div className="absolute inset-0 bg-[radial-gradient(400px_circle_at_88%_0%,rgba(255,255,255,0.07),transparent_50%)]" />
+                  <div className="absolute inset-0 md:hidden bg-[radial-gradient(900px_circle_at_100%_75%,rgba(0,255,150,0.06),transparent_60%)]" />
+                  <div className="absolute inset-0 hidden md:block bg-[radial-gradient(1300px_circle_at_100%_75%,rgba(0,255,150,0.06),transparent_60%)]" />
+                </>
+              )}
+            </div>
             {!inline ? (
               <div
                 className={`md:hidden flex justify-center -mt-1 pt-1 ${receiveView === 'choice' ? 'pb-4' : 'pb-2'}`}
