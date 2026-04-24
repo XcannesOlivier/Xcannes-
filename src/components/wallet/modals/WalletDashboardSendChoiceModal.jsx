@@ -230,6 +230,7 @@ export default function WalletDashboardSendChoiceModal({
   const handleSubModalPillDown = useCallback((event) => {
     if (inline) return;
     if (!event?.isPrimary || event.pointerType === 'mouse') return;
+    if (event.target?.closest?.('input,textarea,select,button,a,[role="button"]')) return;
     subSwipeMeta.current = { startY: event.clientY, startAt: Date.now(), pointerId: event.pointerId, lastDeltaY: 0, dragging: false };
 
     const onMove = (e) => {
@@ -620,6 +621,7 @@ export default function WalletDashboardSendChoiceModal({
               ref={subModalRef}
               className={inline ? 'relative w-full h-full overflow-hidden flex flex-col bg-elevated rounded-xl' : 'relative w-full wallet-modal-panel wallet-cash-modal border-white/10 md:border overflow-hidden flex flex-col bg-elevated h-screen md:h-auto md:max-h-[80vh] rounded-none md:rounded-2xl pb-[env(safe-area-inset-bottom)]'}
               style={!inline && overlayTranslateY ? { transform: `translateY(${Math.max(0, overlayTranslateY)}px)`, transition: overlayDragging ? 'none' : 'transform 220ms cubic-bezier(0.2,0,0,1)' } : undefined}
+              onPointerDown={handleSubModalPillDown}
             >
               {/* Glow */}
               <div className="pointer-events-none absolute inset-0" aria-hidden>
@@ -628,11 +630,7 @@ export default function WalletDashboardSendChoiceModal({
               <div className="relative z-10 flex flex-col flex-1 min-h-0">
                 {/* Swipe bar – mobile only */}
                 {!inline ? (
-                  <div
-                    className="md:hidden flex justify-center -mt-1 pt-1 pb-2"
-                    aria-hidden
-                    onPointerDown={handleSubModalPillDown}
-                  >
+                  <div className="md:hidden flex justify-center -mt-1 pt-1 pb-2" aria-hidden>
                     <span className="block w-12 h-1.5 rounded-full bg-white/20" />
                   </div>
                 ) : null}
@@ -824,6 +822,7 @@ export default function WalletDashboardSendChoiceModal({
             <div
               className={inline ? 'relative w-full h-full overflow-hidden flex flex-col bg-elevated rounded-xl' : 'relative w-full wallet-modal-panel wallet-cash-modal border-white/10 md:border overflow-hidden flex flex-col bg-elevated h-screen md:h-auto md:max-h-[80vh] rounded-none md:rounded-2xl pb-[env(safe-area-inset-bottom)]'}
               style={!inline && overlayTranslateY ? { transform: `translateY(${Math.max(0, overlayTranslateY)}px)`, transition: overlayDragging ? 'none' : 'transform 220ms cubic-bezier(0.2,0,0,1)' } : undefined}
+              onPointerDown={handleSubModalPillDown}
             >
               {/* Glow */}
               <div className="pointer-events-none absolute inset-0" aria-hidden>
@@ -832,11 +831,7 @@ export default function WalletDashboardSendChoiceModal({
               <div className="relative z-10 flex flex-col flex-1 min-h-0">
                 {/* Swipe bar – mobile only */}
                 {!inline ? (
-                  <div
-                    className="md:hidden flex justify-center -mt-1 pt-1 pb-2"
-                    aria-hidden
-                    onPointerDown={handleSubModalPillDown}
-                  >
+                  <div className="md:hidden flex justify-center -mt-1 pt-1 pb-2" aria-hidden>
                     <span className="block w-12 h-1.5 rounded-full bg-white/20" />
                   </div>
                 ) : null}
