@@ -1678,7 +1678,7 @@ export default function WalletDashboardSendModal({
               </button>
             </div>
             <div
-              className="flex items-start justify-between gap-3 mb-5 relative z-[65]"
+              className={`flex items-start justify-between gap-3 relative z-[65] ${hasPaymentRequest ? 'mb-[90px] md:mb-[96px]' : 'mb-[54px] md:mb-[60px]'}`}
               onPointerDown={(event) => {
                 maybeStartOverlayDrag(event, "fixed");
               }}
