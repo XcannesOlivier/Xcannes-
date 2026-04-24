@@ -1101,7 +1101,7 @@ export default function WalletDashboardReceiveModal({
     receiveView === 'choice'
       ? t('ui_receive_choice_subtitle', 'Choisissez comment recevoir un paiement.')
       : receiveView === 'share'
-        ? t('ui_receive_choice_share_desc', 'Partager le QR code ou l’adresse de réception associés à votre compte.')
+        ? t('ui_receive_choice_share_desc', 'Partager le QR code ou votre adresse de réception.')
         : receiveView === 'request_qr'
           ? t('ui_request_qr_subtitle', 'Scannez ou partagez ce QR code.')
         : t('ui_receive_choice_request_desc', 'Définissez un montant, une devise et un message optionnel.');

@@ -1670,11 +1670,11 @@ export default function WalletDashboardSendModal({
                 <span className="block w-12 h-1.5 rounded-full bg-white/20" />
               </div>
             ) : null}
-            {/* Back chevron */}
-            <div className="px-1 pt-2 pb-1 flex items-center relative z-[65]">
+            {/* Back chevron – masqué sur mobile (remplacé par le swipe) */}
+            <div className="hidden md:flex px-1 pt-2 pb-1 items-center relative z-[65]">
               <button type="button" onClick={onBack || onClose} className="text-white/55 hover:text-white transition-colors flex items-center gap-1" aria-label={t('ui_back', 'Retour')}>
                 <svg viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5" aria-hidden><path fillRule="evenodd" d="M11.78 3.22a.75.75 0 0 1 0 1.06L7.06 9l4.72 4.72a.75.75 0 1 1-1.06 1.06l-5.25-5.25a.75.75 0 0 1 0-1.06l5.25-5.25a.75.75 0 0 1 1.06 0Z" clipRule="evenodd" /></svg>
-                <span className="hidden md:inline text-[13px] font-medium">{t('ui_back', 'Retour')}</span>
+                <span className="text-[13px] font-medium">{t('ui_back', 'Retour')}</span>
               </button>
             </div>
             <div
