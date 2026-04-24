@@ -1323,7 +1323,7 @@ export default function WalletDashboardReceiveModal({
                   <div className="pointer-events-none absolute inset-0 z-0" aria-hidden>
                     <div className="absolute inset-0 bg-[radial-gradient(620px_circle_at_100%_75%,rgba(0,255,150,0.09),transparent_58%)]" />
                   </div>
-	                  {/* SECTION 1 — RECEIVE FUNDS */}}
+	                  {/* SECTION 1 — RECEIVE FUNDS */}
 	                  <div className="space-y-5 pt-2">
 
 	                    {/* ── Centered wallet pill (style "Depuis le compte") ── */}
