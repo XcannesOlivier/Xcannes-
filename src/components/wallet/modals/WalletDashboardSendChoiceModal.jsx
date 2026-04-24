@@ -708,19 +708,19 @@ export default function WalletDashboardSendChoiceModal({
                   </div>
                   <style jsx>{`
                     .send-choice-scan-btn {
-                      background: transparent;
-                      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12);
+                      background: linear-gradient(to bottom, #101415, #0d1214);
+                      box-shadow: 0 2px 8px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.06), inset 0 0 0 1px rgba(255,255,255,0.07);
                       color: rgba(255,255,255,0.75);
                     }
-                    .send-choice-scan-btn:hover { background: rgba(255,255,255,0.04); }
+                    .send-choice-scan-btn:hover { background: linear-gradient(to bottom, #161b1c, #111517); }
                     .send-choice-scan-btn svg { color: rgba(255,255,255,0.55); width: 1.15rem; height: 1.15rem; }
                     .send-choice-scan-btn span { color: rgba(255,255,255,0.75); font-size: 15px; font-weight: 500; }
                     .send-choice-import-btn {
-                      background: transparent;
-                      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12);
+                      background: linear-gradient(to bottom, #101415, #0d1214);
+                      box-shadow: 0 2px 8px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.06), inset 0 0 0 1px rgba(255,255,255,0.07);
                       color: rgba(255,255,255,0.75);
                     }
-                    .send-choice-import-btn:hover { background: rgba(255,255,255,0.04); }
+                    .send-choice-import-btn:hover { background: linear-gradient(to bottom, #161b1c, #111517); }
                     .send-choice-scan-btn svg { color: rgba(255,255,255,0.75); width: 1.3rem; height: 1.3rem; }
                     .send-choice-import-btn span { color: rgba(255,255,255,0.75); font-size: 14px; font-weight: 500; }
                     @media (min-width: 768px) {
@@ -733,7 +733,7 @@ export default function WalletDashboardSendChoiceModal({
 
                   {/* Paste input */}
                   <div className="relative">
-                    <input id="quickscan-paste-input" type="text" value={quickscanPasteValue} onChange={(e) => { setQuickscanPasteValue(e.target.value); setShowQuickscanSavedPicker(false); setSimpleSendSelfError(false); }} onKeyDown={(e) => { if (e.key === 'Enter') handleQuickscanPasteSubmit(); }} onPaste={(e) => { const text = (e.clipboardData?.getData('text') || '').trim(); if (text) { e.preventDefault(); setQuickscanPasteValue(text); setShowQuickscanSavedPicker(false); if (normalizedCurrentWallet && text === normalizedCurrentWallet) { setSimpleSendSelfError(true); return; } setSimpleSendSelfError(false); setTimeout(() => { setSendDestination?.(text); setSendDestinationLabel?.(''); onChooseSimpleSend?.(); }, 50); } }} placeholder={t('ui_paste_address_placeholder', 'Coller ou saisir une adresse')} className="w-full bg-elevated ring-1 ring-white/15 ring-inset rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.4)] pl-4 pr-12 py-3 text-[15px] text-white placeholder:text-white/35 outline-none focus:ring-2 focus:ring-xcannes-green/60" />
+                    <input id="quickscan-paste-input" type="text" value={quickscanPasteValue} onChange={(e) => { setQuickscanPasteValue(e.target.value); setShowQuickscanSavedPicker(false); setSimpleSendSelfError(false); }} onKeyDown={(e) => { if (e.key === 'Enter') handleQuickscanPasteSubmit(); }} onPaste={(e) => { const text = (e.clipboardData?.getData('text') || '').trim(); if (text) { e.preventDefault(); setQuickscanPasteValue(text); setShowQuickscanSavedPicker(false); if (normalizedCurrentWallet && text === normalizedCurrentWallet) { setSimpleSendSelfError(true); return; } setSimpleSendSelfError(false); setTimeout(() => { setSendDestination?.(text); setSendDestinationLabel?.(''); onChooseSimpleSend?.(); }, 50); } }} placeholder={t('ui_paste_address_placeholder', 'Coller ou saisir une adresse')} className="w-full bg-[#111518] ring-1 ring-white/10 ring-inset rounded-xl shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30)] pl-4 pr-12 py-3 text-[15px] text-white placeholder:text-white/35 outline-none focus:ring-white/25 focus:shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30),0_0_0_1px_rgba(255,255,255,0.10),0_0_24px_rgba(255,255,255,0.06)] transition-all duration-200" />
                     {quickscanPasteValue.trim() ? (<button type="button" onClick={handleQuickscanPasteSubmit} className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg bg-xcannes-green/20 hover:bg-xcannes-green/30 text-xcannes-green transition-colors" title={t('ui_go_label', 'Valider')}><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg></button>) : null}
                   </div>
 
@@ -900,19 +900,19 @@ export default function WalletDashboardSendChoiceModal({
                   </div>
                   <style jsx>{`
                     .payreq-scan-btn {
-                      background: transparent;
-                      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12);
+                      background: linear-gradient(to bottom, #101415, #0d1214);
+                      box-shadow: 0 2px 8px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.06), inset 0 0 0 1px rgba(255,255,255,0.07);
                       color: rgba(255,255,255,0.75);
                     }
-                    .payreq-scan-btn:hover { background: rgba(255,255,255,0.04); }
+                    .payreq-scan-btn:hover { background: linear-gradient(to bottom, #161b1c, #111517); }
                     .payreq-scan-btn svg { color: rgba(255,255,255,0.55); width: 1.15rem; height: 1.15rem; }
                     .payreq-scan-btn span { color: rgba(255,255,255,0.75); font-size: 15px; font-weight: 500; }
                     .payreq-import-btn {
-                      background: transparent;
-                      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12);
+                      background: linear-gradient(to bottom, #101415, #0d1214);
+                      box-shadow: 0 2px 8px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.06), inset 0 0 0 1px rgba(255,255,255,0.07);
                       color: rgba(255,255,255,0.75);
                     }
-                    .payreq-import-btn:hover { background: rgba(255,255,255,0.04); }
+                    .payreq-import-btn:hover { background: linear-gradient(to bottom, #161b1c, #111517); }
                     .payreq-scan-btn svg { color: rgba(255,255,255,0.75); width: 1.3rem; height: 1.3rem; }
                     .payreq-import-btn span { color: rgba(255,255,255,0.75); font-size: 14px; font-weight: 500; }
                     @media (min-width: 768px) {
@@ -925,7 +925,7 @@ export default function WalletDashboardSendChoiceModal({
 
                   {/* Paste input */}
                   <div className="relative">
-                    <input type="text" value={payreqPasteValue} onChange={(e) => { setPayreqPasteValue(e.target.value); setPayreqSelfSendError(false); }} onKeyDown={(e) => { if (e.key === 'Enter') handlePayreqPasteSubmit(); }} onPaste={(e) => { const text = (e.clipboardData?.getData('text') || '').trim(); if (text) { e.preventDefault(); setPayreqPasteValue(text); if (isPayreqSelfSend(text)) { setPayreqSelfSendError(true); return; } setPayreqSelfSendError(false); setTimeout(() => { handlePaymentRequestScan?.(text); onChoosePayRequest?.(); }, 50); } }} placeholder={t('ui_paste_payreq_placeholder', 'Coller une demande de paiement')} className="w-full bg-elevated ring-1 ring-white/15 ring-inset rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.4)] pl-4 pr-12 py-3 text-[15.5px] text-white placeholder:text-white/80 outline-none focus:ring-2 focus:ring-[#f5a623]/50" />
+                    <input type="text" value={payreqPasteValue} onChange={(e) => { setPayreqPasteValue(e.target.value); setPayreqSelfSendError(false); }} onKeyDown={(e) => { if (e.key === 'Enter') handlePayreqPasteSubmit(); }} onPaste={(e) => { const text = (e.clipboardData?.getData('text') || '').trim(); if (text) { e.preventDefault(); setPayreqPasteValue(text); if (isPayreqSelfSend(text)) { setPayreqSelfSendError(true); return; } setPayreqSelfSendError(false); setTimeout(() => { handlePaymentRequestScan?.(text); onChoosePayRequest?.(); }, 50); } }} placeholder={t('ui_paste_payreq_placeholder', 'Coller une demande de paiement')} className="w-full bg-[#111518] ring-1 ring-white/10 ring-inset rounded-xl shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30)] pl-4 pr-12 py-3 text-[15.5px] text-white placeholder:text-white/80 outline-none focus:ring-white/25 focus:shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30),0_0_0_1px_rgba(255,255,255,0.10),0_0_24px_rgba(255,255,255,0.06)] transition-all duration-200" />
                     {payreqPasteValue.trim() ? (<button type="button" onClick={handlePayreqPasteSubmit} className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg bg-[#f5a623]/20 hover:bg-[#f5a623]/30 text-[#f5a623] transition-colors" title={t('ui_go_label', 'Valider')}><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg></button>) : null}
                   </div>
 
