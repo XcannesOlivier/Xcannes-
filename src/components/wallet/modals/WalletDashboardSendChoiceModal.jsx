@@ -30,6 +30,12 @@ export default function WalletDashboardSendChoiceModal({
 
   // ── Sub-modal state ──────────────────────────────────────────
   const [subModal, setSubModal] = useState(null); // 'quickscan' | 'payreq' | null
+  // Reset la translation du parent quand on ouvre un sous-modal
+  const openSubModal = useCallback((name) => {
+    setOverlayTranslateY(0);
+    setOverlayDragging(false);
+    setSubModal(name);
+  }, []);
   const [showSteps, setShowSteps] = useState(false);
   const [showPayreqSteps, setShowPayreqSteps] = useState(true);
   const [payreqPasteValue, setPayreqPasteValue] = useState('');
@@ -390,17 +396,17 @@ export default function WalletDashboardSendChoiceModal({
   const content = (
     <>
       {/* Backdrop */}
-      {!inline ? (
-        <div
-          className={`fixed inset-0 z-[10000] bg-black/80 md:backdrop-blur-sm ${backdropAnimClass}`}
-          onClick={onClose}
-          style={
-            overlayTranslateY > 0
-              ? { opacity: Math.max(0, Math.min(1, 1 - overlayTranslateY / 420)) }
-              : undefined
-          }
-        />
-      ) : null}
+          {!inline ? <div
+            className={`fixed inset-0 z-[10000] bg-black/80 md:backdrop-blur-sm ${backdropAnimClass}`}
+            onClick={onClose}
+            style={
+              subModal
+                ? { opacity: overlayTranslateY > 0 ? Math.max(0, Math.min(1, 1 - overlayTranslateY / 420)) : 0 }
+                : overlayTranslateY > 0
+                  ? { opacity: Math.max(0, Math.min(1, 1 - overlayTranslateY / 420)) }
+                  : undefined
+            }
+          /> : null}
 
       {/* Modal */}
       <div className={wrapperClass}>
@@ -411,6 +417,7 @@ export default function WalletDashboardSendChoiceModal({
             transform: `translateY(${Math.max(0, overlayTranslateY)}px)`,
             transition: overlayDragging ? 'none' : 'transform 220ms cubic-bezier(0.2,0,0,1)',
             willChange: overlayTranslateY ? 'transform' : undefined,
+            visibility: subModal ? 'hidden' : undefined,
           }}
           onPointerMove={handleOverlayPointerMove}
           onPointerUp={handleOverlayPointerEnd}
@@ -482,7 +489,7 @@ export default function WalletDashboardSendChoiceModal({
                     <button
                       type="button"
                       onClick={() => {
-                        setSubModal('quickscan');
+                        openSubModal('quickscan');
                         setTimeout(() => {
                           document.getElementById('quickscan-paste-input')?.focus();
                         }, 280);
@@ -541,7 +548,7 @@ export default function WalletDashboardSendChoiceModal({
                   {/* ── 1. Envoi simple ── */}
                   <button
                     type="button"
-                    onClick={() => setSubModal('quickscan')}
+                    onClick={() => openSubModal('quickscan')}
                     className={cardClassName}
                   >
                     <div className="flex items-center gap-3">
@@ -567,7 +574,7 @@ export default function WalletDashboardSendChoiceModal({
                   {/* ── 2. Payer une demande ── */}
                   <button
                     type="button"
-                    onClick={() => setSubModal('payreq')}
+                    onClick={() => openSubModal('payreq')}
                     className={cardClassName}
                   >
                     <div className="flex items-center gap-3">
@@ -812,19 +819,32 @@ export default function WalletDashboardSendChoiceModal({
       {/* ═══ Sub-modal: Payer une demande ═══ */}
       {subModal === 'payreq' ? (
         <div className={inline ? 'absolute inset-0 z-50 flex' : 'fixed inset-0 z-[10100] flex items-end md:items-center justify-center md:px-4 pointer-events-none'}>
-          {!inline ? <div className="fixed inset-0 bg-black/70 md:backdrop-blur-sm pointer-events-auto wallet-modal-backdrop-in" onClick={() => setSubModal(null)} /> : null}
+          {!inline ? <div className="fixed inset-0 bg-black/70 md:backdrop-blur-sm pointer-events-auto wallet-modal-backdrop-in" onClick={() => setSubModal(null)} style={overlayTranslateY > 0 ? { opacity: Math.max(0, 1 - overlayTranslateY / 420) } : undefined} /> : null}
           <div className={inline ? 'w-full h-full' : 'relative z-10 pointer-events-auto w-full md:max-w-lg wallet-modal-lift-in'}>
-            <div className={inline ? 'relative w-full h-full overflow-hidden flex flex-col bg-elevated rounded-xl' : 'relative w-full wallet-modal-panel wallet-cash-modal border-white/10 md:border overflow-hidden flex flex-col bg-elevated h-screen md:h-auto md:max-h-[80vh] rounded-none md:rounded-2xl pb-[env(safe-area-inset-bottom)]'}>
+            <div
+              className={inline ? 'relative w-full h-full overflow-hidden flex flex-col bg-elevated rounded-xl' : 'relative w-full wallet-modal-panel wallet-cash-modal border-white/10 md:border overflow-hidden flex flex-col bg-elevated h-screen md:h-auto md:max-h-[80vh] rounded-none md:rounded-2xl pb-[env(safe-area-inset-bottom)]'}
+              style={!inline && overlayTranslateY ? { transform: `translateY(${Math.max(0, overlayTranslateY)}px)`, transition: overlayDragging ? 'none' : 'transform 220ms cubic-bezier(0.2,0,0,1)' } : undefined}
+            >
               {/* Glow */}
               <div className="pointer-events-none absolute inset-0" aria-hidden>
                 <div className="absolute inset-0 bg-[radial-gradient(600px_circle_at_50%_0%,rgba(245,166,35,0.12),transparent_60%)]" />
               </div>
               <div className="relative z-10 flex flex-col flex-1 min-h-0">
-                {/* Back button */}
-                <div className="px-5 pt-4 pb-2 flex items-center">
+                {/* Swipe bar – mobile only */}
+                {!inline ? (
+                  <div
+                    className="md:hidden flex justify-center -mt-1 pt-1 pb-2"
+                    aria-hidden
+                    onPointerDown={handleSubModalPillDown}
+                  >
+                    <span className="block w-12 h-1.5 rounded-full bg-white/20" />
+                  </div>
+                ) : null}
+                {/* Back button – masqué sur mobile (remplacé par le swipe) */}
+                <div className="hidden md:flex px-5 pt-4 pb-2 items-center">
                   <button type="button" onClick={() => setSubModal(null)} className="text-white/70 hover:text-white transition-colors flex items-center gap-1" aria-label={t('ui_back', 'Retour')}>
                     <svg viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5" aria-hidden><path fillRule="evenodd" d="M11.78 3.22a.75.75 0 0 1 0 1.06L7.06 9l4.72 4.72a.75.75 0 1 1-1.06 1.06l-5.25-5.25a.75.75 0 0 1 0-1.06l5.25-5.25a.75.75 0 0 1 1.06 0Z" clipRule="evenodd" /></svg>
-                    <span className="hidden md:inline text-[13px] font-medium">{t('ui_back', 'Retour')}</span>
+                    <span className="text-[13px] font-medium">{t('ui_back', 'Retour')}</span>
                   </button>
                 </div>
                 <div className="px-5 pt-3 pb-5 flex flex-col flex-1 min-h-0">
