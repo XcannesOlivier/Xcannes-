@@ -258,6 +258,8 @@ export default function WalletDashboardSendChoiceModal({
     window.addEventListener('pointerup', onEnd);
     window.addEventListener('pointercancel', onEnd);
   }, [inline, onClose]);
+
+  useEffect(() => {
     const resetMeta = {
       startY: 0, startAt: 0, pointerId: null, lastDelta: 0,
       pending: false, source: null, dragging: false,
