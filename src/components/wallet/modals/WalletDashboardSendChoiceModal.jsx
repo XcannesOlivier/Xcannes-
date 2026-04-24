@@ -627,7 +627,7 @@ export default function WalletDashboardSendChoiceModal({
             >
               {/* Glow */}
               <div className="pointer-events-none absolute inset-0" aria-hidden>
-                <div className="absolute inset-0 bg-[radial-gradient(600px_circle_at_100%_25%,rgba(0,255,150,0.08),transparent_60%)]" />
+                <div className="absolute inset-0 bg-[radial-gradient(600px_circle_at_100%_50%,rgba(0,255,150,0.08),transparent_60%)]" />
                 <div className="absolute inset-0 bg-[radial-gradient(400px_circle_at_0%_100%,rgba(255,255,255,0.03),transparent_55%)]" />
               </div>
               <div className="relative z-10 flex flex-col flex-1 min-h-0">
@@ -831,7 +831,7 @@ export default function WalletDashboardSendChoiceModal({
             >
               {/* Glow */}
               <div className="pointer-events-none absolute inset-0" aria-hidden>
-                <div className="absolute inset-0 bg-[radial-gradient(600px_circle_at_100%_25%,rgba(245,166,35,0.12),transparent_60%)]" />
+                <div className="absolute inset-0 bg-[radial-gradient(600px_circle_at_100%_50%,rgba(245,166,35,0.12),transparent_60%)]" />
                 <div className="absolute inset-0 bg-[radial-gradient(400px_circle_at_0%_100%,rgba(255,255,255,0.03),transparent_55%)]" />
               </div>
               <div className="relative z-10 flex flex-col flex-1 min-h-0">
