@@ -418,6 +418,7 @@ export default function WalletDashboardSendChoiceModal({
           style={{
             transform: `translateY(${Math.max(0, overlayTranslateY)}px)`,
             transition: overlayDragging ? 'none' : 'transform 220ms cubic-bezier(0.2,0,0,1)',
+            opacity: overlayTranslateY > 0 ? Math.max(0, Math.min(1, 1 - overlayTranslateY / 420)) : undefined,
             willChange: overlayTranslateY ? 'transform' : undefined,
             visibility: subModal ? 'hidden' : undefined,
           }}
@@ -621,7 +622,7 @@ export default function WalletDashboardSendChoiceModal({
             <div
               ref={subModalRef}
               className={inline ? 'relative w-full h-full overflow-hidden flex flex-col bg-elevated rounded-xl' : 'relative w-full wallet-modal-panel wallet-cash-modal border-white/10 md:border overflow-hidden flex flex-col bg-elevated h-screen md:h-auto md:max-h-[80vh] rounded-none md:rounded-2xl pb-[env(safe-area-inset-bottom)]'}
-              style={!inline && overlayTranslateY ? { transform: `translateY(${Math.max(0, overlayTranslateY)}px)`, transition: overlayDragging ? 'none' : 'transform 220ms cubic-bezier(0.2,0,0,1)' } : undefined}
+              style={!inline && overlayTranslateY ? { transform: `translateY(${Math.max(0, overlayTranslateY)}px)`, transition: overlayDragging ? 'none' : 'transform 220ms cubic-bezier(0.2,0,0,1)', opacity: Math.max(0, Math.min(1, 1 - overlayTranslateY / 420)) } : undefined}
               onPointerDown={handleSubModalPillDown}
             >
               {/* Glow */}
@@ -825,7 +826,7 @@ export default function WalletDashboardSendChoiceModal({
           <div className={inline ? 'w-full h-full' : 'relative z-10 pointer-events-auto w-full md:max-w-lg wallet-modal-lift-in'} style={!inline ? { boxShadow: '8px 16px 48px rgba(255,255,255,0.07), 0 0 0 1px rgba(255,255,255,0.06)' } : undefined}>
             <div
               className={inline ? 'relative w-full h-full overflow-hidden flex flex-col bg-elevated rounded-xl' : 'relative w-full wallet-modal-panel wallet-cash-modal border-white/10 md:border overflow-hidden flex flex-col bg-elevated h-screen md:h-auto md:max-h-[80vh] rounded-none md:rounded-2xl pb-[env(safe-area-inset-bottom)]'}
-              style={!inline && overlayTranslateY ? { transform: `translateY(${Math.max(0, overlayTranslateY)}px)`, transition: overlayDragging ? 'none' : 'transform 220ms cubic-bezier(0.2,0,0,1)' } : undefined}
+              style={!inline && overlayTranslateY ? { transform: `translateY(${Math.max(0, overlayTranslateY)}px)`, transition: overlayDragging ? 'none' : 'transform 220ms cubic-bezier(0.2,0,0,1)', opacity: Math.max(0, Math.min(1, 1 - overlayTranslateY / 420)) } : undefined}
               onPointerDown={handleSubModalPillDown}
             >
               {/* Glow */}
