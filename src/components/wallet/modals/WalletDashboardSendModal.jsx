@@ -1305,7 +1305,7 @@ export default function WalletDashboardSendModal({
               </span>
             </div>
           ) : null}
-          <div className="relative z-[2]">
+          <div className="relative z-[2] bg-[#111518] rounded-[18px]">
             <div className="flex items-center justify-between mb-2">
               <label
                 className="text-[13px] tracking-normal font-medium text-white/55"
