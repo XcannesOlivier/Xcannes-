@@ -253,7 +253,7 @@ export default function WalletDashboardHeader({
 
   return (
     <div
-      className="panel-header flex flex-col shrink-0"
+      className="panel-header flex flex-col shrink-0 rounded-[18px] bg-[#111518] ring-1 ring-white/10 ring-inset shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30)] px-3 pt-3 pb-4 md:px-5 md:pt-4 md:pb-5"
     >
       {/* Titres discrets en haut */}
       <div className="flex items-center justify-between mb-0 md:mb-3">
@@ -288,7 +288,7 @@ export default function WalletDashboardHeader({
       </div>
 
       {/* Solde et info wallet */}
-      <div className="flex flex-col items-center gap-2 pb-4 md:pb-0">
+      <div className="flex flex-col items-center gap-2">
         {/* Bloc wallet — sélecteur + copier + refresh + paramètres */}
         {isConnected && wallet && (
           <div className="w-full mt-1 md:mt-0 mb-2 md:mb-0 px-1 md:px-2 flex justify-center md:justify-between">
@@ -306,7 +306,7 @@ export default function WalletDashboardHeader({
 	                  onClick={(e) => { e.stopPropagation(); closeSwitcher(); }}
 	                />
 	              )}
-	              <div className="flex-1 md:flex-none md:min-w-[360px] min-w-0 rounded-md bg-[#101415] px-2.5 md:px-3 py-2 shadow-none relative z-[41]">
+	              <div className="flex-1 md:flex-none md:min-w-[360px] min-w-0 rounded-[12px] bg-[#0d1214] px-2.5 md:px-3 py-2 ring-1 ring-white/[0.06] ring-inset shadow-[0_2px_6px_rgba(0,0,0,0.4)] relative z-[41]">
 	                <div className="flex items-start justify-between gap-3" ref={switcherRef}>
                   <div className="min-w-0 flex-1">
                     {/* Wallet name + address — clickable when multi-wallet */}
@@ -341,7 +341,7 @@ export default function WalletDashboardHeader({
                     {/* Multi-wallet dropdown — smooth animated */}
                     {isSwitcherOpen && hasMultipleWallets && (
                       <div
-                        className={`absolute z-50 left-0 top-full mt-0 w-full rounded-b-xl bg-[#101415] shadow-[0_12px_48px_rgba(0,0,0,0.45)] max-h-[70vh] md:max-h-[340px] overflow-y-auto overflow-x-hidden origin-top transition-all duration-[100ms] ${
+                        className={`absolute z-50 left-0 top-full mt-0 w-full rounded-b-[12px] bg-[#0d1214] shadow-[0_12px_48px_rgba(0,0,0,0.45)] max-h-[70vh] md:max-h-[340px] overflow-y-auto overflow-x-hidden origin-top transition-all duration-[100ms] ${
                           isSwitcherVisible
                             ? "opacity-100 scale-y-100 translate-y-0 ease-[cubic-bezier(0.16,1,0.3,1)]"
                             : "opacity-0 scale-y-[0.92] -translate-y-1 ease-[cubic-bezier(0.4,0,1,1)]"
