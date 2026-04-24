@@ -631,7 +631,7 @@ export default function WalletDashboardSendChoiceModal({
               <div className="relative z-10 flex flex-col flex-1 min-h-0">
                 {/* Swipe bar – mobile only */}
                 {!inline ? (
-                  <div className="md:hidden flex justify-center -mt-1 pt-1 pb-2" aria-hidden>
+                  <div className="md:hidden flex justify-center pt-3 pb-0" aria-hidden>
                     <span className="block w-12 h-1.5 rounded-full bg-white/20" />
                   </div>
                 ) : null}
@@ -832,7 +832,7 @@ export default function WalletDashboardSendChoiceModal({
               <div className="relative z-10 flex flex-col flex-1 min-h-0">
                 {/* Swipe bar – mobile only */}
                 {!inline ? (
-                  <div className="md:hidden flex justify-center -mt-1 pt-1 pb-2" aria-hidden>
+                  <div className="md:hidden flex justify-center pt-3 pb-0" aria-hidden>
                     <span className="block w-12 h-1.5 rounded-full bg-white/20" />
                   </div>
                 ) : null}
