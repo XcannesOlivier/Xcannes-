@@ -1320,7 +1320,7 @@ export default function WalletDashboardReceiveModal({
               {receiveView === 'share' ? (
                 <>
                   {/* Glow vert — vue share uniquement */}
-                  <div className="pointer-events-none absolute inset-0 z-0" aria-hidden>
+                  <div className="pointer-events-none absolute inset-0 z-[-1]" aria-hidden>
                     <div className="absolute inset-0 bg-[radial-gradient(620px_circle_at_100%_75%,rgba(0,255,150,0.09),transparent_58%)]" />
                   </div>
 	                  {/* SECTION 1 — RECEIVE FUNDS */}
@@ -1629,7 +1629,7 @@ export default function WalletDashboardReceiveModal({
 	              {receiveView === 'request_qr' ? (
 	                <>
 	                  {/* Glow vert — vue request_qr uniquement */}
-	                  <div className="pointer-events-none absolute inset-0 z-0" aria-hidden>
+	                  <div className="pointer-events-none absolute inset-0 z-[-1]" aria-hidden>
 	                    <div className="absolute inset-0 bg-[radial-gradient(620px_circle_at_100%_75%,rgba(0,255,150,0.09),transparent_58%)]" />
 	                  </div>
 		                  {/* SECTION 3 — REQUEST QR */}

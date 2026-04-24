@@ -561,3 +561,30 @@
     animation: none;
   }
 }
+
+/* ====== IMPORT BUTTON GLOW PULSE (desktop) ====== */
+
+@keyframes importBtnGlowPulse {
+  0%   { box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12); }
+  30%  { box-shadow: inset 0 0 0 1px rgba(255,255,255,0.55), 0 0 14px 3px rgba(255,255,255,0.18), 0 0 28px 6px rgba(255,255,255,0.08); }
+  60%  { box-shadow: inset 0 0 0 1px rgba(255,255,255,0.38), 0 0 10px 2px rgba(255,255,255,0.10), 0 0 20px 4px rgba(255,255,255,0.05); }
+  100% { box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12); }
+}
+
+@media (min-width: 768px) {
+  .import-btn-glow-pulse {
+    animation: importBtnGlowPulse 700ms cubic-bezier(0.4, 0, 0.2, 1) 280ms 1 forwards;
+  }
+}
+
+@media (max-width: 767px) {
+  .scan-btn-glow-pulse {
+    animation: importBtnGlowPulse 700ms cubic-bezier(0.4, 0, 0.2, 1) 280ms 1 forwards;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .import-btn-glow-pulse {
+    animation: none;
+  }
+}
