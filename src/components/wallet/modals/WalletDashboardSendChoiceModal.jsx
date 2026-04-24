@@ -691,20 +691,20 @@ export default function WalletDashboardSendChoiceModal({
                     <button
                       type="button"
                       onClick={onChooseQuickScan}
-                      className={`${accordionBtnClass} send-choice-scan-btn transition-transform scale-[1.04] md:scale-[1.0] text-white scan-btn-glow-pulse`}
+                      className={`${accordionBtnClass} send-choice-scan-btn transition-transform scale-[1.04] md:scale-[1.0] text-white scan-btn-glow-pulse md:py-1.5`}
                       title={t('ui_scan_qr_code_12fa63d927', 'Scan QR Code')}
                     >
                       <svg className="w-5 h-5 md:w-5 md:h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" /></svg>
-                      <span className="text-[15px] md:text-[14px] font-semibold md:font-normal">{t('ui_scan_label', 'Scanner')}</span>
+                      <span className="text-[17px] md:text-[14px] font-semibold md:font-normal">{t('ui_scan_label', 'Scanner')}</span>
                     </button>
                     <button
                       type="button"
                       onClick={() => handleFileUpload(quickscanFileInputId, false)}
-                      className={`${accordionBtnClass} send-choice-import-btn transition-transform scale-[1.0] md:scale-[1.04] import-btn-glow-pulse`}
+                      className={`${accordionBtnClass} send-choice-import-btn transition-transform scale-[1.0] md:scale-[1.04] import-btn-glow-pulse md:py-1.5`}
                       title={t('ui_or_upload_a_qr_image_works_e_df6baa8039', 'Charger une image qrcode')}
                     >
                       <svg className="w-5 h-5 md:w-5 md:h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M12 4v12m0 0l-3-3m3 3l3-3" /></svg>
-                      <span className="text-[14px] md:text-[15px] md:font-semibold">{t('ui_import_label', 'Importer')}</span>
+                      <span className="text-[14px] md:text-[17px] md:font-semibold">{t('ui_import_label', 'Importer')}</span>
                     </button>
                   </div>
                   <style jsx>{`
@@ -891,13 +891,13 @@ export default function WalletDashboardSendChoiceModal({
                   {/* Sub-action buttons row */}
                   {/* Mobile: Scanner prominent | Desktop: Importer prominent */}
                   <div className="payreq-choice-actions grid grid-cols-2 gap-2">
-                    <button type="button" onClick={onChooseQuickScan} className={`${accordionBtnClass} payreq-scan-btn transition-transform scale-[1.04] md:scale-[1.0] scan-btn-glow-pulse`} title={t('ui_scan_qr_code_12fa63d927', 'Scan QR Code')}>
+                    <button type="button" onClick={onChooseQuickScan} className={`${accordionBtnClass} payreq-scan-btn transition-transform scale-[1.04] md:scale-[1.0] scan-btn-glow-pulse md:py-1.5`} title={t('ui_scan_qr_code_12fa63d927', 'Scan QR Code')}>
                       <svg className="w-5 h-5 md:w-5 md:h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" /></svg>
-                      <span className="text-[15px] md:text-[14px] font-semibold md:font-normal">{t('ui_scan_label', 'Scanner')}</span>
+                      <span className="text-[17px] md:text-[14px] font-semibold md:font-normal">{t('ui_scan_label', 'Scanner')}</span>
                     </button>
-                    <button type="button" onClick={() => handleFileUpload(payreqFileInputId, true)} className={`${accordionBtnClass} payreq-import-btn transition-transform scale-[1.0] md:scale-[1.04] import-btn-glow-pulse`} title={t('ui_or_upload_a_qr_image_works_e_df6baa8039', 'Charger une image qrcode')}>
+                    <button type="button" onClick={() => handleFileUpload(payreqFileInputId, true)} className={`${accordionBtnClass} payreq-import-btn transition-transform scale-[1.0] md:scale-[1.04] import-btn-glow-pulse md:py-1.5`} title={t('ui_or_upload_a_qr_image_works_e_df6baa8039', 'Charger une image qrcode')}>
                       <svg className="w-5 h-5 md:w-5 md:h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M12 4v12m0 0l-3-3m3 3l3-3" /></svg>
-                      <span className="text-[14px] md:text-[15px] md:font-semibold">{t('ui_import_label', 'Importer')}</span>
+                      <span className="text-[14px] md:text-[17px] md:font-semibold">{t('ui_import_label', 'Importer')}</span>
                     </button>
                   </div>
                   <style jsx>{`
