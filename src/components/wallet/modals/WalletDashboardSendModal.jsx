@@ -1398,7 +1398,7 @@ export default function WalletDashboardSendModal({
           <span className="text-[15px] md:text-[16px] text-white/45 font-normal tracking-[0.02em]">
             {t("ui_amount_52cea2dd3d", "Montant")}
           </span>
-          <span className={"text-3xl md:text-4xl font-bold tracking-tight " + (summaryAmount > 0 ? "text-white" : "text-white/30")}>
+          <span className={"text-3xl md:text-4xl font-bold tracking-tight " + (summaryAmount > 0 ? "text-white" : "text-white/75")}>
             {confirmAmountLabel || '0'}
           </span>
         </div>
