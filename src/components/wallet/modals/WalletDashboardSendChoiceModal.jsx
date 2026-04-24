@@ -217,6 +217,53 @@ export default function WalletDashboardSendChoiceModal({
   });
   const closeRequestedRef = useRef(false);
 
+  // ── Swipe-to-close pour le sous-modal quickscan (mobile) ──
+  const [subModalTranslateY, setSubModalTranslateY] = useState(0);
+  const subModalRef = useRef(null);
+  const subModalDragRef = useRef({ startY: 0, startAt: 0, pointerId: null, lastDelta: 0, dragging: false });
+
+  const handleSubModalPointerDown = (event) => {
+    if (inline) return;
+    if (!event?.isPrimary || event.pointerType === 'mouse') return;
+    subModalDragRef.current = { startY: event.clientY, startAt: Date.now(), pointerId: event.pointerId, lastDelta: 0, dragging: false };
+  };
+  const handleSubModalPointerMove = (event) => {
+    if (inline) return;
+    const meta = subModalDragRef.current;
+    if (meta.pointerId !== event.pointerId) return;
+    const delta = event.clientY - meta.startY;
+    if (delta <= 0) return;
+    if (!meta.dragging) {
+      if (delta < 8) return;
+      try { subModalRef.current?.setPointerCapture?.(event.pointerId); } catch { /* */ }
+      meta.dragging = true;
+    }
+    meta.lastDelta = delta;
+    setSubModalTranslateY(delta);
+  };
+  const handleSubModalPointerEnd = (event) => {
+    if (inline) return;
+    const meta = subModalDragRef.current;
+    if (meta.pointerId !== event.pointerId) return;
+    const delta = meta.lastDelta || 0;
+    const duration = Math.max(1, Date.now() - (meta.startAt || 0));
+    const velocity = delta / duration;
+    const height = typeof window !== 'undefined' ? window.innerHeight : 800;
+    const closeDistance = Math.max(220, Math.min(320, height * 0.28));
+    const shouldClose = delta > closeDistance || (delta > closeDistance * 0.6 && velocity > 1.25);
+    subModalDragRef.current = { startY: 0, startAt: 0, pointerId: null, lastDelta: 0, dragging: false };
+    if (shouldClose) {
+      setSubModalTranslateY(Math.max(delta, height));
+      window.setTimeout(() => { setSubModalTranslateY(0); setSubModal(null); }, 180);
+    } else {
+      setSubModalTranslateY(0);
+    }
+  };
+
+  useEffect(() => {
+    if (subModal !== 'quickscan') setSubModalTranslateY(0);
+  }, [subModal]);
+
   useEffect(() => {
     const resetMeta = {
       startY: 0, startAt: 0, pointerId: null, lastDelta: 0,
@@ -567,17 +614,34 @@ export default function WalletDashboardSendChoiceModal({
         <div className={inline ? 'absolute inset-0 z-50 flex' : 'fixed inset-0 z-[10100] flex items-end md:items-center justify-center md:px-4 pointer-events-none'}>
           {!inline ? <div className="fixed inset-0 bg-black/70 md:backdrop-blur-sm pointer-events-auto wallet-modal-backdrop-in" onClick={() => setSubModal(null)} /> : null}
           <div className={inline ? 'w-full h-full' : 'relative z-10 pointer-events-auto w-full md:max-w-lg wallet-modal-lift-in'}>
-            <div className={inline ? 'relative w-full h-full overflow-hidden flex flex-col bg-elevated rounded-xl' : 'relative w-full wallet-modal-panel wallet-cash-modal border-white/10 md:border overflow-hidden flex flex-col bg-elevated h-screen md:h-auto md:max-h-[80vh] rounded-none md:rounded-2xl pb-[env(safe-area-inset-bottom)]'}>
+            <div
+              ref={subModalRef}
+              className={inline ? 'relative w-full h-full overflow-hidden flex flex-col bg-elevated rounded-xl' : 'relative w-full wallet-modal-panel wallet-cash-modal border-white/10 md:border overflow-hidden flex flex-col bg-elevated h-screen md:h-auto md:max-h-[80vh] rounded-none md:rounded-2xl pb-[env(safe-area-inset-bottom)]'}
+              style={!inline && subModalTranslateY ? { transform: `translateY(${subModalTranslateY}px)`, transition: subModalDragRef.current.dragging ? 'none' : 'transform 0.18s ease' } : undefined}
+              onPointerMove={handleSubModalPointerMove}
+              onPointerUp={handleSubModalPointerEnd}
+              onPointerCancel={handleSubModalPointerEnd}
+            >
               {/* Glow */}
               <div className="pointer-events-none absolute inset-0" aria-hidden>
                 <div className="absolute inset-0 bg-[radial-gradient(600px_circle_at_50%_0%,rgba(0,255,150,0.08),transparent_60%)]" />
               </div>
               <div className="relative z-10 flex flex-col flex-1 min-h-0">
-                {/* Back button */}
-                <div className="px-5 pt-4 pb-2 flex items-center">
+                {/* Swipe bar – mobile only */}
+                {!inline ? (
+                  <div
+                    className="md:hidden flex justify-center -mt-1 pt-1 pb-2"
+                    aria-hidden
+                    onPointerDown={handleSubModalPointerDown}
+                  >
+                    <span className="block w-12 h-1.5 rounded-full bg-white/20" />
+                  </div>
+                ) : null}
+                {/* Back button – masqué sur mobile (remplacé par le swipe) */}
+                <div className="hidden md:flex px-5 pt-4 pb-2 items-center">
                   <button type="button" onClick={() => setSubModal(null)} className="text-white/55 hover:text-white transition-colors flex items-center gap-1" aria-label={t('ui_back', 'Retour')}>
                     <svg viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5" aria-hidden><path fillRule="evenodd" d="M11.78 3.22a.75.75 0 0 1 0 1.06L7.06 9l4.72 4.72a.75.75 0 1 1-1.06 1.06l-5.25-5.25a.75.75 0 0 1 0-1.06l5.25-5.25a.75.75 0 0 1 1.06 0Z" clipRule="evenodd" /></svg>
-                    <span className="hidden md:inline text-[13px] font-medium">{t('ui_back', 'Retour')}</span>
+                    <span className="text-[13px] font-medium">{t('ui_back', 'Retour')}</span>
                   </button>
                 </div>
                 <div className="px-5 pt-3 pb-5 flex flex-col flex-1 min-h-0">
