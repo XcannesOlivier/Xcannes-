@@ -1597,11 +1597,11 @@ const MoonPaySellModal = ({
                 <button
                   type="button"
                   onClick={onClose}
-                  className="hidden md:inline-flex absolute left-0 top-2 items-center gap-2 text-white/70 hover:text-white transition-colors"
+                  className="hidden md:inline-flex absolute left-0 md:left-[-15px] top-2 md:top-[-10px] items-center gap-2 text-white/70 hover:text-white transition-colors"
                   aria-label={t("back", "Back")}
                 >
-                  <ChevronLeftIcon className="w-5 h-5" aria-hidden="true" />
-                  <span className="text-sm">{t("ui_back", "Retour")}</span>
+                  <ChevronLeftIcon className="w-4 h-4" aria-hidden="true" />
+                  <span className="text-xs">{t("ui_back", "Retour")}</span>
                 </button>
               ) : null}
             <h3 className="text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight mb-1">
