@@ -76,10 +76,15 @@ export default function WalletDashboardTokenRow({
               ? `${getCurrencyDescription(currencyCode)}`
               : "XRPL Token");
 
-  // Keep rows fully opaque so the list background "glow" stays behind them.
-  // Match the visual surface used by action buttons (e.g. "Convert") which is
-  // `rgba(255,255,255,0.02)` over the base background.
-  const rowSurfaceClass = "bg-[#101415] hover:bg-[#12181a]";
+  // Style surface calqué sur le sélecteur "base" du modal Swap :
+  // gradient sombre + ring subtil + shadow interne/externe.
+  const rowSurfaceClass = [
+    "bg-gradient-to-b from-[#101415] to-[#0d1214]",
+    "ring-1 ring-white/[0.07] ring-inset",
+    "shadow-[0_2px_8px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.06)]",
+    "hover:ring-white/[0.13] hover:shadow-[0_2px_12px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.08)]",
+    "transition-shadow transition-[box-shadow]",
+  ].join(" ");
 
   const handleRowKeyDown = (event) => {
     if (!onClick) return;
@@ -100,7 +105,7 @@ export default function WalletDashboardTokenRow({
         className="w-full text-left"
       >
         <div
-          className={`flex items-center gap-3 rounded-md px-3 py-2 transition-colors cursor-pointer ${rowSurfaceClass} ${tokenRowClass}`}
+          className={`flex items-center gap-3 rounded-[14px] px-3 py-2 transition-colors cursor-pointer ${rowSurfaceClass} ${tokenRowClass}`}
         >
           <div className={`flex items-center ${iconTextGapClass} min-w-0`}>
             <div
