@@ -527,3 +527,37 @@
     transform: scale(1);
   }
 }
+
+/* ====== AMOUNT BLOC SHIMMER ====== */
+
+@keyframes walletAmountShimmer {
+  0%   { transform: translateX(-110%); opacity: 1; }
+  100% { transform: translateX(210%);  opacity: 1; }
+}
+
+.wallet-amount-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.wallet-amount-shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 35%,
+    rgba(255, 255, 255, 0.13) 50%,
+    transparent 65%
+  );
+  transform: translateX(-110%);
+  animation: walletAmountShimmer 0.85s cubic-bezier(0.4, 0, 0.2, 1) 0.35s 1 forwards;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wallet-amount-shimmer::after {
+    animation: none;
+  }
+}

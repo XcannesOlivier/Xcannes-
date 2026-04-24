@@ -1372,7 +1372,7 @@ export default function WalletDashboardReceiveModal({
 	                    </div>
 
 	                    {/* ── QR Code ── */}
-	                    <div className="w-full flex flex-col items-center bg-[#232829] rounded-[20px] pt-16 pb-5 md:pt-20 md:pb-10 shadow-[0_2px_0_rgba(255,255,255,0.04)_inset,0_-2px_0_rgba(0,0,0,0.6)_inset,0_24px_60px_rgba(0,0,0,0.7),0_6px_18px_rgba(0,0,0,0.5)]">
+	                    <div className="w-full flex flex-col items-center bg-[#232829] rounded-[20px] pt-16 pb-5 md:pt-20 md:pb-10 shadow-[0_2px_0_rgba(255,255,255,0.04)_inset,0_-2px_0_rgba(0,0,0,0.6)_inset,-10px_28px_55px_rgba(0,0,0,0.72),18px_10px_42px_rgba(0,0,0,0.38),2px_60px_36px_-16px_rgba(0,0,0,0.65),-6px_-14px_28px_rgba(0,0,0,0.22)]">
 	                        <div
 	                          ref={receiveQrContainerRef}
 	                          className="w-[280px] md:w-[260px] aspect-square rounded-none p-3 cursor-pointer border-[20px] border-black"
@@ -1570,7 +1570,7 @@ export default function WalletDashboardReceiveModal({
                                     placeholder="0.00"
                                     token={requestCurrencyCode || 'USD'}
                                     tokenClassName="text-white/70 drop-shadow-sm text-2xl md:text-3xl font-semibold"
-                                    containerClassName="pt-5 pb-5 rounded-[18px] bg-[#111518] ring-1 ring-white/10 ring-inset transition-all duration-200 shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30)] focus-within:ring-white/25 focus-within:shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30),0_0_0_1px_rgba(255,255,255,0.10),0_0_24px_rgba(255,255,255,0.06)] [&_input]:!text-4xl [&_input]:md:!text-5xl [&_input]:font-bold [&_input]:placeholder:text-white/35"
+                                    containerClassName="pt-5 pb-5 rounded-[18px] bg-[#111518] ring-1 ring-white/10 ring-inset transition-all duration-200 shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30)] focus-within:ring-white/25 focus-within:shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30),0_0_0_1px_rgba(255,255,255,0.10),0_0_24px_rgba(255,255,255,0.06)] wallet-amount-shimmer [&_input]:!text-4xl [&_input]:md:!text-5xl [&_input]:font-bold [&_input]:placeholder:text-white/35"
                                   />
 					                      </div>
 
@@ -1642,7 +1642,7 @@ export default function WalletDashboardReceiveModal({
 				                    {hasGeneratedRequest ? (
 					                      <>
 					                        {/* ── QR Code (primary action — first) ── */}
-					                        <div className="w-full flex flex-col items-center bg-[#232829] rounded-[20px] pt-5 pb-2 md:pt-8 md:pb-5 shadow-[0_2px_0_rgba(255,255,255,0.04)_inset,0_-2px_0_rgba(0,0,0,0.6)_inset,0_24px_60px_rgba(0,0,0,0.7),0_6px_18px_rgba(0,0,0,0.5)]">
+					                        <div className="w-full flex flex-col items-center bg-[#232829] rounded-[20px] pt-5 pb-2 md:pt-8 md:pb-5 shadow-[0_2px_0_rgba(255,255,255,0.04)_inset,0_-2px_0_rgba(0,0,0,0.6)_inset,12px_36px_52px_rgba(0,0,0,0.68),-14px_14px_38px_rgba(0,0,0,0.42),0_64px_30px_-20px_rgba(0,0,0,0.6),8px_-10px_22px_rgba(0,0,0,0.28)]">
 				                          <div
 				                            ref={requestQrContainerRef}
 				                            className="w-[240px] md:w-[260px] aspect-square rounded-none p-3 cursor-pointer border-[20px] border-black"
