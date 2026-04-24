@@ -689,20 +689,20 @@ export default function WalletDashboardSendChoiceModal({
                     <button
                       type="button"
                       onClick={onChooseQuickScan}
-                      className={`${accordionBtnClass} send-choice-scan-btn transition-transform scale-[1.04] md:scale-[1.0] text-white`}
+                      className={`${accordionBtnClass} send-choice-scan-btn transition-transform scale-[1.08] md:scale-[1.0] text-white`}
                       title={t('ui_scan_qr_code_12fa63d927', 'Scan QR Code')}
                     >
-                      <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" /></svg>
-                      <span className="text-[15px] md:text-[14px] font-medium md:font-normal">{t('ui_scan_label', 'Scanner')}</span>
+                      <svg className="w-6 h-6 md:w-5 md:h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" /></svg>
+                      <span className="text-[17px] md:text-[14px] font-semibold md:font-normal">{t('ui_scan_label', 'Scanner')}</span>
                     </button>
                     <button
                       type="button"
                       onClick={() => handleFileUpload(quickscanFileInputId, false)}
-                      className={`${accordionBtnClass} send-choice-import-btn transition-transform scale-[1.0] md:scale-[1.04]`}
+                      className={`${accordionBtnClass} send-choice-import-btn transition-transform scale-[1.0] md:scale-[1.08]`}
                       title={t('ui_or_upload_a_qr_image_works_e_df6baa8039', 'Charger une image qrcode')}
                     >
-                      <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M12 4v12m0 0l-3-3m3 3l3-3" /></svg>
-                      <span className="text-[14px] md:text-[15px]">{t('ui_import_label', 'Importer')}</span>
+                      <svg className="w-5 h-5 md:w-6 md:h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M12 4v12m0 0l-3-3m3 3l3-3" /></svg>
+                      <span className="text-[14px] md:text-[17px] md:font-semibold">{t('ui_import_label', 'Importer')}</span>
                     </button>
                   </div>
                   <style jsx>{`
@@ -720,10 +720,13 @@ export default function WalletDashboardSendChoiceModal({
                       color: rgba(255,255,255,0.75);
                     }
                     .send-choice-import-btn:hover { background: rgba(255,255,255,0.04); }
-                    .send-choice-import-btn svg { color: rgba(255,255,255,0.55); width: 1.15rem; height: 1.15rem; }
-                    .send-choice-import-btn span { color: rgba(255,255,255,0.75); font-size: 15px; font-weight: 500; }
+                    .send-choice-scan-btn svg { color: rgba(255,255,255,0.75); width: 1.5rem; height: 1.5rem; }
+                    .send-choice-import-btn span { color: rgba(255,255,255,0.75); font-size: 14px; font-weight: 500; }
                     @media (min-width: 768px) {
-                      .send-choice-scan-btn span { font-size: 14px; }
+                      .send-choice-scan-btn svg { width: 1.15rem; height: 1.15rem; }
+                      .send-choice-scan-btn span { font-size: 14px; font-weight: 400; color: rgba(255,255,255,0.75); }
+                      .send-choice-import-btn svg { color: rgba(255,255,255,0.75); width: 1.5rem; height: 1.5rem; }
+                      .send-choice-import-btn span { color: rgba(255,255,255,0.90); font-size: 17px; font-weight: 600; }
                       .send-choice-import-btn span { font-size: 15px; }
                     }
                   `}</style>
@@ -886,13 +889,13 @@ export default function WalletDashboardSendChoiceModal({
                   {/* Sub-action buttons row */}
                   {/* Mobile: Scanner prominent | Desktop: Importer prominent */}
                   <div className="payreq-choice-actions grid grid-cols-2 gap-2">
-                    <button type="button" onClick={onChooseQuickScan} className={`${accordionBtnClass} payreq-scan-btn transition-transform scale-[1.04] md:scale-[1.0]`} title={t('ui_scan_qr_code_12fa63d927', 'Scan QR Code')}>
-                      <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" /></svg>
-                      <span className="text-[15px] md:text-[14px] font-medium md:font-normal">{t('ui_scan_label', 'Scanner')}</span>
+                    <button type="button" onClick={onChooseQuickScan} className={`${accordionBtnClass} payreq-scan-btn transition-transform scale-[1.08] md:scale-[1.0]`} title={t('ui_scan_qr_code_12fa63d927', 'Scan QR Code')}>
+                      <svg className="w-6 h-6 md:w-5 md:h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" /></svg>
+                      <span className="text-[17px] md:text-[14px] font-semibold md:font-normal">{t('ui_scan_label', 'Scanner')}</span>
                     </button>
-                    <button type="button" onClick={() => handleFileUpload(payreqFileInputId, true)} className={`${accordionBtnClass} payreq-import-btn transition-transform scale-[1.0] md:scale-[1.04]`} title={t('ui_or_upload_a_qr_image_works_e_df6baa8039', 'Charger une image qrcode')}>
-                      <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M12 4v12m0 0l-3-3m3 3l3-3" /></svg>
-                      <span className="text-[14px] md:text-[15px]">{t('ui_import_label', 'Importer')}</span>
+                    <button type="button" onClick={() => handleFileUpload(payreqFileInputId, true)} className={`${accordionBtnClass} payreq-import-btn transition-transform scale-[1.0] md:scale-[1.08]`} title={t('ui_or_upload_a_qr_image_works_e_df6baa8039', 'Charger une image qrcode')}>
+                      <svg className="w-5 h-5 md:w-6 md:h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M12 4v12m0 0l-3-3m3 3l3-3" /></svg>
+                      <span className="text-[14px] md:text-[17px] md:font-semibold">{t('ui_import_label', 'Importer')}</span>
                     </button>
                   </div>
                   <style jsx>{`
@@ -910,10 +913,13 @@ export default function WalletDashboardSendChoiceModal({
                       color: rgba(255,255,255,0.75);
                     }
                     .payreq-import-btn:hover { background: rgba(255,255,255,0.04); }
-                    .payreq-import-btn svg { color: rgba(255,255,255,0.55); width: 1.15rem; height: 1.15rem; }
-                    .payreq-import-btn span { color: rgba(255,255,255,0.75); font-size: 15px; font-weight: 500; }
+                    .payreq-scan-btn svg { color: rgba(255,255,255,0.75); width: 1.5rem; height: 1.5rem; }
+                    .payreq-import-btn span { color: rgba(255,255,255,0.75); font-size: 14px; font-weight: 500; }
                     @media (min-width: 768px) {
-                      .payreq-scan-btn span { font-size: 14px; }
+                      .payreq-scan-btn svg { width: 1.15rem; height: 1.15rem; }
+                      .payreq-scan-btn span { font-size: 14px; font-weight: 400; color: rgba(255,255,255,0.75); }
+                      .payreq-import-btn svg { color: rgba(255,255,255,0.75); width: 1.5rem; height: 1.5rem; }
+                      .payreq-import-btn span { color: rgba(255,255,255,0.90); font-size: 17px; font-weight: 600; }
                       .payreq-import-btn span { font-size: 15px; }
                     }
                   `}</style>
