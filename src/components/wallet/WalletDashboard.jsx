@@ -1143,10 +1143,7 @@ export default function WalletDashboard({
               tokens={tokenListTokens}
               renderTokenRow={renderTokenRow}
               headerTitle={
-                <div className="w-full flex items-center justify-between gap-3">
-                  <div className="shrink-0 pl-3 md:pl-3 text-[17px] md:text-[18px] font-semibold text-white/90">
-                    {t('ui_my_currencies_4d1f0e3a0a', 'Mes devises')}
-                  </div>
+                <div className="w-full flex items-center justify-end gap-3">
                   <button
                     type="button"
                     onClick={handleOpenGlobalStatement}
@@ -1158,7 +1155,7 @@ export default function WalletDashboard({
                     }
                     aria-label={t('ui_open_statement', 'Ouvrir le relevé des transactions')}
                   >
-                    <span>{t('ui_consult_global_statement_3b89f4a7a2', 'Dernières transactions')}</span>
+                    <span>{t('ui_consult_global_statement_3b89f4a7a2', 'Historique')}</span>
                     <span className="text-white/35 text-base md:text-lg leading-none">›</span>
                   </button>
                 </div>
