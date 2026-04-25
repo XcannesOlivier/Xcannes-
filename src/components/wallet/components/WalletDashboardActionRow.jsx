@@ -7,7 +7,7 @@ export default function WalletDashboardActionRow({ onAction }) {
   const cashEnabled = MOONPAY_UI_ENABLED || TOPPER_UI_ENABLED;
   return (
     <div
-      className="relative px-3 py-2 md:py-3 border-b border-white/5 space-y-2 md:space-y-3"
+      className="relative px-3 py-2 md:py-3 space-y-2 md:space-y-3"
     >
       {/* Ombrage vert centré étendu */}
       <div className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2 h-28 bg-[radial-gradient(ellipse_100%_100%_at_50%_50%,rgba(0,255,150,0.12),transparent_70%)] z-[0]" aria-hidden />
