@@ -9,8 +9,8 @@ export default function WalletDashboardActionRow({ onAction }) {
     <div
       className="relative px-3 py-2 md:py-3 space-y-2 md:space-y-3"
     >
-      {/* Ombrage vert centré étendu */}
-      <div className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2 h-28 bg-[radial-gradient(ellipse_100%_100%_at_50%_50%,rgba(0,255,150,0.04),transparent_70%)] z-[0]" aria-hidden />
+      {/* Ombrage vert fondu avec le header et la barre Historique */}
+      <div className="pointer-events-none absolute inset-x-0 inset-y-0 bg-[linear-gradient(to_bottom,#111518_0%,rgba(0,255,150,0.05)_40%,rgba(0,255,150,0.05)_60%,#0b0f10_100%)] z-[0]" aria-hidden />
       <div className="grid grid-cols-4 gap-2 sm:gap-3 relative z-[1]">
         <div className="rounded-[20px] bg-[#0b0f10]">
         <button
