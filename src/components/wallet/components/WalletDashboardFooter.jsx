@@ -125,7 +125,7 @@ function MobileScanButton({ onScan, ariaLabel }) {
       <button
         type="button"
         onClick={onScan}
-        className="absolute left-1/2 top-[5px] z-10 flex h-[50px] w-[170px] -translate-x-1/2 items-center justify-center rounded-full text-white transition-transform duration-150 hover:scale-[1.01] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#39d57c]/20"
+        className="absolute left-1/2 top-[9px] z-10 flex h-[50px] w-[170px] -translate-x-1/2 items-center justify-center rounded-full text-white transition-transform duration-150 hover:scale-[1.01] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#39d57c]/20"
         style={scanButtonStyle}
         aria-label={ariaLabel}
       >
