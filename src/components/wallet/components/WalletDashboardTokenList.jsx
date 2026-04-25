@@ -50,14 +50,11 @@ export default function WalletDashboardTokenList({
           ) : null}
         </div>
       )}
-      <div className={`${listClassName} relative`}>
-        {/* Ambient green glow – left center */}
-        <div className="pointer-events-none absolute inset-0 z-0 md:hidden bg-[radial-gradient(600px_circle_at_0%_50%,rgba(0,255,150,0.07),transparent_60%)]" />
-        <div className="pointer-events-none absolute inset-0 z-0 hidden md:block bg-[radial-gradient(900px_circle_at_0%_50%,rgba(0,255,150,0.07),transparent_60%)]" />
-        <div className="relative z-[1] space-y-[2px] md:hidden">
+      <div className={listClassName}>
+        <div className="space-y-[2px] md:hidden">
           {tokens.map(renderTokenRow)}
         </div>
-        <div className="relative z-[1] hidden md:flex md:flex-col md:space-y-[4px]">
+        <div className="hidden md:flex md:flex-col md:space-y-[4px]">
           {tokens.map(renderTokenRow)}
         </div>
       </div>
