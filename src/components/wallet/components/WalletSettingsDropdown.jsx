@@ -482,7 +482,7 @@ export default function WalletSettingsDropdown({
           />
           <circle cx="12" cy="12" r="3" />
         </svg>
-        <span className="hidden lg:inline text-sm font-medium">
+        <span className="hidden lg:inline text-base font-medium">
           {t("ui_settings_label", "Paramètres")}
         </span>
       </button>
