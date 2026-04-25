@@ -1142,9 +1142,9 @@ export default function WalletDashboard({
             className="relative flex-1 flex flex-col min-h-0"
           >
             {/* Gradient mobile */}
-            <div className="md:hidden absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 70% 220px at 50% 60%, rgba(34,197,94,0.25) 0%, rgba(34,197,94,0.09) 55%, transparent 100%)' }} aria-hidden />
+            <div className="md:hidden absolute inset-0 z-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 70% 220px at 50% 60%, rgba(34,197,94,0.25) 0%, rgba(34,197,94,0.09) 55%, transparent 100%)' }} aria-hidden />
             {/* Gradient desktop */}
-            <div className="hidden md:block absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 70% 220px at 50% 60%, rgba(34,197,94,0.30) 0%, rgba(34,197,94,0.11) 55%, transparent 100%)' }} aria-hidden />
+            <div className="hidden md:block absolute inset-0 z-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 70% 220px at 50% 60%, rgba(34,197,94,0.30) 0%, rgba(34,197,94,0.11) 55%, transparent 100%)' }} aria-hidden />
             <WalletDashboardTokenList
               tokens={tokenListTokens}
               renderTokenRow={renderTokenRow}
@@ -1169,7 +1169,7 @@ export default function WalletDashboard({
                   </button>
                 </div>
               }
-              className="touch-pan-y"
+              className="relative z-[1] touch-pan-y"
               style={{ WebkitOverflowScrolling: 'touch' }}
             />
           </div>
