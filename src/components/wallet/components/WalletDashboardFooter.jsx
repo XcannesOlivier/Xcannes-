@@ -119,7 +119,7 @@ function MobileScanButton({ onScan, ariaLabel }) {
   return (
     <>
       <div
-        className="pointer-events-none absolute left-1/2 top-[7px] z-0 h-[48px] w-[162px] -translate-x-1/2 rounded-full bg-[#111518] blur-[18px]"
+        className="pointer-events-none absolute left-1/2 top-[1px] z-0 h-[48px] w-[162px] -translate-x-1/2 rounded-full bg-[#111518] blur-[18px]"
         aria-hidden
       />
       <button
