@@ -315,7 +315,7 @@ export default function WalletDashboardHeader({
                       onClick={hasMultipleWallets ? toggleSwitcher : undefined}
                       className={`w-full text-left ${hasMultipleWallets ? "cursor-pointer" : "cursor-default"}`}
                     >
-                      <div className="flex items-center gap-2 min-w-0">
+                      <div className="flex items-center gap-3 min-w-0">
                         <span
                           className={`h-2 w-2 rounded-full ring-4 shrink-0 ${xrplConnectionIndicator.dotClass} ${xrplConnectionIndicator.ringClass} ${
                             xrplConnectionIndicator.pulse ? "animate-pulse" : ""
