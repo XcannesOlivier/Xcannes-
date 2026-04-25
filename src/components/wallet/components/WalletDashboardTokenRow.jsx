@@ -104,7 +104,7 @@ export default function WalletDashboardTokenRow({
         className="w-full text-left"
       >
         <div
-          className={`flex items-center gap-3 rounded-[14px] px-3.5 py-1.5 md:py-2 transition-colors cursor-pointer ${rowSurfaceClass} ${tokenRowClass}`}
+          className={`flex items-center gap-3 rounded-[14px] px-3.5 py-2.5 md:py-2 transition-colors cursor-pointer ${rowSurfaceClass} ${tokenRowClass}`}
         >
           <div className={`flex items-center ${iconTextGapClass} min-w-0`}>
             <div
