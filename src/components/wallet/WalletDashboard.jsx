@@ -1153,7 +1153,7 @@ export default function WalletDashboard({
                   <button
                     type="button"
                     onClick={handleOpenGlobalStatement}
-                    className="shrink-0 inline-flex items-center gap-2 text-[14px] md:text-[13px] font-normal text-white/65 hover:text-white/90 transition-colors"
+                    className="shrink-0 inline-flex items-center gap-1.5 text-[13px] md:text-[15px] font-normal text-white/55 hover:text-white/85 transition-colors px-2.5 md:px-3 py-1 md:py-1.5 rounded-full ring-1 ring-white/10 hover:ring-white/20"
                     title={
                       recentActivityMessage
                         ? recentActivityMessage
@@ -1161,8 +1161,11 @@ export default function WalletDashboard({
                     }
                     aria-label={t('ui_open_statement', 'Ouvrir le relevé des transactions')}
                   >
+                    <svg className="w-3.5 h-3.5 md:w-4 md:h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                      <circle cx="12" cy="12" r="9" />
+                      <polyline points="12 7 12 12 15.5 14.5" />
+                    </svg>
                     <span>{t('ui_consult_global_statement_3b89f4a7a2', 'Historique')}</span>
-                    <span className="text-white/35 text-base md:text-lg leading-none">›</span>
                   </button>
                 </div>
               }
