@@ -11,9 +11,9 @@ export default function WalletDashboardTokenList({
   disableInternalScroll = false,
 }) {
   const hasHeader = Boolean(headerTitle || headerActionLabel);
-  const scrollClassName = disableInternalScroll
-    ? `relative z-[2] flex-1 min-h-0 px-0 ${hasHeader ? "pt-[2px] md:pt-[4px]" : "pt-1.5"} pb-[2px] md:pb-[4px] bg-transparent`
-    : `relative z-[2] flex-1 min-h-0 px-0 ${hasHeader ? "pt-[2px] md:pt-[4px]" : "pt-1.5"} pb-[2px] md:pb-[4px] overflow-y-auto overscroll-contain bg-transparent`;
+  const listClassName = disableInternalScroll
+    ? `flex-1 min-h-0 px-0 ${hasHeader ? "pt-[2px] md:pt-[4px]" : "pt-1.5"} pb-[2px] md:pb-[4px] rounded-2xl bg-transparent`
+    : `flex-1 min-h-0 px-0 ${hasHeader ? "pt-[2px] md:pt-[4px]" : "pt-1.5"} pb-[2px] md:pb-[4px] overflow-y-auto overscroll-contain rounded-2xl bg-transparent`;
   const showHeaderAction = Boolean(headerActionLabel && onHeaderAction);
   const headerJustifyClass =
     showHeaderAction || (headerTitle && typeof headerTitle !== "string")
@@ -50,25 +50,12 @@ export default function WalletDashboardTokenList({
           ) : null}
         </div>
       )}
-      {/* Wrapper relatif : bg noir + gradient vert fixe + liste scrollable par-dessus */}
-      <div className="relative z-0 flex-1 min-h-0 rounded-2xl bg-black overflow-hidden">
-        {/* Gradient circulaire vert — fixe, ne scrolle pas */}
-        <div
-          className="pointer-events-none absolute z-[1] top-0 left-1/2 -translate-x-1/2 w-[340px] h-[200px]"
-          aria-hidden
-          style={{
-            background:
-              "radial-gradient(ellipse 60% 100% at 50% 0%, rgba(34,197,94,0.18) 0%, rgba(34,197,94,0.06) 45%, transparent 100%)",
-          }}
-        />
-        {/* Liste scrollable — au-dessus du gradient */}
-        <div className={scrollClassName}>
-          <div className="space-y-[2px] md:hidden">
-            {tokens.map(renderTokenRow)}
-          </div>
-          <div className="hidden md:flex md:flex-col md:space-y-[4px]">
-            {tokens.map(renderTokenRow)}
-          </div>
+      <div className={listClassName}>
+        <div className="space-y-[2px] md:hidden">
+          {tokens.map(renderTokenRow)}
+        </div>
+        <div className="hidden md:flex md:flex-col md:space-y-[4px]">
+          {tokens.map(renderTokenRow)}
         </div>
       </div>
     </div>
