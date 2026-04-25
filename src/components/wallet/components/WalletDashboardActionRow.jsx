@@ -7,8 +7,10 @@ export default function WalletDashboardActionRow({ onAction }) {
   const cashEnabled = MOONPAY_UI_ENABLED || TOPPER_UI_ENABLED;
   return (
     <div
-      className="px-3 py-2 md:py-3 border-b border-white/5 space-y-2 md:space-y-3"
+      className="relative overflow-hidden px-3 py-2 md:py-3 border-b border-white/5 space-y-2 md:space-y-3"
     >
+      {/* Voile vert derrière les boutons */}
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_120%_180%_at_50%_50%,rgba(0,255,150,0.045),transparent_70%)]" aria-hidden />
       <div className="grid grid-cols-4 gap-2 sm:gap-3">
         <button
           type="button"
