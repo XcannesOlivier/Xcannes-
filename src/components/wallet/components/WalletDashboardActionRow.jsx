@@ -9,8 +9,8 @@ export default function WalletDashboardActionRow({ onAction }) {
     <div
       className="relative overflow-hidden px-3 py-2 md:py-3 border-b border-white/5 space-y-2 md:space-y-3"
     >
-      {/* Trait vert en ombrage centré */}
-      <div className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2 h-px bg-transparent shadow-[0_0_18px_6px_rgba(0,255,150,0.18)]" aria-hidden />
+      {/* Ombrage vert centré étendu */}
+      <div className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2 h-8 bg-transparent shadow-[0_0_40px_18px_rgba(0,255,150,0.13)]" aria-hidden />
       <div className="grid grid-cols-4 gap-2 sm:gap-3">
         <button
           type="button"
