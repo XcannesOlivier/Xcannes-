@@ -82,21 +82,18 @@ export function useTokenDisplayLabels({
 
   const selectLabelRightByAssetKey = useMemo(() => {
     const labels = {};
+    const numFmt = (val) =>
+      new Intl.NumberFormat(locale || "en", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }).format(Number.isFinite(Number(val)) ? Number(val) : 0);
     (displayTokensWithCurrencyLines || augmentedTokens || []).forEach(
       (token) => {
         const code = String(token?.currency || "").toUpperCase();
         if (!code) return;
         const display = getDisplayCurrencyCode(code);
         const amount = Number(token?.value || 0);
-        const amountLabel = Number.isFinite(amount)
-          ? formatAmountWithSymbol(locale, amount, display, {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })
-          : formatAmountWithSymbol(locale, 0, display, {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            });
+        const amountLabel = `${numFmt(amount)} ${display}`;
         if (token?.key) labels[token.key] = amountLabel;
         labels[code] = amountLabel;
       },
