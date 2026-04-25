@@ -1215,7 +1215,7 @@ export default function WalletDashboardReceiveModal({
             </div>
             {!inline ? (
               <div
-                className={`md:hidden flex justify-center -mt-1 pt-1 ${receiveView === 'choice' ? 'pb-4' : receiveView === 'request_qr' ? 'pb-0' : 'pb-2'}`}
+                className={`md:hidden flex justify-center -mt-1 pt-1 ${receiveView === 'choice' ? 'pb-0' : receiveView === 'request_qr' ? 'pb-0' : 'pb-2'}`}
                 aria-hidden
                 onPointerDown={event => {
                   if (!disableSwipeToClose) maybeStartOverlayDrag(event, 'fixed');
