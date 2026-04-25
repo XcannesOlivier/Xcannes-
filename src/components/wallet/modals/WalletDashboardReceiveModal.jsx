@@ -1215,7 +1215,7 @@ export default function WalletDashboardReceiveModal({
             </div>
             {!inline ? (
               <div
-                className={`md:hidden flex justify-center -mt-1 pt-1 ${receiveView === 'choice' ? 'pb-4' : 'pb-2'}`}
+                className={`md:hidden flex justify-center -mt-1 pt-1 ${receiveView === 'choice' ? 'pb-4' : receiveView === 'request_qr' ? 'pb-0' : 'pb-2'}`}
                 aria-hidden
                 onPointerDown={event => {
                   if (!disableSwipeToClose) maybeStartOverlayDrag(event, 'fixed');
@@ -1226,7 +1226,7 @@ export default function WalletDashboardReceiveModal({
             ) : null}
             {receiveView !== 'choice' ? (
               <div
-                className="relative z-[65] pt-2 md:pt-0 pb-3 flex flex-col items-center text-center"
+                className={`relative z-[65] ${receiveView === 'request_qr' ? 'pt-0' : 'pt-2'} md:pt-0 pb-3 flex flex-col items-center text-center`}
                 onPointerDown={event => {
                   if (!disableSwipeToClose) maybeStartOverlayDrag(event, 'fixed');
                 }}
@@ -1247,7 +1247,7 @@ export default function WalletDashboardReceiveModal({
                   {isDesktop ? <span className="text-xs font-semibold text-white/50">{t('ui_back', 'Retour')}</span> : null}
                 </button>
 
-                <h2 className={`${receiveView === 'request' ? 'mt-[45px] md:mt-[50px]' : receiveView === 'request_qr' ? 'mt-[-4px] md:mt-[20px]' : 'mt-0 md:mt-[50px]'} text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight`}>
+                <h2 className={`${receiveView === 'request' ? 'mt-[45px] md:mt-[50px]' : receiveView === 'request_qr' ? 'mt-0 md:mt-[20px]' : 'mt-0 md:mt-[50px]'} text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight`}>
                   {headerTitle}
                 </h2>
 
