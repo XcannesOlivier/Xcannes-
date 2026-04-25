@@ -2,8 +2,8 @@
 
 import { useTranslation } from "next-i18next";
 
-const MOBILE_MODAL_BG = "#111516";
-const MOBILE_BASE_BG = "#090c0d";
+const MOBILE_MODAL_BG = "#111518";
+const MOBILE_BASE_BG = "#111518";
 
 const mobileFooterStyle = {
   paddingBottom: "0px",
@@ -141,14 +141,14 @@ export default function WalletDashboardFooter({ onScan } = {}) {
   return (
     <div className="mt-[2px] shrink-0 z-20 bg-elevated [--bg-elevated:#090c0d] border-t-0 md:mt-auto md:border-t md:border-white/10">
       <div
-        className="relative overflow-visible bg-[#090c0d] md:hidden"
+        className="relative overflow-visible bg-[#111518] shadow-[inset_0_-16px_28px_rgba(255,255,255,0.03),inset_0_46px_70px_rgba(0,0,0,0.55)] md:hidden"
         style={mobileFooterStyle}
       >
         <div className="relative h-[88px]">
           <MobileFooterOverlay />
 
           <span
-            className="absolute right-2 top-[7px] z-20 bg-[#090c0d] pl-2 text-[8px] font-light tracking-[0.12em] text-[#697173]/60"
+            className="absolute right-2 top-[7px] z-20 bg-[#111518] pl-2 text-[8px] font-light tracking-[0.12em] text-[#697173]/60"
             style={{ backgroundColor: MOBILE_BASE_BG }}
           >
             By XCANNES LLC
@@ -161,7 +161,7 @@ export default function WalletDashboardFooter({ onScan } = {}) {
         </div>
       </div>
 
-      <div className="hidden min-h-[52px] items-center justify-center px-5 py-4 md:flex md:min-h-[56px] md:px-4 md:py-5">
+      <div className="hidden min-h-[52px] items-center justify-center px-5 py-4 md:flex md:min-h-[56px] md:px-4 md:py-5 md:bg-[#111518] md:shadow-[inset_0_-16px_28px_rgba(255,255,255,0.03),inset_0_46px_70px_rgba(0,0,0,0.55)]">
         <span className="font-orbitron text-xl font-semibold uppercase leading-none tracking-[0.24em] text-white/80">
           {t(BRAND_KEY, "XCANNES")}
         </span>
