@@ -54,10 +54,10 @@ export default function WalletDashboardTokenRow({
   const hasCryptoIcon = Boolean(displayCode && CRYPTO_ICONS?.[displayCode]);
   const isFlagIcon = isDisplayOverride || (isLineCurrency && !hasCryptoIcon);
   const iconSizeClass = isFlagIcon
-    ? "w-[38px] h-[38px] text-3xl leading-none"
+    ? "w-[28px] h-[28px] text-xl leading-none opacity-60"
     : isLineCurrency
-      ? "w-[34px] h-[34px] text-[26px] leading-none"
-      : "w-[30px] h-[30px] text-[22px] leading-none";
+      ? "w-[28px] h-[28px] text-xl leading-none opacity-60"
+      : "w-[26px] h-[26px] text-lg leading-none";
   const iconRadiusClass = isNativeAsset ? "rounded-lg" : "";
   const iconEdgeSpacingClass = isNativeAsset ? "ml-1" : "";
   const iconTextGapClass = isNativeAsset ? "gap-3" : "gap-2";
@@ -121,13 +121,16 @@ export default function WalletDashboardTokenRow({
             </div>
           </div>
           <div className="flex-1" />
-          <div className="text-right text-xl md:text-2xl text-primary shrink-0 leading-tight">
-            <div className="font-mono">
+          <div className="text-right text-xl md:text-2xl text-white/60 shrink-0 leading-tight">
+            <div className="font-mono flex items-center gap-1.5">
               {Number.isFinite(displayValue)
                 ? new Intl.NumberFormat(locale || "en", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(displayValue)
                 : "0.00"}
               {" "}
               <span className="text-sm md:text-base font-normal text-white/60">{displayCode}</span>
+              <svg className="w-3 h-3 shrink-0 text-white/25" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
             </div>
           </div>
         </div>
