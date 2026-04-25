@@ -1247,7 +1247,7 @@ export default function WalletDashboardReceiveModal({
                   {isDesktop ? <span className="text-xs font-semibold text-white/50">{t('ui_back', 'Retour')}</span> : null}
                 </button>
 
-                <h2 className={`${receiveView === 'request' ? 'mt-[45px] md:mt-[50px]' : receiveView === 'request_qr' ? 'mt-[-8px] md:mt-[20px]' : 'mt-0 md:mt-[50px]'} text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight`}>
+                <h2 className={`${receiveView === 'request' ? 'mt-[45px] md:mt-[50px]' : receiveView === 'request_qr' ? 'mt-[-4px] md:mt-[20px]' : 'mt-0 md:mt-[50px]'} text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight`}>
                   {headerTitle}
                 </h2>
 
