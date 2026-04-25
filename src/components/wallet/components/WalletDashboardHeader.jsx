@@ -291,7 +291,7 @@ export default function WalletDashboardHeader({
       <div className="flex flex-col items-center gap-2">
         {/* Bloc wallet — sélecteur + copier + refresh + paramètres */}
         {isConnected && wallet && (
-          <div className="w-full mt-1 md:mt-0 mb-2 md:mb-0 px-1 md:px-2 flex justify-center md:justify-between">
+          <div className="w-full mt-1 md:mt-0 mb-2 md:mb-0 px-1 md:px-2 flex justify-start md:justify-between">
 	            <div className="relative flex items-center gap-2.5 w-full md:w-full">
 	              {isSwitcherOpen && hasMultipleWallets && (
 	                <div
@@ -306,7 +306,7 @@ export default function WalletDashboardHeader({
 	                  onClick={(e) => { e.stopPropagation(); closeSwitcher(); }}
 	                />
 	              )}
-	              <div className="flex-1 md:flex-none md:min-w-[360px] min-w-0 rounded-[12px] bg-[#0d1214] px-2.5 md:px-3 py-2 ring-1 ring-white/[0.06] ring-inset shadow-[0_2px_6px_rgba(0,0,0,0.4)] relative z-[41]">
+	              <div className="flex-none min-w-0 max-w-[180px] md:max-w-[200px] rounded-[12px] bg-[#0d1214] px-2 md:px-2.5 py-1.5 ring-1 ring-white/[0.06] ring-inset shadow-[0_2px_6px_rgba(0,0,0,0.4)] relative z-[41]">
 	                <div className="flex items-start justify-between gap-3" ref={switcherRef}>
                   <div className="min-w-0 flex-1">
                     {/* Wallet name + address — clickable when multi-wallet */}
@@ -324,8 +324,8 @@ export default function WalletDashboardHeader({
                           aria-label={xrplConnectionIndicator.label}
                         />
 
-	                        <span className="text-[18px] md:text-[19px] font-semibold text-white/90 truncate">
-	                          {activeWalletLabel}
+	                        <span className="text-[14px] md:text-[15px] font-semibold text-white/90 truncate">
+	                          {activeWalletLabel.length > 11 ? activeWalletLabel.slice(0, 11) + '…' : activeWalletLabel}
 	                        </span>
                       </div>
 
