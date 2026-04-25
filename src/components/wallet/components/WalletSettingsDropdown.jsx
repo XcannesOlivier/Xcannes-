@@ -456,8 +456,8 @@ export default function WalletSettingsDropdown({
         ref={buttonRef}
         className={[
           inlineButton
-            ? "shrink-0 h-10 px-2.5 flex items-center justify-center gap-2 rounded-md transition-all active:scale-95"
-            : "shrink-0 h-9 px-2.5 flex items-center justify-center gap-2 rounded-lg border transition-all active:scale-95",
+            ? "shrink-0 h-10 px-2.5 flex items-center justify-center gap-2 rounded-md transition-all active:scale-95 drop-shadow-[0_2px_6px_rgba(0,0,0,0.7)]"
+            : "shrink-0 h-9 px-2.5 flex items-center justify-center gap-2 rounded-lg border transition-all active:scale-95 drop-shadow-[0_2px_6px_rgba(0,0,0,0.7)]",
           isOpen
             ? inlineButton
               ? "bg-white/5 text-white"
