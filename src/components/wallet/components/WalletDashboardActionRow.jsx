@@ -10,9 +10,9 @@ export default function WalletDashboardActionRow({ onAction }) {
       className="relative overflow-hidden px-3 py-2 md:py-3 border-b border-white/5 space-y-2 md:space-y-3"
     >
       {/* Ombrage vert centré étendu */}
-      <div className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2 h-8 bg-transparent shadow-[0_0_40px_18px_rgba(0,255,150,0.13)]" aria-hidden />
+      <div className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2 h-8 bg-transparent shadow-[0_0_40px_18px_rgba(0,255,150,0.13)] z-[-1]" aria-hidden />
       <div className="grid grid-cols-4 gap-2 sm:gap-3">
-        <div className="rounded-[20px] bg-[#0b0f10]">
+        <div className="rounded-[20px] bg-[#0b0f10] relative z-[0]">
         <button
           type="button"
           onClick={() => onAction("sendChoice")}
@@ -38,7 +38,7 @@ export default function WalletDashboardActionRow({ onAction }) {
         </button>
         </div>
 
-        <div className="rounded-[20px] bg-[#0b0f10]">
+        <div className="rounded-[20px] bg-[#0b0f10] relative z-[0]">
         <button
           type="button"
           onClick={() => onAction("receive")}
@@ -64,7 +64,7 @@ export default function WalletDashboardActionRow({ onAction }) {
         </button>
         </div>
 
-        <div className="rounded-[20px] bg-[#0b0f10]">
+        <div className="rounded-[20px] bg-[#0b0f10] relative z-[0]">
         <button
           type="button"
           onClick={() => onAction("swap")}
@@ -92,7 +92,7 @@ export default function WalletDashboardActionRow({ onAction }) {
         </button>
         </div>
 
-        <div className="rounded-[20px] bg-[#0b0f10]">
+        <div className="rounded-[20px] bg-[#0b0f10] relative z-[0]">
         <button
           type="button"
           onClick={() => {
