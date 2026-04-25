@@ -12,10 +12,11 @@ export default function WalletDashboardActionRow({ onAction }) {
       {/* Ombrage vert centré étendu */}
       <div className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2 h-8 bg-transparent shadow-[0_0_40px_18px_rgba(0,255,150,0.13)]" aria-hidden />
       <div className="grid grid-cols-4 gap-2 sm:gap-3">
+        <div className="rounded-[20px] bg-[#0b0f10]">
         <button
           type="button"
           onClick={() => onAction("sendChoice")}
-          className="wallet-action-btn wallet-action-send group"
+          className="wallet-action-btn wallet-action-send group w-full"
         >
           <div className="wallet-action-icon">
             <svg
@@ -35,11 +36,13 @@ export default function WalletDashboardActionRow({ onAction }) {
             {t("ui_send_bee4f9e2f5", "Send")}
           </span>
         </button>
+        </div>
 
+        <div className="rounded-[20px] bg-[#0b0f10]">
         <button
           type="button"
           onClick={() => onAction("receive")}
-          className="wallet-action-btn wallet-action-receive group"
+          className="wallet-action-btn wallet-action-receive group w-full"
         >
           <div className="wallet-action-icon">
             <svg
@@ -59,11 +62,13 @@ export default function WalletDashboardActionRow({ onAction }) {
             {t("ui_receive_127eab0703", "Receive")}
           </span>
         </button>
+        </div>
 
+        <div className="rounded-[20px] bg-[#0b0f10]">
         <button
           type="button"
           onClick={() => onAction("swap")}
-          className="wallet-action-btn wallet-action-swap group"
+          className="wallet-action-btn wallet-action-swap group w-full"
         >
           <div className="wallet-action-icon">
             <svg
@@ -85,7 +90,9 @@ export default function WalletDashboardActionRow({ onAction }) {
             {t("ui_convert_e0fbc97f15", "Convert")}
           </span>
         </button>
+        </div>
 
+        <div className="rounded-[20px] bg-[#0b0f10]">
         <button
           type="button"
           onClick={() => {
@@ -102,7 +109,7 @@ export default function WalletDashboardActionRow({ onAction }) {
                 })
           }
           className={[
-            "wallet-action-btn wallet-action-buysell group",
+            "wallet-action-btn wallet-action-buysell group w-full",
             !cashEnabled ? "opacity-40 cursor-not-allowed" : "",
           ].join(" ")}
         >
@@ -127,6 +134,7 @@ export default function WalletDashboardActionRow({ onAction }) {
           </div>
           <span className="wallet-action-label !text-[16px] !font-normal">Funds</span>
         </button>
+        </div>
       </div>
     </div>
   );
