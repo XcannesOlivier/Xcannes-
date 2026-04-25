@@ -147,13 +147,6 @@ export default function WalletDashboardFooter({ onScan } = {}) {
         <div className="relative h-[72px]">
           <MobileFooterOverlay />
 
-          <span
-            className="absolute right-2 top-[7px] z-20 bg-[#111518] pl-2 text-[8px] font-light tracking-[0.12em] text-[#697173]/60"
-            style={{ backgroundColor: MOBILE_BASE_BG }}
-          >
-            By XCANNES LLC
-          </span>
-
           <MobileScanButton
             onScan={onScan}
             ariaLabel={t(SCAN_LABEL_KEY, "Scan QR Code")}
