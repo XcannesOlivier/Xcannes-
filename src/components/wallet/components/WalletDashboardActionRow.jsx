@@ -10,7 +10,7 @@ export default function WalletDashboardActionRow({ onAction }) {
       className="relative px-3 py-2 md:py-3 space-y-2 md:space-y-3"
     >
       <div className="grid grid-cols-4 gap-2 sm:gap-3 relative z-[1]">
-        <div className="rounded-[20px] bg-gradient-to-b from-[#101415] to-[#0d1214] ring-1 ring-white/[0.06] ring-inset shadow-[-5px_5px_14px_3px_rgba(255,255,255,0.10),0_2px_10px_rgba(0,0,0,0.4),inset_0_-14px_18px_rgba(0,0,0,0.8)]">
+        <div className="rounded-[20px] bg-gradient-to-b from-[#101415] to-[#0d1214] ring-1 ring-white/[0.06] ring-inset shadow-[-5px_5px_14px_3px_rgba(255,255,255,0.05),0_2px_10px_rgba(0,0,0,0.4),inset_0_-14px_18px_rgba(0,0,0,0.8)] md:shadow-[-5px_5px_14px_3px_rgba(255,255,255,0.10),0_2px_10px_rgba(0,0,0,0.4),inset_0_-14px_18px_rgba(0,0,0,0.8)]">
         <button
           type="button"
           onClick={() => onAction("sendChoice")}
@@ -36,7 +36,7 @@ export default function WalletDashboardActionRow({ onAction }) {
         </button>
         </div>
 
-        <div className="rounded-[20px] bg-gradient-to-b from-[#101415] to-[#0d1214] ring-1 ring-white/[0.06] ring-inset shadow-[-5px_5px_14px_3px_rgba(255,255,255,0.10),0_2px_10px_rgba(0,0,0,0.4),inset_0_-14px_18px_rgba(0,0,0,0.8)]">
+        <div className="rounded-[20px] bg-gradient-to-b from-[#101415] to-[#0d1214] ring-1 ring-white/[0.06] ring-inset shadow-[-5px_5px_14px_3px_rgba(255,255,255,0.05),0_2px_10px_rgba(0,0,0,0.4),inset_0_-14px_18px_rgba(0,0,0,0.8)] md:shadow-[-5px_5px_14px_3px_rgba(255,255,255,0.10),0_2px_10px_rgba(0,0,0,0.4),inset_0_-14px_18px_rgba(0,0,0,0.8)]">
         <button
           type="button"
           onClick={() => onAction("receive")}
@@ -62,7 +62,7 @@ export default function WalletDashboardActionRow({ onAction }) {
         </button>
         </div>
 
-        <div className="rounded-[20px] bg-gradient-to-b from-[#101415] to-[#0d1214] ring-1 ring-white/[0.06] ring-inset shadow-[-5px_5px_14px_3px_rgba(255,255,255,0.10),0_2px_10px_rgba(0,0,0,0.4),inset_0_-14px_18px_rgba(0,0,0,0.8)]">
+        <div className="rounded-[20px] bg-gradient-to-b from-[#101415] to-[#0d1214] ring-1 ring-white/[0.06] ring-inset shadow-[-5px_5px_14px_3px_rgba(255,255,255,0.05),0_2px_10px_rgba(0,0,0,0.4),inset_0_-14px_18px_rgba(0,0,0,0.8)] md:shadow-[-5px_5px_14px_3px_rgba(255,255,255,0.10),0_2px_10px_rgba(0,0,0,0.4),inset_0_-14px_18px_rgba(0,0,0,0.8)]">
         <button
           type="button"
           onClick={() => onAction("swap")}
@@ -90,7 +90,7 @@ export default function WalletDashboardActionRow({ onAction }) {
         </button>
         </div>
 
-        <div className="rounded-[20px] bg-gradient-to-b from-[#101415] to-[#0d1214] ring-1 ring-white/[0.06] ring-inset shadow-[-5px_5px_14px_3px_rgba(255,255,255,0.10),0_2px_10px_rgba(0,0,0,0.4),inset_0_-14px_18px_rgba(0,0,0,0.8)]">
+        <div className="rounded-[20px] bg-gradient-to-b from-[#101415] to-[#0d1214] ring-1 ring-white/[0.06] ring-inset shadow-[-5px_5px_14px_3px_rgba(255,255,255,0.05),0_2px_10px_rgba(0,0,0,0.4),inset_0_-14px_18px_rgba(0,0,0,0.8)] md:shadow-[-5px_5px_14px_3px_rgba(255,255,255,0.10),0_2px_10px_rgba(0,0,0,0.4),inset_0_-14px_18px_rgba(0,0,0,0.8)]">
         <button
           type="button"
           onClick={() => {
