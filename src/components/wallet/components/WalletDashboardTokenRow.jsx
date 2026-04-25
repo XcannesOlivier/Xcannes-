@@ -7,7 +7,6 @@ import {
   getCurrencyFlag,
   getTokenIcon,
   getDisplayCurrencyCode,
-  formatAmountWithSymbol,
   USD_STABLECOINS,
 } from "../walletDashboardConfig";
 import { useTranslation } from "next-i18next";
@@ -124,15 +123,11 @@ export default function WalletDashboardTokenRow({
           <div className="flex-1" />
           <div className="text-right text-xl md:text-2xl text-primary shrink-0 leading-tight">
             <div className="font-mono">
-                  {Number.isFinite(displayValue)
-                ? formatAmountWithSymbol(locale, displayValue, displayCode, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })
-                : formatAmountWithSymbol(locale, 0, displayCode, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
+              {Number.isFinite(displayValue)
+                ? new Intl.NumberFormat(locale || "en", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(displayValue)
+                : "0.00"}
+              {" "}
+              <span className="text-sm md:text-base font-normal text-white/60">{displayCode}</span>
             </div>
           </div>
         </div>
