@@ -10,7 +10,7 @@ export default function WalletDashboardActionRow({ onAction }) {
       className="relative px-3 py-2 md:py-3 space-y-2 md:space-y-3"
     >
       {/* Ombrage vert centré étendu */}
-      <div className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2 h-28 bg-[radial-gradient(ellipse_100%_100%_at_50%_50%,rgba(0,255,150,0.12),transparent_70%)] z-[0]" aria-hidden />
+      <div className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2 h-28 bg-[radial-gradient(ellipse_100%_100%_at_50%_50%,rgba(0,255,150,0.06),transparent_70%)] z-[0]" aria-hidden />
       <div className="grid grid-cols-4 gap-2 sm:gap-3 relative z-[1]">
         <div className="rounded-[20px] bg-[#0b0f10]">
         <button
