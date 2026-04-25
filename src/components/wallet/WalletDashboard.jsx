@@ -1138,13 +1138,7 @@ export default function WalletDashboard({
           ) : null}
 
           {/* Token list */}
-          <div
-            className="relative flex-1 flex flex-col min-h-0"
-          >
-            {/* Gradient mobile */}
-            <div className="md:hidden absolute inset-0 z-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 70% 220px at 50% 60%, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.09) 55%, transparent 100%)' }} aria-hidden />
-            {/* Gradient desktop */}
-            <div className="hidden md:block absolute inset-0 z-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 70% 220px at 50% 60%, rgba(255,255,255,0.30) 0%, rgba(255,255,255,0.11) 55%, transparent 100%)' }} aria-hidden />
+          <div className="relative flex-1 flex flex-col min-h-0">
             <WalletDashboardTokenList
               tokens={tokenListTokens}
               renderTokenRow={renderTokenRow}
