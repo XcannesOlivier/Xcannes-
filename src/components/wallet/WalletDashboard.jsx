@@ -1153,7 +1153,7 @@ export default function WalletDashboard({
                   <button
                     type="button"
                     onClick={handleOpenGlobalStatement}
-                    className="shrink-0 inline-flex items-center gap-1.5 text-[13px] md:text-[15px] font-normal text-white/55 hover:text-white/85 transition-colors px-2.5 md:px-3 py-1 md:py-1.5 rounded-full ring-1 ring-white/10 hover:ring-white/20"
+                    className="shrink-0 inline-flex items-center gap-1.5 text-[13px] md:text-[15px] font-normal text-white/55 hover:text-white/85 transition-colors px-2.5 md:px-3 py-1 md:py-1.5 rounded-lg ring-1 ring-white/10 hover:ring-white/20"
                     title={
                       recentActivityMessage
                         ? recentActivityMessage

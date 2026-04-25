@@ -26,7 +26,7 @@ export default function WalletDashboardTokenList({
     >
       {(headerTitle || headerActionLabel) && (
         <div
-          className={`flex items-center gap-2 mb-0.5 md:mb-1 px-3 pt-4 bg-[linear-gradient(to_bottom,transparent_0%,#060809_calc(100%-8px),#060809_100%)] md:bg-[linear-gradient(to_bottom,transparent_0%,#0a0d0e_calc(100%-8px),#0a0d0e_100%)] ${
+          className={`flex items-center gap-2 mb-2 md:mb-1 px-3 pt-4 bg-[linear-gradient(to_bottom,transparent_0%,#060809_calc(100%-8px),#060809_100%)] md:bg-[linear-gradient(to_bottom,transparent_0%,#0a0d0e_calc(100%-8px),#0a0d0e_100%)] ${
             headerJustifyClass
           }`}
         >
