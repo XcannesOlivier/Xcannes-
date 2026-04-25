@@ -59,7 +59,7 @@ function MobileFooterOverlay() {
   return (
     <div
       className="absolute inset-x-0 top-0 overflow-visible"
-      style={{ height: 88 }}
+      style={{ height: 72 }}
       aria-hidden
     >
       <div
@@ -119,13 +119,13 @@ function MobileScanButton({ onScan, ariaLabel }) {
   return (
     <>
       <div
-        className="pointer-events-none absolute left-1/2 top-[15px] z-0 h-[58px] w-[162px] -translate-x-1/2 rounded-full bg-black/75 blur-[14px]"
+        className="pointer-events-none absolute left-1/2 top-[12px] z-0 h-[58px] w-[162px] -translate-x-1/2 rounded-full bg-black/75 blur-[14px]"
         aria-hidden
       />
       <button
         type="button"
         onClick={onScan}
-        className="absolute left-1/2 top-[8px] z-10 flex h-[60px] w-[170px] -translate-x-1/2 items-center justify-center rounded-full text-white transition-transform duration-150 hover:scale-[1.01] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#39d57c]/20"
+        className="absolute left-1/2 top-[5px] z-10 flex h-[60px] w-[170px] -translate-x-1/2 items-center justify-center rounded-full text-white transition-transform duration-150 hover:scale-[1.01] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#39d57c]/20"
         style={scanButtonStyle}
         aria-label={ariaLabel}
       >
@@ -144,7 +144,7 @@ export default function WalletDashboardFooter({ onScan } = {}) {
         className="relative overflow-visible bg-[#111518] shadow-[inset_0_-16px_28px_rgba(255,255,255,0.03),inset_0_46px_70px_rgba(0,0,0,0.55)] md:hidden"
         style={mobileFooterStyle}
       >
-        <div className="relative h-[88px]">
+        <div className="relative h-[72px]">
           <MobileFooterOverlay />
 
           <span
