@@ -306,7 +306,7 @@ export default function WalletDashboardHeader({
 	                  onClick={(e) => { e.stopPropagation(); closeSwitcher(); }}
 	                />
 	              )}
-	              <div className="flex-none min-w-0 max-w-[180px] md:max-w-[200px] rounded-[12px] bg-[#0d1214] px-2 md:px-2.5 py-1.5 ring-1 ring-white/[0.06] ring-inset shadow-[0_2px_6px_rgba(0,0,0,0.4)] relative z-[41]">
+	              <div className="flex-none min-w-0 max-w-[220px] md:max-w-[360px] rounded-[12px] bg-[#0d1214] px-2 md:px-3 py-1.5 md:py-2 ring-1 ring-white/[0.06] ring-inset shadow-[0_2px_6px_rgba(0,0,0,0.4)] relative z-[41]">
 	                <div className="flex items-start justify-between gap-3" ref={switcherRef}>
                   <div className="min-w-0 flex-1">
                     {/* Wallet name + address — clickable when multi-wallet */}
@@ -324,7 +324,7 @@ export default function WalletDashboardHeader({
                           aria-label={xrplConnectionIndicator.label}
                         />
 
-	                        <span className="text-[14px] md:text-[15px] font-semibold text-white/90 truncate">
+	                        <span className="text-[14px] md:text-[17px] font-semibold text-white/90 truncate">
 	                          {activeWalletLabel.length > 11 ? activeWalletLabel.slice(0, 11) + '…' : activeWalletLabel}
 	                        </span>
                       </div>
@@ -430,7 +430,7 @@ export default function WalletDashboardHeader({
               {/* Copier / Refresh removed (mobile UI simplification) */}
 
               {/* Bouton Paramètres (à côté du refresh, même style) */}
-              <div className="md:ml-auto">
+              <div className="ml-auto">
               <WalletSettingsDropdown
                 position="inline"
                 isDesktopPanel={isDesktopPanel}
