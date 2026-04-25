@@ -456,13 +456,13 @@ export default function WalletSettingsDropdown({
         ref={buttonRef}
         className={[
           inlineButton
-            ? "shrink-0 h-10 px-2.5 flex items-center justify-center gap-2 rounded-md transition-all active:scale-95 drop-shadow-[0_2px_6px_rgba(0,0,0,0.7)]"
-            : "shrink-0 h-9 px-2.5 flex items-center justify-center gap-2 rounded-lg border transition-all active:scale-95 drop-shadow-[0_2px_6px_rgba(0,0,0,0.7)]",
+            ? "shrink-0 h-10 px-2.5 flex items-center justify-center gap-2 rounded-md transition-all active:scale-95 bg-black/30 shadow-[0_4px_14px_rgba(0,0,0,0.85),0_0_0_1px_rgba(255,255,255,0.07)]"
+            : "shrink-0 h-9 px-2.5 flex items-center justify-center gap-2 rounded-lg border transition-all active:scale-95 bg-black/30 shadow-[0_4px_14px_rgba(0,0,0,0.85),0_0_0_1px_rgba(255,255,255,0.07)]",
           isOpen
             ? inlineButton
-              ? "bg-white/5 text-white"
-              : "bg-white/5 border-white/12 text-white shadow-[0_0_0_1px_rgba(255,255,255,0.06)]"
-            : "bg-transparent border-transparent text-white/60 hover:text-white hover:bg-white/5",
+              ? "text-white"
+              : "border-white/12 text-white"
+            : "border-transparent text-white/60 hover:text-white",
         ].join(" ")}
         aria-label={t("ui_settings_label", "Paramètres")}
         aria-haspopup="menu"
