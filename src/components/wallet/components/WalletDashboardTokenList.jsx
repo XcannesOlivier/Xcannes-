@@ -26,7 +26,7 @@ export default function WalletDashboardTokenList({
     >
       {(headerTitle || headerActionLabel) && (
         <div
-          className={`flex items-center gap-2 mb-0.5 md:mb-1 px-3 pt-4 bg-[#0a0d0e] ${
+          className={`flex items-center gap-2 mb-0.5 md:mb-1 px-3 pt-4 bg-[#060809] md:bg-[#0a0d0e] ${
             headerJustifyClass
           }`}
         >
