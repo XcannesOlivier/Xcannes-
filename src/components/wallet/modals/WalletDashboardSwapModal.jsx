@@ -19,6 +19,14 @@ import {
 import { CRYPTO_ICONS } from "@/utils/marketConstants";
 import { getCurrencyDescription } from "@/utils/currencyDescriptions";
 
+const fmtAmountRight = (raw) => {
+  if (!raw) return null;
+  const str = String(raw);
+  const i = str.lastIndexOf(' ');
+  if (i < 0) return <span>{str}</span>;
+  return <span className="inline-flex items-baseline gap-[3px]">{str.slice(0, i)}<span className="text-[0.78em]">{str.slice(i + 1)}</span></span>;
+};
+
 export default function WalletDashboardSwapModal({
   open,
   onClose,
@@ -671,7 +679,7 @@ export default function WalletDashboardSwapModal({
                                 <span>{t("ui_balances_short_label_aa12", "Soldes")}</span>
                               </span>
                             )
-                            : labelRightRaw;
+                            : fmtAmountRight(labelRightRaw);
                         return {
                           value: code,
                           icon: getIconForCode(code),
@@ -799,7 +807,7 @@ export default function WalletDashboardSwapModal({
                                 <span>{t("ui_balances_short_label_aa12", "Soldes")}</span>
                               </span>
                             )
-                            : labelRightRaw;
+                            : fmtAmountRight(labelRightRaw);
                         const isNewLine = !existingCurrencyLinesSet.has(code) && code && code !== "USD";
                         const labelWithHint = isNewLine ? (
                           <>{labelLeft} <span className="text-[11px] text-white/35 font-normal">{t("ui_new_currency_line_auto_activate_a1b2c3", "the {{currency}} line will be created automatically.").replace("{{currency}}", code)}</span></>

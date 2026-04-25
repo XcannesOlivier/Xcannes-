@@ -14,6 +14,14 @@ import { greenActionBtnBase, simpleSwapBlueActionBtnBase } from './walletModalTo
 import { getCurrencyFlag, formatAmountWithSymbol } from '../walletDashboardConfig';
 import { getCurrencyDescription } from '@/utils/currencyDescriptions';
 
+const fmtAmountRight = (raw) => {
+  if (!raw) return null;
+  const str = String(raw);
+  const i = str.lastIndexOf(' ');
+  if (i < 0) return <span>{str}</span>;
+  return <span className="inline-flex items-baseline gap-[3px]">{str.slice(0, i)}<span className="text-[0.78em]">{str.slice(i + 1)}</span></span>;
+};
+
 const DEBUG_LOGS = process.env.NEXT_PUBLIC_DEBUG_LOGS === 'true';
 const MOONPAY_ORIGIN_SUFFIX = '.moonpay.com';
 const MOONPAY_ACTIVE_STORAGE_KEY = 'xcannes_moonpay_active';
@@ -290,11 +298,8 @@ const MoonPayBuyModal = ({
         if (!currencyCode || seen.has(currencyCode)) return null;
         seen.add(currencyCode);
 
-        const labelLeft =
-          selectLabelByCurrency?.[currencyRaw] ||
-          selectLabelByCurrency?.[currencyCode] ||
-          getCurrencyDescription(currencyCode) ||
-          currencyCode;
+        const _fullNameBuy = getCurrencyDescription(currencyCode) || selectLabelByCurrency?.[currencyRaw] || selectLabelByCurrency?.[currencyCode] || currencyCode;
+        const labelLeft = _fullNameBuy.length > 15 ? _fullNameBuy.slice(0, 15) + '…' : _fullNameBuy;
         const amountValue = Number(token?.value || 0);
         const fallbackAmountLabel = Number.isFinite(amountValue)
           ? formatAmountWithSymbol(locale, amountValue, currencyCode, {
@@ -1886,7 +1891,7 @@ const MoonPayBuyModal = ({
                       </span>
                     )
                     : (opt.amountLabel
-                        ? opt.amountLabel
+                        ? fmtAmountRight(opt.amountLabel)
                         : null);
                   return {
                     value: opt.code,

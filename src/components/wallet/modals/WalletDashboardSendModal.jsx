@@ -9,7 +9,16 @@ import { createPortal } from "react-dom";
 import { useTranslation } from "next-i18next";
 import { useModalTransition } from "@/hooks/useModalTransition";
 import { formatAmountWithSymbol } from "../walletDashboardConfig";
+import { getCurrencyDescription } from "@/utils/currencyDescriptions";
 import { greenActionBtnBase } from "./walletModalTokens";
+
+const fmtAmountRight = (raw) => {
+  if (!raw) return null;
+  const str = String(raw);
+  const i = str.lastIndexOf(' ');
+  if (i < 0) return <span>{str}</span>;
+  return <span className="inline-flex items-baseline gap-[3px]">{str.slice(0, i)}<span className="text-[0.78em]">{str.slice(i + 1)}</span></span>;
+};
 import { normalizeQrImageFile } from "@/utils/qrImage";
 import { apiUrl } from "@/lib/runtimeConfig";
 
@@ -1242,10 +1251,9 @@ export default function WalletDashboardSendModal({
                 onOpenChange={setSendAssetDropdownOpen}
               hideSelected
               options={(augmentedTokens || []).map((token) => {
-                const labelLeftText =
-                  selectLabelByAssetKey?.[token.key] ||
-                  selectLabelByAssetKey?.[token.currency] ||
-                  token.currency;
+                const _currency = String(token?.currency || '').toUpperCase();
+                const _fullName = getCurrencyDescription(_currency) || selectLabelByAssetKey?.[token.key] || selectLabelByAssetKey?.[token.currency] || token.currency;
+                const labelLeftText = _fullName.length > 15 ? _fullName.slice(0, 15) + '…' : _fullName;
                 const labelLeft = <span className="md:text-[1.12em]">{labelLeftText}</span>;
                 const labelRightRaw =
                   selectLabelRightByAssetKey?.[token.key] ||
@@ -1263,7 +1271,7 @@ export default function WalletDashboardSendModal({
                         <span>{t("ui_balances_short_label_aa12", "Soldes")}</span>
                       </span>
                     )
-                    : labelRightRaw;
+                    : fmtAmountRight(labelRightRaw);
                 return {
                   value: token.key,
                   icon:

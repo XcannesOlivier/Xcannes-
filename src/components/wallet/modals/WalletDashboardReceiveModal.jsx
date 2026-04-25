@@ -12,7 +12,16 @@ import { XRPL_KNOWN_ISSUERS } from '@/utils/xrpl';
 
 import { useModalTransition } from '@/hooks/useModalTransition';
 import { formatAmountWithSymbol } from '../walletDashboardConfig';
+import { getCurrencyDescription } from '@/utils/currencyDescriptions';
 import WalletActiveLabel from '../components/WalletActiveLabel';
+
+const fmtAmountRight = (raw) => {
+  if (!raw) return null;
+  const str = String(raw);
+  const i = str.lastIndexOf(' ');
+  if (i < 0) return <span>{str}</span>;
+  return <span className="inline-flex items-baseline gap-[3px]">{str.slice(0, i)}<span className="text-[0.78em]">{str.slice(i + 1)}</span></span>;
+};
 
 const ShareIcon = ({ className = '' }) => (
   <svg
@@ -1522,10 +1531,8 @@ export default function WalletDashboardReceiveModal({
   		                          onOpenChange={setRequestCurrencyDropdownOpen}
 	                          options={(augmentedTokens || []).map(token => {
                             const currencyUpper = String(token.currency || '').toUpperCase();
-                            const labelLeftText =
-                              selectLabelByCurrency?.[token.currency] ||
-                              selectLabelByCurrency?.[currencyUpper] ||
-                              token.currency;
+                            const _fullName = getCurrencyDescription(currencyUpper) || selectLabelByCurrency?.[token.currency] || selectLabelByCurrency?.[currencyUpper] || token.currency;
+                            const labelLeftText = _fullName.length > 15 ? _fullName.slice(0, 15) + '…' : _fullName;
                             const labelLeft = <span className="md:text-[1.12em]">{labelLeftText}</span>;
                               const labelRightRaw =
                               selectLabelRightByCurrency?.[token.currency] ||

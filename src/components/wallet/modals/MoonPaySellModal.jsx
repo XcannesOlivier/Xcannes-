@@ -15,6 +15,14 @@ import { getCurrencyDescription } from "@/utils/currencyDescriptions";
 import { isIOSDevice } from "@/utils/deviceDetect";
 import ModalSelect from "@/components/ui/ModalSelect";
 
+const fmtAmountRight = (raw) => {
+  if (!raw) return null;
+  const str = String(raw);
+  const i = str.lastIndexOf(' ');
+  if (i < 0) return <span>{str}</span>;
+  return <span className="inline-flex items-baseline gap-[3px]">{str.slice(0, i)}<span className="text-[0.78em]">{str.slice(i + 1)}</span></span>;
+};
+
 
 const DEBUG_LOGS = process.env.NEXT_PUBLIC_DEBUG_LOGS === "true";
 const MOONPAY_ORIGIN_SUFFIX = ".moonpay.com";
@@ -521,11 +529,8 @@ const MoonPaySellModal = ({
 	        if (!currency || seen.has(currency)) return null;
 	        seen.add(currency);
 
-        const labelLeft =
-          selectLabelByCurrency?.[currencyRaw] ||
-          selectLabelByCurrency?.[currency] ||
-          getCurrencyDescription(currency) ||
-          currency;
+        const _fullNameSell = getCurrencyDescription(currency) || selectLabelByCurrency?.[currencyRaw] || selectLabelByCurrency?.[currency] || currency;
+        const labelLeft = _fullNameSell.length > 15 ? _fullNameSell.slice(0, 15) + '…' : _fullNameSell;
         const amountValue = Number(token?.value || 0);
         const fallbackAmountLabel = Number.isFinite(amountValue)
           ? formatAmountWithSymbol(locale, amountValue, currency, {
@@ -1654,7 +1659,7 @@ const MoonPaySellModal = ({
 		                      </span>
 		                    )
 		                    : (opt.amountLabel
-		                        ? opt.amountLabel
+		                        ? fmtAmountRight(opt.amountLabel)
 		                        : null);
 		                  return {
 		                    value: opt.code,
