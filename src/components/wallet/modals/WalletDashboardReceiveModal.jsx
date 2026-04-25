@@ -1573,7 +1573,8 @@ export default function WalletDashboardReceiveModal({
 	                          showMobileOptionRight={true}
 	                          backdropClassName="bg-black/80 backdrop-blur-[4px] !z-[45]"
 	                          iconClassName="text-3xl leading-none"
-	                          optionClassName="py-2.5 md:py-3 !text-xl md:!text-2xl"
+	                          optionIconClassName="text-2xl leading-none opacity-60"
+	                          optionClassName="py-2 md:py-2.5 !text-base md:!text-lg !text-white/60"
 	                          menuHeader={t("ui_your_balances_header", "Vos soldes")}
 		                          menuClassName={
 		                            noticeVariant === 'demo'

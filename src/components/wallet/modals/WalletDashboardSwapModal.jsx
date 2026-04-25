@@ -694,7 +694,8 @@ export default function WalletDashboardSwapModal({
 		                      hideSelected
 		                      showMobileOptionRight={true}
 		                      iconClassName="text-3xl leading-none"
-                          optionClassName="py-2.5 md:py-3 !text-xl md:!text-2xl"
+                          optionIconClassName="text-2xl leading-none opacity-60"
+                          optionClassName="py-2 md:py-2.5 !text-base md:!text-lg !text-white/60"
                           menuHeader={t("ui_your_balances_header", "Vos soldes")}
                           backdropClassName="bg-black/80 backdrop-blur-[4px] !z-[45]"
                           buttonClassName="bg-gradient-to-b from-[#101415] to-[#0d1214] ring-1 ring-white/[0.07] ring-inset rounded-[14px] px-3.5 py-1.5 md:py-2 text-xl md:text-2xl text-white outline-none focus:outline-none cursor-pointer transition-all duration-150 shadow-[0_2px_8px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.06)]"
@@ -826,10 +827,11 @@ export default function WalletDashboardSwapModal({
 		                      hideSelected
 		                      showMobileOptionRight={true}
 		                      iconClassName="text-3xl leading-none"
+                          optionIconClassName="text-2xl leading-none opacity-60"
                           backdropClassName="bg-black/80 backdrop-blur-[4px] !z-[45]"
                           buttonClassName="bg-gradient-to-b from-[#101415] to-[#0d1214] ring-1 ring-white/[0.07] ring-inset rounded-[14px] px-3.5 py-2 text-xl md:text-2xl text-white outline-none focus:outline-none cursor-pointer transition-all duration-150 shadow-[0_2px_8px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.06)]"
                           openButtonClassName="!bg-white/10 !border !border-white/10 !border-b-0 !ring-1 !ring-white/10 !shadow-[0_8px_18px_rgba(0,0,0,0.45)]"
-                          optionClassName="py-2.5 md:py-3 !text-xl md:!text-2xl"
+                          optionClassName="py-2 md:py-2.5 !text-base md:!text-lg !text-white/60"
                           menuHeader={t("ui_your_balances_header", "Vos soldes")}
 		                      menuClassName={
 		                        noticeVariant === "demo"

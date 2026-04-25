@@ -14,6 +14,7 @@ export default function ModalSelect({
   optionClassName = "",
   selectClassName = "",
   iconClassName = "",
+  optionIconClassName = "",
   useNativeSelect = true,
   hideMobileSelectedRight = false,
   useMobileSelectedLabel = false,
@@ -168,6 +169,15 @@ export default function ModalSelect({
     return null;
   };
 
+  const renderOptionIcon = (icon) => {
+    if (!icon) return null;
+    const cls = optionIconClassName || iconClassName || "text-base leading-none";
+    if (isValidElement(icon)) return <span className={cls}>{icon}</span>;
+    if (typeof icon === "string" || typeof icon === "number") return <span className={cls} aria-hidden="true">{icon}</span>;
+    if (icon?.src) return <Image src={icon.src} alt={icon.alt || ""} width={16} height={16} className="w-4 h-4 object-contain opacity-70" />;
+    return null;
+  };
+
   const selectedLeft = selected?.labelLeft ?? selected?.label ?? placeholder;
   const selectedRight = selected?.labelRight ?? null;
   const customMenuClassName = useNativeSelect ? "relative hidden md:block" : "relative";
@@ -305,7 +315,7 @@ export default function ModalSelect({
                 className={`w-full text-left px-3 py-2 text-sm text-white/80 hover:bg-white/10 ${optionClassName}`}
               >
                 <span className="flex items-start gap-2">
-                  {renderIcon(opt.icon)}
+                  {renderOptionIcon(opt.icon)}
                   {description ? (
                     <span className="flex flex-col min-w-0 flex-1">
                       <span className="flex items-center gap-2 min-w-0 flex-1">
@@ -380,7 +390,7 @@ export default function ModalSelect({
                 className={`w-full text-left px-3 py-2 text-sm text-white/80 hover:bg-white/10 ${optionClassName}`}
               >
                 <span className="flex items-start gap-2">
-                  {renderIcon(opt.icon)}
+                  {renderOptionIcon(opt.icon)}
                   {description ? (
                     <span className="flex flex-col min-w-0 flex-1">
                       <span className="flex items-center gap-2 min-w-0 flex-1">
