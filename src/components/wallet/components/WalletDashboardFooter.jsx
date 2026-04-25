@@ -118,8 +118,14 @@ function MobileScanButton({ onScan, ariaLabel }) {
 
   return (
     <>
+      {/* Masque solide — couvre la zone transparente du creux de la moustache */}
       <div
-        className="pointer-events-none absolute left-1/2 top-[1px] z-0 h-[48px] w-[162px] -translate-x-1/2 rounded-full bg-[#111518] blur-[18px]"
+        className="pointer-events-none absolute left-1/2 top-0 z-[1] h-[30px] w-[180px] -translate-x-1/2 bg-[#111518]"
+        aria-hidden
+      />
+      {/* Blur doux pour adoucir les bords latéraux */}
+      <div
+        className="pointer-events-none absolute left-1/2 top-[1px] z-0 h-[48px] w-[200px] -translate-x-1/2 rounded-full bg-[#111518] blur-[14px]"
         aria-hidden
       />
       <button
