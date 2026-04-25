@@ -451,7 +451,7 @@ export default function WalletDashboardHeader({
           </div>
         )}
 
-        <div className="text-xl md:text-xl text-white/60 mb-2 md:mb-0">
+        <div className="text-[22px] md:text-[28px] text-white/60 mb-2 md:mb-0">
           {t("ui_total_balance_label_a91b6b8c1e", "Solde total")}
         </div>
         <p className="text-6xl md:text-6xl lg:text-7xl font-sans font-bold text-white tabular-nums tracking-tight">
