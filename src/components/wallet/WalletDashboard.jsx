@@ -1142,7 +1142,7 @@ export default function WalletDashboard({
             className="relative flex-1 flex flex-col min-h-0"
             style={{
               background:
-                'radial-gradient(ellipse 70% 220px at 50% 0%, rgba(34,197,94,0.13) 0%, rgba(34,197,94,0.04) 55%, transparent 100%)',
+                'radial-gradient(ellipse 70% 220px at 50% 30%, rgba(34,197,94,0.13) 0%, rgba(34,197,94,0.04) 55%, transparent 100%)',
             }}
           >
             <WalletDashboardTokenList
