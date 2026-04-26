@@ -319,72 +319,8 @@ export default function WalletDashboardCashModal({
               </div>
             ) : null}
             <div className="relative z-[2] flex flex-col flex-1 min-h-0">
-		          {/* Header */}
-			          {!rampActive ? (
-			            <div className="border-b border-white/10">
-			              <div
-			                className={[
-			                  "flex gap-3",
-			                  cashModalTab === "buy" || cashModalTab === "sell"
-			                    ? "items-center px-3 py-2 md:items-start md:p-4"
-			                    : "items-start p-4",
-			                ].join(" ")}
-			              >
-					                <div className="flex min-w-0 flex-1 flex-col gap-1.5 md:flex-row md:items-center md:gap-2">
-		                  {showWalletMeta ? (
-		                    <div>{renderWalletMeta?.("pr-8")}</div>
-		                  ) : null}
-		                  <div className="flex flex-wrap items-center gap-2">
-		                    {noticeVariant === "demo" ? (
-	                      <span className="inline-flex items-center text-white/80 text-sm md:text-base font-semibold px-2 py-1 leading-none">
-	                        {t("demo_notice_title", "Mode démo")}
-	                      </span>
-		                    ) : null}
-		                  </div>
-		                </div>
-
-                    {bothProvidersEnabled && !(forceSimpleSwapBuy || forceSimpleSwapSell) ? (
-                      <div className="flex items-center gap-1 rounded-full bg-white/10 ring-1 ring-white/10 p-1">
-                        <button
-                          type="button"
-                          onClick={() => setRampProvider("moonpay")}
-                          className={[
-                            "px-3 py-1 rounded-full text-xs font-semibold transition-colors",
-                            rampProvider === "moonpay"
-                              ? "bg-white/20 text-white"
-                              : "text-white/70 hover:text-white",
-                          ].join(" ")}
-                        >
-                          MoonPay
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setRampProvider("topper")}
-                          className={[
-                            "px-3 py-1 rounded-full text-xs font-semibold transition-colors",
-                            rampProvider === "topper"
-                              ? "bg-white/20 text-white"
-                              : "text-white/70 hover:text-white",
-                          ].join(" ")}
-                        >
-                          Topper
-                        </button>
-                      </div>
-                    ) : null}
-
-		                  {cashModalTab !== "buy" && cashModalTab !== "sell" ? (
-		                    <button
-		                      type="button"
-		                      onClick={onClose}
-		                      className="wallet-modal-close text-white/60 hover:text-white transition-colors text-xl"
-		                      aria-label={t("close", "Close")}
-	                    >
-	                      ✕
-	                    </button>
-	                  ) : null}
-		              </div>
-		            </div>
-		          ) : (
+		          {/* Header — visible uniquement quand l'iframe est active */}
+		          {rampActive ? (
 		            <div className="relative z-20 border-b border-white/10 bg-black/40 backdrop-blur-md">
 		              <div className="flex items-center justify-between px-3 py-2">
 		                <div className="flex items-center gap-2 min-w-0">
@@ -450,7 +386,7 @@ export default function WalletDashboardCashModal({
 		                </div>
 		              </div>
 		            </div>
-	          )}
+	          ) : null}
 
 		          {/* Swipe bar mobile — grande zone tactile au-dessus du contenu scrollable */}
           {!rampActive && (cashModalTab === "buy" || cashModalTab === "sell") ? (
