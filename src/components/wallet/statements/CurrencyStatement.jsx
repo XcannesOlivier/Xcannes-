@@ -1893,7 +1893,7 @@ export default function CurrencyStatement({
                                 ref={isHighlighted ? highlightRowRef : null}
                                 onClick={() => openTxDetails(tx)}
                                 className={[
-                                  "w-full flex items-center gap-1.5 text-left px-3 py-2 transition-colors duration-150",
+                                  "w-full flex items-center gap-1.5 text-left px-3 py-2 rounded-[16px] bg-[#101415] ring-1 ring-inset ring-white/[0.06] shadow-[inset_0_-14px_18px_rgba(0,0,0,0.8)] transition-colors duration-150",
                                   isHighlighted
                                     ? "text-white"
                                     : "text-white/90 hover:text-white",

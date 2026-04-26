@@ -1994,7 +1994,7 @@ export default function GlobalStatement({
                           "w-full text-left rounded-[20px] px-3 transition-colors duration-150",
                           isLatest
                             ? "py-3 ring-2 ring-inset bg-[#101415] shadow-[inset_0_1px_0_rgba(255,255,255,0.08),inset_0_-14px_22px_rgba(0,0,0,0.5)] ring-white/45 transform-gpu scale-[1.03] origin-center drop-shadow-[0_10px_18px_rgba(0,0,0,0.55)] transition-transform duration-150"
-                            : "py-2 ring-0 bg-transparent shadow-none",
+                            : "py-2 ring-1 ring-inset ring-white/[0.06] bg-[#101415] shadow-[inset_0_-14px_18px_rgba(0,0,0,0.8)]",
                         ].join(" ")}
                     >
                       <div className="flex items-start justify-between gap-3">
