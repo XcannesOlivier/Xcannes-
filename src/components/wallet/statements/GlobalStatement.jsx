@@ -1857,37 +1857,35 @@ export default function GlobalStatement({
               <button
                 type="button"
                 onClick={() => setAccountDropdownOpen((prev) => !prev)}
-                className={`w-full inline-flex items-center justify-center gap-3 px-6 py-1.5 bg-[#101415] border border-white/10 ${accountDropdownOpen ? "rounded-t-[16px] rounded-b-none border-b-0" : "rounded-[16px]"} shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)] transition-colors`}
+                className={`w-full inline-flex flex-col items-center gap-1 px-6 py-2 bg-elevated ${accountDropdownOpen ? "rounded-t-[20px] rounded-b-none ring-1 ring-white/20 ring-inset shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_10px_rgba(255,255,255,0.16)]" : "rounded-3xl shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]"} transition-all`}
                 aria-haspopup="menu"
                 aria-expanded={accountDropdownOpen}
                 title={t("ui_current_account_plain", "Compte actuel")}
               >
-                <span className="text-[14px] md:text-[15px] font-medium tracking-wide text-white/70 mr-2">
+                <span className="text-white/70 text-[14px] md:text-[15px] font-medium tracking-wide">
                   {t("ui_current_account_plain", "Compte actuel")}
                 </span>
-                <WalletActiveLabel
-                  prefix=""
-                  label={walletLabel || t("nav_wallet", "Wallet")}
-                  labelWrap={false}
-                  className="inline-flex items-center"
-                  labelClassName="!text-white/95 text-[14px] md:text-[15px] font-semibold"
-                  dotClassName="!h-3 !w-3 ring-xcannes-green/20 self-center"
-                />
-                <svg
-                  className={`w-3 h-3 text-white/70 transition-transform duration-150 ${accountDropdownOpen ? "rotate-180" : ""}`}
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
-                >
-                  <path d="M6 9l6 6 6-6" />
-                </svg>
+                <div className="flex items-center gap-2">
+                  <span className="h-3 w-3 rounded-full bg-xcannes-green ring-4 ring-xcannes-green/20 shrink-0 animate-pulse" aria-hidden />
+                  <span className="text-white/95 text-[14px] md:text-[15px] font-semibold">
+                    {walletLabel || t("nav_wallet", "Wallet")}
+                  </span>
+                  <svg
+                    className={`w-3 h-3 text-white/50 transition-transform duration-150 ${accountDropdownOpen ? "rotate-180" : ""}`}
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M6 9l6 6 6-6" />
+                  </svg>
+                </div>
               </button>
               {accountDropdownOpen && walletAddress ? (
-                <div className="w-full -mt-px rounded-b-none border border-white/10 border-t-0 bg-[#101415] px-3 py-2 shadow-[0_8px_18px_rgba(0,0,0,0.45)]">
+                <div className="w-full -mt-px rounded-b-[20px] rounded-t-none ring-1 ring-white/20 ring-inset bg-[#101415] px-4 py-3 shadow-[0_8px_18px_rgba(0,0,0,0.45)]">
                   <div className="flex items-center gap-1.5 min-w-0">
                     <span className="text-xs md:text-sm text-white/55 font-mono break-all whitespace-normal min-w-0" title={walletAddress}>
                       {walletAddress}

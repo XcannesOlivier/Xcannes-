@@ -1220,20 +1220,12 @@ export default function WalletDashboardSendModal({
           </p>
           <div className="flex justify-center relative z-[65]">
             {renderWalletMeta?.({
-              variant: "pill",
-              className:
-                "w-full flex justify-center wallet-meta--plus-4 wallet-meta--desktop-gap relative z-[85]",
+              variant: "pill-column",
+              className: "flex justify-center relative z-[85]",
               prefix: t("moonpay_from_account", "Depuis le compte"),
-              labelWrap: false,
-              pillClassName:
-                `bg-elevated px-6 py-1.5 gap-6 ${sendAssetDropdownOpen
-                  ? "shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_10px_rgba(255,255,255,0.16)]"
-                  : "shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]"}`,
-              prefixClassName:
-                "!text-white/70 text-[14px] md:text-[15px] font-medium tracking-wide mr-6",
-              labelClassName:
-                "!text-white/95 text-[14px] md:text-[15px] font-semibold",
-              dotClassName: "!h-3 !w-3 ring-xcannes-green/20 self-center",
+              pillClassName: `bg-elevated ${sendAssetDropdownOpen
+                ? "shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_10px_rgba(255,255,255,0.16)]"
+                : "shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]"}`,
             })}
           </div>
           <div>
@@ -1428,18 +1420,10 @@ export default function WalletDashboardSendModal({
         </p>
         <div className="mt-4 flex justify-center">
           {renderWalletMeta?.({
-            variant: "pill",
-            className:
-              "w-full flex justify-center wallet-meta--plus-4 wallet-meta--desktop-gap",
+            variant: "pill-column",
+            className: "flex justify-center",
             prefix: t("moonpay_from_account", "Depuis le compte"),
-            labelWrap: false,
-            pillClassName:
-              "bg-elevated px-6 py-1.5 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)] gap-6",
-            prefixClassName:
-              "!text-white/70 text-[14px] md:text-[15px] font-medium tracking-wide mr-6",
-            labelClassName:
-              "!text-white/95 text-[14px] md:text-[15px] font-semibold",
-            dotClassName: "!h-3 !w-3 ring-xcannes-green/20 self-center",
+            pillClassName: "bg-elevated shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]",
           })}
         </div>
       </div>

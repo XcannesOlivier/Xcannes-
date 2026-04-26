@@ -1621,17 +1621,19 @@ const MoonPaySellModal = ({
               </div>
             ) : null}
             <div className="flex justify-center">
-              <div className="inline-flex items-center gap-6 bg-elevated px-6 py-1.5 rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]">
+              <div className="inline-flex flex-col items-center gap-1 bg-elevated px-6 py-2 rounded-3xl shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]">
                 <span className="text-white/70 text-[14px] md:text-[15px] font-medium tracking-wide">
                   {t("moonpay_from_account", "Depuis le compte")}
                 </span>
-                <span
-                  className={["h-3 w-3 rounded-full ring-4 shrink-0 animate-pulse", accentRing25Bg].join(" ")}
-                  aria-hidden
-                />
-                <span className="text-white/95 text-[14px] md:text-[15px] font-semibold">
-                  {walletLabel || "XCANNES"}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span
+                    className={["h-3 w-3 rounded-full ring-4 shrink-0 animate-pulse", accentRing25Bg].join(" ")}
+                    aria-hidden
+                  />
+                  <span className="text-white/95 text-[14px] md:text-[15px] font-semibold">
+                    {walletLabel || "XCANNES"}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
