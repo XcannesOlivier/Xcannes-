@@ -1712,19 +1712,18 @@ export default function CurrencyStatement({
             <div className={`flex items-start gap-3 ${periodDropdownOpen ? "relative z-[60]" : ""}`}>
               {/* Wallet selector — gauche */}
               <div className="flex-1 min-w-0">
+                <p className="text-[22px] md:text-[21px] text-white/85 font-medium mb-1 text-center">
+                  {t("ui_current_account_prefix", "Compte actuel")}
+                </p>
                 <div className="relative w-full">
                     <button
                       type="button"
                       onClick={() => setAccountDropdownOpen((prev) => !prev)}
-                      className={`w-full inline-flex flex-col items-center gap-1 px-6 py-2 bg-elevated ${accountDropdownOpen ? "rounded-t-[20px] rounded-b-none ring-1 ring-white/20 ring-inset shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_10px_rgba(255,255,255,0.16)]" : "rounded-3xl shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]"} transition-all`}
+                      className={`w-full inline-flex items-center justify-center gap-2 px-6 py-2 bg-elevated ${accountDropdownOpen ? "rounded-t-[20px] rounded-b-none ring-1 ring-white/20 ring-inset shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_10px_rgba(255,255,255,0.16)]" : "rounded-3xl shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]"} transition-all`}
                       aria-haspopup="menu"
                       aria-expanded={accountDropdownOpen}
                       title={t("ui_current_account_prefix", "Compte actuel")}
                     >
-                      <span className="text-white/70 text-[14px] md:text-[15px] font-medium tracking-wide">
-                        {t("ui_current_account_prefix", "Compte actuel")}
-                      </span>
-                      <div className="flex items-center gap-2">
                         <span className="h-3 w-3 rounded-full bg-xcannes-green ring-4 ring-xcannes-green/20 shrink-0 animate-pulse" aria-hidden />
                         <span className="text-white/95 text-[14px] md:text-[15px] font-semibold">
                           {walletLabel || t("nav_wallet", "Wallet")}
@@ -1741,7 +1740,6 @@ export default function CurrencyStatement({
                         >
                           <path d="M6 9l6 6 6-6" />
                         </svg>
-                      </div>
                     </button>
                     {accountDropdownOpen && walletAddress ? (
                       <div className="w-full -mt-px rounded-b-[20px] rounded-t-none ring-1 ring-white/20 ring-inset bg-[#101415] px-4 py-3 shadow-[0_8px_18px_rgba(0,0,0,0.45)]">
