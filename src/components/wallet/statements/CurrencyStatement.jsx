@@ -1796,27 +1796,21 @@ export default function CurrencyStatement({
             </div>
             {/* Balance + USD estimé */}
             {!isXrpNetworkView ? (
-            <div className={`grid grid-cols-2 md:grid-cols-3 gap-3`}>
-                <div className="text-center md:text-center">
-                  <p className="text-[20px] md:text-[21px] text-white/60 mb-1">
-                    {t("ui_balance_445d830d72", "Balance")}
-                  </p>
-                  <p className="text-2xl text-white font-bold">
-                    {formatAmountWithSymbolLocal(balance)}
-                  </p>
-                </div>
+              <div className="flex flex-col items-center text-center gap-0.5">
+                <p className="text-[20px] md:text-[21px] text-white/60">
+                  {t("ui_balance_445d830d72", "Balance")}
+                </p>
+                <p className="text-2xl text-white font-bold">
+                  {formatAmountWithSymbolLocal(balance)}
+                </p>
                 {estimatedUsd != null && Number.isFinite(estimatedUsd) ? (
-                  <div className="col-start-2 md:col-start-auto md:ml-auto md:text-right text-right md:mt-0">
-                    <p className="text-[11px] text-white/40 mb-1 hidden md:block">
-                      {t("ui_digital_usd_label", "USD numérique")}
-                    </p>
-                    <p className="text-[12px] text-white/50">
-                      <span className="md:hidden text-white/40 mr-1">{t("ui_digital_usd_label", "USD numérique")}</span>≈ {formatAmountWithSymbol(locale, estimatedUsd, "RLUSD", {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      })}
-                    </p>
-                  </div>
+                  <p className="text-[12px] text-white/50 mt-1 whitespace-nowrap">
+                    <span className="text-white/40 mr-1">{t("ui_digital_usd_label", "USD numérique")}</span>
+                    ≈ {formatAmountWithSymbol(locale, estimatedUsd, "RLUSD", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </p>
                 ) : null}
               </div>
             ) : null}
@@ -1859,19 +1853,18 @@ export default function CurrencyStatement({
           )}
 
           {/* Transactions Timeline */}
-          <div className="rounded-[20px] ring-1 ring-white/10 ring-inset bg-[#101415] shadow-[inset_0_1px_0_rgba(255,255,255,0.05),inset_0_-18px_28px_rgba(0,0,0,0.55)] overflow-hidden flex flex-col min-h-0">
-            {error && (
-              <div className="bg-red-500/10 px-3 py-2 text-[11px] text-red-200">
-                {error}
-              </div>
-            )}
-            <div
-              ref={overlayListRef}
-              className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden md:max-h-[420px]"
-              onPointerDown={(event) => {
-                maybeStartOverlayDrag(event, "list");
-              }}
-            >
+          {error && (
+            <div className="bg-red-500/10 px-3 py-2 text-[11px] text-red-200">
+              {error}
+            </div>
+          )}
+          <div
+            ref={overlayListRef}
+            className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden"
+            onPointerDown={(event) => {
+              maybeStartOverlayDrag(event, "list");
+            }}
+          >
               {loading ? (
                 <div className="py-14 text-center text-white/40 text-sm">
                   {t("ui_loading_948e39804b", "Loading…")}
@@ -1949,7 +1942,6 @@ export default function CurrencyStatement({
                 </div>
               )}
             </div>
-          </div>
 
             </>
           )}
