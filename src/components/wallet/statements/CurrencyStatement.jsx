@@ -1651,33 +1651,33 @@ export default function CurrencyStatement({
 	                <ChevronLeftIcon className="w-6 h-6" aria-hidden="true" />
 	              </button>
 	            ) : null}
-              <div className="flex items-start gap-2 md:gap-3 min-w-0 flex-1">
+              <div className="flex flex-col items-center text-center gap-1 min-w-0 flex-1">
 	              {CRYPTO_ICONS?.[displayCurrency] ? (
 	                isSvgIcon(CRYPTO_ICONS[displayCurrency]) ? (
 	                  // eslint-disable-next-line @next/next/no-img-element
 	                  <img
                     src={CRYPTO_ICONS[displayCurrency]}
                     alt={displayCurrency}
-                    width={32}
-                    height={32}
-                      className="flex-shrink-0 w-8 h-8 md:w-8 md:h-8 rounded-md mt-[2px]"
+                    width={48}
+                    height={48}
+                      className="flex-shrink-0 w-12 h-12 rounded-xl mb-1"
                   />
                 ) : (
                   <Image
                     src={CRYPTO_ICONS[displayCurrency]}
                     alt={displayCurrency}
-                    width={32}
-                    height={32}
-                      className="flex-shrink-0 w-8 h-8 md:w-8 md:h-8 rounded-md mt-[2px]"
+                    width={48}
+                    height={48}
+                      className="flex-shrink-0 w-12 h-12 rounded-xl mb-1"
                   />
                 )
               ) : (
-                  <span className="text-3xl md:text-3xl flex-shrink-0 leading-none inline-block translate-y-[8px]">
+                  <span className="text-5xl flex-shrink-0 leading-none mb-1">
                   {getCurrencyFlag(displayCurrency)}
                 </span>
               )}
-	              <div className="min-w-0 flex-1">
-	                <div className="flex items-center gap-2 min-w-0">
+	              <div className="min-w-0 w-full">
+	                <div className="flex items-center justify-center gap-2 min-w-0">
                     <h2 className="text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight min-w-0 inline-flex items-baseline gap-2">
 	                    <span className="truncate">
 	                      {headerTitle}
@@ -1688,7 +1688,6 @@ export default function CurrencyStatement({
                       {t("demo_notice_title", "Mode démo")}
                     </span>
                   ) : null}
-
 	                </div>
                   <p className="mt-1 text-[13px] md:text-[14px] text-white/55 leading-relaxed">
                     {t(
