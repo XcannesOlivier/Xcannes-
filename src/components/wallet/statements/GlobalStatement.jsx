@@ -2092,9 +2092,9 @@ export default function GlobalStatement({
         </div>
 
         {/* Footer Actions */}
-        <div className="relative px-4 md:px-6 py-3 md:py-4 pb-2 md:pb-4 flex flex-col md:flex-row items-stretch md:items-center gap-2 bg-[#111518] shadow-[inset_0_-16px_28px_rgba(255,255,255,0.03),inset_0_46px_70px_rgba(0,0,0,0.55)] before:content-[''] before:absolute before:left-0 before:right-0 before:top-0 before:h-px before:bg-white/10">
+        <div className="relative px-4 md:px-6 py-3 md:py-4 pb-2 md:pb-4 flex flex-row md:flex-row items-stretch md:items-center gap-2 bg-[#111518] shadow-[inset_0_-16px_28px_rgba(255,255,255,0.03),inset_0_46px_70px_rgba(0,0,0,0.55)] before:content-[''] before:absolute before:left-0 before:right-0 before:top-0 before:h-px before:bg-white/10">
           {/* Filtres */}
-          <div className="flex md:flex md:flex-1 items-center rounded-[16px] p-1 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
+          <div className="flex flex-1 md:flex-1 items-center rounded-[16px] p-1 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
             {[
               { key: "all", label: t("ui_all_0c90d41d71", "All") },
               { key: "credit", label: t("ui_credits_b8166276a0", "Credits") },
@@ -2120,9 +2120,18 @@ export default function GlobalStatement({
                 {item.label}
               </button>
             ))}
+            {/* Icône télécharger intégrée dans le bloc filtres — mobile uniquement */}
+            <button
+              onClick={handleExportPdf}
+              disabled={exportFormat === "pdf"}
+              className="md:hidden shrink-0 px-2 py-2 text-white/60 hover:text-white transition-colors disabled:opacity-40"
+              aria-label={t("ui_export_pdf_9c8d16b4fe", "Télécharger")}
+            >
+              <ShareIcon className={`w-5 h-5 ${exportFormat === "pdf" ? "opacity-40" : ""}`} />
+            </button>
           </div>
-          {/* Export — droite */}
-          <div className="flex justify-center md:justify-end gap-2 shrink-0">
+          {/* Export — droite, desktop uniquement */}
+          <div className="hidden md:flex justify-end gap-2 shrink-0">
             <button
               onClick={handleExportPdf}
               disabled={exportFormat === "pdf"}
@@ -2131,16 +2140,12 @@ export default function GlobalStatement({
               {exportFormat === "pdf" ? (
                 <span className="inline-flex items-center gap-2">
                   <ShareIcon className="w-5 h-5 opacity-60" />
-                  <span className="text-[13px] sm:text-inherit">
-                    {t("ui_loading_1386baebe9", "Loading…")}
-                  </span>
+                  <span>{t("ui_loading_1386baebe9", "Loading…")}</span>
                 </span>
               ) : (
                 <span className="inline-flex items-center gap-2">
                   <ShareIcon className="w-5 h-5" />
-                  <span className="text-[13px] sm:text-inherit">
-                    {t("ui_export_pdf_9c8d16b4fe", "Télécharger")}
-                  </span>
+                  <span>{t("ui_export_pdf_9c8d16b4fe", "Télécharger")}</span>
                 </span>
               )}
             </button>
