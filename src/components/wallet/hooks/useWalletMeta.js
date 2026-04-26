@@ -57,6 +57,31 @@ export function useWalletMeta({
         );
       }
 
+      if (variant === "pill-column") {
+        return (
+          <div className={className}>
+            <div
+              className={[
+                "inline-flex flex-col items-center gap-1 rounded-3xl px-6 py-2",
+                options?.pillClassName || "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+            >
+              <span className={["text-white/70 text-[14px] font-medium tracking-wide", options?.prefixClassName || ""].filter(Boolean).join(" ")}>
+                {effectivePrefix}
+              </span>
+              <div className="flex items-center gap-2">
+                <span className={["h-3 w-3 rounded-full bg-xcannes-green ring-4 ring-xcannes-green/20 shrink-0 animate-pulse", options?.dotClassName || ""].filter(Boolean).join(" ")} aria-hidden />
+                <span className={["text-white/95 text-[14px] font-semibold", options?.labelClassName || ""].filter(Boolean).join(" ")}>
+                  {resolvedLabel || "Wallet"}
+                </span>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
       return (
         <div className={`text-xs text-white/60 ${className}`}>
           <div className="text-xl md:text-2xl font-semibold text-white/80 leading-tight">
