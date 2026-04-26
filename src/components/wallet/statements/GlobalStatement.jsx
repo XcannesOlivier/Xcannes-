@@ -1858,7 +1858,7 @@ export default function GlobalStatement({
               <button
                 type="button"
                 onClick={() => setAccountDropdownOpen((prev) => !prev)}
-                className={`w-full inline-flex flex-col items-center gap-1 px-6 py-2 bg-elevated ${accountDropdownOpen ? "rounded-t-[20px] rounded-b-none border border-white/20" : "rounded-3xl border border-white/10"} transition-all`}
+                className={`w-full inline-flex flex-col items-center gap-1 px-6 py-2 bg-elevated rounded-3xl border border-white/10 transition-all`}
                 aria-haspopup="menu"
                 aria-expanded={accountDropdownOpen}
                 title={t("ui_current_account_plain", "Compte actuel")}
@@ -1887,7 +1887,7 @@ export default function GlobalStatement({
               </button>
               {accountDropdownOpen && walletAddress ? (
                 <div className="absolute top-full left-0 z-[200] w-full mt-1 rounded-[10px] ring-1 ring-white/20 ring-inset bg-elevated px-4 py-3 shadow-[0_8px_18px_rgba(0,0,0,0.45)]">
-                  <p className="text-[11px] font-semibold uppercase tracking-widest text-white/35 mb-2">
+                  <p className="text-[12px] font-medium text-white/55 mb-2">
                     {t("ui_account_address", "Adresse du compte")}
                   </p>
                   <div className="flex items-center gap-1.5 min-w-0">
