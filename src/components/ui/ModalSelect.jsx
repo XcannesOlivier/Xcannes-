@@ -263,7 +263,7 @@ export default function ModalSelect({
             )}
           </span>
           <svg
-            className={`w-3 h-3 transition-transform duration-[100ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
+            className={`pointer-events-none w-3 h-3 transition-transform duration-[100ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
               visible ? "rotate-180" : ""
             }`}
             fill="none"
