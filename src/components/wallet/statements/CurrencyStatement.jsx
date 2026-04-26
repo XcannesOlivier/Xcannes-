@@ -1742,7 +1742,10 @@ export default function CurrencyStatement({
                         </svg>
                     </button>
                     {accountDropdownOpen && walletAddress ? (
-                      <div className="absolute top-full left-0 z-[200] w-full mt-1 rounded-[10px] ring-1 ring-white/20 ring-inset bg-[#101415] px-4 py-3 shadow-[0_8px_18px_rgba(0,0,0,0.45)]">
+                      <div className="absolute top-full left-0 z-[200] w-full mt-1 rounded-[10px] ring-1 ring-white/20 ring-inset bg-elevated px-4 py-3 shadow-[0_8px_18px_rgba(0,0,0,0.45)]">
+                        <p className="text-[11px] font-semibold uppercase tracking-widest text-white/35 mb-2">
+                          {t("ui_account_address", "Adresse du compte")}
+                        </p>
                         <div className="flex items-center gap-1.5 min-w-0">
                           <span className="text-xs md:text-sm text-white/55 font-mono break-all whitespace-normal min-w-0" title={walletAddress}>
                             {walletAddress}
