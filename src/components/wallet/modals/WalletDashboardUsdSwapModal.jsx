@@ -2672,7 +2672,7 @@ export default function WalletDashboardUsdSwapModal({
             >
               {!inline ? (
                 swipeEnabled ? (
-                  <div className="md:hidden flex justify-center pt-4 pb-3 cursor-grab select-none" aria-hidden>
+                  <div className="md:hidden flex justify-center pt-[14px] pb-3 cursor-grab select-none" aria-hidden>
                     <span className="block w-12 h-1.5 rounded-full bg-white/20" />
                   </div>
                 ) : null
