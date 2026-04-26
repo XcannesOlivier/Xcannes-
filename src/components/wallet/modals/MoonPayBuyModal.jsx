@@ -1921,10 +1921,11 @@ const MoonPayBuyModal = ({
           ) : null}
 
           {wizardStep === 1 ? (
-            <div className="relative z-[2] bg-[#111518] rounded-[20px] p-3">
+            <div>
               <div className="text-[13px] tracking-normal font-medium text-white/55 mb-2">
                 {t('moonpay_buy_selected_asset_amount', 'Montant')}
               </div>
+              <div className="relative z-[2] bg-[#111518] rounded-[20px] p-3">
               <div className={[
                 'relative flex items-center gap-3 px-5 pt-5 pb-5 rounded-[18px] bg-black/40 backdrop-blur-sm ring-1 ring-white/10 ring-inset transition-all duration-200 overflow-hidden wallet-amount-shimmer',
                 'shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30)]',
@@ -1948,6 +1949,7 @@ const MoonPayBuyModal = ({
                   {String(currency || '').toUpperCase()}
                 </span>
               </div>
+            </div>{/* /wrapper opaque */}
             </div>
           ) : null}
 

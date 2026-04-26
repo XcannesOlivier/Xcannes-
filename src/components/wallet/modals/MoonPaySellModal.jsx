@@ -1689,8 +1689,11 @@ const MoonPaySellModal = ({
 		              />
 		          </div>
 	          {/* Amount input (étape 1/2) */}
-	            <div className={["relative z-[2] bg-[#111518] rounded-[20px] p-3", wizardStep === 1 ? "" : "hidden"].join(" ")}>
+	            <div className={wizardStep === 1 ? "" : "hidden"}>
 		              <div className="text-[13px] tracking-normal font-medium text-white/55 mb-2">
+		                {t("moonpay_amount_to_sell", "Montant")}
+		              </div>
+	              <div className="relative z-[2] bg-[#111518] rounded-[20px] p-3">
 		                {t("moonpay_amount_to_sell", "Montant")}
 		              </div>
 	              <div className={[
@@ -1717,6 +1720,7 @@ const MoonPaySellModal = ({
 	                  {currency}
 	                </span>
 	              </div>
+	            </div>{/* /wrapper opaque */}
 	              {isCurrencyLine && hasValidAmount && conversionMissing ? (
 	                <p className="mt-2 text-[11px] text-red-300">
 	                  {t(
