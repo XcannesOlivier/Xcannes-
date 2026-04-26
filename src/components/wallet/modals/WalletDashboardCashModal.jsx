@@ -326,7 +326,7 @@ export default function WalletDashboardCashModal({
 			                className={[
 			                  "flex gap-3",
 			                  cashModalTab === "buy" || cashModalTab === "sell"
-			                    ? "items-center px-3 py-2 md:items-start md:p-0"
+			                    ? "items-center px-3 py-2 md:items-start md:p-4"
 			                    : "items-start p-4",
 			                ].join(" ")}
 			              >
@@ -467,7 +467,7 @@ export default function WalletDashboardCashModal({
 					          <div
 					            ref={(el) => { cashContentRootRef.current = el; overlayListRef.current = el; }}
 					            className={`${
-					              rampActive ? "px-0 py-0" : "p-4 md:p-0"
+					              rampActive ? "px-0 py-0" : "p-4 md:p-5"
 				            } relative z-0 overflow-y-auto overscroll-contain flex-1 min-h-0`}
 				            style={{ WebkitOverflowScrolling: "touch" }}
 				            onPointerDown={(e) => maybeStartOverlayDrag(e, 'list')}

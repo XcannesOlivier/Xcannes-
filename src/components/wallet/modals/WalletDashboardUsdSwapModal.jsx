@@ -2677,7 +2677,7 @@ export default function WalletDashboardUsdSwapModal({
                   </div>
                 ) : null
               ) : null}
-              <div className="p-0">
+              <div className="p-4">
               <div className="flex items-center justify-between gap-3">
 	                    {inline ? (
                     <button
@@ -2738,7 +2738,7 @@ export default function WalletDashboardUsdSwapModal({
 
           <div
             ref={modalOverlayListRef}
-            className="flex-1 min-h-0 overflow-y-auto p-4 md:p-0"
+            className="flex-1 min-h-0 overflow-y-auto p-4 md:p-5"
             onPointerDown={
               swipeEnabled
                 ? (event) => {
@@ -3080,7 +3080,7 @@ export default function WalletDashboardUsdSwapModal({
                 {step === "form" ? (
                   <>
 		                    <div className={["rounded-[18px] ring-1 ring-white/10 ring-inset bg-[#101415] overflow-hidden", accentShadowCard].join(" ")}>
-                      <div className="p-0">
+                      <div className="p-4">
                         <div className="flex items-center justify-between gap-3">
                           <div className="text-[11px] tracking-[0.22em] uppercase text-white/45">
                             {t("ui_swap_you_send", "Vous envoyez")}
@@ -3289,7 +3289,7 @@ export default function WalletDashboardUsdSwapModal({
                           </div>
                         </div>
 
-                        <div className="p-0">
+                        <div className="p-4 pt-6">
                           <div className="flex items-center justify-between gap-3">
                             <div className="text-[11px] tracking-[0.22em] uppercase text-white/45">
                               {t("ui_usd_swap_you_receive", "Vous recevez")}
