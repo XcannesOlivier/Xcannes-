@@ -1946,7 +1946,7 @@ export default function CurrencyStatement({
         {!isXrpNetworkView ? (
           <div className="relative px-4 md:px-6 py-3 md:py-4 pb-2 md:pb-4 flex flex-row md:flex-row items-stretch md:items-center gap-2 bg-[#111518] shadow-[inset_0_-16px_28px_rgba(255,255,255,0.03),inset_0_46px_70px_rgba(0,0,0,0.55)] before:content-[''] before:absolute before:left-0 before:right-0 before:top-0 before:h-px before:bg-white/10">
             {/* Filtres */}
-            <div className="flex flex-1 md:flex-1 items-center rounded-[16px] p-1 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
+            <div className="flex flex-1 md:flex-1 items-center rounded-[16px] p-1 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-[#101415] to-[#0d1214]">
               {[
                 { key: "all", label: stripCountSuffix(t("ui_all_0c90d41d71", "All")) },
                 { key: "credit", label: stripCountSuffix(t("ui_credits_b8166276a0", "Credits")) },
@@ -1966,7 +1966,7 @@ export default function CurrencyStatement({
                           : item.key === "debit"
                             ? "bg-red-500/15 text-red-300"
                             : "bg-blue-500/15 text-blue-300"
-                      : "text-white/60 hover:text-white/80 hover:bg-white/5"
+                      : "text-white/60 hover:text-white/80 bg-[#111518] hover:bg-[#111518]"
                   }`}
                 >
                   {item.label}
