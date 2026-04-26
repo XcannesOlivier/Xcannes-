@@ -1652,6 +1652,8 @@ export default function CurrencyStatement({
 	              </button>
 	            ) : null}
               <div className="flex flex-col items-center text-center gap-1 min-w-0 flex-1">
+                {/* Drapeau + nom sur une seule ligne */}
+                <div className="flex items-center justify-center gap-2 flex-wrap min-w-0">
 	              {CRYPTO_ICONS?.[displayCurrency] ? (
 	                isSvgIcon(CRYPTO_ICONS[displayCurrency]) ? (
 	                  // eslint-disable-next-line @next/next/no-img-element
@@ -1660,7 +1662,7 @@ export default function CurrencyStatement({
                     alt={displayCurrency}
                     width={32}
                     height={32}
-                      className="flex-shrink-0 w-8 h-8 rounded-md mt-[2px]"
+                      className="flex-shrink-0 w-8 h-8 rounded-md"
                   />
                 ) : (
                   <Image
@@ -1668,35 +1670,30 @@ export default function CurrencyStatement({
                     alt={displayCurrency}
                     width={32}
                     height={32}
-                      className="flex-shrink-0 w-8 h-8 rounded-md mt-[2px]"
+                      className="flex-shrink-0 w-8 h-8 rounded-md"
                   />
                 )
               ) : (
-                  <span className="text-3xl flex-shrink-0 leading-none inline-block translate-y-[8px]">
+                  <span className="text-3xl flex-shrink-0 leading-none">
                   {getCurrencyFlag(displayCurrency)}
                 </span>
               )}
-	              <div className="min-w-0 w-full">
-	                <div className="flex items-center justify-center gap-2 min-w-0">
-                    <h2 className="text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight min-w-0 inline-flex items-baseline gap-2">
-	                    <span className="truncate">
-	                      {headerTitle}
-                    </span>
-                  </h2>
-                  {noticeVariant === "demo" ? (
-                    <span className="inline-flex items-center text-white/80 text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
-                      {t("demo_notice_title", "Mode démo")}
-                    </span>
-                  ) : null}
-	                </div>
-                  <p className="mt-1 text-[13px] md:text-[14px] text-white/55 leading-relaxed">
-                    {t(
-                      "ui_currency_statement_subtitle_periods",
-                      "Affiche les transactions de la devise sélectionnée pour différentes périodes.",
-                    )}
-                  </p>
+              <h2 className="text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight min-w-0 truncate">
+                {headerTitle}
+              </h2>
+              {noticeVariant === "demo" ? (
+                <span className="inline-flex items-center text-white/80 text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
+                  {t("demo_notice_title", "Mode démo")}
+                </span>
+              ) : null}
+                </div>
+              <p className="mt-1 text-[13px] md:text-[14px] text-white/55 leading-relaxed">
+                {t(
+                  "ui_currency_statement_subtitle_periods",
+                  "Affiche les transactions de la devise sélectionnée pour différentes périodes.",
+                )}
+              </p>
 	              </div>
-	            </div>
               {/* close via swipe/backdrop */}
 	          </div>
 
