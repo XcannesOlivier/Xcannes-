@@ -2653,10 +2653,6 @@ export default function WalletDashboardUsdSwapModal({
               if (!inline) e.stopPropagation();
             }}
           >
-            {/* Ambient glow */}
-            <div className="pointer-events-none absolute top-0 inset-x-0 h-[280px]" aria-hidden>
-              <div className={`absolute inset-0 ${isBinanceYellow ? 'bg-[radial-gradient(350px_circle_at_50%_0%,rgba(240,185,11,0.13),transparent_70%)]' : 'bg-[radial-gradient(350px_circle_at_50%_0%,rgba(8,112,248,0.15),transparent_70%)]'}`} />
-            </div>
             <div
               className="border-b border-white/10"
               onPointerDown={
@@ -2976,7 +2972,13 @@ export default function WalletDashboardUsdSwapModal({
               <div className="space-y-5">
                 {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE || walletTargetSelectionEnabled ? (
                   walletInlineSelectionEnabled ? (
-                    <div className="px-4 pt-2 pb-4 text-center">
+                    <div className="relative px-4 pt-2 pb-4 text-center overflow-hidden">
+                      <div className="pointer-events-none absolute inset-0" aria-hidden>
+                        <div className="absolute inset-0 bg-[radial-gradient(400px_circle_at_88%_0%,rgba(255,255,255,0.07),transparent_50%)]" />
+                        <div className={`absolute inset-0 md:hidden ${isBinanceYellow ? 'bg-[radial-gradient(900px_circle_at_100%_75%,rgba(240,185,11,0.08),transparent_60%)]' : 'bg-[radial-gradient(900px_circle_at_100%_75%,rgba(8,112,248,0.09),transparent_60%)]'}`} />
+                        <div className={`absolute inset-0 hidden md:block ${isBinanceYellow ? 'bg-[radial-gradient(1300px_circle_at_100%_75%,rgba(240,185,11,0.08),transparent_60%)]' : 'bg-[radial-gradient(1300px_circle_at_100%_75%,rgba(8,112,248,0.09),transparent_60%)]'}`} />
+                        <div className={`absolute inset-0 ${isBinanceYellow ? 'bg-[radial-gradient(700px_circle_at_0%_100%,rgba(240,185,11,0.04),transparent_65%)]' : 'bg-[radial-gradient(700px_circle_at_0%_100%,rgba(8,112,248,0.05),transparent_65%)]'}`} />
+                      </div>
                       <h3 className="text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight mb-2">
                         {flowTitle}
                       </h3>

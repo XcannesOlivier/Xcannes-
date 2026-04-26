@@ -1827,7 +1827,13 @@ const MoonPayBuyModal = ({
 
           {/* Title + Wallet pill */}
           {wizardStep === 1 ? (
-            <div className="relative z-[65] px-4 pt-2 pb-4 text-center">
+            <div className="relative z-[65] px-4 pt-2 pb-4 text-center overflow-hidden">
+              <div className="pointer-events-none absolute inset-0" aria-hidden>
+                <div className="absolute inset-0 bg-[radial-gradient(400px_circle_at_88%_0%,rgba(255,255,255,0.07),transparent_50%)]" />
+                <div className="absolute inset-0 md:hidden bg-[radial-gradient(900px_circle_at_100%_75%,rgba(34,154,86,0.08),transparent_60%)]" />
+                <div className="absolute inset-0 hidden md:block bg-[radial-gradient(1300px_circle_at_100%_75%,rgba(34,154,86,0.08),transparent_60%)]" />
+                <div className="absolute inset-0 bg-[radial-gradient(700px_circle_at_0%_100%,rgba(34,154,86,0.05),transparent_65%)]" />
+              </div>
               {/* Desktop: bouton ← Retour vers "Gérer vos fonds" (embedded) */}
               {embedded ? (
                 <button
@@ -2351,11 +2357,6 @@ const MoonPayBuyModal = ({
           } ${isClosing ? 'wallet-modal-lift-out' : 'wallet-modal-lift-in'}`}
           onClick={e => e.stopPropagation()}
         >
-          {/* Ambient glow */}
-          <div className="pointer-events-none absolute top-0 inset-x-0 h-[280px]" aria-hidden>
-            <div className="absolute inset-0 bg-[radial-gradient(350px_circle_at_50%_0%,rgba(34,154,86,0.28),transparent_70%)]" />
-          </div>
-
           {/* Header — visible uniquement pendant l'iframe */}
           {step === 'iframe' && (
             <div className="flex items-center gap-3 p-4 md:p-5 border-b border-white/10">
