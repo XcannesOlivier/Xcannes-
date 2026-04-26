@@ -1858,53 +1858,6 @@ export default function CurrencyStatement({
             </div>
           )}
 
-          {/* Filters */}
-          <div className="flex items-center justify-between gap-2 flex-wrap">
-            <div className="inline-flex items-center rounded-[16px] p-1 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
-              {[
-                {
-                  key: "all",
-                  label: stripCountSuffix(t("ui_all_0c90d41d71", "All")),
-                },
-                {
-                  key: "credit",
-                  label: stripCountSuffix(
-                    t("ui_credits_b8166276a0", "Credits"),
-                  ),
-                },
-                {
-                  key: "debit",
-                  label: stripCountSuffix(t("ui_debits_38c870b18f", "Debits")),
-                },
-                {
-                  key: "conversion",
-                  label: stripCountSuffix(
-                    t("ui_conversions_b604b5ef8b", "Conversions"),
-                  ),
-                },
-              ].map((item) => (
-                <button
-                  key={item.key}
-                  type="button"
-                  onClick={() => setFilter(item.key)}
-                  className={`px-3 py-1.5 rounded-[12px] text-xs md:text-sm font-medium transition-colors whitespace-nowrap ${
-                    filter === item.key
-                      ? item.key === "all"
-                        ? "bg-white/10 text-white"
-                        : item.key === "credit"
-                          ? "bg-green-500/15 text-green-300"
-                          : item.key === "debit"
-                            ? "bg-red-500/15 text-red-300"
-                            : "bg-blue-500/15 text-blue-300"
-                      : "text-white/60 hover:text-white/80 hover:bg-white/5"
-                  }`}
-                >
-                  {item.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
           {/* Transactions Timeline */}
           <div className="rounded-[20px] ring-1 ring-white/10 ring-inset bg-[#101415] shadow-[inset_0_1px_0_rgba(255,255,255,0.05),inset_0_-18px_28px_rgba(0,0,0,0.55)] overflow-hidden flex flex-col min-h-0">
             {error && (
@@ -2004,12 +1957,41 @@ export default function CurrencyStatement({
 
         {/* Footer Actions */}
         {!isXrpNetworkView ? (
-          <div className="relative px-4 md:px-6 py-3 md:py-4 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2 bg-transparent md:bg-black/30 before:content-[''] before:absolute before:left-0 before:right-0 before:top-0 before:h-px before:bg-white/10">
-            <div className="flex gap-2 flex-wrap">
+          <div className="relative px-4 md:px-6 py-3 md:py-4 flex items-center justify-between gap-2 bg-transparent md:bg-black/30 before:content-[''] before:absolute before:left-0 before:right-0 before:top-0 before:h-px before:bg-white/10">
+            {/* Filtres — gauche */}
+            <div className="inline-flex items-center rounded-[16px] p-1 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
+              {[
+                { key: "all", label: stripCountSuffix(t("ui_all_0c90d41d71", "All")) },
+                { key: "credit", label: stripCountSuffix(t("ui_credits_b8166276a0", "Credits")) },
+                { key: "debit", label: stripCountSuffix(t("ui_debits_38c870b18f", "Debits")) },
+                { key: "conversion", label: stripCountSuffix(t("ui_conversions_b604b5ef8b", "Conversions")) },
+              ].map((item) => (
+                <button
+                  key={item.key}
+                  type="button"
+                  onClick={() => setFilter(item.key)}
+                  className={`px-3 py-1.5 rounded-[12px] text-xs md:text-sm font-medium transition-colors whitespace-nowrap ${
+                    filter === item.key
+                      ? item.key === "all"
+                        ? "bg-white/10 text-white"
+                        : item.key === "credit"
+                          ? "bg-green-500/15 text-green-300"
+                          : item.key === "debit"
+                            ? "bg-red-500/15 text-red-300"
+                            : "bg-blue-500/15 text-blue-300"
+                      : "text-white/60 hover:text-white/80 hover:bg-white/5"
+                  }`}
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
+            {/* Export / Print — droite */}
+            <div className="flex gap-2 shrink-0">
               <button
                 onClick={handleExportPdf}
                 disabled={exportFormat === "pdf"}
-                className="flex-1 md:flex-none px-4 py-2.5 rounded-[14px] text-sm font-semibold transition-colors disabled:opacity-50 bg-transparent md:bg-white/10 md:hover:bg-white/15 text-white/80"
+                className="px-4 py-2.5 rounded-[14px] text-sm font-semibold transition-colors disabled:opacity-50 bg-white/10 hover:bg-white/15 text-white/80"
               >
                 {exportFormat === "pdf" ? (
                   <>
@@ -2033,7 +2015,7 @@ export default function CurrencyStatement({
               </button>
               <button
                 onClick={handlePrint}
-                className="hidden md:inline-flex md:flex-none px-4 py-2.5 rounded-[14px] text-sm font-semibold transition-colors bg-white/10 hover:bg-white/15 text-white/80"
+                className="hidden md:inline-flex px-4 py-2.5 rounded-[14px] text-sm font-semibold transition-colors bg-white/10 hover:bg-white/15 text-white/80"
               >
                 {t("ui_print_1313eff37c", "🖨️ Print")}
               </button>
