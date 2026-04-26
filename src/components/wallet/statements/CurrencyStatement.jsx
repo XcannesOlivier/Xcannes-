@@ -1960,7 +1960,7 @@ export default function CurrencyStatement({
                   className={`px-3 py-3 flex-1 text-center rounded-[12px] text-sm font-medium transition-colors whitespace-nowrap ${
                     filter === item.key
                       ? item.key === "all"
-                        ? "bg-white/10 text-white"
+                        ? "bg-[#111518] text-white"
                         : item.key === "credit"
                           ? "bg-green-500/15 text-green-300"
                           : item.key === "debit"

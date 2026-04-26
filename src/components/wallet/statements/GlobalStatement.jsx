@@ -1999,7 +1999,7 @@ export default function GlobalStatement({
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
-                          <div className="text-[13px] font-medium text-white/90 truncate">
+                          <div className="text-[15px] font-medium text-white/90 truncate">
                             {isPaymentOut
                               ? `${t("statement_xrpl_mobile_out", "Envoyé")} ${rowCounterpartyLabel ? `à ${rowCounterpartyLabel}` : ""}`
                               : isPaymentIn
@@ -2108,7 +2108,7 @@ export default function GlobalStatement({
                 className={`px-3 py-3 flex-1 text-center rounded-[12px] text-sm font-medium transition-colors whitespace-nowrap ${
                   txFilter === item.key
                     ? item.key === "all"
-                      ? "bg-white/10 text-white"
+                      ? "bg-[#111518] text-white"
                       : item.key === "credit"
                         ? "bg-green-500/15 text-green-300"
                         : item.key === "debit"
