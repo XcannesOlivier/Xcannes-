@@ -1821,7 +1821,7 @@ export default function GlobalStatement({
       >
         {/* Header */}
         <div
-          className={`relative flex-shrink-0 ${modalBgClass} px-4 md:px-5 py-4 before:content-[''] before:absolute before:left-0 before:right-0 before:bottom-0 before:h-px before:bg-white/10`}
+          className={`relative flex-shrink-0 bg-[#111518] shadow-[inset_0_16px_28px_rgba(255,255,255,0.03),inset_0_-46px_70px_rgba(0,0,0,0.55)] px-4 md:px-5 py-4 before:content-[''] before:absolute before:left-0 before:right-0 before:bottom-0 before:h-px before:bg-white/10`}
           onPointerDown={(event) => {
             maybeStartOverlayDrag(event, "fixed");
           }}
@@ -1993,7 +1993,7 @@ export default function GlobalStatement({
                         className={[
                           "w-full text-left rounded-[20px] px-3 transition-colors duration-150",
                           isLatest
-                            ? "py-3 ring-2 ring-inset bg-[#101415] shadow-[inset_0_1px_0_rgba(255,255,255,0.08),inset_0_-14px_22px_rgba(0,0,0,0.5)] ring-white/45 transform-gpu scale-[1.03] origin-center drop-shadow-[0_10px_18px_rgba(0,0,0,0.55)] transition-transform duration-150"
+                            ? "py-3 ring-1 ring-inset bg-[#101415] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-14px_22px_rgba(0,0,0,0.5)] ring-white/20 transform-gpu scale-[1.03] origin-center drop-shadow-[0_10px_18px_rgba(0,0,0,0.55)] transition-transform duration-150"
                             : "py-2 ring-1 ring-inset ring-white/[0.06] bg-[#101415] shadow-[inset_0_-14px_18px_rgba(0,0,0,0.8)]",
                         ].join(" ")}
                     >

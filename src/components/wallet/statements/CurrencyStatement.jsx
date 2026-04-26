@@ -1627,7 +1627,7 @@ export default function CurrencyStatement({
       >
 	        {/* Header avec Account Info intégré */}
 	        <div
-	          className={`relative flex-shrink-0 ${modalBgClass} px-4 md:px-6 py-3 md:py-4 before:content-[''] before:absolute before:left-0 before:right-0 before:bottom-0 before:h-px before:bg-white/10`}
+	          className={`relative flex-shrink-0 bg-[#111518] shadow-[inset_0_16px_28px_rgba(255,255,255,0.03),inset_0_-46px_70px_rgba(0,0,0,0.55)] px-4 md:px-6 py-3 md:py-4 before:content-[''] before:absolute before:left-0 before:right-0 before:bottom-0 before:h-px before:bg-white/10`}
             onPointerDown={(event) => {
               maybeStartOverlayDrag(event, "fixed");
             }}
