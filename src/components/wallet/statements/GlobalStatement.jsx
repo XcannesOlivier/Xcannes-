@@ -1940,7 +1940,7 @@ export default function GlobalStatement({
                 {recentMovements.filter((m) => {
                   if (txFilter === "all") return true;
                   const uiT = getMovementUiType(m);
-                  if (txFilter === "conversion") return uiT === "conversion";
+                  if (txFilter === "conversion") return normalizeKind(m?.kind) === "CONVERSION";
                   if (txFilter === "credit") return uiT === "credit";
                   if (txFilter === "debit") return uiT === "debit";
                   return true;
@@ -2108,7 +2108,7 @@ export default function GlobalStatement({
                 className={`px-3 py-3 flex-1 text-center rounded-[12px] text-sm font-medium transition-colors whitespace-nowrap ${
                   txFilter === item.key
                     ? item.key === "all"
-                      ? "bg-[#111518] text-white"
+                      ? "bg-[#111518] text-white shadow-[inset_0_-14px_18px_rgba(0,0,0,0.8)]"
                       : item.key === "credit"
                         ? "bg-green-500/15 text-green-300"
                         : item.key === "debit"
