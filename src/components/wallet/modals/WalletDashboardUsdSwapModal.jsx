@@ -2655,11 +2655,9 @@ export default function WalletDashboardUsdSwapModal({
           >
             {/* Ambient glow — step initial uniquement */}
             {step === "form" ? (
-              <div className="pointer-events-none absolute inset-0 z-0" aria-hidden>
-                <div className="absolute inset-0 bg-[radial-gradient(400px_circle_at_88%_0%,rgba(255,255,255,0.07),transparent_50%)]" />
-                <div className={`absolute inset-0 md:hidden ${isBinanceYellow ? 'bg-[radial-gradient(900px_circle_at_100%_75%,rgba(240,185,11,0.08),transparent_60%)]' : 'bg-[radial-gradient(900px_circle_at_100%_75%,rgba(8,112,248,0.09),transparent_60%)]'}`} />
-                <div className={`absolute inset-0 hidden md:block ${isBinanceYellow ? 'bg-[radial-gradient(1300px_circle_at_100%_75%,rgba(240,185,11,0.08),transparent_60%)]' : 'bg-[radial-gradient(1300px_circle_at_100%_75%,rgba(8,112,248,0.09),transparent_60%)]'}`} />
-                <div className={`absolute inset-0 ${isBinanceYellow ? 'bg-[radial-gradient(700px_circle_at_0%_100%,rgba(240,185,11,0.04),transparent_65%)]' : 'bg-[radial-gradient(700px_circle_at_0%_100%,rgba(8,112,248,0.05),transparent_65%)]'}`} />
+              <div className="pointer-events-none absolute inset-0" aria-hidden>
+                <div className={`absolute inset-0 md:hidden ${isBinanceYellow ? 'bg-[radial-gradient(700px_circle_at_100%_50%,rgba(240,185,11,0.07),transparent_60%)]' : 'bg-[radial-gradient(700px_circle_at_100%_50%,rgba(8,112,248,0.07),transparent_60%)]'}`} />
+                <div className={`absolute inset-0 hidden md:block ${isBinanceYellow ? 'bg-[radial-gradient(1000px_circle_at_100%_50%,rgba(240,185,11,0.07),transparent_60%)]' : 'bg-[radial-gradient(1000px_circle_at_100%_50%,rgba(8,112,248,0.07),transparent_60%)]'}`} />
               </div>
             ) : null}
             <div
@@ -2978,7 +2976,7 @@ export default function WalletDashboardUsdSwapModal({
                 </div>
               </div>
             ) : (
-              <div className="space-y-5">
+              <div className="space-y-5 relative z-[2]">
                 {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE || walletTargetSelectionEnabled ? (
                   walletInlineSelectionEnabled ? (
                     <div className="relative px-4 pt-2 pb-4 text-center">

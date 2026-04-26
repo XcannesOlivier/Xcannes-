@@ -304,23 +304,21 @@ export default function WalletDashboardCashModal({
 	        >
             {/* Ambient glow — step initial uniquement */}
             {!rampActive ? (
-              <div className="pointer-events-none absolute inset-0 z-0" aria-hidden>
-                <div className="absolute inset-0 bg-[radial-gradient(400px_circle_at_88%_0%,rgba(255,255,255,0.07),transparent_50%)]" />
+              <div className="pointer-events-none absolute inset-0" aria-hidden>
                 {cashModalTab === 'buy' ? (
                   <>
-                    <div className="absolute inset-0 md:hidden bg-[radial-gradient(900px_circle_at_100%_75%,rgba(34,154,86,0.08),transparent_60%)]" />
-                    <div className="absolute inset-0 hidden md:block bg-[radial-gradient(1300px_circle_at_100%_75%,rgba(34,154,86,0.08),transparent_60%)]" />
-                    <div className="absolute inset-0 bg-[radial-gradient(700px_circle_at_0%_100%,rgba(34,154,86,0.05),transparent_65%)]" />
+                    <div className="absolute inset-0 md:hidden bg-[radial-gradient(700px_circle_at_100%_50%,rgba(34,154,86,0.07),transparent_60%)]" />
+                    <div className="absolute inset-0 hidden md:block bg-[radial-gradient(1000px_circle_at_100%_50%,rgba(34,154,86,0.07),transparent_60%)]" />
                   </>
                 ) : cashModalTab === 'sell' ? (
                   <>
-                    <div className="absolute inset-0 md:hidden bg-[radial-gradient(900px_circle_at_100%_75%,rgba(124,58,237,0.09),transparent_60%)]" />
-                    <div className="absolute inset-0 hidden md:block bg-[radial-gradient(1300px_circle_at_100%_75%,rgba(124,58,237,0.09),transparent_60%)]" />
-                    <div className="absolute inset-0 bg-[radial-gradient(700px_circle_at_0%_100%,rgba(124,58,237,0.05),transparent_65%)]" />
+                    <div className="absolute inset-0 md:hidden bg-[radial-gradient(700px_circle_at_100%_50%,rgba(124,58,237,0.07),transparent_60%)]" />
+                    <div className="absolute inset-0 hidden md:block bg-[radial-gradient(1000px_circle_at_100%_50%,rgba(124,58,237,0.07),transparent_60%)]" />
                   </>
                 ) : null}
               </div>
             ) : null}
+            <div className="relative z-[2] flex flex-col flex-1 min-h-0">
 		          {/* Header */}
 			          {!rampActive ? (
 			            <div className="border-b border-white/10">
@@ -566,6 +564,7 @@ export default function WalletDashboardCashModal({
                 </div>
               )}
             </div>
+            </div>{/* /z-[2] content wrapper */}
           </div>
         </div>
         </div> {/* /overlayRef */}
