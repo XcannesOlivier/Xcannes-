@@ -2105,7 +2105,7 @@ export default function GlobalStatement({
                 key={item.key}
                 type="button"
                 onClick={() => setTxFilter(item.key)}
-                className={`px-3 py-1.5 rounded-[12px] text-xs md:text-sm font-medium transition-colors whitespace-nowrap ${
+                className={`px-3 py-3 rounded-[12px] text-xs md:text-sm font-medium transition-colors whitespace-nowrap ${
                   txFilter === item.key
                     ? item.key === "all"
                       ? "bg-white/10 text-white"

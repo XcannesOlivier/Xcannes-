@@ -1792,10 +1792,10 @@ export default function CurrencyStatement({
             {/* Balance + USD estimé */}
             {!isXrpNetworkView ? (
               <div className="flex flex-col items-center text-center gap-0.5">
-                <p className="text-[20px] md:text-[21px] text-white/60">
-                  {t("ui_balance_445d830d72", "Balance")}
+                <p className="text-[26px] md:text-[28px] text-white/60">
+                  {t("ui_balance_445d830d72", "Solde")}
                 </p>
-                <p className="text-2xl text-white font-bold">
+                <p className="text-4xl text-white font-bold">
                   {formatAmountWithSymbolLocal(balance)}
                 </p>
                 {estimatedUsd != null && Number.isFinite(estimatedUsd) ? (
@@ -1815,7 +1815,7 @@ export default function CurrencyStatement({
         {/* Content - Zone scrollable */}
         <div
           className={[
-            "px-4 md:px-6 py-4 md:py-6 flex flex-col gap-4 overscroll-contain",
+            "px-0 py-4 md:py-6 flex flex-col gap-4 overscroll-contain",
             isXrpNetworkView ? "flex-none" : "flex-1 min-h-0",
             isXrpNetworkView
               ? "overflow-visible"
@@ -1957,7 +1957,7 @@ export default function CurrencyStatement({
                   key={item.key}
                   type="button"
                   onClick={() => setFilter(item.key)}
-                  className={`px-3 py-1.5 rounded-[12px] text-xs md:text-sm font-medium transition-colors whitespace-nowrap ${
+                  className={`px-3 py-3 rounded-[12px] text-xs md:text-sm font-medium transition-colors whitespace-nowrap ${
                     filter === item.key
                       ? item.key === "all"
                         ? "bg-white/10 text-white"
@@ -1973,12 +1973,12 @@ export default function CurrencyStatement({
                 </button>
               ))}
             </div>
-            {/* Export / Print — droite */}
+            {/* Export — droite */}
             <div className="flex gap-2 shrink-0">
               <button
                 onClick={handleExportPdf}
                 disabled={exportFormat === "pdf"}
-                className="px-4 py-2.5 rounded-[14px] text-sm font-semibold transition-colors disabled:opacity-50 bg-white/10 hover:bg-white/15 text-white/80"
+                className="px-4 py-2.5 rounded-[14px] text-sm font-semibold transition-colors disabled:opacity-50 text-white/80 hover:text-white"
               >
                 {exportFormat === "pdf" ? (
                   <>
@@ -1995,16 +1995,10 @@ export default function CurrencyStatement({
                       <ShareIcon className="w-5 h-5" />
                     </span>
                     <span className="hidden md:inline text-[13px] sm:text-inherit">
-                      {t("ui_export_pdf_9c8d16b4fe", "📄 Export PDF")}
+                      {t("ui_export_pdf_9c8d16b4fe", "📄 Télécharger")}
                     </span>
                   </>
                 )}
-              </button>
-              <button
-                onClick={handlePrint}
-                className="hidden md:inline-flex px-4 py-2.5 rounded-[14px] text-sm font-semibold transition-colors bg-white/10 hover:bg-white/15 text-white/80"
-              >
-                {t("ui_print_1313eff37c", "🖨️ Print")}
               </button>
             </div>
           </div>
