@@ -61,7 +61,7 @@ export default function StatementMonthSelect({
         }}
         aria-haspopup="listbox"
         aria-expanded={open}
-        className={`statement-select w-full ${menuClassName} border border-white/10 px-3 py-2.5 text-sm text-white cursor-pointer transition-colors duration-150 flex items-center justify-between gap-2 focus-visible:outline-none focus-visible:border-xcannes-green/60 focus-visible:ring-2 focus-visible:ring-xcannes-green/20 ${open ? "rounded-t-[10px] rounded-b-none border-b-0" : "rounded-[10px]"}`}
+        className={`statement-select w-full ${menuClassName} ring-1 ring-inset px-3 py-2.5 text-sm text-white cursor-pointer transition-colors duration-150 flex items-center justify-between gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-xcannes-green/20 ${open ? "rounded-t-[10px] rounded-b-none ring-white/20" : "rounded-[10px] ring-white/15"}`}
       >
         <span className="truncate min-w-0 flex-1">
           {selectedOption?.label || ""}

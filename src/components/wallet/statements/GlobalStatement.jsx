@@ -1858,7 +1858,7 @@ export default function GlobalStatement({
               <button
                 type="button"
                 onClick={() => setAccountDropdownOpen((prev) => !prev)}
-                className={`w-full inline-flex flex-col items-center gap-1 px-6 py-2 bg-elevated ${accountDropdownOpen ? "rounded-t-[20px] rounded-b-none ring-1 ring-white/20 ring-inset shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_10px_rgba(255,255,255,0.16)]" : "rounded-3xl shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]"} transition-all`}
+                className={`w-full inline-flex flex-col items-center gap-1 px-6 py-2 bg-elevated ${accountDropdownOpen ? "rounded-t-[20px] rounded-b-none border border-white/20" : "rounded-3xl border border-white/10"} transition-all`}
                 aria-haspopup="menu"
                 aria-expanded={accountDropdownOpen}
                 title={t("ui_current_account_plain", "Compte actuel")}
@@ -2092,7 +2092,7 @@ export default function GlobalStatement({
         </div>
 
         {/* Footer Actions */}
-        <div className="relative px-4 md:px-6 py-3 md:py-4 flex flex-col md:flex-row items-stretch md:items-center gap-2 bg-transparent md:bg-black/30 before:content-[''] before:absolute before:left-0 before:right-0 before:top-0 before:h-px before:bg-white/10">
+        <div className="relative px-4 md:px-6 py-3 md:py-4 pb-2 md:pb-4 flex flex-col md:flex-row items-stretch md:items-center gap-2 bg-transparent md:bg-black/30 before:content-[''] before:absolute before:left-0 before:right-0 before:top-0 before:h-px before:bg-white/10">
           {/* Filtres */}
           <div className="flex md:flex md:flex-1 items-center rounded-[16px] p-1 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
             {[
