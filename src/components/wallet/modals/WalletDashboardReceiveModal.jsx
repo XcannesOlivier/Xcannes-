@@ -1436,7 +1436,7 @@ export default function WalletDashboardReceiveModal({
 	                    </div>
 
 	                    {/* ── Actions ── */}
-	                    <div className="grid grid-cols-2 gap-3 mt-4 md:mt-1">
+	                    <div className="grid grid-cols-2 gap-3 mt-[30px] md:mt-[14px]">
 	                      <button
 	                        type="button"
 	                        onClick={async e => {
