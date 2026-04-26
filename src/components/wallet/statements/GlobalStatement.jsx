@@ -1854,7 +1854,7 @@ export default function GlobalStatement({
           </div>
 
             <div className="mt-6 mb-4 flex justify-center">
-            <div className="relative w-full md:max-w-[260px]">
+            <div className="relative w-auto min-w-[200px] max-w-[260px]">
               <button
                 type="button"
                 onClick={() => setAccountDropdownOpen((prev) => !prev)}
@@ -2092,9 +2092,9 @@ export default function GlobalStatement({
         </div>
 
         {/* Footer Actions */}
-        <div className="relative px-4 md:px-6 py-3 md:py-4 flex items-center justify-between gap-2 bg-transparent md:bg-black/30 before:content-[''] before:absolute before:left-0 before:right-0 before:top-0 before:h-px before:bg-white/10">
-          {/* Filtres — gauche */}
-          <div className="inline-flex md:flex md:flex-1 items-center rounded-[16px] p-1 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
+        <div className="relative px-4 md:px-6 py-3 md:py-4 flex flex-col md:flex-row items-stretch md:items-center gap-2 bg-transparent md:bg-black/30 before:content-[''] before:absolute before:left-0 before:right-0 before:top-0 before:h-px before:bg-white/10">
+          {/* Filtres */}
+          <div className="flex md:flex md:flex-1 items-center rounded-[16px] p-1 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
             {[
               { key: "all", label: t("ui_all_0c90d41d71", "All") },
               { key: "credit", label: t("ui_credits_b8166276a0", "Credits") },
@@ -2105,7 +2105,7 @@ export default function GlobalStatement({
                 key={item.key}
                 type="button"
                 onClick={() => setTxFilter(item.key)}
-                className={`px-3 py-3 md:flex-1 md:text-center rounded-[12px] text-sm md:text-sm font-medium transition-colors whitespace-nowrap ${
+                className={`px-3 py-3 flex-1 text-center rounded-[12px] text-sm font-medium transition-colors whitespace-nowrap ${
                   txFilter === item.key
                     ? item.key === "all"
                       ? "bg-white/10 text-white"
@@ -2121,38 +2121,28 @@ export default function GlobalStatement({
               </button>
             ))}
           </div>
-          {/* Export / Print — droite */}
-          <div className="flex gap-2 shrink-0">
+          {/* Export — droite */}
+          <div className="flex justify-center md:justify-end gap-2 shrink-0">
             <button
               onClick={handleExportPdf}
               disabled={exportFormat === "pdf"}
-              className="px-4 py-2.5 rounded-[14px] text-sm font-semibold transition-colors disabled:opacity-50 bg-white/10 hover:bg-white/15 text-white/80"
+              className="px-4 py-2.5 rounded-[14px] text-sm font-semibold transition-colors disabled:opacity-50 text-white/80 hover:text-white"
             >
               {exportFormat === "pdf" ? (
-                <>
-                  <span className="md:hidden" aria-hidden>
-                    <ShareIcon className="w-5 h-5 opacity-60" />
-                  </span>
-                  <span className="hidden md:inline text-[13px] sm:text-inherit">
+                <span className="inline-flex items-center gap-2">
+                  <ShareIcon className="w-5 h-5 opacity-60" />
+                  <span className="text-[13px] sm:text-inherit">
                     {t("ui_loading_1386baebe9", "Loading…")}
                   </span>
-                </>
+                </span>
               ) : (
-                <>
-                  <span className="md:hidden" aria-hidden>
-                    <ShareIcon className="w-5 h-5" />
+                <span className="inline-flex items-center gap-2">
+                  <ShareIcon className="w-5 h-5" />
+                  <span className="text-[13px] sm:text-inherit">
+                    {t("ui_export_pdf_9c8d16b4fe", "Télécharger")}
                   </span>
-                  <span className="hidden md:inline text-[13px] sm:text-inherit">
-                    {t("ui_export_pdf_9c8d16b4fe", "📄 Export PDF")}
-                  </span>
-                </>
+                </span>
               )}
-            </button>
-            <button
-              onClick={handlePrint}
-              className="hidden md:inline-flex px-4 py-2.5 rounded-[14px] text-sm font-semibold transition-colors bg-white/10 hover:bg-white/15 text-white/80"
-            >
-              {t("ui_print_eb5de3a228", "🖨️ Print")}
             </button>
           </div>
         </div>

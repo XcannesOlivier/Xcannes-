@@ -1709,7 +1709,7 @@ export default function CurrencyStatement({
           )}
           <div className={`space-y-3 ${periodDropdownOpen ? "relative z-[60]" : ""}`}>
             {/* Ligne wallet (gauche) + Statement Period (droite) */}
-            <div className={`flex items-start gap-3 ${periodDropdownOpen ? "relative z-[60]" : ""}`}>
+            <div className={`flex items-end gap-3 ${periodDropdownOpen ? "relative z-[60]" : ""}`}>
               {/* Wallet selector — gauche */}
               <div className="flex-1 min-w-0">
                 <p className="text-[14px] md:text-[15px] text-white/85 font-medium mb-1 text-center">
@@ -1944,9 +1944,9 @@ export default function CurrencyStatement({
 
         {/* Footer Actions */}
         {!isXrpNetworkView ? (
-          <div className="relative px-4 md:px-6 py-3 md:py-4 flex items-center justify-between gap-2 bg-transparent md:bg-black/30 before:content-[''] before:absolute before:left-0 before:right-0 before:top-0 before:h-px before:bg-white/10">
-            {/* Filtres — gauche */}
-            <div className="inline-flex md:flex md:flex-1 items-center rounded-[16px] p-1 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
+          <div className="relative px-4 md:px-6 py-3 md:py-4 flex flex-col md:flex-row items-stretch md:items-center gap-2 bg-transparent md:bg-black/30 before:content-[''] before:absolute before:left-0 before:right-0 before:top-0 before:h-px before:bg-white/10">
+            {/* Filtres */}
+            <div className="flex md:flex md:flex-1 items-center rounded-[16px] p-1 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
               {[
                 { key: "all", label: stripCountSuffix(t("ui_all_0c90d41d71", "All")) },
                 { key: "credit", label: stripCountSuffix(t("ui_credits_b8166276a0", "Credits")) },
@@ -1957,7 +1957,7 @@ export default function CurrencyStatement({
                   key={item.key}
                   type="button"
                   onClick={() => setFilter(item.key)}
-                  className={`px-3 py-3 md:flex-1 md:text-center rounded-[12px] text-sm md:text-sm font-medium transition-colors whitespace-nowrap ${
+                  className={`px-3 py-3 flex-1 text-center rounded-[12px] text-sm font-medium transition-colors whitespace-nowrap ${
                     filter === item.key
                       ? item.key === "all"
                         ? "bg-white/10 text-white"
@@ -1974,7 +1974,7 @@ export default function CurrencyStatement({
               ))}
             </div>
             {/* Export — droite */}
-            <div className="flex gap-2 shrink-0">
+            <div className="flex justify-center md:justify-end gap-2 shrink-0">
               <button
                 onClick={handleExportPdf}
                 disabled={exportFormat === "pdf"}
