@@ -1921,7 +1921,7 @@ const MoonPayBuyModal = ({
           ) : null}
 
           {wizardStep === 1 ? (
-            <div>
+            <div className="relative z-[2] bg-[#111518] rounded-[20px] p-3">
               <div className="text-[13px] tracking-normal font-medium text-white/55 mb-2">
                 {t('moonpay_buy_selected_asset_amount', 'Montant')}
               </div>
