@@ -391,7 +391,7 @@ export default function WalletDashboardCashModal({
 		          {/* Swipe bar mobile — grande zone tactile au-dessus du contenu scrollable */}
           {!rampActive && (cashModalTab === "buy" || cashModalTab === "sell") ? (
             <div
-              className="md:hidden flex justify-center pt-[2px] pb-3 cursor-grab select-none"
+              className="md:hidden flex justify-center pt-1 pb-3 cursor-grab select-none"
               aria-hidden
               onPointerDown={(e) => maybeStartOverlayDrag(e, 'fixed')}
             >

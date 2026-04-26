@@ -1580,8 +1580,8 @@ const MoonPaySellModal = ({
       {/* Form */}
       {step === "form" && (
         <div className="space-y-5">
-          <div className="relative flex items-center">
-            {wizardStep === 2 ? (
+          {wizardStep === 2 ? (
+            <div className="relative flex items-center">
               <button
                 type="button"
                 onClick={() => setWizardStep(1)}
@@ -1591,12 +1591,13 @@ const MoonPaySellModal = ({
                 <ChevronLeftIcon className="w-5 h-5" aria-hidden="true" />
                 <span className="text-sm">{t("ui_back", "Retour")}</span>
               </button>
-            ) : null}
-            <div className="ml-auto" />
-          </div>
+              <div className="ml-auto" />
+            </div>
+          ) : null}
 
           {/* Title + Wallet pill */}
-          <div className={["relative z-[65] px-4 pt-2 pb-4 text-center", wizardStep === 1 ? "" : "hidden"].join(" ")}>
+          {wizardStep === 1 ? (
+          <div className="relative z-[65] px-4 pt-2 pb-4 text-center">
               {/* Desktop: bouton ← Retour vers "Gérer vos fonds" (embedded) */}
               {embedded ? (
                 <button
@@ -1637,6 +1638,7 @@ const MoonPaySellModal = ({
               </div>
             </div>
           </div>
+          ) : null}
 
 		          {/* Currency selector */}
 		          <div className={wizardStep === 1 ? "relative z-[65]" : "hidden"}>
