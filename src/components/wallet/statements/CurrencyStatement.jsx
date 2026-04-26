@@ -1658,21 +1658,21 @@ export default function CurrencyStatement({
 	                  <img
                     src={CRYPTO_ICONS[displayCurrency]}
                     alt={displayCurrency}
-                    width={48}
-                    height={48}
-                      className="flex-shrink-0 w-12 h-12 rounded-xl mb-1"
+                    width={32}
+                    height={32}
+                      className="flex-shrink-0 w-8 h-8 rounded-md mt-[2px]"
                   />
                 ) : (
                   <Image
                     src={CRYPTO_ICONS[displayCurrency]}
                     alt={displayCurrency}
-                    width={48}
-                    height={48}
-                      className="flex-shrink-0 w-12 h-12 rounded-xl mb-1"
+                    width={32}
+                    height={32}
+                      className="flex-shrink-0 w-8 h-8 rounded-md mt-[2px]"
                   />
                 )
               ) : (
-                  <span className="text-5xl flex-shrink-0 leading-none mb-1">
+                  <span className="text-3xl flex-shrink-0 leading-none inline-block translate-y-[8px]">
                   {getCurrencyFlag(displayCurrency)}
                 </span>
               )}
@@ -1710,10 +1710,12 @@ export default function CurrencyStatement({
               }}
             />
           )}
-          <div className={`grid grid-cols-2 md:grid-cols-3 gap-3 ${periodDropdownOpen ? "relative z-[60]" : ""}`}>
-            <div className={`col-span-2 ${isInlineDesktop ? "md:col-span-3" : ""} ${periodDropdownOpen ? "relative z-[60]" : ""}`}>
-                <div className="my-3 md:my-4 flex justify-center">
-                  <div className="relative w-full md:max-w-[420px]">
+          <div className={`space-y-3 ${periodDropdownOpen ? "relative z-[60]" : ""}`}>
+            {/* Ligne wallet (gauche) + Statement Period (droite) */}
+            <div className={`flex items-start gap-3 ${periodDropdownOpen ? "relative z-[60]" : ""}`}>
+              {/* Wallet selector — gauche */}
+              <div className="flex-1 min-w-0">
+                <div className="relative w-full">
                     <button
                       type="button"
                       onClick={() => setAccountDropdownOpen((prev) => !prev)}
@@ -1765,15 +1767,14 @@ export default function CurrencyStatement({
                         </div>
                       </div>
                     ) : null}
-                  </div>
                 </div>
-            </div>
-            {!isXrpNetworkView ? (
-              <>
-                <div>
+              </div>
+              {/* Statement Period — droite */}
+              {!isXrpNetworkView ? (
+                <div className="flex-1 min-w-0">
                   <StatementMonthSelect
                     label={t("ui_statement_period_6dedec11d9", "Statement Period")}
-                    labelClassName="text-[22px] md:text-[21px] text-white/85 font-medium mb-1 text-center md:text-left"
+                    labelClassName="text-[22px] md:text-[21px] text-white/85 font-medium mb-1 text-center"
                     value={selectedMonth}
                     onOpenChange={(open) => {
                       setPeriodDropdownOpen(open);
@@ -1791,6 +1792,11 @@ export default function CurrencyStatement({
                     menuClassName={modalBgClass}
                   />
                 </div>
+              ) : null}
+            </div>
+            {/* Balance + USD estimé */}
+            {!isXrpNetworkView ? (
+            <div className={`grid grid-cols-2 md:grid-cols-3 gap-3`}>
                 <div className="text-center md:text-center">
                   <p className="text-[20px] md:text-[21px] text-white/60 mb-1">
                     {t("ui_balance_445d830d72", "Balance")}
@@ -1812,7 +1818,7 @@ export default function CurrencyStatement({
                     </p>
                   </div>
                 ) : null}
-              </>
+              </div>
             ) : null}
           </div>
         </div>
