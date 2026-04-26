@@ -1712,14 +1712,14 @@ export default function CurrencyStatement({
             <div className={`flex items-start gap-3 ${periodDropdownOpen ? "relative z-[60]" : ""}`}>
               {/* Wallet selector — gauche */}
               <div className="flex-1 min-w-0">
-                <p className="text-[22px] md:text-[21px] text-white/85 font-medium mb-1 text-center">
+                <p className="text-[14px] md:text-[15px] text-white/85 font-medium mb-1 text-center">
                   {t("ui_current_account_prefix", "Compte actuel")}
                 </p>
                 <div className="relative w-full">
                     <button
                       type="button"
                       onClick={() => setAccountDropdownOpen((prev) => !prev)}
-                      className={`w-full inline-flex items-center justify-center gap-2 px-6 py-2 bg-elevated ${accountDropdownOpen ? "rounded-t-[20px] rounded-b-none ring-1 ring-white/20 ring-inset shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_10px_rgba(255,255,255,0.16)]" : "rounded-3xl shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]"} transition-all`}
+                      className={`w-full inline-flex items-center justify-center gap-2 px-6 py-2 bg-elevated ${accountDropdownOpen ? "rounded-t-[20px] rounded-b-none ring-1 ring-white/20 ring-inset" : "rounded-3xl ring-1 ring-white/15 ring-inset"} transition-all`}
                       aria-haspopup="menu"
                       aria-expanded={accountDropdownOpen}
                       title={t("ui_current_account_prefix", "Compte actuel")}
@@ -1946,7 +1946,7 @@ export default function CurrencyStatement({
         {!isXrpNetworkView ? (
           <div className="relative px-4 md:px-6 py-3 md:py-4 flex items-center justify-between gap-2 bg-transparent md:bg-black/30 before:content-[''] before:absolute before:left-0 before:right-0 before:top-0 before:h-px before:bg-white/10">
             {/* Filtres — gauche */}
-            <div className="inline-flex items-center rounded-[16px] p-1 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
+            <div className="inline-flex md:flex md:flex-1 items-center rounded-[16px] p-1 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
               {[
                 { key: "all", label: stripCountSuffix(t("ui_all_0c90d41d71", "All")) },
                 { key: "credit", label: stripCountSuffix(t("ui_credits_b8166276a0", "Credits")) },
@@ -1957,7 +1957,7 @@ export default function CurrencyStatement({
                   key={item.key}
                   type="button"
                   onClick={() => setFilter(item.key)}
-                  className={`px-3 py-3 rounded-[12px] text-xs md:text-sm font-medium transition-colors whitespace-nowrap ${
+                  className={`px-3 py-3 md:flex-1 md:text-center rounded-[12px] text-sm md:text-sm font-medium transition-colors whitespace-nowrap ${
                     filter === item.key
                       ? item.key === "all"
                         ? "bg-white/10 text-white"
@@ -1990,14 +1990,12 @@ export default function CurrencyStatement({
                     </span>
                   </>
                 ) : (
-                  <>
-                    <span className="md:hidden" aria-hidden>
-                      <ShareIcon className="w-5 h-5" />
+                  <span className="inline-flex items-center gap-2">
+                    <ShareIcon className="w-5 h-5" />
+                    <span className="text-[13px] sm:text-inherit">
+                      {t("ui_export_pdf_9c8d16b4fe", "Télécharger")}
                     </span>
-                    <span className="hidden md:inline text-[13px] sm:text-inherit">
-                      {t("ui_export_pdf_9c8d16b4fe", "📄 Télécharger")}
-                    </span>
-                  </>
+                  </span>
                 )}
               </button>
             </div>
