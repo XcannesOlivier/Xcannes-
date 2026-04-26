@@ -1719,13 +1719,13 @@ export default function CurrencyStatement({
                     <button
                       type="button"
                       onClick={() => setAccountDropdownOpen((prev) => !prev)}
-                      className={`w-full inline-flex items-center justify-center gap-2 px-3 py-2.5 bg-elevated ${accountDropdownOpen ? "rounded-t-[10px] rounded-b-none border border-white/20" : "rounded-[10px] border border-white/10"} transition-all`}
+                      className={`w-full inline-flex items-center justify-center gap-2 px-3 py-2.5 bg-elevated rounded-[10px] ${accountDropdownOpen ? "border border-white/20" : "border border-white/10"} transition-all`}
                       aria-haspopup="menu"
                       aria-expanded={accountDropdownOpen}
                       title={t("ui_current_account_prefix", "Compte actuel")}
                     >
                         <span className="h-3 w-3 rounded-full bg-xcannes-green ring-4 ring-xcannes-green/20 shrink-0 animate-pulse" aria-hidden />
-                        <span className="text-white/95 text-[14px] md:text-[15px] font-semibold">
+                        <span className="text-white/95 text-sm font-semibold truncate min-w-0 flex-1 text-center">
                           {walletLabel || t("nav_wallet", "Wallet")}
                         </span>
                         <svg
@@ -1742,7 +1742,7 @@ export default function CurrencyStatement({
                         </svg>
                     </button>
                     {accountDropdownOpen && walletAddress ? (
-                      <div className="w-full -mt-px rounded-b-[10px] rounded-t-none ring-1 ring-white/20 ring-inset bg-[#101415] px-4 py-3 shadow-[0_8px_18px_rgba(0,0,0,0.45)]">
+                      <div className="absolute top-full left-0 z-[200] w-full mt-1 rounded-[10px] ring-1 ring-white/20 ring-inset bg-[#101415] px-4 py-3 shadow-[0_8px_18px_rgba(0,0,0,0.45)]">
                         <div className="flex items-center gap-1.5 min-w-0">
                           <span className="text-xs md:text-sm text-white/55 font-mono break-all whitespace-normal min-w-0" title={walletAddress}>
                             {walletAddress}
@@ -1815,7 +1815,7 @@ export default function CurrencyStatement({
         {/* Content - Zone scrollable */}
         <div
           className={[
-            "px-0 py-4 md:py-6 flex flex-col gap-4 overscroll-contain",
+            "px-0 py-4 md:py-6 flex flex-col gap-4 overscroll-contain bg-gradient-to-b from-[#101415] to-[#0d1214]",
             isXrpNetworkView ? "flex-none" : "flex-1 min-h-0",
             isXrpNetworkView
               ? "overflow-visible"
