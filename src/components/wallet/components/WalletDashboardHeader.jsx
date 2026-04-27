@@ -329,7 +329,7 @@ export default function WalletDashboardHeader({
                     {/* Multi-wallet dropdown — smooth animated */}
                     {isSwitcherOpen && hasMultipleWallets && (
                       <div
-                        className={`absolute z-50 left-0 top-full mt-0 min-w-[260px] w-max max-w-[340px] rounded-b-[12px] bg-[#0d1214] border-l border-r border-b border-white/15 shadow-[0_12px_48px_rgba(0,0,0,0.45)] max-h-[70vh] md:max-h-[340px] overflow-y-auto overflow-x-hidden origin-top transition-all duration-[100ms] ${
+                        className={`absolute z-50 -left-px top-full mt-0 min-w-[260px] w-max max-w-[340px] rounded-b-[12px] bg-[#0d1214] border-l border-r border-b border-white/20 shadow-[0_12px_48px_rgba(0,0,0,0.45)] max-h-[70vh] md:max-h-[340px] overflow-y-auto overflow-x-hidden origin-top transition-all duration-[100ms] ${
                           isSwitcherVisible
                             ? "opacity-100 scale-y-100 translate-y-0 ease-[cubic-bezier(0.16,1,0.3,1)]"
                             : "opacity-0 scale-y-[0.92] -translate-y-1 ease-[cubic-bezier(0.4,0,1,1)]"
@@ -341,14 +341,14 @@ export default function WalletDashboardHeader({
                         {/* Active wallet address pinned at top */}
                         <div className="px-2.5 md:px-3 pt-2 pb-1.5 border-b border-white/[0.06]">
                           <div
-                            className="font-mono text-[13px] md:text-[14px] text-xcannes-green/70 whitespace-normal break-all leading-snug"
+                            className="font-mono text-[13px] md:text-[14px] text-white/85 whitespace-normal break-all leading-snug"
                           >
-                            {wallet}
+                            {`${wallet.slice(0, 8)}…${wallet.slice(-6)}`}
                           </div>
                         </div>
                         {/* Subtitle */}
                         <div className="px-2.5 md:px-3 pt-2 pb-1">
-                          <div className="text-[11px] md:text-[12px] text-white/35">
+                          <div className="text-[12px] md:text-[13px] text-white/40">
                             Changer de compte
                           </div>
                         </div>
@@ -383,9 +383,9 @@ export default function WalletDashboardHeader({
 		                                  {displayName}
 		                                </div>
 		                                <div
-		                                  className="font-mono text-[13px] md:text-[14px] whitespace-normal break-all leading-snug text-white/40"
+		                                  className="font-mono text-[13px] md:text-[14px] leading-snug text-white/40"
 		                                >
-		                                  {addr}
+		                                  {`${addr.slice(0, 8)}…${addr.slice(-6)}`}
 		                                </div>
 		                              </div>
                             </button>
