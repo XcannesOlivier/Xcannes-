@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useRef, useEffect, useLayoutEffect, useCallback } from "react";
-import Image from "next/image";
 import { useTranslation } from "next-i18next";
 import { QRCodeSVG } from "qrcode.react";
 import { ChevronLeftIcon } from "@heroicons/react/24/outline";
@@ -61,6 +60,56 @@ export default function WalletSettingsDropdown({
   const [desktopMenuStyle, setDesktopMenuStyle] = useState(null);
   const [desktopArrowX, setDesktopArrowX] = useState(null);
   const [desktopPlacement, setDesktopPlacement] = useState("bottom");
+  const settingsIconShellClassName =
+    "inline-flex h-12 w-12 items-center justify-center rounded-[16px] bg-black/30 ring-1 ring-white/10 ring-inset shadow-[0_4px_12px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.04)] shrink-0";
+  const SettingsAddWalletIcon = () => (
+    <svg viewBox="0 0 48 48" className="w-8 h-8" fill="none" aria-hidden>
+      <rect x="10" y="10" width="28" height="28" rx="9" className="fill-white/5 stroke-white/14" strokeWidth="1.4" />
+      <path d="M24 16v16M16 24h16" className="stroke-white/72" strokeWidth="2.4" strokeLinecap="round" />
+    </svg>
+  );
+  const SettingsXrplIcon = () => (
+    <svg viewBox="0 0 48 48" className="w-8 h-8" fill="none" aria-hidden>
+      <path d="M14 15c2.8 0 4.2 1.6 5.4 3 1.3 1.4 2.4 2.7 4.6 2.7s3.3-1.3 4.6-2.7c1.2-1.4 2.6-3 5.4-3" className="stroke-white/84" strokeWidth="2.3" strokeLinecap="round" />
+      <path d="M14 33c2.8 0 4.2-1.6 5.4-3 1.3-1.4 2.4-2.7 4.6-2.7s3.3 1.3 4.6 2.7c1.2 1.4 2.6 3 5.4 3" className="stroke-white/84" strokeWidth="2.3" strokeLinecap="round" />
+      <path d="M17 14.5l14 19M31 14.5l-14 19" className="stroke-white/18" strokeWidth="1.2" strokeLinecap="round" />
+    </svg>
+  );
+  const SettingsRlusdIcon = () => (
+    <svg viewBox="0 0 48 48" className="w-8 h-8" fill="none" aria-hidden>
+      <circle cx="24" cy="24" r="13.5" className="fill-white/5 stroke-white/18" strokeWidth="1.4" />
+      <path d="M24 17.5v9m0 4h.01" className="stroke-white/86" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="24" cy="31.5" r="1" className="fill-white/86" />
+    </svg>
+  );
+  const SettingsInfoIcon = () => (
+    <svg viewBox="0 0 48 48" className="w-8 h-8" fill="none" aria-hidden>
+      <circle cx="24" cy="24" r="13.5" className="fill-white/5 stroke-white/18" strokeWidth="1.4" />
+      <path d="M24 22v9" className="stroke-white/86" strokeWidth="2.2" strokeLinecap="round" />
+      <circle cx="24" cy="17" r="1.4" className="fill-white/86" />
+    </svg>
+  );
+  const SettingsSecurityIcon = () => (
+    <svg viewBox="0 0 48 48" className="w-8 h-8" fill="none" aria-hidden>
+      <path d="M24 11l11 5.2v8.2c0 8.1-6.1 12.7-11 14.6-4.9-1.9-11-6.5-11-14.6v-8.2L24 11Z" className="fill-white/5 stroke-white/18" strokeWidth="1.5" strokeLinejoin="round" />
+      <path d="M19.5 24.5l3.2 3.2 5.8-6.2" className="stroke-white/86" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+  const SettingsHelpIcon = () => (
+    <svg viewBox="0 0 48 48" className="w-8 h-8" fill="none" aria-hidden>
+      <path d="M15 18.5c0-3 2.3-5.5 5.3-5.5h7.4c3 0 5.3 2.5 5.3 5.5v6.8c0 3-2.3 5.5-5.3 5.5H24l-5.5 4.2v-4.2h-1.2c-3 0-5.3-2.5-5.3-5.5v-6.8Z" className="fill-white/5 stroke-white/18" strokeWidth="1.5" strokeLinejoin="round" />
+      <circle cx="18.5" cy="22" r="1.2" className="fill-white/82" />
+      <circle cx="24" cy="22" r="1.2" className="fill-white/82" />
+      <circle cx="29.5" cy="22" r="1.2" className="fill-white/82" />
+    </svg>
+  );
+  const SettingsDocIcon = () => (
+    <svg viewBox="0 0 48 48" className="w-8 h-8" fill="none" aria-hidden>
+      <path d="M17 11.5h11l5 5V34c0 2-1.6 3.5-3.5 3.5h-12c-1.9 0-3.5-1.5-3.5-3.5V15c0-1.9 1.6-3.5 3.5-3.5Z" className="fill-white/5 stroke-white/18" strokeWidth="1.5" strokeLinejoin="round" />
+      <path d="M28 11.5V17h5" className="stroke-white/30" strokeWidth="1.5" strokeLinejoin="round" />
+      <path d="M19.5 22h9M19.5 27h9M19.5 32h6" className="stroke-white/82" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
 
   const RETURN_FLAG = "__XCANNES_RETURN_TO_SETTINGS_DROPDOWN__";
 
@@ -641,10 +690,8 @@ export default function WalletSettingsDropdown({
                   }}
                   className="w-full flex items-center gap-3 px-3 py-3 rounded-[20px] border border-white/10 bg-white/3 hover:bg-white/5 hover:border-white/15 transition-colors duration-150 text-left focus-visible:outline-none focus-visible:border-xcannes-green/60 focus-visible:ring-2 focus-visible:ring-xcannes-green/20"
                 >
-                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-[10px] bg-white/5 border border-white/10 text-white/60 shrink-0">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.8}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-                    </svg>
+                  <span className={`${settingsIconShellClassName} text-white/60`}>
+                    <SettingsAddWalletIcon />
                   </span>
                   <div className="min-w-0 flex-1">
 	                    <div className="text-[13px] font-medium text-white/90">
@@ -677,14 +724,8 @@ export default function WalletSettingsDropdown({
                     }}
                     className="w-full flex items-center gap-3 px-3 py-3 rounded-[20px] border border-transparent hover:border-white/10 hover:bg-white/5 transition-colors duration-150 text-left focus-visible:outline-none focus-visible:border-xcannes-green/60 focus-visible:ring-2 focus-visible:ring-xcannes-green/20"
                   >
-                    <span className="inline-flex h-9 w-9 items-center justify-center rounded-[10px] bg-white/5 border border-white/10 shrink-0">
-                      <Image
-                        src="/symbols/xrp.png"
-                        alt="XRP"
-                        width={22}
-                        height={22}
-                        className="rounded-md"
-                      />
+                    <span className={settingsIconShellClassName}>
+                      <SettingsXrplIcon />
                     </span>
                     <div className="min-w-0 flex-1">
                       <div className="text-[13px] font-medium text-white/90">
@@ -741,10 +782,8 @@ export default function WalletSettingsDropdown({
                   onClick={() => setIsOpen(false)}
                   className="w-full flex items-center gap-3 px-3 py-3 rounded-[20px] border border-transparent hover:border-white/10 hover:bg-white/5 transition-colors duration-150 text-left focus-visible:outline-none focus-visible:border-xcannes-green/60 focus-visible:ring-2 focus-visible:ring-xcannes-green/20"
                 >
-                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-[10px] bg-white/5 border border-white/10 text-white/85 shrink-0">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.8}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 6v4m0 4h.01" />
-                    </svg>
+                  <span className={`${settingsIconShellClassName} text-white/85`}>
+                    <SettingsRlusdIcon />
                   </span>
                   <div className="min-w-0 flex-1">
                     <div className="text-[13px] font-medium text-white/85">
@@ -766,10 +805,8 @@ export default function WalletSettingsDropdown({
                   }}
                   className="mt-2 w-full flex items-center gap-3 px-3 py-3 rounded-[20px] border border-transparent hover:border-white/10 hover:bg-white/5 transition-colors duration-150 text-left focus-visible:outline-none focus-visible:border-xcannes-green/60 focus-visible:ring-2 focus-visible:ring-xcannes-green/20"
                 >
-                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-[10px] bg-white/5 border border-white/10 text-white/85 shrink-0">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.8}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z" />
-                    </svg>
+                  <span className={`${settingsIconShellClassName} text-white/85`}>
+                    <SettingsInfoIcon />
                   </span>
                   <div className="min-w-0 flex-1">
                     <div className="text-[13px] font-medium text-white/85">
@@ -795,25 +832,8 @@ export default function WalletSettingsDropdown({
                   }}
                   className="mt-2 w-full flex items-center gap-3 px-3 py-3 rounded-[20px] border border-transparent hover:border-white/10 hover:bg-white/5 transition-colors duration-150 text-left focus-visible:outline-none focus-visible:border-xcannes-green/60 focus-visible:ring-2 focus-visible:ring-xcannes-green/20"
                 >
-                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-[10px] bg-white/5 border border-white/10 text-white/85 shrink-0">
-                    <svg
-                      className="w-5 h-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      strokeWidth={1.8}
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M12 22s8-4 8-10V6l-8-4-8 4v6c0 6 8 10 8 10z"
-                      />
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M9 12l2 2 4-4"
-                      />
-                    </svg>
+                  <span className={`${settingsIconShellClassName} text-white/85`}>
+                    <SettingsSecurityIcon />
                   </span>
                   <div className="min-w-0 flex-1">
                     <div className="text-[13px] font-medium text-white/85">
@@ -840,20 +860,8 @@ export default function WalletSettingsDropdown({
                   }}
                   className="mt-2 w-full flex items-center gap-3 px-3 py-3 rounded-[20px] border border-transparent hover:border-white/10 hover:bg-white/5 transition-colors duration-150 text-left focus-visible:outline-none focus-visible:border-xcannes-green/60 focus-visible:ring-2 focus-visible:ring-xcannes-green/20"
                 >
-                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-[10px] bg-white/5 border border-white/10 text-white/85 shrink-0">
-                    <svg
-                      className="w-5 h-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      strokeWidth={1.8}
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a10.2 10.2 0 01-4.4-1l-3.6 1 1.2-3.2A7.61 7.61 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                      />
-                    </svg>
+                  <span className={`${settingsIconShellClassName} text-white/85`}>
+                    <SettingsHelpIcon />
                   </span>
                   <div className="min-w-0 flex-1">
                     <div className="text-[13px] font-medium text-white/85">
@@ -879,25 +887,8 @@ export default function WalletSettingsDropdown({
                   }}
                   className="mt-2 w-full flex items-center gap-3 px-3 py-3 rounded-[20px] border border-transparent hover:border-white/10 hover:bg-white/5 transition-colors duration-150 text-left focus-visible:outline-none focus-visible:border-xcannes-green/60 focus-visible:ring-2 focus-visible:ring-xcannes-green/20"
                 >
-                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-[10px] bg-white/5 border border-white/10 text-white/85 shrink-0">
-                    <svg
-                      className="w-5 h-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      strokeWidth={1.8}
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M7 3h10a2 2 0 012 2v14a2 2 0 01-2 2H7a2 2 0 01-2-2V5a2 2 0 012-2z"
-                      />
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M9 7h6M9 11h6M9 15h4"
-                      />
-                    </svg>
+                  <span className={`${settingsIconShellClassName} text-white/85`}>
+                    <SettingsDocIcon />
                   </span>
                   <div className="min-w-0 flex-1">
                     <div className="text-[13px] font-medium text-white/85">
