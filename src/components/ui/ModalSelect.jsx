@@ -282,7 +282,7 @@ export default function ModalSelect({
           <div
             ref={popupRef}
             data-modal-select-dropdown
-            className={`absolute z-50 mt-0 w-full max-h-64 overflow-y-auto !ring-0 shadow-2xl origin-top transition-all duration-[100ms] ${!menuClassName ? 'border border-white/10 border-t-0 rounded-b-lg' : ''} ${
+            className={`absolute z-50 mt-0 w-full overflow-y-auto !ring-0 shadow-2xl origin-top transition-all duration-[100ms] ${!menuClassName ? 'max-h-64 border border-white/10 border-t-0 rounded-b-lg' : ''} ${
               visible
                 ? "opacity-100 scale-y-100 translate-y-0 ease-[cubic-bezier(0.16,1,0.3,1)]"
                 : "opacity-0 scale-y-[0.92] -translate-y-1 ease-[cubic-bezier(0.4,0,1,1)]"
@@ -357,7 +357,7 @@ export default function ModalSelect({
           <div
             ref={popupRef}
             data-modal-select-dropdown
-            className={`${isScoped ? 'absolute' : 'fixed'} z-[70] !mt-0 max-h-64 overflow-y-auto !ring-0 shadow-2xl origin-top transition-all duration-[100ms] ${!menuClassName ? 'border border-white/10 border-t-0 rounded-b-lg' : ''} ${
+            className={`${isScoped ? 'absolute' : 'fixed'} z-[70] !mt-0 overflow-y-auto !ring-0 shadow-2xl origin-top transition-all duration-[100ms] ${!menuClassName ? 'max-h-64 border border-white/10 border-t-0 rounded-b-lg' : ''} ${
               visible
                 ? "opacity-100 scale-y-100 translate-y-0 ease-[cubic-bezier(0.16,1,0.3,1)]"
                 : "opacity-0 scale-y-[0.92] -translate-y-1 ease-[cubic-bezier(0.4,0,1,1)]"
