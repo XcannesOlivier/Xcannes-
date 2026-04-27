@@ -76,7 +76,7 @@ function MobileFooterOverlay() {
           d={MUSTACHE_CENTER_PATH}
           fill="none"
           stroke="currentColor"
-          className="text-[#697173]/85"
+          className="text-[#697173]"
           strokeWidth="1.1"
           strokeLinecap="round"
         />

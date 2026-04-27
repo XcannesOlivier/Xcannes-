@@ -360,6 +360,7 @@ export default function WalletDashboard({
   const desktopDefaultActionSetRef = useRef(false);
   const [recentActivityMessage, setRecentActivityMessage] = useState('');
   const recentActivityTimerRef = useRef(null);
+  const [activityTooltipOpen, setActivityTooltipOpen] = useState(false);
 
   // ── Desktop panel media query ──────────────────────────────
   useEffect(() => {
@@ -1162,14 +1163,28 @@ export default function WalletDashboard({
                   />
                   <div
                     className={[
-                      "flex-1 min-w-0 overflow-hidden transition-all duration-500",
+                      "flex-1 min-w-0 overflow-visible relative transition-all duration-500",
                       recentActivityMessage ? "opacity-100 max-h-10" : "opacity-0 max-h-0 pointer-events-none",
                     ].join(" ")}
                     aria-live="polite"
                   >
-                    <p className="truncate text-center text-[11px] md:text-[12px] text-white/60 px-1 leading-tight">
-                      {recentActivityMessage}
-                    </p>
+                    <button
+                      type="button"
+                      title={recentActivityMessage}
+                      onClick={() => setActivityTooltipOpen(v => !v)}
+                      onBlur={() => setActivityTooltipOpen(false)}
+                      className="w-full text-left focus:outline-none"
+                    >
+                      <p className="truncate text-center text-[11px] md:text-[12px] text-white/60 px-1 leading-tight">
+                        {recentActivityMessage}
+                      </p>
+                    </button>
+                    {activityTooltipOpen && recentActivityMessage ? (
+                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50 w-max max-w-[260px] bg-[#1e2628] text-white/85 text-[11px] leading-snug rounded-lg px-3 py-2 shadow-xl ring-1 ring-white/10 pointer-events-none">
+                        {recentActivityMessage}
+                        <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#1e2628]" />
+                      </div>
+                    ) : null}
                   </div>
                   <button
                     type="button"
