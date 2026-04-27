@@ -1159,6 +1159,11 @@ export default function WalletDashboard({
                     placeholder={t('ui_search_all_currencies_c5d6e7f8', 'Search currency...')}
                     excludeCodes={['USD', 'RLUSD', 'XRP']}
                     showQuickAdd={false}
+                    fullscreenPortalTarget={
+                      typeof document !== 'undefined' && isDesktopPanel
+                        ? document.getElementById('wallet-desktop-inline-panel')
+                        : null
+                    }
                     fullscreen={true}
                   />
                   <div

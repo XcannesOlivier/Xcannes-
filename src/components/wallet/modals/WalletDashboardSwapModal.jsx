@@ -809,8 +809,12 @@ export default function WalletDashboardSwapModal({
                             )
                             : fmtAmountRight(labelRightRaw);
                         const isNewLine = !existingCurrencyLinesSet.has(code) && code && code !== "USD";
+                        const newLineHint = t(
+                          "ui_new_currency_line_auto_activate_a1b2c3",
+                          "the {{currency}} line will be created automatically.",
+                        ).replace("{{currency}}", code);
                         const labelWithHint = isNewLine ? (
-                          <>{labelLeft} <span className="text-[11px] text-white/35 font-normal">{t("ui_new_currency_line_auto_activate_a1b2c3", "the {{currency}} line will be created automatically.").replace("{{currency}}", code)}</span></>
+                          <>{labelLeft} <span className="text-[11px] text-white/35 font-normal">{newLineHint}</span></>
                         ) : labelLeft;
                         return {
                           value: code,
@@ -818,6 +822,7 @@ export default function WalletDashboardSwapModal({
                           label: labelLeftText,
                           labelLeft: labelWithHint,
                           labelRight,
+                          tooltip: isNewLine ? newLineHint : null,
                           labelMobile:
                             selectLabelMobileByCurrency?.[code] || shortCode,
                         };

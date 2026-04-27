@@ -32,6 +32,7 @@ export default function ModalSelect({
 }) {
   const [open, setOpen] = useState(false);
   const [visible, setVisible] = useState(false);
+  const [activeTooltipValue, setActiveTooltipValue] = useState(null);
   const isClosingRef = useRef(false);
   const popupRef = useRef(null);
   const triggerRef = useRef(null);
@@ -59,6 +60,7 @@ export default function ModalSelect({
   const closeMenu = useCallback(() => {
     if (isClosingRef.current) return;
     isClosingRef.current = true;
+    setActiveTooltipValue(null);
     setVisible(false);
     setTimeout(() => {
       setOpen(false);
@@ -157,8 +159,41 @@ export default function ModalSelect({
   }, [options, value]);
 
   const handleSelect = (nextValue) => {
+    setActiveTooltipValue(null);
     onChange?.(nextValue);
     closeMenu();
+  };
+
+  const renderOptionTextWithTooltip = (content, tooltip, value, mobile = false) => {
+    if (!tooltip) {
+      return <span className={mobile ? "truncate md:hidden" : "truncate hidden md:inline"}>{content}</span>;
+    }
+
+    const isTooltipOpen = activeTooltipValue === String(value);
+
+    return (
+      <span
+        className={`relative min-w-0 ${mobile ? "truncate md:hidden" : "truncate hidden md:inline"}`}
+        title={typeof tooltip === "string" ? tooltip : undefined}
+        onPointerDown={(e) => e.stopPropagation()}
+        onMouseEnter={() => setActiveTooltipValue(String(value))}
+        onMouseLeave={() => {
+          setActiveTooltipValue((prev) => (prev === String(value) ? null : prev));
+        }}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          setActiveTooltipValue((prev) => (prev === String(value) ? null : String(value)));
+        }}
+      >
+        {content}
+        {isTooltipOpen ? (
+          <span className="absolute left-0 top-full z-[110] mt-1 w-[220px] rounded-[10px] border border-white/12 bg-[#161c1f] px-2.5 py-2 text-[11px] leading-snug text-white/80 shadow-[0_14px_30px_rgba(0,0,0,0.42)] whitespace-normal">
+            {tooltip}
+          </span>
+        ) : null}
+      </span>
+    );
   };
 
   const renderIcon = (icon) => {
@@ -324,6 +359,7 @@ export default function ModalSelect({
               const mobileLeft = opt.labelMobile ?? left;
               const optionLeft = showMobileOptionRight ? left : mobileLeft;
               const right = opt.labelRight ?? null;
+              const tooltip = opt.tooltip ?? null;
               const rightClassName = showMobileOptionRight
                 ? "ml-auto text-white/30 tabular-nums"
                 : "ml-auto text-white/30 tabular-nums hidden md:inline";
@@ -340,8 +376,8 @@ export default function ModalSelect({
                   {description ? (
                     <span className="flex flex-col min-w-0 flex-1">
                       <span className="flex items-center gap-2 min-w-0 flex-1">
-                        <span className="truncate md:hidden">{optionLeft}</span>
-                        <span className="truncate hidden md:inline">{left}</span>
+                        {renderOptionTextWithTooltip(optionLeft, tooltip, opt.value, true)}
+                        {renderOptionTextWithTooltip(left, tooltip, opt.value, false)}
                         {right ? (
                           <span className={rightClassName}>
                             {right}
@@ -354,8 +390,8 @@ export default function ModalSelect({
                     </span>
                   ) : (
                     <span className="flex items-center gap-2 min-w-0 flex-1">
-                      <span className="truncate md:hidden">{optionLeft}</span>
-                      <span className="truncate hidden md:inline">{left}</span>
+                      {renderOptionTextWithTooltip(optionLeft, tooltip, opt.value, true)}
+                      {renderOptionTextWithTooltip(left, tooltip, opt.value, false)}
                       {right ? (
                         <span className={rightClassName}>
                           {right}
@@ -399,6 +435,7 @@ export default function ModalSelect({
               const mobileLeft = opt.labelMobile ?? left;
               const optionLeft = showMobileOptionRight ? left : mobileLeft;
               const right = opt.labelRight ?? null;
+              const tooltip = opt.tooltip ?? null;
               const rightClassName = showMobileOptionRight
                 ? "ml-auto text-white/30 tabular-nums"
                 : "ml-auto text-white/30 tabular-nums hidden md:inline";
@@ -415,8 +452,8 @@ export default function ModalSelect({
                   {description ? (
                     <span className="flex flex-col min-w-0 flex-1">
                       <span className="flex items-center gap-2 min-w-0 flex-1">
-                        <span className="truncate md:hidden">{optionLeft}</span>
-                        <span className="truncate hidden md:inline">{left}</span>
+                        {renderOptionTextWithTooltip(optionLeft, tooltip, opt.value, true)}
+                        {renderOptionTextWithTooltip(left, tooltip, opt.value, false)}
                         {right ? (
                           <span className={rightClassName}>
                             {right}
@@ -429,8 +466,8 @@ export default function ModalSelect({
                     </span>
                   ) : (
                     <span className="flex items-center gap-2 min-w-0 flex-1">
-                      <span className="truncate md:hidden">{optionLeft}</span>
-                      <span className="truncate hidden md:inline">{left}</span>
+                      {renderOptionTextWithTooltip(optionLeft, tooltip, opt.value, true)}
+                      {renderOptionTextWithTooltip(left, tooltip, opt.value, false)}
                       {right ? (
                         <span className={rightClassName}>
                           {right}
