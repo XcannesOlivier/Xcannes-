@@ -1357,7 +1357,7 @@ export default function WalletDashboardReceiveModal({
                       <div className="flex justify-center pt-1 pb-1 relative z-[85]">
 	                      <div className="relative">
 	                        {/* Visible pill */}
-                          <div className={`relative flex w-fit flex-col items-center gap-1 bg-elevated px-6 py-2 ${shareWalletDropdownOpen ? 'rounded-3xl rounded-b-none border border-white/25 border-b-0' : 'rounded-3xl'} ${shareWalletDropdownOpen ? 'shadow-[0_4px_12px_rgba(0,0,0,0.45)]' : 'shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]'} ${hasMultipleWallets ? 'cursor-pointer' : ''}`}>
+                          <div className={`relative flex w-fit flex-col items-center gap-1 bg-elevated px-6 py-2 ${shareWalletDropdownOpen ? "rounded-3xl rounded-b-none before:content-[''] before:absolute before:inset-0 before:rounded-3xl before:rounded-b-none before:border before:border-white/35 before:border-b-0 before:pointer-events-none" : 'rounded-3xl'} ${shareWalletDropdownOpen ? 'shadow-[0_4px_12px_rgba(0,0,0,0.45)]' : 'shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]'} ${hasMultipleWallets ? 'cursor-pointer' : ''}`}>
 	                          <span className="text-white/70 text-[14px] md:text-[15px] font-medium tracking-wide">
 	                            {t('ui_receive_account_info_label', 'Choisissez le compte')}
 	                          </span>
@@ -1470,7 +1470,7 @@ export default function WalletDashboardReceiveModal({
                         <div className="flex justify-center pt-1 pb-1 relative z-[85]">
 	                      <div className="relative">
 	                        {/* Visible pill */}
-                            <div className={`relative flex w-fit flex-col items-center gap-1 bg-elevated px-6 py-2 ${requestWalletDropdownOpen ? 'rounded-3xl rounded-b-none border border-white/25 border-b-0' : 'rounded-3xl'} ${requestCurrencyDropdownOpen ? 'shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_10px_rgba(255,255,255,0.16)]' : 'shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]'} ${requestWalletDropdownOpen ? 'shadow-[0_4px_12px_rgba(0,0,0,0.45)]' : ''} ${requestCurrencyDropdownOpen ? 'ring-1 ring-white/20 ring-inset' : ''} ${hasMultipleWallets ? 'cursor-pointer' : ''}`}>
+                            <div className={`relative flex w-fit flex-col items-center gap-1 bg-elevated px-6 py-2 ${requestWalletDropdownOpen ? "rounded-3xl rounded-b-none before:content-[''] before:absolute before:inset-0 before:rounded-3xl before:rounded-b-none before:border before:border-white/35 before:border-b-0 before:pointer-events-none" : 'rounded-3xl'} ${requestCurrencyDropdownOpen ? 'shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_10px_rgba(255,255,255,0.16)]' : 'shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]'} ${requestWalletDropdownOpen ? 'shadow-[0_4px_12px_rgba(0,0,0,0.45)]' : ''} ${requestCurrencyDropdownOpen ? 'ring-1 ring-white/20 ring-inset' : ''} ${hasMultipleWallets ? 'cursor-pointer' : ''}`}>
 	                          <span className="text-white/70 text-[14px] md:text-[15px] font-medium tracking-wide">
 	                            {t('ui_receive_account_info_label', 'Choisissez le compte')}
 	                          </span>
