@@ -1563,12 +1563,12 @@ export default function WalletDashboardReceiveModal({
 	                          useNativeSelect={false}
 	                          portal
 	                          portalTarget={overlayListRef.current}
-	                          hideSelected
-	                          showMobileOptionRight={true}
-	                          backdropClassName=""
-	                          iconClassName="text-3xl leading-none"
-	                          optionIconClassName="text-2xl leading-none opacity-60"
-	                          optionClassName="py-2 md:py-2.5 !text-base md:!text-lg !text-white/60"
+		                          hideSelected
+		                          showMobileOptionRight={true}
+		                          backdropClassName="bg-black/80 backdrop-blur-[4px] !z-[65]"
+		                          iconClassName="text-3xl leading-none"
+		                          optionIconClassName="text-2xl leading-none opacity-60"
+		                          optionClassName="py-2 md:py-2.5 !text-base md:!text-lg !text-white/60"
 	                          menuHeader={t("ui_your_balances_header", "Vos soldes")}
 		                          menuClassName={
 		                            noticeVariant === 'demo'
