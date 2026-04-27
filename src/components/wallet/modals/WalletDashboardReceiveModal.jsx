@@ -1386,7 +1386,6 @@ export default function WalletDashboardReceiveModal({
 	                                options={shareWalletOptions}
 	                                useNativeSelect={false}
 	                                portal
-	                                portalDesktopWidthOffset={1.75}
 	                                hideSelected
 	                                backdropClassName=""
 	                                iconClassName="inline-flex items-center justify-center leading-none"
@@ -1500,7 +1499,6 @@ export default function WalletDashboardReceiveModal({
 	                                options={shareWalletOptions}
 	                                useNativeSelect={false}
 	                                portal
-	                                portalDesktopWidthOffset={1.75}
 	                                hideSelected
 	                                backdropClassName=""
 	                                iconClassName="inline-flex items-center justify-center leading-none"

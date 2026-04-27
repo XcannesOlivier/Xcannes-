@@ -43,6 +43,12 @@ export default function ModalSelect({
     return baseWidth + Number(portalDesktopWidthOffset || 0);
   }, [portalDesktopWidthOffset]);
 
+  const getTriggerWidth = useCallback(() => {
+    if (!triggerRef.current) return 0;
+    const measuredWidth = triggerRef.current.offsetWidth || triggerRef.current.getBoundingClientRect().width;
+    return resolvePortalWidth(measuredWidth);
+  }, [resolvePortalWidth]);
+
   const openMenu = useCallback(() => {
     isClosingRef.current = false;
     setOpen(true);
@@ -115,7 +121,7 @@ export default function ModalSelect({
           position: 'absolute',
           top: tRect.bottom - cRect.top + resolvedPortalTarget.scrollTop - 1,
           left: tRect.left - cRect.left + resolvedPortalTarget.scrollLeft,
-          width: resolvePortalWidth(tRect.width),
+          width: getTriggerWidth(),
         });
       };
       update();
@@ -134,7 +140,7 @@ export default function ModalSelect({
         position: 'fixed',
         top: r.bottom - 1,
         left: r.left,
-        width: resolvePortalWidth(r.width),
+        width: getTriggerWidth(),
       });
     };
     update();
@@ -144,7 +150,7 @@ export default function ModalSelect({
       window.removeEventListener('scroll', update, true);
       window.removeEventListener('resize', update);
     };
-  }, [open, resolvedPortalTarget, isScoped, resolvePortalWidth]);
+  }, [open, resolvedPortalTarget, isScoped, getTriggerWidth]);
 
   const selected = useMemo(() => {
     return options.find((opt) => String(opt.value) === String(value)) || null;
