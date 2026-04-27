@@ -637,12 +637,12 @@ export default function WalletDashboardSwapModal({
                       variant: "pill",
                       className: "w-full flex justify-center wallet-meta--plus-4 wallet-meta--desktop-gap relative z-[120]",
                       prefix: t("moonpay_from_account", "Depuis le compte"),
-                      labelWrap: false,
-                      pillClassName: `bg-elevated px-5 py-1 gap-4 ${baseDropdownOpen || quoteDropdownOpen
-                        ? "shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_10px_rgba(255,255,255,0.16)]"
-                        : "shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]"}`  ,
-                      prefixClassName:
-                        "!text-white/45 text-[12px] md:text-[13px] font-normal tracking-wide mr-4",
+	                      labelWrap: false,
+	                      pillClassName: `bg-elevated px-5 py-1 gap-4 ${baseDropdownOpen || quoteDropdownOpen
+	                        ? "ring-1 ring-white/20 ring-inset shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_10px_rgba(255,255,255,0.16)]"
+	                        : "shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]"}`  ,
+	                      prefixClassName:
+	                        "!text-white/45 text-[12px] md:text-[13px] font-normal tracking-wide mr-4",
                       labelClassName:
                         "!text-white/90 text-[14px] md:text-[15px] font-semibold",
                       dotClassName: "!h-2.5 !w-2.5 ring-xcannes-green/20 self-center",
@@ -726,59 +726,58 @@ export default function WalletDashboardSwapModal({
 		                      </span>
 		                      <span className="h-px flex-1 bg-gradient-to-l from-transparent to-white/20" />
 		                    </div>
-		                    {/* Swap button centered above the amount block */}
-                        <div className="relative flex justify-center -mt-0.5 -mb-4 z-10">
-		                      <button
-		                        type="button"
-		                        onClick={() => {
-		                          setSwapRotating(true);
-		                          setTimeout(() => setSwapRotating(false), 420);
-		                          const prev = convertBaseCurrency;
-		                          setConvertBaseCurrency(convertQuoteCurrency);
-		                          setConvertQuoteCurrency(prev);
-		                        }}
-                            className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 active:scale-90 hover:brightness-125 ${swapRotating ? 'scale-90' : ''}`}
-                            style={{
-                              background: 'linear-gradient(160deg, #1c2428 0%, #0c1012 100%)',
-                              boxShadow: '0 0 0 1px rgba(255,255,255,0.09), 0 6px 18px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.11), inset 0 -6px 12px rgba(0,0,0,0.35)',
-                            }}
-		                        aria-label="Inverser les devises"
-		                      >
-		                        <svg
-		                          width="16"
-		                          height="16"
-		                          viewBox="0 0 24 24"
-		                          fill="none"
-		                          stroke="rgba(255,255,255,0.65)"
-		                          strokeWidth="2"
-		                          strokeLinecap="round"
-		                          strokeLinejoin="round"
-		                          style={{
-		                            transform: swapRotating ? 'rotate(180deg)' : 'rotate(0deg)',
-		                            transition: 'transform 380ms cubic-bezier(0.34,1.56,0.64,1)',
-		                          }}
-		                        >
-		                          <polyline points="17 1 21 5 17 9" />
-		                          <path d="M3 11V9a4 4 0 0 1 4-4h14" />
-		                          <polyline points="7 23 3 19 7 15" />
-		                          <path d="M21 13v2a4 4 0 0 1-4 4H3" />
-		                        </svg>
-		                      </button>
-		                    </div>
-		                    {/* Amount input */}
-		                    <TokenAmountInput
-		                      value={convertAmount}
-		                      onChange={setConvertAmount}
-		                      placeholder="0.00"
-		                      token={
-		                        selectLabelByCurrency?.[convertBaseCurrency] ||
-		                        convertBaseCurrency ||
-		                        "USD"
-		                      }
-		                      tokenClassName="text-white/70 drop-shadow-sm text-2xl md:text-3xl font-semibold"
-                          containerClassName="pt-5 pb-5 rounded-[18px] bg-[#111518] ring-1 ring-white/10 ring-inset transition-all duration-200 shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30)] focus-within:ring-white/25 focus-within:shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30),0_0_0_1px_rgba(255,255,255,0.10),0_0_24px_rgba(255,255,255,0.06)] wallet-amount-shimmer [&_input]:!text-4xl [&_input]:md:!text-5xl [&_input]:font-bold [&_input]:placeholder:text-white/35"
-		                    />
-		                  </div>
+			                    {/* Amount input + swap button on bottom border */}
+                          <div className="relative mb-6">
+  			                    <TokenAmountInput
+  			                      value={convertAmount}
+  			                      onChange={setConvertAmount}
+  			                      placeholder="0.00"
+  			                      token={
+  			                        selectLabelByCurrency?.[convertBaseCurrency] ||
+  			                        convertBaseCurrency ||
+  			                        "USD"
+  			                      }
+  			                      tokenClassName="text-white/70 drop-shadow-sm text-2xl md:text-3xl font-semibold"
+                            containerClassName="pt-5 pb-5 rounded-[18px] bg-[#111518] ring-1 ring-white/10 ring-inset transition-all duration-200 shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30)] focus-within:ring-white/25 focus-within:shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30),0_0_0_1px_rgba(255,255,255,0.10),0_0_24px_rgba(255,255,255,0.06)] wallet-amount-shimmer [&_input]:!text-4xl [&_input]:md:!text-5xl [&_input]:font-bold [&_input]:placeholder:text-white/35"
+  			                    />
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSwapRotating(true);
+                                setTimeout(() => setSwapRotating(false), 420);
+                                const prev = convertBaseCurrency;
+                                setConvertBaseCurrency(convertQuoteCurrency);
+                                setConvertQuoteCurrency(prev);
+                              }}
+                              className={`absolute left-1/2 bottom-0 translate-y-1/2 -translate-x-1/2 z-20 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 active:scale-90 hover:brightness-125 ${swapRotating ? 'scale-90' : ''}`}
+                              style={{
+                                background: 'linear-gradient(160deg, #1a1f22 0%, #111518 100%)',
+                                boxShadow: '0 0 0 1px rgba(255,255,255,0.09), 0 6px 18px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.11), inset 0 -6px 12px rgba(0,0,0,0.35)',
+                              }}
+                              aria-label="Inverser les devises"
+                            >
+                              <svg
+                                width="16"
+                                height="16"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="rgba(255,255,255,0.65)"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                style={{
+                                  transform: swapRotating ? 'rotate(180deg)' : 'rotate(0deg)',
+                                  transition: 'transform 380ms cubic-bezier(0.34,1.56,0.64,1)',
+                                }}
+                              >
+                                <polyline points="17 1 21 5 17 9" />
+                                <path d="M3 11V9a4 4 0 0 1 4-4h14" />
+                                <polyline points="7 23 3 19 7 15" />
+                                <path d="M21 13v2a4 4 0 0 1-4 4H3" />
+                              </svg>
+                            </button>
+                          </div>
+			                  </div>
 
                   <div className={quoteDropdownOpen ? "relative z-[65]" : "relative"}>
                     <div className={`flex items-center justify-between mb-2 relative ${quoteDropdownOpen ? "z-[65]" : "z-[41]"}`}>
