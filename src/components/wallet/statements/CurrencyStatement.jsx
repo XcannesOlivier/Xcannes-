@@ -1700,7 +1700,7 @@ export default function CurrencyStatement({
           {/* Account Info dans le header */}
           {periodDropdownOpen && (
             <div
-              className="fixed inset-0 z-[55] bg-black/80 backdrop-blur-[4px]"
+              className="fixed inset-0 z-[55]"
               aria-hidden="true"
               onClick={() => {
                 setPeriodDropdownOpen(false);

@@ -85,7 +85,7 @@ export default function StatementMonthSelect({
         <div
           ref={menuRef}
           role="listbox"
-          className={`absolute z-50 mt-0 w-full max-h-[480px] overflow-y-auto rounded-b-[10px] rounded-t-none border border-white/10 border-t-0 shadow-[0_8px_32px_rgba(0,0,0,0.6),0_0_0_1px_rgba(255,255,255,0.06),inset_0_1px_0_rgba(255,255,255,0.08)] ${menuClassName}`}
+          className={`absolute z-50 mt-0 w-full max-h-[480px] overflow-y-auto rounded-b-[10px] rounded-t-none border border-white/10 border-t-0 shadow-[0_8px_32px_rgba(0,0,0,0.6),0_0_0_1px_rgba(255,255,255,0.06)] ${menuClassName}`}
           onClick={(e) => e.stopPropagation()}
         >
           {options.map((option) => {
