@@ -1354,7 +1354,7 @@ export default function WalletDashboardReceiveModal({
 	                  <div className="space-y-5 pt-2 relative z-[2]">
 
 	                    {/* ── Centered wallet pill (style "Depuis le compte") ── */}
-                      <div className="flex justify-center pt-1 pb-1 relative z-[85]">
+                      <div className="flex justify-center pt-1 pb-1 relative" style={{ zIndex: shareWalletDropdownOpen ? 50 : 85 }}>
 	                      <div className="relative">
 	                        {/* Visible pill */}
                           <div className={`relative flex w-fit flex-col items-center gap-1 bg-elevated px-6 py-2 ${shareWalletDropdownOpen ? 'rounded-t-[20px] rounded-b-none' : 'rounded-3xl'} ${shareWalletDropdownOpen ? 'shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_10px_rgba(255,255,255,0.16)]' : 'shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]'} ${shareWalletDropdownOpen ? 'ring-1 ring-white/20 ring-inset' : ''} ${hasMultipleWallets ? 'cursor-pointer' : ''}`}>
@@ -1472,7 +1472,7 @@ export default function WalletDashboardReceiveModal({
 		                  {/* SECTION 2 — CREATE REQUEST */}
                       <div className="flex flex-col gap-2 pt-2 flex-1">
 	                    {/* ── Centered wallet pill (style "Choisissez le compte") ── */}
-                        <div className="flex justify-center pt-1 pb-1 relative z-[85]">
+                        <div className="flex justify-center pt-1 pb-1 relative" style={{ zIndex: requestWalletDropdownOpen ? 50 : requestCurrencyDropdownOpen ? 95 : 85 }}>
 	                      <div className="relative">
 	                        {/* Visible pill */}
                             <div className={`relative flex w-fit flex-col items-center gap-1 bg-elevated px-6 py-2 ${requestWalletDropdownOpen ? 'rounded-t-[20px] rounded-b-none' : 'rounded-3xl'} ${requestCurrencyDropdownOpen ? 'shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_10px_rgba(255,255,255,0.16)]' : 'shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]'} ${requestWalletDropdownOpen ? 'ring-1 ring-white/20 ring-inset' : ''} ${requestCurrencyDropdownOpen ? 'ring-1 ring-white/30 ring-inset' : ''} ${hasMultipleWallets ? 'cursor-pointer' : ''}`}>
