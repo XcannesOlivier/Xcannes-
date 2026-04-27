@@ -1357,7 +1357,7 @@ export default function WalletDashboardReceiveModal({
                       <div className="flex justify-center pt-1 pb-1 relative z-[85]">
 	                      <div className="relative">
 	                        {/* Visible pill */}
-                          <div className={`flex w-fit flex-col items-center gap-1 bg-elevated px-6 py-2 ${shareWalletDropdownOpen ? 'rounded-t-[20px] rounded-b-none' : 'rounded-3xl'} ${shareWalletDropdownOpen ? 'shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_10px_rgba(255,255,255,0.16)]' : 'shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]'} ${shareWalletDropdownOpen ? 'ring-1 ring-white/20 ring-inset' : ''} ${hasMultipleWallets ? 'cursor-pointer' : ''}`}>
+                          <div className={`relative flex w-fit flex-col items-center gap-1 bg-elevated px-6 py-2 ${shareWalletDropdownOpen ? 'rounded-t-[20px] rounded-b-none' : 'rounded-3xl'} ${shareWalletDropdownOpen ? 'shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_10px_rgba(255,255,255,0.16)]' : 'shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]'} ${shareWalletDropdownOpen ? 'ring-1 ring-white/20 ring-inset' : ''} ${hasMultipleWallets ? 'cursor-pointer' : ''}`}>
 	                          <span className="text-white/70 text-[14px] md:text-[15px] font-medium tracking-wide">
 	                            {t('ui_receive_account_info_label', 'Choisissez le compte')}
 	                          </span>
@@ -1372,35 +1372,35 @@ export default function WalletDashboardReceiveModal({
 	                              </svg>
 	                            )}
 	                          </div>
+	                          {/* Invisible ModalSelect overlay for wallet switching */}
+	                          {hasMultipleWallets && (
+	                            <div className="absolute inset-0 z-10">
+	                              <ModalSelect
+	                                value={wallet}
+	                                onChange={next => {
+	                                  const addr = trimmed(next);
+	                                  if (!addr || addr === wallet) return;
+	                                  onSwitchWallet?.(addr);
+	                                }}
+                                  onOpenChange={setShareWalletDropdownOpen}
+	                                options={shareWalletOptions}
+	                                useNativeSelect={false}
+	                                portal
+	                                portalTarget={overlayListRef.current}
+	                                hideSelected
+	                                backdropClassName=""
+	                                iconClassName="inline-flex items-center justify-center leading-none"
+	                                buttonClassName="w-full h-full opacity-0 cursor-pointer"
+	                                menuClassName={
+	                                  noticeVariant === 'demo'
+                                      ? 'bg-xcannes-surface-demo !-mt-px !max-h-64 overflow-y-auto overscroll-contain touch-pan-y !border-white/20 !ring-1 !ring-white/20 ring-inset'
+                                      : 'bg-[#101415] !-mt-px !max-h-64 overflow-y-auto overscroll-contain touch-pan-y !border-white/20 !ring-1 !ring-white/20 ring-inset'
+	                                }
+	                                selectClassName="xcannes-select w-full bg-transparent rounded-xl pl-0 pr-2 py-2 text-base text-white focus:outline-none transition-colors duration-150"
+	                              />
+	                            </div>
+	                          )}
 	                        </div>
-	                        {/* Invisible ModalSelect overlay for wallet switching */}
-	                        {hasMultipleWallets && (
-	                          <div className="absolute inset-0 z-10">
-	                            <ModalSelect
-	                              value={wallet}
-	                              onChange={next => {
-	                                const addr = trimmed(next);
-	                                if (!addr || addr === wallet) return;
-	                                onSwitchWallet?.(addr);
-	                              }}
-                                onOpenChange={setShareWalletDropdownOpen}
-	                              options={shareWalletOptions}
-	                              useNativeSelect={false}
-	                              portal
-	                              portalTarget={overlayListRef.current}
-	                              hideSelected
-	                              backdropClassName="bg-black/80 backdrop-blur-[4px]"
-	                              iconClassName="inline-flex items-center justify-center leading-none"
-	                              buttonClassName="w-full h-full opacity-0 cursor-pointer rounded-full"
-	                              menuClassName={
-	                                noticeVariant === 'demo'
-                                    ? 'bg-xcannes-surface-demo !-mt-px !max-h-64 overflow-y-auto overscroll-contain touch-pan-y !border-white/20 !ring-1 !ring-white/20 ring-inset'
-                                    : 'bg-[#101415] !-mt-px !max-h-64 overflow-y-auto overscroll-contain touch-pan-y !border-white/20 !ring-1 !ring-white/20 ring-inset'
-	                              }
-	                              selectClassName="xcannes-select w-full bg-transparent rounded-xl pl-0 pr-2 py-2 text-base text-white focus:outline-none transition-colors duration-150"
-	                            />
-	                          </div>
-	                        )}
 	                      </div>
 	                    </div>
 
@@ -1475,7 +1475,7 @@ export default function WalletDashboardReceiveModal({
                         <div className="flex justify-center pt-1 pb-1 relative z-[85]">
 	                      <div className="relative">
 	                        {/* Visible pill */}
-                            <div className={`flex w-fit flex-col items-center gap-1 bg-elevated px-6 py-2 ${requestWalletDropdownOpen ? 'rounded-t-[20px] rounded-b-none' : 'rounded-3xl'} ${requestCurrencyDropdownOpen ? 'shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_10px_rgba(255,255,255,0.16)]' : 'shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]'} ${requestWalletDropdownOpen ? 'ring-1 ring-white/20 ring-inset' : ''} ${hasMultipleWallets ? 'cursor-pointer' : ''}`}>
+                            <div className={`relative flex w-fit flex-col items-center gap-1 bg-elevated px-6 py-2 ${requestWalletDropdownOpen ? 'rounded-t-[20px] rounded-b-none' : 'rounded-3xl'} ${requestCurrencyDropdownOpen ? 'shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_10px_rgba(255,255,255,0.16)]' : 'shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]'} ${requestWalletDropdownOpen ? 'ring-1 ring-white/20 ring-inset' : ''} ${requestCurrencyDropdownOpen ? 'ring-1 ring-white/30 ring-inset' : ''} ${hasMultipleWallets ? 'cursor-pointer' : ''}`}>
 	                          <span className="text-white/70 text-[14px] md:text-[15px] font-medium tracking-wide">
 	                            {t('ui_receive_account_info_label', 'Choisissez le compte')}
 	                          </span>
@@ -1490,35 +1490,35 @@ export default function WalletDashboardReceiveModal({
 	                              </svg>
 	                            )}
 	                          </div>
+	                          {/* Invisible ModalSelect overlay for wallet switching */}
+	                          {hasMultipleWallets && (
+	                            <div className="absolute inset-0 z-10">
+	                              <ModalSelect
+	                                value={wallet}
+	                                onChange={next => {
+	                                  const addr = trimmed(next);
+	                                  if (!addr || addr === wallet) return;
+	                                  onSwitchWallet?.(addr);
+	                                }}
+                                  onOpenChange={setRequestWalletDropdownOpen}
+	                                options={shareWalletOptions}
+	                                useNativeSelect={false}
+	                                portal
+	                                portalTarget={overlayListRef.current}
+	                                hideSelected
+	                                backdropClassName=""
+	                                iconClassName="inline-flex items-center justify-center leading-none"
+	                                buttonClassName="w-full h-full opacity-0 cursor-pointer"
+	                                menuClassName={
+                                    noticeVariant === 'demo'
+                                      ? 'bg-xcannes-surface-demo !-mt-px !max-h-64 overflow-y-auto overscroll-contain touch-pan-y !border-white/20 !ring-1 !ring-white/20 ring-inset'
+                                      : 'bg-[#101415] !-mt-px !max-h-64 overflow-y-auto overscroll-contain touch-pan-y !border-white/20 !ring-1 !ring-white/20 ring-inset'
+	                                }
+	                                selectClassName="xcannes-select w-full bg-transparent rounded-xl pl-0 pr-2 py-2 text-base text-white focus:outline-none transition-colors duration-150"
+	                              />
+	                            </div>
+	                          )}
 	                        </div>
-	                        {/* Invisible ModalSelect overlay for wallet switching */}
-	                        {hasMultipleWallets && (
-	                          <div className="absolute inset-0 z-10">
-	                            <ModalSelect
-	                              value={wallet}
-	                              onChange={next => {
-	                                const addr = trimmed(next);
-	                                if (!addr || addr === wallet) return;
-	                                onSwitchWallet?.(addr);
-	                              }}
-                                onOpenChange={setRequestWalletDropdownOpen}
-	                              options={shareWalletOptions}
-	                              useNativeSelect={false}
-	                              portal
-	                              portalTarget={overlayListRef.current}
-	                              hideSelected
-	                              backdropClassName="bg-black/80 backdrop-blur-[4px]"
-	                              iconClassName="inline-flex items-center justify-center leading-none"
-	                              buttonClassName="w-full h-full opacity-0 cursor-pointer rounded-full"
-	                              menuClassName={
-                                  noticeVariant === 'demo'
-                                    ? 'bg-xcannes-surface-demo !-mt-px !max-h-64 overflow-y-auto overscroll-contain touch-pan-y !border-white/20 !ring-1 !ring-white/20 ring-inset'
-                                    : 'bg-[#101415] !-mt-px !max-h-64 overflow-y-auto overscroll-contain touch-pan-y !border-white/20 !ring-1 !ring-white/20 ring-inset'
-	                              }
-	                              selectClassName="xcannes-select w-full bg-transparent rounded-xl pl-0 pr-2 py-2 text-base text-white focus:outline-none transition-colors duration-150"
-	                            />
-	                          </div>
-	                        )}
 	                      </div>
 	                    </div>
 
@@ -1575,7 +1575,7 @@ export default function WalletDashboardReceiveModal({
 	                          portalTarget={overlayListRef.current}
 	                          hideSelected
 	                          showMobileOptionRight={true}
-	                          backdropClassName="bg-black/80 backdrop-blur-[4px] !z-[45]"
+	                          backdropClassName=""
 	                          iconClassName="text-3xl leading-none"
 	                          optionIconClassName="text-2xl leading-none opacity-60"
 	                          optionClassName="py-2 md:py-2.5 !text-base md:!text-lg !text-white/60"
