@@ -1827,7 +1827,7 @@ const MoonPayBuyModal = ({
 
           {/* Title + Wallet pill */}
           {wizardStep === 1 ? (
-            <div className="relative z-[65] px-4 pt-2 pb-4 text-center">
+	            <div className="relative z-[66] px-4 pt-2 pb-4 text-center">
               {/* Desktop: bouton ← Retour vers "Gérer vos fonds" (embedded) */}
               {embedded ? (
                 <button
@@ -1850,8 +1850,8 @@ const MoonPayBuyModal = ({
                   </p>
                 </div>
               ) : null}
-              <div className="flex justify-center">
-                <div className="inline-flex flex-col items-center gap-1 bg-elevated px-6 py-2 rounded-3xl shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]">
+	              <div className="flex justify-center">
+	                <div className={`inline-flex flex-col items-center gap-1 bg-elevated px-6 py-2 rounded-3xl shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)] ${assetDropdownOpen ? 'ring-1 ring-white/20 ring-inset' : ''}`}>
                   <span className="text-white/70 text-[14px] md:text-[15px] font-medium tracking-wide">
                     {t('moonpay_from_account', 'Depuis le compte')}
                   </span>
@@ -1871,7 +1871,7 @@ const MoonPayBuyModal = ({
 
           {/* Currency selector */}
           {wizardStep === 1 ? (
-            <div className="relative z-[65]">
+	            <div className="relative z-[66]">
               <div className="text-[13px] tracking-normal font-medium text-white/55 mb-2">
                 {t('moonpay_buy_receive_currency_label', 'Vous achetez')}
               </div>
