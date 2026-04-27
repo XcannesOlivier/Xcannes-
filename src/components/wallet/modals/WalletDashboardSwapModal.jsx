@@ -651,7 +651,7 @@ export default function WalletDashboardSwapModal({
                 </div>
                 {/* ── SECTION 1: Currency selection ───────────────────────── */}
                 <div className="space-y-3">
-                  <div className="relative z-[65]">
+	                  <div className={`relative ${quoteDropdownOpen ? "z-[70]" : "z-[65]"}`}>
                     <div className="flex items-center justify-between mb-2 relative z-[50]">
                       <div className="text-[13px] tracking-normal font-medium text-white/55">
                         {t("ui_convert_from_label", "Vous envoyez")}
@@ -710,7 +710,7 @@ export default function WalletDashboardSwapModal({
 		                  </div>
 
 		                  {/* ── Rate line + swap button + Amount input ── */}
-		                  <div className={`relative z-[65] transition-all duration-200 ${baseDropdownOpen ? 'opacity-0 max-h-0 overflow-hidden !my-0' : 'opacity-100'}`}>
+			                  <div className={`relative ${quoteDropdownOpen ? "z-[70]" : "z-[65]"} transition-all duration-200 ${baseDropdownOpen ? 'opacity-0 max-h-0 overflow-hidden !my-0' : 'opacity-100'}`}>
 		                    {/* Rate line */}
                         <div className="flex items-center gap-3 px-2 pb-2 text-white/45">
 		                      <span className="h-px flex-1 bg-gradient-to-r from-transparent to-white/20" />
