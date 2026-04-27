@@ -28,12 +28,20 @@ export default function ModalSelect({
   menuFooter = null,
   menuHeader = null,
   openButtonClassName = "",
+  portalDesktopWidthOffset = 0,
 }) {
   const [open, setOpen] = useState(false);
   const [visible, setVisible] = useState(false);
   const isClosingRef = useRef(false);
   const popupRef = useRef(null);
   const triggerRef = useRef(null);
+
+  const resolvePortalWidth = useCallback((baseWidth) => {
+    if (!Number.isFinite(baseWidth)) return baseWidth;
+    if (typeof window === "undefined") return baseWidth;
+    if (window.innerWidth < 768) return baseWidth;
+    return baseWidth + Number(portalDesktopWidthOffset || 0);
+  }, [portalDesktopWidthOffset]);
 
   const openMenu = useCallback(() => {
     isClosingRef.current = false;
@@ -107,7 +115,7 @@ export default function ModalSelect({
           position: 'absolute',
           top: tRect.bottom - cRect.top + resolvedPortalTarget.scrollTop - 1,
           left: tRect.left - cRect.left + resolvedPortalTarget.scrollLeft,
-          width: tRect.width,
+          width: resolvePortalWidth(tRect.width),
         });
       };
       update();
@@ -122,7 +130,12 @@ export default function ModalSelect({
     const update = () => {
       if (!triggerRef.current) return;
       const r = triggerRef.current.getBoundingClientRect();
-      setPortalStyle({ position: 'fixed', top: r.bottom - 1, left: r.left, width: r.width });
+      setPortalStyle({
+        position: 'fixed',
+        top: r.bottom - 1,
+        left: r.left,
+        width: resolvePortalWidth(r.width),
+      });
     };
     update();
     window.addEventListener('scroll', update, true);
@@ -131,7 +144,7 @@ export default function ModalSelect({
       window.removeEventListener('scroll', update, true);
       window.removeEventListener('resize', update);
     };
-  }, [open, resolvedPortalTarget, isScoped]);
+  }, [open, resolvedPortalTarget, isScoped, resolvePortalWidth]);
 
   const selected = useMemo(() => {
     return options.find((opt) => String(opt.value) === String(value)) || null;
