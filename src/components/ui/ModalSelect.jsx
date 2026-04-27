@@ -173,9 +173,10 @@ export default function ModalSelect({
 
     return (
       <span
-        className={`relative min-w-0 ${mobile ? "truncate md:hidden" : "truncate hidden md:inline"}`}
+        className={`relative min-w-0 ${mobile ? "md:hidden" : "hidden md:inline"}`}
         title={typeof tooltip === "string" ? tooltip : undefined}
         onPointerDown={(e) => e.stopPropagation()}
+        onTouchStart={(e) => e.stopPropagation()}
         onMouseEnter={() => setActiveTooltipValue(String(value))}
         onMouseLeave={() => {
           setActiveTooltipValue((prev) => (prev === String(value) ? null : prev));
@@ -186,9 +187,9 @@ export default function ModalSelect({
           setActiveTooltipValue((prev) => (prev === String(value) ? null : String(value)));
         }}
       >
-        {content}
+        <span className="block truncate">{content}</span>
         {isTooltipOpen ? (
-          <span className="absolute left-0 top-full z-[110] mt-1 w-[220px] rounded-[10px] border border-white/12 bg-[#161c1f] px-2.5 py-2 text-[11px] leading-snug text-white/80 shadow-[0_14px_30px_rgba(0,0,0,0.42)] whitespace-normal">
+          <span className="absolute left-0 bottom-full z-[110] mb-2 w-[220px] rounded-[10px] border border-white/12 bg-[#161c1f] px-2.5 py-2 text-[11px] leading-snug text-white/80 shadow-[0_14px_30px_rgba(0,0,0,0.42)] whitespace-normal">
             {tooltip}
           </span>
         ) : null}
