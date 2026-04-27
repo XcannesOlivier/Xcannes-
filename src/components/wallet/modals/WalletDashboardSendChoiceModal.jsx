@@ -754,7 +754,7 @@ export default function WalletDashboardSendChoiceModal({
                       <svg className={`w-4 h-4 text-white/40 flex-shrink-0 ml-2 transition-transform duration-200 ${showQuickscanSavedPicker ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
                     </button>
                     <div
-                      className={`absolute left-0 right-0 top-full mt-1.5 z-[100] rounded-[20px] ring-1 ring-white/15 ring-inset overflow-hidden shadow-[0_12px_36px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.06)] bg-gradient-to-b from-[#101415] to-[#0d1214] transition-all duration-200 origin-top ${showQuickscanSavedPicker ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-95 pointer-events-none'}`}
+                      className={`absolute left-0 right-0 top-full mt-1.5 z-[100] rounded-[20px] ring-1 ring-white/15 ring-inset overflow-hidden shadow-[0_12px_36px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.06),inset_1px_0_0_rgba(255,255,255,0.04),inset_-1px_0_0_rgba(255,255,255,0.04)] bg-gradient-to-b from-[#101415] to-[#0d1214] transition-all duration-200 origin-top ${showQuickscanSavedPicker ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-95 pointer-events-none'}`}
                     >
                       {/* Header */}
                       <div className="px-4 py-2.5 border-b border-white/[0.04]">

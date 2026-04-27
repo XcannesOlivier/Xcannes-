@@ -1212,10 +1212,10 @@ export default function WalletDashboardSendModal({
         {/* ── Devise + Montant (séparés) – masqués en mode payreq ── */}
         {!hasPaymentRequest && (
         <div className={`transition-opacity duration-300 space-y-4 ${hasDestination ? 'opacity-100' : 'opacity-30 pointer-events-none select-none'}`}>
-          <h3 className="text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight text-center leading-snug">
+          <h3 className="relative z-[50] text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight text-center leading-snug">
             {t("ui_send_modal_title", "Envoi simple")}
           </h3>
-          <p className="text-[14px] md:text-[15px] text-white/55 text-center leading-relaxed -mt-2">
+          <p className="relative z-[50] text-[14px] md:text-[15px] text-white/55 text-center leading-relaxed -mt-2">
             {t("ui_send_devise_hint", "Indiquez la devise, le montant, et vérifiez avant d'envoyer.")}
           </p>
           <div className="flex justify-center relative z-[65]">
@@ -1224,7 +1224,7 @@ export default function WalletDashboardSendModal({
               className: "flex justify-center relative z-[85]",
               prefix: t("moonpay_from_account", "Depuis le compte"),
               pillClassName: `bg-elevated ${sendAssetDropdownOpen
-                ? "shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_10px_rgba(255,255,255,0.16)]"
+                ? "ring-1 ring-white/15 ring-inset shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_10px_rgba(255,255,255,0.16)]"
                 : "shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]"}`,
             })}
           </div>
@@ -1287,11 +1287,11 @@ export default function WalletDashboardSendModal({
 	              menuHeader={t("ui_your_balances_header", "Vos soldes")}
 	              backdropClassName="bg-black/80 backdrop-blur-[4px] !z-[45]"
 	              buttonClassName="bg-gradient-to-b from-[#101415] to-[#0d1214] ring-1 ring-white/[0.07] ring-inset rounded-[14px] px-3.5 py-1.5 md:py-2 text-xl md:text-2xl text-white outline-none focus:outline-none cursor-pointer transition-all duration-150 shadow-[0_2px_8px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.06)]"
-	              openButtonClassName="!bg-white/10 !border !border-white/10 !border-b-0 !ring-1 !ring-white/10 !shadow-[0_8px_18px_rgba(0,0,0,0.45)]"
+	              openButtonClassName="!bg-white/10 !border !border-white/10 !border-b-0 !rounded-b-none !ring-1 !ring-white/10 !shadow-[0_8px_18px_rgba(0,0,0,0.45)]"
 	              menuClassName={
 		                noticeVariant === "demo"
-		                  ? "bg-xcannes-surface-demo !border-white/10 ring-1 ring-white/10 ring-inset max-h-[480px]"
-		                  : "bg-[#101415] !border-white/10 ring-1 ring-white/10 ring-inset max-h-[480px]"
+		                  ? "bg-xcannes-surface-demo border border-white/10 border-t-0 rounded-b-[14px] max-h-[480px] shadow-[0_12px_28px_rgba(0,0,0,0.5),4px_0_12px_rgba(255,255,255,0.03),-4px_0_12px_rgba(255,255,255,0.03),0_12px_16px_rgba(255,255,255,0.03)]"
+		                  : "bg-[#101415] border border-white/10 border-t-0 rounded-b-[14px] max-h-[480px] shadow-[0_12px_28px_rgba(0,0,0,0.5),4px_0_12px_rgba(255,255,255,0.03),-4px_0_12px_rgba(255,255,255,0.03),0_12px_16px_rgba(255,255,255,0.03)]"
 		              }
 	              selectClassName="xcannes-select w-full bg-[#101415] ring-1 ring-white/10 ring-inset rounded-[14px] px-3.5 py-1.5 md:py-2 text-xl md:text-2xl text-white outline-none focus:outline-none cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
 			            />
@@ -1307,9 +1307,9 @@ export default function WalletDashboardSendModal({
             </div>
           ) : null}
           <div className="relative z-[2]">
-            <div className="flex items-center justify-between mb-2">
+            <div className="flex items-baseline justify-between mb-1.5 relative z-[65]">
               <label
-                className="text-[13px] tracking-normal font-medium text-white/55"
+                className="text-base md:text-lg text-white/60"
                 title={t("ui_send_amount_tip", "Saisissez le montant à envoyer.")}
               >
                 {t("ui_amount_52cea2dd3d", "Montant")}

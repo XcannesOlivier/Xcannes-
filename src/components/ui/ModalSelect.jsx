@@ -294,7 +294,7 @@ export default function ModalSelect({
           >
             {menuHeader ? (
               <div className="flex items-center justify-end px-3 pt-2 pb-1">
-                <span className="text-[11px] text-white/30 font-thin border border-white/15 rounded px-1.5 py-0.5 leading-none">{menuHeader}</span>
+                <span className="text-[11px] text-white/50 font-thin border border-white/20 rounded px-1.5 py-0.5 leading-none">{menuHeader}</span>
               </div>
             ) : null}
             {hideSelected && <div className="border-t border-white/10 mx-3 mb-1" />}
@@ -369,7 +369,7 @@ export default function ModalSelect({
           >
             {menuHeader ? (
               <div className="flex items-center justify-end px-3 pt-2 pb-1">
-                <span className="text-[11px] text-white/30 font-thin border border-white/15 rounded px-1.5 py-0.5 leading-none">{menuHeader}</span>
+                <span className="text-[11px] text-white/50 font-thin border border-white/20 rounded px-1.5 py-0.5 leading-none">{menuHeader}</span>
               </div>
             ) : null}
             {hideSelected && <div className="border-t border-white/10 mx-3 mb-1" />}
