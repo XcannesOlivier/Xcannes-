@@ -41,6 +41,7 @@ import { useDesktopInlineFlags } from './hooks/useDesktopInlineFlags';
 import { useAugmentedCurrencyLines } from './hooks/useAugmentedCurrencyLines';
 import { useReconciliation } from './hooks/useReconciliation';
 import { usePreferredCurrency } from './hooks/usePreferredCurrency';
+import WalletCurrencySelector from '@/components/ui/WalletCurrencySelector';
 
 function isAcceptedOnChainToken(currency) {
   const code = String(currency || '').toUpperCase();
@@ -451,6 +452,14 @@ export default function WalletDashboard({
     upsertCurrencyLine,
     toast,
   });
+
+  const handleAddDevise = useCallback(async (code) => {
+    if (!code) return;
+    await upsertCurrencyLine?.({
+      currencyCode: String(code).trim().toUpperCase(),
+      allocatedRlusd: 0,
+    });
+  }, [upsertCurrencyLine]);
 
   // ── Reconciliation (external spend detection) ──────────────
   const reconciliation = useReconciliation({
@@ -1143,7 +1152,18 @@ export default function WalletDashboard({
               tokens={tokenListTokens}
               renderTokenRow={renderTokenRow}
               headerTitle={
-                <div className="w-full flex items-center justify-end gap-3">
+                <div className="w-full flex items-center justify-between gap-3">
+                  <WalletCurrencySelector
+                    value=""
+                    onChange={handleAddDevise}
+                    triggerVariant="text"
+                    triggerLabel={t('ui_add_devise_button', '+ Devise')}
+                    buttonClassName="shrink-0 inline-flex items-center gap-1 text-[13px] md:text-[15px] font-normal text-white/55 hover:text-white/85 transition-colors px-2.5 md:px-3 py-1 md:py-1.5 rounded-lg ring-1 ring-white/10 hover:ring-white/20"
+                    placeholder={t('ui_search_all_currencies_c5d6e7f8', 'Search currency...')}
+                    excludeCodes={['USD', 'RLUSD', 'XRP']}
+                    showQuickAdd={false}
+                    fullscreen={true}
+                  />
                   <button
                     type="button"
                     onClick={handleOpenGlobalStatement}
