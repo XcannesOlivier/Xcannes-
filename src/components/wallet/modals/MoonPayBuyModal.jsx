@@ -1875,13 +1875,14 @@ const MoonPayBuyModal = ({
               <div className="text-[13px] tracking-normal font-medium text-white/55 mb-2">
                 {t('moonpay_buy_receive_currency_label', 'Vous achetez')}
               </div>
-              <ModalSelect
-                value={currency}
-                onChange={(val) => setCurrency(String(val || '').toUpperCase())}
-                onOpenChange={setAssetDropdownOpen}
-                options={(supportedCurrencies || []).map((opt) => {
-                  const labelLeftText = opt.labelLeft || opt.label || opt.code;
-                  const isSelected = String(opt.code) === String(currency || '');
+	              <ModalSelect
+	                value={currency}
+	                onChange={(val) => setCurrency(String(val || '').toUpperCase())}
+	                onOpenChange={setAssetDropdownOpen}
+	                portalTarget={modalPanelRef.current}
+	                options={(supportedCurrencies || []).map((opt) => {
+	                  const labelLeftText = opt.labelLeft || opt.label || opt.code;
+	                  const isSelected = String(opt.code) === String(currency || '');
                   const labelRight = !assetDropdownOpen && isSelected
                     ? (
                       <span className="inline-flex items-center gap-[3px] text-[10px] text-white/30 tracking-normal font-normal">
