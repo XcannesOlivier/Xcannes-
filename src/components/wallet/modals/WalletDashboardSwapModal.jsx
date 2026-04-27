@@ -634,17 +634,23 @@ export default function WalletDashboardSwapModal({
                   </p>
                   <div className="mt-2 flex justify-center relative z-[120]">
                     {renderWalletMeta?.({
-                      variant: "pill-column",
-                      className: "flex justify-center relative z-[120]",
+                      variant: "pill",
+                      className: "w-full flex justify-center wallet-meta--plus-4 wallet-meta--desktop-gap relative z-[120]",
                       prefix: t("moonpay_from_account", "Depuis le compte"),
-                      pillClassName: `bg-elevated ${baseDropdownOpen || quoteDropdownOpen
+                      labelWrap: false,
+                      pillClassName: `bg-elevated px-5 py-1 gap-4 ${baseDropdownOpen || quoteDropdownOpen
                         ? "shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_10px_rgba(255,255,255,0.16)]"
-                        : "shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]"}`,
+                        : "shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]"}`  ,
+                      prefixClassName:
+                        "!text-white/45 text-[12px] md:text-[13px] font-normal tracking-wide mr-4",
+                      labelClassName:
+                        "!text-white/90 text-[14px] md:text-[15px] font-semibold",
+                      dotClassName: "!h-2.5 !w-2.5 ring-xcannes-green/20 self-center",
                     })}
                   </div>
                 </div>
                 {/* ── SECTION 1: Currency selection ───────────────────────── */}
-                <div className={`space-y-3 ${quoteDropdownOpen ? 'relative z-[50]' : ''}`}>
+                <div className="space-y-3">
                   <div className="relative z-[65]">
                     <div className="flex items-center justify-between mb-2 relative z-[50]">
                       <div className="text-[13px] tracking-normal font-medium text-white/55">
