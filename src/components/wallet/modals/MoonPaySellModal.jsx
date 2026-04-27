@@ -1649,7 +1649,7 @@ const MoonPaySellModal = ({
 			                value={currency}
 			                onChange={(val) => setCurrency(String(val || "").toUpperCase())}
 			                onOpenChange={setCryptoDropdownOpen}
-			                portalTarget={modalPanelRef.current}
+			                portalTarget={embedded ? contentRootRef.current : modalPanelRef.current}
 			                options={(supportedCurrencies || []).map((opt) => {
 			                  const labelLeftText = opt.labelLeft || opt.label || opt.code;
 			                  const isSelected = String(opt.code) === String(currency || "");
