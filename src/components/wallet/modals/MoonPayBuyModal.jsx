@@ -1827,7 +1827,7 @@ const MoonPayBuyModal = ({
 
           {/* Title + Wallet pill */}
           {wizardStep === 1 ? (
-	            <div className="relative z-[66] px-4 pt-2 pb-4 text-center">
+	            <div className="relative z-[120] px-4 pt-2 pb-4 text-center">
               {/* Desktop: bouton ← Retour vers "Gérer vos fonds" (embedded) */}
               {embedded ? (
                 <button
@@ -1871,7 +1871,7 @@ const MoonPayBuyModal = ({
 
           {/* Currency selector */}
           {wizardStep === 1 ? (
-	            <div className="relative z-[66]">
+		            <div className="relative z-[120]">
               <div className="text-[13px] tracking-normal font-medium text-white/55 mb-2">
                 {t('moonpay_buy_receive_currency_label', 'Vous achetez')}
               </div>
