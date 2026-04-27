@@ -1290,8 +1290,8 @@ export default function WalletDashboardSendModal({
 	              openButtonClassName="!bg-white/10 !border !border-white/10 !border-b-0 !rounded-b-none !ring-1 !ring-white/10 !shadow-[0_8px_18px_rgba(0,0,0,0.45)]"
 	              menuClassName={
 		                noticeVariant === "demo"
-		                  ? "bg-xcannes-surface-demo border border-white/10 border-t-0 rounded-b-[14px] max-h-[480px] shadow-[0_12px_28px_rgba(0,0,0,0.5),4px_0_12px_rgba(255,255,255,0.03),-4px_0_12px_rgba(255,255,255,0.03),0_12px_16px_rgba(255,255,255,0.03)]"
-		                  : "bg-[#101415] border border-white/10 border-t-0 rounded-b-[14px] max-h-[480px] shadow-[0_12px_28px_rgba(0,0,0,0.5),4px_0_12px_rgba(255,255,255,0.03),-4px_0_12px_rgba(255,255,255,0.03),0_12px_16px_rgba(255,255,255,0.03)]"
+		                  ? "bg-xcannes-surface-demo !border-white/10 !ring-1 !ring-white/10 ring-inset rounded-b-[14px] max-h-[480px]"
+		                  : "bg-[#101415] !border-white/10 !ring-1 !ring-white/10 ring-inset rounded-b-[14px] max-h-[480px]"
 		              }
 	              selectClassName="xcannes-select w-full bg-[#101415] ring-1 ring-white/10 ring-inset rounded-[14px] px-3.5 py-1.5 md:py-2 text-xl md:text-2xl text-white outline-none focus:outline-none cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
 			            />
