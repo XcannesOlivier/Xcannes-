@@ -454,14 +454,6 @@ export default function WalletDashboard({
     toast,
   });
 
-  const handleAddDevise = useCallback(async (code) => {
-    if (!code) return;
-    await upsertCurrencyLine?.({
-      currencyCode: String(code).trim().toUpperCase(),
-      allocatedRlusd: 0,
-    });
-  }, [upsertCurrencyLine]);
-
   // ── Reconciliation (external spend detection) ──────────────
   const reconciliation = useReconciliation({
     reconciliation: reconciliationData,
@@ -895,6 +887,14 @@ export default function WalletDashboard({
     t,
     toast,
   });
+
+  const handleAddDevise = useCallback(
+    async (code) => {
+      if (!code) return;
+      await handleActivateCurrencyLine?.(code);
+    },
+    [handleActivateCurrencyLine],
+  );
 
   // ── Token row renderer ─────────────────────────────────────
   const renderTokenRow = useCallback(
