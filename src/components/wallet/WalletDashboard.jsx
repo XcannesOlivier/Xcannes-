@@ -1157,8 +1157,8 @@ export default function WalletDashboard({
                     value=""
                     onChange={handleAddDevise}
                     triggerVariant="text"
-                    triggerLabel={t('ui_add_devise_button', '+ Devise')}
-                    buttonClassName="shrink-0 inline-flex items-center gap-1 text-[13px] md:text-[15px] font-normal text-white/55 hover:text-white/85 transition-colors px-2.5 md:px-3 py-1 md:py-1.5 rounded-lg ring-1 ring-white/10 hover:ring-white/20"
+                    triggerLabel={<><span className="md:hidden">+ Devise</span><span className="hidden md:inline">Ajouter une devise</span></>}
+                    buttonClassName="shrink-0 inline-flex items-center gap-1 text-[13px] md:text-[15px] font-normal text-white/55 hover:text-white/85 transition-colors px-4 md:px-3 py-1 md:py-1.5 rounded-lg ring-1 ring-white/10 hover:ring-white/20"
                     placeholder={t('ui_search_all_currencies_c5d6e7f8', 'Search currency...')}
                     excludeCodes={['USD', 'RLUSD', 'XRP']}
                     showQuickAdd={false}
@@ -1179,7 +1179,8 @@ export default function WalletDashboard({
                       <circle cx="12" cy="12" r="9" />
                       <polyline points="12 7 12 12 15.5 14.5" />
                     </svg>
-                    <span>{t('ui_consult_global_statement_3b89f4a7a2', 'Historique')}</span>
+                    <span className="md:hidden">{t('ui_consult_global_statement_3b89f4a7a2', 'Historique')}</span>
+                    <span className="hidden md:inline">{t('ui_consult_global_statement_desktop', "Voir l'historique")}</span>
                   </button>
                 </div>
               }
