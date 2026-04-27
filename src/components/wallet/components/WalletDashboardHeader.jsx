@@ -330,7 +330,7 @@ export default function WalletDashboardHeader({
                     {/* Multi-wallet dropdown — smooth animated */}
                     {isSwitcherOpen && hasMultipleWallets && (
                       <div
-                        className={`absolute z-50 -left-px top-full mt-0 w-[260px] rounded-b-[12px] bg-[#0d1214] border-l border-r border-b border-white/20 shadow-[0_12px_48px_rgba(0,0,0,0.45)] max-h-[70vh] md:max-h-[340px] overflow-y-auto overflow-x-hidden origin-top transition-all duration-[100ms] ${
+                        className={`absolute z-50 -left-px top-full mt-0 w-[260px] rounded-b-[12px] bg-[#0d1214] border-l border-r border-b border-white/20 shadow-[0_12px_48px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.04),inset_1px_0_0_rgba(255,255,255,0.03),inset_-1px_0_0_rgba(255,255,255,0.03)] max-h-[70vh] md:max-h-[340px] overflow-y-auto overflow-x-hidden origin-top transition-all duration-[100ms] ${
                           isSwitcherVisible
                             ? "opacity-100 scale-y-100 translate-y-0 ease-[cubic-bezier(0.16,1,0.3,1)]"
                             : "opacity-0 scale-y-[0.92] -translate-y-1 ease-[cubic-bezier(0.4,0,1,1)]"
@@ -349,7 +349,7 @@ export default function WalletDashboardHeader({
                         </div>
                         {/* Subtitle */}
                         <div className="px-2.5 md:px-3 pt-2 pb-1">
-                          <div className="text-[12px] md:text-[13px] text-white/40">
+                          <div className="text-[13px] md:text-[14px] text-white/40">
                             Changer de compte
                           </div>
                         </div>
