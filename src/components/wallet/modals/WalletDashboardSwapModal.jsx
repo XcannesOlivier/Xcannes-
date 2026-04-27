@@ -644,9 +644,9 @@ export default function WalletDashboardSwapModal({
                   </div>
                 </div>
                 {/* ── SECTION 1: Currency selection ───────────────────────── */}
-                <div className="space-y-3">
+                <div className={`space-y-3 ${quoteDropdownOpen ? 'relative z-[50]' : ''}`}>
                   <div className="relative z-[65]">
-                    <div className="flex items-center justify-between mb-2 relative z-[41]">
+                    <div className="flex items-center justify-between mb-2 relative z-[50]">
                       <div className="text-[13px] tracking-normal font-medium text-white/55">
                         {t("ui_convert_from_label", "Vous envoyez")}
                       </div>
