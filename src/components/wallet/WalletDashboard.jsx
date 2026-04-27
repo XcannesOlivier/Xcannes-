@@ -749,10 +749,6 @@ export default function WalletDashboard({
       window.clearTimeout(recentActivityTimerRef.current);
       recentActivityTimerRef.current = null;
     }
-    recentActivityTimerRef.current = window.setTimeout(() => {
-      setRecentActivityMessage('');
-      recentActivityTimerRef.current = null;
-    }, 10000);
   }, []);
 
   useEffect(() => {

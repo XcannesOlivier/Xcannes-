@@ -78,6 +78,7 @@ export function useWalletRecentActivityBanner({
 }) {
   const mountedAtRef = useRef(Date.now());
   const lastSeenIdRef = useRef(null);
+  const initialLoadDoneRef = useRef(false);
   const labelCacheRef = useRef(new Map());
 
   const savedAddressLabelByAddress = useMemo(() => {
@@ -125,11 +126,6 @@ export function useWalletRecentActivityBanner({
     if (typeof onActivity !== "function") return;
 
     const storageKey = `xcannes_wallet_last_activity_banner:${backendWalletAddress}`;
-    try {
-      lastSeenIdRef.current = window.sessionStorage.getItem(storageKey);
-    } catch {
-      // ignore
-    }
 
     let cancelled = false;
 
@@ -159,8 +155,13 @@ export function useWalletRecentActivityBanner({
             ? createdAt.getTime()
             : null;
 
-        // Ignore older transactions on initial mount.
-        if (createdAtMs != null && createdAtMs < mountedAtRef.current) {
+        // Au premier chargement, on affiche la dernière transaction existante
+        // sans la marquer comme "déjà vue", pour qu'elle s'affiche en permanence.
+        // Pour les polls suivants, on ignore les transactions antérieures au montage.
+        const isInitialLoad = !initialLoadDoneRef.current;
+        initialLoadDoneRef.current = true;
+
+        if (!isInitialLoad && createdAtMs != null && createdAtMs < mountedAtRef.current) {
           lastSeenIdRef.current = movementId;
           try {
             window.sessionStorage.setItem(storageKey, movementId);
