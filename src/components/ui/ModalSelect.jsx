@@ -180,7 +180,9 @@ export default function ModalSelect({
 
   const selectedLeft = selected?.labelLeft ?? selected?.label ?? placeholder;
   const selectedRight = selected?.labelRight ?? null;
-  const customMenuClassName = useNativeSelect ? "relative hidden md:block" : "relative";
+  const customMenuClassName = useNativeSelect
+    ? "relative hidden md:block w-full h-full"
+    : "relative w-full h-full";
   const mobileSelectedLabel = useMobileSelectedLabel
     ? selected?.labelMobile ?? selectedLeft
     : selectedLeft;
