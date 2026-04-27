@@ -64,50 +64,50 @@ export default function WalletSettingsDropdown({
     "inline-flex h-12 w-12 items-center justify-center rounded-[16px] bg-black/30 ring-1 ring-white/10 ring-inset shadow-[0_4px_12px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.04)] shrink-0";
   const SettingsAddWalletIcon = () => (
     <svg viewBox="0 0 48 48" className="w-8 h-8" fill="none" aria-hidden>
-      <rect x="10" y="10" width="28" height="28" rx="9" className="fill-white/5 stroke-white/14" strokeWidth="1.4" />
-      <path d="M24 16v16M16 24h16" className="stroke-white/72" strokeWidth="2.4" strokeLinecap="round" />
+      <rect x="10" y="10" width="28" height="28" rx="9" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.14)" strokeWidth="1.4" />
+      <path d="M24 16v16M16 24h16" stroke="rgba(255,255,255,0.72)" strokeWidth="2.4" strokeLinecap="round" />
     </svg>
   );
   const SettingsXrplIcon = () => (
     <svg viewBox="0 0 48 48" className="w-8 h-8" fill="none" aria-hidden>
-      <path d="M14 15c2.8 0 4.2 1.6 5.4 3 1.3 1.4 2.4 2.7 4.6 2.7s3.3-1.3 4.6-2.7c1.2-1.4 2.6-3 5.4-3" className="stroke-white/84" strokeWidth="2.3" strokeLinecap="round" />
-      <path d="M14 33c2.8 0 4.2-1.6 5.4-3 1.3-1.4 2.4-2.7 4.6-2.7s3.3 1.3 4.6 2.7c1.2 1.4 2.6 3 5.4 3" className="stroke-white/84" strokeWidth="2.3" strokeLinecap="round" />
-      <path d="M17 14.5l14 19M31 14.5l-14 19" className="stroke-white/18" strokeWidth="1.2" strokeLinecap="round" />
+      <path d="M14 15c2.8 0 4.2 1.6 5.4 3 1.3 1.4 2.4 2.7 4.6 2.7s3.3-1.3 4.6-2.7c1.2-1.4 2.6-3 5.4-3" stroke="rgba(255,255,255,0.84)" strokeWidth="2.3" strokeLinecap="round" />
+      <path d="M14 33c2.8 0 4.2-1.6 5.4-3 1.3-1.4 2.4-2.7 4.6-2.7s3.3 1.3 4.6 2.7c1.2 1.4 2.6 3 5.4 3" stroke="rgba(255,255,255,0.84)" strokeWidth="2.3" strokeLinecap="round" />
+      <path d="M17 14.5l14 19M31 14.5l-14 19" stroke="rgba(255,255,255,0.18)" strokeWidth="1.2" strokeLinecap="round" />
     </svg>
   );
   const SettingsRlusdIcon = () => (
     <svg viewBox="0 0 48 48" className="w-8 h-8" fill="none" aria-hidden>
-      <circle cx="24" cy="24" r="13.5" className="fill-white/5 stroke-white/18" strokeWidth="1.4" />
-      <path d="M24 17.5v9m0 4h.01" className="stroke-white/86" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx="24" cy="31.5" r="1" className="fill-white/86" />
+      <circle cx="24" cy="24" r="13.5" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.18)" strokeWidth="1.4" />
+      <path d="M24 17.5v9m0 4h.01" stroke="rgba(255,255,255,0.86)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="24" cy="31.5" r="1" fill="rgba(255,255,255,0.86)" />
     </svg>
   );
   const SettingsInfoIcon = () => (
     <svg viewBox="0 0 48 48" className="w-8 h-8" fill="none" aria-hidden>
-      <circle cx="24" cy="24" r="13.5" className="fill-white/5 stroke-white/18" strokeWidth="1.4" />
-      <path d="M24 22v9" className="stroke-white/86" strokeWidth="2.2" strokeLinecap="round" />
-      <circle cx="24" cy="17" r="1.4" className="fill-white/86" />
+      <circle cx="24" cy="24" r="13.5" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.18)" strokeWidth="1.4" />
+      <path d="M24 22v9" stroke="rgba(255,255,255,0.86)" strokeWidth="2.2" strokeLinecap="round" />
+      <circle cx="24" cy="17" r="1.4" fill="rgba(255,255,255,0.86)" />
     </svg>
   );
   const SettingsSecurityIcon = () => (
     <svg viewBox="0 0 48 48" className="w-8 h-8" fill="none" aria-hidden>
-      <path d="M24 11l11 5.2v8.2c0 8.1-6.1 12.7-11 14.6-4.9-1.9-11-6.5-11-14.6v-8.2L24 11Z" className="fill-white/5 stroke-white/18" strokeWidth="1.5" strokeLinejoin="round" />
-      <path d="M19.5 24.5l3.2 3.2 5.8-6.2" className="stroke-white/86" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M24 11l11 5.2v8.2c0 8.1-6.1 12.7-11 14.6-4.9-1.9-11-6.5-11-14.6v-8.2L24 11Z" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.18)" strokeWidth="1.5" strokeLinejoin="round" />
+      <path d="M19.5 24.5l3.2 3.2 5.8-6.2" stroke="rgba(255,255,255,0.86)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
   const SettingsHelpIcon = () => (
     <svg viewBox="0 0 48 48" className="w-8 h-8" fill="none" aria-hidden>
-      <path d="M15 18.5c0-3 2.3-5.5 5.3-5.5h7.4c3 0 5.3 2.5 5.3 5.5v6.8c0 3-2.3 5.5-5.3 5.5H24l-5.5 4.2v-4.2h-1.2c-3 0-5.3-2.5-5.3-5.5v-6.8Z" className="fill-white/5 stroke-white/18" strokeWidth="1.5" strokeLinejoin="round" />
-      <circle cx="18.5" cy="22" r="1.2" className="fill-white/82" />
-      <circle cx="24" cy="22" r="1.2" className="fill-white/82" />
-      <circle cx="29.5" cy="22" r="1.2" className="fill-white/82" />
+      <path d="M15 18.5c0-3 2.3-5.5 5.3-5.5h7.4c3 0 5.3 2.5 5.3 5.5v6.8c0 3-2.3 5.5-5.3 5.5H24l-5.5 4.2v-4.2h-1.2c-3 0-5.3-2.5-5.3-5.5v-6.8Z" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.18)" strokeWidth="1.5" strokeLinejoin="round" />
+      <circle cx="18.5" cy="22" r="1.2" fill="rgba(255,255,255,0.82)" />
+      <circle cx="24" cy="22" r="1.2" fill="rgba(255,255,255,0.82)" />
+      <circle cx="29.5" cy="22" r="1.2" fill="rgba(255,255,255,0.82)" />
     </svg>
   );
   const SettingsDocIcon = () => (
     <svg viewBox="0 0 48 48" className="w-8 h-8" fill="none" aria-hidden>
-      <path d="M17 11.5h11l5 5V34c0 2-1.6 3.5-3.5 3.5h-12c-1.9 0-3.5-1.5-3.5-3.5V15c0-1.9 1.6-3.5 3.5-3.5Z" className="fill-white/5 stroke-white/18" strokeWidth="1.5" strokeLinejoin="round" />
-      <path d="M28 11.5V17h5" className="stroke-white/30" strokeWidth="1.5" strokeLinejoin="round" />
-      <path d="M19.5 22h9M19.5 27h9M19.5 32h6" className="stroke-white/82" strokeWidth="2" strokeLinecap="round" />
+      <path d="M17 11.5h11l5 5V34c0 2-1.6 3.5-3.5 3.5h-12c-1.9 0-3.5-1.5-3.5-3.5V15c0-1.9 1.6-3.5 3.5-3.5Z" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.18)" strokeWidth="1.5" strokeLinejoin="round" />
+      <path d="M28 11.5V17h5" stroke="rgba(255,255,255,0.30)" strokeWidth="1.5" strokeLinejoin="round" />
+      <path d="M19.5 22h9M19.5 27h9M19.5 32h6" stroke="rgba(255,255,255,0.82)" strokeWidth="2" strokeLinecap="round" />
     </svg>
   );
 
