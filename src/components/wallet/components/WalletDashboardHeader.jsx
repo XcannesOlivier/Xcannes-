@@ -294,7 +294,7 @@ export default function WalletDashboardHeader({
           <div className="w-full mt-1 md:mt-0 mb-2 md:mb-0 px-1 md:px-2 flex justify-start md:justify-between">
 	            <div className="relative flex items-center gap-2.5 w-full md:w-full">
 
-	              <div className="flex-none min-w-0 max-w-[220px] md:max-w-[360px] rounded-[12px] px-2 md:px-3 py-1.5 md:py-2 relative z-[41]">
+	              <div className={`flex-none min-w-0 max-w-[220px] md:max-w-[360px] rounded-[12px] px-2 md:px-3 py-1.5 md:py-2 relative z-[41] transition-all duration-150 ${isSwitcherVisible ? 'ring-1 ring-white/20' : ''}`}>
 	                <div className="flex items-start justify-between gap-3" ref={switcherRef}>
                   <div className="min-w-0 flex-1">
                     {/* Wallet name + address — clickable when multi-wallet */}
@@ -329,7 +329,7 @@ export default function WalletDashboardHeader({
                     {/* Multi-wallet dropdown — smooth animated */}
                     {isSwitcherOpen && hasMultipleWallets && (
                       <div
-                        className={`absolute z-50 left-0 top-full mt-0 min-w-[260px] w-max max-w-[340px] rounded-b-[12px] bg-[#0d1214] ring-1 ring-white/15 shadow-[0_12px_48px_rgba(0,0,0,0.45)] max-h-[70vh] md:max-h-[340px] overflow-y-auto overflow-x-hidden origin-top transition-all duration-[100ms] ${
+                        className={`absolute z-50 left-0 top-full mt-0 min-w-[260px] w-max max-w-[340px] rounded-b-[12px] bg-[#0d1214] border-l border-r border-b border-white/15 shadow-[0_12px_48px_rgba(0,0,0,0.45)] max-h-[70vh] md:max-h-[340px] overflow-y-auto overflow-x-hidden origin-top transition-all duration-[100ms] ${
                           isSwitcherVisible
                             ? "opacity-100 scale-y-100 translate-y-0 ease-[cubic-bezier(0.16,1,0.3,1)]"
                             : "opacity-0 scale-y-[0.92] -translate-y-1 ease-[cubic-bezier(0.4,0,1,1)]"
@@ -338,12 +338,10 @@ export default function WalletDashboardHeader({
                         onMouseDown={(e) => e.stopPropagation()}
                         onClick={(e) => e.stopPropagation()}
                       >
-                        {/* Active wallet address pinned at top */}
-                        <div className="px-2.5 md:px-3 pt-2 pb-1.5 border-b border-white/[0.06]">
-                          <div
-                            className="font-mono text-[13px] md:text-[14px] text-xcannes-green/70 whitespace-normal break-all leading-snug"
-                          >
-                            {wallet}
+                        {/* Header dropdown */}
+                        <div className="px-2.5 md:px-3 pt-2.5 pb-2 border-b border-white/[0.06]">
+                          <div className="text-[11px] md:text-[12px] font-medium text-white/40 uppercase tracking-wider">
+                            Changer de compte
                           </div>
                         </div>
 
