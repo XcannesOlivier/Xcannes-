@@ -1152,7 +1152,7 @@ export default function WalletDashboard({
               tokens={tokenListTokens}
               renderTokenRow={renderTokenRow}
               headerTitle={
-                <div className="w-full flex items-center justify-between gap-3">
+                <div className="w-full flex items-center justify-between gap-2">
                   <WalletCurrencySelector
                     value=""
                     onChange={handleAddDevise}
@@ -1164,6 +1164,17 @@ export default function WalletDashboard({
                     showQuickAdd={false}
                     fullscreen={true}
                   />
+                  <div
+                    className={[
+                      "flex-1 min-w-0 overflow-hidden transition-all duration-500",
+                      recentActivityMessage ? "opacity-100 max-h-10" : "opacity-0 max-h-0 pointer-events-none",
+                    ].join(" ")}
+                    aria-live="polite"
+                  >
+                    <p className="truncate text-center text-[11px] md:text-[12px] text-white/60 px-1 leading-tight">
+                      {recentActivityMessage}
+                    </p>
+                  </div>
                   <button
                     type="button"
                     onClick={handleOpenGlobalStatement}
