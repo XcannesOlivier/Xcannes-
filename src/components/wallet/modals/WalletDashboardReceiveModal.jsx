@@ -1354,7 +1354,7 @@ export default function WalletDashboardReceiveModal({
 	                  <div className="space-y-5 pt-2 relative z-[2]">
 
 	                    {/* ── Centered wallet pill (style "Depuis le compte") ── */}
-                      <div className="flex justify-center pt-1 pb-1 relative" style={{ zIndex: shareWalletDropdownOpen ? 50 : 85 }}>
+                      <div className="flex justify-center pt-1 pb-1 relative z-[85]">
 	                      <div className="relative">
 	                        {/* Visible pill */}
                           <div className={`relative flex w-fit flex-col items-center gap-1 bg-elevated px-6 py-2 ${shareWalletDropdownOpen ? 'rounded-t-[20px] rounded-b-none' : 'rounded-3xl'} ${shareWalletDropdownOpen ? 'shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_10px_rgba(255,255,255,0.16)]' : 'shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]'} ${shareWalletDropdownOpen ? 'ring-1 ring-white/20 ring-inset' : ''} ${hasMultipleWallets ? 'cursor-pointer' : ''}`}>
@@ -1386,15 +1386,14 @@ export default function WalletDashboardReceiveModal({
 	                                options={shareWalletOptions}
 	                                useNativeSelect={false}
 	                                portal
-	                                portalTarget={overlayListRef.current}
 	                                hideSelected
 	                                backdropClassName=""
 	                                iconClassName="inline-flex items-center justify-center leading-none"
 	                                buttonClassName="w-full h-full opacity-0 cursor-pointer"
 	                                menuClassName={
 	                                  noticeVariant === 'demo'
-                                      ? 'bg-xcannes-surface-demo !-mt-px !max-h-64 overflow-y-auto overscroll-contain touch-pan-y !border-white/20 !ring-1 !ring-white/20 ring-inset'
-                                      : 'bg-[#101415] !-mt-px !max-h-64 overflow-y-auto overscroll-contain touch-pan-y !border-white/20 !ring-1 !ring-white/20 ring-inset'
+                                      ? 'bg-xcannes-surface-demo !mt-0 !max-h-64 overflow-y-auto overscroll-contain touch-pan-y !border-white/20 !ring-1 !ring-white/20 ring-inset !z-[10020]'
+                                      : 'bg-[#101415] !mt-0 !max-h-64 overflow-y-auto overscroll-contain touch-pan-y !border-white/20 !ring-1 !ring-white/20 ring-inset !z-[10020]'
 	                                }
 	                                selectClassName="xcannes-select w-full bg-transparent rounded-xl pl-0 pr-2 py-2 text-base text-white focus:outline-none transition-colors duration-150"
 	                              />
@@ -1472,7 +1471,7 @@ export default function WalletDashboardReceiveModal({
 		                  {/* SECTION 2 — CREATE REQUEST */}
                       <div className="flex flex-col gap-2 pt-2 flex-1">
 	                    {/* ── Centered wallet pill (style "Choisissez le compte") ── */}
-                        <div className="flex justify-center pt-1 pb-1 relative" style={{ zIndex: requestWalletDropdownOpen ? 50 : requestCurrencyDropdownOpen ? 95 : 85 }}>
+                        <div className="flex justify-center pt-1 pb-1 relative z-[85]">
 	                      <div className="relative">
 	                        {/* Visible pill */}
                             <div className={`relative flex w-fit flex-col items-center gap-1 bg-elevated px-6 py-2 ${requestWalletDropdownOpen ? 'rounded-t-[20px] rounded-b-none' : 'rounded-3xl'} ${requestCurrencyDropdownOpen ? 'shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_10px_rgba(255,255,255,0.16)]' : 'shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]'} ${requestWalletDropdownOpen ? 'ring-1 ring-white/20 ring-inset' : ''} ${requestCurrencyDropdownOpen ? 'ring-1 ring-white/30 ring-inset' : ''} ${hasMultipleWallets ? 'cursor-pointer' : ''}`}>
@@ -1504,15 +1503,14 @@ export default function WalletDashboardReceiveModal({
 	                                options={shareWalletOptions}
 	                                useNativeSelect={false}
 	                                portal
-	                                portalTarget={overlayListRef.current}
 	                                hideSelected
 	                                backdropClassName=""
 	                                iconClassName="inline-flex items-center justify-center leading-none"
 	                                buttonClassName="w-full h-full opacity-0 cursor-pointer"
 	                                menuClassName={
                                     noticeVariant === 'demo'
-                                      ? 'bg-xcannes-surface-demo !-mt-px !max-h-64 overflow-y-auto overscroll-contain touch-pan-y !border-white/20 !ring-1 !ring-white/20 ring-inset'
-                                      : 'bg-[#101415] !-mt-px !max-h-64 overflow-y-auto overscroll-contain touch-pan-y !border-white/20 !ring-1 !ring-white/20 ring-inset'
+                                      ? 'bg-xcannes-surface-demo !mt-0 !max-h-64 overflow-y-auto overscroll-contain touch-pan-y !border-white/20 !ring-1 !ring-white/20 ring-inset !z-[10020]'
+                                      : 'bg-[#101415] !mt-0 !max-h-64 overflow-y-auto overscroll-contain touch-pan-y !border-white/20 !ring-1 !ring-white/20 ring-inset !z-[10020]'
 	                                }
 	                                selectClassName="xcannes-select w-full bg-transparent rounded-xl pl-0 pr-2 py-2 text-base text-white focus:outline-none transition-colors duration-150"
 	                              />
