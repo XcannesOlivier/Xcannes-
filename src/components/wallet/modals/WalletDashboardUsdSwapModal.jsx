@@ -89,13 +89,14 @@ function renderCurrencyIcon(currency) {
   const url = String(currency?.image || "").trim();
   if (!url) return null;
   return (
-    <img
+    <Image
       src={url}
+      loader={({ src }) => src}
+      unoptimized
       alt=""
+      width={24}
+      height={24}
       className="w-6 h-6 rounded-full bg-white/10 ring-1 ring-white/10 object-cover flex-shrink-0"
-      loading="lazy"
-      decoding="async"
-      referrerPolicy="no-referrer"
     />
   );
 }
@@ -3172,23 +3173,24 @@ export default function WalletDashboardUsdSwapModal({
                                 </button>
                               </div>
                             ) : (
-                              <div className="inline-flex items-center gap-2 text-white/90">
-                                <img
-                                  src={
-                                    String(rlusdDisplayCurrency?.image || "").trim() ||
-                                    CRYPTO_ICONS?.RLUSD ||
-                                    "/symbols/rlusd.png"
-                                  }
-                                  alt=""
-                                  className="w-8 h-8 rounded-full object-cover flex-shrink-0"
-                                  loading="lazy"
-                                  decoding="async"
-                                  referrerPolicy="no-referrer"
-                                />
-                                <span className="text-base font-semibold tracking-tight">
-                                  {String(rlusdDisplayCurrency?.ticker || "RLUSD").toUpperCase()}
-                                </span>
-                                <span className="text-[11px] tracking-[0.22em] uppercase text-white/55">
+	                              <div className="inline-flex items-center gap-2 text-white/90">
+	                                <Image
+	                                  src={
+	                                    String(rlusdDisplayCurrency?.image || "").trim() ||
+	                                    CRYPTO_ICONS?.RLUSD ||
+	                                    "/symbols/rlusd.png"
+	                                  }
+	                                  loader={({ src }) => src}
+	                                  unoptimized
+	                                  alt=""
+	                                  width={32}
+	                                  height={32}
+	                                  className="w-8 h-8 rounded-full object-cover flex-shrink-0"
+	                                />
+	                                <span className="text-base font-semibold tracking-tight">
+	                                  {String(rlusdDisplayCurrency?.ticker || "RLUSD").toUpperCase()}
+	                                </span>
+	                                <span className="text-[11px] tracking-[0.22em] uppercase text-white/55">
                                   {String(rlusdDisplayCurrency?.network || "xrp").toUpperCase()}
                                 </span>
                               </div>
@@ -3394,23 +3396,24 @@ export default function WalletDashboardUsdSwapModal({
                                   </button>
                                 </div>
                               ) : (
-                                <div className="inline-flex items-center gap-2 text-white/90">
-                                  <img
-                                    src={
-                                      String(rlusdDisplayCurrency?.image || "").trim() ||
-                                      CRYPTO_ICONS?.RLUSD ||
-                                      "/symbols/rlusd.png"
-                                    }
-                                    alt=""
-                                    className="w-8 h-8 rounded-full object-cover flex-shrink-0"
-                                    loading="lazy"
-                                    decoding="async"
-                                    referrerPolicy="no-referrer"
-                                  />
-                                  <span className="text-base font-semibold tracking-tight">
-                                    {String(rlusdDisplayCurrency?.ticker || "RLUSD").toUpperCase()}
-                                  </span>
-                                  <span className="text-[11px] tracking-[0.22em] uppercase text-white/55">
+	                                <div className="inline-flex items-center gap-2 text-white/90">
+	                                  <Image
+	                                    src={
+	                                      String(rlusdDisplayCurrency?.image || "").trim() ||
+	                                      CRYPTO_ICONS?.RLUSD ||
+	                                      "/symbols/rlusd.png"
+	                                    }
+	                                    loader={({ src }) => src}
+	                                    unoptimized
+	                                    alt=""
+	                                    width={32}
+	                                    height={32}
+	                                    className="w-8 h-8 rounded-full object-cover flex-shrink-0"
+	                                  />
+	                                  <span className="text-base font-semibold tracking-tight">
+	                                    {String(rlusdDisplayCurrency?.ticker || "RLUSD").toUpperCase()}
+	                                  </span>
+	                                  <span className="text-[11px] tracking-[0.22em] uppercase text-white/55">
                                     {String(rlusdDisplayCurrency?.network || "xrp").toUpperCase()}
                                   </span>
                                 </div>

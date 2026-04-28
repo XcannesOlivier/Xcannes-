@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useCallback, useState, useEffect, useMemo, useRef } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
 import {
@@ -565,15 +565,13 @@ const MoonPaySellModal = ({
         };
       })
       .filter(Boolean);
-  }, [
-    availableTokens,
-    selectLabelByCurrency,
-    selectLabelRightByCurrency,
-    selectIconByCurrency,
-    selectLabelMobileByCurrency,
-    locale,
-    t,
-  ]);
+	  }, [
+	    availableTokens,
+	    selectLabelByCurrency,
+	    selectLabelRightByCurrency,
+	    selectIconByCurrency,
+	    locale,
+	  ]);
 
   const selectedSellCurrency = useMemo(() => {
     const code = String(currency || "").toUpperCase();
@@ -1005,13 +1003,13 @@ const MoonPaySellModal = ({
     return upper ? `${formatted} ${upper}` : formatted;
   };
 
-  const resolveRlusdRateForFiat = (code) => {
+  const resolveRlusdRateForFiat = useCallback((code) => {
     const upper = String(code || "").trim().toUpperCase();
     if (!upper) return Number.NaN;
     if (upper === "USD" || upper === "RLUSD") return 1;
     const rate = Number(rlusdPerUnitRates?.[upper]);
     return Number.isFinite(rate) && rate > 0 ? rate : Number.NaN;
-  };
+  }, [rlusdPerUnitRates]);
 
   const fallbackMoonpayFeeEstimates = useMemo(() => {
     // Show fee estimates in the selected currency line (wallet allocation).
@@ -1066,7 +1064,7 @@ const MoonPaySellModal = ({
       .filter(Boolean);
 
     return items.length ? items : null;
-  }, [isCurrencyLine, quoteCurrency, rlusdPerUnitRates, rlusdRate, sourceAmountRlusd, t]);
+  }, [isCurrencyLine, quoteCurrency, resolveRlusdRateForFiat, rlusdRate, sourceAmountRlusd, t]);
 
   const [moonpayFeeEstimates, setMoonpayFeeEstimates] = useState(null);
   const [moonpayFeeEstimateError, setMoonpayFeeEstimateError] = useState(null);
@@ -1188,6 +1186,7 @@ const MoonPaySellModal = ({
     isCurrencyLine,
     isOpen,
     quoteCurrency,
+    resolveRlusdRateForFiat,
     rlusdRate,
     sourceAmountRlusd,
     t,
@@ -1518,48 +1517,6 @@ const MoonPaySellModal = ({
 	      ) : (
 	        <span key={idx}>{part}</span>
 	      ),
-    );
-  };
-
-  const PaymentLogo = ({
-    src,
-    alt,
-    fallback,
-    containerClassName = "bg-white/5",
-    widthClassName = "w-auto",
-  }) => {
-    const [failed, setFailed] = useState(false);
-
-    if (failed) {
-      return (
-        <span
-          className={[
-            "inline-flex items-center justify-center h-[22px] md:h-6 rounded-md px-2 bg-white/5 ring-1 ring-white/10 text-[9px] md:text-[10px] font-semibold text-white/75 leading-none",
-            widthClassName,
-          ].join(" ")}
-        >
-          {fallback}
-        </span>
-      );
-    }
-
-    return (
-      <span
-        className={[
-          "inline-flex items-center justify-center h-[22px] md:h-6 rounded-md px-2 ring-1 ring-white/10 leading-none",
-          containerClassName,
-          widthClassName,
-        ].join(" ")}
-      >
-        <img
-          src={src}
-          alt={alt}
-          loading="lazy"
-          decoding="async"
-          className="h-full w-auto object-contain"
-          onError={() => setFailed(true)}
-        />
-      </span>
     );
   };
 

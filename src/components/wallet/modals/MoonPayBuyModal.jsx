@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect, useRef } from 'react';
+import { useCallback, useMemo, useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import Image from 'next/image';
 import { XCircleIcon, CheckCircleIcon, ChevronLeftIcon } from '@heroicons/react/24/outline';
@@ -481,7 +481,7 @@ const MoonPayBuyModal = ({
     return COMMON_MOONPAY_FIATS.has(requested) ? requested : 'USD';
   }, [COMMON_MOONPAY_FIATS, fiatCurrency, moonpayFiatCurrenciesLoaded, moonpayFiatCurrencyCodes]);
 
-  const resolveRlusdRateForFiat = code => {
+  const resolveRlusdRateForFiat = useCallback((code) => {
     const upper = String(code || '')
       .trim()
       .toUpperCase();
@@ -489,7 +489,7 @@ const MoonPayBuyModal = ({
     if (upper === 'USD' || upper === 'RLUSD') return 1;
     const rate = Number(rlusdPerUnitRates?.[upper]);
     return Number.isFinite(rate) && rate > 0 ? rate : Number.NaN;
-  };
+  }, [rlusdPerUnitRates]);
 
   const fallbackMoonpayFeeEstimates = useMemo(() => {
     const amountRlusdForQuote = Number(rlusdEquivalent);
@@ -550,7 +550,7 @@ const MoonPayBuyModal = ({
       .filter(Boolean);
 
     return items.length ? items : null;
-  }, [isCurrencyLine, resolvedMoonpayBaseFiatCurrencyCode, rlusdEquivalent, rlusdPerUnitRates, rlusdRate, t]);
+  }, [isCurrencyLine, resolvedMoonpayBaseFiatCurrencyCode, resolveRlusdRateForFiat, rlusdEquivalent, rlusdRate, t]);
 
   const [moonpayFeeEstimates, setMoonpayFeeEstimates] = useState(null);
   const [moonpayFeeEstimateError, setMoonpayFeeEstimateError] = useState(null);
@@ -674,12 +674,12 @@ const MoonPayBuyModal = ({
     hasValidTargetAmount,
     isCurrencyLine,
     isOpen,
+    resolveRlusdRateForFiat,
     rlusdEquivalent,
     rlusdRate,
     resolvedMoonpayBaseFiatCurrencyCode,
     t,
     wizardStep,
-    xcannesApi,
   ]);
   const reviewTimestampLabel = useMemo(() => {
     if (!reviewTimestamp) return '';
@@ -1740,42 +1740,6 @@ const MoonPayBuyModal = ({
       ) : (
         <span key={idx}>{part}</span>
       ),
-    );
-  };
-
-  const PaymentLogo = ({ src, alt, fallback, containerClassName = 'bg-white/5', widthClassName = 'w-auto' }) => {
-    const [failed, setFailed] = useState(false);
-
-    if (failed) {
-      return (
-        <span
-          className={[
-            'inline-flex items-center justify-center h-[22px] md:h-6 rounded-md px-2 bg-white/5 ring-1 ring-white/10 text-[9px] md:text-[10px] font-semibold text-white/75 leading-none',
-            widthClassName,
-          ].join(' ')}
-        >
-          {fallback}
-        </span>
-      );
-    }
-
-    return (
-      <span
-        className={[
-          'inline-flex items-center justify-center h-[22px] md:h-6 rounded-md px-2 ring-1 ring-white/10 leading-none',
-          containerClassName,
-          widthClassName,
-        ].join(' ')}
-      >
-        <img
-          src={src}
-          alt={alt}
-          loading="lazy"
-          decoding="async"
-          className="h-full w-auto object-contain"
-          onError={() => setFailed(true)}
-        />
-      </span>
     );
   };
 

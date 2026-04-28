@@ -130,7 +130,7 @@ export default function WalletDashboardSendChoiceModal({
     } catch {
       toast?.error(t('ui_qr_decode_failed_3b5d7f9a2c', 'Unable to decode this image. Try a clearer screenshot.'));
     }
-  }, [handlePaymentRequestScan, setSendDestination, setSendDestinationLabel, onChooseSimpleSend, onChoosePayRequest, isPayreqSelfSend, toast, t]);
+  }, [handlePaymentRequestScan, normalizedCurrentWallet, setSendDestination, setSendDestinationLabel, onChooseSimpleSend, onChoosePayRequest, isPayreqSelfSend, toast, t]);
 
   const handleFileUpload = useCallback((inputId, isPayreq) => {
     const input = document.getElementById(inputId);
