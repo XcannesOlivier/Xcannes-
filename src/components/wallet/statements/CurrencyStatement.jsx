@@ -1951,9 +1951,9 @@ export default function CurrencyStatement({
             {/* Filtres */}
             <div className="flex flex-1 md:flex-1 items-center rounded-[16px] p-1 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-[#101415] to-[#0d1214]">
               {[
-                { key: "all", label: stripCountSuffix(t("ui_all_0c90d41d71", "All")) },
-                { key: "credit", label: stripCountSuffix(t("ui_credits_b8166276a0", "Credits")) },
-                { key: "debit", label: stripCountSuffix(t("ui_debits_38c870b18f", "Debits")) },
+                { key: "all", label: stripCountSuffix(t("ui_all_0c90d41d71", "Tout")) },
+                { key: "credit", label: stripCountSuffix(t("ui_credits_b8166276a0", "Entrées")) },
+                { key: "debit", label: stripCountSuffix(t("ui_debits_38c870b18f", "Sorties")) },
                 { key: "conversion", label: stripCountSuffix(t("ui_conversions_b604b5ef8b", "Conversions")) },
               ].map((item) => (
                 <button
