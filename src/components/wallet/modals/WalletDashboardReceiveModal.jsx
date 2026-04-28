@@ -1275,10 +1275,10 @@ export default function WalletDashboardReceiveModal({
                     }}
                   >
                     <h3 className="mt-1 text-[30px] md:text-[32px] font-semibold text-white/95 tracking-tight">
-                      {t('ui_receive_choice_decision_title', 'Comment voulez-vous recevoir ?')}
+                      {t('ui_receive_choice_decision_title', 'Comment souhaitez-vous recevoir ?')}
                     </h3>
                     <p className="mt-2 text-[14px] md:text-[15px] text-white/60 max-w-[34ch] leading-relaxed">
-                      {t('ui_receive_choice_decision_subtitle', 'Partagez votre QR ou créez une demande avec le montant')}
+                      {t('ui_receive_choice_decision_subtitle', 'Partagez vos coordonnées de réception ou créez une demande de paiement.')}
                     </p>
                   </div>
 
@@ -1305,7 +1305,7 @@ export default function WalletDashboardReceiveModal({
                           <div className="mt-1 text-[15px] md:text-sm leading-snug text-white/60">
                             {t(
                               'ui_receive_choice_share_desc',
-                              'Affichez le QR code et l’adresse de réception associés à votre compte.',
+                              'Affichez votre QR code et votre adresse de réception.',
                             )}
                           </div>
                         </div>
@@ -1430,7 +1430,7 @@ export default function WalletDashboardReceiveModal({
 	                        <svg xmlns="http://www.w3.org/2000/svg" className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
 	                          <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
 	                        </svg>
-	                        Agrandir
+	                        Agrandir le QR code
 	                      </button>
 	                    </div>
 
@@ -1447,7 +1447,7 @@ export default function WalletDashboardReceiveModal({
 	                          'shadow-[0_4px_12px_rgba(0,0,0,0.4)] hover:ring-white/20 hover:bg-white/[0.04] transition-all duration-[140ms] active:scale-[0.99]',
 	                        ].join(' ')}
 	                      >
-	                        {t('ui_copy', 'Copier')}
+	                        {t('ui_copy_address', 'Copier l’adresse')}
 	                      </button>
 	                      <button
 	                        type="button"
@@ -1710,7 +1710,7 @@ export default function WalletDashboardReceiveModal({
 				                            <svg xmlns="http://www.w3.org/2000/svg" className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
 				                              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
 				                            </svg>
-				                            Agrandir
+				                            Agrandir le QR code
 				                          </button>
 					                        </div>
 
@@ -1754,7 +1754,7 @@ export default function WalletDashboardReceiveModal({
 	                              'shadow-[0_4px_12px_rgba(0,0,0,0.4)] hover:ring-white/20 hover:bg-white/[0.04] transition-all duration-[140ms] active:scale-[0.99]',
 	                            ].join(' ')}
 	                          >
-	                            {t('ui_copy', 'Copier')}
+				                            {t('ui_copy_address', 'Copier l’adresse')}
 	                          </button>
 	                          <button
 	                            type="button"
