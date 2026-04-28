@@ -16,7 +16,7 @@ export default function WalletDashboardCashChoiceModal({
   inline = false,
 }) {
   const { t } = useTranslation('common');
-  const addHintText = t('ui_funds_add_hint', 'Carte ou virement bancaire');
+  const addHintText = t('ui_funds_add_hint', 'Par carte ou virement bancaire');
   const withdrawHintText = t('ui_funds_withdraw_hint', 'Vers votre compte bancaire');
   const highlightWithdraw = value => {
     const input = String(value || '');
@@ -32,13 +32,13 @@ export default function WalletDashboardCashChoiceModal({
       ),
     );
   };
-  const swapOutHintText = t('ui_funds_swap_out_hint', 'Depuis un wallet (USDC, USDT, RLUSD, ...)');
+  const swapOutHintText = t('ui_funds_swap_out_hint', 'Depuis un portefeuille externe (USDC, USDT, RLUSD, ...)');
   const swapOutSubhintText = t('ui_funds_swap_out_subhint', 'Ajoutés automatiquement à votre solde');
-  const swapInHintText = t('ui_funds_swap_in_hint', 'Vers un wallet');
+  const swapInHintText = t('ui_funds_swap_in_hint', 'Vers un portefeuille externe');
   const swapInSubhintText = t('ui_funds_swap_in_subhint', 'Conversion automatique si nécessaire');
   const stablecoinLiquidityNote = t(
     'ui_funds_stablecoin_liquidity_note',
-    'Optimisé via stablecoins USD (RLUSD) et la liquidité du réseau XRP',
+    'Transactions optimisées via les stablecoins en USD et le réseau XRP.',
   );
   const shouldAnimate = !inline;
   const { shouldRender, isClosing } = useModalTransition(open, {
@@ -393,7 +393,7 @@ export default function WalletDashboardCashChoiceModal({
                       </span>
                     ) : null}
                     <p className="mt-2 text-[14px] md:text-[15px] text-white/60 max-w-[34ch] leading-relaxed">
-                      {t('ui_funds_manage_subtitle', "Ajoutez ou retirez de l'argent facilement")}
+                      {t('ui_funds_manage_subtitle', 'Ajoutez, retirez ou transférez vos fonds facilement.')}
                     </p>
                     
 	                </div>
@@ -408,7 +408,7 @@ export default function WalletDashboardCashChoiceModal({
               >
                 <div className="flex flex-col gap-7 pb-2">
                   <div className="space-y-4">
-                    {sectionHeader(t('ui_funds_section_agent', 'Argent'))}
+                    {sectionHeader(t('ui_funds_section_agent', 'Compte bancaire'))}
 
                     <button type="button" onClick={onChooseBuy} className={cardClassName}>
                       <div className="flex items-center gap-3">
@@ -418,7 +418,7 @@ export default function WalletDashboardCashChoiceModal({
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center justify-between gap-2">
                             <p className="text-[18px] md:text-[19px] text-white font-semibold truncate">
-                              {t('ui_funds_increase_balances_title', 'Acheter des devises')}
+                              {t('ui_funds_increase_balances_title', 'Ajouter des fonds')}
                             </p>
                             <svg className="w-5 h-5 text-white/45" viewBox="0 0 24 24" fill="none" aria-hidden>
                               <path
@@ -455,7 +455,7 @@ export default function WalletDashboardCashChoiceModal({
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center justify-between gap-2">
                             <p className="text-[18px] md:text-[19px] text-white font-semibold truncate">
-                              {t('ui_funds_withdraw_title', 'Envoyer vers la banque')}
+                              {t('ui_funds_withdraw_title', 'Retirer vers un compte bancaire')}
                             </p>
                             <svg className="w-5 h-5 text-white/45" viewBox="0 0 24 24" fill="none" aria-hidden>
                               <path
@@ -488,7 +488,7 @@ export default function WalletDashboardCashChoiceModal({
                   </div>
 
                   <div className="space-y-4">
-                    {sectionHeader(t('ui_funds_section_digital_dollars', 'Stablecoins USD'))}
+                    {sectionHeader(t('ui_funds_section_digital_dollars', 'Stablecoins en USD'))}
 
                     <button type="button" onClick={onChooseUsdSwapOut} className={cardClassName}>
                       <div className="flex items-center gap-3">
