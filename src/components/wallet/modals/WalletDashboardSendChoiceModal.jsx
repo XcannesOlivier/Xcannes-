@@ -461,7 +461,7 @@ export default function WalletDashboardSendChoiceModal({
                     {t('ui_send_choice_hint', 'Choisissez le type d’envoi qui correspond à votre besoin.')}
                   </p>
                   {/* Wallet meta pill */}
-                  <div className="mt-4 flex justify-center px-4 w-full">
+                  <div className="mt-6 flex justify-center px-4 w-full">
                     {renderWalletMeta?.({
                       variant: "pill-column",
                       className: "flex justify-center",
