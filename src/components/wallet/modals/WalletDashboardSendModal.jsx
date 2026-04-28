@@ -1495,13 +1495,15 @@ export default function WalletDashboardSendModal({
     (!hasPaymentRequest && manualInsufficientBalance) ||
     selfSendBlocked;
 
-  const sendButtonLabel = sendProcessing
-    ? hasMoonpaySellRequest
-      ? t("moonpay_sell_signing_action", "Signature en cours...")
-      : t("ui_sending_3b8c1a7d5e", "Sending...")
-    : hasMoonpaySellRequest
-      ? t("moonpay_sell_sign_submit", "Signer et envoyer")
-	      : t("ui_send_504b64a87b", "Envoyer");
+	  const sendButtonLabel = sendProcessing
+	    ? hasMoonpaySellRequest
+	      ? t("moonpay_sell_signing_action", "Signature en cours...")
+	      : t("ui_sending_3b8c1a7d5e", "Sending...")
+	    : hasMoonpaySellRequest
+	      ? t("moonpay_sell_sign_submit", "Signer et envoyer")
+	      : hasPaymentRequest
+	        ? t("ui_confirm_payment_button", "Confirmer le paiement")
+	        : t("ui_send_504b64a87b", "Envoyer");
 
   const sendActions = (
     <div className="sticky bottom-0 pt-8 pb-3 mt-auto space-y-2 bg-inherit z-10 relative">
