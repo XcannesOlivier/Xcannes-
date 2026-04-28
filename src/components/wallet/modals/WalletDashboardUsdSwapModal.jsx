@@ -3299,11 +3299,17 @@ export default function WalletDashboardUsdSwapModal({
 
                         <div className="p-4 pt-6">
                           <div className="flex items-center justify-between gap-3">
-	                            <div className="text-[11px] tracking-[0.22em] uppercase text-white/45">
-	                              {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD
-	                                ? t("ui_usd_swap_credited_in", "Crédité en")
-	                                : t("ui_usd_swap_recipient_receives", "Le destinataire reçoit")}
-	                            </div>
+		                            <div
+		                              className={
+		                                direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
+		                                  ? "text-[12px] md:text-[13px] text-white/55"
+		                                  : "text-[11px] tracking-[0.22em] uppercase text-white/45"
+		                              }
+		                            >
+		                              {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD
+		                                ? t("ui_usd_swap_credited_in", "Crédité en")
+		                                : t("ui_usd_swap_recipient_receives", "Le destinataire reçoit")}
+		                            </div>
                             <div className="flex items-center gap-2">
                               {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE ? (
                                 <div ref={stableDropdownRef}>
