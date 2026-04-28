@@ -455,10 +455,10 @@ export default function WalletDashboardSendChoiceModal({
                   onPointerDown={event => { maybeStartOverlayDrag(event, 'fixed'); }}
                 >
                   <h3 className="mt-1 px-6 text-[30px] md:text-[32px] font-semibold text-white/95 tracking-tight">
-                    {t('ui_send_choice_subtitle', 'Comment souhaitez-vous envoyer ?')}
+                    {t('ui_send_choice_subtitle', "Comment souhaitez-vous envoyer de l'argent ?")}
                   </h3>
                   <p className="mt-2 text-[14px] md:text-[15px] text-white/60 max-w-[34ch] leading-relaxed">
-                    {t('ui_send_choice_hint', 'Scannez, collez, importez ou sélectionnez une adresse enregistrée.')}
+                    {t('ui_send_choice_hint', 'Choisissez le type d’envoi qui correspond à votre besoin.')}
                   </p>
                   {/* Wallet meta pill */}
                   <div className="mt-4 flex justify-center px-4 w-full">
@@ -467,46 +467,8 @@ export default function WalletDashboardSendChoiceModal({
                       className: "flex justify-center",
                       prefix: t("moonpay_from_account", "Depuis le compte"),
                       pillClassName:
-                        "bg-elevated shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]",
+                        "bg-elevated ring-1 ring-white/10 shadow-none",
                     })}
-                  </div>
-                  {/* Action chips */}
-                  <div className="mt-8 flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={onChooseQuickScan}
-                      className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-transparent ring-1 ring-white/10 hover:bg-white/[0.06] active:scale-[0.97] transition-all text-[13px] text-white/80 font-medium"
-                    >
-                      <svg className="w-4 h-4 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
-                      </svg>
-                      {t('ui_scan_label', 'Scanner')}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        openSubModal('quickscan');
-                        setTimeout(() => {
-                          document.getElementById('quickscan-paste-input')?.focus();
-                        }, 280);
-                      }}
-                      className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-transparent ring-1 ring-white/10 hover:bg-white/[0.06] active:scale-[0.97] transition-all text-[13px] text-white/80 font-medium"
-                    >
-                      <svg className="w-4 h-4 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                      </svg>
-                      {t('ui_paste_label', 'Coller')}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleFileUpload(quickscanFileInputId, false)}
-                      className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-transparent ring-1 ring-white/10 hover:bg-white/[0.06] active:scale-[0.97] transition-all text-[13px] text-white/80 font-medium"
-                    >
-                      <svg className="w-4 h-4 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M12 4v12m0 0l-3-3m3 3l3-3" />
-                      </svg>
-                      {t('ui_import_label', 'Importer')}
-                    </button>
                   </div>
                 </div>
 
@@ -595,11 +557,6 @@ export default function WalletDashboardSendChoiceModal({
 
                   {/* Hidden div for html5-qrcode reader */}
                   <div id={manualQrReaderIdRef.current} className="hidden" />
-
-                  {/* Footer note */}
-                  <p className="text-center text-[12px] text-white/40 leading-relaxed mt-2">
-                    {t('ui_send_fees_note', 'Les détails s’afficheront avant validation.')}
-                  </p>
                 </div>
               </div>
             </div>
