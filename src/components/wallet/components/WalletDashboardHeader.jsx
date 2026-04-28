@@ -340,7 +340,7 @@ export default function WalletDashboardHeader({
                         onClick={(e) => e.stopPropagation()}
                       >
                         {/* Active wallet address pinned at top */}
-                        <div className="px-2.5 md:px-3 pt-2 pb-1.5 border-b border-white/[0.06]">
+                        <div className="px-2.5 md:px-3 pt-2 pb-1.5">
                           <div
                             className="font-mono text-[13px] md:text-[14px] text-white/85 whitespace-normal break-all leading-snug"
                           >

@@ -600,22 +600,22 @@ export default function WalletCurrencySelector({
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between gap-3 px-4 py-4">
-                    <div className="min-w-0">
-                      <div className="text-white font-semibold text-lg leading-tight">
-	                        {t(
-	                          "ui_select_currency_title",
-	                          "Sélectionnez une devise à ajouter à votre compte. Une transaction validera l’ajout, aucun montant minimum requis.",
-	                        )}
+                  <div className="relative flex items-center justify-center gap-3 px-4 py-4">
+                    <div className="min-w-0 text-center">
+                      <div className="text-white/90 font-semibold text-lg leading-tight">
+                        {t("ui_select_currency_title", "Ajouter une devise")}
                       </div>
-	                      <div className="mt-0.5 text-[11px] text-white/50 truncate">
-	                        {t("ui_select_currency_subtitle", "Code ou nom de la devise")}
-	                      </div>
+                      <div className="mt-1 text-[12px] text-white/55 leading-snug max-w-[52ch] mx-auto">
+                        {t(
+                          "ui_select_currency_subtitle_add_currency",
+                          "Une transaction validera l’ajout, aucun montant minimum requis.",
+                        )}
+                      </div>
                     </div>
                     <button
                       type="button"
                       onClick={() => setOpen(false)}
-                      className="hidden sm:inline-flex text-white/70 hover:text-white transition-colors text-xl"
+                      className="hidden sm:inline-flex absolute right-4 top-4 text-white/70 hover:text-white transition-colors text-xl"
                       aria-label={t("ui_close", "Fermer")}
                     >
                       ✕

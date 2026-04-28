@@ -1795,7 +1795,7 @@ export default function CurrencyStatement({
             {/* Balance + USD estimé */}
             {!isXrpNetworkView ? (
               <div className="flex flex-col items-center text-center gap-0.5">
-                <p className="text-[26px] md:text-[28px] text-white/60">
+                <p className="text-[24px] md:text-[26px] text-white/60">
                   {t("ui_balance_445d830d72", "Solde disponible")}
                 </p>
                 <p className="text-4xl text-white font-bold">

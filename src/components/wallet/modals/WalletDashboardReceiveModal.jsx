@@ -1107,7 +1107,7 @@ export default function WalletDashboardReceiveModal({
       : receiveView === 'share'
         ? t('ui_receive_choice_share_title', 'Coordonnées de réception')
         : receiveView === 'request_qr'
-	          ? t('ui_request_generated_label', 'Demande créée')
+	          ? t('ui_request_generated_label', 'Demande prête')
         : t('ui_receive_choice_request_title', 'Demander un paiement');
   const headerSubtitle =
     receiveView === 'choice'

@@ -455,7 +455,9 @@ export default function WalletDashboardCashChoiceModal({
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center justify-between gap-2">
                             <p className="text-[18px] md:text-[19px] text-white font-semibold truncate">
-                              {t('ui_funds_withdraw_title', 'Retirer vers un compte bancaire')}
+                              {isDesktop
+                                ? t('ui_funds_withdraw_title', 'Retirer vers un compte bancaire')
+                                : t('ui_funds_withdraw_title_mobile', 'Retirer')}
                             </p>
                             <svg className="w-5 h-5 text-white/45" viewBox="0 0 24 24" fill="none" aria-hidden>
                               <path
