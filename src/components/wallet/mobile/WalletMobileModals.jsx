@@ -305,11 +305,11 @@ export default function WalletMobileModals({
 		                  accentVariant: "binanceYellow",
 		                  sourceSelectionMode: "wallet",
 		                  initialSourceCurrency: "USD",
-		                  titleOverride: "Envoyer vers un wallet",
-		                  subtitleOverride:
-		                    "Choisissez une devise, le montant, le stablecoin souhaité puis l'adresse de votre wallet de réception.",
-		                });
-		              }}
+			                  titleOverride: "Envoyer vers un portefeuille externe",
+			                  subtitleOverride:
+			                    "Choisissez la devise, le montant, le stablecoin et l’adresse de réception.",
+			                });
+			              }}
 	            />
 
             <WalletDashboardUsdSwapModal

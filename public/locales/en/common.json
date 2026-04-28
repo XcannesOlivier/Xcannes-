@@ -1071,6 +1071,8 @@
   "ui_usd_swap_usdt_hint": "Tether (USD stablecoin)",
   "ui_usd_swap_you_exchange": "You swap",
   "ui_usd_swap_you_receive": "You receive",
+  "ui_usd_swap_credited_in": "Credited in",
+  "ui_usd_swap_recipient_receives": "Recipient receives",
   "ui_action_continue": "Continue",
   "ui_review": "Review",
   "ui_back": "Back",

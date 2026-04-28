@@ -835,12 +835,12 @@ export default function WalletDashboardUsdSwapModal({
     (direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD
       ? t(
           "ui_swap_subtitle_in_wallet",
-          "Choisissez le stablecoin, le montant puis la devise XCANNES créditée sur votre wallet.",
+          "Sélectionnez le stablecoin, le réseau et la devise qui sera créditée sur votre solde.",
         )
-      : t(
-          "ui_swap_subtitle_out",
-          "Choisissez une devise, le montant, le stablecoin souhaité puis l'adresse de votre wallet de réception.",
-        ));
+	      : t(
+	          "ui_swap_subtitle_out",
+	          "Choisissez la devise, le montant, le stablecoin et l’adresse de réception.",
+	        ));
   const walletSelectorDialogTitle = t(
     "ui_choose_wallet_currency",
     "Choisir une devise",
@@ -2989,7 +2989,7 @@ export default function WalletDashboardUsdSwapModal({
                       <div className="flex justify-center">
                         <div className="inline-flex flex-col items-center gap-1 bg-elevated px-6 py-2 rounded-3xl shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]">
                           <span className="text-white/70 text-[14px] md:text-[15px] font-medium tracking-wide">
-                            {t("moonpay_from_account", "Depuis le compte")}
+	                            {t("moonpay_from_account", "Compte de réception")}
                           </span>
                           <div className="flex items-center gap-2">
                             <span
@@ -3013,7 +3013,7 @@ export default function WalletDashboardUsdSwapModal({
                       <p className="text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
                         {walletTargetSelectionEnabled
                           ? t("moonpay_destination_wallet", "Vers le compte")
-                          : t("moonpay_from_account", "Depuis le compte")}
+	                          : t("moonpay_from_account", "Compte de réception")}
                       </p>
                       {String(walletLabel || "").trim() ? (
                         <div className="flex items-center gap-2 mb-1">
@@ -3082,9 +3082,17 @@ export default function WalletDashboardUsdSwapModal({
 		                    <div className={["rounded-[18px] ring-1 ring-white/10 ring-inset bg-[#101415] overflow-hidden", accentShadowCard].join(" ")}>
                       <div className="p-4">
                         <div className="flex items-center justify-between gap-3">
-                          <div className="text-[11px] tracking-[0.22em] uppercase text-white/45">
-                            {t("ui_swap_you_send", "Vous envoyez")}
-                          </div>
+	                          <div
+	                            className={
+	                              direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
+	                                ? "text-[11px] text-white/45"
+	                                : "text-[11px] tracking-[0.22em] uppercase text-white/45"
+	                            }
+	                          >
+			                            {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD
+			                              ? t("ui_usd_swap_credited_in", "Crédité en")
+			                              : t("ui_swap_you_send", "Vous envoyez")}
+	                          </div>
                           <div className="flex items-center gap-2">
                             {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD ? (
                               <div ref={stableDropdownRef}>
@@ -3291,9 +3299,11 @@ export default function WalletDashboardUsdSwapModal({
 
                         <div className="p-4 pt-6">
                           <div className="flex items-center justify-between gap-3">
-                            <div className="text-[11px] tracking-[0.22em] uppercase text-white/45">
-                              {t("ui_usd_swap_you_receive", "Vous recevez")}
-                            </div>
+	                            <div className="text-[11px] tracking-[0.22em] uppercase text-white/45">
+	                              {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD
+	                                ? t("ui_usd_swap_credited_in", "Crédité en")
+	                                : t("ui_usd_swap_recipient_receives", "Le destinataire reçoit")}
+	                            </div>
                             <div className="flex items-center gap-2">
                               {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE ? (
                                 <div ref={stableDropdownRef}>
@@ -4254,33 +4264,19 @@ export default function WalletDashboardUsdSwapModal({
                     >
                       {t("ui_action_continue", "Continuer")}
                     </button>
-	                    {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE || walletTargetSelectionEnabled ? (
-	                      <div className="mt-2 flex items-center justify-center gap-2 text-[11px] md:text-xs text-white/60">
-	                        <span>
-	                          {t(
-	                            "ui_simpleswap_secure_partner_note_f1d7a9c2b3",
-	                            "Conversion sécurisé via",
-	                          )}
-	                        </span>
-                        <span
-                          className="inline-flex items-center gap-1.5"
-                          aria-label={t(
-                            "moonpay_buy_payment_methods",
-                            "Partenaires et moyens de paiement",
-                          )}
-                        >
-                          <span className="inline-flex items-center justify-center h-[22px] md:h-6 rounded-md px-2 ring-1 ring-white/10 leading-none bg-white/90 w-[140px]">
-                            <Image
-                              src="/assets/payment-logos/simpleswap.jpeg"
-                              alt="SimpleSwap"
-                              width={140}
-                              height={24}
-                              className="h-full w-auto object-contain"
-                            />
-                          </span>
-                        </span>
-	                      </div>
-	                    ) : null}
+			                    {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE || walletTargetSelectionEnabled ? (
+			                      <div className="mt-2 flex items-center justify-center gap-2 text-[11px] md:text-xs text-white/60">
+			                        <span>
+			                          {t(
+			                            "ui_simpleswap_secure_partner_note_f1d7a9c2b3",
+			                            "Conversion sécurisée via",
+			                          )}{" "}
+			                          <span className="text-[13px] md:text-[14px] font-bold text-white/95 drop-shadow-sm">
+			                            SimpleSwap
+			                          </span>
+			                        </span>
+			                      </div>
+			                    ) : null}
 	                  </>
 	                ) : null}
 
@@ -4295,7 +4291,9 @@ export default function WalletDashboardUsdSwapModal({
                     <div className="rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-black/20">
                       <div className="text-white/80 text-sm">
                         <div>
-                          {t("ui_swap_you_send", "Vous envoyez")}{" "}
+		                          {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD
+		                            ? t("ui_usd_swap_credited_in", "Crédité en")
+		                            : t("ui_swap_you_send", "Vous envoyez")}{" "}
                           <span className="text-white font-semibold">
                             {hasValidAmount ? parsedAmount : 0}{" "}
                             {walletSourceSelectionEnabled
@@ -4304,10 +4302,12 @@ export default function WalletDashboardUsdSwapModal({
                           </span>
                         </div>
                         <div className="mt-1">
-                          {t("ui_usd_swap_you_receive", "Vous recevez")}{" "}
-                          <span className="text-white font-semibold">
-                            {toCurrency ? currencyLabel(toCurrency) : toLabel}
-                          </span>
+	                          {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD
+	                            ? t("ui_usd_swap_credited_in", "Crédité en")
+	                            : t("ui_usd_swap_recipient_receives", "Le destinataire reçoit")}{" "}
+	                          <span className="text-white font-semibold">
+	                            {toCurrency ? currencyLabel(toCurrency) : toLabel}
+	                          </span>
                         </div>
                         {walletSourceSelectionEnabled && Number.isFinite(outboundAmountRlusd) ? (
                           <div className="mt-1 text-white/55">
