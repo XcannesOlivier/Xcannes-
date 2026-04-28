@@ -1438,7 +1438,7 @@ const MoonPaySellModal = ({
 	                selectedSellCurrency?.label ||
 	                String(currency || "").toUpperCase(),
 	            })
-	          : t("ui_send_to_bank_action", "Envoyer vers la banque")
+	          : t("ui_send_to_bank_action", "Retirer vers un compte bancaire")
 	        : t("ui_continue", "Continuer");
   const continueDisabled =
     wizardStep === 1
@@ -1612,13 +1612,16 @@ const MoonPaySellModal = ({
               ) : null}
             <h3 className="text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight mb-1">
               {resolvedSelectCryptoTitleOverride ||
-                t("moonpay_sell_withdraw_title_prefix", "Envoyer vers la banque")}
+                t("moonpay_sell_withdraw_title_prefix", "Retirer vers un compte bancaire")}
             </h3>
             {isBankSellFlow ? (
               <div className="mb-4 flex flex-col items-center">
-                <p className="mt-2 text-[14px] md:text-[15px] text-white/80 max-w-[34ch] mx-auto leading-relaxed text-center">
-                  {t("moonpay_sell_bank_partner_notice", "par")} {t("moonpay_sell_bank_methods", "virement bancaire, carte ou PayPal selon votre pays")}.
-                </p>
+	                <p className="mt-2 text-[14px] md:text-[15px] text-white/80 max-w-[40ch] mx-auto leading-relaxed text-center">
+	                  {t(
+	                    "moonpay_sell_bank_methods_full",
+	                    "Recevez vos fonds par virement bancaire, carte ou PayPal selon votre pays.",
+	                  )}
+	                </p>
               </div>
             ) : null}
 	            <div className="flex justify-center">
@@ -1643,7 +1646,7 @@ const MoonPaySellModal = ({
 		          {/* Currency selector */}
 			          <div className={wizardStep === 1 ? "relative z-[66]" : "hidden"}>
 		              <div className="text-[13px] tracking-normal font-medium text-white/55 mb-2">
-		                {t("moonpay_sell_send_currency_label", "Devise à envoyer")}
+		                {t("moonpay_sell_send_currency_label", "Devise à retirer")}
 		              </div>
 			              <ModalSelect
 			                value={currency}
@@ -1765,7 +1768,7 @@ const MoonPaySellModal = ({
 		            <>
                   <div className="px-1">
                     <div className="mb-4 text-[14px] md:text-[16px] font-semibold tracking-[0.08em] text-white/80">
-                      🏦 {t("ui_send_to_bank_action", "Envoyer vers la banque")}
+                      🏦 {t("ui_send_to_bank_action", "Retirer vers un compte bancaire")}
                     </div>
                     <div className="text-white text-[36px] md:text-[42px] font-semibold tracking-tight leading-none">
                       {summaryAmountLabel}
@@ -1980,17 +1983,15 @@ const MoonPaySellModal = ({
           >
             {continueLabel}
           </button>
-          {!demoMode && isBankSellFlow ? (
-            <div className="flex items-center justify-center gap-1 mt-3">
-              <span className="text-[11px] text-white/45">
-                {t("moonpay_sell_bank_partner_notice_title", "Le retrait sera effectué via")}
-              </span>
-              <span className="text-[13px] font-semibold text-white/80">MoonPay</span>
-              <span className="text-[11px] text-white/45">et/ou</span>
-              <span className="text-[13px] font-semibold text-white/80">Topper</span>
-            </div>
-          ) : null}
-          <p className="text-center text-[11px] md:text-xs text-white/40 mt-2">
+	          {!demoMode && isBankSellFlow ? (
+		            <p className="text-center text-[12px] md:text-[13px] text-white/55 mt-2">
+	              {t(
+	                "moonpay_sell_bank_partner_notice_full",
+	                "Le retrait sera effectué via MoonPay ou Topper.",
+	              )}
+	            </p>
+	          ) : null}
+	          <p className="text-center text-[11px] md:text-xs text-white/40 mt-1">
             {t('moonpay_sell_partner_location_note_cta', 'Le partenaire proposé dépend de votre localisation.')}
           </p>
 	        </div>

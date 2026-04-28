@@ -2145,11 +2145,11 @@ const MoonPayBuyModal = ({
             {continueLabel}
           </button>
 		          {!demoMode && !useSimpleSwapPartner ? (
-		            <p className="text-center text-[12px] md:text-[13px] text-white/55 mt-2">
+		            <p className="text-center text-[12px] md:text-[13px] text-white/55 mt-1">
 		              {t('moonpay_info_buy_live_3c8a1d6b2f', 'Transactions sécurisées via MoonPay ou Topper.')}
 		            </p>
 		          ) : null}
-	          <p className="text-center text-[11px] md:text-xs text-white/40 mt-1">
+	          <p className="text-center text-[11px] md:text-xs text-white/40 mt-0.5">
 	            {t('moonpay_buy_partner_location_note_cta', 'Le partenaire proposé dépend de votre localisation.')}
 	          </p>
         </div>
