@@ -1222,7 +1222,7 @@ export default function WalletDashboardSendModal({
             {renderWalletMeta?.({
               variant: "pill-column",
               className: "flex justify-center relative z-[85]",
-	            prefix: t("ui_debited_account_label", "Compte débité"),
+	            prefix: t("moonpay_from_account", "Depuis le compte"),
               pillClassName: `bg-elevated ${sendAssetDropdownOpen
                 ? "ring-1 ring-white/15 ring-inset shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_10px_rgba(255,255,255,0.16)]"
                 : "shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]"}`,
