@@ -1107,7 +1107,7 @@ export default function WalletDashboardReceiveModal({
       : receiveView === 'share'
         ? t('ui_receive_choice_share_title', 'Coordonnées de réception')
         : receiveView === 'request_qr'
-          ? t('ui_request_generated_label', 'Demande générée')
+	          ? t('ui_request_generated_label', 'Demande créée')
         : t('ui_receive_choice_request_title', 'Demander un paiement');
   const headerSubtitle =
     receiveView === 'choice'
@@ -1115,7 +1115,7 @@ export default function WalletDashboardReceiveModal({
       : receiveView === 'share'
 	        ? t('ui_receive_choice_share_desc', 'Partagez votre QR code ou votre adresse de réception.')
         : receiveView === 'request_qr'
-          ? t('ui_request_qr_subtitle', 'Scannez ou partagez ce QR code.')
+	          ? t('ui_request_qr_subtitle', 'Partagez ce QR code pour recevoir le paiement.')
 	        : t('ui_receive_choice_request_desc', 'Créez une demande avec un montant, une devise et un message facultatif.');
 
   const choiceCardBaseClassName =
@@ -1733,7 +1733,7 @@ export default function WalletDashboardReceiveModal({
 					                          </div>
 					                          {generatedRequest?.memo ? (
 					                            <div className="flex items-center justify-between">
-					                              <span className="text-[13px] text-white/40 font-medium">{t('ui_memo_label', 'Message')}</span>
+				                              <span className="text-[13px] text-white/40 font-medium">{t('ui_memo_label', 'Motif')}</span>
 					                              <span className="text-[13px] text-white/60 font-medium">
 					                                {generatedRequest.memo}
 					                              </span>
@@ -1754,7 +1754,7 @@ export default function WalletDashboardReceiveModal({
 	                              'shadow-[0_4px_12px_rgba(0,0,0,0.4)] hover:ring-white/20 hover:bg-white/[0.04] transition-all duration-[140ms] active:scale-[0.99]',
 	                            ].join(' ')}
 	                          >
-				                            {t('ui_copy_address', 'Copier l’adresse')}
+				                            {t('ui_copy_request', 'Copier la demande')}
 	                          </button>
 	                          <button
 	                            type="button"
