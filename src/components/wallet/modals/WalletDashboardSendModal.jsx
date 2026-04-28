@@ -1213,7 +1213,7 @@ export default function WalletDashboardSendModal({
         {!hasPaymentRequest && (
         <div className={`transition-opacity duration-300 space-y-4 ${hasDestination ? 'opacity-100' : 'opacity-30 pointer-events-none select-none'}`}>
           <h3 className="relative z-[50] text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight text-center leading-snug">
-            {t("ui_send_modal_title", "Envoi simple")}
+            {t("ui_send_modal_title", "Montant à envoyer")}
           </h3>
           <p className="relative z-[50] text-[14px] md:text-[15px] text-white/55 text-center leading-relaxed -mt-2">
             {t("ui_send_devise_hint", "Choisissez la devise, saisissez le montant, puis vérifiez avant l’envoi.")}
