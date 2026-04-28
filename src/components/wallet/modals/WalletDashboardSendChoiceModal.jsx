@@ -599,25 +599,25 @@ export default function WalletDashboardSendChoiceModal({
                 {/* Title + subtitle (centered) */}
                 <div className="flex flex-col items-center text-center mb-6">
                   <h3 className="mt-1 text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight">
-                    {t('ui_send_simple_title', 'Envoi simple')}
+                    {t('ui_send_choose_recipient_title', 'Renseigner le destinataire')}
                   </h3>
                   <p className="mt-2 text-[14px] md:text-[15px] text-white/60 max-w-[40ch] leading-relaxed">
-                    {t('ui_send_simple_hint_long', 'Scannez, importez ou saisissez l’adresse du destinataire.')}
+                    {t('ui_send_choose_recipient_hint', 'Scannez, importez un QR code ou saisissez l’adresse du destinataire.')}
                   </p>
                   {/* Wallet meta pill */}
-                  <div className="mt-4 flex justify-center px-4 w-full">
+                  <div className="mt-6 flex justify-center px-4 w-full">
                     {renderWalletMeta?.({
                       variant: 'pill-column',
                       className: 'flex justify-center',
                       prefix: t('moonpay_from_account', 'Depuis le compte'),
-                      pillClassName: 'bg-elevated shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]',
+                      pillClassName: 'bg-elevated ring-1 ring-white/10 shadow-none',
                     })}
                   </div>
                 </div>
 
                 {/* Steps toggle */}
                 <button type="button" onClick={() => setShowSteps(s => !s)} className="mb-4 text-[13px] text-xcannes-green/80 hover:text-xcannes-green transition-colors duration-150 font-medium self-start text-left">
-                  {showSteps ? t('ui_hide_steps', 'Masquer les étapes') : t('ui_show_steps', 'Voir les étapes')}
+                  {showSteps ? t('ui_hide_steps', 'Masquer les étapes') : t('ui_show_steps', 'Voir les étapes de l’envoi')}
                 </button>
 
                 {/* Steps guide (collapsible) */}
@@ -702,7 +702,7 @@ export default function WalletDashboardSendChoiceModal({
                       <svg className="w-5 h-5 text-white/50 flex-shrink-0 mr-3" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0" /></svg>
                       <span className="flex-1 text-left truncate">
                         {(() => {
-                          if (!quickscanPasteValue.trim()) return t('ui_choose_saved_address', 'Choisir un destinataire enregistré');
+                          if (!quickscanPasteValue.trim()) return t('ui_choose_saved_address', 'Choisir un destinataire dans vos contacts');
                           const match = (savedAddresses || []).find(a => String(a?.address || '').trim() === quickscanPasteValue.trim());
                           if (match) return String(match?.onChainLabel || match?.label || '').trim() || quickscanPasteValue.trim();
                           return quickscanPasteValue.trim();
@@ -754,10 +754,6 @@ export default function WalletDashboardSendChoiceModal({
                     </div>
                   </div>
 
-                  {/* Footer note */}
-                  <p className="text-center text-[12px] text-white/40 leading-relaxed mt-5">
-                    {t('ui_send_details_before_confirm', 'Les détails s’afficheront avant validation.')}
-                  </p>
                 </div>
                 </div>
               </div>
