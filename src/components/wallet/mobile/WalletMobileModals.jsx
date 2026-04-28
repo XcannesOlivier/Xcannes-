@@ -292,10 +292,10 @@ export default function WalletMobileModals({
 		                  targetSelectionMode: "wallet",
 		                  initialTargetCurrency: "USD",
 		                  titleOverride: "Recevoir des stablecoins",
-		                  subtitleOverride:
-		                    "Choisissez le stablecoin, le montant puis la devise XCANNES créditée sur votre wallet.",
-		                });
-		              }}
+			                  subtitleOverride:
+			                    "Sélectionnez le stablecoin, le réseau et la devise qui sera créditée sur votre solde.",
+			                });
+			              }}
 		              onChooseUsdSwapIn={() => {
 		                setCashSellSelectTitleOverride?.("");
 		                setCashSellDestinationMode?.("");

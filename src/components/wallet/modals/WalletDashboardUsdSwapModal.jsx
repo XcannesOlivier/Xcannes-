@@ -3083,15 +3083,16 @@ export default function WalletDashboardUsdSwapModal({
                       <div className="p-4">
                         <div className="flex items-center justify-between gap-3">
 	                          <div
-	                            className={
-	                              direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
-	                                ? "text-[11px] text-white/45"
-	                                : "text-[11px] tracking-[0.22em] uppercase text-white/45"
-	                            }
-	                          >
-			                            {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD
-			                              ? t("ui_usd_swap_credited_in", "Crédité en")
-			                              : t("ui_swap_you_send", "Vous envoyez")}
+		                            className={
+		                              direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE ||
+		                              direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD
+		                                ? "text-[12px] md:text-[13px] text-white/55"
+		                                : "text-[11px] tracking-[0.22em] uppercase text-white/45"
+		                            }
+		                          >
+				                            {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD
+				                              ? t("ui_usd_swap_you_receive", "Vous recevez")
+				                              : t("ui_swap_you_send", "Vous envoyez")}
 	                          </div>
                           <div className="flex items-center gap-2">
                             {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD ? (
@@ -3301,14 +3302,15 @@ export default function WalletDashboardUsdSwapModal({
                           <div className="flex items-center justify-between gap-3">
 		                            <div
 		                              className={
-		                                direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
+		                                direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE ||
+		                                direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD
 		                                  ? "text-[12px] md:text-[13px] text-white/55"
 		                                  : "text-[11px] tracking-[0.22em] uppercase text-white/45"
 		                              }
 		                            >
-		                              {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD
-		                                ? t("ui_usd_swap_credited_in", "Crédité en")
-		                                : t("ui_usd_swap_recipient_receives", "Le destinataire reçoit")}
+			                              {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD
+			                                ? t("ui_usd_swap_you_receive", "Vous recevez")
+			                                : t("ui_usd_swap_recipient_receives", "Le destinataire reçoit")}
 		                            </div>
                             <div className="flex items-center gap-2">
                               {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE ? (
