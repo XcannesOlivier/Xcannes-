@@ -4,6 +4,7 @@ import { createPortal } from 'react-dom';
 import { useTranslation } from 'next-i18next';
 import { useModalTransition } from '@/hooks/useModalTransition';
 import { useEffect, useRef, useState } from 'react';
+import useIsDesktop from '../hooks/useIsDesktop';
 
 export default function WalletDashboardCashChoiceModal({
   open,
@@ -16,6 +17,7 @@ export default function WalletDashboardCashChoiceModal({
   inline = false,
 }) {
   const { t } = useTranslation('common');
+  const isDesktop = useIsDesktop();
   const addHintText = t('ui_funds_add_hint', 'Par carte ou virement bancaire');
   const withdrawHintText = t('ui_funds_withdraw_hint', 'Vers votre compte bancaire');
   const highlightWithdraw = value => {
