@@ -533,7 +533,7 @@ export default function WalletDashboardSendChoiceModal({
                   <button
                     type="button"
                     onClick={() => openSubModal('payreq')}
-                    className={cardClassName}
+                    className={`${cardClassName} md:py-4`}
                   >
                     <div className="flex items-center gap-3 md:gap-4">
                       <div className="w-12 h-12 md:w-14 md:h-14 rounded-[16px] bg-black/30 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
@@ -541,7 +541,7 @@ export default function WalletDashboardSendChoiceModal({
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center justify-between gap-2">
-                          <p className="text-[18px] md:text-[22px] text-white font-semibold truncate">
+                          <p className="text-[18px] md:text-[22px] text-white font-semibold truncate md:whitespace-normal md:break-words">
                             {t('ui_send_pay_request_title', 'Renseigner une demande ')}
                           </p>
                           <svg className="w-5 h-5 md:w-6 md:h-6 text-white/45 flex-shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden>
