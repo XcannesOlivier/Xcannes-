@@ -1113,10 +1113,10 @@ export default function WalletDashboardReceiveModal({
     receiveView === 'choice'
       ? t('ui_receive_choice_subtitle', 'Choisissez comment recevoir un paiement.')
       : receiveView === 'share'
-        ? t('ui_receive_choice_share_desc', 'Partager le QR code ou votre adresse de réception.')
+	        ? t('ui_receive_choice_share_desc', 'Partagez votre QR code ou votre adresse de réception.')
         : receiveView === 'request_qr'
           ? t('ui_request_qr_subtitle', 'Scannez ou partagez ce QR code.')
-        : t('ui_receive_choice_request_desc', 'Définissez un montant, une devise et un message optionnel.');
+	        : t('ui_receive_choice_request_desc', 'Créez une demande avec un montant, une devise et un message facultatif.');
 
   const choiceCardBaseClassName =
     // Match the "CashChoice" action button background (wallet-actions.css).
@@ -1334,8 +1334,8 @@ export default function WalletDashboardReceiveModal({
                           <div className="mt-1 text-[15px] md:text-sm leading-snug text-white/60">
                             {t(
                               'ui_receive_choice_request_desc',
-                              'Définissez un montant, une devise et un message optionnel.',
-                            )}
+	                              'Créez une demande avec un montant, une devise et un message facultatif.',
+	                            )}
                           </div>
                         </div>
                       </div>
@@ -1362,7 +1362,7 @@ export default function WalletDashboardReceiveModal({
 	                        {/* Visible pill */}
                           <div className={`relative flex w-fit flex-col items-center gap-1 bg-elevated px-6 py-2 ${shareWalletDropdownOpen ? accountDropdownOpenPillClassName : 'rounded-3xl'} ${shareWalletDropdownOpen ? 'shadow-[0_4px_12px_rgba(0,0,0,0.45)]' : 'shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]'} ${hasMultipleWallets ? 'cursor-pointer' : ''}`}>
 	                          <span className="text-white/70 text-[14px] md:text-[15px] font-medium tracking-wide">
-	                            {t('ui_receive_account_info_label', 'Choisissez le compte')}
+		                            {t('ui_receive_account_info_label', 'Choisissez le compte')}
 	                          </span>
 	                          <div className="flex items-center gap-2">
 	                            <span className="h-3 w-3 rounded-full bg-xcannes-green ring-4 ring-xcannes-green/20 shrink-0 animate-pulse" aria-hidden />
@@ -1476,7 +1476,7 @@ export default function WalletDashboardReceiveModal({
 	                        {/* Visible pill */}
                             <div className={`relative flex w-fit flex-col items-center gap-1 bg-elevated px-6 py-2 ${requestWalletDropdownOpen ? accountDropdownOpenPillClassName : 'rounded-3xl'} ${requestCurrencyDropdownOpen ? 'shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_10px_rgba(255,255,255,0.16)]' : 'shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]'} ${requestWalletDropdownOpen ? 'shadow-[0_4px_12px_rgba(0,0,0,0.45)]' : ''} ${requestCurrencyDropdownOpen ? 'ring-1 ring-white/20 ring-inset' : ''} ${hasMultipleWallets ? 'cursor-pointer' : ''}`}>
 	                          <span className="text-white/70 text-[14px] md:text-[15px] font-medium tracking-wide">
-	                            {t('ui_receive_account_info_label', 'Choisissez le compte')}
+		                            {t('ui_receive_receiving_account_label', 'Compte de réception')}
 	                          </span>
 	                          <div className="flex items-center gap-2">
 	                            <span className="h-3 w-3 rounded-full bg-xcannes-green ring-4 ring-xcannes-green/20 shrink-0 animate-pulse" aria-hidden />
@@ -1521,7 +1521,7 @@ export default function WalletDashboardReceiveModal({
 			                      <div className="pt-2">
 			                        <div className="flex items-center justify-between mb-2 px-3.5">
 			                          <label className="block text-[11px] tracking-[0.22em] text-white/45">
-			                            {t('ui_currency_1ed55673be', 'Currency')}
+			                            {t('ui_currency_1ed55673be', 'Devise')}
 			                          </label>
 			                        </div>
 			                        <ModalSelect
@@ -1608,7 +1608,7 @@ export default function WalletDashboardReceiveModal({
 	                      {/* Message (optional) */}
 			                      <div className="pt-4">
 			                        <label className="block text-[11px] tracking-[0.22em] text-white/45 mb-2">
-			                          {t('ui_message_optional_label', 'Message (optional)')}
+			                          {t('ui_message_optional_label', 'Message facultatif')}
 			                        </label>
 	                        <div className="relative z-[2] bg-[#101415] rounded-[12px]">
 				                        <input
@@ -1616,7 +1616,7 @@ export default function WalletDashboardReceiveModal({
 				                          value={requestMemo}
 				                          onChange={e => setRequestMemo(e.target.value.slice(0, 40))}
 				                          maxLength={40}
-				                          placeholder={t('ui_request_memo_placeholder', 'Objet de la demande')}
+				                          placeholder={t('ui_request_memo_placeholder', 'Motif de la demande')}
 				                          className={`w-full ring-1 ring-white/10 ring-inset rounded-[12px] px-3.5 py-2 text-base text-white placeholder:text-white/25 focus:outline-none transition-colors duration-150 ${
 				                            noticeVariant === 'demo' ? 'bg-xcannes-surface-demo' : 'bg-[#101415]'
 				                          }`}
@@ -1642,7 +1642,7 @@ export default function WalletDashboardReceiveModal({
                             ? { background: 'linear-gradient(180deg, rgba(34,154,86,0.65) 0%, rgba(14,103,58,0.65) 100%)' }
                             : { background: 'linear-gradient(180deg, rgba(34,154,86,1) 0%, rgba(14,103,58,1) 100%)', boxShadow: '0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)' }}
                         >
-                          {t('ui_generate_request_fr', 'Générer la demande')}
+                          {t('ui_generate_request_fr', 'Créer la demande')}
                         </button>
                       </div>
 
@@ -1671,7 +1671,7 @@ export default function WalletDashboardReceiveModal({
 	                    <div className="flex justify-center pt-1 pb-1">
 	                      <div className="inline-flex flex-col items-center gap-1 bg-elevated px-6 py-2 rounded-3xl shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]">
 	                        <span className="text-white/70 text-[14px] md:text-[15px] font-medium tracking-wide">
-	                          {t('moonpay_from_account', 'Depuis le compte')}
+		                          {t('ui_receive_receiving_account_label', 'Compte de réception')}
 	                        </span>
 	                        <div className="flex items-center gap-2">
 	                          <span className="h-3 w-3 rounded-full bg-xcannes-green ring-4 ring-xcannes-green/20 shrink-0 animate-pulse" aria-hidden />
