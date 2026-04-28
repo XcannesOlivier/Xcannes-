@@ -780,131 +780,133 @@ export default function WalletSettingsDropdown({
                   {t("ui_settings_section_support", "Support")}
                 </div>
 
-                <a
-                  href="https://rlusd.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => setIsOpen(false)}
-                  className={settingsRowClassName}
-                >
-                  <span className={`${settingsIconShellClassName} text-white/85`}>
-                    <SettingsRlusdIcon />
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <div className="text-[13px] font-medium text-white/85">
-                      {t("ui_stablecoin_rlusd", "Stablecoin RLUSD")}
+                <div className="rounded-[20px] border border-white/10 bg-white/3 overflow-hidden">
+                  <a
+                    href="https://rlusd.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => setIsOpen(false)}
+                    className="w-full flex items-center gap-3 px-3 py-3 text-left hover:bg-white/5 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-xcannes-green/20 focus-visible:ring-inset"
+                  >
+                    <span className={`${settingsIconShellClassName} text-white/85`}>
+                      <SettingsRlusdIcon />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <div className="text-[13px] font-medium text-white/85">
+                        {t("ui_stablecoin_rlusd", "Stablecoin RLUSD")}
+                      </div>
+                      <div className="text-[11px] text-white/40 mt-0.5">
+                        {t("ui_stablecoin_rlusd_hint", "Ouvrir ripple.com")}
+                      </div>
                     </div>
-                    <div className="text-[11px] text-white/40 mt-0.5">
-                      {t("ui_stablecoin_rlusd_hint", "Ouvrir ripple.com")}
-                    </div>
-                  </div>
-                  <span className="text-white/20 text-lg">↗</span>
-                </a>
+                    <span className="text-white/20 text-lg">↗</span>
+                  </a>
 
-                <button
-                  type="button"
-                  onClick={() => {
-                    markReturnToSettings();
-                    onOpenInfo?.();
-                    setIsOpen(false);
-                  }}
-                  className={["mt-2", settingsRowClassName].join(" ")}
-                >
-                  <span className={`${settingsIconShellClassName} text-white/85`}>
-                    <SettingsInfoIcon />
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <div className="text-[13px] font-medium text-white/85">
-                      {t("ui_fees_and_how_it_works", "Frais et fonctionnement")}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      markReturnToSettings();
+                      onOpenInfo?.();
+                      setIsOpen(false);
+                    }}
+                    className="w-full flex items-center gap-3 px-3 py-3 border-t border-white/10 text-left hover:bg-white/5 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-xcannes-green/20 focus-visible:ring-inset"
+                  >
+                    <span className={`${settingsIconShellClassName} text-white/85`}>
+                      <SettingsInfoIcon />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <div className="text-[13px] font-medium text-white/85">
+                        {t("ui_fees_and_how_it_works", "Frais et fonctionnement")}
+                      </div>
+                      <div className="text-[11px] text-white/40 mt-0.5">
+                        {t("ui_settings_info_hint", "Comprendre les frais et le fonctionnement")}
+                      </div>
                     </div>
-                    <div className="text-[11px] text-white/40 mt-0.5">
-                      {t("ui_settings_info_hint", "Comprendre les frais et le fonctionnement")}
-                    </div>
-                  </div>
-                  <span className="text-white/20 text-lg">›</span>
-                </button>
+                    <span className="text-white/20 text-lg">›</span>
+                  </button>
 
-                <button
-                  type="button"
-                  onClick={() => {
-                    markReturnToSettings();
-                    setIsOpen(false);
-                    if (isDesktopPanel) {
-                      onOpenSecurity?.();
-                      return;
-                    }
-                    setShowSecurityModal(true);
-                  }}
-                  className={["mt-2", settingsRowClassName].join(" ")}
-                >
-                  <span className={`${settingsIconShellClassName} text-white/85`}>
-                    <SettingsSecurityIcon />
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <div className="text-[13px] font-medium text-white/85">
-                      {t("ui_security", "Sécurité")}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      markReturnToSettings();
+                      setIsOpen(false);
+                      if (isDesktopPanel) {
+                        onOpenSecurity?.();
+                        return;
+                      }
+                      setShowSecurityModal(true);
+                    }}
+                    className="w-full flex items-center gap-3 px-3 py-3 border-t border-white/10 text-left hover:bg-white/5 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-xcannes-green/20 focus-visible:ring-inset"
+                  >
+                    <span className={`${settingsIconShellClassName} text-white/85`}>
+                      <SettingsSecurityIcon />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <div className="text-[13px] font-medium text-white/85">
+                        {t("ui_security", "Sécurité")}
+                      </div>
+                      <div className="text-[11px] text-white/40 mt-0.5">
+                        {t("ui_security_hint", "Comprendre la protection du compte")}
+                      </div>
                     </div>
-                    <div className="text-[11px] text-white/40 mt-0.5">
-                      {t("ui_security_hint", "Comprendre la protection du compte")}
-                    </div>
-                  </div>
-                  <span className="text-white/20 text-lg">›</span>
-                </button>
+                    <span className="text-white/20 text-lg">›</span>
+                  </button>
 
-                <button
-                  type="button"
-                  onClick={() => {
-                    markReturnToSettings();
-                    setIsOpen(false);
-                    if (isDesktopPanel) {
-                      onOpenHelp?.();
-                      return;
-                    }
-                    setHelpOpenIndex(0);
-                    setShowHelpModal(true);
-                  }}
-                  className={["mt-2", settingsRowClassName].join(" ")}
-                >
-                  <span className={`${settingsIconShellClassName} text-white/85`}>
-                    <SettingsHelpIcon />
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <div className="text-[13px] font-medium text-white/85">
-                      {t("ui_questions_and_help", "Questions et aides")}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      markReturnToSettings();
+                      setIsOpen(false);
+                      if (isDesktopPanel) {
+                        onOpenHelp?.();
+                        return;
+                      }
+                      setHelpOpenIndex(0);
+                      setShowHelpModal(true);
+                    }}
+                    className="w-full flex items-center gap-3 px-3 py-3 border-t border-white/10 text-left hover:bg-white/5 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-xcannes-green/20 focus-visible:ring-inset"
+                  >
+                    <span className={`${settingsIconShellClassName} text-white/85`}>
+                      <SettingsHelpIcon />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <div className="text-[13px] font-medium text-white/85">
+                        {t("ui_questions_and_help", "Questions et aides")}
+                      </div>
+                      <div className="text-[11px] text-white/40 mt-0.5">
+                        {t("ui_questions_and_help_hint", "FAQ rapide et réponses")}
+                      </div>
                     </div>
-                    <div className="text-[11px] text-white/40 mt-0.5">
-                      {t("ui_questions_and_help_hint", "FAQ rapide et réponses")}
-                    </div>
-                  </div>
-                  <span className="text-white/20 text-lg">›</span>
-                </button>
+                    <span className="text-white/20 text-lg">›</span>
+                  </button>
 
-                <button
-                  type="button"
-                  onClick={() => {
-                    markReturnToSettings();
-                    setIsOpen(false);
-                    if (isDesktopPanel) {
-                      onOpenTerms?.();
-                      return;
-                    }
-                    setShowTermsModal(true);
-                  }}
-                  className={["mt-2", settingsRowClassName].join(" ")}
-                >
-                  <span className={`${settingsIconShellClassName} text-white/85`}>
-                    <SettingsDocIcon />
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <div className="text-[13px] font-medium text-white/85">
-                      {t("ui_terms_of_use", "Conditions d'utilisations")}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      markReturnToSettings();
+                      setIsOpen(false);
+                      if (isDesktopPanel) {
+                        onOpenTerms?.();
+                        return;
+                      }
+                      setShowTermsModal(true);
+                    }}
+                    className="w-full flex items-center gap-3 px-3 py-3 border-t border-white/10 text-left hover:bg-white/5 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-xcannes-green/20 focus-visible:ring-inset"
+                  >
+                    <span className={`${settingsIconShellClassName} text-white/85`}>
+                      <SettingsDocIcon />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <div className="text-[13px] font-medium text-white/85">
+                        {t("ui_terms_of_use", "Conditions d'utilisations")}
+                      </div>
+                      <div className="text-[11px] text-white/40 mt-0.5">
+                        {t("ui_terms_of_use_hint", "Lire les conditions d'utilisation")}
+                      </div>
                     </div>
-                    <div className="text-[11px] text-white/40 mt-0.5">
-                      {t("ui_terms_of_use_hint", "Lire les conditions d'utilisation")}
-                    </div>
-                  </div>
-                  <span className="text-white/20 text-lg">›</span>
-                </button>
+                    <span className="text-white/20 text-lg">›</span>
+                  </button>
+                </div>
               </div>
                 </div>
               </div>
