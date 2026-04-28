@@ -1548,7 +1548,7 @@ export default function WalletDashboardReceiveModal({
                                         <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6Z" stroke="currentColor" strokeWidth="1.7"/>
                                         <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.7"/>
                                       </svg>
-                                      <span>{t('ui_balances_short_label_aa12', 'Soldes')}</span>
+                                      <span>{t('ui_balances_short_label_aa12', 'Solde disponible')}</span>
                                     </span>
                                   )
                                   : labelRightRaw;

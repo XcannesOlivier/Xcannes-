@@ -455,10 +455,10 @@ export default function WalletDashboardSendChoiceModal({
                   onPointerDown={event => { maybeStartOverlayDrag(event, 'fixed'); }}
                 >
                   <h3 className="mt-1 px-6 text-[30px] md:text-[32px] font-semibold text-white/95 tracking-tight">
-                    {t('ui_send_choice_subtitle', 'Comment voulez-vous envoyer ?')}
+                    {t('ui_send_choice_subtitle', 'Comment souhaitez-vous envoyer ?')}
                   </h3>
                   <p className="mt-2 text-[14px] md:text-[15px] text-white/60 max-w-[34ch] leading-relaxed">
-                    {t('ui_send_choice_hint', 'Scannez, collez, importez ou choisissez une adresse dans votre liste.')}
+                    {t('ui_send_choice_hint', 'Scannez, collez, importez ou sélectionnez une adresse enregistrée.')}
                   </p>
                   {/* Wallet meta pill */}
                   <div className="mt-4 flex justify-center px-4 w-full">
@@ -561,7 +561,7 @@ export default function WalletDashboardSendChoiceModal({
                           </svg>
                         </div>
                         <p className="mt-1 text-[15px] md:text-sm leading-snug text-white/60">
-                          {t('ui_send_simple_hint_long', 'Saisissez une adresse, indiquez la devise et le montant.')}
+                          {t('ui_send_simple_hint_long', 'Saisissez une adresse, choisissez la devise et indiquez le montant.')}
                         </p>
                       </div>
                     </div>
@@ -580,14 +580,14 @@ export default function WalletDashboardSendChoiceModal({
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center justify-between gap-2">
                           <p className="text-[18px] md:text-[19px] text-white font-semibold truncate">
-                            {t('ui_send_pay_request_title', 'Payer une demande')}
+                            {t('ui_send_pay_request_title', 'Régler une demande')}
                           </p>
                           <svg className="w-5 h-5 text-white/45 flex-shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden>
                             <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                           </svg>
                         </div>
                         <p className="mt-1 text-[15px] md:text-sm leading-snug text-white/60">
-                          {t('ui_send_pay_request_hint', 'Réglez une demande reçue après vérification.')}
+                          {t('ui_send_pay_request_hint', 'Vérifiez les détails d’une demande reçue avant de la payer.')}
                         </p>
                       </div>
                     </div>
@@ -598,7 +598,7 @@ export default function WalletDashboardSendChoiceModal({
 
                   {/* Footer note */}
                   <p className="text-center text-[12px] text-white/40 leading-relaxed mt-2">
-                    {t('ui_send_fees_note', 'Les détails seront affichés avant confirmation.')}
+                    {t('ui_send_fees_note', 'Les détails s’afficheront avant validation.')}
                   </p>
                 </div>
               </div>
@@ -645,7 +645,7 @@ export default function WalletDashboardSendChoiceModal({
                     {t('ui_send_simple_title', 'Envoi simple')}
                   </h3>
                   <p className="mt-2 text-[14px] md:text-[15px] text-white/60 max-w-[40ch] leading-relaxed">
-                    {t('ui_send_simple_hint_long', 'Saisissez une adresse, scannez, collez, importez ou choisissez dans vos destinataires.')}
+                    {t('ui_send_simple_hint_long', 'Scannez, importez ou saisissez l’adresse du destinataire.')}
                   </p>
                   {/* Wallet meta pill */}
                   <div className="mt-4 flex justify-center px-4 w-full">
@@ -799,7 +799,7 @@ export default function WalletDashboardSendChoiceModal({
 
                   {/* Footer note */}
                   <p className="text-center text-[12px] text-white/40 leading-relaxed mt-5">
-                    {t('ui_send_details_before_confirm', 'Les détails seront affichés avant confirmation.')}
+                    {t('ui_send_details_before_confirm', 'Les détails s’afficheront avant validation.')}
                   </p>
                 </div>
                 </div>
@@ -846,7 +846,7 @@ export default function WalletDashboardSendChoiceModal({
                     {t('ui_send_pay_request_title', 'Payer une demande')}
                   </h3>
                   <p className="mt-2 text-[14px] md:text-[15px] text-white/60 max-w-[34ch] leading-relaxed">
-                    {t('ui_send_pay_request_hint', 'Réglez une demande reçue après vérification.')}
+                    {t('ui_send_pay_request_hint', 'Vérifiez les détails d’une demande reçue avant de la payer.')}
                   </p>
                   {/* Wallet meta pill */}
                   <div className="mt-4 flex justify-center px-4 w-full">
@@ -927,7 +927,7 @@ export default function WalletDashboardSendChoiceModal({
 
                   {/* Footer note */}
                   <p className="text-center text-[12px] text-white/40 leading-relaxed mt-5">
-                    {t('ui_send_details_before_confirm', 'Les détails seront affichés avant confirmation.')}
+                    {t('ui_send_details_before_confirm', 'Les détails s’afficheront avant validation.')}
                   </p>
                 </div>
                 </div>

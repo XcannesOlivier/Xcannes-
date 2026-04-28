@@ -1216,7 +1216,7 @@ export default function WalletDashboardSendModal({
             {t("ui_send_modal_title", "Envoi simple")}
           </h3>
           <p className="relative z-[50] text-[14px] md:text-[15px] text-white/55 text-center leading-relaxed -mt-2">
-            {t("ui_send_devise_hint", "Indiquez la devise, le montant, et vérifiez avant d'envoyer.")}
+            {t("ui_send_devise_hint", "Choisissez la devise, saisissez le montant, puis vérifiez avant l’envoi.")}
           </p>
           <div className="flex justify-center relative z-[65]">
             {renderWalletMeta?.({
@@ -1260,7 +1260,7 @@ export default function WalletDashboardSendModal({
                           <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6Z" stroke="currentColor" strokeWidth="1.5"/>
                           <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.5"/>
                         </svg>
-                        <span>{t("ui_balances_short_label_aa12", "Soldes")}</span>
+                        <span>{t("ui_balances_short_label_aa12", "Solde disponible")}</span>
                       </span>
                     )
                     : fmtAmountRight(labelRightRaw);
@@ -1380,7 +1380,7 @@ export default function WalletDashboardSendModal({
           </span>
           {normalizedDestination ? (
             <span className="text-[13px] md:text-[14px] text-white/45 font-normal tabular-nums">
-              {t("ui_account_number_label", "N° de Compte")} —{" "}
+              {t("ui_account_number_label", "N° de compte")} —{" "}
               <button
                 type="button"
                 onClick={() => setShowFullRecipientAccount((prev) => !prev)}
@@ -1452,7 +1452,7 @@ export default function WalletDashboardSendModal({
           <span className="text-[17px] text-white/90">{requestCurrencyCode || confirmCurrencyCode || "—"}</span>
         </div>
         <div className="flex items-baseline justify-between gap-4">
-          <span className="text-[20px] text-white/90">{t("ui_amount_52cea2dd3d", "Montant")}</span>
+	          <span className="text-[20px] text-white/90">{t("ui_total_to_send_label", "Total à envoyer")}</span>
           <span className="text-3xl font-semibold text-white">{requestAmountLabel || "—"}</span>
         </div>
       </div>
@@ -1501,7 +1501,7 @@ export default function WalletDashboardSendModal({
       : t("ui_sending_3b8c1a7d5e", "Sending...")
     : hasMoonpaySellRequest
       ? t("moonpay_sell_sign_submit", "Signer et envoyer")
-      : t("ui_send_504b64a87b", "Send");
+	      : t("ui_send_504b64a87b", "Envoyer");
 
   const sendActions = (
     <div className="sticky bottom-0 pt-8 pb-3 mt-auto space-y-2 bg-inherit z-10 relative">
