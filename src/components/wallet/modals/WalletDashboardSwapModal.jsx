@@ -630,7 +630,7 @@ export default function WalletDashboardSwapModal({
                     {t("ui_convert_title_main", "Convertissez vos devises")}
                   </h3>
                   <p className="mt-2 text-[14px] md:text-[15px] text-white/80 max-w-[34ch] mx-auto leading-relaxed">
-                    {t("ui_convert_subtitle_main", "Convertissez instantanément entre vos devises.")}
+                    {t("ui_convert_subtitle_main", "Choisissez les devises et le montant à convertir.")}
                   </p>
 	                  <div className="mt-2 flex justify-center relative z-[75]">
                     {renderWalletMeta?.({
@@ -654,7 +654,7 @@ export default function WalletDashboardSwapModal({
 	                  <div className={`relative ${quoteDropdownOpen ? "z-[70]" : "z-[65]"}`}>
                     <div className="flex items-center justify-between mb-2 relative z-[50]">
                       <div className="text-[13px] tracking-normal font-medium text-white/55">
-                        {t("ui_convert_from_label", "Vous envoyez")}
+                        {t("ui_convert_from_label", "Vous convertissez")}
                       </div>
                     </div>
 		                    <ModalSelect
@@ -897,7 +897,7 @@ export default function WalletDashboardSwapModal({
                           {formatAmountWithSymbol(locale, Number(previewMeta?.spreadFeeRlusd || 0), "USD", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </span>
                         <span className="text-[11px] md:text-[12.5px] text-white/40 font-normal tabular-nums">
-                          {t("ui_exchange_rate_label", "Taux")} —{" "}
+                          {t("ui_exchange_rate_label", "Taux de change")} —{" "}
                           {Number.isFinite(Number(previewMeta?.unitRate)) && previewMeta?.unitRate > 0 && baseCode && quoteCode
                             ? `1 ${getDisplayCurrencyCode(baseCode)} = ${Number(previewMeta.unitRate).toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 4 })} ${getDisplayCurrencyCode(quoteCode)}`
                             : Number.isFinite(inlineUnitRate) && baseCode && quoteCode
