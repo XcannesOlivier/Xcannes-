@@ -1452,7 +1452,7 @@ export default function WalletDashboardSendModal({
           <span className="text-[17px] text-white/90">{requestCurrencyCode || confirmCurrencyCode || "—"}</span>
         </div>
         <div className="flex items-baseline justify-between gap-4">
-	          <span className="text-[20px] text-white/90">{t("ui_total_to_send_label", "Total à envoyer")}</span>
+	          <span className="text-[20px] text-white/90">{t("ui_total_to_send_label", { defaultValue: "Total to send" })}</span>
           <span className="text-3xl font-semibold text-white">{requestAmountLabel || "—"}</span>
         </div>
       </div>
