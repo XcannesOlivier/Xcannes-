@@ -62,6 +62,8 @@ export default function WalletSettingsDropdown({
   const [desktopPlacement, setDesktopPlacement] = useState("bottom");
   const settingsIconShellClassName =
     "inline-flex h-12 w-12 items-center justify-center rounded-[16px] bg-black/30 ring-1 ring-white/10 ring-inset shadow-[0_4px_12px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.04)] shrink-0";
+  const settingsRowClassName =
+    "w-full flex items-center gap-3 px-3 py-3 rounded-[20px] border border-white/10 bg-white/3 hover:bg-white/5 hover:border-white/15 transition-colors duration-150 text-left focus-visible:outline-none focus-visible:border-xcannes-green/60 focus-visible:ring-2 focus-visible:ring-xcannes-green/20";
   const SettingsAddWalletIcon = () => (
     <svg viewBox="0 0 48 48" className="w-8 h-8" fill="none" aria-hidden>
       <rect x="10" y="10" width="28" height="28" rx="9" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.14)" strokeWidth="1.4" />
@@ -601,7 +603,7 @@ export default function WalletSettingsDropdown({
 
                 {/* Mobile header */}
                 <div
-                  className="shrink-0 md:hidden border-b border-white/10"
+                  className="shrink-0 md:hidden"
                   onPointerDown={(event) => {
                     maybeStartOverlayDrag(event, "fixed");
                   }}
@@ -614,10 +616,13 @@ export default function WalletSettingsDropdown({
                       <span className="block w-12 h-1.5 rounded-full bg-white/20" />
                     </div>
                   </div>
-                  <div className="flex items-center justify-center px-4 pt-2 pb-3">
-                    <div className="text-[12px] font-semibold tracking-[0.28em] uppercase text-white">
+                  <div className="flex items-center justify-center px-4 pt-2 pb-2">
+                    <div className="text-[12px] font-semibold tracking-[0.32em] uppercase text-white/90">
                       {t("ui_settings_label", "Paramètres")}
                     </div>
+                  </div>
+                  <div className="px-6 pb-3">
+                    <div className="h-px bg-white/10" />
                   </div>
                 </div>
 
@@ -688,7 +693,7 @@ export default function WalletSettingsDropdown({
                       window.open("/wallet-app/?action=choice", "_blank");
                     }
                   }}
-                  className="w-full flex items-center gap-3 px-3 py-3 rounded-[20px] border border-white/10 bg-white/3 hover:bg-white/5 hover:border-white/15 transition-colors duration-150 text-left focus-visible:outline-none focus-visible:border-xcannes-green/60 focus-visible:ring-2 focus-visible:ring-xcannes-green/20"
+                  className={settingsRowClassName}
                 >
                   <span className={`${settingsIconShellClassName} text-white/60`}>
                     <SettingsAddWalletIcon />
@@ -722,7 +727,7 @@ export default function WalletSettingsDropdown({
                       setIsOpen(false);
                       onOpenXrplActivity?.();
                     }}
-                    className="w-full flex items-center gap-3 px-3 py-3 rounded-[20px] border border-transparent hover:border-white/10 hover:bg-white/5 transition-colors duration-150 text-left focus-visible:outline-none focus-visible:border-xcannes-green/60 focus-visible:ring-2 focus-visible:ring-xcannes-green/20"
+                    className={settingsRowClassName}
                   >
                     <span className={settingsIconShellClassName}>
                       <SettingsXrplIcon />
@@ -780,7 +785,7 @@ export default function WalletSettingsDropdown({
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => setIsOpen(false)}
-                  className="w-full flex items-center gap-3 px-3 py-3 rounded-[20px] border border-transparent hover:border-white/10 hover:bg-white/5 transition-colors duration-150 text-left focus-visible:outline-none focus-visible:border-xcannes-green/60 focus-visible:ring-2 focus-visible:ring-xcannes-green/20"
+                  className={settingsRowClassName}
                 >
                   <span className={`${settingsIconShellClassName} text-white/85`}>
                     <SettingsRlusdIcon />
@@ -803,7 +808,7 @@ export default function WalletSettingsDropdown({
                     onOpenInfo?.();
                     setIsOpen(false);
                   }}
-                  className="mt-2 w-full flex items-center gap-3 px-3 py-3 rounded-[20px] border border-transparent hover:border-white/10 hover:bg-white/5 transition-colors duration-150 text-left focus-visible:outline-none focus-visible:border-xcannes-green/60 focus-visible:ring-2 focus-visible:ring-xcannes-green/20"
+                  className={["mt-2", settingsRowClassName].join(" ")}
                 >
                   <span className={`${settingsIconShellClassName} text-white/85`}>
                     <SettingsInfoIcon />
@@ -830,7 +835,7 @@ export default function WalletSettingsDropdown({
                     }
                     setShowSecurityModal(true);
                   }}
-                  className="mt-2 w-full flex items-center gap-3 px-3 py-3 rounded-[20px] border border-transparent hover:border-white/10 hover:bg-white/5 transition-colors duration-150 text-left focus-visible:outline-none focus-visible:border-xcannes-green/60 focus-visible:ring-2 focus-visible:ring-xcannes-green/20"
+                  className={["mt-2", settingsRowClassName].join(" ")}
                 >
                   <span className={`${settingsIconShellClassName} text-white/85`}>
                     <SettingsSecurityIcon />
@@ -858,7 +863,7 @@ export default function WalletSettingsDropdown({
                     setHelpOpenIndex(0);
                     setShowHelpModal(true);
                   }}
-                  className="mt-2 w-full flex items-center gap-3 px-3 py-3 rounded-[20px] border border-transparent hover:border-white/10 hover:bg-white/5 transition-colors duration-150 text-left focus-visible:outline-none focus-visible:border-xcannes-green/60 focus-visible:ring-2 focus-visible:ring-xcannes-green/20"
+                  className={["mt-2", settingsRowClassName].join(" ")}
                 >
                   <span className={`${settingsIconShellClassName} text-white/85`}>
                     <SettingsHelpIcon />
@@ -885,7 +890,7 @@ export default function WalletSettingsDropdown({
                     }
                     setShowTermsModal(true);
                   }}
-                  className="mt-2 w-full flex items-center gap-3 px-3 py-3 rounded-[20px] border border-transparent hover:border-white/10 hover:bg-white/5 transition-colors duration-150 text-left focus-visible:outline-none focus-visible:border-xcannes-green/60 focus-visible:ring-2 focus-visible:ring-xcannes-green/20"
+                  className={["mt-2", settingsRowClassName].join(" ")}
                 >
                   <span className={`${settingsIconShellClassName} text-white/85`}>
                     <SettingsDocIcon />

@@ -121,12 +121,10 @@ export default function PreferredCurrencySelector({
 
   return (
     <div className="space-y-2" ref={rootRef}>
-      {/* Label */}
-      <div className="text-[10px] font-semibold text-white/60 uppercase tracking-wider px-1">
+      <div className="text-[10px] font-semibold text-white/55 uppercase tracking-[0.22em] px-1">
         {t("ui_preferred_currency_label", "Devise principale")}
       </div>
 
-      {/* Select button */}
       <button
         type="button"
         onClick={() => {
@@ -138,27 +136,26 @@ export default function PreferredCurrencySelector({
           });
         }}
         className={[
-          "w-full flex items-center gap-2 px-3 py-2 rounded-xl border transition-colors",
-          "bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/15",
+          "w-full flex items-center gap-3 px-3 py-3 rounded-[18px] transition-colors",
+          "bg-black/25 ring-1 ring-inset ring-white/10 hover:bg-black/30 hover:ring-white/15",
         ].join(" ")}
         aria-haspopup="listbox"
         aria-expanded={isExpanded}
       >
-        <span className="text-[14px] shrink-0">
+        <span className="h-10 w-10 rounded-full bg-black/30 ring-1 ring-white/10 inline-flex items-center justify-center text-[18px] shrink-0">
           {getCurrencyFlag(currentCurrency)}
         </span>
-        <span className="font-mono font-semibold text-[12px] text-white/85 shrink-0">
-          {currentCurrency}
-        </span>
-        <span className="text-[11px] text-white/35 truncate">
-          {selectedCurrency?.name || t("ui_currency_picker_hint", "Choisir une devise")}
-        </span>
-        <span className="ml-auto text-white/25">
+        <div className="min-w-0 flex-1">
+          <div className="text-[15px] font-semibold text-white/90 leading-tight">
+            {currentCurrency}
+          </div>
+          <div className="text-[11px] text-white/45 truncate mt-0.5">
+            {selectedCurrency?.name || t("ui_currency_picker_hint", "Choisir une devise")}
+          </div>
+        </div>
+        <span className="text-white/35 shrink-0">
           <svg
-            className={[
-              "w-4 h-4 transition-transform",
-              isExpanded ? "rotate-180" : "",
-            ].join(" ")}
+            className={["w-5 h-5 transition-transform", isExpanded ? "rotate-180" : ""].join(" ")}
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
