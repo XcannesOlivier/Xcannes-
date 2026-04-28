@@ -1846,7 +1846,7 @@ export default function GlobalStatement({
               <p className="mt-2 text-[14px] md:text-[15px] text-white/60 max-w-[52ch] leading-relaxed">
                 {t(
                   "ui_global_statement_subtitle_recent_20",
-                  "Consultez vos 20 transactions les plus récentes et sélectionnez une transaction pour voir le détail.",
+                  "Consultez vos transactions récentes et ouvrez-en une pour voir les détails.",
                 )}
               </p>
             </div>
@@ -2099,9 +2099,9 @@ export default function GlobalStatement({
           {/* Filtres */}
           <div className="flex flex-1 md:flex-1 items-center rounded-[16px] p-1 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-[#101415] to-[#0d1214]">
             {[
-              { key: "all", label: t("ui_all_0c90d41d71", "All") },
-              { key: "credit", label: t("ui_credits_b8166276a0", "Credits") },
-              { key: "debit", label: t("ui_debits_38c870b18f", "Debits") },
+              { key: "all", label: t("ui_all_0c90d41d71", "Tout") },
+              { key: "credit", label: t("ui_credits_b8166276a0", "Entrées") },
+              { key: "debit", label: t("ui_debits_38c870b18f", "Sorties") },
               { key: "conversion", label: t("ui_conversions_b604b5ef8b", "Conversions") },
             ].map((item) => (
               <button
