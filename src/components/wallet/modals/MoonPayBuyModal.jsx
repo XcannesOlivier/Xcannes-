@@ -1841,19 +1841,19 @@ const MoonPayBuyModal = ({
                 </button>
               ) : null}
               <h3 className="text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight mb-1">
-                {resolvedTitleOverride || t('ui_funds_add_title', 'Acheter des devises')}
+                {resolvedTitleOverride || t('ui_funds_add_title', 'Ajouter des fonds')}
               </h3>
               {!demoMode && !useSimpleSwapPartner ? (
                 <div className="mb-4 flex flex-col items-center">
                   <p className="mt-2 text-[14px] md:text-[15px] text-white/80 max-w-[34ch] mx-auto leading-relaxed text-center">
-                    {t('moonpay_buy_payment_methods_list', 'Moyens acceptés : carte bancaire, Apple Pay, Google Pay, virement.')}
+                    {t('moonpay_buy_payment_methods_list', 'Payez par carte, Apple Pay, Google Pay ou virement bancaire.')}
                   </p>
                 </div>
               ) : null}
 	              <div className="flex justify-center">
 	                <div className={`inline-flex flex-col items-center gap-1 bg-elevated px-6 py-2 rounded-3xl shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)] ${assetDropdownOpen ? 'ring-1 ring-white/20 ring-inset' : ''}`}>
                   <span className="text-white/70 text-[14px] md:text-[15px] font-medium tracking-wide">
-                    {t('moonpay_from_account', 'Depuis le compte')}
+                    {t('moonpay_from_account', 'Compte de réception')}
                   </span>
                   <div className="flex items-center gap-2">
                     <span
@@ -1873,7 +1873,7 @@ const MoonPayBuyModal = ({
           {wizardStep === 1 ? (
 		            <div className="relative z-[120]">
               <div className="text-[13px] tracking-normal font-medium text-white/55 mb-2">
-                {t('moonpay_buy_receive_currency_label', 'Vous achetez')}
+                {t('moonpay_buy_receive_currency_label', 'Devise à recevoir')}
               </div>
 	              <ModalSelect
 	                value={currency}
@@ -1959,7 +1959,7 @@ const MoonPayBuyModal = ({
               <>
 	                <div className="px-1">
                   <div className="mb-4 text-[14px] md:text-[16px] font-semibold tracking-[0.08em] text-white/80">
-                    💳 {resolvedTitleOverride || t('ui_funds_add_title', 'Acheter des devises')}
+                    💳 {resolvedTitleOverride || t('ui_funds_add_title', 'Ajouter des fonds')}
                   </div>
                   <div className="text-white text-[36px] md:text-[42px] font-semibold tracking-tight leading-none">
                     {hasValidTargetAmount
@@ -2144,19 +2144,14 @@ const MoonPayBuyModal = ({
           >
             {continueLabel}
           </button>
-          {!demoMode && !useSimpleSwapPartner ? (
-            <div className="flex items-center justify-center gap-1 mt-3">
-              <span className="text-[11px] text-white/45">
-                {t('moonpay_info_buy_live_3c8a1d6b2f', 'Transactions sécurisées via')}
-              </span>
-              <span className="text-[13px] font-semibold text-white/80">MoonPay</span>
-              <span className="text-[11px] text-white/45">et/ou</span>
-              <span className="text-[13px] font-semibold text-white/80">Topper</span>
-            </div>
-          ) : null}
-          <p className="text-center text-[11px] md:text-xs text-white/40 mt-2">
-            {t('moonpay_buy_partner_location_note_cta', 'Le partenaire proposé dépend de votre localisation.')}
-          </p>
+		          {!demoMode && !useSimpleSwapPartner ? (
+		            <p className="text-center text-[12px] md:text-[13px] text-white/55 mt-2">
+		              {t('moonpay_info_buy_live_3c8a1d6b2f', 'Transactions sécurisées via MoonPay ou Topper.')}
+		            </p>
+		          ) : null}
+	          <p className="text-center text-[11px] md:text-xs text-white/40 mt-1">
+	            {t('moonpay_buy_partner_location_note_cta', 'Le partenaire proposé dépend de votre localisation.')}
+	          </p>
         </div>
       )}
 
