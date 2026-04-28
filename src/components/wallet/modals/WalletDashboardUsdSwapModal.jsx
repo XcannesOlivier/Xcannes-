@@ -1449,7 +1449,7 @@ export default function WalletDashboardUsdSwapModal({
       if (delta < 8) return;
       // Start drag.
       try {
-        stableDropdownOverlayRef.current?.setPointerCapture?.(event.pointerId);
+        event.currentTarget?.setPointerCapture?.(event.pointerId);
       } catch {
         // ignore
       }
@@ -1575,7 +1575,7 @@ export default function WalletDashboardUsdSwapModal({
     if (!meta.dragging) {
       if (delta < 8) return;
       try {
-        sourceDropdownOverlayRef.current?.setPointerCapture?.(event.pointerId);
+        event.currentTarget?.setPointerCapture?.(event.pointerId);
       } catch {
         // ignore
       }
@@ -2519,7 +2519,7 @@ export default function WalletDashboardUsdSwapModal({
     if (!meta.dragging) {
       if (delta < 8) return;
       try {
-        modalOverlayRef.current?.setPointerCapture?.(event.pointerId);
+        event.currentTarget?.setPointerCapture?.(event.pointerId);
       } catch {
         // ignore
       }

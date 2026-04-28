@@ -325,7 +325,7 @@ export default function WalletMobileModals({
                 setUsdSwapInitialTargetCurrency("");
                 setUsdSwapTitleOverride("");
                 setUsdSwapSubtitleOverride("");
-                setActiveAction("cashChoice");
+                setActiveAction(null);
               }}
               walletLabel={cashModalProps?.walletLabel || ""}
               walletAddress={cashModalProps?.walletAddress || ""}
@@ -352,7 +352,7 @@ export default function WalletMobileModals({
               open={activeAction === "cash"}
               onClose={() => {
                 resetCashForm?.();
-                setActiveAction("cashChoice");
+                setActiveAction(null);
                 setCashBuyPrefill(null);
               }}
               {...cashModalProps}
