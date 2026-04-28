@@ -1690,7 +1690,7 @@ export default function CurrencyStatement({
               <p className="mt-1 text-[13px] md:text-[14px] text-white/55 leading-relaxed">
                 {t(
                   "ui_currency_statement_subtitle_periods",
-                  "Affiche les transactions de la devise sélectionnée pour différentes périodes.",
+                  "Suivez le solde et les mouvements de cette devise.",
                 )}
               </p>
 	              </div>
@@ -1771,7 +1771,7 @@ export default function CurrencyStatement({
               {!isXrpNetworkView ? (
                 <div className="flex-1 min-w-0">
                   <StatementMonthSelect
-                    label={t("ui_statement_period_6dedec11d9", "Statement Period")}
+                    label={t("ui_statement_period_6dedec11d9", "Période du relevé")}
                     labelClassName="text-[22px] md:text-[21px] text-white/85 font-medium mb-1 text-center"
                     value={selectedMonth}
                     onOpenChange={(open) => {
@@ -1796,14 +1796,14 @@ export default function CurrencyStatement({
             {!isXrpNetworkView ? (
               <div className="flex flex-col items-center text-center gap-0.5">
                 <p className="text-[26px] md:text-[28px] text-white/60">
-                  {t("ui_balance_445d830d72", "Solde")}
+                  {t("ui_balance_445d830d72", "Solde disponible")}
                 </p>
                 <p className="text-4xl text-white font-bold">
                   {formatAmountWithSymbolLocal(balance)}
                 </p>
                 {estimatedUsd != null && Number.isFinite(estimatedUsd) ? (
                   <p className="text-[12px] text-white/50 mt-1 whitespace-nowrap">
-                    <span className="text-white/40 mr-1">{t("ui_digital_usd_label", "USD numérique")}</span>
+	                    <span className="text-white/40 mr-1">{t("ui_digital_usd_label", "équivalent USD numérique")}</span>
                     ≈ {formatAmountWithSymbol(locale, estimatedUsd, "RLUSD", {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2,
