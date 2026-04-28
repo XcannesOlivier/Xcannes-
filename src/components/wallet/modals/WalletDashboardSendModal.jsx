@@ -1222,7 +1222,7 @@ export default function WalletDashboardSendModal({
             {renderWalletMeta?.({
               variant: "pill-column",
               className: "flex justify-center relative z-[85]",
-              prefix: t("moonpay_from_account", "Depuis le compte"),
+	            prefix: t("ui_debited_account_label", "Compte débité"),
               pillClassName: `bg-elevated ${sendAssetDropdownOpen
                 ? "ring-1 ring-white/15 ring-inset shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_10px_rgba(255,255,255,0.16)]"
                 : "shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]"}`,
@@ -1413,10 +1413,10 @@ export default function WalletDashboardSendModal({
       {/* Title + subtitle */}
       <div className="text-center space-y-2 pt-1">
         <h3 className="text-[26px] md:text-[28px] font-semibold text-white/95 tracking-tight">
-          {t("ui_payreq_summary_title", "Résumé de la demande de paiement")}
+	          {t("ui_payreq_summary_title", "Résumé de la demande")}
         </h3>
         <p className="text-[14px] md:text-[15px] text-white/60 max-w-[34ch] mx-auto leading-relaxed">
-          {t("ui_payreq_summary_subtitle", "Vérifiez les informations avant d\u2019envoyer")}
+	          {t("ui_payreq_summary_subtitle", "Vérifiez les détails avant de confirmer le paiement.")}
         </p>
         <div className="mt-4 flex justify-center">
           {renderWalletMeta?.({
@@ -1431,7 +1431,7 @@ export default function WalletDashboardSendModal({
       {/* Summary lines – flat, no box */}
       <div className="space-y-4">
         <div className="flex items-baseline justify-between gap-4">
-          <span className="text-[15px] text-white/50">{t("ui_beneficiary_label", "Destinataire")}</span>
+	          <span className="text-[15px] text-white/50">{t("ui_payreq_requested_by_label", "Demandé par")}</span>
           <span className="text-[22px] font-semibold text-white truncate text-right">
             {payreqSelectorLabel || t("ui_wallet_unknown", "Unknown wallet")}
           </span>

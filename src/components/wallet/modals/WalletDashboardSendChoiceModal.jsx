@@ -587,7 +587,7 @@ export default function WalletDashboardSendChoiceModal({
                           </svg>
                         </div>
                         <p className="mt-1 text-[15px] md:text-sm leading-snug text-white/60">
-                          {t('ui_send_pay_request_hint', 'Vérifiez les détails d’une demande reçue avant de la payer.')}
+                          {t('ui_send_pay_request_hint', 'Scannez, importez ou collez une demande de paiement.')}
                         </p>
                       </div>
                     </div>
@@ -843,10 +843,10 @@ export default function WalletDashboardSendChoiceModal({
                 {/* Title + subtitle (centered) */}
                 <div className="flex flex-col items-center text-center mb-6">
                   <h3 className="mt-1 text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight">
-                    {t('ui_send_pay_request_title', 'Payer une demande')}
+	                    {t('ui_send_pay_request_title', 'Régler une demande')}
                   </h3>
                   <p className="mt-2 text-[14px] md:text-[15px] text-white/60 max-w-[34ch] leading-relaxed">
-                    {t('ui_send_pay_request_hint', 'Vérifiez les détails d’une demande reçue avant de la payer.')}
+                    {t('ui_send_pay_request_hint', 'Scannez, importez ou collez une demande de paiement.')}
                   </p>
                   {/* Wallet meta pill */}
                   <div className="mt-4 flex justify-center px-4 w-full">
