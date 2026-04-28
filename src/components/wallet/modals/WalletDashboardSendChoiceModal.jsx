@@ -542,14 +542,14 @@ export default function WalletDashboardSendChoiceModal({
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center justify-between gap-2">
                           <p className="text-[18px] md:text-[22px] text-white font-semibold truncate">
-                            {t('ui_send_pay_request_title', 'Régler une demande')}
+                            {t('ui_send_pay_request_title', 'Renseigner une demande ')}
                           </p>
                           <svg className="w-5 h-5 md:w-6 md:h-6 text-white/45 flex-shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden>
                             <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                           </svg>
                         </div>
                         <p className="mt-1 text-[15px] md:text-[16px] leading-snug text-white/60">
-                          {t('ui_send_pay_request_hint', 'Scannez, importez ou collez une demande de paiement.')}
+                          {t('ui_send_pay_request_hint', 'Scannez, importez un QR code ou saisissez une demande de paiement.')}
                         </p>
                       </div>
                     </div>
@@ -796,10 +796,10 @@ export default function WalletDashboardSendChoiceModal({
                 {/* Title + subtitle (centered) */}
                 <div className="flex flex-col items-center text-center mb-6">
                   <h3 className="mt-1 text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight">
-	                    {t('ui_send_pay_request_title', 'Régler une demande')}
+	                    {t('ui_send_pay_request_title', 'Renseigner une demande ')}
                   </h3>
                   <p className="mt-2 text-[14px] md:text-[15px] text-white/60 max-w-[34ch] leading-relaxed">
-                    {t('ui_send_pay_request_hint', 'Scannez, importez ou collez une demande de paiement.')}
+                    {t('ui_send_pay_request_hint', 'Scannez, importez un QR code ou saisissez une demande de paiement.')}
                   </p>
                   {/* Wallet meta pill */}
                   <div className="mt-4 flex justify-center px-4 w-full">
@@ -815,7 +815,7 @@ export default function WalletDashboardSendChoiceModal({
 
                 {/* Steps toggle */}
                 <button type="button" onClick={() => setShowPayreqSteps(s => !s)} className="mb-4 text-[13px] text-[#f5a623]/80 hover:text-[#f5a623] transition-colors duration-150 font-medium self-start text-left">
-                  {showPayreqSteps ? t('ui_hide_steps', 'Masquer les étapes') : t('ui_show_steps', 'Voir les étapes')}
+                  {showPayreqSteps ? t('ui_hide_steps', 'Masquer les étapes') : t('ui_show_steps', 'Voir les étapes de paiement')}
                 </button>
 
                 {/* Steps guide (collapsible) */}
