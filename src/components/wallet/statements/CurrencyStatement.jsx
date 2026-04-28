@@ -1803,7 +1803,7 @@ export default function CurrencyStatement({
                 </p>
                 {estimatedUsd != null && Number.isFinite(estimatedUsd) ? (
                   <p className="text-[12px] text-white/50 mt-1 whitespace-nowrap">
-	                    <span className="text-white/40 mr-1">{t("ui_digital_usd_label", "équivalent USD numérique")}</span>
+	                    <span className="text-white/40 mr-1">{t("ui_digital_usd_label", "Équivalent USD numérique")}</span>
                     ≈ {formatAmountWithSymbol(locale, estimatedUsd, "RLUSD", {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2,

@@ -1154,7 +1154,7 @@ export default function WalletDashboard({
                     value=""
                     onChange={handleAddDevise}
                     triggerVariant="text"
-                    triggerLabel={<><span className="md:hidden">+ Devise</span><span className="hidden md:inline">Ajouter une devise</span></>}
+                    triggerLabel={<><span className="md:hidden">+ Devise</span><span className="hidden md:inline">+ Ajouter une devise</span></>}
                     buttonClassName="shrink-0 inline-flex items-center gap-1 text-[13px] md:text-[15px] font-normal text-white/55 hover:text-white/85 transition-colors px-4 md:px-3 py-1.5 md:py-1.5 rounded-lg ring-1 ring-white/10 hover:ring-white/20"
                     placeholder={t('ui_search_all_currencies_c5d6e7f8', 'Search currency...')}
                     excludeCodes={['USD', 'RLUSD', 'XRP']}
@@ -1180,9 +1180,9 @@ export default function WalletDashboard({
                       onBlur={() => setActivityTooltipOpen(false)}
                       className="w-full text-left focus:outline-none"
                     >
-                      <p className="truncate text-center text-[11px] md:text-[12px] text-white/60 px-1 leading-tight">
-                        {recentActivityMessage}
-                      </p>
+	                      <p className="truncate text-center text-[11px] md:text-[13px] text-white/60 px-1 leading-tight">
+	                        {recentActivityMessage}
+	                      </p>
                     </button>
                     {activityTooltipOpen && recentActivityMessage ? (
                       <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50 w-max max-w-[260px] bg-[#1e2628] text-white/85 text-[11px] leading-snug rounded-lg px-3 py-2 shadow-xl ring-1 ring-white/10 pointer-events-none">

@@ -29,12 +29,12 @@ export default function WalletDashboardActionRow({ onAction }) {
               <line x1="12" y1="19" x2="12" y2="5"></line>
               <polyline points="5 12 12 5 19 12"></polyline>
             </svg>
-          </div>
-          <span className="wallet-action-label !text-[18px] !font-medium">
-            {t("ui_send_bee4f9e2f5", "Send")}
-          </span>
-        </button>
-        </div>
+	          </div>
+	          <span className="wallet-action-label !text-[18px] !font-medium">
+	            {t("ui_send_bee4f9e2f5", "Envoyer")}
+	          </span>
+	        </button>
+	        </div>
 
         <div className="rounded-[20px] bg-gradient-to-b from-[#101415] to-[#0d1214] ring-1 ring-white/[0.06] ring-inset shadow-[-5px_5px_14px_3px_rgba(255,255,255,0.05),0_2px_10px_rgba(0,0,0,0.4),inset_0_-14px_18px_rgba(0,0,0,0.8)] md:shadow-[-5px_5px_14px_3px_rgba(255,255,255,0.10),0_2px_10px_rgba(0,0,0,0.4),inset_0_-14px_18px_rgba(0,0,0,0.8)]">
         <button
@@ -55,12 +55,12 @@ export default function WalletDashboardActionRow({ onAction }) {
               <line x1="12" y1="5" x2="12" y2="19"></line>
               <polyline points="19 12 12 19 5 12"></polyline>
             </svg>
-          </div>
-          <span className="wallet-action-label !text-[16px] !font-normal">
-            {t("ui_receive_127eab0703", "Receive")}
-          </span>
-        </button>
-        </div>
+	          </div>
+	          <span className="wallet-action-label !text-[16px] !font-normal">
+	            {t("ui_receive_127eab0703", "Recevoir")}
+	          </span>
+	        </button>
+	        </div>
 
         <div className="rounded-[20px] bg-gradient-to-b from-[#101415] to-[#0d1214] ring-1 ring-white/[0.06] ring-inset shadow-[-5px_5px_14px_3px_rgba(255,255,255,0.05),0_2px_10px_rgba(0,0,0,0.4),inset_0_-14px_18px_rgba(0,0,0,0.8)] md:shadow-[-5px_5px_14px_3px_rgba(255,255,255,0.10),0_2px_10px_rgba(0,0,0,0.4),inset_0_-14px_18px_rgba(0,0,0,0.8)]">
         <button
@@ -83,12 +83,12 @@ export default function WalletDashboardActionRow({ onAction }) {
               <polyline points="7 23 3 19 7 15"></polyline>
               <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
             </svg>
-          </div>
-          <span className="wallet-action-label !text-[16px] !font-normal">
-            {t("ui_convert_e0fbc97f15", "Convert")}
-          </span>
-        </button>
-        </div>
+	          </div>
+	          <span className="wallet-action-label !text-[16px] !font-normal">
+	            {t("ui_convert_e0fbc97f15", "Convertir")}
+	          </span>
+	        </button>
+	        </div>
 
         <div className="rounded-[20px] bg-gradient-to-b from-[#101415] to-[#0d1214] ring-1 ring-white/[0.06] ring-inset shadow-[-5px_5px_14px_3px_rgba(255,255,255,0.05),0_2px_10px_rgba(0,0,0,0.4),inset_0_-14px_18px_rgba(0,0,0,0.8)] md:shadow-[-5px_5px_14px_3px_rgba(255,255,255,0.10),0_2px_10px_rgba(0,0,0,0.4),inset_0_-14px_18px_rgba(0,0,0,0.8)]">
         <button
@@ -129,10 +129,12 @@ export default function WalletDashboardActionRow({ onAction }) {
                 +/−
               </text>
             </svg>
-          </div>
-          <span className="wallet-action-label !text-[16px] !font-normal">Funds</span>
-        </button>
-        </div>
+	          </div>
+	          <span className="wallet-action-label !text-[16px] !font-normal">
+	            {t("ui_funds_action_label", "Fonds")}
+	          </span>
+	        </button>
+	        </div>
       </div>
     </div>
   );
