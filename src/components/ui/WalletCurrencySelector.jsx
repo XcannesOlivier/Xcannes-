@@ -512,7 +512,7 @@ export default function WalletCurrencySelector({
             onChange={(e) => setSearch(e.target.value)}
             onClick={(e) => e.stopPropagation()}
             onFocus={(e) => e.stopPropagation()}
-            placeholder={t("ui_search_currency_045b7c357f", "Search currency...")}
+            placeholder={t("ui_search_currency_045b7c357f", "Rechercher une devise…")}
             className="w-full rounded-lg bg-white/5 ring-1 ring-white/10 ring-inset px-2.5 py-2 text-[15px] text-white/85 placeholder:text-white/35 outline-none focus:ring-1 focus:ring-white/20" />
 
           </div>
@@ -603,14 +603,14 @@ export default function WalletCurrencySelector({
                   <div className="flex items-center justify-between gap-3 px-4 py-4">
                     <div className="min-w-0">
                       <div className="text-white font-semibold text-lg leading-tight">
-                        {t(
-                          "ui_select_currency_title",
-                          "Sélectionnez une nouvelle devise, et ajoutez-la en créant une transaction (aucun montant minimum n'est requis)",
-                        )}
+	                        {t(
+	                          "ui_select_currency_title",
+	                          "Sélectionnez une devise à ajouter à votre compte. Une transaction validera l’ajout, aucun montant minimum requis.",
+	                        )}
                       </div>
-                      <div className="mt-0.5 text-[11px] text-white/50 truncate">
-                        {t("ui_select_currency_subtitle", "Code / nom (EUR, GBP…)")}
-                      </div>
+	                      <div className="mt-0.5 text-[11px] text-white/50 truncate">
+	                        {t("ui_select_currency_subtitle", "Code ou nom de la devise")}
+	                      </div>
                     </div>
                     <button
                       type="button"
@@ -643,7 +643,7 @@ export default function WalletCurrencySelector({
                         onChange={(e) => setSearch(e.target.value)}
                         onClick={(e) => e.stopPropagation()}
                         onFocus={(e) => e.stopPropagation()}
-                        placeholder={t("ui_search_currency_045b7c357f", "Search currency...")}
+                        placeholder={t("ui_search_currency_045b7c357f", "Rechercher une devise…")}
                         className="w-full pl-11 pr-4 py-3 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-1 focus:ring-white/25 transition-all duration-150"
                       />
                     </div>
@@ -703,7 +703,7 @@ export default function WalletCurrencySelector({
                 </div>
 
                 <div className="px-3 py-3 text-xs text-white/55 bg-white/[0.02] border-t border-white/5">
-                  {t("ui_search_results", "Sélectionnez un actif.")}
+                  {t("ui_search_results", "Sélectionnez une devise.")}
                 </div>
               </div>
             </div>,
