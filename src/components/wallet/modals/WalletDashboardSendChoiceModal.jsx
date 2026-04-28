@@ -173,7 +173,7 @@ export default function WalletDashboardSendChoiceModal({
 
   // ── Icons ────────────────────────────────────────────────────
   const QuickScanIcon = () => (
-    <svg viewBox="0 0 48 48" className="w-9 h-9" fill="none" aria-hidden>
+    <svg viewBox="0 0 48 48" className="w-9 h-9 md:w-10 md:h-10" fill="none" aria-hidden>
       <rect x="10" y="10" width="12" height="12" rx="2" className="stroke-xcannes-green/70" strokeWidth="1.5" fill="none" />
       <rect x="13" y="13" width="6" height="6" rx="1" className="fill-xcannes-green/50" />
       <rect x="26" y="10" width="12" height="12" rx="2" className="stroke-white/50" strokeWidth="1.5" fill="none" />
@@ -186,7 +186,7 @@ export default function WalletDashboardSendChoiceModal({
   );
 
   const PayRequestIcon = () => (
-    <svg viewBox="0 0 48 48" className="w-9 h-9" fill="none" aria-hidden>
+    <svg viewBox="0 0 48 48" className="w-9 h-9 md:w-10 md:h-10" fill="none" aria-hidden>
       <rect x="10" y="12" width="28" height="24" rx="5" className="fill-white/5 stroke-white/40" strokeWidth="1.5" />
       <path d="M16 22h16" className="stroke-white/50" strokeWidth="1.5" strokeLinecap="round" />
       <path d="M16 28h10" className="stroke-white/35" strokeWidth="1.5" strokeLinecap="round" />
@@ -198,7 +198,7 @@ export default function WalletDashboardSendChoiceModal({
 
   const ChevronIcon = ({ expanded }) => (
     <svg
-      className="w-5 h-5 text-white/30 flex-shrink-0"
+      className="w-5 h-5 md:w-6 md:h-6 text-white/30 flex-shrink-0"
       viewBox="0 0 24 24" fill="none" aria-hidden
     >
       <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -206,7 +206,7 @@ export default function WalletDashboardSendChoiceModal({
   );
 
   const cardClassName =
-    'w-full text-left rounded-[20px] px-4 py-4 bg-white/[0.02] hover:bg-white/[0.05] active:bg-white/[0.03] ring-1 ring-white/10 ring-inset shadow-[0_8px_26px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-22px_34px_rgba(0,0,0,0.68)] transition-all duration-[140ms] ease-[cubic-bezier(0.4,0,0.2,1)] hover:ring-white/20 hover:-translate-y-px active:translate-y-0 active:scale-[0.99]';
+    'w-full text-left rounded-[20px] px-4 py-4 md:px-6 md:py-5 bg-white/[0.02] hover:bg-white/[0.05] active:bg-white/[0.03] ring-1 ring-white/10 ring-inset shadow-[0_8px_26px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-22px_34px_rgba(0,0,0,0.68)] transition-all duration-[140ms] ease-[cubic-bezier(0.4,0,0.2,1)] hover:ring-white/20 hover:-translate-y-px active:translate-y-0 active:scale-[0.99]';
 
   const accordionBtnClass =
     'flex items-center justify-center gap-2.5 w-full rounded-[20px] px-3 py-2.5 bg-white/[0.07] hover:bg-white/[0.10] active:bg-white/[0.04] transition-colors duration-100';
@@ -475,7 +475,7 @@ export default function WalletDashboardSendChoiceModal({
                 {/* Cards — vertically centred in remaining space */}
                 <div
                   ref={overlayListRef}
-                  className={`flex-1 min-h-0 flex flex-col justify-start gap-3 mt-8 pt-1 px-4 md:px-5 [--list-pad:1rem] md:[--list-pad:1.25rem] ${showQuickscanSavedPicker ? 'overflow-visible' : 'overflow-y-auto'}`}
+                  className={`flex-1 min-h-0 flex flex-col justify-start gap-4 mt-8 pt-1 px-4 md:px-5 [--list-pad:1rem] md:[--list-pad:1.25rem] ${showQuickscanSavedPicker ? 'overflow-visible' : 'overflow-y-auto'}`}
                   onPointerDown={event => { maybeStartOverlayDrag(event, 'list'); }}
                 >
 
@@ -509,20 +509,20 @@ export default function WalletDashboardSendChoiceModal({
                     onClick={() => openSubModal('quickscan')}
                     className={cardClassName}
                   >
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-[16px] bg-black/30 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
+                    <div className="flex items-center gap-3 md:gap-4">
+                      <div className="w-12 h-12 md:w-14 md:h-14 rounded-[16px] bg-black/30 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
                         <QuickScanIcon />
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center justify-between gap-2">
-                          <p className="text-[18px] md:text-[19px] text-white font-semibold truncate">
+                          <p className="text-[18px] md:text-[22px] text-white font-semibold truncate">
                             {t('ui_send_simple_title', 'Envoi simple')}
                           </p>
-                          <svg className="w-5 h-5 text-white/45 flex-shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden>
+                          <svg className="w-5 h-5 md:w-6 md:h-6 text-white/45 flex-shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden>
                             <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                           </svg>
                         </div>
-                        <p className="mt-1 text-[15px] md:text-sm leading-snug text-white/60">
+                        <p className="mt-1 text-[15px] md:text-[16px] leading-snug text-white/60">
                           {t('ui_send_simple_hint_long', 'Saisissez une adresse, choisissez la devise et indiquez le montant.')}
                         </p>
                       </div>
@@ -535,20 +535,20 @@ export default function WalletDashboardSendChoiceModal({
                     onClick={() => openSubModal('payreq')}
                     className={cardClassName}
                   >
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-[16px] bg-black/30 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
+                    <div className="flex items-center gap-3 md:gap-4">
+                      <div className="w-12 h-12 md:w-14 md:h-14 rounded-[16px] bg-black/30 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
                         <PayRequestIcon />
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center justify-between gap-2">
-                          <p className="text-[18px] md:text-[19px] text-white font-semibold truncate">
+                          <p className="text-[18px] md:text-[22px] text-white font-semibold truncate">
                             {t('ui_send_pay_request_title', 'Régler une demande')}
                           </p>
-                          <svg className="w-5 h-5 text-white/45 flex-shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden>
+                          <svg className="w-5 h-5 md:w-6 md:h-6 text-white/45 flex-shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden>
                             <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                           </svg>
                         </div>
-                        <p className="mt-1 text-[15px] md:text-sm leading-snug text-white/60">
+                        <p className="mt-1 text-[15px] md:text-[16px] leading-snug text-white/60">
                           {t('ui_send_pay_request_hint', 'Scannez, importez ou collez une demande de paiement.')}
                         </p>
                       </div>
