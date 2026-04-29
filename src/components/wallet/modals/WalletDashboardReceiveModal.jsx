@@ -353,6 +353,7 @@ export default function WalletDashboardReceiveModal({
 	          options={walletOptions}
 	          useNativeSelect={false}
 	          iconClassName="inline-flex items-center justify-center leading-none"
+	          optionIconClassName="inline-flex items-center justify-center leading-none opacity-0"
 	          buttonClassName={`${walletPickerSurfaceClass} hover:bg-white/5 ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3 text-base text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer transition-colors duration-150`}
 	          menuClassName={
 	            noticeVariant === 'demo'
@@ -1393,6 +1394,7 @@ export default function WalletDashboardReceiveModal({
 	                                hideSelected
 	                                backdropClassName=""
 	                                iconClassName="inline-flex items-center justify-center leading-none"
+	                                optionIconClassName="inline-flex items-center justify-center leading-none opacity-0"
 	                                buttonClassName="w-full h-full opacity-0 cursor-pointer"
 	                                menuClassName={accountDropdownMenuClassName}
 	                                selectClassName="xcannes-select w-full bg-transparent rounded-xl pl-0 pr-2 py-2 text-base text-white focus:outline-none transition-colors duration-150"
@@ -1507,6 +1509,7 @@ export default function WalletDashboardReceiveModal({
 	                                hideSelected
 	                                backdropClassName=""
 	                                iconClassName="inline-flex items-center justify-center leading-none"
+	                                optionIconClassName="inline-flex items-center justify-center leading-none opacity-0"
 	                                buttonClassName="w-full h-full opacity-0 cursor-pointer"
 	                                menuClassName={accountDropdownMenuClassName}
 	                                selectClassName="xcannes-select w-full bg-transparent rounded-xl pl-0 pr-2 py-2 text-base text-white focus:outline-none transition-colors duration-150"
