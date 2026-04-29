@@ -268,23 +268,23 @@ export default function PreferredCurrencySelector({
                       type="button"
                       onClick={() => handleSelect(c.code)}
                       className={[
-                        "w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[11px] transition-all",
+                        "w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[12px] transition-all",
                         isActive
                           ? "bg-emerald-400/10 text-emerald-300"
                           : "text-white/60 hover:bg-white/5 hover:text-white/80",
                       ].join(" ")}
                     >
-                      <span className="text-[13px] shrink-0">{flag}</span>
+                      <span className="text-[15px] shrink-0">{flag}</span>
                       <span className="font-mono font-semibold shrink-0">
                         {c.code}
                       </span>
                       {c.name && (
-                        <span className="text-[10px] text-white/40 truncate">
+                        <span className="text-[11px] text-white/40 truncate">
                           {c.name}
                         </span>
                       )}
                       {isActive && (
-                        <span className="ml-auto text-emerald-400 text-[10px]">
+                        <span className="ml-auto text-emerald-400 text-[11px]">
                           ✓
                         </span>
                       )}
