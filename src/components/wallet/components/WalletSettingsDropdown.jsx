@@ -68,8 +68,13 @@ export default function WalletSettingsDropdown({
   const settingsRowClassName =
     "w-full flex items-center gap-3 px-3 py-3 rounded-[20px] border border-white/10 bg-white/3 hover:bg-white/5 hover:border-white/15 transition-colors duration-150 text-left focus-visible:outline-none focus-visible:border-xcannes-green/60 focus-visible:ring-2 focus-visible:ring-xcannes-green/20";
   const SettingsAddWalletIcon = () => (
-    <svg viewBox="0 0 48 48" className="w-9 h-9" fill="none" aria-hidden>
-      <path d="M24 16v16M16 24h16" stroke="rgba(255,255,255,0.72)" strokeWidth="2.8" strokeLinecap="round" />
+    <svg viewBox="0 0 48 48" className="w-10 h-10" fill="none" aria-hidden>
+      <path
+        d="M24 14v20M14 24h20"
+        stroke="rgba(255,255,255,0.74)"
+        strokeWidth="3.2"
+        strokeLinecap="round"
+      />
     </svg>
   );
   const SettingsXrplIcon = () => (
@@ -708,7 +713,7 @@ export default function WalletSettingsDropdown({
                   }}
                   className={settingsRowClassName}
                 >
-                  <span className={`${settingsIconShellClassName} text-white/60`}>
+                  <span className={`${settingsIconShellClassName} bg-black text-white/60`}>
                     <SettingsAddWalletIcon />
                   </span>
                   <div className="min-w-0 flex-1">
