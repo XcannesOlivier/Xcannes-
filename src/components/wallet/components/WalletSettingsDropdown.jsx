@@ -80,27 +80,28 @@ export default function WalletSettingsDropdown({
   );
   const SettingsRlusdIcon = () => (
     <svg viewBox="0 0 48 48" className="w-10 h-10" fill="none" aria-hidden>
+      {/* Ripple-like mark: 3 lobes + soft connectors (white, transparent bg) */}
       <path
-        d="M18.5 18.5c5.2 4.2 5.2 6.8 0 11"
-        stroke="rgba(255,255,255,0.80)"
-        strokeWidth="1.8"
+        d="M21 19.5c1.7 1.6 3.3 2.4 5.9 2.4s4.2-.8 5.9-2.4"
+        stroke="rgba(255,255,255,0.65)"
+        strokeWidth="2"
         strokeLinecap="round"
       />
       <path
-        d="M29.5 18.5c-5.2 4.2-5.2 6.8 0 11"
-        stroke="rgba(255,255,255,0.80)"
-        strokeWidth="1.8"
+        d="M17.5 21.5c0 3.1 1.6 5.6 4.2 7.2"
+        stroke="rgba(255,255,255,0.65)"
+        strokeWidth="2"
         strokeLinecap="round"
       />
       <path
-        d="M18.5 29.5c4.2 5.2 6.8 5.2 11 0"
-        stroke="rgba(255,255,255,0.80)"
-        strokeWidth="1.8"
+        d="M30.5 28.7c2.6-1.6 4.2-4.1 4.2-7.2"
+        stroke="rgba(255,255,255,0.65)"
+        strokeWidth="2"
         strokeLinecap="round"
       />
-      <circle cx="18.5" cy="18.5" r="5" fill="rgba(255,255,255,0.88)" />
-      <circle cx="29.5" cy="18.5" r="5" fill="rgba(255,255,255,0.88)" />
-      <circle cx="24" cy="30.5" r="5" fill="rgba(255,255,255,0.88)" />
+      <circle cx="18" cy="18" r="6.5" fill="rgba(255,255,255,0.92)" />
+      <circle cx="30" cy="18" r="6.5" fill="rgba(255,255,255,0.92)" />
+      <circle cx="24" cy="30" r="6.5" fill="rgba(255,255,255,0.92)" />
     </svg>
   );
   const SettingsInfoIcon = () => (
