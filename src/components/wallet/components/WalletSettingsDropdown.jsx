@@ -120,7 +120,7 @@ export default function WalletSettingsDropdown({
   );
   const SettingsHelpIcon = () => (
     <svg viewBox="0 0 48 48" className="w-14 h-14" fill="none" aria-hidden>
-      <path d="M15 18.5c0-3 2.3-5.5 5.3-5.5h7.4c3 0 5.3 2.5 5.3 5.5v6.8c0 3-2.3 5.5-5.3 5.5H24l-5.5 4.2v-4.2h-1.2c-3 0-5.3-2.5-5.3-5.5v-6.8Z" stroke="rgba(255,255,255,0.18)" strokeWidth="1.5" strokeLinejoin="round" />
+      <path d="M15 18.5c0-3 2.3-5.5 5.3-5.5h7.4c3 0 5.3 2.5 5.3 5.5v6.8c0 3-2.3 5.5-5.3 5.5H24l-5.5 4.2v-4.2h-1.2c-3 0-5.3-2.5-5.3-5.5v-6.8Z" stroke="rgba(255,255,255,0.18)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
       <circle cx="18.5" cy="22" r="1.2" fill="rgba(255,255,255,0.82)" />
       <circle cx="24" cy="22" r="1.2" fill="rgba(255,255,255,0.82)" />
       <circle cx="29.5" cy="22" r="1.2" fill="rgba(255,255,255,0.82)" />
