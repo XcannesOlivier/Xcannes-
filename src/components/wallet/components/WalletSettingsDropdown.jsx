@@ -80,8 +80,8 @@ export default function WalletSettingsDropdown({
   );
   const SettingsRlusdIcon = () => (
     <svg
-      viewBox="0 0 2500 2500"
-      className="w-12 h-12"
+      viewBox="0 0 2500 1527.2"
+      className="w-11 h-11"
       fill="none"
       aria-hidden
     >
