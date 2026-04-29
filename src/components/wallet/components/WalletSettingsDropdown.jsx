@@ -63,12 +63,12 @@ export default function WalletSettingsDropdown({
   const settingsIconShellClassName =
     "inline-flex h-12 w-12 items-center justify-center rounded-[16px] bg-black/30 ring-1 ring-white/10 ring-inset shadow-[0_4px_12px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.04)] shrink-0";
   const settingsSupportIconShellClassName =
-    "inline-flex h-12 w-12 items-center justify-center rounded-[16px] shrink-0";
+    "inline-flex h-14 w-14 items-center justify-center rounded-[18px] shrink-0";
   const settingsRowClassName =
     "w-full flex items-center gap-3 px-3 py-3 rounded-[20px] border border-white/10 bg-white/3 hover:bg-white/5 hover:border-white/15 transition-colors duration-150 text-left focus-visible:outline-none focus-visible:border-xcannes-green/60 focus-visible:ring-2 focus-visible:ring-xcannes-green/20";
   const SettingsAddWalletIcon = () => (
-    <svg viewBox="0 0 48 48" className="w-8 h-8" fill="none" aria-hidden>
-      <path d="M24 16v16M16 24h16" stroke="rgba(255,255,255,0.72)" strokeWidth="2.4" strokeLinecap="round" />
+    <svg viewBox="0 0 48 48" className="w-9 h-9" fill="none" aria-hidden>
+      <path d="M24 16v16M16 24h16" stroke="rgba(255,255,255,0.72)" strokeWidth="2.8" strokeLinecap="round" />
     </svg>
   );
   const SettingsXrplIcon = () => (
@@ -79,27 +79,27 @@ export default function WalletSettingsDropdown({
     </svg>
   );
   const SettingsRlusdIcon = () => (
-    <svg viewBox="0 0 48 48" className="w-8 h-8" fill="none" aria-hidden>
+    <svg viewBox="0 0 48 48" className="w-9 h-9" fill="none" aria-hidden>
       <circle cx="24" cy="24" r="13.5" stroke="rgba(255,255,255,0.18)" strokeWidth="1.4" />
       <path d="M24 17.5v9m0 4h.01" stroke="rgba(255,255,255,0.86)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
       <circle cx="24" cy="31.5" r="1" fill="rgba(255,255,255,0.86)" />
     </svg>
   );
   const SettingsInfoIcon = () => (
-    <svg viewBox="0 0 48 48" className="w-8 h-8" fill="none" aria-hidden>
+    <svg viewBox="0 0 48 48" className="w-9 h-9" fill="none" aria-hidden>
       <circle cx="24" cy="24" r="13.5" stroke="rgba(255,255,255,0.18)" strokeWidth="1.4" />
       <path d="M24 22v9" stroke="rgba(255,255,255,0.86)" strokeWidth="2.2" strokeLinecap="round" />
       <circle cx="24" cy="17" r="1.4" fill="rgba(255,255,255,0.86)" />
     </svg>
   );
   const SettingsSecurityIcon = () => (
-    <svg viewBox="0 0 48 48" className="w-8 h-8" fill="none" aria-hidden>
+    <svg viewBox="0 0 48 48" className="w-9 h-9" fill="none" aria-hidden>
       <path d="M24 11l11 5.2v8.2c0 8.1-6.1 12.7-11 14.6-4.9-1.9-11-6.5-11-14.6v-8.2L24 11Z" stroke="rgba(255,255,255,0.18)" strokeWidth="1.5" strokeLinejoin="round" />
       <path d="M19.5 24.5l3.2 3.2 5.8-6.2" stroke="rgba(255,255,255,0.86)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
   const SettingsHelpIcon = () => (
-    <svg viewBox="0 0 48 48" className="w-8 h-8" fill="none" aria-hidden>
+    <svg viewBox="0 0 48 48" className="w-9 h-9" fill="none" aria-hidden>
       <path d="M15 18.5c0-3 2.3-5.5 5.3-5.5h7.4c3 0 5.3 2.5 5.3 5.5v6.8c0 3-2.3 5.5-5.3 5.5H24l-5.5 4.2v-4.2h-1.2c-3 0-5.3-2.5-5.3-5.5v-6.8Z" stroke="rgba(255,255,255,0.18)" strokeWidth="1.5" strokeLinejoin="round" />
       <circle cx="18.5" cy="22" r="1.2" fill="rgba(255,255,255,0.82)" />
       <circle cx="24" cy="22" r="1.2" fill="rgba(255,255,255,0.82)" />
@@ -107,7 +107,7 @@ export default function WalletSettingsDropdown({
     </svg>
   );
   const SettingsDocIcon = () => (
-    <svg viewBox="0 0 48 48" className="w-8 h-8" fill="none" aria-hidden>
+    <svg viewBox="0 0 48 48" className="w-9 h-9" fill="none" aria-hidden>
       <path d="M17 11.5h11l5 5V34c0 2-1.6 3.5-3.5 3.5h-12c-1.9 0-3.5-1.5-3.5-3.5V15c0-1.9 1.6-3.5 3.5-3.5Z" stroke="rgba(255,255,255,0.18)" strokeWidth="1.5" strokeLinejoin="round" />
       <path d="M28 11.5V17h5" stroke="rgba(255,255,255,0.30)" strokeWidth="1.5" strokeLinejoin="round" />
       <path d="M19.5 22h9M19.5 27h9M19.5 32h6" stroke="rgba(255,255,255,0.82)" strokeWidth="2" strokeLinecap="round" />
