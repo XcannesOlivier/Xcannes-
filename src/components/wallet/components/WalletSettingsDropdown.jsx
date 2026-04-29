@@ -85,6 +85,8 @@ export default function WalletSettingsDropdown({
       height={32}
       className="w-8 h-8 object-contain"
       draggable={false}
+      unoptimized
+      loading="eager"
     />
   );
   const SettingsRlusdIcon = () => (
