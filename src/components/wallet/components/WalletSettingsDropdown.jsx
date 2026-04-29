@@ -73,9 +73,20 @@ export default function WalletSettingsDropdown({
   );
   const SettingsXrplIcon = () => (
     <svg viewBox="0 0 48 48" className="w-8 h-8" fill="none" aria-hidden>
-      <path d="M14 15c2.8 0 4.2 1.6 5.4 3 1.3 1.4 2.4 2.7 4.6 2.7s3.3-1.3 4.6-2.7c1.2-1.4 2.6-3 5.4-3" stroke="rgba(255,255,255,0.84)" strokeWidth="2.3" strokeLinecap="round" />
-      <path d="M14 33c2.8 0 4.2-1.6 5.4-3 1.3-1.4 2.4-2.7 4.6-2.7s3.3 1.3 4.6 2.7c1.2 1.4 2.6 3 5.4 3" stroke="rgba(255,255,255,0.84)" strokeWidth="2.3" strokeLinecap="round" />
-      <path d="M17 14.5l14 19M31 14.5l-14 19" stroke="rgba(255,255,255,0.18)" strokeWidth="1.2" strokeLinecap="round" />
+      <path
+        d="M14 16c5.6 0 8.5 4.3 10.1 6.3C25 23.6 25.9 24 27 24c1.1 0 2-.4 2.9-1.7C31.5 20.3 34.4 16 40 16"
+        stroke="rgba(255,255,255,0.84)"
+        strokeWidth="2.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M14 32c5.6 0 8.5-4.3 10.1-6.3C25 24.4 25.9 24 27 24c1.1 0 2 .4 2.9 1.7C31.5 27.7 34.4 32 40 32"
+        stroke="rgba(255,255,255,0.84)"
+        strokeWidth="2.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
   const SettingsRlusdIcon = () => (
