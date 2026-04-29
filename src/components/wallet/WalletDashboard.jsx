@@ -359,6 +359,7 @@ export default function WalletDashboard({
   const [isDesktopPanel, setIsDesktopPanel] = useState(false);
   const desktopDefaultActionSetRef = useRef(false);
   const [recentActivityMessage, setRecentActivityMessage] = useState('');
+  const [recentActivityCreatedAt, setRecentActivityCreatedAt] = useState('');
   const recentActivityTimerRef = useRef(null);
   const [activityTooltipOpen, setActivityTooltipOpen] = useState(false);
 
@@ -742,10 +743,11 @@ export default function WalletDashboard({
     };
   }, [activeAction, isConnected, setActiveAction, setCashModalTab, wallet]);
 
-  const flashRecentActivity = useCallback(message => {
+  const flashRecentActivity = useCallback((message, movement) => {
     const text = String(message || '').trim();
     if (!text) return;
     setRecentActivityMessage(text);
+    setRecentActivityCreatedAt(String(movement?.createdAt || '').trim());
     if (recentActivityTimerRef.current) {
       window.clearTimeout(recentActivityTimerRef.current);
       recentActivityTimerRef.current = null;
@@ -765,8 +767,26 @@ export default function WalletDashboard({
     backendWalletAddress,
     rlusdPerUnitRates,
     savedAddresses: sendState?.savedAddresses || [],
-    onActivity: ({ message }) => flashRecentActivity(message),
+    onActivity: ({ movement, message }) => flashRecentActivity(message, movement),
   });
+
+  const recentActivityWhen = useMemo(() => {
+    const raw = String(recentActivityCreatedAt || "").trim();
+    if (!raw) return "";
+    const parsed = new Date(raw);
+    if (!Number.isFinite(parsed.getTime())) return "";
+    // Mirror GlobalStatement formatting: compact on mobile, full locale string on desktop.
+    if (typeof window !== "undefined" && window.innerWidth < 768) {
+      return parsed.toLocaleString(locale, {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    }
+    return parsed.toLocaleString(locale);
+  }, [locale, recentActivityCreatedAt]);
 
   // ── Reset previous action state on desktop inline switch ──
   const prevActionRef = useRef(null);
@@ -1184,18 +1204,37 @@ export default function WalletDashboard({
                   >
                     <button
                       type="button"
-                      title={recentActivityMessage}
+                      title={
+                        recentActivityWhen
+                          ? `${recentActivityWhen} — ${recentActivityMessage}`
+                          : recentActivityMessage
+                      }
                       onClick={() => setActivityTooltipOpen(v => !v)}
                       onBlur={() => setActivityTooltipOpen(false)}
                       className="w-full text-left focus:outline-none"
                     >
-	                      <p className="truncate text-center text-[11px] md:text-[13px] text-white/60 px-1 leading-tight">
-	                        {recentActivityMessage}
-	                      </p>
+	                      <div className="px-1 leading-tight">
+                          {/* Desktop: date + message on one line (left aligned). Mobile: date above message (centered). */}
+                          <div className="flex flex-col items-center md:flex-row md:items-baseline md:justify-start md:gap-2">
+                            {recentActivityWhen ? (
+                              <span className="text-[10px] md:text-[13px] text-white/40 whitespace-nowrap">
+                                {recentActivityWhen}
+                              </span>
+                            ) : null}
+                            <span className="text-center md:text-left text-[11px] md:text-[13px] text-white/60 truncate max-w-full">
+                              {recentActivityMessage}
+                            </span>
+                          </div>
+                        </div>
                     </button>
                     {activityTooltipOpen && recentActivityMessage ? (
                       <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50 w-max max-w-[260px] bg-[#1e2628] text-white/85 text-[11px] leading-snug rounded-lg px-3 py-2 shadow-xl ring-1 ring-white/10 pointer-events-none">
-                        {recentActivityMessage}
+                        {recentActivityWhen ? (
+                          <div className="text-white/50 text-[10px] mb-1">
+                            {recentActivityWhen}
+                          </div>
+                        ) : null}
+                        <div>{recentActivityMessage}</div>
                         <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#1e2628]" />
                       </div>
                     ) : null}
