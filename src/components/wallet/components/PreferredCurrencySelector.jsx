@@ -142,7 +142,7 @@ export default function PreferredCurrencySelector({
         aria-haspopup="listbox"
         aria-expanded={isExpanded}
       >
-        <span className="h-8 w-8 rounded-full bg-black/30 ring-1 ring-white/10 inline-flex items-center justify-center text-[16px] shrink-0">
+        <span className="h-8 w-8 rounded-full bg-black/30 ring-1 ring-white/10 inline-flex items-center justify-center text-[22px] shrink-0">
           {getCurrencyFlag(currentCurrency)}
         </span>
         <div className="min-w-0 flex-1">
