@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useLayoutEffect, useCallback } from "react";
+import Image from "next/image";
 import { useTranslation } from "next-i18next";
 import { QRCodeSVG } from "qrcode.react";
 import { ChevronLeftIcon } from "@heroicons/react/24/outline";
@@ -72,22 +73,14 @@ export default function WalletSettingsDropdown({
     </svg>
   );
   const SettingsXrplIcon = () => (
-    <svg viewBox="0 0 48 48" className="w-8 h-8" fill="none" aria-hidden>
-      <path
-        d="M14 16c5.6 0 8.5 4.3 10.1 6.3C25 23.6 25.9 24 27 24c1.1 0 2-.4 2.9-1.7C31.5 20.3 34.4 16 40 16"
-        stroke="rgba(255,255,255,0.84)"
-        strokeWidth="2.6"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M14 32c5.6 0 8.5-4.3 10.1-6.3C25 24.4 25.9 24 27 24c1.1 0 2 .4 2.9 1.7C31.5 27.7 34.4 32 40 32"
-        stroke="rgba(255,255,255,0.84)"
-        strokeWidth="2.6"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
+    <Image
+      src="/symbols/xrp.png"
+      alt="XRP"
+      width={32}
+      height={32}
+      className="w-8 h-8 object-contain"
+      draggable={false}
+    />
   );
   const SettingsRlusdIcon = () => (
     <svg
