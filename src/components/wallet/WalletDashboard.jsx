@@ -772,21 +772,36 @@ export default function WalletDashboard({
 
   const recentActivityWhen = useMemo(() => {
     const raw = String(recentActivityCreatedAt || "").trim();
-    if (!raw) return "";
+    if (!raw) return { mobile: "", desktop: "" };
     const parsed = new Date(raw);
-    if (!Number.isFinite(parsed.getTime())) return "";
-    // Mirror GlobalStatement formatting: compact on mobile, full locale string on desktop.
-    if (typeof window !== "undefined" && window.innerWidth < 768) {
-      return parsed.toLocaleString(locale, {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-      });
-    }
-    return parsed.toLocaleString(locale);
+    if (!Number.isFinite(parsed.getTime())) return { mobile: "", desktop: "" };
+
+    const dateMobile = new Intl.DateTimeFormat(locale, {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    }).format(parsed);
+    const dateDesktop = new Intl.DateTimeFormat(locale, {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    }).format(parsed);
+    const time = new Intl.DateTimeFormat(locale, {
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(parsed);
+
+    return {
+      mobile: `Le ${dateMobile} à ${time}`,
+      desktop: `Le ${dateDesktop} à ${time}`,
+    };
   }, [locale, recentActivityCreatedAt]);
+
+  const recentActivityMessageMobile = useMemo(() => {
+    const text = String(recentActivityMessage || "").trim();
+    if (!text) return "";
+    return text.replace(/^Vous avez\s+/i, "");
+  }, [recentActivityMessage]);
 
   // ── Reset previous action state on desktop inline switch ──
   const prevActionRef = useRef(null);
@@ -1205,8 +1220,8 @@ export default function WalletDashboard({
                     <button
                       type="button"
                       title={
-                        recentActivityWhen
-                          ? `${recentActivityWhen} — ${recentActivityMessage}`
+                        (recentActivityWhen?.desktop || recentActivityWhen?.mobile)
+                          ? `${recentActivityWhen?.desktop || recentActivityWhen?.mobile} — ${recentActivityMessage}`
                           : recentActivityMessage
                       }
                       onClick={() => setActivityTooltipOpen(v => !v)}
@@ -1214,27 +1229,37 @@ export default function WalletDashboard({
                       className="w-full text-left focus:outline-none"
                     >
 	                      <div className="px-1 leading-tight">
-                          {/* Desktop: date + message on one line (left aligned). Mobile: date above message (centered). */}
-                          <div className="flex flex-col items-center md:flex-row md:items-baseline md:justify-start md:gap-2">
-                            {recentActivityWhen ? (
-                              <span className="text-[10px] md:text-[13px] text-white/40 whitespace-nowrap">
-                                {recentActivityWhen}
-                              </span>
+                          {/* Desktop: date + message on one line (centered). Mobile: date above message (centered). */}
+                          <div className="flex flex-col items-center md:flex-row md:items-baseline md:justify-center md:gap-3">
+                            {recentActivityWhen?.mobile || recentActivityWhen?.desktop ? (
+                              <>
+                                <span className="md:hidden text-[10.5px] text-white/45 whitespace-nowrap">
+                                  {recentActivityWhen.mobile}
+                                </span>
+                                <span className="hidden md:inline text-[14px] text-white/45 whitespace-nowrap">
+                                  {recentActivityWhen.desktop}
+                                </span>
+                              </>
                             ) : null}
-                            <span className="text-center md:text-left text-[11px] md:text-[13px] text-white/60 truncate max-w-full">
-                              {recentActivityMessage}
+                            <span className="text-center md:text-center text-[11px] md:text-[14px] text-white/65 truncate max-w-full md:max-w-[520px]">
+                              <span className="md:hidden">{recentActivityMessageMobile}</span>
+                              <span className="hidden md:inline">{recentActivityMessage}</span>
                             </span>
                           </div>
                         </div>
                     </button>
                     {activityTooltipOpen && recentActivityMessage ? (
                       <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50 w-max max-w-[260px] bg-[#1e2628] text-white/85 text-[11px] leading-snug rounded-lg px-3 py-2 shadow-xl ring-1 ring-white/10 pointer-events-none">
-                        {recentActivityWhen ? (
+                        {recentActivityWhen?.mobile || recentActivityWhen?.desktop ? (
                           <div className="text-white/50 text-[10px] mb-1">
-                            {recentActivityWhen}
+                            <span className="md:hidden">{recentActivityWhen.mobile}</span>
+                            <span className="hidden md:inline">{recentActivityWhen.desktop}</span>
                           </div>
                         ) : null}
-                        <div>{recentActivityMessage}</div>
+                        <div>
+                          <span className="md:hidden">{recentActivityMessageMobile}</span>
+                          <span className="hidden md:inline">{recentActivityMessage}</span>
+                        </div>
                         <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#1e2628]" />
                       </div>
                     ) : null}
