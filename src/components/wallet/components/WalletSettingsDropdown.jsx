@@ -67,7 +67,7 @@ export default function WalletSettingsDropdown({
   const settingsSupportIconShellClassName =
     "inline-flex h-[70px] w-[96px] items-center justify-center rounded-[26px] shrink-0";
   const settingsRowClassName =
-    "w-full flex items-center gap-3 px-3 py-3 rounded-[20px] border border-white/10 bg-white/3 hover:bg-white/5 hover:border-white/15 transition-colors duration-150 text-left focus-visible:outline-none focus-visible:border-xcannes-green/60 focus-visible:ring-2 focus-visible:ring-xcannes-green/20";
+    "w-full flex items-center gap-3 px-3 py-3 rounded-[20px] border border-white/10 bg-white/3 hover:bg-white/5 hover:border-white/15 transition-colors duration-150 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/10";
   const SettingsAddWalletIcon = () => (
     <svg viewBox="0 0 48 48" className="w-10 h-10" fill="none" aria-hidden>
       <path
@@ -757,12 +757,12 @@ export default function WalletSettingsDropdown({
 	                    <div className="px-1.5 pb-2 text-[10px] font-semibold tracking-[0.22em] text-white/35">
 	                      {t("ui_settings_section_preferences", "Préférences")}
 	                    </div>
-	                    <div className="rounded-[20px] border border-white/10 bg-black/20 p-2.5 focus-within:border-white/20 focus-within:ring-2 focus-within:ring-white/10 transition-colors duration-150">
-                      <PreferredCurrencySelector
-                        currentCurrency={preferredCurrency}
-                        topCurrencies={topCurrencies}
-                        allCurrencies={fawazCurrencies}
-                        isLoading={fawazLoading}
+	                    <div className="rounded-[20px] border border-white/10 bg-black/20 p-2.5 transition-colors duration-150">
+	                      <PreferredCurrencySelector
+	                        currentCurrency={preferredCurrency}
+	                        topCurrencies={topCurrencies}
+	                        allCurrencies={fawazCurrencies}
+	                        isLoading={fawazLoading}
                         allowedCurrencyCodes={allowedCurrencyCodes}
                         onSelect={(code) => {
                           onPreferredCurrencyChange?.(code);
