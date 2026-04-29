@@ -1712,7 +1712,7 @@ export default function CurrencyStatement({
             <div className={`flex items-end gap-3 ${periodDropdownOpen ? "relative z-[60]" : ""}`}>
               {/* Wallet selector — gauche */}
               <div className="flex-1 min-w-0">
-                <p className="text-[14px] md:text-[15px] text-white/85 font-medium mb-1 text-center">
+                <p className="text-[22px] md:text-[21px] text-white/85 font-medium mb-1 text-center">
                   {t("ui_current_account_prefix", "Compte actuel")}
                 </p>
                 <div className="relative w-full">

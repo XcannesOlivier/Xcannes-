@@ -664,7 +664,7 @@ export default function WalletDashboardSendChoiceModal({
                     }
                     .send-choice-scan-btn:hover { background: linear-gradient(to bottom, #161b1c, #111517); }
                     .send-choice-scan-btn svg { color: rgba(255,255,255,0.55); width: 1.15rem; height: 1.15rem; }
-                    .send-choice-scan-btn span { color: rgba(255,255,255,0.75); font-size: 15px; font-weight: 500; }
+                    .send-choice-scan-btn span { color: rgba(255,255,255,0.75); font-weight: 500; }
                     .send-choice-import-btn {
                       background: linear-gradient(to bottom, #101415, #0d1214);
                       box-shadow: 0 2px 8px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.06), inset 0 0 0 1px rgba(255,255,255,0.07);
@@ -675,7 +675,7 @@ export default function WalletDashboardSendChoiceModal({
                     .send-choice-import-btn span { color: rgba(255,255,255,0.75); font-size: 14px; font-weight: 500; }
                     @media (min-width: 768px) {
                       .send-choice-scan-btn svg { width: 1.15rem; height: 1.15rem; }
-                      .send-choice-scan-btn span { font-size: 14px; font-weight: 400; color: rgba(255,255,255,0.75); }
+                      .send-choice-scan-btn span { font-weight: 400; color: rgba(255,255,255,0.75); }
                       .send-choice-import-btn svg { color: rgba(255,255,255,0.75); width: 1.3rem; height: 1.3rem; }
                       .send-choice-import-btn span { color: rgba(255,255,255,0.90); font-size: 15px; font-weight: 600; }
                     }
