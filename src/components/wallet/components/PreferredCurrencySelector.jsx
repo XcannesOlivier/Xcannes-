@@ -136,7 +136,7 @@ export default function PreferredCurrencySelector({
           });
         }}
         className={[
-          "w-full flex items-center gap-3 px-3 py-3 rounded-[18px] transition-colors",
+          "w-full flex items-center gap-3 px-3 py-2 md:py-3 rounded-[18px] transition-colors",
           "bg-black/25 ring-1 ring-inset ring-white/10 hover:bg-black/30 hover:ring-white/15",
         ].join(" ")}
         aria-haspopup="listbox"
