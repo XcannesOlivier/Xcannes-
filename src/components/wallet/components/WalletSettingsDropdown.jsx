@@ -62,11 +62,12 @@ export default function WalletSettingsDropdown({
   const [desktopPlacement, setDesktopPlacement] = useState("bottom");
   const settingsIconShellClassName =
     "inline-flex h-12 w-12 items-center justify-center rounded-[16px] bg-black/30 ring-1 ring-white/10 ring-inset shadow-[0_4px_12px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.04)] shrink-0";
+  const settingsSupportIconShellClassName =
+    "inline-flex h-12 w-12 items-center justify-center rounded-[16px] shrink-0";
   const settingsRowClassName =
     "w-full flex items-center gap-3 px-3 py-3 rounded-[20px] border border-white/10 bg-white/3 hover:bg-white/5 hover:border-white/15 transition-colors duration-150 text-left focus-visible:outline-none focus-visible:border-xcannes-green/60 focus-visible:ring-2 focus-visible:ring-xcannes-green/20";
   const SettingsAddWalletIcon = () => (
     <svg viewBox="0 0 48 48" className="w-8 h-8" fill="none" aria-hidden>
-      <rect x="10" y="10" width="28" height="28" rx="9" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.14)" strokeWidth="1.4" />
       <path d="M24 16v16M16 24h16" stroke="rgba(255,255,255,0.72)" strokeWidth="2.4" strokeLinecap="round" />
     </svg>
   );
@@ -79,27 +80,27 @@ export default function WalletSettingsDropdown({
   );
   const SettingsRlusdIcon = () => (
     <svg viewBox="0 0 48 48" className="w-8 h-8" fill="none" aria-hidden>
-      <circle cx="24" cy="24" r="13.5" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.18)" strokeWidth="1.4" />
+      <circle cx="24" cy="24" r="13.5" stroke="rgba(255,255,255,0.18)" strokeWidth="1.4" />
       <path d="M24 17.5v9m0 4h.01" stroke="rgba(255,255,255,0.86)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
       <circle cx="24" cy="31.5" r="1" fill="rgba(255,255,255,0.86)" />
     </svg>
   );
   const SettingsInfoIcon = () => (
     <svg viewBox="0 0 48 48" className="w-8 h-8" fill="none" aria-hidden>
-      <circle cx="24" cy="24" r="13.5" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.18)" strokeWidth="1.4" />
+      <circle cx="24" cy="24" r="13.5" stroke="rgba(255,255,255,0.18)" strokeWidth="1.4" />
       <path d="M24 22v9" stroke="rgba(255,255,255,0.86)" strokeWidth="2.2" strokeLinecap="round" />
       <circle cx="24" cy="17" r="1.4" fill="rgba(255,255,255,0.86)" />
     </svg>
   );
   const SettingsSecurityIcon = () => (
     <svg viewBox="0 0 48 48" className="w-8 h-8" fill="none" aria-hidden>
-      <path d="M24 11l11 5.2v8.2c0 8.1-6.1 12.7-11 14.6-4.9-1.9-11-6.5-11-14.6v-8.2L24 11Z" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.18)" strokeWidth="1.5" strokeLinejoin="round" />
+      <path d="M24 11l11 5.2v8.2c0 8.1-6.1 12.7-11 14.6-4.9-1.9-11-6.5-11-14.6v-8.2L24 11Z" stroke="rgba(255,255,255,0.18)" strokeWidth="1.5" strokeLinejoin="round" />
       <path d="M19.5 24.5l3.2 3.2 5.8-6.2" stroke="rgba(255,255,255,0.86)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
   const SettingsHelpIcon = () => (
     <svg viewBox="0 0 48 48" className="w-8 h-8" fill="none" aria-hidden>
-      <path d="M15 18.5c0-3 2.3-5.5 5.3-5.5h7.4c3 0 5.3 2.5 5.3 5.5v6.8c0 3-2.3 5.5-5.3 5.5H24l-5.5 4.2v-4.2h-1.2c-3 0-5.3-2.5-5.3-5.5v-6.8Z" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.18)" strokeWidth="1.5" strokeLinejoin="round" />
+      <path d="M15 18.5c0-3 2.3-5.5 5.3-5.5h7.4c3 0 5.3 2.5 5.3 5.5v6.8c0 3-2.3 5.5-5.3 5.5H24l-5.5 4.2v-4.2h-1.2c-3 0-5.3-2.5-5.3-5.5v-6.8Z" stroke="rgba(255,255,255,0.18)" strokeWidth="1.5" strokeLinejoin="round" />
       <circle cx="18.5" cy="22" r="1.2" fill="rgba(255,255,255,0.82)" />
       <circle cx="24" cy="22" r="1.2" fill="rgba(255,255,255,0.82)" />
       <circle cx="29.5" cy="22" r="1.2" fill="rgba(255,255,255,0.82)" />
@@ -107,7 +108,7 @@ export default function WalletSettingsDropdown({
   );
   const SettingsDocIcon = () => (
     <svg viewBox="0 0 48 48" className="w-8 h-8" fill="none" aria-hidden>
-      <path d="M17 11.5h11l5 5V34c0 2-1.6 3.5-3.5 3.5h-12c-1.9 0-3.5-1.5-3.5-3.5V15c0-1.9 1.6-3.5 3.5-3.5Z" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.18)" strokeWidth="1.5" strokeLinejoin="round" />
+      <path d="M17 11.5h11l5 5V34c0 2-1.6 3.5-3.5 3.5h-12c-1.9 0-3.5-1.5-3.5-3.5V15c0-1.9 1.6-3.5 3.5-3.5Z" stroke="rgba(255,255,255,0.18)" strokeWidth="1.5" strokeLinejoin="round" />
       <path d="M28 11.5V17h5" stroke="rgba(255,255,255,0.30)" strokeWidth="1.5" strokeLinejoin="round" />
       <path d="M19.5 22h9M19.5 27h9M19.5 32h6" stroke="rgba(255,255,255,0.82)" strokeWidth="2" strokeLinecap="round" />
     </svg>
@@ -617,7 +618,7 @@ export default function WalletSettingsDropdown({
                     </div>
                   </div>
                   <div className="flex items-center justify-center px-4 pt-2 pb-2">
-                    <div className="text-[12px] font-semibold tracking-[0.32em] uppercase text-white/90">
+                    <div className="text-[12px] font-semibold tracking-[0.32em] text-white/90">
                       {t("ui_settings_label", "Paramètres")}
                     </div>
                   </div>
@@ -669,7 +670,7 @@ export default function WalletSettingsDropdown({
                 >
 	              {/* Section: Comptes */}
 	              <div className="pt-2 md:pt-2.5">
-	                <div className="px-1.5 pb-2 text-[10px] font-semibold tracking-[0.22em] uppercase text-white/35">
+	                <div className="px-1.5 pb-2 text-[10px] font-semibold tracking-[0.22em] text-white/35">
 	                  {t("ui_settings_section_accounts", "Comptes")}
 	                </div>
 
@@ -716,7 +717,7 @@ export default function WalletSettingsDropdown({
               {/* Section: Réseau */}
               {onOpenXrplActivity ? (
                 <div className="mt-4">
-                  <div className="px-1.5 pb-2 text-[10px] font-semibold tracking-[0.22em] uppercase text-white/35">
+                  <div className="px-1.5 pb-2 text-[10px] font-semibold tracking-[0.22em] text-white/35">
                     {t("ui_settings_section_network", "Réseau")}
                   </div>
 
@@ -755,7 +756,7 @@ export default function WalletSettingsDropdown({
               {preferredCurrency && (
                 <>
                   <div className="mt-4">
-	                    <div className="px-1.5 pb-2 text-[10px] font-semibold tracking-[0.22em] uppercase text-white/35">
+	                    <div className="px-1.5 pb-2 text-[10px] font-semibold tracking-[0.22em] text-white/35">
 	                      {t("ui_settings_section_preferences", "Préférences")}
 	                    </div>
 	                    <div className="rounded-[20px] border border-white/10 bg-black/20 p-2.5 focus-within:border-white/20 focus-within:ring-2 focus-within:ring-white/10 transition-colors duration-150">
@@ -776,7 +777,7 @@ export default function WalletSettingsDropdown({
 
               {/* Section: Support */}
               <div className="mt-4">
-                <div className="px-1.5 pb-2 text-[10px] font-semibold tracking-[0.22em] uppercase text-white/35">
+                <div className="px-1.5 pb-2 text-[10px] font-semibold tracking-[0.22em] text-white/35">
                   {t("ui_settings_section_support", "Support")}
                 </div>
 
@@ -788,7 +789,7 @@ export default function WalletSettingsDropdown({
                     onClick={() => setIsOpen(false)}
                     className="w-full flex items-center gap-3 px-3 py-3 text-left hover:bg-white/5 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-xcannes-green/20 focus-visible:ring-inset"
                   >
-                    <span className={`${settingsIconShellClassName} text-white/85`}>
+                    <span className={`${settingsSupportIconShellClassName} text-white/85`}>
                       <SettingsRlusdIcon />
                     </span>
                     <div className="min-w-0 flex-1">
@@ -811,7 +812,7 @@ export default function WalletSettingsDropdown({
                     }}
                     className="w-full flex items-center gap-3 px-3 py-3 border-t border-white/10 text-left hover:bg-white/5 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-xcannes-green/20 focus-visible:ring-inset"
                   >
-                    <span className={`${settingsIconShellClassName} text-white/85`}>
+                    <span className={`${settingsSupportIconShellClassName} text-white/85`}>
                       <SettingsInfoIcon />
                     </span>
                     <div className="min-w-0 flex-1">
@@ -838,7 +839,7 @@ export default function WalletSettingsDropdown({
                     }}
                     className="w-full flex items-center gap-3 px-3 py-3 border-t border-white/10 text-left hover:bg-white/5 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-xcannes-green/20 focus-visible:ring-inset"
                   >
-                    <span className={`${settingsIconShellClassName} text-white/85`}>
+                    <span className={`${settingsSupportIconShellClassName} text-white/85`}>
                       <SettingsSecurityIcon />
                     </span>
                     <div className="min-w-0 flex-1">
@@ -866,7 +867,7 @@ export default function WalletSettingsDropdown({
                     }}
                     className="w-full flex items-center gap-3 px-3 py-3 border-t border-white/10 text-left hover:bg-white/5 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-xcannes-green/20 focus-visible:ring-inset"
                   >
-                    <span className={`${settingsIconShellClassName} text-white/85`}>
+                    <span className={`${settingsSupportIconShellClassName} text-white/85`}>
                       <SettingsHelpIcon />
                     </span>
                     <div className="min-w-0 flex-1">
@@ -893,7 +894,7 @@ export default function WalletSettingsDropdown({
                     }}
                     className="w-full flex items-center gap-3 px-3 py-3 border-t border-white/10 text-left hover:bg-white/5 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-xcannes-green/20 focus-visible:ring-inset"
                   >
-                    <span className={`${settingsIconShellClassName} text-white/85`}>
+                    <span className={`${settingsSupportIconShellClassName} text-white/85`}>
                       <SettingsDocIcon />
                     </span>
                     <div className="min-w-0 flex-1">

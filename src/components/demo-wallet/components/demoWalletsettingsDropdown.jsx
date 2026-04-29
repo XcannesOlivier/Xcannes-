@@ -155,7 +155,7 @@ export default function DemoWalletSettingsDropdown({
             <div className="px-3 pb-4 md:px-3 md:pb-3">
               {/* Comptes */}
               <div className="pt-2 md:pt-2.5">
-                <div className="px-1.5 pb-2 text-[10px] font-semibold tracking-[0.22em] uppercase text-white/35">
+                <div className="px-1.5 pb-2 text-[10px] font-semibold tracking-[0.22em] text-white/35">
                   {t("ui_settings_section_accounts", "Comptes")}
                 </div>
                 <button
@@ -199,7 +199,7 @@ export default function DemoWalletSettingsDropdown({
               {/* Préférences */}
               {preferredCurrency ? (
                 <div className="mt-4">
-	                  <div className="px-1.5 pb-2 text-[10px] font-semibold tracking-[0.22em] uppercase text-white/35">
+	                  <div className="px-1.5 pb-2 text-[10px] font-semibold tracking-[0.22em] text-white/35">
 	                    {t("ui_settings_section_preferences", "Préférences")}
 	                  </div>
 	                  <div className="rounded-[10px] border border-white/10 bg-black/20 p-2.5 focus-within:border-xcannes-green/60 focus-within:ring-2 focus-within:ring-xcannes-green/20 transition-colors duration-150">
@@ -217,7 +217,7 @@ export default function DemoWalletSettingsDropdown({
 
               {/* Support */}
               <div className="mt-4">
-                <div className="px-1.5 pb-2 text-[10px] font-semibold tracking-[0.22em] uppercase text-white/35">
+                <div className="px-1.5 pb-2 text-[10px] font-semibold tracking-[0.22em] text-white/35">
                   {t("ui_settings_section_support", "Support")}
                 </div>
 

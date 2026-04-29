@@ -121,7 +121,7 @@ export default function PreferredCurrencySelector({
 
   return (
     <div className="space-y-2" ref={rootRef}>
-      <div className="text-[10px] font-semibold text-white/55 uppercase tracking-[0.22em] px-1">
+      <div className="text-[10px] font-semibold text-white/55 tracking-[0.22em] px-1">
         {t("ui_preferred_currency_label", "Devise principale")}
       </div>
 
