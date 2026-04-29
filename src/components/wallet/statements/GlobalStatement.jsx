@@ -1855,35 +1855,33 @@ export default function GlobalStatement({
 
             <div className="mt-6 mb-4 flex justify-center">
             <div className="relative w-auto min-w-[200px] max-w-[260px]">
+              <p className="text-[22px] md:text-[21px] text-white/85 font-medium mb-1 text-center">
+                {t("ui_current_account_plain", "Compte actuel")}
+              </p>
               <button
                 type="button"
                 onClick={() => setAccountDropdownOpen((prev) => !prev)}
-                className={`w-full inline-flex flex-col items-center gap-1 px-6 py-2 bg-elevated rounded-3xl border border-white/10 transition-all`}
+                className={`w-full inline-flex items-center justify-center gap-2 px-3 py-2.5 bg-elevated rounded-[10px] border border-white/10 transition-all`}
                 aria-haspopup="menu"
                 aria-expanded={accountDropdownOpen}
                 title={t("ui_current_account_plain", "Compte actuel")}
               >
-                <span className="text-white/70 text-[14px] md:text-[15px] font-medium tracking-wide">
-                  {t("ui_current_account_plain", "Compte actuel")}
+                <span className="h-3 w-3 rounded-full bg-xcannes-green ring-4 ring-xcannes-green/20 shrink-0 animate-pulse" aria-hidden />
+                <span className="text-white/95 text-sm font-semibold truncate min-w-0 flex-1 text-center">
+                  {walletLabel || t("nav_wallet", "Wallet")}
                 </span>
-                <div className="flex items-center gap-2">
-                  <span className="h-3 w-3 rounded-full bg-xcannes-green ring-4 ring-xcannes-green/20 shrink-0 animate-pulse" aria-hidden />
-                  <span className="text-white/95 text-[14px] md:text-[15px] font-semibold">
-                    {walletLabel || t("nav_wallet", "Wallet")}
-                  </span>
-                  <svg
-                    className={`w-3 h-3 text-white/50 transition-transform duration-150 ${accountDropdownOpen ? "rotate-180" : ""}`}
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
-                  >
-                    <path d="M6 9l6 6 6-6" />
-                  </svg>
-                </div>
+                <svg
+                  className={`w-3 h-3 text-white/50 transition-transform duration-150 ${accountDropdownOpen ? "rotate-180" : ""}`}
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
               </button>
               {accountDropdownOpen && walletAddress ? (
                 <div className="absolute top-full left-0 z-[200] w-full mt-1 rounded-[10px] ring-1 ring-white/20 ring-inset bg-elevated px-4 py-3 shadow-[0_8px_18px_rgba(0,0,0,0.45)]">
