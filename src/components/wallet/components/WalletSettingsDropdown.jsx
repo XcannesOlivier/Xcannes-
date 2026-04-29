@@ -81,7 +81,7 @@ export default function WalletSettingsDropdown({
   const SettingsRlusdIcon = () => (
     <svg
       viewBox="-1 7 102 112"
-      className="w-11 h-11"
+      className="w-8 h-8"
       fill="none"
       aria-hidden
     >
