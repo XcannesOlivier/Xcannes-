@@ -737,13 +737,13 @@ export default function WalletSettingsDropdown({
                       <div className="text-[13px] font-medium text-white/90">
                         {t(
                           "ui_xrpl_network_activity_6c7a1d9b5e",
-                          "Activité réseau XRPL",
+                          "Activité du réseau XRPL",
                         )}
                       </div>
                       <div className="text-[11px] text-white/45 mt-0.5">
                         {t(
                           "ui_xrpl_network_activity_hint_2c7a1d9b5e",
-                          "Voir les frais et opérations réseau",
+                          "Voir les frais et les opérations du réseau",
                         )}
                       </div>
                     </div>
@@ -798,7 +798,7 @@ export default function WalletSettingsDropdown({
                         {t("ui_stablecoin_rlusd", "Stablecoin RLUSD")}
                       </div>
                       <div className="text-[11px] text-white/40 mt-0.5">
-                        {t("ui_stablecoin_rlusd_hint", "Ouvrir ripple.com")}
+                        {t("ui_stablecoin_rlusd_hint", "En savoir plus sur Ripple.com")}
                       </div>
                     </div>
                     <span className="text-white/20 text-lg">↗</span>
@@ -873,10 +873,10 @@ export default function WalletSettingsDropdown({
                     </span>
                     <div className="min-w-0 flex-1">
                       <div className="text-[13px] font-medium text-white/85">
-                        {t("ui_questions_and_help", "Questions et aides")}
+                        {t("ui_questions_and_help", "Aide & FAQ")}
                       </div>
                       <div className="text-[11px] text-white/40 mt-0.5">
-                        {t("ui_questions_and_help_hint", "FAQ rapide et réponses")}
+                        {t("ui_questions_and_help_hint", "Questions fréquentes et réponses")}
                       </div>
                     </div>
                     <span className="text-white/20 text-lg">›</span>
@@ -1070,7 +1070,7 @@ export default function WalletSettingsDropdown({
 	          className="fixed inset-0 z-[9999] bg-[#0b0f10]"
           role="dialog"
           aria-modal="true"
-          aria-label={t("ui_questions_and_help", "Questions et aides")}
+          aria-label={t("ui_questions_and_help", "Aide & FAQ")}
         >
 	          <div className="h-full w-full flex flex-col">
 	            <div className="shrink-0 px-4 pt-4 pb-3 border-b border-white/10 bg-black/20">
@@ -1086,7 +1086,7 @@ export default function WalletSettingsDropdown({
 	                  </button>
 	                  <div className="min-w-0">
 	                  <div className="text-[11px] font-semibold tracking-[0.24em] uppercase text-white/60">
-	                    {t("ui_questions_and_help", "Questions et aides")}
+	                    {t("ui_questions_and_help", "Aide & FAQ")}
 	                  </div>
 	                  <div className="text-[12px] text-white/80 mt-1 truncate">
 	                    {t("ui_questions_and_help_subtitle", "Réponses rapides")}
