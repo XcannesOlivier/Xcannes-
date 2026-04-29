@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "next-i18next";
 import PreferredCurrencySelector from "@/components/wallet/components/PreferredCurrencySelector";
+import { AVAILABLE_DEFAULT_CURRENCIES } from "@/components/wallet/walletDashboardConfig";
 
 /**
  * DemoWalletSettingsDropdown — settings gear button + dropdown menu.
@@ -208,6 +209,7 @@ export default function DemoWalletSettingsDropdown({
 	                      topCurrencies={topCurrencies}
 	                      allCurrencies={fawazCurrencies}
 	                      isLoading={fawazLoading}
+                        allowedCurrencyCodes={AVAILABLE_DEFAULT_CURRENCIES}
                       onSelect={(code) => onPreferredCurrencyChange?.(code)}
                       onOpen={onLoadFawazCurrencies}
                     />

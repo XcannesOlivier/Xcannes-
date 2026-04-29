@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "next-i18next";
 import { getCurrencyFlag } from "../walletDashboardConfig";
+import { AVAILABLE_DEFAULT_CURRENCIES } from "../walletDashboardConfig";
 
 /**
  * PreferredCurrencySelector — dropdown selector for preferred display currency.
@@ -14,6 +15,7 @@ export default function PreferredCurrencySelector({
   topCurrencies = [],
   allCurrencies = [],
   isLoading = false,
+  allowedCurrencyCodes,
   onSelect,
   onOpen,
 }) {
@@ -46,6 +48,10 @@ export default function PreferredCurrencySelector({
   const uniqueCurrencies = useMemo(() => {
     const list = [];
     const seen = new Set();
+    const allowedSet =
+      Array.isArray(allowedCurrencyCodes) && allowedCurrencyCodes.length > 0
+        ? new Set(allowedCurrencyCodes.map((c) => String(c || "").toUpperCase()))
+        : new Set(AVAILABLE_DEFAULT_CURRENCIES.map((c) => String(c || "").toUpperCase()));
     const candidates = [
       ...normalizedTopCurrencies,
       ...(Array.isArray(allCurrencies) ? allCurrencies : []),
@@ -53,6 +59,7 @@ export default function PreferredCurrencySelector({
 
     for (const raw of candidates) {
       const code = String(raw?.code || "").toUpperCase();
+      if (allowedSet.size > 0 && !allowedSet.has(code)) continue;
       if (!code || seen.has(code)) continue;
       seen.add(code);
       list.push({
@@ -62,8 +69,14 @@ export default function PreferredCurrencySelector({
       });
     }
 
+    // Ensure currentCurrency is selectable even if it's not in the allowed set (so the UI never "loses" it)
+    const current = String(currentCurrency || "").toUpperCase();
+    if (current && !seen.has(current)) {
+      list.unshift({ code: current, name: "", symbol: "" });
+    }
+
     return list;
-  }, [allCurrencies, normalizedTopCurrencies]);
+  }, [allCurrencies, allowedCurrencyCodes, currentCurrency, normalizedTopCurrencies]);
 
   const filteredCurrencies = useMemo(() => {
     if (!search.trim()) return uniqueCurrencies;
@@ -130,7 +143,9 @@ export default function PreferredCurrencySelector({
         onClick={() => {
           setIsExpanded((v) => {
             const next = !v;
-            if (next) onOpen?.();
+            if (next && !(Array.isArray(allowedCurrencyCodes) && allowedCurrencyCodes.length > 0)) {
+              onOpen?.();
+            }
             if (next) setSearch("");
             return next;
           });

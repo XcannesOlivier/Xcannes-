@@ -8,6 +8,7 @@ import { ChevronLeftIcon } from "@heroicons/react/24/outline";
 import { useWallet } from "@/context/WalletContext";
 import PreferredCurrencySelector from "./PreferredCurrencySelector";
 import { createPortal } from "react-dom";
+import { AVAILABLE_DEFAULT_CURRENCIES } from "../walletDashboardConfig";
 
 /**
  * Settings gear button + dropdown menu.
@@ -779,11 +780,12 @@ export default function WalletSettingsDropdown({
 	                      {t("ui_settings_section_preferences", "Préférences")}
 	                    </div>
 	                    <div className="rounded-[20px] border border-white/10 bg-black/20 p-2.5 focus-within:border-white/20 focus-within:ring-2 focus-within:ring-white/10 transition-colors duration-150">
-	                      <PreferredCurrencySelector
-	                        currentCurrency={preferredCurrency}
-	                        topCurrencies={topCurrencies}
-	                        allCurrencies={fawazCurrencies}
-	                        isLoading={fawazLoading}
+                      <PreferredCurrencySelector
+                        currentCurrency={preferredCurrency}
+                        topCurrencies={topCurrencies}
+                        allCurrencies={fawazCurrencies}
+                        isLoading={fawazLoading}
+                        allowedCurrencyCodes={AVAILABLE_DEFAULT_CURRENCIES}
                         onSelect={(code) => {
                           onPreferredCurrencyChange?.(code);
                         }}
