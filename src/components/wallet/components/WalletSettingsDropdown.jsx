@@ -8,7 +8,6 @@ import { ChevronLeftIcon } from "@heroicons/react/24/outline";
 import { useWallet } from "@/context/WalletContext";
 import PreferredCurrencySelector from "./PreferredCurrencySelector";
 import { createPortal } from "react-dom";
-import { AVAILABLE_DEFAULT_CURRENCIES } from "../walletDashboardConfig";
 
 /**
  * Settings gear button + dropdown menu.
@@ -32,6 +31,7 @@ export default function WalletSettingsDropdown({
   fawazLoading,
   onLoadFawazCurrencies,
   onPreferredCurrencyChange,
+  allowedCurrencyCodes = null,
 }) {
   const { t } = useTranslation("common");
   const { goToChoice } = useWallet();
@@ -785,7 +785,7 @@ export default function WalletSettingsDropdown({
                         topCurrencies={topCurrencies}
                         allCurrencies={fawazCurrencies}
                         isLoading={fawazLoading}
-                        allowedCurrencyCodes={AVAILABLE_DEFAULT_CURRENCIES}
+                        allowedCurrencyCodes={allowedCurrencyCodes}
                         onSelect={(code) => {
                           onPreferredCurrencyChange?.(code);
                         }}

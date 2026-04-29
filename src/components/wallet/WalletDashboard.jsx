@@ -473,6 +473,14 @@ export default function WalletDashboard({
     refreshCurrencyLines,
   });
 
+  const activeFiatCurrencyCodes = useMemo(() => {
+    const codes = (Array.isArray(augmentedCurrencyLines) ? augmentedCurrencyLines : [])
+      .map((line) => String(line?.currencyCode || "").trim().toUpperCase())
+      .filter(Boolean);
+    if (preferredCurrency) codes.push(String(preferredCurrency).toUpperCase());
+    return Array.from(new Set(codes)).sort((a, b) => a.localeCompare(b));
+  }, [augmentedCurrencyLines, preferredCurrency]);
+
   // ── Tokens (augmented with currency lines) ─────────────────
   const { augmentedTokens, allocatedRlusdByCurrency, swapCurrencyOptions } = useWalletTokens({
     displayTokens,
@@ -1115,6 +1123,7 @@ export default function WalletDashboard({
             fawazLoading={prefFawazLoading}
             onLoadFawazCurrencies={prefLoadFawazCurrencies}
             onPreferredCurrencyChange={setPreferredCurrency}
+            allowedCurrencyCodes={activeFiatCurrencyCodes}
           />
 
           {/* Action row: Send / Receive / Exchange / Buy */}

@@ -83,6 +83,7 @@ export default function WalletDashboardHeader({
   fawazLoading,
   onLoadFawazCurrencies,
   onPreferredCurrencyChange,
+  allowedCurrencyCodes,
 }) {
   const { t } = useTranslation("common");
   const [isSwitcherOpen, setIsSwitcherOpen] = useState(false);
@@ -440,6 +441,7 @@ export default function WalletDashboardHeader({
                 fawazLoading={fawazLoading}
                 onLoadFawazCurrencies={onLoadFawazCurrencies}
                 onPreferredCurrencyChange={onPreferredCurrencyChange}
+                allowedCurrencyCodes={allowedCurrencyCodes}
               />
               </div>
             </div>

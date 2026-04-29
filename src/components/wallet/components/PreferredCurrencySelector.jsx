@@ -25,11 +25,6 @@ export default function PreferredCurrencySelector({
   const [search, setSearch] = useState("");
   const searchRef = useRef(null);
 
-  useEffect(() => {
-    if (!isExpanded) return;
-    searchRef.current?.focus();
-  }, [isExpanded]);
-
   const normalizedTopCurrencies = useMemo(() => {
     if (Array.isArray(topCurrencies) && topCurrencies.length > 0) {
       return topCurrencies;
@@ -52,6 +47,14 @@ export default function PreferredCurrencySelector({
       Array.isArray(allowedCurrencyCodes) && allowedCurrencyCodes.length > 0
         ? new Set(allowedCurrencyCodes.map((c) => String(c || "").toUpperCase()))
         : new Set(AVAILABLE_DEFAULT_CURRENCIES.map((c) => String(c || "").toUpperCase()));
+    // Seed with allowed currencies so we always show the full allowed list,
+    // even before the Fawaz currency metadata has loaded.
+    for (const code of allowedSet) {
+      if (!code || seen.has(code)) continue;
+      seen.add(code);
+      list.push({ code, name: "", symbol: "" });
+    }
+
     const candidates = [
       ...normalizedTopCurrencies,
       ...(Array.isArray(allCurrencies) ? allCurrencies : []),
@@ -69,13 +72,33 @@ export default function PreferredCurrencySelector({
       });
     }
 
+    // Enrich seeded entries when metadata is available
+    if (Array.isArray(allCurrencies) && allCurrencies.length > 0) {
+      const metaByCode = new Map(
+        allCurrencies
+          .map((c) => ({
+            code: String(c?.code || "").toUpperCase(),
+            name: String(c?.name || ""),
+            symbol: String(c?.symbol || ""),
+          }))
+          .filter((c) => c.code)
+          .map((c) => [c.code, c]),
+      );
+      for (let i = 0; i < list.length; i += 1) {
+        const meta = metaByCode.get(list[i].code);
+        if (!meta) continue;
+        if (!list[i].name && meta.name) list[i].name = meta.name;
+        if (!list[i].symbol && meta.symbol) list[i].symbol = meta.symbol;
+      }
+    }
+
     // Ensure currentCurrency is selectable even if it's not in the allowed set (so the UI never "loses" it)
     const current = String(currentCurrency || "").toUpperCase();
     if (current && !seen.has(current)) {
       list.unshift({ code: current, name: "", symbol: "" });
     }
 
-    return list;
+    return list.sort((a, b) => a.code.localeCompare(b.code));
   }, [allCurrencies, allowedCurrencyCodes, currentCurrency, normalizedTopCurrencies]);
 
   const filteredCurrencies = useMemo(() => {
@@ -143,9 +166,7 @@ export default function PreferredCurrencySelector({
         onClick={() => {
           setIsExpanded((v) => {
             const next = !v;
-            if (next && !(Array.isArray(allowedCurrencyCodes) && allowedCurrencyCodes.length > 0)) {
-              onOpen?.();
-            }
+            if (next) onOpen?.();
             if (next) setSearch("");
             return next;
           });
@@ -194,6 +215,10 @@ export default function PreferredCurrencySelector({
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
+              onPointerDown={(e) => {
+                // Prevent the settings overlay drag handler from interfering on mobile.
+                e.stopPropagation();
+              }}
               onKeyDown={(e) => {
                 if (e.key === "Escape") {
                   e.preventDefault();
