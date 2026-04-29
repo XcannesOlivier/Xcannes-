@@ -782,7 +782,7 @@ export default function WalletSettingsDropdown({
                   {t("ui_settings_section_support", "Support")}
                 </div>
 
-                <div className="rounded-[20px] border border-white/10 bg-white/3 overflow-hidden">
+                <div className="rounded-[20px] border border-white/10 bg-elevated overflow-hidden">
                   <a
                     href="https://rlusd.com"
                     target="_blank"
