@@ -623,7 +623,7 @@ export default function WalletDashboardSendChoiceModal({
                 {/* Steps guide (collapsible) */}
                 <div className="overflow-hidden transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]" style={{ maxHeight: showSteps ? '300px' : '0px', opacity: showSteps ? 1 : 0 }}>
                   <ol className="space-y-2 text-[12px] leading-relaxed pb-4">
-                    <li className="flex gap-2"><span className="flex-shrink-0 w-5 h-5 rounded-full bg-xcannes-green/15 text-xcannes-green text-[11px] font-bold flex items-center justify-center">1</span><span className="text-white/60">{t('ui_step_1', 'Renseignez l\'adresse du destinataire — scannez, collez, importez ou choisissez dans votre liste.')}</span></li>
+                    <li className="flex gap-2"><span className="flex-shrink-0 w-5 h-5 rounded-full bg-xcannes-green/15 text-xcannes-green text-[11px] font-bold flex items-center justify-center">1</span><span className="text-white/60">{t('ui_step_1', 'Renseignez l\'adresse du destinataire — scannez, saisissez, importez ou choisissez dans votre liste.')}</span></li>
                     <li className="flex gap-2"><span className="flex-shrink-0 w-5 h-5 rounded-full bg-xcannes-green/15 text-xcannes-green text-[11px] font-bold flex items-center justify-center">2</span><span className="text-white/60">{t('ui_step_2', 'Sélectionnez la devise parmi celles disponibles sur votre compte.')}</span></li>
                     <li className="flex gap-2"><span className="flex-shrink-0 w-5 h-5 rounded-full bg-xcannes-green/15 text-xcannes-green text-[11px] font-bold flex items-center justify-center">3</span><span className="text-white/60">{t('ui_step_3', 'Indiquez le montant à envoyer.')}</span></li>
                     <li className="flex gap-2"><span className="flex-shrink-0 w-5 h-5 rounded-full bg-xcannes-green/15 text-xcannes-green text-[11px] font-bold flex items-center justify-center">4</span><span className="text-white/60">{t('ui_step_4', 'Vérifiez et validez en toute sécurité.')}</span></li>
@@ -641,7 +641,7 @@ export default function WalletDashboardSendChoiceModal({
                       title={t('ui_scan_qr_code_12fa63d927', 'Scan QR Code')}
                     >
                       <svg className="w-5 h-5 md:w-5 md:h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" /></svg>
-                      <span className="text-[19px] md:text-[14px] font-semibold md:font-normal">{t('ui_scan_label', 'Scanner')}</span>
+                      <span className="text-[20.8px] md:text-[18.4px] font-semibold md:font-normal">{t('ui_scan_label', 'Scanner')}</span>
                     </button>
                     <button
                       type="button"
@@ -650,7 +650,10 @@ export default function WalletDashboardSendChoiceModal({
                       title={t('ui_or_upload_a_qr_image_works_e_df6baa8039', 'Charger une image qrcode')}
                     >
                       <svg className="w-5 h-5 md:w-5 md:h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M12 4v12m0 0l-3-3m3 3l3-3" /></svg>
-                      <span className="text-[14px] md:text-[17px] md:font-semibold">{t('ui_import_label', 'Importer un QR code')}</span>
+                      <span className="text-[14px] md:text-[17px] md:font-semibold">
+                        <span className="md:hidden">{t('ui_import_label_mobile', 'Importer')}</span>
+                        <span className="hidden md:inline">{t('ui_import_label', 'Importer un QR code')}</span>
+                      </span>
                     </button>
                   </div>
                   <style jsx>{`
@@ -680,7 +683,7 @@ export default function WalletDashboardSendChoiceModal({
 
                   {/* Paste input */}
                   <div className="relative">
-                    <input id="quickscan-paste-input" type="text" value={quickscanPasteValue} onChange={(e) => { setQuickscanPasteValue(e.target.value); setShowQuickscanSavedPicker(false); setSimpleSendSelfError(false); }} onKeyDown={(e) => { if (e.key === 'Enter') handleQuickscanPasteSubmit(); }} onPaste={(e) => { const text = (e.clipboardData?.getData('text') || '').trim(); if (text) { e.preventDefault(); setQuickscanPasteValue(text); setShowQuickscanSavedPicker(false); if (normalizedCurrentWallet && text === normalizedCurrentWallet) { setSimpleSendSelfError(true); return; } setSimpleSendSelfError(false); setTimeout(() => { setSendDestination?.(text); setSendDestinationLabel?.(''); onChooseSimpleSend?.(); }, 50); } }} placeholder={t('ui_paste_address_placeholder', 'Coller ou saisir une adresse')} className="w-full bg-[#111518] ring-1 ring-white/10 ring-inset rounded-xl shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30)] pl-4 pr-12 py-3 text-[15px] text-white placeholder:text-white/35 outline-none focus:ring-white/25 focus:shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30),0_0_0_1px_rgba(255,255,255,0.10),0_0_24px_rgba(255,255,255,0.06)] transition-all duration-200" />
+                    <input id="quickscan-paste-input" type="text" value={quickscanPasteValue} onChange={(e) => { setQuickscanPasteValue(e.target.value); setShowQuickscanSavedPicker(false); setSimpleSendSelfError(false); }} onKeyDown={(e) => { if (e.key === 'Enter') handleQuickscanPasteSubmit(); }} onPaste={(e) => { const text = (e.clipboardData?.getData('text') || '').trim(); if (text) { e.preventDefault(); setQuickscanPasteValue(text); setShowQuickscanSavedPicker(false); if (normalizedCurrentWallet && text === normalizedCurrentWallet) { setSimpleSendSelfError(true); return; } setSimpleSendSelfError(false); setTimeout(() => { setSendDestination?.(text); setSendDestinationLabel?.(''); onChooseSimpleSend?.(); }, 50); } }} placeholder={t('ui_paste_address_placeholder', 'Saisir une adresse de compte')} className="w-full bg-[#151c20] ring-1 ring-white/10 ring-inset rounded-xl shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30)] pl-4 pr-12 py-3 text-[15px] text-white placeholder:text-white/35 outline-none focus:ring-white/25 focus:shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30),0_0_0_1px_rgba(255,255,255,0.10),0_0_24px_rgba(255,255,255,0.06)] transition-all duration-200" />
                     {quickscanPasteValue.trim() ? (<button type="button" onClick={handleQuickscanPasteSubmit} className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg bg-xcannes-green/20 hover:bg-xcannes-green/30 text-xcannes-green transition-colors" title={t('ui_go_label', 'Valider')}><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg></button>) : null}
                   </div>
 
@@ -702,7 +705,18 @@ export default function WalletDashboardSendChoiceModal({
                       <svg className="w-5 h-5 text-white/50 flex-shrink-0 mr-3" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0" /></svg>
                       <span className="flex-1 text-left truncate">
                         {(() => {
-                          if (!quickscanPasteValue.trim()) return t('ui_choose_saved_address', 'Choisir un destinataire dans vos contacts');
+                          if (!quickscanPasteValue.trim()) {
+                            return (
+                              <>
+                                <span className="md:hidden">
+                                  {t('ui_choose_saved_address_mobile', 'Choisir dans vos contacts')}
+                                </span>
+                                <span className="hidden md:inline">
+                                  {t('ui_choose_saved_address', 'Choisir un destinataire dans vos contacts')}
+                                </span>
+                              </>
+                            );
+                          }
                           const match = (savedAddresses || []).find(a => String(a?.address || '').trim() === quickscanPasteValue.trim());
                           if (match) return String(match?.onChainLabel || match?.label || '').trim() || quickscanPasteValue.trim();
                           return quickscanPasteValue.trim();
@@ -832,11 +846,14 @@ export default function WalletDashboardSendChoiceModal({
                   <div className="payreq-choice-actions grid grid-cols-2 gap-2">
                     <button type="button" onClick={onChooseQuickScan} className={`${accordionBtnClass} payreq-scan-btn transition-transform scale-[1.04] md:scale-[1.0] scan-btn-glow-pulse md:py-1.5`} title={t('ui_scan_qr_code_12fa63d927', 'Scan QR Code')}>
                       <svg className="w-5 h-5 md:w-5 md:h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" /></svg>
-                      <span className="text-[19px] md:text-[14px] font-semibold md:font-normal">{t('ui_scan_label', 'Scanner')}</span>
+                      <span className="text-[20.8px] md:text-[18.4px] font-semibold md:font-normal">{t('ui_scan_label', 'Scanner')}</span>
                     </button>
                     <button type="button" onClick={() => handleFileUpload(payreqFileInputId, true)} className={`${accordionBtnClass} payreq-import-btn transition-transform scale-[1.0] md:scale-[1.04] import-btn-glow-pulse md:py-1.5`} title={t('ui_or_upload_a_qr_image_works_e_df6baa8039', 'Charger une image qrcode')}>
                       <svg className="w-5 h-5 md:w-5 md:h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M12 4v12m0 0l-3-3m3 3l3-3" /></svg>
-                      <span className="text-[14px] md:text-[17px] md:font-semibold">{t('ui_import_label', 'Importer un QR code')}</span>
+                      <span className="text-[14px] md:text-[17px] md:font-semibold">
+                        <span className="md:hidden">{t('ui_import_label_mobile', 'Importer')}</span>
+                        <span className="hidden md:inline">{t('ui_import_label', 'Importer un QR code')}</span>
+                      </span>
                     </button>
                   </div>
                   <style jsx>{`
@@ -847,7 +864,7 @@ export default function WalletDashboardSendChoiceModal({
                     }
                     .payreq-scan-btn:hover { background: linear-gradient(to bottom, #161b1c, #111517); }
                     .payreq-scan-btn svg { color: rgba(255,255,255,0.55); width: 1.15rem; height: 1.15rem; }
-                    .payreq-scan-btn span { color: rgba(255,255,255,0.75); font-size: 15px; font-weight: 500; }
+                    .payreq-scan-btn span { color: rgba(255,255,255,0.75); font-weight: 500; }
                     .payreq-import-btn {
                       background: linear-gradient(to bottom, #101415, #0d1214);
                       box-shadow: 0 2px 8px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.06), inset 0 0 0 1px rgba(255,255,255,0.07);
@@ -858,7 +875,7 @@ export default function WalletDashboardSendChoiceModal({
                     .payreq-import-btn span { color: rgba(255,255,255,0.75); font-size: 14px; font-weight: 500; }
                     @media (min-width: 768px) {
                       .payreq-scan-btn svg { width: 1.15rem; height: 1.15rem; }
-                      .payreq-scan-btn span { font-size: 14px; font-weight: 400; color: rgba(255,255,255,0.75); }
+                      .payreq-scan-btn span { font-weight: 400; color: rgba(255,255,255,0.75); }
                       .payreq-import-btn svg { color: rgba(255,255,255,0.75); width: 1.3rem; height: 1.3rem; }
                       .payreq-import-btn span { color: rgba(255,255,255,0.90); font-size: 15px; font-weight: 600; }
                     }
