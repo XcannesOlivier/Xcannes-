@@ -594,8 +594,8 @@ export default function WalletSettingsDropdown({
                 }}
                 className={[
                   shouldPortalToInlinePanel
-                    ? "absolute inset-0 z-50 bg-elevated flex flex-col min-h-0 overflow-hidden will-change-transform"
-                    : "fixed inset-0 z-50 bg-elevated flex flex-col min-h-0 overflow-hidden will-change-transform",
+                    ? "absolute inset-0 z-50 bg-elevated flex flex-col min-h-0 overflow-hidden will-change-transform relative"
+                    : "fixed inset-0 z-50 bg-elevated flex flex-col min-h-0 overflow-hidden will-change-transform relative",
                   shouldPortalToInlinePanel
                     ? ""
                     : "md:fixed md:inset-auto md:w-[min(420px,calc(100vw-32px))] md:rounded-xl md:border md:border-white/10 md:bg-elevated md:shadow-[0_28px_90px_rgba(0,0,0,0.6)] md:overflow-visible md:animate-walletSettingsIn",
@@ -604,10 +604,17 @@ export default function WalletSettingsDropdown({
                 onPointerUp={handleOverlayPointerEnd}
                 onPointerCancel={handleOverlayPointerEnd}
               >
+                {/* Green glow (like "Demander un paiement") */}
+                <div className="pointer-events-none absolute inset-0 z-0" aria-hidden>
+                  <div className="absolute inset-0 bg-[radial-gradient(520px_circle_at_80%_0%,rgba(255,255,255,0.06),transparent_55%)]" />
+                  <div className="absolute inset-0 bg-[radial-gradient(900px_circle_at_100%_70%,rgba(0,255,150,0.06),transparent_60%)]" />
+                  <div className="absolute inset-0 bg-[radial-gradient(700px_circle_at_0%_100%,rgba(0,255,150,0.04),transparent_65%)]" />
+                </div>
+
                 {/* Pointer (desktop) */}
                 {!shouldPortalToInlinePanel ? (
                   <div
-                    className="hidden md:block absolute h-3.5 w-3.5 bg-elevated border border-white/10 rotate-45"
+                    className="hidden md:block absolute h-3.5 w-3.5 bg-elevated border border-white/10 rotate-45 z-[2]"
                     style={
                       !isDesktop || desktopArrowX == null
                         ? undefined
@@ -625,6 +632,7 @@ export default function WalletSettingsDropdown({
                 {/* Mobile header */}
                 <div
                   className="shrink-0 md:hidden"
+                  style={{ position: "relative", zIndex: 1 }}
                   onPointerDown={(event) => {
                     maybeStartOverlayDrag(event, "fixed");
                   }}
@@ -648,7 +656,7 @@ export default function WalletSettingsDropdown({
                 </div>
 
                 {/* Desktop header */}
-                <div className="hidden md:flex items-center justify-center px-4 py-4 border-b border-white/10">
+                <div className="hidden md:flex items-center justify-center px-4 py-4 border-b border-white/10 relative z-[1]">
                   <div className="text-[18px] font-semibold text-white">
                     {t("ui_settings_label", "Paramètres")}
                   </div>
@@ -662,6 +670,7 @@ export default function WalletSettingsDropdown({
                       ? ""
                       : "md:max-h-[min(680px,calc(100vh-140px))] md:overflow-y-auto md:overscroll-contain",
                   ].join(" ")}
+                  style={{ position: "relative", zIndex: 1 }}
                   onPointerDown={(event) => {
                     maybeStartOverlayDrag(event, "list");
                   }}
