@@ -776,17 +776,21 @@ export default function WalletDashboard({
     const parsed = new Date(raw);
     if (!Number.isFinite(parsed.getTime())) return { mobile: "", desktop: "" };
 
-    const dateMobile = new Intl.DateTimeFormat(locale, {
+    const dateLocale = String(locale || "").toLowerCase().startsWith("fr")
+      ? "fr-FR"
+      : locale;
+
+    const dateMobile = new Intl.DateTimeFormat(dateLocale, {
       day: "numeric",
       month: "short",
       year: "numeric",
     }).format(parsed);
-    const dateDesktop = new Intl.DateTimeFormat(locale, {
+    const dateDesktop = new Intl.DateTimeFormat(dateLocale, {
       day: "numeric",
       month: "long",
       year: "numeric",
     }).format(parsed);
-    const time = new Intl.DateTimeFormat(locale, {
+    const time = new Intl.DateTimeFormat(dateLocale, {
       hour: "2-digit",
       minute: "2-digit",
     }).format(parsed);
