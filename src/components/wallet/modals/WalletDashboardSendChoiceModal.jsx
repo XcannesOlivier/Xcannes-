@@ -747,7 +747,7 @@ export default function WalletDashboardSendChoiceModal({
                               >
                                 <div className="min-w-0 flex-1">
                                   <p className={`text-[16px] md:text-[17px] font-semibold truncate ${isSelected ? 'text-xcannes-green' : 'text-white/90'}`}>{label}</p>
-                                  <p className="text-[13px] font-mono text-white/40 mt-0.5">
+                                  <p className="text-[13px] font-mono font-light text-white/40 mt-0.5">
                                     <span className="md:hidden">{addrStr.length > 18 ? `${addrStr.slice(0, 8)}…${addrStr.slice(-4)}` : addrStr}</span>
                                     <span className="hidden md:inline">{addrStr.length > 26 ? `${addrStr.slice(0, 14)}…${addrStr.slice(-6)}` : addrStr}</span>
                                   </p>

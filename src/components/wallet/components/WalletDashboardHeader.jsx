@@ -343,7 +343,7 @@ export default function WalletDashboardHeader({
                         {/* Active wallet address pinned at top */}
                         <div className="px-2.5 md:px-3 pt-2 pb-1.5">
                           <div
-                            className="font-mono text-[13px] md:text-[14px] text-white/85 whitespace-normal break-all leading-snug"
+                            className="font-mono font-light text-[13px] md:text-[14px] text-white/85 whitespace-normal break-all leading-snug"
                           >
                             {`${wallet.slice(0, 8)}…${wallet.slice(-6)}`}
                           </div>
@@ -385,7 +385,7 @@ export default function WalletDashboardHeader({
 		                                  {displayName}
 		                                </div>
 		                                <div
-		                                  className="font-mono text-[13px] md:text-[14px] leading-snug text-white/40"
+		                                  className="font-mono font-light text-[13px] md:text-[14px] leading-snug text-white/40"
 		                                >
 		                                  {`${addr.slice(0, 8)}…${addr.slice(-6)}`}
 		                                </div>

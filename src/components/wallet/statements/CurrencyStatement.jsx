@@ -1747,7 +1747,7 @@ export default function CurrencyStatement({
                           {t("ui_account_address", "Adresse du compte")}
                         </p>
                         <div className="flex items-center gap-1.5 min-w-0">
-                          <span className="text-xs md:text-sm text-white/55 font-mono break-all whitespace-normal min-w-0" title={walletAddress}>
+                          <span className="text-xs md:text-sm text-white/55 font-mono font-light break-all whitespace-normal min-w-0" title={walletAddress}>
                             {walletAddress}
                           </span>
                           <button

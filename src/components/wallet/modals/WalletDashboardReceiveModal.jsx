@@ -314,7 +314,7 @@ export default function WalletDashboardReceiveModal({
 	          ),
 	          label,
 	          labelLeft: label,
-	          labelRight: shortAddress(addr),
+	          labelRight: <span className="font-mono font-light">{shortAddress(addr)}</span>,
 	          labelMobile: label,
 	        };
 	      })
@@ -325,7 +325,7 @@ export default function WalletDashboardReceiveModal({
       return walletOptions.map(opt => ({
         ...opt,
         labelRight: undefined,
-        description: shortAddress(opt.value, 8, 8),
+        description: <span className="font-mono font-light">{shortAddress(opt.value, 8, 8)}</span>,
       }));
     }, [shortAddress, walletOptions]);
 

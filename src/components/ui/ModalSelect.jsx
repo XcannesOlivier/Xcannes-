@@ -299,7 +299,7 @@ export default function ModalSelect({
                 <span className="truncate hidden md:inline">
                   {selectedLeft}
                 </span>
-                <span className="font-mono text-[13px] text-xcannes-green leading-snug truncate md:whitespace-normal md:break-all md:overflow-visible">
+                <span className="font-mono font-light text-[13px] text-xcannes-green leading-snug truncate md:whitespace-normal md:break-all md:overflow-visible">
                   {selected.description}
                 </span>
               </span>
@@ -385,7 +385,7 @@ export default function ModalSelect({
                           </span>
                         ) : null}
                       </span>
-                      <span className="font-mono text-[13px] text-white/40 leading-snug mt-0.5 truncate md:whitespace-normal md:break-all md:overflow-visible">
+                      <span className="font-mono font-light text-[13px] text-white/40 leading-snug mt-0.5 truncate md:whitespace-normal md:break-all md:overflow-visible">
                         {description}
                       </span>
                     </span>
