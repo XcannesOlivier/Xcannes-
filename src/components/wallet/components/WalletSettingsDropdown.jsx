@@ -648,32 +648,10 @@ export default function WalletSettingsDropdown({
                 </div>
 
                 {/* Desktop header */}
-                <div className="hidden md:flex items-center justify-between px-4 py-3 border-b border-white/10">
-                  <div className="min-w-0">
-                    <div className="text-sm font-semibold text-white">
-                      {t("ui_settings_label", "Paramètres")}
-                    </div>
+                <div className="hidden md:flex items-center justify-center px-4 py-4 border-b border-white/10">
+                  <div className="text-[18px] font-semibold text-white">
+                    {t("ui_settings_label", "Paramètres")}
                   </div>
-                  <button
-                    type="button"
-                    aria-label={t("close", "Fermer")}
-                    className="h-8 w-8 inline-flex items-center justify-center rounded-lg text-white/50 hover:text-white hover:bg-white/5 transition"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      strokeWidth={2}
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
-                  </button>
                 </div>
 
                 <div
