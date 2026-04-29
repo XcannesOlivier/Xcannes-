@@ -594,8 +594,8 @@ export default function WalletSettingsDropdown({
                 }}
                 className={[
                   shouldPortalToInlinePanel
-                    ? "absolute inset-0 z-50 bg-elevated flex flex-col min-h-0 overflow-hidden will-change-transform"
-                    : "fixed inset-0 z-50 bg-elevated flex flex-col min-h-0 overflow-hidden will-change-transform",
+                    ? "absolute inset-0 z-50 bg-elevated flex flex-col min-h-0 overflow-hidden will-change-transform relative"
+                    : "fixed inset-0 z-50 bg-elevated flex flex-col min-h-0 overflow-hidden will-change-transform relative",
                   shouldPortalToInlinePanel
                     ? ""
                     : "md:fixed md:inset-auto md:w-[min(420px,calc(100vw-32px))] md:rounded-xl md:border md:border-white/10 md:bg-elevated md:shadow-[0_28px_90px_rgba(0,0,0,0.6)] md:overflow-visible md:animate-walletSettingsIn",
@@ -604,68 +604,76 @@ export default function WalletSettingsDropdown({
                 onPointerUp={handleOverlayPointerEnd}
                 onPointerCancel={handleOverlayPointerEnd}
               >
-                {/* Pointer (desktop) */}
-                {!shouldPortalToInlinePanel ? (
-                  <div
-                    className="hidden md:block absolute h-3.5 w-3.5 bg-elevated border border-white/10 rotate-45"
-                    style={
-                      !isDesktop || desktopArrowX == null
-                        ? undefined
-                        : {
-                            left: `${Math.round(desktopArrowX - 7)}px`,
-                            top: desktopPlacement === "bottom" ? "-7px" : undefined,
-                            bottom:
-                              desktopPlacement === "top" ? "-7px" : undefined,
-                          }
-                    }
-                    aria-hidden
-                  />
-                ) : null}
+                {/* Green glow (under content, above panel bg) */}
+                <div className="pointer-events-none absolute inset-0 z-0" aria-hidden>
+                  <div className="absolute inset-0 bg-[radial-gradient(520px_circle_at_80%_0%,rgba(255,255,255,0.06),transparent_55%)]" />
+                  <div className="absolute inset-0 bg-[radial-gradient(900px_circle_at_100%_70%,rgba(0,255,150,0.06),transparent_60%)]" />
+                  <div className="absolute inset-0 bg-[radial-gradient(700px_circle_at_0%_100%,rgba(0,255,150,0.04),transparent_65%)]" />
+                </div>
 
-                {/* Mobile header */}
-                <div
-                  className="shrink-0 md:hidden"
-                  onPointerDown={(event) => {
-                    maybeStartOverlayDrag(event, "fixed");
-                  }}
-                >
-                  <div className="flex justify-center pt-3 pb-1">
+                <div className="relative z-10 flex flex-col min-h-0 flex-1">
+                  {/* Pointer (desktop) */}
+                  {!shouldPortalToInlinePanel ? (
                     <div
-                      className="w-16 h-5 flex items-center justify-center"
+                      className="hidden md:block absolute h-3.5 w-3.5 bg-elevated border border-white/10 rotate-45"
+                      style={
+                        !isDesktop || desktopArrowX == null
+                          ? undefined
+                          : {
+                              left: `${Math.round(desktopArrowX - 7)}px`,
+                              top: desktopPlacement === "bottom" ? "-7px" : undefined,
+                              bottom:
+                                desktopPlacement === "top" ? "-7px" : undefined,
+                            }
+                      }
                       aria-hidden
-                    >
-                      <span className="block w-12 h-1.5 rounded-full bg-white/20" />
+                    />
+                  ) : null}
+
+                  {/* Mobile header */}
+                  <div
+                    className="shrink-0 md:hidden"
+                    onPointerDown={(event) => {
+                      maybeStartOverlayDrag(event, "fixed");
+                    }}
+                  >
+                    <div className="flex justify-center pt-3 pb-1">
+                      <div
+                        className="w-16 h-5 flex items-center justify-center"
+                        aria-hidden
+                      >
+                        <span className="block w-12 h-1.5 rounded-full bg-white/20" />
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-center px-4 pt-2 pb-2">
+                      <div className="text-[12px] font-semibold tracking-[0.32em] text-white/90">
+                        {t("ui_settings_label", "Paramètres")}
+                      </div>
+                    </div>
+                    <div className="px-6 pb-3">
+                      <div className="h-px bg-white/10" />
                     </div>
                   </div>
-                  <div className="flex items-center justify-center px-4 pt-2 pb-2">
-                    <div className="text-[12px] font-semibold tracking-[0.32em] text-white/90">
+
+                  {/* Desktop header */}
+                  <div className="hidden md:flex items-center justify-center px-4 py-4 border-b border-white/10">
+                    <div className="text-[18px] font-semibold text-white">
                       {t("ui_settings_label", "Paramètres")}
                     </div>
                   </div>
-                  <div className="px-6 pb-3">
-                    <div className="h-px bg-white/10" />
-                  </div>
-                </div>
 
-                {/* Desktop header */}
-                <div className="hidden md:flex items-center justify-center px-4 py-4 border-b border-white/10">
-                  <div className="text-[18px] font-semibold text-white">
-                    {t("ui_settings_label", "Paramètres")}
-                  </div>
-                </div>
-
-                <div
-                  ref={overlayListRef}
-                  className={[
-                    "flex-1 min-h-0 overflow-y-auto overscroll-contain px-3 pb-4 md:px-3 md:pb-3",
-                    shouldPortalToInlinePanel
-                      ? ""
-                      : "md:max-h-[min(680px,calc(100vh-140px))] md:overflow-y-auto md:overscroll-contain",
-                  ].join(" ")}
-                  onPointerDown={(event) => {
-                    maybeStartOverlayDrag(event, "list");
-                  }}
-                >
+                  <div
+                    ref={overlayListRef}
+                    className={[
+                      "flex-1 min-h-0 overflow-y-auto overscroll-contain px-3 pb-4 md:px-3 md:pb-3",
+                      shouldPortalToInlinePanel
+                        ? ""
+                        : "md:max-h-[min(680px,calc(100vh-140px))] md:overflow-y-auto md:overscroll-contain",
+                    ].join(" ")}
+                    onPointerDown={(event) => {
+                      maybeStartOverlayDrag(event, "list");
+                    }}
+                  >
 	              {/* Section: Comptes */}
 	              <div className="pt-2 md:pt-2.5">
 	                <div className="px-1.5 pb-2 text-[10px] font-semibold tracking-[0.22em] text-white/35">
@@ -906,6 +914,7 @@ export default function WalletSettingsDropdown({
                     </div>
                     <span className="text-white/20 text-lg">›</span>
                   </button>
+                  </div>
                 </div>
               </div>
                 </div>
