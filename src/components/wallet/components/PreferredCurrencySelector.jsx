@@ -146,11 +146,14 @@ export default function PreferredCurrencySelector({
           {getCurrencyFlag(currentCurrency)}
         </span>
         <div className="min-w-0 flex-1">
-          <div className="text-[15px] font-semibold text-white/90 leading-tight">
-            {currentCurrency}
-          </div>
-          <div className="text-[11px] text-white/45 truncate mt-0.5">
-            {selectedCurrency?.name || t("ui_currency_picker_hint", "Choisir une devise")}
+          <div className="flex items-baseline gap-2 min-w-0">
+            <div className="text-[15px] font-semibold text-white/90 leading-tight shrink-0">
+              {currentCurrency}
+            </div>
+            <div className="text-[11px] text-white/45 truncate">
+              {selectedCurrency?.name ||
+                t("ui_currency_picker_hint", "Choisir une devise")}
+            </div>
           </div>
         </div>
         <span className="text-white/35 shrink-0">
