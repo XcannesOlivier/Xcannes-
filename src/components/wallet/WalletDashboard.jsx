@@ -1474,8 +1474,12 @@ export default function WalletDashboard({
                   </div>
                 </div>
               }
-              className="relative z-[1] touch-pan-y"
-              style={{ WebkitOverflowScrolling: 'touch' }}
+              className="relative z-[1] touch-pan-y bg-elevated rounded-2xl"
+              style={{
+                WebkitOverflowScrolling: 'touch',
+                backgroundImage:
+                  'radial-gradient(520px circle at 80% 0%, rgba(255,255,255,0.08), transparent 55%), radial-gradient(900px circle at 100% 50%, rgba(0,255,150,0.10), transparent 35%), radial-gradient(700px circle at 0% 100%, rgba(0,255,150,0.07), transparent 60%)',
+              }}
             />
           </div>
 
