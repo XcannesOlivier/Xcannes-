@@ -360,6 +360,7 @@ export default function WalletDashboard({
   const desktopDefaultActionSetRef = useRef(false);
   const [recentActivityMessage, setRecentActivityMessage] = useState('');
   const [recentActivityCreatedAt, setRecentActivityCreatedAt] = useState('');
+  const [recentActivityKind, setRecentActivityKind] = useState('');
   const recentActivityTimerRef = useRef(null);
   const [activityTooltipOpen, setActivityTooltipOpen] = useState(false);
 
@@ -748,6 +749,7 @@ export default function WalletDashboard({
     if (!text) return;
     setRecentActivityMessage(text);
     setRecentActivityCreatedAt(String(movement?.createdAt || '').trim());
+    setRecentActivityKind(String(movement?.kind || '').trim());
     if (recentActivityTimerRef.current) {
       window.clearTimeout(recentActivityTimerRef.current);
       recentActivityTimerRef.current = null;
@@ -806,6 +808,53 @@ export default function WalletDashboard({
     if (!text) return "";
     return text;
   }, [recentActivityMessage]);
+
+  const recentActivityMessageMobileParts = useMemo(() => {
+    const text = String(recentActivityMessageMobile || "").trim();
+    if (!text) return { isConversion: false, text: "" };
+    const match = text.match(/^(.*?)(?:\s*)(→|->)(?:\s*)(.+)$/);
+    if (!match) return { isConversion: false, text };
+    return {
+      isConversion: true,
+      left: match[1].trim(),
+      arrow: match[2] === '->' ? '→' : match[2],
+      right: match[3].trim(),
+    };
+  }, [recentActivityMessageMobile]);
+
+  const recentActivityReceiveParts = useMemo(() => {
+    const text = String(recentActivityMessage || "").trim();
+    if (!text) return null;
+    const match = text.match(/^Vous avez reçu\s+([0-9][0-9\s.,]*?)\s+([A-Z0-9]{2,10})(.*)$/i);
+    if (!match) return null;
+    return {
+      prefix: "Vous avez reçu",
+      amount: match[1].trim(),
+      currency: match[2].trim(),
+      suffix: String(match[3] || ""),
+    };
+  }, [recentActivityMessage]);
+
+  const recentActivitySendParts = useMemo(() => {
+    const text = String(recentActivityMessage || "").trim();
+    if (!text) return null;
+    const match = text.match(/^Vous avez envoyé\s+([0-9][0-9\s.,]*?)\s+([A-Z0-9]{2,10})(.*)$/i);
+    if (!match) return null;
+    return {
+      prefix: "Vous avez envoyé",
+      amount: match[1].trim(),
+      currency: match[2].trim(),
+      suffix: String(match[3] || ""),
+    };
+  }, [recentActivityMessage]);
+
+  const recentActivityIcon = useMemo(() => {
+    const kind = String(recentActivityKind || "").trim().toUpperCase();
+    if (kind === "CONVERSION") return "convert";
+    if (kind === "PAYMENT_IN" || kind === "XRPL_PAYMENT_IN") return "receive";
+    if (kind === "PAYMENT_OUT" || kind === "XRPL_PAYMENT_OUT") return "send";
+    return null;
+  }, [recentActivityKind]);
 
   // ── Reset previous action state on desktop inline switch ──
   const prevActionRef = useRef(null);
@@ -1234,25 +1283,118 @@ export default function WalletDashboard({
                     >
 	                      <div className="px-1 leading-tight">
                           {/* Desktop: date + message on one line (centered). Mobile: date above message (centered). */}
-                          <div className="flex flex-col items-center md:flex-row md:items-baseline md:justify-center md:gap-3">
-                            {recentActivityWhen?.mobile || recentActivityWhen?.desktop ? (
-                              <>
-                                <span className="md:hidden text-[12px] text-white/60 whitespace-nowrap">
-                                  {recentActivityWhen.mobile}
-                                </span>
-                                <span className="hidden md:inline text-[14px] text-white/45 whitespace-nowrap">
-                                  {recentActivityWhen.desktop}
-                                </span>
-                              </>
+                          <div className="flex items-center justify-center gap-2 md:gap-3">
+                            {recentActivityIcon === "convert" ? (
+                              <span className="shrink-0 text-white" aria-hidden>
+                                <svg
+                                  className="w-4 h-4 md:w-[18px] md:h-[18px]"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                >
+                                  <polyline points="17 1 21 5 17 9" />
+                                  <path d="M3 11V9a4 4 0 0 1 4-4h14" />
+                                  <polyline points="7 23 3 19 7 15" />
+                                  <path d="M21 13v2a4 4 0 0 1-4 4H3" />
+                                </svg>
+                              </span>
+                            ) : recentActivityIcon === "receive" ? (
+                              <span className="shrink-0 text-[#16A34A]" aria-hidden>
+                                <svg
+                                  className="w-4 h-4 md:w-[18px] md:h-[18px]"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                >
+                                  <line x1="12" y1="5" x2="12" y2="19" />
+                                  <polyline points="19 12 12 19 5 12" />
+                                </svg>
+                              </span>
+                            ) : recentActivityIcon === "send" ? (
+                              <span className="shrink-0 text-red-400" aria-hidden>
+                                <svg
+                                  className="w-4 h-4 md:w-[18px] md:h-[18px]"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                >
+                                  <line x1="12" y1="19" x2="12" y2="5" />
+                                  <polyline points="5 12 12 5 19 12" />
+                                </svg>
+                              </span>
                             ) : null}
-                            <span className="text-center md:text-center truncate max-w-full md:max-w-[520px]">
-                              <span className="md:hidden text-[14px] text-white/85 font-semibold">
-                                {recentActivityMessageMobile}
+                            <div className="flex flex-col items-center md:flex-row md:items-baseline md:justify-center md:gap-3">
+                              {recentActivityWhen?.mobile || recentActivityWhen?.desktop ? (
+                                <>
+                                  <span className="md:hidden text-[12px] text-white/60 whitespace-nowrap">
+                                    {recentActivityWhen.mobile}
+                                  </span>
+                                  <span className="hidden md:inline text-[14px] text-white/45 whitespace-nowrap">
+                                    {recentActivityWhen.desktop}
+                                  </span>
+                                </>
+                              ) : null}
+                              <span className="text-center md:text-center truncate max-w-full md:max-w-[520px]">
+                                <span className="md:hidden text-[14px] text-white/85 font-semibold">
+                                  {recentActivityMessageMobileParts.isConversion ? (
+                                    <>
+                                      {recentActivityMessageMobileParts.left} {recentActivityMessageMobileParts.arrow}{" "}
+                                      <span className="text-[16px] text-white/90 font-semibold">
+                                        {recentActivityMessageMobileParts.right}
+                                      </span>
+                                    </>
+                                  ) : recentActivityIcon === "receive" && recentActivityReceiveParts ? (
+                                    <>
+                                      {recentActivityReceiveParts.prefix}{" "}
+                                      <span className="text-[16px] text-[#16A34A] font-semibold">
+                                        + {recentActivityReceiveParts.amount} {recentActivityReceiveParts.currency}
+                                      </span>
+                                      {recentActivityReceiveParts.suffix}
+                                    </>
+                                  ) : recentActivityIcon === "send" && recentActivitySendParts ? (
+                                    <>
+                                      {recentActivitySendParts.prefix}{" "}
+                                      <span className="text-[16px] text-red-300 font-semibold">
+                                        - {recentActivitySendParts.amount} {recentActivitySendParts.currency}
+                                      </span>
+                                      {recentActivitySendParts.suffix}
+                                    </>
+                                  ) : (
+                                    recentActivityMessageMobileParts.text
+                                  )}
+                                </span>
+                                <span className="hidden md:inline text-[14px] text-white/65">
+                                  {recentActivityIcon === "receive" && recentActivityReceiveParts ? (
+                                    <>
+                                      {recentActivityReceiveParts.prefix}{" "}
+                                      <span className="text-[15px] text-[#16A34A] font-semibold">
+                                        + {recentActivityReceiveParts.amount} {recentActivityReceiveParts.currency}
+                                      </span>
+                                      {recentActivityReceiveParts.suffix}
+                                    </>
+                                  ) : recentActivityIcon === "send" && recentActivitySendParts ? (
+                                    <>
+                                      {recentActivitySendParts.prefix}{" "}
+                                      <span className="text-[15px] text-red-300 font-semibold">
+                                        - {recentActivitySendParts.amount} {recentActivitySendParts.currency}
+                                      </span>
+                                      {recentActivitySendParts.suffix}
+                                    </>
+                                  ) : (
+                                    recentActivityMessage
+                                  )}
+                                </span>
                               </span>
-                              <span className="hidden md:inline text-[14px] text-white/65">
-                                {recentActivityMessage}
-                              </span>
-                            </span>
+                            </div>
                           </div>
                         </div>
                     </button>
@@ -1266,10 +1408,53 @@ export default function WalletDashboard({
                         ) : null}
                         <div>
                           <span className="md:hidden text-[14px] text-white/85 font-semibold">
-                            {recentActivityMessageMobile}
+                            {recentActivityMessageMobileParts.isConversion ? (
+                              <>
+                                {recentActivityMessageMobileParts.left} {recentActivityMessageMobileParts.arrow}{' '}
+                                <span className="text-[16px] text-white/90 font-semibold">
+                                  {recentActivityMessageMobileParts.right}
+                                </span>
+                              </>
+                            ) : recentActivityIcon === "receive" && recentActivityReceiveParts ? (
+                              <>
+                                {recentActivityReceiveParts.prefix}{" "}
+                                <span className="text-[16px] text-[#16A34A] font-semibold">
+                                  + {recentActivityReceiveParts.amount} {recentActivityReceiveParts.currency}
+                                </span>
+                                {recentActivityReceiveParts.suffix}
+                              </>
+                            ) : recentActivityIcon === "send" && recentActivitySendParts ? (
+                              <>
+                                {recentActivitySendParts.prefix}{" "}
+                                <span className="text-[16px] text-red-300 font-semibold">
+                                  - {recentActivitySendParts.amount} {recentActivitySendParts.currency}
+                                </span>
+                                {recentActivitySendParts.suffix}
+                              </>
+                            ) : (
+                              recentActivityMessageMobileParts.text
+                            )}
                           </span>
                           <span className="hidden md:inline text-[14px] text-white/85 font-semibold">
-                            {recentActivityMessage}
+                            {recentActivityIcon === "receive" && recentActivityReceiveParts ? (
+                              <>
+                                {recentActivityReceiveParts.prefix}{" "}
+                                <span className="text-[15px] text-[#16A34A] font-semibold">
+                                  + {recentActivityReceiveParts.amount} {recentActivityReceiveParts.currency}
+                                </span>
+                                {recentActivityReceiveParts.suffix}
+                              </>
+                            ) : recentActivityIcon === "send" && recentActivitySendParts ? (
+                              <>
+                                {recentActivitySendParts.prefix}{" "}
+                                <span className="text-[15px] text-red-300 font-semibold">
+                                  - {recentActivitySendParts.amount} {recentActivitySendParts.currency}
+                                </span>
+                                {recentActivitySendParts.suffix}
+                              </>
+                            ) : (
+                              recentActivityMessage
+                            )}
                           </span>
                         </div>
                         <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#1e2628]" />
