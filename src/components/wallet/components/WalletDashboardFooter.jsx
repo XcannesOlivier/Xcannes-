@@ -147,7 +147,7 @@ export default function WalletDashboardFooter({ onScan } = {}) {
         <div className="relative h-[72px]">
           <MobileFooterOverlay />
           {/* Ombre visible au-dessus de l'overlay */}
-          <div className="absolute inset-0 z-[5] pointer-events-none shadow-[inset_0_-16px_28px_rgba(255,255,255,0.03),inset_0_46px_70px_rgba(0,0,0,0.55)]" aria-hidden />
+          <div className="absolute inset-0 z-[5] pointer-events-none shadow-[inset_0_-16px_28px_rgba(255,255,255,0.03)]" aria-hidden />
 
           <MobileScanButton
             onScan={onScan}
