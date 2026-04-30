@@ -139,7 +139,7 @@ export default function WalletDashboardFooter({ onScan } = {}) {
   const { t } = useTranslation("common");
 
   return (
-    <div className="mt-[2px] shrink-0 z-20 bg-elevated [--bg-elevated:#090c0d] border-t-0 md:mt-auto md:border-t md:border-white/10">
+    <div className="mt-[2px] shrink-0 z-20 bg-transparent md:bg-elevated md:[--bg-elevated:#090c0d] border-t-0 md:mt-auto md:border-t md:border-white/10">
       <div
         className="relative overflow-visible bg-[#111518] md:hidden"
         style={mobileFooterStyle}
