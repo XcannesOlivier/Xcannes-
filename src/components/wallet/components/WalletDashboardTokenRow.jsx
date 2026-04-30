@@ -82,7 +82,7 @@ export default function WalletDashboardTokenRow({
     "border border-white/[0.04]",
     "bg-white/5",
     "bg-[linear-gradient(to_bottom,rgba(255,255,255,0.05),rgba(255,255,255,0)_85%)]",
-    "hover:bg-transparent hover:border-white/[0.06]",
+    "hover:bg-none hover:border-white/[0.06]",
     "transition-colors duration-150",
   ].join(" ");
 
