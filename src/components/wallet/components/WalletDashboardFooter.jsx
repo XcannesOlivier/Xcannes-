@@ -83,14 +83,14 @@ function MobileFooterOverlay() {
         <path
           d={LEFT_LABEL_LINE_PATH}
           fill="none"
-          stroke="transparent"
+          stroke="currentColor"
           strokeWidth="1.1"
           strokeLinecap="round"
         />
         <path
           d={RIGHT_LABEL_LINE_PATH}
           fill="none"
-          stroke="transparent"
+          stroke="currentColor"
           strokeWidth="1.1"
           strokeLinecap="round"
         />
@@ -141,7 +141,7 @@ export default function WalletDashboardFooter({ onScan } = {}) {
   return (
     <div className="mt-[2px] shrink-0 z-20 bg-transparent md:bg-elevated md:[--bg-elevated:#090c0d] border-t-0 md:mt-auto md:border-t md:border-white/10">
       <div
-        className="relative overflow-visible bg-[#111518] md:hidden"
+        className="relative overflow-visible bg-transparent md:hidden"
         style={mobileFooterStyle}
       >
         <div className="relative h-[72px]">
