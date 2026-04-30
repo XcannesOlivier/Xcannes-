@@ -1280,7 +1280,7 @@ export default function WalletDashboard({
                     <div className="w-px h-6 bg-white/10" />
                   </div>
                   <div className="order-1 md:hidden flex-1 flex items-center justify-center pointer-events-none" aria-hidden>
-                    <div className="w-px h-5 bg-white/15" />
+                    <div className="w-[1.1px] h-5 bg-[#697173]/40" />
                   </div>
                   <button
                     type="button"
@@ -1302,7 +1302,7 @@ export default function WalletDashboard({
                   </button>
                   {recentActivityMessage ? (
                     <div className="order-3 basis-full md:hidden flex items-center justify-center py-0.5 pointer-events-none" aria-hidden>
-                      <div className="w-[70%] h-px bg-white/10" />
+                      <div className="w-[70%] h-[1.1px] bg-[#697173]/40" />
                     </div>
                   ) : null}
                   <div
