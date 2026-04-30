@@ -79,10 +79,10 @@ export default function WalletDashboardTokenRow({
   // fond elevated + voile blanc léger + ombres internes.
   const rowSurfaceClass = [
     "bg-elevated",
-    "border border-white/7",
+    "border border-white/[0.04]",
     "bg-white/5",
     "bg-[linear-gradient(to_bottom,rgba(255,255,255,0.05),rgba(255,255,255,0)_85%)]",
-    "hover:bg-transparent hover:border-white/10",
+    "hover:bg-transparent hover:border-white/[0.06]",
     "transition-colors duration-150",
   ].join(" ");
 
