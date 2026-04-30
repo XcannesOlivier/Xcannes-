@@ -83,14 +83,14 @@ function MobileFooterOverlay() {
         <path
           d={LEFT_LABEL_LINE_PATH}
           fill="none"
-          stroke="currentColor"
+          stroke="transparent"
           strokeWidth="1.1"
           strokeLinecap="round"
         />
         <path
           d={RIGHT_LABEL_LINE_PATH}
           fill="none"
-          stroke="currentColor"
+          stroke="transparent"
           strokeWidth="1.1"
           strokeLinecap="round"
         />
