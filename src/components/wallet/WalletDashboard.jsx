@@ -804,7 +804,7 @@ export default function WalletDashboard({
   const recentActivityMessageMobile = useMemo(() => {
     const text = String(recentActivityMessage || "").trim();
     if (!text) return "";
-    return text.replace(/^Vous avez\s+/i, "");
+    return text;
   }, [recentActivityMessage]);
 
   // ── Reset previous action state on desktop inline switch ──
@@ -1237,7 +1237,7 @@ export default function WalletDashboard({
                           <div className="flex flex-col items-center md:flex-row md:items-baseline md:justify-center md:gap-3">
                             {recentActivityWhen?.mobile || recentActivityWhen?.desktop ? (
                               <>
-                                <span className="md:hidden text-[10.5px] text-white/45 whitespace-nowrap">
+                                <span className="md:hidden text-[12px] text-white/60 whitespace-nowrap">
                                   {recentActivityWhen.mobile}
                                 </span>
                                 <span className="hidden md:inline text-[14px] text-white/45 whitespace-nowrap">
@@ -1245,9 +1245,13 @@ export default function WalletDashboard({
                                 </span>
                               </>
                             ) : null}
-                            <span className="text-center md:text-center text-[11px] md:text-[14px] text-white/65 truncate max-w-full md:max-w-[520px]">
-                              <span className="md:hidden">{recentActivityMessageMobile}</span>
-                              <span className="hidden md:inline">{recentActivityMessage}</span>
+                            <span className="text-center md:text-center truncate max-w-full md:max-w-[520px]">
+                              <span className="md:hidden text-[14px] text-white/85 font-semibold">
+                                {recentActivityMessageMobile}
+                              </span>
+                              <span className="hidden md:inline text-[14px] text-white/65">
+                                {recentActivityMessage}
+                              </span>
                             </span>
                           </div>
                         </div>
@@ -1255,14 +1259,18 @@ export default function WalletDashboard({
                     {activityTooltipOpen && recentActivityMessage ? (
                       <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50 w-max max-w-[260px] bg-[#1e2628] text-white/85 text-[11px] leading-snug rounded-lg px-3 py-2 shadow-xl ring-1 ring-white/10 pointer-events-none">
                         {recentActivityWhen?.mobile || recentActivityWhen?.desktop ? (
-                          <div className="text-white/50 text-[10px] mb-1">
+                          <div className="text-white/60 text-[12px] mb-1">
                             <span className="md:hidden">{recentActivityWhen.mobile}</span>
                             <span className="hidden md:inline">{recentActivityWhen.desktop}</span>
                           </div>
                         ) : null}
                         <div>
-                          <span className="md:hidden">{recentActivityMessageMobile}</span>
-                          <span className="hidden md:inline">{recentActivityMessage}</span>
+                          <span className="md:hidden text-[14px] text-white/85 font-semibold">
+                            {recentActivityMessageMobile}
+                          </span>
+                          <span className="hidden md:inline text-[14px] text-white/85 font-semibold">
+                            {recentActivityMessage}
+                          </span>
                         </div>
                         <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#1e2628]" />
                       </div>
