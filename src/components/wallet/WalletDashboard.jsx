@@ -822,6 +822,19 @@ export default function WalletDashboard({
     };
   }, [recentActivityMessageMobile]);
 
+  const recentActivityMessageParts = useMemo(() => {
+    const text = String(recentActivityMessage || "").trim();
+    if (!text) return { isConversion: false, text: "" };
+    const match = text.match(/^(.*?)(?:\s*)(→|->)(?:\s*)(.+)$/);
+    if (!match) return { isConversion: false, text };
+    return {
+      isConversion: true,
+      left: match[1].trim(),
+      arrow: match[2] === "->" ? "→" : match[2],
+      right: match[3].trim(),
+    };
+  }, [recentActivityMessage]);
+
   const recentActivityReceiveParts = useMemo(() => {
     const text = String(recentActivityMessage || "").trim();
     if (!text) return null;
@@ -1246,13 +1259,13 @@ export default function WalletDashboard({
               tokens={tokenListTokens}
               renderTokenRow={renderTokenRow}
               headerTitle={
-                <div className="w-full flex flex-wrap md:flex-nowrap items-center justify-between gap-2">
+                <div className="w-full flex flex-wrap md:flex-nowrap items-center justify-start md:justify-between gap-2">
                   <WalletCurrencySelector
                     value=""
                     onChange={handleAddDevise}
                     triggerVariant="text"
                     triggerLabel={<><span className="md:hidden">+ Ajouter une devise</span><span className="hidden md:inline">+ Ajouter une devise</span></>}
-                    buttonClassName="shrink-0 inline-flex items-center gap-1 text-[14px] md:text-[15px] font-normal text-white/55 hover:text-white/85 transition-colors px-4 md:px-3 py-1.5 md:py-1.5 rounded-lg ring-1 ring-white/10 hover:ring-white/20"
+                    buttonClassName="shrink-0 inline-flex items-center gap-1 text-[14px] md:text-[15px] font-normal text-white/55 hover:text-white/85 transition-colors px-4 md:px-3 py-1.5 md:py-1.5 rounded-lg"
                     placeholder={t('ui_search_all_currencies_c5d6e7f8', 'Search currency...')}
                     excludeCodes={['USD', 'RLUSD', 'XRP']}
                     showQuickAdd={false}
@@ -1263,9 +1276,33 @@ export default function WalletDashboard({
                     }
                     fullscreen={true}
                   />
+                  <div className="hidden md:flex items-center justify-center px-1.5 pointer-events-none md:order-1" aria-hidden>
+                    <div className="w-px h-6 bg-white/10" />
+                  </div>
+                  <div className="order-1 md:hidden flex-1 flex items-center justify-center pointer-events-none" aria-hidden>
+                    <div className="w-px h-5 bg-white/15" />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleOpenGlobalStatement}
+                    className="order-2 md:order-5 shrink-0 inline-flex items-center gap-1.5 text-[14px] md:text-[15px] font-normal text-white/55 hover:text-white/85 transition-colors px-2.5 md:px-3 py-1 md:py-1.5 rounded-lg"
+                    title={
+                      recentActivityMessage
+                        ? recentActivityMessage
+                        : t('ui_open_statement', 'Ouvrir le relevé des transactions')
+                    }
+                    aria-label={t('ui_open_statement', 'Ouvrir le relevé des transactions')}
+                  >
+                    <svg className="w-3.5 h-3.5 md:w-4 md:h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                      <circle cx="12" cy="12" r="9" />
+                      <polyline points="12 7 12 12 15.5 14.5" />
+                    </svg>
+                    <span className="md:hidden">{t('ui_consult_global_statement_desktop', "Voir l'historique")}</span>
+                    <span className="hidden md:inline">{t('ui_consult_global_statement_desktop', "Voir l'historique")}</span>
+                  </button>
                   <div
                     className={[
-                      "order-3 basis-full md:order-none md:basis-auto flex-1 min-w-0 overflow-visible relative transition-all duration-500",
+                      "order-3 basis-full md:order-3 md:basis-auto flex-1 min-w-0 overflow-visible relative transition-all duration-500",
                       recentActivityMessage ? "opacity-100 max-h-10" : "opacity-0 max-h-0 pointer-events-none",
                     ].join(" ")}
                     aria-live="polite"
@@ -1373,7 +1410,14 @@ export default function WalletDashboard({
                                   )}
                                 </span>
                                 <span className="hidden md:inline text-[14px] text-white/65">
-                                  {recentActivityIcon === "receive" && recentActivityReceiveParts ? (
+                                  {recentActivityMessageParts.isConversion ? (
+                                    <>
+                                      {recentActivityMessageParts.left} {recentActivityMessageParts.arrow}{" "}
+                                      <span className="text-[16px] text-white/85 font-semibold">
+                                        {recentActivityMessageParts.right}
+                                      </span>
+                                    </>
+                                  ) : recentActivityIcon === "receive" && recentActivityReceiveParts ? (
                                     <>
                                       {recentActivityReceiveParts.prefix}{" "}
                                       <span className="text-[15px] text-[#16A34A] font-semibold">
@@ -1436,7 +1480,14 @@ export default function WalletDashboard({
                             )}
                           </span>
                           <span className="hidden md:inline text-[14px] text-white/85 font-semibold">
-                            {recentActivityIcon === "receive" && recentActivityReceiveParts ? (
+                            {recentActivityMessageParts.isConversion ? (
+                              <>
+                                {recentActivityMessageParts.left} {recentActivityMessageParts.arrow}{" "}
+                                <span className="text-[16px] text-white/90 font-semibold">
+                                  {recentActivityMessageParts.right}
+                                </span>
+                              </>
+                            ) : recentActivityIcon === "receive" && recentActivityReceiveParts ? (
                               <>
                                 {recentActivityReceiveParts.prefix}{" "}
                                 <span className="text-[15px] text-[#16A34A] font-semibold">
@@ -1461,24 +1512,9 @@ export default function WalletDashboard({
                       </div>
                     ) : null}
                   </div>
-                  <button
-                    type="button"
-                    onClick={handleOpenGlobalStatement}
-                    className="shrink-0 inline-flex items-center gap-1.5 text-[14px] md:text-[15px] font-normal text-white/55 hover:text-white/85 transition-colors px-2.5 md:px-3 py-1 md:py-1.5 rounded-lg ring-1 ring-white/10 hover:ring-white/20"
-                    title={
-                      recentActivityMessage
-                        ? recentActivityMessage
-                        : t('ui_open_statement', 'Ouvrir le relevé des transactions')
-                    }
-                    aria-label={t('ui_open_statement', 'Ouvrir le relevé des transactions')}
-                  >
-                    <svg className="w-3.5 h-3.5 md:w-4 md:h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                      <circle cx="12" cy="12" r="9" />
-                      <polyline points="12 7 12 12 15.5 14.5" />
-                    </svg>
-                    <span className="md:hidden">{t('ui_consult_global_statement_desktop', "Voir l'historique")}</span>
-                    <span className="hidden md:inline">{t('ui_consult_global_statement_desktop', "Voir l'historique")}</span>
-                  </button>
+                  <div className="hidden md:flex items-center justify-center px-1.5 pointer-events-none md:order-4" aria-hidden>
+                    <div className="w-px h-6 bg-white/10" />
+                  </div>
                 </div>
               }
               className="relative z-[1] touch-pan-y"
