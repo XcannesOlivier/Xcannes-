@@ -1386,7 +1386,7 @@ export default function WalletDashboard({
                                 </>
                               ) : null}
                               <span className="text-center md:text-center truncate max-w-full md:max-w-[520px]">
-                                <span className="md:hidden text-[13px] text-white/85 font-semibold">
+                                <span className="md:hidden text-[13px] text-white/65 font-semibold">
                                   {recentActivityMessageMobileParts.isConversion ? (
                                     <>
                                       {recentActivityMessageMobileParts.left} {recentActivityMessageMobileParts.arrow}{" "}
@@ -1456,7 +1456,7 @@ export default function WalletDashboard({
                           </div>
                         ) : null}
                         <div>
-                          <span className="md:hidden text-[13px] text-white/85 font-semibold">
+                          <span className="md:hidden text-[13px] text-white/65 font-semibold">
                             {recentActivityMessageMobileParts.isConversion ? (
                               <>
                                 {recentActivityMessageMobileParts.left} {recentActivityMessageMobileParts.arrow}{' '}
