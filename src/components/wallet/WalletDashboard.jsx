@@ -1259,7 +1259,7 @@ export default function WalletDashboard({
               tokens={tokenListTokens}
               renderTokenRow={renderTokenRow}
               headerTitle={
-                <div className="w-full flex flex-wrap md:flex-nowrap items-center justify-start md:justify-between gap-2">
+                <div className="w-full flex flex-wrap md:flex-nowrap items-center justify-start md:justify-between gap-x-2 gap-y-1 md:gap-2">
                   <WalletCurrencySelector
                     value=""
                     onChange={handleAddDevise}
@@ -1301,7 +1301,7 @@ export default function WalletDashboard({
                     <span className="hidden md:inline">{t('ui_consult_global_statement_desktop', "Voir l'historique")}</span>
                   </button>
                   {recentActivityMessage ? (
-                    <div className="order-3 basis-full md:hidden flex items-center justify-center py-1 pointer-events-none" aria-hidden>
+                    <div className="order-3 basis-full md:hidden flex items-center justify-center py-0.5 pointer-events-none" aria-hidden>
                       <div className="w-[70%] h-px bg-white/10" />
                     </div>
                   ) : null}
@@ -1386,18 +1386,18 @@ export default function WalletDashboard({
                                 </>
                               ) : null}
                               <span className="text-center md:text-center truncate max-w-full md:max-w-[520px]">
-                                <span className="md:hidden text-[14px] text-white/85 font-semibold">
+                                <span className="md:hidden text-[13px] text-white/85 font-semibold">
                                   {recentActivityMessageMobileParts.isConversion ? (
                                     <>
                                       {recentActivityMessageMobileParts.left} {recentActivityMessageMobileParts.arrow}{" "}
-                                      <span className="text-[16px] text-white/90 font-semibold">
+                                      <span className="text-[14px] text-white/90 font-semibold">
                                         {recentActivityMessageMobileParts.right}
                                       </span>
                                     </>
                                   ) : recentActivityIcon === "receive" && recentActivityReceiveParts ? (
                                     <>
                                       {recentActivityReceiveParts.prefix}{" "}
-                                      <span className="text-[16px] text-[#16A34A] font-semibold">
+                                      <span className="text-[14px] text-[#16A34A] font-semibold">
                                         + {recentActivityReceiveParts.amount} {recentActivityReceiveParts.currency}
                                       </span>
                                       {recentActivityReceiveParts.suffix}
@@ -1405,7 +1405,7 @@ export default function WalletDashboard({
                                   ) : recentActivityIcon === "send" && recentActivitySendParts ? (
                                     <>
                                       {recentActivitySendParts.prefix}{" "}
-                                      <span className="text-[16px] text-red-300 font-semibold">
+                                      <span className="text-[14px] text-red-300 font-semibold">
                                         - {recentActivitySendParts.amount} {recentActivitySendParts.currency}
                                       </span>
                                       {recentActivitySendParts.suffix}
@@ -1456,18 +1456,18 @@ export default function WalletDashboard({
                           </div>
                         ) : null}
                         <div>
-                          <span className="md:hidden text-[14px] text-white/85 font-semibold">
+                          <span className="md:hidden text-[13px] text-white/85 font-semibold">
                             {recentActivityMessageMobileParts.isConversion ? (
                               <>
                                 {recentActivityMessageMobileParts.left} {recentActivityMessageMobileParts.arrow}{' '}
-                                <span className="text-[16px] text-white/90 font-semibold">
+                                <span className="text-[14px] text-white/90 font-semibold">
                                   {recentActivityMessageMobileParts.right}
                                 </span>
                               </>
                             ) : recentActivityIcon === "receive" && recentActivityReceiveParts ? (
                               <>
                                 {recentActivityReceiveParts.prefix}{" "}
-                                <span className="text-[16px] text-[#16A34A] font-semibold">
+                                <span className="text-[14px] text-[#16A34A] font-semibold">
                                   + {recentActivityReceiveParts.amount} {recentActivityReceiveParts.currency}
                                 </span>
                                 {recentActivityReceiveParts.suffix}
@@ -1475,7 +1475,7 @@ export default function WalletDashboard({
                             ) : recentActivityIcon === "send" && recentActivitySendParts ? (
                               <>
                                 {recentActivitySendParts.prefix}{" "}
-                                <span className="text-[16px] text-red-300 font-semibold">
+                                <span className="text-[14px] text-red-300 font-semibold">
                                   - {recentActivitySendParts.amount} {recentActivitySendParts.currency}
                                 </span>
                                 {recentActivitySendParts.suffix}
