@@ -80,8 +80,8 @@ export default function WalletDashboardTokenRow({
   const rowSurfaceClass = [
     "bg-gradient-to-b from-[#101415] to-[#0d1214]",
     "ring-1 ring-white/[0.07] ring-inset",
-    "shadow-[0_2px_8px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-12px_18px_rgba(0,0,0,0.55),inset_0_-8px_14px_rgba(34,197,94,0.12)]",
-    "hover:ring-white/[0.13] hover:shadow-[0_2px_12px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.08),inset_0_-12px_18px_rgba(0,0,0,0.55),inset_0_-8px_14px_rgba(34,197,94,0.18)]",
+    "shadow-[0_2px_8px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-12px_18px_rgba(0,0,0,0.55)]",
+    "hover:ring-white/[0.13] hover:shadow-[0_2px_12px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.08),inset_0_-12px_18px_rgba(0,0,0,0.55)]",
     "transition-shadow transition-[box-shadow]",
   ].join(" ");
 
