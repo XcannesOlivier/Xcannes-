@@ -78,17 +78,13 @@ export default function WalletDashboardTokenRow({
   // Style surface calqué sur les cartes du bloc "Support" (Paramètres) :
   // fond elevated + voile blanc léger + ombres internes.
   const rowSurfaceClass = [
+    "bg-elevated",
     "border border-white/10",
     "bg-white/5",
     "shadow-[inset_0_-34px_34px_-20px_rgba(0,0,0,0.95),inset_0_-18px_70px_-45px_rgba(0,0,0,0.9)]",
     "hover:bg-transparent hover:border-white/15",
     "transition-colors duration-150",
   ].join(" ");
-
-  const rowSurfaceStyle = {
-    backgroundImage:
-      "radial-gradient(520px circle at 80% 0%, rgba(255,255,255,0.08), transparent 55%), radial-gradient(900px circle at 100% 50%, rgba(0,255,150,0.10), transparent 35%), radial-gradient(700px circle at 0% 100%, rgba(0,255,150,0.07), transparent 60%)",
-  };
 
   const handleRowKeyDown = (event) => {
     if (!onClick) return;
@@ -109,7 +105,6 @@ export default function WalletDashboardTokenRow({
         className="w-full text-left"
       >
         <div
-          style={rowSurfaceStyle}
           className={`flex items-center gap-3 rounded-[14px] px-3.5 py-2.5 md:py-2 transition-colors cursor-pointer ${rowSurfaceClass} ${tokenRowClass}`}
         >
           <div className={`flex items-center ${iconTextGapClass} min-w-0`}>
