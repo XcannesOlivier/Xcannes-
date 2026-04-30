@@ -1300,9 +1300,14 @@ export default function WalletDashboard({
                     <span className="md:hidden">{t('ui_consult_global_statement_desktop', "Voir l'historique")}</span>
                     <span className="hidden md:inline">{t('ui_consult_global_statement_desktop', "Voir l'historique")}</span>
                   </button>
+                  {recentActivityMessage ? (
+                    <div className="order-3 basis-full md:hidden flex items-center justify-center py-1 pointer-events-none" aria-hidden>
+                      <div className="w-[70%] h-px bg-white/10" />
+                    </div>
+                  ) : null}
                   <div
                     className={[
-                      "order-3 basis-full md:order-3 md:basis-auto flex-1 min-w-0 overflow-visible relative transition-all duration-500",
+                      "order-4 basis-full md:order-3 md:basis-auto flex-1 min-w-0 overflow-visible relative transition-all duration-500",
                       recentActivityMessage ? "opacity-100 max-h-10" : "opacity-0 max-h-0 pointer-events-none",
                     ].join(" ")}
                     aria-live="polite"
@@ -1324,7 +1329,7 @@ export default function WalletDashboard({
                             {recentActivityIcon === "convert" ? (
                               <span className="shrink-0 text-white" aria-hidden>
                                 <svg
-                                  className="w-4 h-4 md:w-[18px] md:h-[18px]"
+                                  className="w-5 h-5 md:w-[18px] md:h-[18px]"
                                   viewBox="0 0 24 24"
                                   fill="none"
                                   stroke="currentColor"
@@ -1341,7 +1346,7 @@ export default function WalletDashboard({
                             ) : recentActivityIcon === "receive" ? (
                               <span className="shrink-0 text-[#16A34A]" aria-hidden>
                                 <svg
-                                  className="w-4 h-4 md:w-[18px] md:h-[18px]"
+                                  className="w-5 h-5 md:w-[18px] md:h-[18px]"
                                   viewBox="0 0 24 24"
                                   fill="none"
                                   stroke="currentColor"
@@ -1356,7 +1361,7 @@ export default function WalletDashboard({
                             ) : recentActivityIcon === "send" ? (
                               <span className="shrink-0 text-red-400" aria-hidden>
                                 <svg
-                                  className="w-4 h-4 md:w-[18px] md:h-[18px]"
+                                  className="w-5 h-5 md:w-[18px] md:h-[18px]"
                                   viewBox="0 0 24 24"
                                   fill="none"
                                   stroke="currentColor"
