@@ -1329,7 +1329,7 @@ export default function WalletDashboard({
                             <div className="flex flex-col items-center md:flex-row md:items-baseline md:justify-center md:gap-3">
                               {recentActivityWhen?.mobile || recentActivityWhen?.desktop ? (
                                 <>
-                                  <span className="md:hidden text-[11px] text-white/60 whitespace-nowrap">
+                                  <span className="md:hidden text-[11px] text-white/45 whitespace-nowrap">
                                     {recentActivityWhen.mobile}
                                   </span>
                                   <span className="hidden md:inline text-[14px] text-white/45 whitespace-nowrap">
