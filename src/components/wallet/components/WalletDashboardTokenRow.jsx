@@ -75,14 +75,15 @@ export default function WalletDashboardTokenRow({
               ? `${getCurrencyDescription(currencyCode)}`
               : "XRPL Token");
 
-  // Style surface calqué sur le sélecteur "base" du modal Swap :
-  // gradient sombre + ring subtil + shadow interne/externe.
+  // Style surface calqué sur les cartes du bloc "Support" (Paramètres) :
+  // fond elevated + voile blanc léger + ombres internes.
   const rowSurfaceClass = [
-    "bg-gradient-to-b from-[#101415] to-[#0d1214]",
-    "ring-1 ring-white/[0.07] ring-inset",
-    "shadow-[0_2px_8px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-12px_18px_rgba(0,0,0,0.55)]",
-    "hover:ring-white/[0.13] hover:shadow-[0_2px_12px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.08),inset_0_-12px_18px_rgba(0,0,0,0.55)]",
-    "transition-shadow transition-[box-shadow]",
+    "bg-elevated",
+    "border border-white/10",
+    "bg-white/5",
+    "shadow-[inset_0_-34px_34px_-20px_rgba(0,0,0,0.95),inset_0_-18px_70px_-45px_rgba(0,0,0,0.9)]",
+    "hover:bg-transparent hover:border-white/15",
+    "transition-colors duration-150",
   ].join(" ");
 
   const handleRowKeyDown = (event) => {
