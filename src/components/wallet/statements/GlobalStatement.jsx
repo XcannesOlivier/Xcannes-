@@ -56,6 +56,9 @@ export default function GlobalStatement({
   /* ── local state ───────────────────────────────────────── */
   const [exportFormat, setExportFormat] = useState(null);
   const [accountDropdownOpen, setAccountDropdownOpen] = useState(false);
+  const [accountAddressExpanded, setAccountAddressExpanded] = useState(false);
+  const [accountCopyNotice, setAccountCopyNotice] = useState("");
+  const accountCopyNoticeTimerRef = useRef(null);
   const [detailMovement, setDetailMovement] = useState(null);
   const [detailOpen, setDetailOpen] = useState(false);
   const [copiedHash, setCopiedHash] = useState(false);
@@ -70,6 +73,7 @@ export default function GlobalStatement({
   const [overlayTranslateY, setOverlayTranslateY] = useState(0);
   const [txFilter, setTxFilter] = useState("all");
   const overlayRef = useRef(null);
+  const accountDropdownRef = useRef(null);
   const overlayListRef = useRef(null);
   const overlayDragMetaRef = useRef({
     startY: 0,
@@ -88,6 +92,44 @@ export default function GlobalStatement({
     "December 2025",
   );
   const fallbackPeriod = period || defaultPeriod;
+
+  useEffect(() => {
+    if (!accountDropdownOpen) {
+      setAccountAddressExpanded(false);
+      setAccountCopyNotice("");
+      if (accountCopyNoticeTimerRef.current) clearTimeout(accountCopyNoticeTimerRef.current);
+    }
+  }, [accountDropdownOpen]);
+
+  useEffect(() => {
+    setAccountAddressExpanded(false);
+    setAccountCopyNotice("");
+    if (accountCopyNoticeTimerRef.current) clearTimeout(accountCopyNoticeTimerRef.current);
+  }, [walletAddress]);
+
+  useEffect(() => {
+    return () => {
+      if (accountCopyNoticeTimerRef.current) clearTimeout(accountCopyNoticeTimerRef.current);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!accountDropdownOpen) return;
+
+    const handlePointerDown = (event) => {
+      const target = event?.target;
+      if (!target) return;
+      if (accountDropdownRef.current && accountDropdownRef.current.contains(target)) return;
+      setAccountDropdownOpen(false);
+    };
+
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("touchstart", handlePointerDown, { passive: true });
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("touchstart", handlePointerDown);
+    };
+  }, [accountDropdownOpen]);
   const currentPeriod = t(
     "ui_last_20_transactions_period_0b6d4c2a1e",
     "Last 20 transactions",
@@ -1854,7 +1896,7 @@ export default function GlobalStatement({
           </div>
 
             <div className="mt-6 mb-4 flex justify-center">
-            <div className="relative w-auto min-w-[200px] max-w-[260px]">
+            <div className="relative w-auto min-w-[200px] max-w-[260px]" ref={accountDropdownRef}>
               <p className="text-[22px] md:text-[21px] text-white/85 font-medium mb-1 text-center">
                 {t("ui_current_account_plain", "Compte actuel")}
               </p>
@@ -1871,30 +1913,53 @@ export default function GlobalStatement({
                   {walletLabel || t("nav_wallet", "Wallet")}
                 </span>
                 <svg
-                  className={`w-3 h-3 text-white/50 transition-transform duration-150 ${accountDropdownOpen ? "rotate-180" : ""}`}
+                  className="w-4 h-4 text-white/45 transition-colors"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
-                  strokeWidth="2"
+                  strokeWidth="1.7"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   aria-hidden="true"
                 >
-                  <path d="M6 9l6 6 6-6" />
+                  <path d="M2.5 12s3.5-7 9.5-7 9.5 7 9.5 7-3.5 7-9.5 7-9.5-7-9.5-7Z" />
+                  <circle cx="12" cy="12" r="2.6" />
+                  {accountDropdownOpen ? <path d="M4 20L20 4" /> : null}
                 </svg>
               </button>
               {accountDropdownOpen && walletAddress ? (
                 <div className="absolute top-full left-0 z-[200] w-full mt-1 rounded-[10px] ring-1 ring-white/20 ring-inset bg-elevated px-4 py-3 shadow-[0_8px_18px_rgba(0,0,0,0.45)]">
-                  <p className="text-[12px] font-medium text-white/55 mb-2">
+                  <p className="text-[13px] md:text-[14px] text-white/60 mb-2">
                     {t("ui_account_address", "Adresse du compte")}
                   </p>
                   <div className="flex items-center gap-1.5 min-w-0">
-                    <span className="text-xs md:text-sm text-white/55 font-mono font-light break-all whitespace-normal min-w-0" title={walletAddress}>
-                      {walletAddress}
-                    </span>
                     <button
                       type="button"
-                      onClick={() => copyToClipboard(walletAddress, t("ui_copied_address", "Adresse copiée"))}
+                      className={`min-w-0 flex-1 text-left text-xs md:text-sm text-white/55 font-mono font-light ${
+                        accountAddressExpanded ? "break-all whitespace-normal" : "truncate"
+                      }`}
+                      title={walletAddress}
+                      onClick={() => setAccountAddressExpanded((prev) => !prev)}
+                      aria-label={t("ui_toggle_wallet_address_truncation", "Afficher l'adresse complète")}
+                    >
+                      {accountAddressExpanded
+                        ? walletAddress
+                        : `${walletAddress.slice(0, 8)}…${walletAddress.slice(-6)}`}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        try {
+                          await navigator.clipboard?.writeText?.(walletAddress);
+                          setAccountCopyNotice(t("ui_copied_address", "Adresse copiée"));
+                          if (accountCopyNoticeTimerRef.current) clearTimeout(accountCopyNoticeTimerRef.current);
+                          accountCopyNoticeTimerRef.current = window.setTimeout(() => {
+                            setAccountCopyNotice("");
+                          }, 3000);
+                        } catch {
+                          /* ignore */
+                        }
+                      }}
                       className="shrink-0 text-white/40 hover:text-white/70 transition-colors p-0.5"
                       title={t("ui_copy_address", "Copier l'adresse")}
                       aria-label={t("ui_copy_address", "Copier l'adresse")}
@@ -1904,6 +1969,15 @@ export default function GlobalStatement({
                         <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
                       </svg>
                     </button>
+                  </div>
+                  <div
+                    className={`mt-1.5 text-[11px] text-xcannes-green/85 transition-opacity duration-200 ${
+                      accountCopyNotice ? "opacity-100" : "opacity-0"
+                    }`}
+                    role="status"
+                    aria-live="polite"
+                  >
+                    {accountCopyNotice || " "}
                   </div>
                 </div>
               ) : null}
