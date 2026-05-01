@@ -451,7 +451,7 @@ export default function WalletDashboardReceiveModal({
     }, [shortAddress, walletOptions]);
 
 	  const accountDropdownOpenPillClassName = "rounded-3xl rounded-b-none before:content-[''] before:absolute before:inset-0 before:rounded-3xl before:rounded-b-none before:border before:border-white/20 before:border-b-0 before:pointer-events-none";
-	  const accountDropdownMenuClassName = 'bg-elevated box-border !mt-0 !max-h-64 overflow-y-auto overscroll-contain touch-pan-y border border-white/20 border-t-0 rounded-b-[20px] shadow-[0_28px_70px_rgba(0,0,0,0.72)] !z-[10020]';
+	  const accountDropdownMenuClassName = 'bg-elevated box-border !mt-0 !max-h-64 overflow-y-auto overscroll-contain touch-pan-y border border-white/20 border-t-0 ring-1 ring-white/10 ring-inset rounded-b-[20px] shadow-[0_28px_70px_rgba(0,0,0,0.72)] !z-[10020]';
 
 	  const walletPickerSurfaceClass =
 	    receiveView === 'share' ? 'bg-white/[0.02]' : 'bg-transparent';
