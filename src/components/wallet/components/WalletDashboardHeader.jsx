@@ -392,19 +392,32 @@ export default function WalletDashboardHeader({
 
                             if (revealMode === "hidden") {
                               return (
-                                <button
-                                  type="button"
-                                  className="inline-flex items-center gap-2 text-[13px] md:text-[14px] text-white/60 hover:text-white/80 transition-colors"
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    setAddressRevealState({ addr: wallet, mode: "truncated" });
-                                  }}
-                                  aria-label={t("ui_show_wallet_address", "Voir l'adresse")}
-                                >
-                                  <span>{t("ui_view_wallet_address", "Voir l'adresse")}</span>
-                                  <EyeIcon className="h-4 w-4 text-white/45" slashed={false} />
-                                </button>
+                                <div className="flex items-center justify-between gap-2">
+                                  <button
+                                    type="button"
+                                    className="min-w-0 flex-1 text-left text-[13px] md:text-[14px] text-white/60 hover:text-white/80 transition-colors"
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      setAddressRevealState({ addr: wallet, mode: "truncated" });
+                                    }}
+                                    aria-label={t("ui_show_wallet_address", "Voir l'adresse")}
+                                  >
+                                    {t("ui_view_wallet_address", "Voir l'adresse")}
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className="shrink-0 rounded-md bg-white/[0.06] p-1 text-white/55 hover:bg-white/[0.10] hover:text-white/85 transition-colors"
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      setAddressRevealState({ addr: wallet, mode: "truncated" });
+                                    }}
+                                    aria-label={t("ui_show_wallet_address", "Voir l'adresse")}
+                                  >
+                                    <EyeIcon className="h-4 w-4" slashed={false} />
+                                  </button>
+                                </div>
                               );
                             }
 
@@ -518,8 +531,8 @@ export default function WalletDashboardHeader({
     		                                </div>
                                       <button
                                         type="button"
-                                        className={`shrink-0 rounded-md p-1 text-white/45 hover:text-white/80 transition-colors ${
-                                          revealMode !== "hidden" ? "text-white/80" : ""
+                                        className={`shrink-0 rounded-md bg-white/[0.06] p-1 text-white/55 hover:bg-white/[0.10] hover:text-white/85 transition-colors ${
+                                          revealMode !== "hidden" ? "text-white/85" : ""
                                         }`}
                                         onClick={(e) => {
                                           e.preventDefault();
