@@ -1332,7 +1332,7 @@ export default function WalletDashboard({
                     aria-live="polite"
                   >
                     {recentActivityMessage ? (
-                      <div className="pointer-events-none absolute inset-x-0 -top-2 -bottom-2 md:-top-3 md:-bottom-3" aria-hidden>
+                      <div className="pointer-events-none absolute inset-x-0 -top-2 -bottom-2 md:-top-3 md:-bottom-3 overflow-hidden" aria-hidden>
                         <div className="absolute inset-0 bg-[radial-gradient(260px_circle_at_50%_50%,rgba(22,163,74,0.16),transparent_60%)] md:bg-[radial-gradient(420px_circle_at_50%_50%,rgba(22,163,74,0.14),transparent_62%)]" />
                       </div>
                     ) : null}
