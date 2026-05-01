@@ -1332,7 +1332,7 @@ export default function WalletDashboard({
                     aria-live="polite"
                   >
                     {recentActivityMessage ? (
-                      <div className="hidden md:flex items-center justify-center py-0.5 pointer-events-none" aria-hidden>
+                      <div className="hidden md:flex items-center justify-center py-1.5 pointer-events-none" aria-hidden>
                         <div className="w-[70%] h-[1.1px] bg-[#697173]/40" />
                       </div>
                     ) : null}
@@ -1362,9 +1362,9 @@ export default function WalletDashboard({
                                   </span>
                                 </>
                               ) : null}
-                              <span
-                                className="text-center md:text-center truncate max-w-full md:max-w-[520px]"
-                                style={{ filter: "drop-shadow(0 0 10px rgba(22,163,74,0.10))" }}
+                                <span
+                                  className="text-center md:text-center truncate max-w-full md:max-w-[520px]"
+                                style={{ filter: "drop-shadow(0 0 14px rgba(22,163,74,0.16))" }}
                               >
                                 <span className="md:hidden text-[13px] text-white/65 font-semibold">
                                   {recentActivityMessageMobileParts.isConversion ? (
@@ -1433,7 +1433,7 @@ export default function WalletDashboard({
                       </div>
                     ) : null}
                     {recentActivityMessage ? (
-                      <div className="hidden md:flex items-center justify-center py-0.5 pointer-events-none" aria-hidden>
+                      <div className="hidden md:flex items-center justify-center py-1.5 pointer-events-none" aria-hidden>
                         <div className="w-[70%] h-[1.1px] bg-[#697173]/40" />
                       </div>
                     ) : null}
