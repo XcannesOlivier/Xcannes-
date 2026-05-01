@@ -1353,11 +1353,11 @@ export default function WalletDashboard({
                       className="w-full text-left focus:outline-none"
                     >
                       <div className="px-1">
-                        <div className="w-full rounded-full bg-white/[0.04] ring-1 ring-white/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] hover:bg-white/[0.06] transition-colors">
-                          <div className="flex items-center gap-2.5 px-3 py-2">
+                        <div className="w-full rounded-[16px] bg-white/[0.04] ring-1 ring-white/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] hover:bg-white/[0.06] transition-colors">
+                          <div className="flex items-center gap-1.5 px-2 py-1.5">
                             <div
                               className={[
-                                "shrink-0 w-7 h-7 rounded-full flex items-center justify-center ring-1",
+                                "shrink-0 w-6 h-6 rounded-full flex items-center justify-center ring-1",
                                 recentActivityIcon === "receive"
                                   ? "bg-emerald-500/15 ring-emerald-500/25 text-emerald-300"
                                   : recentActivityIcon === "send"
@@ -1378,16 +1378,16 @@ export default function WalletDashboard({
                                 </svg>
                               ) : (
                                 <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                  <path d="M21 12a9 9 0 0 0-15.5-6.5" />
-                                  <path d="M3 4v6h6" />
-                                  <path d="M3 12a9 9 0 0 0 15.5 6.5" />
-                                  <path d="M21 20v-6h-6" />
+                                  <polyline points="17 1 21 5 17 9"></polyline>
+                                  <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
+                                  <polyline points="7 23 3 19 7 15"></polyline>
+                                  <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
                                 </svg>
                               )}
                             </div>
 
-                            <div className="flex-1 min-w-0 flex items-center gap-2">
-                              <span className="shrink-0 text-[12px] md:text-[13px] text-white/70">
+                            <div className="flex-1 min-w-0 flex items-center gap-1">
+                              <span className="shrink-0 text-[11px] md:text-[12px] text-white/70">
                                 {recentActivityIcon === "convert"
                                   ? t("ui_recent_conversion_banner", "Conversion récente")
                                   : recentActivityIcon === "receive"
@@ -1396,8 +1396,8 @@ export default function WalletDashboard({
                                       ? t("ui_recent_send_banner", "Envoi récent")
                                       : t("ui_recent_activity_banner", "Activité récente")}
                               </span>
-                              <span className="text-white/35">•</span>
-                              <span className="min-w-0 truncate text-[12px] md:text-[13px] text-white/80">
+                              <span className="text-white/30 text-[11px] md:text-[12px] leading-none">•</span>
+                              <span className="min-w-0 truncate text-[11px] md:text-[12px] text-white/80">
                                 {recentActivityMessageParts.isConversion ? (
                                   <>
                                     {String(recentActivityMessageParts.left || "")
@@ -1428,13 +1428,13 @@ export default function WalletDashboard({
                               </span>
                             </div>
 
-                            <div className="shrink-0 flex items-center gap-2">
+                            <div className="shrink-0 flex items-center gap-1.5">
                               {recentActivityWhen?.mobile || recentActivityWhen?.desktop ? (
                                 <>
-                                  <span className="md:hidden text-[11px] text-white/45 whitespace-nowrap">
+                                  <span className="md:hidden text-[10px] text-white/45 whitespace-nowrap">
                                     {recentActivityWhen.mobile}
                                   </span>
-                                  <span className="hidden md:inline text-[12px] text-white/45 whitespace-nowrap">
+                                  <span className="hidden md:inline text-[11px] text-white/45 whitespace-nowrap">
                                     {recentActivityWhen.desktop}
                                   </span>
                                 </>
