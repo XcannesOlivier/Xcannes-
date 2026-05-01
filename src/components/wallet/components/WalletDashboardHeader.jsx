@@ -431,7 +431,7 @@ export default function WalletDashboardHeader({
                               <span
                                 className="h-2 w-2 rounded-full shrink-0 transition-colors duration-150 bg-white/20 opacity-0"
                               />
-		                              <div className="min-w-0">
+		                              <div className="min-w-0 flex-1">
                                     <div className="flex items-center justify-between gap-2 min-w-0">
     		                                <div
     		                                  className="text-[16px] md:text-[17px] font-medium truncate text-white/80 min-w-0"
