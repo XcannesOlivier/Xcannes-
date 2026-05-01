@@ -363,6 +363,7 @@ export default function WalletDashboard({
   const [recentActivityKind, setRecentActivityKind] = useState('');
   const recentActivityTimerRef = useRef(null);
   const [activityTooltipOpen, setActivityTooltipOpen] = useState(false);
+  const activityTooltipTriggerRef = useRef(null);
 
   // ── Desktop panel media query ──────────────────────────────
   useEffect(() => {
@@ -387,6 +388,24 @@ export default function WalletDashboard({
     if (isDesktopPanel) return;
     setDesktopSettingsPage(null);
   }, [isDesktopPanel]);
+
+  useEffect(() => {
+    if (!activityTooltipOpen) return;
+
+    const handlePointerDown = (event) => {
+      const target = event?.target;
+      if (!target) return;
+      if (activityTooltipTriggerRef.current && activityTooltipTriggerRef.current.contains(target)) return;
+      setActivityTooltipOpen(false);
+    };
+
+    document.addEventListener('mousedown', handlePointerDown);
+    document.addEventListener('touchstart', handlePointerDown, { passive: true });
+    return () => {
+      document.removeEventListener('mousedown', handlePointerDown);
+      document.removeEventListener('touchstart', handlePointerDown);
+    };
+  }, [activityTooltipOpen]);
 
   // ── Currency lines (backend) — called first so label can feed useWalletLabel
   const backendWalletAddress = wallet || null;
@@ -1314,6 +1333,7 @@ export default function WalletDashboard({
                   >
                     <button
                       type="button"
+                      ref={activityTooltipTriggerRef}
                       title={
                         (recentActivityWhen?.desktop || recentActivityWhen?.mobile)
                           ? `${recentActivityWhen?.desktop || recentActivityWhen?.mobile} — ${recentActivityMessage}`
@@ -1399,6 +1419,11 @@ export default function WalletDashboard({
                           </div>
                         </div>
                     </button>
+                    {recentActivityMessage ? (
+                      <div className="md:hidden flex items-center justify-center py-0.5 pointer-events-none" aria-hidden>
+                        <div className="w-[70%] h-[1.1px] bg-[#697173]/40" />
+                      </div>
+                    ) : null}
                     {activityTooltipOpen && recentActivityMessage ? (
                       <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50 w-max max-w-[260px] bg-[#1e2628] text-white/85 text-[11px] leading-snug rounded-lg px-3 py-2 shadow-xl ring-1 ring-white/10 pointer-events-none">
                         {recentActivityWhen?.mobile || recentActivityWhen?.desktop ? (
