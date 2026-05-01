@@ -32,10 +32,10 @@ const MUSTACHE_RIGHT_CONNECT_PATH = "M254 0 C272 0 292 30 320 30";
 const LEFT_LABEL_LINE_PATH = "M0 30 H70";
 const RIGHT_LABEL_LINE_PATH = "M390 30 H320";
 
-function ScanIcon({ className = "h-8 w-8" }) {
+function ScanIcon({ className = "h-8 w-12" }) {
   return (
     <svg
-      viewBox="0 0 24 24"
+      viewBox="0 0 48 24"
       className={className}
       fill="none"
       stroke="currentColor"
@@ -45,12 +45,21 @@ function ScanIcon({ className = "h-8 w-8" }) {
       <path
         strokeLinecap="butt"
         strokeLinejoin="miter"
-        d="M2.5 9V2.5H9M15 2.5H21.5V9M9 21.5H2.5V15M21.5 15V21.5H15"
+        d="M2.5 9V2.5H9M39 2.5H45.5V9M9 21.5H2.5V15M45.5 15V21.5H39"
       />
-      <rect x="7.7" y="7.7" width="2.9" height="2.9" rx="0.2" fill="currentColor" stroke="none" />
-      <rect x="13.4" y="7.7" width="2.9" height="2.9" rx="0.2" fill="currentColor" stroke="none" />
-      <rect x="7.7" y="13.4" width="2.9" height="2.9" rx="0.2" fill="currentColor" stroke="none" />
-      <rect x="13.4" y="13.4" width="2.9" height="2.9" rx="0.2" fill="currentColor" stroke="none" />
+      <text
+        x="24"
+        y="12.5"
+        textAnchor="middle"
+        dominantBaseline="middle"
+        fill="currentColor"
+        stroke="none"
+        fontSize="9"
+        fontWeight="600"
+        fontFamily="system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif"
+      >
+        QR code
+      </text>
     </svg>
   );
 }
