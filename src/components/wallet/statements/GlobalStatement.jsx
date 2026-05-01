@@ -41,6 +41,8 @@ export default function GlobalStatement({
   movementsLoadingMore: _movementsLoadingMore = false,
   onLoadMoreMovements: _onLoadMoreMovements,
   highlightTransactionId = null,
+  detailOnly = false,
+  initialDetailMovement = null,
   onClose,
   onViewCurrency,
   toast,
@@ -564,7 +566,18 @@ export default function GlobalStatement({
       window.clearTimeout(shareNoticeTimerRef.current);
       shareNoticeTimerRef.current = null;
     }
-  }, []);
+    if (detailOnly) {
+      onClose?.();
+    }
+  }, [detailOnly, onClose]);
+
+  useEffect(() => {
+    if (!detailOnly) return;
+    if (detailOpen) return;
+    if (!initialDetailMovement) return;
+    setDetailMovement(initialDetailMovement);
+    setDetailOpen(true);
+  }, [detailOnly, detailOpen, initialDetailMovement]);
 
   const flashShareNotice = useCallback(
     (message, { tone = "success", autoClose = true } = {}) => {
@@ -2250,7 +2263,7 @@ export default function GlobalStatement({
 
   const rendered = (
     <>
-      {content}
+      {detailOnly ? null : content}
       {transactionDetailModal}
     </>
   );

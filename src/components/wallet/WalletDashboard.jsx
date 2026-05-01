@@ -30,6 +30,7 @@ import WalletPendingPayreqs from './components/WalletPendingPayreqs';
 import ReconciliationBanner from './components/ReconciliationBanner';
 import { useTranslation } from 'next-i18next';
 import xcannesApi from '@/lib/xcannesApi';
+import GlobalStatement from './statements/GlobalStatement';
 import { WALLET_LAYOUT, USD_STABLECOINS, WALLET_ACCEPTED_TOKENS } from './walletDashboardConfig';
 
 // Sub-orchestrator hooks
@@ -363,6 +364,8 @@ export default function WalletDashboard({
   const [recentActivityKind, setRecentActivityKind] = useState('');
   const [recentActivityMovementId, setRecentActivityMovementId] = useState('');
   const [highlightTransactionId, setHighlightTransactionId] = useState(null);
+  const [recentActivityMovement, setRecentActivityMovement] = useState(null);
+  const [recentSummaryOpen, setRecentSummaryOpen] = useState(false);
   const recentActivityTimerRef = useRef(null);
   const [activityTooltipOpen, setActivityTooltipOpen] = useState(false);
   const activityTooltipTriggerRef = useRef(null);
@@ -772,6 +775,7 @@ export default function WalletDashboard({
     setRecentActivityCreatedAt(String(movement?.createdAt || '').trim());
     setRecentActivityKind(String(movement?.kind || '').trim());
     setRecentActivityMovementId(String(movement?.movementId || movement?._id || movement?.txHash || '').trim());
+    setRecentActivityMovement(movement || null);
     if (recentActivityTimerRef.current) {
       window.clearTimeout(recentActivityTimerRef.current);
       recentActivityTimerRef.current = null;
@@ -1018,12 +1022,10 @@ export default function WalletDashboard({
     toast,
   });
 
-  const handleOpenGlobalStatementFromRecent = useCallback(() => {
-    const id = String(recentActivityMovementId || '').trim();
-    setHighlightTransactionId(id || null);
+  const handleOpenRecentSummary = useCallback(() => {
     setActivityTooltipOpen(false);
-    handleOpenGlobalStatement?.();
-  }, [handleOpenGlobalStatement, recentActivityMovementId]);
+    setRecentSummaryOpen(true);
+  }, []);
 
   const handleOpenGlobalStatementPlain = useCallback(() => {
     setHighlightTransactionId(null);
@@ -1349,12 +1351,12 @@ export default function WalletDashboard({
                           ? `${recentActivityWhen?.desktop || recentActivityWhen?.mobile} — ${recentActivityMessage}`
                           : recentActivityMessage
                       }
-                      onClick={handleOpenGlobalStatementFromRecent}
+                      onClick={handleOpenRecentSummary}
                       onBlur={() => setActivityTooltipOpen(false)}
                       className="w-full text-left focus:outline-none"
                     >
                       <div className="px-1">
-                        <div className="w-full rounded-[12px] bg-white/[0.04] ring-1 ring-white/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] hover:bg-white/[0.06] transition-colors">
+                        <div className="w-full rounded-[10px] bg-white/[0.04] ring-1 ring-white/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] hover:bg-white/[0.06] transition-colors">
                           <div className="flex items-center gap-1 px-1.5 py-1.5">
                             <div
                               className={[
@@ -1582,6 +1584,26 @@ export default function WalletDashboard({
         dismissToast={dismissToast}
         resolveConfirm={resolveConfirm}
       />
+      {recentSummaryOpen && recentActivityMovement ? (
+        <GlobalStatement
+          detailOnly
+          initialDetailMovement={recentActivityMovement}
+          tokens={displayTokensWithCurrencyLines || augmentedTokens}
+          walletAddress={wallet}
+          isPreviewMode={false}
+          noticeVariant="preview"
+          variant="full"
+          usdRates={usdRates}
+          preferredCurrency={preferredCurrency}
+          rlusdPerUnitRates={rlusdPerUnitRates}
+          movements={[recentActivityMovement]}
+          movementsLoading={false}
+          movementsError={null}
+          onClose={() => setRecentSummaryOpen(false)}
+          onViewCurrency={null}
+          toast={toast}
+        />
+      ) : null}
     </>
   );
 }
