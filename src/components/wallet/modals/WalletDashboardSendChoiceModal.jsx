@@ -6,6 +6,39 @@ import { useModalTransition } from '@/hooks/useModalTransition';
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { normalizeQrImageFile } from '@/utils/qrImage';
 
+const EyeIcon = ({ className = '', slashed = false }) => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.7"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+    aria-hidden="true"
+  >
+    <path d="M2.5 12s3.5-7 9.5-7 9.5 7 9.5 7-3.5 7-9.5 7-9.5-7-9.5-7Z" />
+    <circle cx="12" cy="12" r="2.6" />
+    {slashed ? <path d="M4 20L20 4" /> : null}
+  </svg>
+);
+
+const CopyIcon = ({ className = '' }) => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.7"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+    aria-hidden="true"
+  >
+    <path d="M9 9h10v12H9z" />
+    <path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1" />
+  </svg>
+);
+
 export default function WalletDashboardSendChoiceModal({
   open,
   onClose,
@@ -43,6 +76,9 @@ export default function WalletDashboardSendChoiceModal({
   const [simpleSendSelfError, setSimpleSendSelfError] = useState(false);
   const [quickscanPasteValue, setQuickscanPasteValue] = useState('');
   const [showQuickscanSavedPicker, setShowQuickscanSavedPicker] = useState(false);
+  const [savedAddressesVisible, setSavedAddressesVisible] = useState(false);
+  const [savedAddressModes, setSavedAddressModes] = useState({});
+  const quickscanSavedPickerRef = useRef(null);
   const normalizedCurrentWallet = String(currentWalletAddress || '').trim();
   const quickscanFileInputId = 'quickscan-choice-qr-file';
   const payreqFileInputId = 'payreq-choice-qr-file';
@@ -61,8 +97,30 @@ export default function WalletDashboardSendChoiceModal({
       setSimpleSendSelfError(false);
       setQuickscanPasteValue('');
       setShowQuickscanSavedPicker(false);
+      setSavedAddressesVisible(false);
+      setSavedAddressModes({});
     }
   }, [open]);
+
+  useEffect(() => {
+    if (!showQuickscanSavedPicker) return;
+
+    const handlePointerDown = (event) => {
+      const target = event?.target;
+      if (!target) return;
+      if (quickscanSavedPickerRef.current && quickscanSavedPickerRef.current.contains(target)) return;
+      setShowQuickscanSavedPicker(false);
+      setSavedAddressesVisible(false);
+      setSavedAddressModes({});
+    };
+
+    document.addEventListener('mousedown', handlePointerDown);
+    document.addEventListener('touchstart', handlePointerDown, { passive: true });
+    return () => {
+      document.removeEventListener('mousedown', handlePointerDown);
+      document.removeEventListener('touchstart', handlePointerDown);
+    };
+  }, [showQuickscanSavedPicker]);
 
   // ── Extract destination from raw payreq data ─────────────────
   const extractPayreqDestination = useCallback((raw) => {
@@ -696,10 +754,19 @@ export default function WalletDashboardSendChoiceModal({
                   )}
 
                   {/* Saved addresses selector */}
-                  <div className="relative">
+                  <div className="relative" ref={quickscanSavedPickerRef}>
                     <button
                       type="button"
-                      onClick={() => setShowQuickscanSavedPicker(prev => !prev)}
+                      onClick={() => {
+                        setShowQuickscanSavedPicker(prev => {
+                          const next = !prev;
+                          if (!next) {
+                            setSavedAddressesVisible(false);
+                            setSavedAddressModes({});
+                          }
+                          return next;
+                        });
+                      }}
                       className="w-full flex items-center bg-gradient-to-b from-[#101415] to-[#0d1214] ring-1 ring-white/[0.07] ring-inset rounded-[20px] shadow-[0_2px_8px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.06)] px-4 py-3 text-[15.5px] text-white/80 hover:bg-white/[0.03] transition-colors"
                     >
                       <svg className="w-5 h-5 text-white/50 flex-shrink-0 mr-3" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0" /></svg>
@@ -729,7 +796,25 @@ export default function WalletDashboardSendChoiceModal({
                     >
                       {/* Header */}
                       <div className="px-4 py-2.5 border-b border-white/[0.04]">
-                        <p className="text-[12px] text-white/40 font-medium tracking-wide">{t('ui_saved_addresses_label', 'Adresses enregistrées')}</p>
+                        <div className="flex items-center justify-between gap-2">
+                          <p className="text-[13px] md:text-[14px] text-white/40 font-normal">
+                            {t('ui_saved_addresses_label', 'Adresses enregistrées')}
+                          </p>
+                          <button
+                            type="button"
+                            className="shrink-0 rounded-md bg-white/[0.06] p-1 text-white/35 hover:bg-white/[0.10] hover:text-white/55 transition-colors"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              setSavedAddressesVisible((prev) => !prev);
+                              setSavedAddressModes({});
+                            }}
+                            aria-label={t('ui_toggle_saved_addresses_visibility', 'Afficher les adresses')}
+                            title={t('ui_toggle_saved_addresses_visibility', 'Afficher les adresses')}
+                          >
+                            <EyeIcon className="h-4 w-4" slashed={savedAddressesVisible} />
+                          </button>
+                        </div>
                       </div>
                       <div className="max-h-52 overflow-y-auto overscroll-contain">
                         {(() => {
@@ -738,6 +823,17 @@ export default function WalletDashboardSendChoiceModal({
                             const addrStr = String(addr?.address || '').trim();
                             const label = String(addr?.onChainLabel || addr?.label || '').trim() || t('ui_wallet_unknown', 'Unknown wallet');
                             const isSelected = quickscanPasteValue.trim() === addrStr;
+                            const mode = savedAddressModes?.[addrStr] || 'truncated';
+                            const addressLine = !savedAddressesVisible
+                              ? '••••••••'
+                              : mode === 'full'
+                                ? addrStr
+                                : (
+                                  <>
+                                    <span className="md:hidden">{addrStr.length > 18 ? `${addrStr.slice(0, 8)}…${addrStr.slice(-4)}` : addrStr}</span>
+                                    <span className="hidden md:inline">{addrStr.length > 26 ? `${addrStr.slice(0, 14)}…${addrStr.slice(-6)}` : addrStr}</span>
+                                  </>
+                                );
                             return (
                               <button
                                 key={`qs-${addrStr}-${idx}`}
@@ -747,10 +843,49 @@ export default function WalletDashboardSendChoiceModal({
                               >
                                 <div className="min-w-0 flex-1">
                                   <p className={`text-[16px] md:text-[17px] font-semibold truncate ${isSelected ? 'text-xcannes-green' : 'text-white/90'}`}>{label}</p>
-                                  <p className="text-[13px] font-mono font-light text-white/40 mt-0.5">
-                                    <span className="md:hidden">{addrStr.length > 18 ? `${addrStr.slice(0, 8)}…${addrStr.slice(-4)}` : addrStr}</span>
-                                    <span className="hidden md:inline">{addrStr.length > 26 ? `${addrStr.slice(0, 14)}…${addrStr.slice(-6)}` : addrStr}</span>
-                                  </p>
+                                  {savedAddressesVisible ? (
+                                    <div className="mt-0.5 flex items-start gap-2">
+                                      <button
+                                        type="button"
+                                        className={`min-w-0 flex-1 text-left text-[13px] font-mono font-light ${
+                                          mode === 'full' ? 'text-white/55 whitespace-normal break-all' : 'text-white/40 truncate'
+                                        }`}
+                                        onClick={(e) => {
+                                          e.preventDefault();
+                                          e.stopPropagation();
+                                          setSavedAddressModes((prev) => ({
+                                            ...(prev || {}),
+                                            [addrStr]: prev?.[addrStr] === 'full' ? 'truncated' : 'full',
+                                          }));
+                                        }}
+                                        title={addrStr}
+                                        aria-label={t('ui_toggle_wallet_address_truncation', "Afficher l'adresse complète")}
+                                      >
+                                        {addressLine}
+                                      </button>
+                                      <button
+                                        type="button"
+                                        className="shrink-0 rounded-md p-1 text-white/45 hover:text-white/80 transition-colors"
+                                        onClick={async (e) => {
+                                          e.preventDefault();
+                                          e.stopPropagation();
+                                          try {
+                                            await navigator.clipboard?.writeText?.(addrStr);
+                                          } catch {
+                                            /* ignore */
+                                          }
+                                        }}
+                                        aria-label={t('ui_copy_address', "Copier l'adresse")}
+                                        title={t('ui_copy_address', "Copier l'adresse")}
+                                      >
+                                        <CopyIcon className="h-4 w-4" />
+                                      </button>
+                                    </div>
+                                  ) : (
+                                    <p className="text-[13px] font-mono font-light text-white/30 mt-0.5">
+                                      {addressLine}
+                                    </p>
+                                  )}
                                 </div>
                                 {isSelected ? (
                                   <svg className="w-4 h-4 text-xcannes-green flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clipRule="evenodd" /></svg>
