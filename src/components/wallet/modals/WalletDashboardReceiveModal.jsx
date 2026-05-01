@@ -225,11 +225,11 @@ export default function WalletDashboardReceiveModal({
   const [requestWalletDropdownOpen, setRequestWalletDropdownOpen] = useState(false);
   const [requestCurrencyDropdownOpen, setRequestCurrencyDropdownOpen] = useState(false);
   const shareWalletDropdownRef = useRef(null);
-  const [shareAddressRevealState, setShareAddressRevealState] = useState({ addr: null, mode: 'hidden' });
+  const [shareAddressModes, setShareAddressModes] = useState({});
   const [shareDropdownToast, setShareDropdownToast] = useState('');
   const shareDropdownToastTimerRef = useRef(null);
   const requestWalletDropdownRef = useRef(null);
-  const [requestAddressRevealState, setRequestAddressRevealState] = useState({ addr: null, mode: 'hidden' });
+  const [requestAddressModes, setRequestAddressModes] = useState({});
   const [requestDropdownToast, setRequestDropdownToast] = useState('');
   const requestDropdownToastTimerRef = useRef(null);
 	  const receiveQrContainerRef = useRef(null);
@@ -293,7 +293,7 @@ export default function WalletDashboardReceiveModal({
 
   useEffect(() => {
     if (!shareWalletDropdownOpen) {
-      setShareAddressRevealState({ addr: null, mode: 'hidden' });
+      setShareAddressModes({});
       setShareDropdownToast('');
       if (shareDropdownToastTimerRef.current) clearTimeout(shareDropdownToastTimerRef.current);
     }
@@ -301,20 +301,20 @@ export default function WalletDashboardReceiveModal({
 
   useEffect(() => {
     if (!requestWalletDropdownOpen) {
-      setRequestAddressRevealState({ addr: null, mode: 'hidden' });
+      setRequestAddressModes({});
       setRequestDropdownToast('');
       if (requestDropdownToastTimerRef.current) clearTimeout(requestDropdownToastTimerRef.current);
     }
   }, [requestWalletDropdownOpen]);
 
   useEffect(() => {
-    setShareAddressRevealState({ addr: null, mode: 'hidden' });
+    setShareAddressModes({});
     setShareDropdownToast('');
     if (shareDropdownToastTimerRef.current) clearTimeout(shareDropdownToastTimerRef.current);
   }, [wallet]);
 
   useEffect(() => {
-    setRequestAddressRevealState({ addr: null, mode: 'hidden' });
+    setRequestAddressModes({});
     setRequestDropdownToast('');
     if (requestDropdownToastTimerRef.current) clearTimeout(requestDropdownToastTimerRef.current);
   }, [wallet]);
@@ -1512,82 +1512,93 @@ export default function WalletDashboardReceiveModal({
                               onClick={(e) => e.stopPropagation()}
                               role="menu"
                             >
-                              {/* Selected wallet — address */}
+                              {/* Addresses toggle (single eye) */}
                               <div className="px-3 pt-2 pb-1.5">
                                 {(() => {
-                                  const revealMode =
-                                    shareAddressRevealState?.addr === wallet ? shareAddressRevealState?.mode : 'hidden';
+                                  const addressesVisible = Object.keys(shareAddressModes || {}).length > 0;
+                                  const allAddresses = Array.from(
+                                    new Set([
+                                      wallet,
+                                      ...((shareWalletOptions || [])
+                                        .map((opt) => opt?.value)
+                                        .filter(Boolean)),
+                                    ]),
+                                  );
+
+                                  const toggleAll = () => {
+                                    setShareAddressModes((prev) => {
+                                      const isOn = Object.keys(prev || {}).length > 0;
+                                      if (isOn) return {};
+                                      const next = {};
+                                      for (const addr of allAddresses) next[addr] = 'truncated';
+                                      return next;
+                                    });
+                                  };
+
+                                  const mode = shareAddressModes?.[wallet] || 'truncated';
                                   const displayAddress =
-                                    revealMode === 'full'
+                                    mode === 'full'
                                       ? wallet
                                       : `${wallet.slice(0, 8)}…${wallet.slice(-6)}`;
 
-                                  if (revealMode === 'hidden') {
-                                    return (
+                                  return (
+                                    <>
                                       <div className="flex items-center justify-between gap-2">
                                         <button
                                           type="button"
                                           className="min-w-0 flex-1 text-left text-[13px] md:text-[14px] text-white/40 hover:text-white/60 transition-colors"
-                                          onClick={() => setShareAddressRevealState({ addr: wallet, mode: 'truncated' })}
+                                          onClick={toggleAll}
                                         >
-                                          {t('ui_view_wallet_address', "Voir l'adresse")}
+                                          {t('ui_view_wallet_addresses', 'Voir les adresses')}
                                         </button>
                                         <button
                                           type="button"
                                           className="shrink-0 rounded-md bg-white/[0.06] p-1 text-white/35 hover:bg-white/[0.10] hover:text-white/55 transition-colors"
-                                          onClick={() => setShareAddressRevealState({ addr: wallet, mode: 'truncated' })}
-                                          aria-label={t('ui_show_wallet_address', "Voir l'adresse")}
+                                          onClick={toggleAll}
+                                          aria-label={t('ui_view_wallet_addresses', 'Voir les adresses')}
                                         >
-                                          <EyeIcon className="h-4 w-4" />
+                                          <EyeIcon className="h-4 w-4" slashed={addressesVisible} />
                                         </button>
                                       </div>
-                                    );
-                                  }
 
-                                  return (
-                                    <div className="flex items-start gap-2">
-                                      <button
-                                        type="button"
-                                        className={`min-w-0 flex-1 text-left font-mono font-light text-[13px] md:text-[14px] leading-snug text-white/70 ${
-                                          revealMode === 'full' ? 'whitespace-normal break-all' : 'truncate'
-                                        }`}
-                                        title={wallet}
-                                        onClick={() =>
-                                          setShareAddressRevealState((prev) => {
-                                            if (prev?.addr !== wallet) return { addr: wallet, mode: 'full' };
-                                            if (prev?.mode === 'full') return { addr: wallet, mode: 'truncated' };
-                                            return { addr: wallet, mode: 'full' };
-                                          })
-                                        }
-                                      >
-                                        {displayAddress}
-                                      </button>
-
-                                      <button
-                                        type="button"
-                                        className="shrink-0 rounded-md p-1 text-white/45 hover:text-white/80 transition-colors"
-                                        onClick={async () => {
-                                          try {
-                                            await navigator.clipboard?.writeText?.(wallet);
-                                            showShareDropdownToast(t('ui_address_copied', 'Adresse copiée'));
-                                          } catch {
-                                            /* ignore */
-                                          }
-                                        }}
-                                        aria-label={t('ui_copy_wallet_address', "Copier l'adresse du wallet")}
-                                      >
-                                        <CopyIcon className="h-4 w-4" />
-                                      </button>
-
-                                      <button
-                                        type="button"
-                                        className="shrink-0 rounded-md bg-white/[0.06] p-1 text-white/40 hover:bg-white/[0.10] hover:text-white/60 transition-colors"
-                                        onClick={() => setShareAddressRevealState({ addr: null, mode: 'hidden' })}
-                                        aria-label={t('ui_hide_wallet_address', "Masquer l'adresse du wallet")}
-                                      >
-                                        <EyeIcon className="h-4 w-4" slashed />
-                                      </button>
-                                    </div>
+                                      {addressesVisible ? (
+                                        <div className="mt-1 flex items-start gap-2">
+                                          <button
+                                            type="button"
+                                            className={`min-w-0 flex-1 text-left font-mono font-light text-[13px] md:text-[14px] leading-snug text-white/70 ${
+                                              mode === 'full'
+                                                ? 'whitespace-normal break-all'
+                                                : 'truncate'
+                                            }`}
+                                            title={wallet}
+                                            onClick={() =>
+                                              setShareAddressModes((prev) => ({
+                                                ...(prev || {}),
+                                                [wallet]:
+                                                  prev?.[wallet] === 'full' ? 'truncated' : 'full',
+                                              }))
+                                            }
+                                          >
+                                            {displayAddress}
+                                          </button>
+                                          <button
+                                            type="button"
+                                            className="shrink-0 rounded-md p-1 text-white/45 hover:text-white/80 transition-colors"
+                                            onClick={async () => {
+                                              try {
+                                                await navigator.clipboard?.writeText?.(wallet);
+                                                showShareDropdownToast(t('ui_address_copied', 'Adresse copiée'));
+                                              } catch {
+                                                /* ignore */
+                                              }
+                                            }}
+                                            aria-label={t('ui_copy_wallet_address', "Copier l'adresse du wallet")}
+                                          >
+                                            <CopyIcon className="h-4 w-4" />
+                                          </button>
+                                        </div>
+                                      ) : null}
+                                    </>
                                   );
                                 })()}
                               </div>
@@ -1619,10 +1630,10 @@ export default function WalletDashboardReceiveModal({
                                 .map((opt, idx) => {
                                   const addr = opt.value;
                                   const displayName = opt.label || `Compte ${idx + 1}`;
-                                  const revealMode =
-                                    shareAddressRevealState?.addr === addr ? shareAddressRevealState?.mode : 'hidden';
+                                  const addressesVisible = Object.keys(shareAddressModes || {}).length > 0;
+                                  const mode = shareAddressModes?.[addr] || 'truncated';
                                   const displayAddress =
-                                    revealMode === 'full'
+                                    mode === 'full'
                                       ? addr
                                       : `${addr.slice(0, 8)}…${addr.slice(-6)}`;
 
@@ -1649,46 +1660,23 @@ export default function WalletDashboardReceiveModal({
                                           <div className="text-[16px] md:text-[17px] font-medium truncate text-white/80 min-w-0">
                                             {displayName}
                                           </div>
-                                          <button
-                                            type="button"
-                                            className={`shrink-0 rounded-md bg-white/[0.06] p-1 text-white/35 hover:bg-white/[0.10] hover:text-white/60 transition-colors ${
-                                              revealMode !== 'hidden' ? 'text-white/55' : ''
-                                            }`}
-                                            onClick={(e) => {
-                                              e.preventDefault();
-                                              e.stopPropagation();
-                                              setShareAddressRevealState((prev) =>
-                                                prev?.addr === addr && prev?.mode !== 'hidden'
-                                                  ? { addr: null, mode: 'hidden' }
-                                                  : { addr, mode: 'truncated' },
-                                              );
-                                            }}
-                                            aria-label={
-                                              revealMode !== 'hidden'
-                                                ? t('ui_hide_wallet_address', "Masquer l'adresse du wallet")
-                                                : t('ui_show_wallet_address', "Afficher l'adresse du wallet")
-                                            }
-                                          >
-                                            <EyeIcon className="h-4 w-4" slashed={revealMode !== 'hidden'} />
-                                          </button>
                                         </div>
 
-                                        {revealMode === 'hidden' ? null : (
+                                        {!addressesVisible ? null : (
                                           <div className="mt-0.5 flex items-start gap-2">
                                             <button
                                               type="button"
                                               className={`min-w-0 flex-1 text-left font-mono font-light text-[13px] md:text-[14px] leading-snug text-white/70 ${
-                                                revealMode === 'full' ? 'whitespace-normal break-all' : 'truncate'
+                                                mode === 'full' ? 'whitespace-normal break-all' : 'truncate'
                                               }`}
                                               title={addr}
                                               onClick={(e) => {
                                                 e.preventDefault();
                                                 e.stopPropagation();
-                                                setShareAddressRevealState((prev) => {
-                                                  if (prev?.addr !== addr) return { addr, mode: 'full' };
-                                                  if (prev?.mode === 'full') return { addr, mode: 'truncated' };
-                                                  return { addr, mode: 'full' };
-                                                });
+                                                setShareAddressModes((prev) => ({
+                                                  ...(prev || {}),
+                                                  [addr]: prev?.[addr] === 'full' ? 'truncated' : 'full',
+                                                }));
                                               }}
                                             >
                                               {displayAddress}
@@ -1824,79 +1812,91 @@ export default function WalletDashboardReceiveModal({
                               >
                                 <div className="px-3 pt-2 pb-1.5">
                                   {(() => {
-                                    const revealMode =
-                                      requestAddressRevealState?.addr === wallet ? requestAddressRevealState?.mode : 'hidden';
+                                    const addressesVisible = Object.keys(requestAddressModes || {}).length > 0;
+                                    const allAddresses = Array.from(
+                                      new Set([
+                                        wallet,
+                                        ...((shareWalletOptions || [])
+                                          .map((opt) => opt?.value)
+                                          .filter(Boolean)),
+                                      ]),
+                                    );
+
+                                    const toggleAll = () => {
+                                      setRequestAddressModes((prev) => {
+                                        const isOn = Object.keys(prev || {}).length > 0;
+                                        if (isOn) return {};
+                                        const next = {};
+                                        for (const addr of allAddresses) next[addr] = 'truncated';
+                                        return next;
+                                      });
+                                    };
+
+                                    const mode = requestAddressModes?.[wallet] || 'truncated';
                                     const displayAddress =
-                                      revealMode === 'full'
+                                      mode === 'full'
                                         ? wallet
                                         : `${wallet.slice(0, 8)}…${wallet.slice(-6)}`;
 
-                                    if (revealMode === 'hidden') {
-                                      return (
+                                    return (
+                                      <>
                                         <div className="flex items-center justify-between gap-2">
                                           <button
                                             type="button"
                                             className="min-w-0 flex-1 text-left text-[13px] md:text-[14px] text-white/40 hover:text-white/60 transition-colors"
-                                            onClick={() => setRequestAddressRevealState({ addr: wallet, mode: 'truncated' })}
+                                            onClick={toggleAll}
                                           >
-                                            {t('ui_view_wallet_address', "Voir l'adresse")}
+                                            {t('ui_view_wallet_addresses', 'Voir les adresses')}
                                           </button>
                                           <button
                                             type="button"
                                             className="shrink-0 rounded-md bg-white/[0.06] p-1 text-white/35 hover:bg-white/[0.10] hover:text-white/55 transition-colors"
-                                            onClick={() => setRequestAddressRevealState({ addr: wallet, mode: 'truncated' })}
-                                            aria-label={t('ui_show_wallet_address', "Voir l'adresse")}
+                                            onClick={toggleAll}
+                                            aria-label={t('ui_view_wallet_addresses', 'Voir les adresses')}
                                           >
-                                            <EyeIcon className="h-4 w-4" />
+                                            <EyeIcon className="h-4 w-4" slashed={addressesVisible} />
                                           </button>
                                         </div>
-                                      );
-                                    }
 
-                                    return (
-                                      <div className="flex items-start gap-2">
-                                        <button
-                                          type="button"
-                                          className={`min-w-0 flex-1 text-left font-mono font-light text-[13px] md:text-[14px] leading-snug text-white/70 ${
-                                            revealMode === 'full' ? 'whitespace-normal break-all' : 'truncate'
-                                          }`}
-                                          title={wallet}
-                                          onClick={() =>
-                                            setRequestAddressRevealState((prev) => {
-                                              if (prev?.addr !== wallet) return { addr: wallet, mode: 'full' };
-                                              if (prev?.mode === 'full') return { addr: wallet, mode: 'truncated' };
-                                              return { addr: wallet, mode: 'full' };
-                                            })
-                                          }
-                                        >
-                                          {displayAddress}
-                                        </button>
+                                        {addressesVisible ? (
+                                          <div className="mt-1 flex items-start gap-2">
+                                            <button
+                                              type="button"
+                                              className={`min-w-0 flex-1 text-left font-mono font-light text-[13px] md:text-[14px] leading-snug text-white/70 ${
+                                                mode === 'full'
+                                                  ? 'whitespace-normal break-all'
+                                                  : 'truncate'
+                                              }`}
+                                              title={wallet}
+                                              onClick={() =>
+                                                setRequestAddressModes((prev) => ({
+                                                  ...(prev || {}),
+                                                  [wallet]:
+                                                    prev?.[wallet] === 'full' ? 'truncated' : 'full',
+                                                }))
+                                              }
+                                            >
+                                              {displayAddress}
+                                            </button>
 
-                                        <button
-                                          type="button"
-                                          className="shrink-0 rounded-md p-1 text-white/45 hover:text-white/80 transition-colors"
-                                          onClick={async () => {
-                                            try {
-                                              await navigator.clipboard?.writeText?.(wallet);
-                                              showRequestDropdownToast(t('ui_address_copied', 'Adresse copiée'));
-                                            } catch {
-                                              /* ignore */
-                                            }
-                                          }}
-                                          aria-label={t('ui_copy_wallet_address', "Copier l'adresse du wallet")}
-                                        >
-                                          <CopyIcon className="h-4 w-4" />
-                                        </button>
-
-                                        <button
-                                          type="button"
-                                          className="shrink-0 rounded-md bg-white/[0.06] p-1 text-white/40 hover:bg-white/[0.10] hover:text-white/60 transition-colors"
-                                          onClick={() => setRequestAddressRevealState({ addr: null, mode: 'hidden' })}
-                                          aria-label={t('ui_hide_wallet_address', "Masquer l'adresse du wallet")}
-                                        >
-                                          <EyeIcon className="h-4 w-4" slashed />
-                                        </button>
-                                      </div>
+                                            <button
+                                              type="button"
+                                              className="shrink-0 rounded-md p-1 text-white/45 hover:text-white/80 transition-colors"
+                                              onClick={async () => {
+                                                try {
+                                                  await navigator.clipboard?.writeText?.(wallet);
+                                                  showRequestDropdownToast(t('ui_address_copied', 'Adresse copiée'));
+                                                } catch {
+                                                  /* ignore */
+                                                }
+                                              }}
+                                              aria-label={t('ui_copy_wallet_address', "Copier l'adresse du wallet")}
+                                            >
+                                              <CopyIcon className="h-4 w-4" />
+                                            </button>
+                                          </div>
+                                        ) : null}
+                                      </>
                                     );
                                   })()}
                                 </div>
@@ -1928,10 +1928,10 @@ export default function WalletDashboardReceiveModal({
                                   .map((opt, idx) => {
                                     const addr = opt.value;
                                     const displayName = opt.label || `Compte ${idx + 1}`;
-                                    const revealMode =
-                                      requestAddressRevealState?.addr === addr ? requestAddressRevealState?.mode : 'hidden';
+                                    const addressesVisible = Object.keys(requestAddressModes || {}).length > 0;
+                                    const mode = requestAddressModes?.[addr] || 'truncated';
                                     const displayAddress =
-                                      revealMode === 'full'
+                                      mode === 'full'
                                         ? addr
                                         : `${addr.slice(0, 8)}…${addr.slice(-6)}`;
 
@@ -1958,46 +1958,23 @@ export default function WalletDashboardReceiveModal({
                                             <div className="text-[16px] md:text-[17px] font-medium truncate text-white/80 min-w-0">
                                               {displayName}
                                             </div>
-                                            <button
-                                              type="button"
-                                              className={`shrink-0 rounded-md bg-white/[0.06] p-1 text-white/35 hover:bg-white/[0.10] hover:text-white/60 transition-colors ${
-                                                revealMode !== 'hidden' ? 'text-white/55' : ''
-                                              }`}
-                                              onClick={(e) => {
-                                                e.preventDefault();
-                                                e.stopPropagation();
-                                                setRequestAddressRevealState((prev) =>
-                                                  prev?.addr === addr && prev?.mode !== 'hidden'
-                                                    ? { addr: null, mode: 'hidden' }
-                                                    : { addr, mode: 'truncated' },
-                                                );
-                                              }}
-                                              aria-label={
-                                                revealMode !== 'hidden'
-                                                  ? t('ui_hide_wallet_address', "Masquer l'adresse du wallet")
-                                                  : t('ui_show_wallet_address', "Afficher l'adresse du wallet")
-                                              }
-                                            >
-                                              <EyeIcon className="h-4 w-4" slashed={revealMode !== 'hidden'} />
-                                            </button>
                                           </div>
 
-                                          {revealMode === 'hidden' ? null : (
+                                          {!addressesVisible ? null : (
                                             <div className="mt-0.5 flex items-start gap-2">
                                               <button
                                                 type="button"
                                                 className={`min-w-0 flex-1 text-left font-mono font-light text-[13px] md:text-[14px] leading-snug text-white/70 ${
-                                                  revealMode === 'full' ? 'whitespace-normal break-all' : 'truncate'
+                                                  mode === 'full' ? 'whitespace-normal break-all' : 'truncate'
                                                 }`}
                                                 title={addr}
                                                 onClick={(e) => {
                                                   e.preventDefault();
                                                   e.stopPropagation();
-                                                  setRequestAddressRevealState((prev) => {
-                                                    if (prev?.addr !== addr) return { addr, mode: 'full' };
-                                                    if (prev?.mode === 'full') return { addr, mode: 'truncated' };
-                                                    return { addr, mode: 'full' };
-                                                  });
+                                                  setRequestAddressModes((prev) => ({
+                                                    ...(prev || {}),
+                                                    [addr]: prev?.[addr] === 'full' ? 'truncated' : 'full',
+                                                  }));
                                                 }}
                                               >
                                                 {displayAddress}
