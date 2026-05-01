@@ -451,7 +451,7 @@ export default function WalletDashboardReceiveModal({
     }, [shortAddress, walletOptions]);
 
 	  const accountDropdownOpenPillClassName = "rounded-3xl rounded-b-none before:content-[''] before:absolute before:inset-0 before:rounded-3xl before:rounded-b-none before:border before:border-white/20 before:border-b-0 before:pointer-events-none";
-	  const accountDropdownMenuClassName = 'bg-elevated box-border !mt-0 !max-h-64 overflow-y-auto overscroll-contain touch-pan-y border border-white/20 border-t-0 rounded-b-[20px] shadow-[0_28px_70px_rgba(0,0,0,0.72)] !z-[10020]';
+	  const accountDropdownMenuClassName = 'bg-elevated box-border !mt-0 !max-h-64 overflow-y-auto overscroll-contain touch-pan-y border border-white/20 rounded-b-[20px] shadow-[0_28px_70px_rgba(0,0,0,0.72)] !z-[10020]';
 
 	  const walletPickerSurfaceClass =
 	    receiveView === 'share' ? 'bg-white/[0.02]' : 'bg-transparent';
@@ -1507,7 +1507,7 @@ export default function WalletDashboardReceiveModal({
 
                           {shareWalletDropdownOpen && hasMultipleWallets ? (
                             <div
-                              className={`absolute left-0 right-0 top-full ${accountDropdownMenuClassName}`}
+                              className={`absolute left-0 right-0 top-full -mt-px ${accountDropdownMenuClassName}`}
                               onMouseDown={(e) => e.stopPropagation()}
                               onClick={(e) => e.stopPropagation()}
                               role="menu"
@@ -1817,7 +1817,7 @@ export default function WalletDashboardReceiveModal({
 
                             {requestWalletDropdownOpen && hasMultipleWallets ? (
                               <div
-                                className={`absolute left-0 right-0 top-full ${accountDropdownMenuClassName}`}
+                                className={`absolute left-0 right-0 top-full -mt-px ${accountDropdownMenuClassName}`}
                                 onMouseDown={(e) => e.stopPropagation()}
                                 onClick={(e) => e.stopPropagation()}
                                 role="menu"
