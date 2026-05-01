@@ -1332,11 +1332,6 @@ export default function WalletDashboard({
                     aria-live="polite"
                   >
                     {recentActivityMessage ? (
-                      <div className="pointer-events-none absolute inset-x-0 -top-2 -bottom-2 md:-top-3 md:-bottom-3 overflow-hidden" aria-hidden>
-                        <div className="absolute inset-0 bg-[radial-gradient(260px_circle_at_50%_50%,rgba(22,163,74,0.16),transparent_60%)] md:bg-[radial-gradient(420px_circle_at_50%_50%,rgba(22,163,74,0.14),transparent_62%)]" />
-                      </div>
-                    ) : null}
-                    {recentActivityMessage ? (
                       <div className="hidden md:flex items-center justify-center py-1.5 pointer-events-none" aria-hidden>
                         <div className="w-[70%] h-[1.1px] bg-[#697173]/40" />
                       </div>
@@ -1372,20 +1367,14 @@ export default function WalletDashboard({
                                   {recentActivityMessageMobileParts.isConversion ? (
                                     <>
                                       {recentActivityMessageMobileParts.left} {recentActivityMessageMobileParts.arrow}{" "}
-                                      <span
-                                        className="text-[13px] text-white/90 font-semibold"
-                                        style={{ textShadow: "0 0 14px rgba(22,163,74,0.28), 0 0 28px rgba(22,163,74,0.18)" }}
-                                      >
+                                      <span className="text-[13px] text-white/90 font-semibold">
                                         {recentActivityMessageMobileParts.right}
                                       </span>
                                     </>
                                   ) : recentActivityIcon === "receive" && recentActivityReceiveParts ? (
                                     <>
                                       {recentActivityReceiveParts.prefix}{" "}
-                                      <span
-                                        className="text-[13px] text-[#16A34A] font-semibold"
-                                        style={{ textShadow: "0 0 14px rgba(22,163,74,0.28), 0 0 28px rgba(22,163,74,0.18)" }}
-                                      >
+                                      <span className="text-[13px] text-[#16A34A] font-semibold">
                                         + {recentActivityReceiveParts.amount} {recentActivityReceiveParts.currency}
                                       </span>
                                       {recentActivityReceiveParts.suffix}
@@ -1393,38 +1382,27 @@ export default function WalletDashboard({
                                   ) : recentActivityIcon === "send" && recentActivitySendParts ? (
                                     <>
                                       {recentActivitySendParts.prefix}{" "}
-                                      <span
-                                        className="text-[13px] text-red-300 font-semibold"
-                                        style={{ textShadow: "0 0 14px rgba(22,163,74,0.24), 0 0 28px rgba(22,163,74,0.14)" }}
-                                      >
+                                      <span className="text-[13px] text-red-300 font-semibold">
                                         - {recentActivitySendParts.amount} {recentActivitySendParts.currency}
                                       </span>
                                       {recentActivitySendParts.suffix}
                                     </>
                                   ) : (
-                                    <span style={{ textShadow: "0 0 14px rgba(22,163,74,0.22), 0 0 28px rgba(22,163,74,0.14)" }}>
-                                      {recentActivityMessageMobileParts.text}
-                                    </span>
+                                    recentActivityMessageMobileParts.text
                                   )}
                                 </span>
                                 <span className="hidden md:inline text-[14px] text-white/65">
                                   {recentActivityMessageParts.isConversion ? (
                                     <>
                                       {recentActivityMessageParts.left} {recentActivityMessageParts.arrow}{" "}
-                                      <span
-                                        className="text-[16px] text-white/85 font-semibold"
-                                        style={{ textShadow: "0 0 14px rgba(22,163,74,0.24), 0 0 32px rgba(22,163,74,0.16)" }}
-                                      >
+                                      <span className="text-[16px] text-white/85 font-semibold">
                                         {recentActivityMessageParts.right}
                                       </span>
                                     </>
                                   ) : recentActivityIcon === "receive" && recentActivityReceiveParts ? (
                                     <>
                                       {recentActivityReceiveParts.prefix}{" "}
-                                      <span
-                                        className="text-[15px] text-[#16A34A] font-semibold"
-                                        style={{ textShadow: "0 0 14px rgba(22,163,74,0.24), 0 0 32px rgba(22,163,74,0.16)" }}
-                                      >
+                                      <span className="text-[15px] text-[#16A34A] font-semibold">
                                         + {recentActivityReceiveParts.amount} {recentActivityReceiveParts.currency}
                                       </span>
                                       {recentActivityReceiveParts.suffix}
@@ -1432,18 +1410,13 @@ export default function WalletDashboard({
                                   ) : recentActivityIcon === "send" && recentActivitySendParts ? (
                                     <>
                                       {recentActivitySendParts.prefix}{" "}
-                                      <span
-                                        className="text-[15px] text-red-300 font-semibold"
-                                        style={{ textShadow: "0 0 14px rgba(22,163,74,0.22), 0 0 32px rgba(22,163,74,0.14)" }}
-                                      >
+                                      <span className="text-[15px] text-red-300 font-semibold">
                                         - {recentActivitySendParts.amount} {recentActivitySendParts.currency}
                                       </span>
                                       {recentActivitySendParts.suffix}
                                     </>
                                   ) : (
-                                    <span style={{ textShadow: "0 0 14px rgba(22,163,74,0.20), 0 0 32px rgba(22,163,74,0.12)" }}>
-                                      {recentActivityMessage}
-                                    </span>
+                                    recentActivityMessage
                                   )}
                                 </span>
                               </span>
