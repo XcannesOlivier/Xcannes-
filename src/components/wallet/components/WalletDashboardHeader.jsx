@@ -48,6 +48,24 @@ function writeLabelCache(labelsByAddress) {
   }
 }
 
+function EyeIcon({ className = "h-4 w-4" } = {}) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden
+    >
+      <path d="M2.5 12s3.5-7 9.5-7 9.5 7 9.5 7-3.5 7-9.5 7-9.5-7-9.5-7Z" />
+      <circle cx="12" cy="12" r="2.6" />
+    </svg>
+  );
+}
+
 export default function WalletDashboardHeader({
   isConnected,
   wallet,
@@ -88,6 +106,7 @@ export default function WalletDashboardHeader({
   const { t } = useTranslation("common");
   const [isSwitcherOpen, setIsSwitcherOpen] = useState(false);
   const [isSwitcherVisible, setIsSwitcherVisible] = useState(false);
+  const [revealedAddress, setRevealedAddress] = useState(null);
   const isSwitcherClosingRef = useRef(false);
   const didSwitchRef = useRef(false);
   const switcherRef = useRef(null);
@@ -101,6 +120,7 @@ export default function WalletDashboardHeader({
   const openSwitcher = () => {
     isSwitcherClosingRef.current = false;
     didSwitchRef.current = false;
+    setRevealedAddress(null);
     setIsSwitcherOpen(true);
     requestAnimationFrame(() => requestAnimationFrame(() => setIsSwitcherVisible(true)));
   };
@@ -108,6 +128,7 @@ export default function WalletDashboardHeader({
     if (isSwitcherClosingRef.current) return; // already closing
     isSwitcherClosingRef.current = true;
     setIsSwitcherVisible(false);
+    setRevealedAddress(null);
     const unmountDelay = didSwitchRef.current ? 1850 : 130;
     // Wait for the CSS transition to finish before unmounting
     setTimeout(() => {
@@ -364,33 +385,65 @@ export default function WalletDashboardHeader({
                           const isActive = addr === wallet;
                           if (isActive) return null;
                           const displayName = label || `Compte ${index + 1}`;
+                          const isRevealed = revealedAddress === addr;
+                          const displayAddress = isRevealed
+                            ? addr
+                            : `${addr.slice(0, 8)}…${addr.slice(-6)}`;
                           return (
-                            <button
+                            <div
                               key={addr}
-                              type="button"
                               onClick={() => {
                                 onSwitchWallet?.(addr);
                                 didSwitchRef.current = true;
                                 closeSwitcher();
                               }}
-                              className="w-full text-left px-2.5 md:px-3 py-2.5 flex items-center gap-2 transition-colors duration-150 hover:bg-white/[0.06]"
+                              onKeyDown={(e) => {
+                                if (e.key !== "Enter" && e.key !== " ") return;
+                                e.preventDefault();
+                                onSwitchWallet?.(addr);
+                                didSwitchRef.current = true;
+                                closeSwitcher();
+                              }}
+                              role="button"
+                              tabIndex={0}
+                              className="w-full text-left px-2.5 md:px-3 py-2.5 flex items-center gap-2 transition-colors duration-150 hover:bg-white/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/20"
                             >
                               <span
                                 className="h-2 w-2 rounded-full shrink-0 transition-colors duration-150 bg-white/20 opacity-0"
                               />
 		                              <div className="min-w-0">
+                                    <div className="flex items-center justify-between gap-2 min-w-0">
+    		                                <div
+    		                                  className="text-[16px] md:text-[17px] font-medium truncate text-white/80 min-w-0"
+    		                                >
+    		                                  {displayName}
+    		                                </div>
+                                      <button
+                                        type="button"
+                                        className={`shrink-0 rounded-md p-1 text-white/45 hover:text-white/80 transition-colors ${isRevealed ? "text-white/80" : ""}`}
+                                        onClick={(e) => {
+                                          e.preventDefault();
+                                          e.stopPropagation();
+                                          setRevealedAddress((prev) => (prev === addr ? null : addr));
+                                        }}
+                                        aria-label={
+                                          isRevealed
+                                            ? t("ui_hide_wallet_address", "Masquer l'adresse du wallet")
+                                            : t("ui_show_wallet_address", "Afficher l'adresse du wallet")
+                                        }
+                                      >
+                                        <EyeIcon className="h-4 w-4" />
+                                      </button>
+                                    </div>
 		                                <div
-		                                  className="text-[16px] md:text-[17px] font-medium truncate text-white/80"
+		                                  className={`font-mono font-light text-[13px] md:text-[14px] leading-snug ${
+                                        isRevealed ? "text-white/70 whitespace-normal break-all" : "text-white/40"
+                                      }`}
 		                                >
-		                                  {displayName}
-		                                </div>
-		                                <div
-		                                  className="font-mono font-light text-[13px] md:text-[14px] leading-snug text-white/40"
-		                                >
-		                                  {`${addr.slice(0, 8)}…${addr.slice(-6)}`}
+		                                  {displayAddress}
 		                                </div>
 		                              </div>
-                            </button>
+                            </div>
                           );
                         })}
                       </div>
