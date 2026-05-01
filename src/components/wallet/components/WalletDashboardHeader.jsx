@@ -125,7 +125,7 @@ export default function WalletDashboardHeader({
   const { t } = useTranslation("common");
   const [isSwitcherOpen, setIsSwitcherOpen] = useState(false);
   const [isSwitcherVisible, setIsSwitcherVisible] = useState(false);
-  const [addressRevealState, setAddressRevealState] = useState({ addr: null, mode: "hidden" });
+  const [addressModes, setAddressModes] = useState({});
   const [copyToast, setCopyToast] = useState("");
   const copyToastTimerRef = useRef(null);
   const isSwitcherClosingRef = useRef(false);
@@ -153,7 +153,7 @@ export default function WalletDashboardHeader({
   const openSwitcher = () => {
     isSwitcherClosingRef.current = false;
     didSwitchRef.current = false;
-    setAddressRevealState({ addr: null, mode: "hidden" });
+    setAddressModes({});
     setCopyToast("");
     setIsSwitcherOpen(true);
     requestAnimationFrame(() => requestAnimationFrame(() => setIsSwitcherVisible(true)));
@@ -162,7 +162,7 @@ export default function WalletDashboardHeader({
     if (isSwitcherClosingRef.current) return; // already closing
     isSwitcherClosingRef.current = true;
     setIsSwitcherVisible(false);
-    setAddressRevealState({ addr: null, mode: "hidden" });
+    setAddressModes({});
     setCopyToast("");
     const unmountDelay = didSwitchRef.current ? 1850 : 130;
     // Wait for the CSS transition to finish before unmounting
@@ -399,14 +399,35 @@ export default function WalletDashboardHeader({
                         {/* Active wallet address pinned at top */}
                         <div className="px-2.5 md:px-3 pt-2 pb-1.5">
                           {(() => {
-                            const revealMode =
-                              addressRevealState?.addr === wallet ? addressRevealState?.mode : "hidden";
+                            const addressesVisible = Object.keys(addressModes || {}).length > 0;
+                            const walletMode = addressModes?.[wallet] || "truncated";
                             const displayAddress =
-                              revealMode === "full"
+                              walletMode === "full"
                                 ? wallet
                                 : `${wallet.slice(0, 8)}…${wallet.slice(-6)}`;
 
-                            if (revealMode === "hidden") {
+                            const allAddresses = Array.from(
+                              new Set(
+                                [
+                                  wallet,
+                                  ...(walletAddresses || []).map((w) =>
+                                    typeof w === "string" ? w : w?.address
+                                  ),
+                                ].filter(Boolean)
+                              )
+                            );
+
+                            const toggleAllAddresses = () => {
+                              setAddressModes((prev) => {
+                                const isOn = Object.keys(prev || {}).length > 0;
+                                if (isOn) return {};
+                                const next = {};
+                                for (const addr of allAddresses) next[addr] = "truncated";
+                                return next;
+                              });
+                            };
+
+                            if (!addressesVisible) {
                               return (
                                 <div className="flex items-center justify-between gap-2">
                                   <button
@@ -415,11 +436,11 @@ export default function WalletDashboardHeader({
                                     onClick={(e) => {
                                       e.preventDefault();
                                       e.stopPropagation();
-                                      setAddressRevealState({ addr: wallet, mode: "truncated" });
+                                      toggleAllAddresses();
                                     }}
-                                    aria-label={t("ui_show_wallet_address", "Voir l'adresse")}
+                                    aria-label={t("ui_view_wallet_addresses", "Voir les adresses")}
                                   >
-                                    {t("ui_view_wallet_address", "Voir l'adresse")}
+                                    {t("ui_view_wallet_addresses", "Voir les adresses")}
                                   </button>
                                   <button
                                     type="button"
@@ -427,9 +448,9 @@ export default function WalletDashboardHeader({
                                     onClick={(e) => {
                                       e.preventDefault();
                                       e.stopPropagation();
-                                      setAddressRevealState({ addr: wallet, mode: "truncated" });
+                                      toggleAllAddresses();
                                     }}
-                                    aria-label={t("ui_show_wallet_address", "Voir l'adresse")}
+                                    aria-label={t("ui_view_wallet_addresses", "Voir les adresses")}
                                   >
                                     <EyeIcon className="h-4 w-4" slashed={false} />
                                   </button>
@@ -439,26 +460,55 @@ export default function WalletDashboardHeader({
 
                             return (
                               <div className="flex items-start gap-2">
+                                <div className="flex items-center justify-between gap-2 w-full">
+                                  <div className="text-[13px] md:text-[14px] text-white/60">
+                                    {t("ui_view_wallet_addresses", "Voir les adresses")}
+                                  </div>
+                                  <button
+                                    type="button"
+                                    className="shrink-0 rounded-md bg-white/[0.06] p-1 text-white/35 hover:bg-white/[0.10] hover:text-white/55 transition-colors"
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      toggleAllAddresses();
+                                    }}
+                                    aria-label={t("ui_view_wallet_addresses", "Voir les adresses")}
+                                  >
+                                    <EyeIcon className="h-4 w-4" slashed />
+                                  </button>
+                                </div>
+                              </div>
+                            );
+                          })()}
+                        </div>
+                        {/* Address row for selected wallet (only when all addresses visible) */}
+                        {Object.keys(addressModes || {}).length > 0 ? (
+                          <div className="px-2.5 md:px-3 pb-1.5">
+                            <div className="flex items-start gap-2">
                                 <button
                                   type="button"
                                   className={`min-w-0 flex-1 text-left font-mono font-light text-[13px] md:text-[14px] leading-snug text-white/85 ${
-                                    revealMode === "full" ? "whitespace-normal break-all" : "truncate"
+                                    (addressModes?.[wallet] || "truncated") === "full"
+                                      ? "whitespace-normal break-all"
+                                      : "truncate"
                                   }`}
                                   onClick={(e) => {
                                     e.preventDefault();
                                     e.stopPropagation();
-                                    setAddressRevealState((prev) => {
-                                      if (prev?.addr !== wallet) return { addr: wallet, mode: "full" };
-                                      if (prev?.mode === "full") return { addr: wallet, mode: "truncated" };
-                                      return { addr: wallet, mode: "full" };
-                                    });
+                                    setAddressModes((prev) => ({
+                                      ...(prev || {}),
+                                      [wallet]:
+                                        prev?.[wallet] === "full" ? "truncated" : "full",
+                                    }));
                                   }}
                                   aria-label={t(
                                     "ui_toggle_wallet_address_truncation",
                                     "Afficher l'adresse complète"
                                   )}
                                 >
-                                  {displayAddress}
+                                  {(addressModes?.[wallet] || "truncated") === "full"
+                                    ? wallet
+                                    : `${wallet.slice(0, 8)}…${wallet.slice(-6)}`}
                                 </button>
 
                                 <button
@@ -478,23 +528,10 @@ export default function WalletDashboardHeader({
                                 >
                                   <CopyIcon className="h-4 w-4" />
                                 </button>
-
-                                <button
-                                  type="button"
-                                  className="shrink-0 rounded-md bg-white/[0.06] p-1 text-white/40 hover:bg-white/[0.10] hover:text-white/60 transition-colors"
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    setAddressRevealState({ addr: null, mode: "hidden" });
-                                  }}
-                                  aria-label={t("ui_hide_wallet_address", "Masquer l'adresse du wallet")}
-                                >
-                                  <EyeIcon className="h-4 w-4" slashed />
-                                </button>
                               </div>
                             );
-                          })()}
-                        </div>
+                          </div>
+                        ) : null}
                         <div className="px-2.5 md:px-3">
                           <div className="h-px w-full bg-white/10" aria-hidden />
                         </div>
@@ -525,10 +562,10 @@ export default function WalletDashboardHeader({
                           const isActive = addr === wallet;
                           if (isActive) return null;
                           const displayName = label || `Compte ${index + 1}`;
-                          const revealMode =
-                            addressRevealState?.addr === addr ? addressRevealState?.mode : "hidden";
+                          const addressesVisible = Object.keys(addressModes || {}).length > 0;
+                          const mode = addressModes?.[addr] || "truncated";
                           const displayAddress =
-                            revealMode === "full"
+                            mode === "full"
                               ? addr
                               : `${addr.slice(0, 8)}…${addr.slice(-6)}`;
                           return (
@@ -560,44 +597,22 @@ export default function WalletDashboardHeader({
     		                                >
     		                                  {displayName}
     		                                </div>
-                                      <button
-                                        type="button"
-                                        className={`shrink-0 rounded-md bg-white/[0.06] p-1 text-white/35 hover:bg-white/[0.10] hover:text-white/60 transition-colors ${
-                                          revealMode !== "hidden" ? "text-white/55" : ""
-                                        }`}
-                                        onClick={(e) => {
-                                          e.preventDefault();
-                                          e.stopPropagation();
-                                          setAddressRevealState((prev) =>
-                                            prev?.addr === addr && prev?.mode !== "hidden"
-                                              ? { addr: null, mode: "hidden" }
-                                              : { addr, mode: "truncated" }
-                                          );
-                                        }}
-                                        aria-label={
-                                          revealMode !== "hidden"
-                                            ? t("ui_hide_wallet_address", "Masquer l'adresse du wallet")
-                                            : t("ui_show_wallet_address", "Afficher l'adresse du wallet")
-                                        }
-                                      >
-                                        <EyeIcon className="h-4 w-4" slashed={revealMode !== "hidden"} />
-                                      </button>
                                     </div>
-                                    {revealMode === "hidden" ? null : (
+                                    {!addressesVisible ? null : (
                                       <div className="mt-0.5 flex items-start gap-2">
         		                                <button
                                           type="button"
                                           className={`min-w-0 flex-1 text-left font-mono font-light text-[13px] md:text-[14px] leading-snug text-white/70 ${
-                                            revealMode === "full" ? "whitespace-normal break-all" : "truncate"
+                                            mode === "full" ? "whitespace-normal break-all" : "truncate"
                                           }`}
                                           onClick={(e) => {
                                             e.preventDefault();
                                             e.stopPropagation();
-                                            setAddressRevealState((prev) => {
-                                              if (prev?.addr !== addr) return { addr, mode: "full" };
-                                              if (prev?.mode === "full") return { addr, mode: "truncated" };
-                                              return { addr, mode: "full" };
-                                            });
+                                            setAddressModes((prev) => ({
+                                              ...(prev || {}),
+                                              [addr]:
+                                                prev?.[addr] === "full" ? "truncated" : "full",
+                                            }));
                                           }}
                                           aria-label={t(
                                             "ui_toggle_wallet_address_truncation",
