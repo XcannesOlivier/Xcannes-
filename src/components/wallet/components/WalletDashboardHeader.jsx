@@ -529,7 +529,6 @@ export default function WalletDashboardHeader({
                                   <CopyIcon className="h-4 w-4" />
                                 </button>
                               </div>
-                            );
                           </div>
                         ) : null}
                         <div className="px-2.5 md:px-3">
