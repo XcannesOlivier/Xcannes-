@@ -394,7 +394,7 @@ export default function WalletDashboardHeader({
                               return (
                                 <button
                                   type="button"
-                                  className="inline-flex items-center gap-2 text-[13px] md:text-[14px] text-white/75 hover:text-white/90 transition-colors"
+                                  className="inline-flex items-center gap-2 text-[13px] md:text-[14px] text-white/60 hover:text-white/80 transition-colors"
                                   onClick={(e) => {
                                     e.preventDefault();
                                     e.stopPropagation();
@@ -402,20 +402,14 @@ export default function WalletDashboardHeader({
                                   }}
                                   aria-label={t("ui_show_wallet_address", "Voir l'adresse")}
                                 >
-                                  <EyeIcon className="h-4 w-4" slashed={false} />
                                   <span>{t("ui_view_wallet_address", "Voir l'adresse")}</span>
+                                  <EyeIcon className="h-4 w-4 text-white/45" slashed={false} />
                                 </button>
                               );
                             }
 
                             return (
                               <div className="flex items-start gap-2">
-                                <span
-                                  className="mt-[3px] shrink-0 text-white/60"
-                                  aria-hidden
-                                >
-                                  <EyeIcon className="h-4 w-4" slashed />
-                                </span>
                                 <button
                                   type="button"
                                   className={`min-w-0 flex-1 text-left font-mono font-light text-[13px] md:text-[14px] leading-snug text-white/85 ${
@@ -453,6 +447,19 @@ export default function WalletDashboardHeader({
                                   aria-label={t("ui_copy_wallet_address", "Copier l'adresse du wallet")}
                                 >
                                   <CopyIcon className="h-4 w-4" />
+                                </button>
+
+                                <button
+                                  type="button"
+                                  className="shrink-0 rounded-md bg-white/[0.06] p-1 text-white/60 hover:bg-white/[0.10] hover:text-white/85 transition-colors"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    setAddressRevealState({ addr: null, mode: "hidden" });
+                                  }}
+                                  aria-label={t("ui_hide_wallet_address", "Masquer l'adresse du wallet")}
+                                >
+                                  <EyeIcon className="h-4 w-4" slashed />
                                 </button>
                               </div>
                             );
