@@ -1331,6 +1331,11 @@ export default function WalletDashboard({
                     ].join(" ")}
                     aria-live="polite"
                   >
+                    {recentActivityMessage ? (
+                      <div className="hidden md:flex items-center justify-center py-0.5 pointer-events-none" aria-hidden>
+                        <div className="w-[70%] h-[1.1px] bg-[#697173]/40" />
+                      </div>
+                    ) : null}
                     <button
                       type="button"
                       ref={activityTooltipTriggerRef}
@@ -1421,6 +1426,11 @@ export default function WalletDashboard({
                     </button>
                     {recentActivityMessage ? (
                       <div className="md:hidden flex items-center justify-center py-0.5 pointer-events-none" aria-hidden>
+                        <div className="w-[70%] h-[1.1px] bg-[#697173]/40" />
+                      </div>
+                    ) : null}
+                    {recentActivityMessage ? (
+                      <div className="hidden md:flex items-center justify-center py-0.5 pointer-events-none" aria-hidden>
                         <div className="w-[70%] h-[1.1px] bg-[#697173]/40" />
                       </div>
                     ) : null}
