@@ -478,6 +478,9 @@ export default function WalletDashboardHeader({
                             );
                           })()}
                         </div>
+                        <div className="px-2.5 md:px-3">
+                          <div className="h-px w-full bg-white/10" aria-hidden />
+                        </div>
                         {/* Subtitle */}
                         <div className="px-2.5 md:px-3 pt-2 pb-1">
                           <div className="text-[13px] md:text-[14px] text-white/40">
