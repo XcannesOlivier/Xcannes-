@@ -1507,7 +1507,7 @@ export default function WalletDashboardReceiveModal({
 
                           {shareWalletDropdownOpen && hasMultipleWallets ? (
                             <div
-                              className={`absolute left-0 right-0 top-full -mt-px ${accountDropdownMenuClassName}`}
+                              className={`wallet-receive-account-menu absolute left-0 right-0 top-full -mt-px ${accountDropdownMenuClassName}`}
                               onMouseDown={(e) => e.stopPropagation()}
                               onClick={(e) => e.stopPropagation()}
                               role="menu"
@@ -1817,7 +1817,7 @@ export default function WalletDashboardReceiveModal({
 
                             {requestWalletDropdownOpen && hasMultipleWallets ? (
                               <div
-                                className={`absolute left-0 right-0 top-full -mt-px ${accountDropdownMenuClassName}`}
+                                className={`wallet-receive-account-menu absolute left-0 right-0 top-full -mt-px ${accountDropdownMenuClassName}`}
                                 onMouseDown={(e) => e.stopPropagation()}
                                 onClick={(e) => e.stopPropagation()}
                                 role="menu"

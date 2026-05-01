@@ -309,6 +309,13 @@ body.wallet-page {
   border-width: 0 !important;
 }
 
+.wallet-receive-modal .wallet-receive-account-menu {
+  border-width: 1px !important;
+  border-style: solid !important;
+  border-color: rgba(255, 255, 255, 0.25) !important;
+  border-top-width: 0 !important;
+}
+
 .wallet-convert-modal :where(*) {
   border-width: 0 !important;
 }
