@@ -228,6 +228,10 @@ export default function WalletDashboardReceiveModal({
   const [shareAddressRevealState, setShareAddressRevealState] = useState({ addr: null, mode: 'hidden' });
   const [shareDropdownToast, setShareDropdownToast] = useState('');
   const shareDropdownToastTimerRef = useRef(null);
+  const requestWalletDropdownRef = useRef(null);
+  const [requestAddressRevealState, setRequestAddressRevealState] = useState({ addr: null, mode: 'hidden' });
+  const [requestDropdownToast, setRequestDropdownToast] = useState('');
+  const requestDropdownToastTimerRef = useRef(null);
 	  const receiveQrContainerRef = useRef(null);
 	  const requestQrContainerRef = useRef(null);
 	  const [qrZoomValue, setQrZoomValue] = useState(null);
@@ -261,6 +265,12 @@ export default function WalletDashboardReceiveModal({
     shareDropdownToastTimerRef.current = setTimeout(() => setShareDropdownToast(''), 3000);
   }, []);
 
+  const showRequestDropdownToast = useCallback((message) => {
+    setRequestDropdownToast(message);
+    if (requestDropdownToastTimerRef.current) clearTimeout(requestDropdownToastTimerRef.current);
+    requestDropdownToastTimerRef.current = setTimeout(() => setRequestDropdownToast(''), 3000);
+  }, []);
+
   const requestCurrencyCode = useMemo(
     () =>
       String(requestCurrency || '')
@@ -290,9 +300,23 @@ export default function WalletDashboardReceiveModal({
   }, [shareWalletDropdownOpen]);
 
   useEffect(() => {
+    if (!requestWalletDropdownOpen) {
+      setRequestAddressRevealState({ addr: null, mode: 'hidden' });
+      setRequestDropdownToast('');
+      if (requestDropdownToastTimerRef.current) clearTimeout(requestDropdownToastTimerRef.current);
+    }
+  }, [requestWalletDropdownOpen]);
+
+  useEffect(() => {
     setShareAddressRevealState({ addr: null, mode: 'hidden' });
     setShareDropdownToast('');
     if (shareDropdownToastTimerRef.current) clearTimeout(shareDropdownToastTimerRef.current);
+  }, [wallet]);
+
+  useEffect(() => {
+    setRequestAddressRevealState({ addr: null, mode: 'hidden' });
+    setRequestDropdownToast('');
+    if (requestDropdownToastTimerRef.current) clearTimeout(requestDropdownToastTimerRef.current);
   }, [wallet]);
 
   useEffect(() => {
@@ -312,6 +336,22 @@ export default function WalletDashboardReceiveModal({
   }, [shareWalletDropdownOpen]);
 
   useEffect(() => {
+    if (!requestWalletDropdownOpen) return;
+    const handlePointerDown = (event) => {
+      const target = event?.target;
+      if (!target) return;
+      if (requestWalletDropdownRef.current && requestWalletDropdownRef.current.contains(target)) return;
+      setRequestWalletDropdownOpen(false);
+    };
+    document.addEventListener('mousedown', handlePointerDown);
+    document.addEventListener('touchstart', handlePointerDown, { passive: true });
+    return () => {
+      document.removeEventListener('mousedown', handlePointerDown);
+      document.removeEventListener('touchstart', handlePointerDown);
+    };
+  }, [requestWalletDropdownOpen]);
+
+  useEffect(() => {
     return () => {
       if (copyToastTimerRef.current) {
         window.clearTimeout(copyToastTimerRef.current);
@@ -324,6 +364,10 @@ export default function WalletDashboardReceiveModal({
       if (shareDropdownToastTimerRef.current) {
         clearTimeout(shareDropdownToastTimerRef.current);
         shareDropdownToastTimerRef.current = null;
+      }
+      if (requestDropdownToastTimerRef.current) {
+        clearTimeout(requestDropdownToastTimerRef.current);
+        requestDropdownToastTimerRef.current = null;
       }
     };
   }, []);
@@ -1740,15 +1784,21 @@ export default function WalletDashboardReceiveModal({
 	                </>
 	              ) : null}
 
-		              {receiveView === 'request' ? (
+	                  {receiveView === 'request' ? (
 		                <>
 		                  {/* SECTION 2 — CREATE REQUEST */}
                       <div className="flex flex-col gap-2 pt-2 flex-1">
 	                    {/* ── Centered wallet pill (style "Choisissez le compte") ── */}
                         <div className="flex justify-center pt-1 pb-1 relative z-[85]">
-	                      <div className="relative">
+	                      <div className="relative" ref={requestWalletDropdownRef}>
 	                        {/* Visible pill */}
-                            <div className={`relative flex w-fit flex-col items-center gap-1 bg-elevated px-6 py-2 ${requestWalletDropdownOpen ? accountDropdownOpenPillClassName : 'rounded-3xl'} ${requestCurrencyDropdownOpen ? 'shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_10px_rgba(255,255,255,0.16)]' : 'shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]'} ${requestWalletDropdownOpen ? 'shadow-[0_4px_12px_rgba(0,0,0,0.45)]' : ''} ${requestCurrencyDropdownOpen ? 'ring-1 ring-white/20 ring-inset' : ''} ${hasMultipleWallets ? 'cursor-pointer' : ''}`}>
+                            <button
+                              type="button"
+                              onClick={hasMultipleWallets ? () => setRequestWalletDropdownOpen((prev) => !prev) : undefined}
+                              className={`relative flex w-fit flex-col items-center gap-1 bg-elevated px-6 py-2 ${requestWalletDropdownOpen ? accountDropdownOpenPillClassName : 'rounded-3xl'} ${requestCurrencyDropdownOpen ? 'shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_10px_rgba(255,255,255,0.16)]' : 'shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]'} ${requestWalletDropdownOpen ? 'shadow-[0_4px_12px_rgba(0,0,0,0.45)]' : ''} ${requestCurrencyDropdownOpen ? 'ring-1 ring-white/20 ring-inset' : ''} ${hasMultipleWallets ? 'cursor-pointer' : ''}`}
+                              aria-haspopup={hasMultipleWallets ? 'menu' : undefined}
+                              aria-expanded={hasMultipleWallets ? requestWalletDropdownOpen : undefined}
+                            >
 	                          <span className="text-white/70 text-[14px] md:text-[15px] font-medium tracking-wide">
 		                            {t('ui_receive_receiving_account_label', 'Compte de réception')}
 	                          </span>
@@ -1763,32 +1813,220 @@ export default function WalletDashboardReceiveModal({
 	                              </svg>
 	                            )}
 	                          </div>
-	                          {/* Invisible ModalSelect overlay for wallet switching */}
-	                          {hasMultipleWallets && (
-	                            <div className="absolute inset-0 z-10">
-	                              <ModalSelect
-	                                value={wallet}
-	                                onChange={next => {
-	                                  const addr = trimmed(next);
-	                                  if (!addr || addr === wallet) return;
-	                                  onSwitchWallet?.(addr);
-	                                }}
-                                  onOpenChange={setRequestWalletDropdownOpen}
-	                                options={shareWalletOptions}
-	                                useNativeSelect={false}
-	                                portal
-	                                portalDesktopWidthOffset={1}
-	                                hideSelected
-	                                backdropClassName=""
-	                                iconClassName="inline-flex items-center justify-center leading-none"
-	                                optionIconClassName="inline-flex items-center justify-center leading-none opacity-0"
-	                                buttonClassName="w-full h-full opacity-0 cursor-pointer"
-	                                menuClassName={accountDropdownMenuClassName}
-	                                selectClassName="xcannes-select w-full bg-transparent rounded-xl pl-0 pr-2 py-2 text-base text-white focus:outline-none transition-colors duration-150"
-	                              />
-	                            </div>
-	                          )}
-	                        </div>
+	                        </button>
+
+                            {requestWalletDropdownOpen && hasMultipleWallets ? (
+                              <div
+                                className={`absolute left-0 right-0 top-full ${accountDropdownMenuClassName}`}
+                                onMouseDown={(e) => e.stopPropagation()}
+                                onClick={(e) => e.stopPropagation()}
+                                role="menu"
+                              >
+                                <div className="px-3 pt-2 pb-1.5">
+                                  {(() => {
+                                    const revealMode =
+                                      requestAddressRevealState?.addr === wallet ? requestAddressRevealState?.mode : 'hidden';
+                                    const displayAddress =
+                                      revealMode === 'full'
+                                        ? wallet
+                                        : `${wallet.slice(0, 8)}…${wallet.slice(-6)}`;
+
+                                    if (revealMode === 'hidden') {
+                                      return (
+                                        <div className="flex items-center justify-between gap-2">
+                                          <button
+                                            type="button"
+                                            className="min-w-0 flex-1 text-left text-[13px] md:text-[14px] text-white/40 hover:text-white/60 transition-colors"
+                                            onClick={() => setRequestAddressRevealState({ addr: wallet, mode: 'truncated' })}
+                                          >
+                                            {t('ui_view_wallet_address', "Voir l'adresse")}
+                                          </button>
+                                          <button
+                                            type="button"
+                                            className="shrink-0 rounded-md bg-white/[0.06] p-1 text-white/35 hover:bg-white/[0.10] hover:text-white/55 transition-colors"
+                                            onClick={() => setRequestAddressRevealState({ addr: wallet, mode: 'truncated' })}
+                                            aria-label={t('ui_show_wallet_address', "Voir l'adresse")}
+                                          >
+                                            <EyeIcon className="h-4 w-4" />
+                                          </button>
+                                        </div>
+                                      );
+                                    }
+
+                                    return (
+                                      <div className="flex items-start gap-2">
+                                        <button
+                                          type="button"
+                                          className={`min-w-0 flex-1 text-left font-mono font-light text-[13px] md:text-[14px] leading-snug text-white/70 ${
+                                            revealMode === 'full' ? 'whitespace-normal break-all' : 'truncate'
+                                          }`}
+                                          title={wallet}
+                                          onClick={() =>
+                                            setRequestAddressRevealState((prev) => {
+                                              if (prev?.addr !== wallet) return { addr: wallet, mode: 'full' };
+                                              if (prev?.mode === 'full') return { addr: wallet, mode: 'truncated' };
+                                              return { addr: wallet, mode: 'full' };
+                                            })
+                                          }
+                                        >
+                                          {displayAddress}
+                                        </button>
+
+                                        <button
+                                          type="button"
+                                          className="shrink-0 rounded-md p-1 text-white/45 hover:text-white/80 transition-colors"
+                                          onClick={async () => {
+                                            try {
+                                              await navigator.clipboard?.writeText?.(wallet);
+                                              showRequestDropdownToast(t('ui_address_copied', 'Adresse copiée'));
+                                            } catch {
+                                              /* ignore */
+                                            }
+                                          }}
+                                          aria-label={t('ui_copy_wallet_address', "Copier l'adresse du wallet")}
+                                        >
+                                          <CopyIcon className="h-4 w-4" />
+                                        </button>
+
+                                        <button
+                                          type="button"
+                                          className="shrink-0 rounded-md bg-white/[0.06] p-1 text-white/40 hover:bg-white/[0.10] hover:text-white/60 transition-colors"
+                                          onClick={() => setRequestAddressRevealState({ addr: null, mode: 'hidden' })}
+                                          aria-label={t('ui_hide_wallet_address', "Masquer l'adresse du wallet")}
+                                        >
+                                          <EyeIcon className="h-4 w-4" slashed />
+                                        </button>
+                                      </div>
+                                    );
+                                  })()}
+                                </div>
+
+                                <div className="px-3">
+                                  <div className="h-px w-full bg-white/10" aria-hidden />
+                                </div>
+
+                                <div className="px-3 pt-1.5">
+                                  <div
+                                    className={`text-[11px] md:text-[12px] text-xcannes-green/80 transition-opacity duration-200 ${
+                                      requestDropdownToast ? 'opacity-100' : 'opacity-0'
+                                    }`}
+                                    role="status"
+                                    aria-live="polite"
+                                  >
+                                    {requestDropdownToast || ' '}
+                                  </div>
+                                </div>
+
+                                <div className="px-3 pt-2 pb-1">
+                                  <div className="text-[13px] md:text-[14px] text-white/60">
+                                    {t('ui_switch_wallet', 'Changer de compte')}
+                                  </div>
+                                </div>
+
+                                {(shareWalletOptions || [])
+                                  .filter((opt) => opt?.value && opt.value !== wallet)
+                                  .map((opt, idx) => {
+                                    const addr = opt.value;
+                                    const displayName = opt.label || `Compte ${idx + 1}`;
+                                    const revealMode =
+                                      requestAddressRevealState?.addr === addr ? requestAddressRevealState?.mode : 'hidden';
+                                    const displayAddress =
+                                      revealMode === 'full'
+                                        ? addr
+                                        : `${addr.slice(0, 8)}…${addr.slice(-6)}`;
+
+                                    return (
+                                      <div
+                                        key={addr}
+                                        className="w-full text-left px-3 py-2.5 flex items-center gap-2 transition-colors duration-150 hover:bg-white/[0.06]"
+                                        role="menuitem"
+                                        tabIndex={0}
+                                        onClick={() => {
+                                          onSwitchWallet?.(addr);
+                                          setRequestWalletDropdownOpen(false);
+                                        }}
+                                        onKeyDown={(e) => {
+                                          if (e.key !== 'Enter' && e.key !== ' ') return;
+                                          e.preventDefault();
+                                          onSwitchWallet?.(addr);
+                                          setRequestWalletDropdownOpen(false);
+                                        }}
+                                      >
+                                        <span className="h-2 w-2 rounded-full shrink-0 transition-colors duration-150 bg-white/20 opacity-0" />
+                                        <div className="min-w-0 flex-1">
+                                          <div className="flex items-center justify-between gap-2 min-w-0">
+                                            <div className="text-[16px] md:text-[17px] font-medium truncate text-white/80 min-w-0">
+                                              {displayName}
+                                            </div>
+                                            <button
+                                              type="button"
+                                              className={`shrink-0 rounded-md bg-white/[0.06] p-1 text-white/35 hover:bg-white/[0.10] hover:text-white/60 transition-colors ${
+                                                revealMode !== 'hidden' ? 'text-white/55' : ''
+                                              }`}
+                                              onClick={(e) => {
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                                setRequestAddressRevealState((prev) =>
+                                                  prev?.addr === addr && prev?.mode !== 'hidden'
+                                                    ? { addr: null, mode: 'hidden' }
+                                                    : { addr, mode: 'truncated' },
+                                                );
+                                              }}
+                                              aria-label={
+                                                revealMode !== 'hidden'
+                                                  ? t('ui_hide_wallet_address', "Masquer l'adresse du wallet")
+                                                  : t('ui_show_wallet_address', "Afficher l'adresse du wallet")
+                                              }
+                                            >
+                                              <EyeIcon className="h-4 w-4" slashed={revealMode !== 'hidden'} />
+                                            </button>
+                                          </div>
+
+                                          {revealMode === 'hidden' ? null : (
+                                            <div className="mt-0.5 flex items-start gap-2">
+                                              <button
+                                                type="button"
+                                                className={`min-w-0 flex-1 text-left font-mono font-light text-[13px] md:text-[14px] leading-snug text-white/70 ${
+                                                  revealMode === 'full' ? 'whitespace-normal break-all' : 'truncate'
+                                                }`}
+                                                title={addr}
+                                                onClick={(e) => {
+                                                  e.preventDefault();
+                                                  e.stopPropagation();
+                                                  setRequestAddressRevealState((prev) => {
+                                                    if (prev?.addr !== addr) return { addr, mode: 'full' };
+                                                    if (prev?.mode === 'full') return { addr, mode: 'truncated' };
+                                                    return { addr, mode: 'full' };
+                                                  });
+                                                }}
+                                              >
+                                                {displayAddress}
+                                              </button>
+                                              <button
+                                                type="button"
+                                                className="shrink-0 rounded-md p-1 text-white/45 hover:text-white/80 transition-colors"
+                                                onClick={async (e) => {
+                                                  e.preventDefault();
+                                                  e.stopPropagation();
+                                                  try {
+                                                    await navigator.clipboard?.writeText?.(addr);
+                                                    showRequestDropdownToast(t('ui_address_copied', 'Adresse copiée'));
+                                                  } catch {
+                                                    /* ignore */
+                                                  }
+                                                }}
+                                                aria-label={t('ui_copy_wallet_address', "Copier l'adresse du wallet")}
+                                              >
+                                                <CopyIcon className="h-4 w-4" />
+                                              </button>
+                                            </div>
+                                          )}
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
+                              </div>
+                            ) : null}
 	                      </div>
 	                    </div>
 
