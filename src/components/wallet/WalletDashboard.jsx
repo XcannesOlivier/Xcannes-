@@ -1354,7 +1354,7 @@ export default function WalletDashboard({
                             <div className="flex flex-col items-center md:flex-row md:items-baseline md:justify-center md:gap-3">
                               {recentActivityWhen?.mobile || recentActivityWhen?.desktop ? (
                                 <>
-                                  <span className="md:hidden text-[11px] text-white/45 whitespace-nowrap">
+                                  <span className="md:hidden text-[10px] text-white/45 whitespace-nowrap">
                                     {recentActivityWhen.mobile}
                                   </span>
                                   <span className="hidden md:inline text-[14px] text-white/45 whitespace-nowrap">
@@ -1365,22 +1365,22 @@ export default function WalletDashboard({
                               <span
                                 className="text-center md:text-center truncate max-w-full md:max-w-[520px]"
                                 style={{
-                                  textShadow:
-                                    "0 0 14px rgba(22,163,74,0.22), 0 0 28px rgba(22,163,74,0.14)",
+                                  filter:
+                                    "drop-shadow(0 0 12px rgba(22,163,74,0.22)) drop-shadow(0 0 24px rgba(22,163,74,0.14))",
                                 }}
                               >
-                                <span className="md:hidden text-[13px] text-white/65 font-semibold">
+                                <span className="md:hidden text-[12px] text-white/65 font-semibold">
                                   {recentActivityMessageMobileParts.isConversion ? (
                                     <>
                                       {recentActivityMessageMobileParts.left} {recentActivityMessageMobileParts.arrow}{" "}
-                                      <span className="text-[14px] text-white/90 font-semibold">
+                                      <span className="text-[13px] text-white/90 font-semibold">
                                         {recentActivityMessageMobileParts.right}
                                       </span>
                                     </>
                                   ) : recentActivityIcon === "receive" && recentActivityReceiveParts ? (
                                     <>
                                       {recentActivityReceiveParts.prefix}{" "}
-                                      <span className="text-[14px] text-[#16A34A] font-semibold">
+                                      <span className="text-[13px] text-[#16A34A] font-semibold">
                                         + {recentActivityReceiveParts.amount} {recentActivityReceiveParts.currency}
                                       </span>
                                       {recentActivityReceiveParts.suffix}
@@ -1388,7 +1388,7 @@ export default function WalletDashboard({
                                   ) : recentActivityIcon === "send" && recentActivitySendParts ? (
                                     <>
                                       {recentActivitySendParts.prefix}{" "}
-                                      <span className="text-[14px] text-red-300 font-semibold">
+                                      <span className="text-[13px] text-red-300 font-semibold">
                                         - {recentActivitySendParts.amount} {recentActivitySendParts.currency}
                                       </span>
                                       {recentActivitySendParts.suffix}
