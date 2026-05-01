@@ -126,6 +126,8 @@ export default function WalletDashboardHeader({
   const [isSwitcherOpen, setIsSwitcherOpen] = useState(false);
   const [isSwitcherVisible, setIsSwitcherVisible] = useState(false);
   const [addressRevealState, setAddressRevealState] = useState({ addr: null, mode: "hidden" });
+  const [copyToast, setCopyToast] = useState("");
+  const copyToastTimerRef = useRef(null);
   const isSwitcherClosingRef = useRef(false);
   const didSwitchRef = useRef(false);
   const switcherRef = useRef(null);
@@ -135,11 +137,24 @@ export default function WalletDashboardHeader({
   // Fade-out duration: slow (1800ms) after wallet switch, fast (100ms) otherwise
   const closeDuration = didSwitchRef.current ? 1800 : 100;
 
+  const showCopyToast = (message) => {
+    setCopyToast(message);
+    if (copyToastTimerRef.current) clearTimeout(copyToastTimerRef.current);
+    copyToastTimerRef.current = setTimeout(() => setCopyToast(""), 3000);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (copyToastTimerRef.current) clearTimeout(copyToastTimerRef.current);
+    };
+  }, []);
+
   // Smooth open/close with two-phase state (mount → animate in, animate out → unmount)
   const openSwitcher = () => {
     isSwitcherClosingRef.current = false;
     didSwitchRef.current = false;
     setAddressRevealState({ addr: null, mode: "hidden" });
+    setCopyToast("");
     setIsSwitcherOpen(true);
     requestAnimationFrame(() => requestAnimationFrame(() => setIsSwitcherVisible(true)));
   };
@@ -148,6 +163,7 @@ export default function WalletDashboardHeader({
     isSwitcherClosingRef.current = true;
     setIsSwitcherVisible(false);
     setAddressRevealState({ addr: null, mode: "hidden" });
+    setCopyToast("");
     const unmountDelay = didSwitchRef.current ? 1850 : 130;
     // Wait for the CSS transition to finish before unmounting
     setTimeout(() => {
@@ -407,7 +423,7 @@ export default function WalletDashboardHeader({
                                   </button>
                                   <button
                                     type="button"
-                                    className="shrink-0 rounded-md bg-white/[0.06] p-1 text-white/55 hover:bg-white/[0.10] hover:text-white/85 transition-colors"
+                                    className="shrink-0 rounded-md bg-white/[0.06] p-1 text-white/35 hover:bg-white/[0.10] hover:text-white/55 transition-colors"
                                     onClick={(e) => {
                                       e.preventDefault();
                                       e.stopPropagation();
@@ -453,6 +469,7 @@ export default function WalletDashboardHeader({
                                     e.stopPropagation();
                                     try {
                                       await navigator.clipboard?.writeText?.(wallet);
+                                      showCopyToast(t("ui_address_copied", "Adresse copiée"));
                                     } catch {
                                       /* ignore */
                                     }
@@ -464,7 +481,7 @@ export default function WalletDashboardHeader({
 
                                 <button
                                   type="button"
-                                  className="shrink-0 rounded-md bg-white/[0.06] p-1 text-white/60 hover:bg-white/[0.10] hover:text-white/85 transition-colors"
+                                  className="shrink-0 rounded-md bg-white/[0.06] p-1 text-white/40 hover:bg-white/[0.10] hover:text-white/60 transition-colors"
                                   onClick={(e) => {
                                     e.preventDefault();
                                     e.stopPropagation();
@@ -480,6 +497,17 @@ export default function WalletDashboardHeader({
                         </div>
                         <div className="px-2.5 md:px-3">
                           <div className="h-px w-full bg-white/10" aria-hidden />
+                        </div>
+                        <div className="px-2.5 md:px-3 pt-1.5">
+                          <div
+                            className={`text-[11px] md:text-[12px] text-xcannes-green/80 transition-opacity duration-200 ${
+                              copyToast ? "opacity-100" : "opacity-0"
+                            }`}
+                            role="status"
+                            aria-live="polite"
+                          >
+                            {copyToast || " "}
+                          </div>
                         </div>
                         {/* Subtitle */}
                         <div className="px-2.5 md:px-3 pt-2 pb-1">
@@ -534,8 +562,8 @@ export default function WalletDashboardHeader({
     		                                </div>
                                       <button
                                         type="button"
-                                        className={`shrink-0 rounded-md bg-white/[0.06] p-1 text-white/55 hover:bg-white/[0.10] hover:text-white/85 transition-colors ${
-                                          revealMode !== "hidden" ? "text-white/85" : ""
+                                        className={`shrink-0 rounded-md bg-white/[0.06] p-1 text-white/35 hover:bg-white/[0.10] hover:text-white/60 transition-colors ${
+                                          revealMode !== "hidden" ? "text-white/55" : ""
                                         }`}
                                         onClick={(e) => {
                                           e.preventDefault();
@@ -586,6 +614,7 @@ export default function WalletDashboardHeader({
                                             e.stopPropagation();
                                             try {
                                               await navigator.clipboard?.writeText?.(addr);
+                                              showCopyToast(t("ui_address_copied", "Adresse copiée"));
                                             } catch {
                                               /* ignore */
                                             }
