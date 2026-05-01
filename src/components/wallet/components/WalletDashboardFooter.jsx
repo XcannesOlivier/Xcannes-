@@ -32,7 +32,7 @@ const MUSTACHE_RIGHT_CONNECT_PATH = "M254 0 C272 0 292 30 320 30";
 const LEFT_LABEL_LINE_PATH = "M0 30 H70";
 const RIGHT_LABEL_LINE_PATH = "M390 30 H320";
 
-function ScanIcon({ className = "h-7 w-7" }) {
+function ScanIcon({ className = "h-8 w-8" }) {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -119,13 +119,13 @@ function MobileScanButton({ onScan, ariaLabel }) {
   return (
     <>
       <div
-        className="pointer-events-none absolute left-1/2 top-[12px] z-0 h-[33px] w-[122px] -translate-x-1/2 rounded-full bg-[#111518] blur-[18px]"
+        className="pointer-events-none absolute left-1/2 top-[11px] z-0 h-[38px] w-[132px] -translate-x-1/2 rounded-full bg-[#111518] blur-[18px]"
         aria-hidden
       />
       <button
         type="button"
         onClick={onScan}
-        className="absolute left-1/2 top-[16px] z-10 flex h-[35px] w-[130px] -translate-x-1/2 items-center justify-center rounded-full text-white transition-transform duration-150 hover:scale-[1.01] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#39d57c]/20"
+        className="absolute left-1/2 top-[16px] z-10 flex h-[40px] w-[140px] -translate-x-1/2 items-center justify-center rounded-full text-white transition-transform duration-150 hover:scale-[1.01] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#39d57c]/20"
         style={scanButtonStyle}
         aria-label={ariaLabel}
       >
