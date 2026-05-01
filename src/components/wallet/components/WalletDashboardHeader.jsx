@@ -354,7 +354,7 @@ export default function WalletDashboardHeader({
                           aria-label={xrplConnectionIndicator.label}
                         />
 
-	                        <span className="text-[14px] md:text-[17px] font-semibold text-white/90 truncate">
+	                        <span className="text-[15px] md:text-[18px] font-semibold text-white/90 truncate">
 	                          {activeWalletLabel.length > 11 ? activeWalletLabel.slice(0, 11) + '…' : activeWalletLabel}
 	                        </span>
                       </div>
@@ -395,7 +395,7 @@ export default function WalletDashboardHeader({
                                 <div className="flex items-center justify-between gap-2">
                                   <button
                                     type="button"
-                                    className="min-w-0 flex-1 text-left text-[13px] md:text-[14px] text-white/60 hover:text-white/80 transition-colors"
+                                    className="min-w-0 flex-1 text-left text-[13px] md:text-[14px] text-white/40 hover:text-white/60 transition-colors"
                                     onClick={(e) => {
                                       e.preventDefault();
                                       e.stopPropagation();
@@ -483,7 +483,7 @@ export default function WalletDashboardHeader({
                         </div>
                         {/* Subtitle */}
                         <div className="px-2.5 md:px-3 pt-2 pb-1">
-                          <div className="text-[13px] md:text-[14px] text-white/40">
+                          <div className="text-[13px] md:text-[14px] text-white/60">
                             Changer de compte
                           </div>
                         </div>

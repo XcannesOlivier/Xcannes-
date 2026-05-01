@@ -58,7 +58,7 @@ function ScanIcon({ className = "h-8 w-20" }) {
         fontWeight="600"
         fontFamily="system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif"
       >
-        QR code
+        Scanner
       </text>
     </svg>
   );
