@@ -32,10 +32,10 @@ const MUSTACHE_RIGHT_CONNECT_PATH = "M254 0 C272 0 292 30 320 30";
 const LEFT_LABEL_LINE_PATH = "M0 30 H70";
 const RIGHT_LABEL_LINE_PATH = "M390 30 H320";
 
-function ScanIcon({ className = "h-8 w-16" }) {
+function ScanIcon({ className = "h-8 w-20" }) {
   return (
     <svg
-      viewBox="0 0 64 24"
+      viewBox="0 0 80 24"
       className={className}
       fill="none"
       stroke="currentColor"
@@ -45,16 +45,16 @@ function ScanIcon({ className = "h-8 w-16" }) {
       <path
         strokeLinecap="butt"
         strokeLinejoin="miter"
-        d="M2.5 9V2.5H9M55 2.5H61.5V9M9 21.5H2.5V15M61.5 15V21.5H55"
+        d="M2.5 9V2.5H9M71 2.5H77.5V9M9 21.5H2.5V15M77.5 15V21.5H71"
       />
       <text
-        x="32"
+        x="40"
         y="12.6"
         textAnchor="middle"
         dominantBaseline="middle"
         fill="currentColor"
         stroke="none"
-        fontSize="12"
+        fontSize="14"
         fontWeight="600"
         fontFamily="system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif"
       >
