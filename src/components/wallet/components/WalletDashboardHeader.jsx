@@ -48,7 +48,7 @@ function writeLabelCache(labelsByAddress) {
   }
 }
 
-function EyeIcon({ className = "h-4 w-4" } = {}) {
+function EyeIcon({ className = "h-4 w-4", slashed = false } = {}) {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -62,6 +62,7 @@ function EyeIcon({ className = "h-4 w-4" } = {}) {
     >
       <path d="M2.5 12s3.5-7 9.5-7 9.5 7 9.5 7-3.5 7-9.5 7-9.5-7-9.5-7Z" />
       <circle cx="12" cy="12" r="2.6" />
+      {slashed ? <path d="M4 20L20 4" /> : null}
     </svg>
   );
 }
@@ -381,11 +382,81 @@ export default function WalletDashboardHeader({
                       >
                         {/* Active wallet address pinned at top */}
                         <div className="px-2.5 md:px-3 pt-2 pb-1.5">
-                          <div
-                            className="font-mono font-light text-[13px] md:text-[14px] text-white/85 whitespace-normal break-all leading-snug"
-                          >
-                            {`${wallet.slice(0, 8)}…${wallet.slice(-6)}`}
-                          </div>
+                          {(() => {
+                            const revealMode =
+                              addressRevealState?.addr === wallet ? addressRevealState?.mode : "hidden";
+                            const displayAddress =
+                              revealMode === "full"
+                                ? wallet
+                                : `${wallet.slice(0, 8)}…${wallet.slice(-6)}`;
+
+                            if (revealMode === "hidden") {
+                              return (
+                                <button
+                                  type="button"
+                                  className="inline-flex items-center gap-2 text-[13px] md:text-[14px] text-white/75 hover:text-white/90 transition-colors"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    setAddressRevealState({ addr: wallet, mode: "truncated" });
+                                  }}
+                                  aria-label={t("ui_show_wallet_address", "Voir l'adresse")}
+                                >
+                                  <EyeIcon className="h-4 w-4" slashed={false} />
+                                  <span>{t("ui_view_wallet_address", "Voir l'adresse")}</span>
+                                </button>
+                              );
+                            }
+
+                            return (
+                              <div className="flex items-start gap-2">
+                                <span
+                                  className="mt-[3px] shrink-0 text-white/60"
+                                  aria-hidden
+                                >
+                                  <EyeIcon className="h-4 w-4" slashed />
+                                </span>
+                                <button
+                                  type="button"
+                                  className={`min-w-0 flex-1 text-left font-mono font-light text-[13px] md:text-[14px] leading-snug text-white/85 ${
+                                    revealMode === "full" ? "whitespace-normal break-all" : "truncate"
+                                  }`}
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    setAddressRevealState((prev) => {
+                                      if (prev?.addr !== wallet) return { addr: wallet, mode: "full" };
+                                      if (prev?.mode === "full") return { addr: wallet, mode: "truncated" };
+                                      return { addr: wallet, mode: "full" };
+                                    });
+                                  }}
+                                  aria-label={t(
+                                    "ui_toggle_wallet_address_truncation",
+                                    "Afficher l'adresse complète"
+                                  )}
+                                >
+                                  {displayAddress}
+                                </button>
+
+                                <button
+                                  type="button"
+                                  className="shrink-0 rounded-md p-1 text-white/45 hover:text-white/80 transition-colors"
+                                  onClick={async (e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    try {
+                                      await navigator.clipboard?.writeText?.(wallet);
+                                    } catch {
+                                      /* ignore */
+                                    }
+                                  }}
+                                  aria-label={t("ui_copy_wallet_address", "Copier l'adresse du wallet")}
+                                >
+                                  <CopyIcon className="h-4 w-4" />
+                                </button>
+                              </div>
+                            );
+                          })()}
                         </div>
                         {/* Subtitle */}
                         <div className="px-2.5 md:px-3 pt-2 pb-1">
@@ -458,7 +529,7 @@ export default function WalletDashboardHeader({
                                             : t("ui_show_wallet_address", "Afficher l'adresse du wallet")
                                         }
                                       >
-                                        <EyeIcon className="h-4 w-4" />
+                                        <EyeIcon className="h-4 w-4" slashed={revealMode !== "hidden"} />
                                       </button>
                                     </div>
                                     {revealMode === "hidden" ? null : (
