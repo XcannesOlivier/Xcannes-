@@ -1362,7 +1362,10 @@ export default function WalletDashboard({
                                   </span>
                                 </>
                               ) : null}
-                              <span className="text-center md:text-center truncate max-w-full md:max-w-[520px]">
+                              <span
+                                className="text-center md:text-center truncate max-w-full md:max-w-[520px]"
+                                style={{ filter: "drop-shadow(0 0 10px rgba(22,163,74,0.10))" }}
+                              >
                                 <span className="md:hidden text-[13px] text-white/65 font-semibold">
                                   {recentActivityMessageMobileParts.isConversion ? (
                                     <>
