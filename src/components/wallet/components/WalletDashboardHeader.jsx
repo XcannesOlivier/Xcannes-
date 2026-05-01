@@ -66,6 +66,24 @@ function EyeIcon({ className = "h-4 w-4" } = {}) {
   );
 }
 
+function CopyIcon({ className = "h-4 w-4" } = {}) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden
+    >
+      <path d="M9 9h10v12H9z" />
+      <path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1" />
+    </svg>
+  );
+}
+
 export default function WalletDashboardHeader({
   isConnected,
   wallet,
@@ -106,7 +124,7 @@ export default function WalletDashboardHeader({
   const { t } = useTranslation("common");
   const [isSwitcherOpen, setIsSwitcherOpen] = useState(false);
   const [isSwitcherVisible, setIsSwitcherVisible] = useState(false);
-  const [revealedAddress, setRevealedAddress] = useState(null);
+  const [addressRevealState, setAddressRevealState] = useState({ addr: null, mode: "hidden" });
   const isSwitcherClosingRef = useRef(false);
   const didSwitchRef = useRef(false);
   const switcherRef = useRef(null);
@@ -120,7 +138,7 @@ export default function WalletDashboardHeader({
   const openSwitcher = () => {
     isSwitcherClosingRef.current = false;
     didSwitchRef.current = false;
-    setRevealedAddress(null);
+    setAddressRevealState({ addr: null, mode: "hidden" });
     setIsSwitcherOpen(true);
     requestAnimationFrame(() => requestAnimationFrame(() => setIsSwitcherVisible(true)));
   };
@@ -128,7 +146,7 @@ export default function WalletDashboardHeader({
     if (isSwitcherClosingRef.current) return; // already closing
     isSwitcherClosingRef.current = true;
     setIsSwitcherVisible(false);
-    setRevealedAddress(null);
+    setAddressRevealState({ addr: null, mode: "hidden" });
     const unmountDelay = didSwitchRef.current ? 1850 : 130;
     // Wait for the CSS transition to finish before unmounting
     setTimeout(() => {
@@ -385,10 +403,12 @@ export default function WalletDashboardHeader({
                           const isActive = addr === wallet;
                           if (isActive) return null;
                           const displayName = label || `Compte ${index + 1}`;
-                          const isRevealed = revealedAddress === addr;
-                          const displayAddress = isRevealed
-                            ? addr
-                            : `${addr.slice(0, 8)}…${addr.slice(-6)}`;
+                          const revealMode =
+                            addressRevealState?.addr === addr ? addressRevealState?.mode : "hidden";
+                          const displayAddress =
+                            revealMode === "full"
+                              ? addr
+                              : `${addr.slice(0, 8)}…${addr.slice(-6)}`;
                           return (
                             <div
                               key={addr}
@@ -420,14 +440,20 @@ export default function WalletDashboardHeader({
     		                                </div>
                                       <button
                                         type="button"
-                                        className={`shrink-0 rounded-md p-1 text-white/45 hover:text-white/80 transition-colors ${isRevealed ? "text-white/80" : ""}`}
+                                        className={`shrink-0 rounded-md p-1 text-white/45 hover:text-white/80 transition-colors ${
+                                          revealMode !== "hidden" ? "text-white/80" : ""
+                                        }`}
                                         onClick={(e) => {
                                           e.preventDefault();
                                           e.stopPropagation();
-                                          setRevealedAddress((prev) => (prev === addr ? null : addr));
+                                          setAddressRevealState((prev) =>
+                                            prev?.addr === addr && prev?.mode !== "hidden"
+                                              ? { addr: null, mode: "hidden" }
+                                              : { addr, mode: "truncated" }
+                                          );
                                         }}
                                         aria-label={
-                                          isRevealed
+                                          revealMode !== "hidden"
                                             ? t("ui_hide_wallet_address", "Masquer l'adresse du wallet")
                                             : t("ui_show_wallet_address", "Afficher l'adresse du wallet")
                                         }
@@ -435,13 +461,47 @@ export default function WalletDashboardHeader({
                                         <EyeIcon className="h-4 w-4" />
                                       </button>
                                     </div>
-		                                <div
-		                                  className={`font-mono font-light text-[13px] md:text-[14px] leading-snug ${
-                                        isRevealed ? "text-white/70 whitespace-normal break-all" : "text-white/40"
-                                      }`}
-		                                >
-		                                  {displayAddress}
-		                                </div>
+                                    {revealMode === "hidden" ? null : (
+                                      <div className="mt-0.5 flex items-start gap-2">
+        		                                <button
+                                          type="button"
+                                          className={`min-w-0 flex-1 text-left font-mono font-light text-[13px] md:text-[14px] leading-snug text-white/70 ${
+                                            revealMode === "full" ? "whitespace-normal break-all" : "truncate"
+                                          }`}
+                                          onClick={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            setAddressRevealState((prev) => {
+                                              if (prev?.addr !== addr) return { addr, mode: "full" };
+                                              if (prev?.mode === "full") return { addr, mode: "truncated" };
+                                              return { addr, mode: "full" };
+                                            });
+                                          }}
+                                          aria-label={t(
+                                            "ui_toggle_wallet_address_truncation",
+                                            "Afficher l'adresse complète"
+                                          )}
+                                        >
+        		                                  {displayAddress}
+        		                                </button>
+                                        <button
+                                          type="button"
+                                          className="shrink-0 rounded-md p-1 text-white/45 hover:text-white/80 transition-colors"
+                                          onClick={async (e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            try {
+                                              await navigator.clipboard?.writeText?.(addr);
+                                            } catch {
+                                              /* ignore */
+                                            }
+                                          }}
+                                          aria-label={t("ui_copy_wallet_address", "Copier l'adresse du wallet")}
+                                        >
+                                          <CopyIcon className="h-4 w-4" />
+                                        </button>
+                                      </div>
+                                    )}
 		                              </div>
                             </div>
                           );
