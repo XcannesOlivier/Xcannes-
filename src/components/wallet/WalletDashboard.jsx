@@ -361,6 +361,8 @@ export default function WalletDashboard({
   const [recentActivityMessage, setRecentActivityMessage] = useState('');
   const [recentActivityCreatedAt, setRecentActivityCreatedAt] = useState('');
   const [recentActivityKind, setRecentActivityKind] = useState('');
+  const [recentActivityMovementId, setRecentActivityMovementId] = useState('');
+  const [highlightTransactionId, setHighlightTransactionId] = useState(null);
   const recentActivityTimerRef = useRef(null);
   const [activityTooltipOpen, setActivityTooltipOpen] = useState(false);
   const activityTooltipTriggerRef = useRef(null);
@@ -769,6 +771,7 @@ export default function WalletDashboard({
     setRecentActivityMessage(text);
     setRecentActivityCreatedAt(String(movement?.createdAt || '').trim());
     setRecentActivityKind(String(movement?.kind || '').trim());
+    setRecentActivityMovementId(String(movement?.movementId || movement?._id || movement?.txHash || '').trim());
     if (recentActivityTimerRef.current) {
       window.clearTimeout(recentActivityTimerRef.current);
       recentActivityTimerRef.current = null;
@@ -804,12 +807,10 @@ export default function WalletDashboard({
     const dateMobile = new Intl.DateTimeFormat(dateLocale, {
       day: "numeric",
       month: "short",
-      year: "numeric",
     }).format(parsed);
     const dateDesktop = new Intl.DateTimeFormat(dateLocale, {
       day: "numeric",
-      month: "long",
-      year: "numeric",
+      month: "short",
     }).format(parsed);
     const time = new Intl.DateTimeFormat(dateLocale, {
       hour: "2-digit",
@@ -817,8 +818,8 @@ export default function WalletDashboard({
     }).format(parsed);
 
     return {
-      mobile: `Le ${dateMobile} à ${time}`,
-      desktop: `Le ${dateDesktop} à ${time}`,
+      mobile: `${dateMobile} • ${time}`,
+      desktop: `${dateDesktop} • ${time}`,
     };
   }, [locale, recentActivityCreatedAt]);
 
@@ -1016,6 +1017,18 @@ export default function WalletDashboard({
     toast,
   });
 
+  const handleOpenGlobalStatementFromRecent = useCallback(() => {
+    const id = String(recentActivityMovementId || '').trim();
+    setHighlightTransactionId(id || null);
+    setActivityTooltipOpen(false);
+    handleOpenGlobalStatement?.();
+  }, [handleOpenGlobalStatement, recentActivityMovementId]);
+
+  const handleOpenGlobalStatementPlain = useCallback(() => {
+    setHighlightTransactionId(null);
+    handleOpenGlobalStatement?.();
+  }, [handleOpenGlobalStatement]);
+
   const handleAddDevise = useCallback(
     async (code) => {
       if (!code) return;
@@ -1155,14 +1168,15 @@ export default function WalletDashboard({
     setShowGlobalStatement,
     showCurrencyStatement,
     setShowCurrencyStatement,
-    selectedStatementToken,
-    setSelectedStatementToken,
-    statementBalance,
-    toast,
-    // Spread sub-orchestrator state (keys match useWalletModalProps params)
-    ...sendState,
-    ...swapState,
-  });
+	    selectedStatementToken,
+	    setSelectedStatementToken,
+	    statementBalance,
+	    highlightTransactionId,
+	    toast,
+	    // Spread sub-orchestrator state (keys match useWalletModalProps params)
+	    ...sendState,
+	    ...swapState,
+	  });
 
   // ── Body scroll lock ───────────────────────────────────────
   const allowBackgroundScrollForStatements = !isDesktopPanel && (showGlobalStatement || showCurrencyStatement);
@@ -1303,7 +1317,7 @@ export default function WalletDashboard({
                   </div>
                   <button
                     type="button"
-                    onClick={handleOpenGlobalStatement}
+                    onClick={handleOpenGlobalStatementPlain}
                     className="order-2 md:order-5 shrink-0 inline-flex items-center gap-1.5 text-[14px] md:text-[15px] font-normal text-white/55 hover:text-white/85 transition-colors px-2.5 md:px-3 py-1 md:py-1.5 rounded-lg"
                     title={
                       recentActivityMessage
@@ -1319,23 +1333,13 @@ export default function WalletDashboard({
                     <span className="md:hidden">{t('ui_consult_global_statement_desktop', "Voir l'historique")}</span>
                     <span className="hidden md:inline">{t('ui_consult_global_statement_desktop', "Voir l'historique")}</span>
                   </button>
-                  {recentActivityMessage ? (
-                    <div className="order-3 basis-full md:hidden flex items-center justify-center py-0.5 pointer-events-none" aria-hidden>
-                      <div className="w-[70%] h-[1.1px] bg-[#697173]/40" />
-                    </div>
-                  ) : null}
                   <div
                     className={[
                       "order-4 basis-full md:order-3 md:basis-auto flex-1 min-w-0 overflow-visible relative transition-all duration-500",
-                      recentActivityMessage ? "opacity-100 max-h-10" : "opacity-0 max-h-0 pointer-events-none",
+                      recentActivityMessage ? "opacity-100 max-h-20" : "opacity-0 max-h-0 pointer-events-none",
                     ].join(" ")}
                     aria-live="polite"
                   >
-                    {recentActivityMessage ? (
-                      <div className="hidden md:flex items-center justify-center py-1.5 pointer-events-none" aria-hidden>
-                        <div className="w-[70%] h-[1.1px] bg-[#697173]/40" />
-                      </div>
-                    ) : null}
                     <button
                       type="button"
                       ref={activityTooltipTriggerRef}
@@ -1344,96 +1348,105 @@ export default function WalletDashboard({
                           ? `${recentActivityWhen?.desktop || recentActivityWhen?.mobile} — ${recentActivityMessage}`
                           : recentActivityMessage
                       }
-                      onClick={() => setActivityTooltipOpen(v => !v)}
+                      onClick={handleOpenGlobalStatementFromRecent}
                       onBlur={() => setActivityTooltipOpen(false)}
                       className="w-full text-left focus:outline-none"
                     >
-	                      <div className="px-1 leading-tight">
-                          {/* Desktop: date + message on one line (centered). Mobile: date above message (centered). */}
-                          <div className="flex items-center justify-center">
-                            <div className="flex flex-col items-center md:flex-row md:items-baseline md:justify-center md:gap-3">
+                      <div className="px-1">
+                        <div className="w-full rounded-full bg-white/[0.04] ring-1 ring-white/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] hover:bg-white/[0.06] transition-colors">
+                          <div className="flex items-center gap-2.5 px-3 py-2">
+                            <div
+                              className={[
+                                "shrink-0 w-7 h-7 rounded-full flex items-center justify-center ring-1",
+                                recentActivityIcon === "receive"
+                                  ? "bg-emerald-500/15 ring-emerald-500/25 text-emerald-300"
+                                  : recentActivityIcon === "send"
+                                    ? "bg-red-500/15 ring-red-500/25 text-red-200"
+                                    : "bg-emerald-500/15 ring-emerald-500/25 text-emerald-300",
+                              ].join(" ")}
+                              aria-hidden
+                            >
+                              {recentActivityIcon === "send" ? (
+                                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                  <path d="M7 17L17 7" />
+                                  <path d="M7 7h10v10" />
+                                </svg>
+                              ) : recentActivityIcon === "receive" ? (
+                                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                  <path d="M7 7l10 10" />
+                                  <path d="M17 7v10H7" />
+                                </svg>
+                              ) : (
+                                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                  <path d="M21 12a9 9 0 0 0-15.5-6.5" />
+                                  <path d="M3 4v6h6" />
+                                  <path d="M3 12a9 9 0 0 0 15.5 6.5" />
+                                  <path d="M21 20v-6h-6" />
+                                </svg>
+                              )}
+                            </div>
+
+                            <div className="flex-1 min-w-0 flex items-center gap-2">
+                              <span className="shrink-0 text-[12px] md:text-[13px] text-white/70">
+                                {recentActivityIcon === "convert"
+                                  ? t("ui_recent_conversion_banner", "Conversion récente")
+                                  : recentActivityIcon === "receive"
+                                    ? t("ui_recent_receive_banner", "Réception récente")
+                                    : recentActivityIcon === "send"
+                                      ? t("ui_recent_send_banner", "Envoi récent")
+                                      : t("ui_recent_activity_banner", "Activité récente")}
+                              </span>
+                              <span className="text-white/35">•</span>
+                              <span className="min-w-0 truncate text-[12px] md:text-[13px] text-white/80">
+                                {recentActivityMessageParts.isConversion ? (
+                                  <>
+                                    {String(recentActivityMessageParts.left || "")
+                                      .replace(/^Vous avez converti\s+/i, "")
+                                      .trim()}{" "}
+                                    {recentActivityMessageParts.arrow}{" "}
+                                    <span className="text-white/90 font-semibold">
+                                      {recentActivityMessageParts.right}
+                                    </span>
+                                  </>
+                                ) : recentActivityIcon === "receive" && recentActivityReceiveParts ? (
+                                  <>
+                                    <span className="text-emerald-300 font-semibold">
+                                      + {recentActivityReceiveParts.amount} {recentActivityReceiveParts.currency}
+                                    </span>
+                                    {String(recentActivityReceiveParts.suffix || "")}
+                                  </>
+                                ) : recentActivityIcon === "send" && recentActivitySendParts ? (
+                                  <>
+                                    <span className="text-red-200 font-semibold">
+                                      - {recentActivitySendParts.amount} {recentActivitySendParts.currency}
+                                    </span>
+                                    {String(recentActivitySendParts.suffix || "")}
+                                  </>
+                                ) : (
+                                  recentActivityMessage
+                                )}
+                              </span>
+                            </div>
+
+                            <div className="shrink-0 flex items-center gap-2">
                               {recentActivityWhen?.mobile || recentActivityWhen?.desktop ? (
                                 <>
-                                  <span className="md:hidden text-[10px] text-white/45 whitespace-nowrap">
+                                  <span className="md:hidden text-[11px] text-white/45 whitespace-nowrap">
                                     {recentActivityWhen.mobile}
                                   </span>
-                                  <span className="hidden md:inline text-[14px] text-white/45 whitespace-nowrap">
+                                  <span className="hidden md:inline text-[12px] text-white/45 whitespace-nowrap">
                                     {recentActivityWhen.desktop}
                                   </span>
                                 </>
                               ) : null}
-                              <span className="text-center md:text-center truncate max-w-full md:max-w-[520px]">
-                                <span className="md:hidden text-[12px] text-white/65 font-semibold">
-                                  {recentActivityMessageMobileParts.isConversion ? (
-                                    <>
-                                      {recentActivityMessageMobileParts.left} {recentActivityMessageMobileParts.arrow}{" "}
-                                      <span className="text-[13px] text-white/90 font-semibold">
-                                        {recentActivityMessageMobileParts.right}
-                                      </span>
-                                    </>
-                                  ) : recentActivityIcon === "receive" && recentActivityReceiveParts ? (
-                                    <>
-                                      {recentActivityReceiveParts.prefix}{" "}
-                                      <span className="text-[13px] text-[#16A34A] font-semibold">
-                                        + {recentActivityReceiveParts.amount} {recentActivityReceiveParts.currency}
-                                      </span>
-                                      {recentActivityReceiveParts.suffix}
-                                    </>
-                                  ) : recentActivityIcon === "send" && recentActivitySendParts ? (
-                                    <>
-                                      {recentActivitySendParts.prefix}{" "}
-                                      <span className="text-[13px] text-red-300 font-semibold">
-                                        - {recentActivitySendParts.amount} {recentActivitySendParts.currency}
-                                      </span>
-                                      {recentActivitySendParts.suffix}
-                                    </>
-                                  ) : (
-                                    recentActivityMessageMobileParts.text
-                                  )}
-                                </span>
-                                <span className="hidden md:inline text-[14px] text-white/65">
-                                  {recentActivityMessageParts.isConversion ? (
-                                    <>
-                                      {recentActivityMessageParts.left} {recentActivityMessageParts.arrow}{" "}
-                                      <span className="text-[16px] text-white/85 font-semibold">
-                                        {recentActivityMessageParts.right}
-                                      </span>
-                                    </>
-                                  ) : recentActivityIcon === "receive" && recentActivityReceiveParts ? (
-                                    <>
-                                      {recentActivityReceiveParts.prefix}{" "}
-                                      <span className="text-[15px] text-[#16A34A] font-semibold">
-                                        + {recentActivityReceiveParts.amount} {recentActivityReceiveParts.currency}
-                                      </span>
-                                      {recentActivityReceiveParts.suffix}
-                                    </>
-                                  ) : recentActivityIcon === "send" && recentActivitySendParts ? (
-                                    <>
-                                      {recentActivitySendParts.prefix}{" "}
-                                      <span className="text-[15px] text-red-300 font-semibold">
-                                        - {recentActivitySendParts.amount} {recentActivitySendParts.currency}
-                                      </span>
-                                      {recentActivitySendParts.suffix}
-                                    </>
-                                  ) : (
-                                    recentActivityMessage
-                                  )}
-                                </span>
-                              </span>
+                              <svg className="w-4 h-4 text-white/35" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                                <path d="M9 18l6-6-6-6" />
+                              </svg>
                             </div>
                           </div>
                         </div>
+                      </div>
                     </button>
-                    {recentActivityMessage ? (
-                      <div className="md:hidden flex items-center justify-center py-0.5 pointer-events-none" aria-hidden>
-                        <div className="w-[70%] h-[1.1px] bg-[#697173]/40" />
-                      </div>
-                    ) : null}
-                    {recentActivityMessage ? (
-                      <div className="hidden md:flex items-center justify-center py-1.5 pointer-events-none" aria-hidden>
-                        <div className="w-[70%] h-[1.1px] bg-[#697173]/40" />
-                      </div>
-                    ) : null}
                     {activityTooltipOpen && recentActivityMessage ? (
                       <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50 w-max max-w-[260px] bg-[#1e2628] text-white/85 text-[11px] leading-snug rounded-lg px-3 py-2 shadow-xl ring-1 ring-white/10 pointer-events-none">
                         {recentActivityWhen?.mobile || recentActivityWhen?.desktop ? (

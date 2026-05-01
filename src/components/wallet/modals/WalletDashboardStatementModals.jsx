@@ -524,6 +524,7 @@ export default function WalletDashboardStatementModals({
           movementsHasMore={canFetchStatements ? globalHasMore : false}
           movementsLoadingMore={canFetchStatements ? globalLoadingMore : false}
           onLoadMoreMovements={canFetchStatements ? loadGlobalMore : null}
+          highlightTransactionId={highlightTransactionId}
           isClosing={globalModalTransition.isClosing}
           onClose={() => {
             setShowGlobalStatement(false);

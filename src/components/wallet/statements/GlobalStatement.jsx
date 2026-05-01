@@ -40,6 +40,7 @@ export default function GlobalStatement({
   movementsHasMore: _movementsHasMore = false,
   movementsLoadingMore: _movementsLoadingMore = false,
   onLoadMoreMovements: _onLoadMoreMovements,
+  highlightTransactionId = null,
   onClose,
   onViewCurrency,
   toast,
@@ -534,6 +535,23 @@ export default function GlobalStatement({
     setDetailMovement(m);
     setDetailOpen(true);
   }, []);
+
+  const lastAutoOpenedIdRef = useRef(null);
+  useEffect(() => {
+    const wanted = String(highlightTransactionId || "").trim();
+    if (!wanted) return;
+    if (movementsLoading) return;
+    if (lastAutoOpenedIdRef.current === wanted) return;
+    const match = (m) => {
+      const movementId = String(m?.movementId || m?._id || "").trim();
+      const txHash = String(m?.txHash || "").trim();
+      return movementId === wanted || txHash === wanted;
+    };
+    const found = (movements || []).find(match) || null;
+    if (!found) return;
+    lastAutoOpenedIdRef.current = wanted;
+    openMovementDetails(found);
+  }, [highlightTransactionId, movements, movementsLoading, openMovementDetails]);
 
   const closeMovementDetails = useCallback(() => {
     setDetailOpen(false);

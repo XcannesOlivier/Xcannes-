@@ -133,6 +133,7 @@ export function useWalletModalProps({
   selectedStatementToken,
   setSelectedStatementToken,
   statementBalance,
+  highlightTransactionId,
 
   // --- QR ---
   qrScannerOpen,
@@ -468,6 +469,7 @@ export function useWalletModalProps({
       selectedStatementToken,
       setSelectedStatementToken,
       statementBalance,
+      highlightTransactionId,
       toast,
     }),
     [
@@ -490,6 +492,7 @@ export function useWalletModalProps({
       selectedStatementToken,
       setSelectedStatementToken,
       statementBalance,
+      highlightTransactionId,
       toast,
     ],
   );
