@@ -15,6 +15,10 @@ function normalizeKind(value) {
 function sortMovementsDesc(list) {
   const sorted = Array.isArray(list) ? list.slice() : [];
   sorted.sort((a, b) => {
+    const leftDate = a?.createdAt ? new Date(a.createdAt).getTime() : 0;
+    const rightDate = b?.createdAt ? new Date(b.createdAt).getTime() : 0;
+    if (leftDate !== rightDate) return rightDate - leftDate;
+
     const left = Number.isFinite(Number(a?.ledgerIndex))
       ? Number(a.ledgerIndex)
       : -Infinity;
@@ -22,9 +26,6 @@ function sortMovementsDesc(list) {
       ? Number(b.ledgerIndex)
       : -Infinity;
     if (left !== right) return right - left;
-    const leftDate = a?.createdAt ? new Date(a.createdAt).getTime() : 0;
-    const rightDate = b?.createdAt ? new Date(b.createdAt).getTime() : 0;
-    if (leftDate !== rightDate) return rightDate - leftDate;
     return String(b?.txHash || "").localeCompare(String(a?.txHash || ""));
   });
   return sorted;
@@ -243,4 +244,3 @@ export function useWalletRecentActivityBanner({
     rlusdPerUnitRates,
   ]);
 }
-
