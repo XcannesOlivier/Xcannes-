@@ -702,3 +702,24 @@ body.header-hero-mode .home-content-wrapper {
   50% { opacity: 1; }
   100% { top: calc(100% - 2px); opacity: 0.3; }
 }
+
+/* ── Discreet ping around mobile scan button ── */
+@keyframes xcannesScanPing {
+  0%,
+  65% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0;
+  }
+  72% {
+    transform: translate(-50%, -50%) scale(1.02);
+    opacity: 0.28;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.28);
+    opacity: 0;
+  }
+}
+
+.xcannes-scan-ping {
+  animation: xcannesScanPing 6s ease-out infinite;
+}
