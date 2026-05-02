@@ -109,7 +109,7 @@ export default function WalletDashboardStatementModals({
   const [closingCurrencyToken, setClosingCurrencyToken] = useState(null);
 
   const fetchStatement = useCallback(
-    async (params) => {
+    async (params, { cacheTtlMs } = {}) => {
       const url = new URL(apiUrl("/wallet/statement"));
       Object.entries(params || {}).forEach(([key, value]) => {
         if (value == null || value === "") return;
@@ -117,7 +117,10 @@ export default function WalletDashboardStatementModals({
       });
       url.searchParams.set("source", "onchain");
       const cacheKey = url.toString();
-      const cached = getCachedStatement(cacheKey);
+      const cached =
+        cacheTtlMs === 0
+          ? null
+          : getCachedStatement(cacheKey, cacheTtlMs != null ? { ttlMs: cacheTtlMs } : undefined);
       if (cached) return cached;
       const res = await fetch(url.toString());
       const data = await res.json().catch(() => ({}));
@@ -141,12 +144,15 @@ export default function WalletDashboardStatementModals({
     setGlobalLoading(true);
     setGlobalError(null);
     try {
-      const data = await fetchStatement({
-        address: backendWalletAddress,
-        // Fetch more than we display so GlobalStatement can filter out
-        // internal/system movements and still show the last 20 user txs.
-        limit: 60,
-      });
+      const data = await fetchStatement(
+        {
+          address: backendWalletAddress,
+          // Fetch more than we display so GlobalStatement can filter out
+          // internal/system movements and still show the last 20 user txs.
+          limit: 60,
+        },
+        { cacheTtlMs: 0 },
+      );
       setGlobalMovements(Array.isArray(data?.movements) ? data.movements : []);
       setGlobalHasMore(Boolean(data?.hasMore));
       setGlobalCursorNext(data?.cursorNext || null);
@@ -170,11 +176,14 @@ export default function WalletDashboardStatementModals({
     setGlobalLoadingMore(true);
     setGlobalError(null);
     try {
-      const data = await fetchStatement({
-        address: backendWalletAddress,
-        limit: 60,
-        cursor: globalCursorNext,
-      });
+      const data = await fetchStatement(
+        {
+          address: backendWalletAddress,
+          limit: 60,
+          cursor: globalCursorNext,
+        },
+        { cacheTtlMs: 0 },
+      );
       const more = Array.isArray(data?.movements) ? data.movements : [];
       setGlobalMovements((prev) => [...(prev || []), ...more]);
       setGlobalHasMore(Boolean(data?.hasMore));
