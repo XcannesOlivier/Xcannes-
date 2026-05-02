@@ -19,36 +19,6 @@ export const greenActionBtnBase = [
   "disabled:hover:translate-y-0 disabled:hover:scale-100",
 ].join(" ");
 
-/** Same green action button without disabled-state classes (e.g. Receive). */
-export const greenActionBtnMuted = [
-  "rounded-[20px] border border-transparent",
-  "bg-xcannes-btn-green text-white font-semibold",
-  "transition-all duration-[120ms] ease-[cubic-bezier(0.4,0,0.2,1)]",
-  "hover:bg-xcannes-btn-green-hover hover:-translate-y-px",
-  "active:translate-y-0 active:scale-[0.97]",
-].join(" ");
-
-/** Neutral blue action button — with disabled states. */
-export const blueNeutralActionBtnBase = [
-  "rounded-[20px] border border-transparent",
-  "bg-xcannes-blue text-white font-semibold",
-  "transition-all duration-[120ms] ease-[cubic-bezier(0.4,0,0.2,1)]",
-  "hover:bg-xcannes-blue/40 hover:-translate-y-px",
-  "active:translate-y-0 active:scale-[0.97]",
-  "disabled:bg-xcannes-blue/45 disabled:text-white/75 disabled:border-white/10 disabled:cursor-not-allowed",
-  "disabled:hover:translate-y-0 disabled:hover:scale-100",
-].join(" ");
-
-/** Violet action button (MoonPay vibe) — with disabled states. */
-export const violetActionBtnBase = [
-  "rounded-[20px] border border-transparent",
-  "bg-xcannes-violet text-white font-semibold",
-  "transition-all duration-[120ms] ease-[cubic-bezier(0.4,0,0.2,1)]",
-  "hover:bg-xcannes-violet-weight hover:-translate-y-px",
-  "active:translate-y-0 active:scale-[0.97]",
-  "disabled:bg-xcannes-violet/45 disabled:text-white/75 disabled:border-white/10 disabled:cursor-not-allowed",
-  "disabled:hover:translate-y-0 disabled:hover:scale-100",
-].join(" ");
 
 /** SimpleSwap blue action button — with disabled states. */
 export const simpleSwapBlueActionBtnBase = [
@@ -82,6 +52,3 @@ export const binanceYellowActionBtnBase = [
   "disabled:bg-[#F0B90B]/45 disabled:text-black/70 disabled:border-white/10 disabled:cursor-not-allowed",
   "disabled:hover:translate-y-0 disabled:hover:scale-100",
 ].join(" ");
-
-/** Standard modal max-height on desktop. */
-export const MODAL_MAX_H = "md:max-h-[100vh]";
