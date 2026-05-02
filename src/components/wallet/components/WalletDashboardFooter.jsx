@@ -132,7 +132,7 @@ function MobileScanButton({ onScan, ariaLabel }) {
         aria-hidden
       />
       <div
-        className="pointer-events-none absolute left-1/2 top-[36px] z-[6] h-[52px] w-[162px] rounded-full border border-[#39d57c]/25 xcannes-scan-ping"
+        className="pointer-events-none absolute left-1/2 top-[36px] z-[6] h-[54px] w-[166px] rounded-full border-2 border-[#39d57c]/35 shadow-[0_0_0_1px_rgba(57,213,124,0.10),0_0_18px_rgba(57,213,124,0.08)] xcannes-scan-ping"
         aria-hidden
       />
       <button
