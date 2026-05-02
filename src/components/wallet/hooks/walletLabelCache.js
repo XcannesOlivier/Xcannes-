@@ -1,6 +1,7 @@
 "use client";
 
-export const WALLET_LABEL_CACHE_KEY = "xcannes_wallet_labels_v1";
+// Bump version when label persistence semantics change.
+export const WALLET_LABEL_CACHE_KEY = "xcannes_wallet_labels_v2";
 export const WALLET_LABEL_CACHE_TTL_MS = 10 * 60_000; // 10 minutes
 
 export function readWalletLabelCache() {
@@ -38,4 +39,3 @@ export function writeWalletLabelCache(labelsByAddress) {
     /* ignore */
   }
 }
-

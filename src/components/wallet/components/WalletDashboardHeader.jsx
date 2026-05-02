@@ -190,14 +190,14 @@ export default function WalletDashboardHeader({
         if (addr && label) next[addr] = label;
       }
       const active = trimmed(walletLabel);
-      if (wallet && active) next[wallet] = active;
+      if (wallet && active && isWalletLabelLocked) next[wallet] = active;
       for (const addr of Object.keys(next)) {
         if (!walletAddressSet.has(addr)) delete next[addr];
       }
       writeWalletLabelCache(next);
       return next;
     });
-  }, [hasMultipleWallets, walletAddresses, walletAddressSet, wallet, walletLabel]);
+  }, [hasMultipleWallets, isWalletLabelLocked, walletAddresses, walletAddressSet, wallet, walletLabel]);
 
   // Best-effort: resolve missing wallet labels in the background (prefetch).
   // In native relay mode, the multi-wallet list may not have labels.

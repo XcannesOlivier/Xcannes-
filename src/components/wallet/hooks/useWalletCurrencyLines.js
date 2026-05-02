@@ -49,6 +49,11 @@ export function useWalletCurrencyLines(address) {
   const [initialReady, setInitialReady] = useState(false);
 
   const hydratedRef = useRef(false);
+  const activeAddressRef = useRef(address || "");
+  const requestSeqRef = useRef(0);
+
+  // Keep current address available synchronously to async completions.
+  activeAddressRef.current = String(address || "");
 
   // ── Apply a data payload to all state slices ───────────────
   const applyData = useCallback((data) => {
@@ -80,6 +85,9 @@ export function useWalletCurrencyLines(address) {
       return;
     }
 
+    const seq = (requestSeqRef.current += 1);
+    const requestAddress = String(address || "");
+
     try {
       if (!silent) setLoading(true);
       setError(null);
@@ -87,19 +95,22 @@ export function useWalletCurrencyLines(address) {
       const params = new URLSearchParams({ address });
       if (bustCache) params.set("bustCache", "true");
 
-      const res = await fetch(
-        apiUrl(`/wallet/currency-lines?${params.toString()}`),
-      );
+      const res = await fetch(apiUrl(`/wallet/currency-lines?${params.toString()}`));
       const data = await res.json();
 
       if (!res.ok) {
         throw new Error(data.error || "Failed to load wallet currency lines");
       }
 
+      if (seq !== requestSeqRef.current) return;
+      if (activeAddressRef.current !== requestAddress) return;
+
       applyData(data);
       writeClCache(address, data);
       setInitialReady(true);
     } catch (err) {
+      if (seq !== requestSeqRef.current) return;
+      if (activeAddressRef.current !== requestAddress) return;
       console.error("[useWalletCurrencyLines] Error:", err);
       setError(err.message || "Unknown error");
       setInitialReady(true);
@@ -160,6 +171,19 @@ export function useWalletCurrencyLines(address) {
   // ── Mount: try cache hydration, then silent revalidate ─────
   useEffect(() => {
     hydratedRef.current = false;
+    // Prevent label/data from a previous wallet leaking into the new wallet UI
+    // during async fetch/hydration.
+    setLines([]);
+    setSummary({
+      rlusdOnChain: null,
+      totalAllocatedRlusd: 0,
+      unallocatedRlusd: null,
+    });
+    setReconciliation(null);
+    setWalletLabel("");
+    setDefaultCurrency(null);
+    setError(null);
+    setInitialReady(false);
     if (!address) {
       fetchCurrencyLines();
       return;
