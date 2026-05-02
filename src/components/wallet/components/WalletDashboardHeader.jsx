@@ -7,46 +7,10 @@ import WalletSetupDropdown from "@/components/wallet/components/WalletSetupDropd
 import Link from "next/link";
 import { useTranslation } from "next-i18next";
 import { apiUrl } from "@/lib/runtimeConfig";
-
-// ── Local label cache (best-effort) ──────────────────────────────────────────
-const LABEL_CACHE_KEY = "xcannes_wallet_labels_v1";
-const LABEL_CACHE_TTL_MS = 10 * 60_000; // 10 minutes
-
-function readLabelCache() {
-  try {
-    const raw = localStorage.getItem(LABEL_CACHE_KEY);
-    if (!raw) return {};
-    const parsed = JSON.parse(raw);
-    if (!parsed || typeof parsed !== "object") return {};
-    const now = Date.now();
-    const out = {};
-    for (const [addr, entry] of Object.entries(parsed)) {
-      const label = String(entry?.label || "").trim();
-      const ts = Number(entry?.ts || 0);
-      if (!addr || !label) continue;
-      if (!Number.isFinite(ts) || now - ts > LABEL_CACHE_TTL_MS) continue;
-      out[addr] = label;
-    }
-    return out;
-  } catch {
-    return {};
-  }
-}
-
-function writeLabelCache(labelsByAddress) {
-  try {
-    const now = Date.now();
-    const payload = {};
-    for (const [addr, label] of Object.entries(labelsByAddress || {})) {
-      const t = String(label || "").trim();
-      if (!addr || !t) continue;
-      payload[addr] = { label: t, ts: now };
-    }
-    localStorage.setItem(LABEL_CACHE_KEY, JSON.stringify(payload));
-  } catch {
-    /* ignore */
-  }
-}
+import {
+  readWalletLabelCache,
+  writeWalletLabelCache,
+} from "../hooks/walletLabelCache";
 
 function EyeIcon({ className = "h-4 w-4", slashed = false } = {}) {
   return (
@@ -132,7 +96,15 @@ export default function WalletDashboardHeader({
   const didSwitchRef = useRef(false);
   const switcherRef = useRef(null);
   const selectorContainerRef = useRef(null);
-  const hasMultipleWallets = walletAddresses.length > 1;
+  const hasMultipleWallets = useMemo(() => {
+    const set = new Set();
+    for (const w of walletAddresses || []) {
+      const addr = typeof w === "string" ? w : w?.address;
+      if (addr) set.add(addr);
+    }
+    if (wallet) set.add(wallet);
+    return set.size > 1;
+  }, [wallet, walletAddresses]);
 
   // Fade-out duration: slow (1800ms) after wallet switch, fast (100ms) otherwise
   const closeDuration = didSwitchRef.current ? 1800 : 100;
@@ -179,17 +151,24 @@ export default function WalletDashboardHeader({
 
   const walletAddressSet = useMemo(() => {
     const set = new Set();
-    for (const w of walletAddresses) {
+    for (const w of walletAddresses || []) {
       const addr = typeof w === "string" ? w : w?.address;
       if (addr) set.add(addr);
     }
+    if (wallet) set.add(wallet);
     return set;
-  }, [walletAddresses]);
+  }, [wallet, walletAddresses]);
+
+  useEffect(() => {
+    if (!isSwitcherOpen) return;
+    closeSwitcher();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [wallet]);
 
   // Hydrate cached labels once (client-side).
   useEffect(() => {
     try {
-      const cached = readLabelCache();
+      const cached = readWalletLabelCache();
       if (cached && Object.keys(cached).length > 0) {
         setLabelsByAddress((prev) => ({ ...cached, ...prev }));
       }
@@ -215,7 +194,7 @@ export default function WalletDashboardHeader({
       for (const addr of Object.keys(next)) {
         if (!walletAddressSet.has(addr)) delete next[addr];
       }
-      writeLabelCache(next);
+      writeWalletLabelCache(next);
       return next;
     });
   }, [hasMultipleWallets, walletAddresses, walletAddressSet, wallet, walletLabel]);
@@ -260,7 +239,7 @@ export default function WalletDashboardHeader({
             if (cancelled) return;
             setLabelsByAddress((prev) => {
               const next = { ...prev, [addr]: label };
-              writeLabelCache(next);
+              writeWalletLabelCache(next);
               return next;
             });
           } catch {
@@ -289,6 +268,21 @@ export default function WalletDashboardHeader({
     if (fromMap) return fromMap;
     return "Compte";
   }, [labelsByAddress, wallet, walletAddresses, walletLabel]);
+
+  const otherWalletEntries = useMemo(() => {
+    const out = [];
+    const seen = new Set();
+    for (const w of walletAddresses || []) {
+      const addr = typeof w === "string" ? w : w?.address;
+      if (!addr || addr === wallet) continue;
+      if (seen.has(addr)) continue;
+      seen.add(addr);
+      const label =
+        typeof w === "string" ? "" : trimmed(w?.label) || trimmed(labelsByAddress?.[addr]);
+      out.push({ addr, label });
+    }
+    return out;
+  }, [labelsByAddress, trimmed, wallet, walletAddresses]);
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -552,21 +546,16 @@ export default function WalletDashboardHeader({
                           </div>
                         </div>
 
-	                        {walletAddresses.map((w, index) => {
-	                          const addr = typeof w === "string" ? w : w.address;
-                          const label =
-                            typeof w === "string"
-                              ? ""
-                              : trimmed(w?.label) || trimmed(labelsByAddress?.[addr]);
-                          const isActive = addr === wallet;
-                          if (isActive) return null;
-                          const displayName = label || `Compte ${index + 1}`;
-                          const addressesVisible = Object.keys(addressModes || {}).length > 0;
-                          const mode = addressModes?.[addr] || "truncated";
-                          const displayAddress =
-                            mode === "full"
-                              ? addr
-                              : `${addr.slice(0, 8)}…${addr.slice(-6)}`;
+		                        {otherWalletEntries.map((entry, index) => {
+		                          const addr = entry.addr;
+		                          const label = entry.label;
+	                          const displayName = label || `Compte ${index + 1}`;
+	                          const addressesVisible = Object.keys(addressModes || {}).length > 0;
+	                          const mode = addressModes?.[addr] || "truncated";
+	                          const displayAddress =
+	                            mode === "full"
+	                              ? addr
+	                              : `${addr.slice(0, 8)}…${addr.slice(-6)}`;
                           return (
                             <div
                               key={addr}

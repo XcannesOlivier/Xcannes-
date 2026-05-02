@@ -3,6 +3,7 @@
 import { Buffer } from 'buffer';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import useIsDesktop from '../hooks/useIsDesktop';
+import { readWalletLabelCache } from '../hooks/walletLabelCache';
 import { QRCodeCanvas } from 'qrcode.react';
 import ModalSelect from '@/components/ui/ModalSelect';
 import TokenAmountInput from '@/components/ui/TokenAmountInput';
@@ -254,9 +255,12 @@ export default function WalletDashboardReceiveModal({
     nextView => {
       setGenerateError(null);
       setCopyToast('');
+      setShareWalletDropdownOpen(false);
+      setRequestWalletDropdownOpen(false);
+      setRequestCurrencyDropdownOpen(false);
       setReceiveTabSafe(nextView);
     },
-    [setReceiveTabSafe],
+    [setReceiveTabSafe, setShareWalletDropdownOpen, setRequestCurrencyDropdownOpen, setRequestWalletDropdownOpen],
   );
 
   const showShareDropdownToast = useCallback((message) => {
@@ -287,6 +291,9 @@ export default function WalletDashboardReceiveModal({
     if (!open) {
       setGeneratedRequest(null);
       setGenerateError(null);
+      setShareWalletDropdownOpen(false);
+      setRequestWalletDropdownOpen(false);
+      setRequestCurrencyDropdownOpen(false);
       if (!setReceiveTab) setLocalReceiveTab('choice');
     }
   }, [open, setReceiveTab]);
@@ -413,12 +420,18 @@ export default function WalletDashboardReceiveModal({
   );
 
 	  const walletOptions = useMemo(() => {
+      const cachedLabelsByAddress =
+        typeof window === 'undefined' ? {} : readWalletLabelCache();
 	    return (walletList || [])
 	      .map((w, idx) => {
 	        const addr = typeof w === 'string' ? w : w?.address;
 	        if (!addr) return null;
 	        const labelFromList = typeof w === 'string' ? '' : trimmed(w?.label);
-	        const label = addr === wallet ? activeWalletLabel : labelFromList || `Wallet ${idx + 1}`;
+          const cachedLabel = String(cachedLabelsByAddress?.[addr] || '').trim();
+	        const label =
+            addr === wallet
+              ? activeWalletLabel
+              : labelFromList || cachedLabel || shortAddress(addr, 8, 8) || `Wallet ${idx + 1}`;
 	        const isActive = addr === wallet;
 	        return {
 	          value: addr,
