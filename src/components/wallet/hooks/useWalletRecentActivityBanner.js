@@ -81,6 +81,7 @@ export function useWalletRecentActivityBanner({
   const lastSeenIdRef = useRef(null);
   const initialLoadDoneRef = useRef(false);
   const labelCacheRef = useRef(new Map());
+  const rateLimitedUntilRef = useRef(0);
 
   useEffect(() => {
     mountedAtRef.current = Date.now();
@@ -139,6 +140,7 @@ export function useWalletRecentActivityBanner({
 
     const fetchLatest = async () => {
       if (cancelled) return;
+      if (Date.now() < rateLimitedUntilRef.current) return;
       try {
         const params = new URLSearchParams();
         params.set("address", backendWalletAddress);
@@ -146,6 +148,15 @@ export function useWalletRecentActivityBanner({
         params.set("source", "onchain");
         const res = await fetch(apiUrl(`/wallet/statement?${params.toString()}`));
         const data = await res.json().catch(() => ({}));
+        if (res.status === 429) {
+          const header = Number(res.headers?.get("Retry-After"));
+          const retryAfter = Number.isFinite(header)
+            ? header
+            : Number(data?.retryAfter);
+          const waitSec = Number.isFinite(retryAfter) && retryAfter > 0 ? retryAfter : 10;
+          rateLimitedUntilRef.current = Date.now() + waitSec * 1000;
+          return;
+        }
         if (!res.ok) return;
 
         const movements = Array.isArray(data?.movements) ? data.movements : [];

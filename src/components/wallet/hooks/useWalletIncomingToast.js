@@ -13,6 +13,7 @@ export function useWalletIncomingToast({
 }) {
   const lastIncomingToastRef = useRef(null);
   const mountedAtRef = useRef(Date.now());
+  const rateLimitedUntilRef = useRef(0);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -29,6 +30,7 @@ export function useWalletIncomingToast({
 
     const fetchLatestIncoming = async () => {
       if (cancelled) return;
+      if (Date.now() < rateLimitedUntilRef.current) return;
       try {
         const params = new URLSearchParams();
         params.set("address", backendWalletAddress);
@@ -38,6 +40,15 @@ export function useWalletIncomingToast({
           apiUrl(`/wallet/statement?${params.toString()}`),
         );
         const data = await res.json().catch(() => ({}));
+        if (res.status === 429) {
+          const header = Number(res.headers?.get("Retry-After"));
+          const retryAfter = Number.isFinite(header)
+            ? header
+            : Number(data?.retryAfter);
+          const waitSec = Number.isFinite(retryAfter) && retryAfter > 0 ? retryAfter : 10;
+          rateLimitedUntilRef.current = Date.now() + waitSec * 1000;
+          return;
+        }
         if (!res.ok) return;
 
         const movements = Array.isArray(data?.movements) ? data.movements : [];
