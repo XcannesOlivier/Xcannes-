@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import TokenAmountInput from "@/components/ui/TokenAmountInput";
-import SwipeConfirmButton from "@/components/ui/SwipeConfirmButton";
 import ModalSelect from "@/components/ui/ModalSelect";
 import QRScanner from "../components/QRScanner";
 import { createPortal } from "react-dom";
@@ -10,7 +9,6 @@ import { useTranslation } from "next-i18next";
 import { useModalTransition } from "@/hooks/useModalTransition";
 import { formatAmountWithSymbol } from "../walletDashboardConfig";
 import { getCurrencyDescription } from "@/utils/currencyDescriptions";
-import { greenActionBtnBase } from "./walletModalTokens";
 
 const fmtAmountRight = (raw) => {
   if (!raw) return null;

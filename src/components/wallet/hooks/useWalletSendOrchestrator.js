@@ -32,8 +32,6 @@ export function useWalletSendOrchestrator({
 
   // ── Send form ──────────────────────────────────────────────
   const {
-    sendTab,
-    setSendTab,
     sendAssetKey,
     setSendAssetKey,
     sendDestination,
@@ -191,7 +189,6 @@ export function useWalletSendOrchestrator({
     setSendDestinationLabel,
     setSendAmount,
     setSendAssetKey,
-    setSendTab,
     setSendPaymentRequest,
     toast,
   });
@@ -225,7 +222,6 @@ export function useWalletSendOrchestrator({
         setSendAmount(String(pr.amountRlusd));
       }
       setSendPaymentRequest(pr);
-      setSendTab('manual');
       setActiveAction('send');
     },
     [
@@ -235,7 +231,6 @@ export function useWalletSendOrchestrator({
       setSendAssetKey,
       setSendAmount,
       setSendPaymentRequest,
-      setSendTab,
       setActiveAction,
     ],
   );
@@ -270,7 +265,6 @@ export function useWalletSendOrchestrator({
         beneficiaryLabel: 'MoonPay',
       });
       setSendPaymentRequest(null);
-      setSendTab('manual');
       setSendAssetKey(matchingToken.key);
       setSendDestination(destination);
       setSendDestinationLabel('MoonPay');
@@ -284,7 +278,6 @@ export function useWalletSendOrchestrator({
       setSendDestination,
       setSendDestinationLabel,
       setSendPaymentRequest,
-      setSendTab,
     ],
   );
 
@@ -327,7 +320,6 @@ export function useWalletSendOrchestrator({
 
   return {
     // Send form
-    sendTab,
     setSendAssetKey,
     sendDestination,
     setSendDestination,
@@ -364,7 +356,6 @@ export function useWalletSendOrchestrator({
     // Derived
     selectedSendToken,
     sendFxInfo,
-    hasPayreq: Boolean(sendPaymentRequest),
     // QR
     qrScannerOpen,
     setQrScannerOpen,

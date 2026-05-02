@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import {
-  ChevronLeftIcon,
   EllipsisHorizontalIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";

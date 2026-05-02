@@ -14,7 +14,6 @@ import { createPortal } from "react-dom";
 import { useCallback, useEffect, useRef, useState } from "react";
 import QRScanner from "../components/QRScanner";
 import WalletDashboardSendModal from "../modals/WalletDashboardSendModal";
-import WalletDashboardPayreqModal from "../modals/WalletDashboardPayreqModal";
 import WalletDashboardReceiveModal from "../modals/WalletDashboardReceiveModal";
 import WalletDashboardSwapModal from "../modals/WalletDashboardSwapModal";
 import WalletDashboardCashChoiceModal from "../modals/WalletDashboardCashChoiceModal";
@@ -30,7 +29,6 @@ import WalletDashboardSaveAddressPrompt from "../components/WalletDashboardSaveA
 export default function WalletMobileModals({
   // shared modal prop bundles (from useWalletModalProps)
   sendModalProps,
-  payreqModalProps,
   receiveModalProps,
   swapModalProps,
   cashModalProps,
@@ -42,7 +40,6 @@ export default function WalletMobileModals({
 
   // open/close handlers
   activeAction,
-  hasPayreq,
   setActiveAction,
   showActivationModal,
   setShowActivationModal,

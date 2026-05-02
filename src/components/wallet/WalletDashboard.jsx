@@ -1201,8 +1201,7 @@ export default function WalletDashboard({
       activeAction === 'sendChoice' ||
       activeAction === 'cashUsdSwapOut' ||
       activeAction === 'cashUsdSwapIn' ||
-      (activeAction === 'swap' && swapState.swapLockedView === 'lines') ||
-      (activeAction === 'send' && sendState.sendTab === 'payreq'));
+      (activeAction === 'swap' && swapState.swapLockedView === 'lines'));
   const lockForActiveAction = Boolean(activeAction && !allowBackgroundScrollForActions);
   const lockForStatements = Boolean(
     (showGlobalStatement || showCurrencyStatement) && !allowBackgroundScrollForStatements,

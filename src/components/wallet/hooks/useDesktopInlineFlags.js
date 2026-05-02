@@ -6,7 +6,6 @@ export function useDesktopInlineFlags({
   isDesktopPanel,
   qrScannerOpen,
   activeAction,
-  sendPaymentRequest,
   showActivationModal,
   showActivationRequestModal,
   walletInfoOpen,
@@ -16,7 +15,6 @@ export function useDesktopInlineFlags({
 }) {
   const showInlineQrScanner =
     isDesktopPanel && qrScannerOpen;
-  const hasPayreq = Boolean(sendPaymentRequest);
   const showInlineSendChoice =
     isDesktopPanel &&
     !showInlineQrScanner &&
@@ -25,7 +23,6 @@ export function useDesktopInlineFlags({
     isDesktopPanel &&
     !showInlineQrScanner &&
     activeAction === "send";
-  const showInlinePayreq = false;
   const showInlineReceive =
     isDesktopPanel &&
     !showInlineQrScanner &&
@@ -75,7 +72,6 @@ export function useDesktopInlineFlags({
     showInlineQrScanner ||
     showInlineSendChoice ||
     showInlineSend ||
-    showInlinePayreq ||
     showInlineReceive ||
     showInlineSwap ||
     showInlineCashChoice ||
@@ -99,7 +95,6 @@ export function useDesktopInlineFlags({
     showInlineQrScanner,
     showInlineSendChoice,
     showInlineSend,
-    showInlinePayreq,
     showInlineReceive,
     showInlineSwap,
     showInlineCashChoice,

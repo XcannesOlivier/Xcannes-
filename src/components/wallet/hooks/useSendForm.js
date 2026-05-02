@@ -3,12 +3,10 @@
 import { useState } from "react";
 
 export function useSendForm({
-  defaultSendTab = "scan-request",
   defaultSendAssetKey = "",
   defaultSendDestination = "",
   defaultSendAmount = "",
 } = {}) {
-  const [sendTab, setSendTab] = useState(defaultSendTab); // 'manual' | 'scan-request'
   const [sendAssetKey, setSendAssetKey] = useState(defaultSendAssetKey);
   const [sendDestination, setSendDestination] = useState(
     defaultSendDestination,
@@ -19,7 +17,6 @@ export function useSendForm({
   const [sendPaymentRequest, setSendPaymentRequest] = useState(null);
 
   const resetSendForm = () => {
-    setSendTab(defaultSendTab);
     setSendAssetKey(defaultSendAssetKey);
     setSendDestination(defaultSendDestination);
     setSendDestinationLabel("");
@@ -29,8 +26,6 @@ export function useSendForm({
   };
 
   return {
-    sendTab,
-    setSendTab,
     sendAssetKey,
     setSendAssetKey,
     sendDestination,

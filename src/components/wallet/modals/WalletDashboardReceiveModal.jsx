@@ -14,7 +14,6 @@ import { XRPL_KNOWN_ISSUERS } from '@/utils/xrpl';
 import { useModalTransition } from '@/hooks/useModalTransition';
 import { formatAmountWithSymbol } from '../walletDashboardConfig';
 import { getCurrencyDescription } from '@/utils/currencyDescriptions';
-import WalletActiveLabel from '../components/WalletActiveLabel';
 
 const fmtAmountRight = (raw) => {
   if (!raw) return null;

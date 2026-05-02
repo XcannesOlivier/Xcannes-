@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import useIsDesktop from "../hooks/useIsDesktop";
 import TokenAmountInput from "@/components/ui/TokenAmountInput";
-import SwipeConfirmButton from "@/components/ui/SwipeConfirmButton";
 import ModalSelect from "@/components/ui/ModalSelect";
 import WalletCurrencySelector from "@/components/ui/WalletCurrencySelector";
 import { createPortal } from "react-dom";

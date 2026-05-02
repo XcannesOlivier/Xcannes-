@@ -9,7 +9,6 @@
 import QRScanner from "../components/QRScanner";
 import { useCallback, useState } from "react";
 import WalletDashboardSendModal from "../modals/WalletDashboardSendModal";
-import WalletDashboardPayreqModal from "../modals/WalletDashboardPayreqModal";
 import WalletDashboardReceiveModal from "../modals/WalletDashboardReceiveModal";
 import WalletDashboardSwapModal from "../modals/WalletDashboardSwapModal";
 import WalletDashboardCashChoiceModal from "../modals/WalletDashboardCashChoiceModal";
@@ -31,7 +30,6 @@ export default function WalletDesktopModals({
   showInlineQrScanner,
   showInlineSendChoice,
   showInlineSend,
-  showInlinePayreq,
   showInlineReceive,
   showInlineSwap,
   showInlineCashChoice,
@@ -48,7 +46,6 @@ export default function WalletDesktopModals({
 
   // shared modal prop bundles (from useWalletModalProps)
   sendModalProps,
-  payreqModalProps,
   receiveModalProps,
   swapModalProps,
   cashModalProps,

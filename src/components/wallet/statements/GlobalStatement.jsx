@@ -5,7 +5,6 @@ import { createPortal } from "react-dom";
 import { useTranslation } from "next-i18next";
 import { escapeHtml, openPrintWindow } from "@/utils/statementExport";
 import { apiUrl } from "@/lib/runtimeConfig";
-import WalletActiveLabel from "../components/WalletActiveLabel";
 import {
   formatAmountWithSymbol,
   USD_STABLECOINS,

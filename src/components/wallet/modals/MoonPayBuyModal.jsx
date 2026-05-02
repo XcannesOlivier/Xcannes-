@@ -1,8 +1,6 @@
 import { useCallback, useMemo, useState, useEffect, useRef } from 'react';
-import { createPortal } from 'react-dom';
 import Image from 'next/image';
 import { XCircleIcon, CheckCircleIcon, ChevronLeftIcon } from '@heroicons/react/24/outline';
-import SwipeConfirmButton from '@/components/ui/SwipeConfirmButton';
 import ModalSelect from '@/components/ui/ModalSelect';
 import { useTranslation } from 'next-i18next';
 import { CRYPTO_ICONS } from '@/utils/marketConstants';
@@ -10,7 +8,6 @@ import { useModalTransition } from '@/hooks/useModalTransition';
 import { isIOSDevice } from '@/utils/deviceDetect';
 import xcannesApi from '@/lib/xcannesApi';
 import { apiUrl } from '@/lib/runtimeConfig';
-import { greenActionBtnBase, simpleSwapBlueActionBtnBase } from './walletModalTokens';
 import { getCurrencyFlag, formatAmountWithSymbol } from '../walletDashboardConfig';
 import { getCurrencyDescription } from '@/utils/currencyDescriptions';
 

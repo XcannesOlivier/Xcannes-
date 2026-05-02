@@ -53,9 +53,6 @@ export function useWalletModalProps({
   handlePaymentRequestScan,
   handleSendSubmit,
   sendProcessing,
-  hasPayreq,
-  savePayreq,
-  removePayreq,
 
   // --- Receive ---
   receiveTab,
@@ -206,51 +203,6 @@ export function useWalletModalProps({
       sendProcessing,
       resetSendForm,
       toast,
-    ],
-  );
-
-  // --- Payreq modal props ---
-  const payreqModalProps = useMemo(
-    () => ({
-      renderWalletMeta,
-      augmentedTokens: selectableTokens,
-      selectedSendToken,
-      sendFxInfo,
-      setSendAssetKey,
-      setSendAmount,
-      sendPaymentRequest,
-      sendDestination,
-      sendAmount,
-      sendProcessing,
-      handleSendSubmit,
-      savedAddresses,
-      selectLabelByAssetKey,
-      selectLabelRightByAssetKey,
-      selectIconByAssetKey,
-      selectLabelMobileByAssetKey,
-      enableSaveAddress: true,
-      savePayreq,
-      removePayreq,
-    }),
-    [
-      renderWalletMeta,
-      selectableTokens,
-      selectedSendToken,
-      sendFxInfo,
-      setSendAssetKey,
-      setSendAmount,
-      sendPaymentRequest,
-      sendDestination,
-      sendAmount,
-      sendProcessing,
-      handleSendSubmit,
-      savedAddresses,
-      selectLabelByAssetKey,
-      selectLabelRightByAssetKey,
-      selectIconByAssetKey,
-      selectLabelMobileByAssetKey,
-      savePayreq,
-      removePayreq,
     ],
   );
 
@@ -501,7 +453,6 @@ export function useWalletModalProps({
 
   return {
     sendModalProps,
-    payreqModalProps,
     receiveModalProps,
     swapModalProps,
     cashModalProps,
@@ -513,7 +464,6 @@ export function useWalletModalProps({
     // open / close handlers needed by both desktop & mobile
     activeAction,
     setActiveAction,
-    hasPayreq,
     showActivationModal,
     setShowActivationModal,
     showActivationRequestModal,

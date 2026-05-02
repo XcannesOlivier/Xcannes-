@@ -717,7 +717,6 @@ function buildReconcileMemo(data) {
 
 export {
   XCANNES_MEMO_TYPE,
-  XCANNES_MEMO_FORMAT,
   XCANNES_MEMO_FORMAT_ZLIB,
   MEMO_MAX_JSON_BYTES,
   validateXcannesMemoPayload,

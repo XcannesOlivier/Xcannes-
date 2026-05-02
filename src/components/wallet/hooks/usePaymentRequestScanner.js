@@ -14,7 +14,6 @@ export function usePaymentRequestScanner({
   setSendDestinationLabel,
   setSendAmount,
   setSendAssetKey,
-  setSendTab,
   setSendPaymentRequest,
   toast,
 } = {}) {
@@ -192,7 +191,6 @@ export function usePaymentRequestScanner({
           setSendDestinationLabel(nextLabel);
         }
         setSendPaymentRequest?.(null);
-        setSendTab?.("manual");
       };
 
       try {
@@ -280,7 +278,6 @@ export function usePaymentRequestScanner({
               beneficiaryLabel:
                 beneficiaryLabel != null ? String(beneficiaryLabel) : null,
             });
-            setSendTab?.("manual");
             return;
           }
 
@@ -381,7 +378,6 @@ export function usePaymentRequestScanner({
             beneficiaryLabel:
               beneficiaryLabel != null ? String(beneficiaryLabel) : null,
           });
-          setSendTab?.("manual");
           return;
         }
 
@@ -411,7 +407,6 @@ export function usePaymentRequestScanner({
       setSendDestination,
       setSendDestinationLabel,
       setSendPaymentRequest,
-      setSendTab,
       toast,
     ],
   );

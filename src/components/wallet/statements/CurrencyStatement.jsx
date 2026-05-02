@@ -16,7 +16,6 @@ import { escapeHtml, openPrintWindow } from "@/utils/statementExport";
 import { useTranslation } from "next-i18next";
 import StatementMonthSelect from "./StatementMonthSelect";
 import { apiUrl } from "@/lib/runtimeConfig";
-import WalletActiveLabel from "../components/WalletActiveLabel";
 import {
   formatAmountWithSymbol,
   getDisplayCurrencyCode,
