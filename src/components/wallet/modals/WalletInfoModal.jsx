@@ -5,7 +5,7 @@ import { useTranslation } from "next-i18next";
 import { useModalTransition } from "@/hooks/useModalTransition";
 import { ChevronLeftIcon } from "@heroicons/react/24/outline";
 
-export function WalletInfoContent({
+function WalletInfoContent({
   noticeVariant = "preview",
   onBack,
 }) {

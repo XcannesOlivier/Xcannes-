@@ -16,7 +16,7 @@ import { useEffect, useState } from "react";
  * const isDesktop = useIsDesktop();           // >= 768px
  * const isLargeDesktop = useIsDesktop(1024);  // >= 1024px
  */
-export function useIsDesktop(breakpoint = 768) {
+function useIsDesktop(breakpoint = 768) {
   const [isDesktop, setIsDesktop] = useState(false);
 
   useEffect(() => {
