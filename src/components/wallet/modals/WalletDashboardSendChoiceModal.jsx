@@ -190,7 +190,7 @@ export default function WalletDashboardSendChoiceModal({
     }
   }, [handlePaymentRequestScan, normalizedCurrentWallet, setSendDestination, setSendDestinationLabel, onChooseSimpleSend, onChoosePayRequest, isPayreqSelfSend, toast, t]);
 
-  const handleFileUpload = useCallback((inputId, isPayreq) => {
+  const handleFileUpload = useCallback((inputId) => {
     const input = document.getElementById(inputId);
     input?.click();
   }, []);
@@ -251,15 +251,6 @@ export default function WalletDashboardSendChoiceModal({
       <circle cx="34" cy="30" r="6" className="fill-[#f5a623]/15 stroke-[#f5a623]/60" strokeWidth="1.4" />
       <path d="M34 27v6m-2-4c0-.7.9-1.2 2-1.2s2 .5 2 1.2-.9 1.2-2 1.2-2 .5-2 1.2.9 1.2 2 1.2 2-.5 2-1.2"
         className="stroke-[#f5a623]/90" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-
-  const ChevronIcon = ({ expanded }) => (
-    <svg
-      className="w-5 h-5 md:w-6 md:h-6 text-white/30 flex-shrink-0"
-      viewBox="0 0 24 24" fill="none" aria-hidden
-    >
-      <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 

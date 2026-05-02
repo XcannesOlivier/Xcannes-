@@ -47,7 +47,6 @@ export default function WalletMobileModals({
   setShowActivationRequestModal,
   walletInfoOpen,
   setWalletInfoOpen,
-  setSendPaymentRequest,
   setCashBuyPrefill,
   setCashSellSelectTitleOverride,
   setCashSellDestinationMode,

@@ -169,10 +169,8 @@ export default function WalletDashboard({
     isConnecting,
     balance,
     isWalletActivated,
-    qrModalData,
     refreshBalance,
     connect,
-    disconnect,
     signTransaction,
     closeQrModal,
     walletAddresses,
@@ -362,7 +360,7 @@ export default function WalletDashboard({
   const [recentActivityMessage, setRecentActivityMessage] = useState('');
   const [recentActivityCreatedAt, setRecentActivityCreatedAt] = useState('');
   const [recentActivityKind, setRecentActivityKind] = useState('');
-  const [recentActivityMovementId, setRecentActivityMovementId] = useState('');
+  const [, setRecentActivityMovementId] = useState('');
   const [highlightTransactionId, setHighlightTransactionId] = useState(null);
   const [recentActivityMovement, setRecentActivityMovement] = useState(null);
   const [recentSummaryOpen, setRecentSummaryOpen] = useState(false);
@@ -434,7 +432,6 @@ export default function WalletDashboard({
     defaultCurrency: clDefaultCurrency,
     loading: currencyLinesLoading,
     error: currencyLinesError,
-    initialReady: currencyLinesReady,
     refresh: refreshCurrencyLines,
     upsertCurrencyLine,
   } = useWalletCurrencyLines(backendWalletAddress);

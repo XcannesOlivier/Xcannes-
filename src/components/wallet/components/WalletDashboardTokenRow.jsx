@@ -43,7 +43,7 @@ export default function WalletDashboardTokenRow({
   tokenRowClass = "",
   onClick,
 }) {
-  const { t, i18n } = useTranslation("common");
+  const { i18n } = useTranslation("common");
   const locale = i18n?.language || "en";
   const currencyCode = String(token?.currency || "").toUpperCase();
   const displayCode = getDisplayCurrencyCode(currencyCode);

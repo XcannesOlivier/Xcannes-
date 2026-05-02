@@ -43,16 +43,11 @@ import XrpNetworkStatement from "./XrpNetworkStatement";
 export default function CurrencyStatement({
   currency,
   balance,
-  issuer: _issuer,
   walletAddress,
   walletLabelOverride = "",
   isPreviewMode = false,
-  isWalletActivated = null,
   noticeVariant = "preview",
   transactions = [],
-  hasMore = false,
-  loadingMore = false,
-  onLoadMore,
   loading = false,
   error = null,
   period = "",
@@ -189,13 +184,6 @@ export default function CurrencyStatement({
     walletLabelOverride,
   );
 
-  const truncatedWalletAddress = useMemo(() => {
-    const addr = String(walletAddress || "").trim();
-    if (!addr) return "";
-    if (addr.length <= 22) return addr;
-    return `${addr.slice(0, 10)}…${addr.slice(-8)}`;
-  }, [walletAddress]);
-
   const data = useCurrencyStatementData({
     transactions,
     statementMonths,
@@ -229,7 +217,6 @@ export default function CurrencyStatement({
     getLocalizedDescription,
     formatDate,
     formatAmountLocal: formatAmountWithSymbolLocal,
-    formatUsd: formatUsdWithSymbol,
   } = fmt;
 
   // Format a RLUSD amount as local-currency units.
@@ -714,13 +701,6 @@ export default function CurrencyStatement({
     [transactions],
   );
 
-  const ledgerLastIndex = useMemo(() => {
-    const indexes = (transactions || [])
-      .map((tok) => Number(tok?.ledgerIndex))
-      .filter((v) => Number.isFinite(v));
-    return indexes.length ? Math.max(...indexes) : null;
-  }, [transactions]);
-
   const ledgerStatus = useMemo(() => {
     if (isPreviewMode) return "preview";
     if (!["XRP", "RLUSD"].includes(normalizedCurrency)) return "offchain";
@@ -893,22 +873,6 @@ export default function CurrencyStatement({
       }
     } finally {
       setExportFormat(null);
-    }
-  }, [buildPrintHtml, docHash, normalizedCurrency, t, toast]);
-
-  const handlePrint = useCallback(() => {
-    const suffix = docHash ? docHash.slice(0, 12) : "draft";
-    const ok = openPrintWindow({
-      title: `XCANNES ${normalizedCurrency || "Statement"} ${suffix}`,
-      bodyHtml: buildPrintHtml(),
-    });
-    if (!ok && typeof window !== "undefined") {
-      const msg = t(
-        "ui_popup_blocked_1c7a9d3b5e",
-        "Popup blocked. Please allow popups to export or print.",
-      );
-      if (toast?.warn) toast.warn(msg);
-      else window.alert(msg);
     }
   }, [buildPrintHtml, docHash, normalizedCurrency, t, toast]);
 

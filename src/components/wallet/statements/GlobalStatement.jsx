@@ -36,14 +36,10 @@ export default function GlobalStatement({
   movements = [],
   movementsLoading = false,
   movementsError = null,
-  movementsHasMore: _movementsHasMore = false,
-  movementsLoadingMore: _movementsLoadingMore = false,
-  onLoadMoreMovements: _onLoadMoreMovements,
   highlightTransactionId = null,
   detailOnly = false,
   initialDetailMovement = null,
   onClose,
-  onViewCurrency,
   toast,
 }) {
   const { t, i18n } = useTranslation("common");
@@ -52,7 +48,6 @@ export default function GlobalStatement({
     "ui_global_statement_13e29aa8aa",
     "Vos dernières transactions",
   );
-  const isInlineDesktop = variant === "inline-desktop";
   const MAX_RECENT_TRANSACTIONS = 20;
 
   /* ── local state ───────────────────────────────────────── */
@@ -656,13 +651,6 @@ export default function GlobalStatement({
     [locale],
   );
 
-  const truncatedWalletAddress = useMemo(() => {
-    const addr = String(walletAddress || "").trim();
-    if (!addr) return "";
-    if (addr.length <= 22) return addr;
-    return `${addr.slice(0, 10)}…${addr.slice(-8)}`;
-  }, [walletAddress]);
-
   const copyToClipboard = useCallback(
     async (text, successMessage) => {
       const value = String(text || "");
@@ -1005,13 +993,6 @@ export default function GlobalStatement({
     [recentMovements],
   );
 
-  const ledgerLastIndex = useMemo(() => {
-    const indexes = (recentMovements || [])
-      .map((m) => Number(m?.ledgerIndex))
-      .filter((v) => Number.isFinite(v));
-    return indexes.length ? Math.max(...indexes) : null;
-  }, [recentMovements]);
-
   const ledgerStatus = useMemo(() => {
     if (isPreviewMode) return "preview";
     if (ledgerEvidenceCount > 0) return "verified";
@@ -1195,22 +1176,6 @@ export default function GlobalStatement({
       }
     } finally {
       setExportFormat(null);
-    }
-  }, [buildPrintHtml, docHash, globalTitle, t, toast]);
-
-  const handlePrint = useCallback(() => {
-    const suffix = docHash ? docHash.slice(0, 12) : "draft";
-    const ok = openPrintWindow({
-      title: `XCANNES ${globalTitle} ${suffix}`,
-      bodyHtml: buildPrintHtml(),
-    });
-    if (!ok && typeof window !== "undefined") {
-      const msg = t(
-        "ui_popup_blocked_1c7a9d3b5e",
-        "Popup blocked. Please allow popups to export or print.",
-      );
-      if (toast?.warn) toast.warn(msg);
-      else window.alert(msg);
     }
   }, [buildPrintHtml, docHash, globalTitle, t, toast]);
 

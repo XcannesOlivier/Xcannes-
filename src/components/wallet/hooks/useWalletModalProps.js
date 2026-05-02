@@ -21,7 +21,6 @@ export function useWalletModalProps({
   walletLabel,
   walletHasCustomLabel,
   renderWalletMeta,
-  signTransaction,
   connect,
 
   // --- actions / state machines ---
@@ -79,9 +78,7 @@ export function useWalletModalProps({
   setConvertAmount,
   convertProcessing,
   handleInstallRequiredTrustline,
-  handleActivateCurrencyLine,
   effectiveRefreshCurrencyLines,
-  effectiveCurrencyLinesLoading,
   effectiveCurrencyLinesError,
   effectiveCurrencyLinesSummary,
   effectiveCurrencyLines,

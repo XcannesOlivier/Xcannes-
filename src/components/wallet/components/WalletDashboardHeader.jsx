@@ -57,10 +57,6 @@ export default function WalletDashboardHeader({
   xrplConnectionIndicator,
   walletLabel,
   walletHeaderToast,
-  onCopyAddress,
-  onRefreshWallet,
-  isConnecting,
-  isRefreshing,
   isWalletLabelLocked,
   onOpenInfo,
   onOpenXrplActivity,
@@ -107,7 +103,6 @@ export default function WalletDashboardHeader({
   }, [wallet, walletAddresses]);
 
   // Fade-out duration: slow (1800ms) after wallet switch, fast (100ms) otherwise
-  const closeDuration = didSwitchRef.current ? 1800 : 100;
 
   const showCopyToast = (message) => {
     setCopyToast(message);
@@ -394,12 +389,6 @@ export default function WalletDashboardHeader({
                         <div className="px-2.5 md:px-3 pt-2 pb-1.5">
                           {(() => {
                             const addressesVisible = Object.keys(addressModes || {}).length > 0;
-                            const walletMode = addressModes?.[wallet] || "truncated";
-                            const displayAddress =
-                              walletMode === "full"
-                                ? wallet
-                                : `${wallet.slice(0, 8)}…${wallet.slice(-6)}`;
-
                             const allAddresses = Array.from(
                               new Set(
                                 [

@@ -1,5 +1,4 @@
 import { useCallback, useState, useEffect, useMemo, useRef } from "react";
-import Image from "next/image";
 import {
   XCircleIcon,
   CheckCircleIcon,
@@ -102,8 +101,6 @@ const MoonPaySellModal = ({
   selectLabelByCurrency,
   selectLabelRightByCurrency,
   selectIconByCurrency,
-  selectLabelMobileByCurrency,
-  embeddedOverlayRootRef = null,
 }) => {
   const { t, i18n } = useTranslation("common");
   const locale = i18n?.language || "en";
@@ -119,28 +116,12 @@ const MoonPaySellModal = ({
     accentVariant === "fireOrange"
       ? "text-[#ff6a00]/90"
       : "text-xcannes-violet/90";
-  const accentText80 =
-    accentVariant === "fireOrange"
-      ? "text-[#ff6a00]/80"
-      : "text-xcannes-violet/80";
   const accentRing25Bg =
     accentVariant === "fireOrange"
       ? "ring-[#ff6a00]/25 bg-[#ff6a00]"
       : "ring-xcannes-violet/25 bg-xcannes-violet";
-  const accentRing60 =
-    accentVariant === "fireOrange"
-      ? "focus:ring-[#ff6a00]/60"
-      : "focus:ring-white/30";
-  const accentBg10 =
-    accentVariant === "fireOrange"
-      ? "bg-[#ff6a00]/10 text-white"
-      : "bg-xcannes-violet/10 text-white";
   const accentCheck =
     accentVariant === "fireOrange" ? "text-[#ff6a00]" : "text-xcannes-violet";
-  const accentGlowShadow =
-    accentVariant === "fireOrange"
-      ? "0_0_8px_rgba(255,106,0,0.22)"
-      : "0_0_8px_rgba(160,80,255,0.18)";
 
   const modalPanelRef = useRef(null);
   const contentRootRef = useRef(null);
@@ -152,12 +133,7 @@ const MoonPaySellModal = ({
   const displayError =
     error && /api\.sandbox\.moonpay\.com/i.test(error) ? null : error;
   const pendingAutoStartRef = useRef(false);
-  const swipeDragStartY = useRef(null);
-  const isEmbeddedPwa =
-    typeof window !== "undefined" &&
-    new URLSearchParams(window.location.search).get("embedded") === "pwa";
   const isIOS = isIOSDevice();
-  const showIOSKycFallback = isEmbeddedPwa && isIOS;
   const moonpayIframeAllow = isIOS
     ? "camera *; microphone *; clipboard-write"
     : "camera https://moonpay.com https://buy.moonpay.com https://buy-sandbox.moonpay.com https://sell.moonpay.com https://sell-sandbox.moonpay.com https://wallet.moonpay.com https://*.moonpay.com; clipboard-write";
@@ -218,13 +194,12 @@ const MoonPaySellModal = ({
     return Boolean(window.matchMedia?.("(min-width: 768px)")?.matches);
   });
   const [cryptoDropdownOpen, setCryptoDropdownOpen] = useState(false);
-  const [cryptoSearch, setCryptoSearch] = useState("");
-  const cryptoDropdownOverlayRef = useRef(null);
+  const [, setCryptoSearch] = useState("");
   const cryptoDropdownListRef = useRef(null);
   const cryptoDropdownTriggerRef = useRef(null);
   const cryptoDropdownDesktopPopupRef = useRef(null);
-  const [cryptoOverlayDragging, setCryptoOverlayDragging] = useState(false);
-  const [cryptoOverlayTranslateY, setCryptoOverlayTranslateY] = useState(0);
+  const [, setCryptoOverlayDragging] = useState(false);
+  const [, setCryptoOverlayTranslateY] = useState(0);
   const cryptoOverlayDragMetaRef = useRef({
     startY: 0,
     startAt: 0,
@@ -577,40 +552,6 @@ const MoonPaySellModal = ({
     return supportedCurrencies.find((c) => String(c?.code || "").toUpperCase() === code) || null;
   }, [currency, supportedCurrencies]);
 
-  const renderSelectIcon = (icon) => {
-    if (!icon) return null;
-    if (typeof icon === "string" || typeof icon === "number") {
-      return (
-        <span className="text-base leading-none" aria-hidden="true">
-          {icon}
-        </span>
-      );
-    }
-    if (icon?.src) {
-      return (
-        <Image
-          src={icon.src}
-          alt={icon.alt || ""}
-          width={22}
-          height={22}
-          className="w-5 h-5 object-contain"
-        />
-      );
-    }
-    return null;
-  };
-
-  const filteredSellCurrencies = useMemo(() => {
-    const needle = String(cryptoSearch || "").trim().toLowerCase();
-    if (!needle) return supportedCurrencies;
-    return supportedCurrencies.filter((c) => {
-      const code = String(c?.code || "").toLowerCase();
-      const label = String(c?.label || c?.labelLeft || "").toLowerCase();
-      const right = String(c?.amountLabel || c?.labelRight || "").toLowerCase();
-      return `${code} ${label} ${right}`.includes(needle);
-    });
-  }, [cryptoSearch, supportedCurrencies]);
-
   useEffect(() => {
     if (typeof window === "undefined") return;
     const mediaQuery = window.matchMedia?.("(min-width: 768px)");
@@ -689,122 +630,6 @@ const MoonPaySellModal = ({
       lockedOverflowY: "",
     };
   }, [cryptoDropdownOpen]);
-
-  const releaseCryptoOverlayScrollLock = () => {
-    const meta = cryptoOverlayDragMetaRef.current;
-    if (meta?.source !== "list") return;
-    if (!meta?.scrollLocked) return;
-    const listEl = cryptoDropdownListRef.current;
-    if (!listEl) return;
-    try {
-      listEl.style.overflowY = meta.lockedOverflowY;
-    } catch {
-      // ignore
-    }
-    meta.scrollLocked = false;
-    meta.lockedOverflowY = "";
-  };
-
-  const maybeStartCryptoOverlayDrag = (event, source) => {
-    if (!event?.isPrimary) return false;
-    if (event.pointerType === "mouse") return false;
-    if (event.target?.closest?.("input,textarea,select")) return false;
-
-    if (source === "list") {
-      const listEl = cryptoDropdownListRef.current;
-      if (!listEl) return false;
-      if (listEl.scrollTop > 0) return false;
-    }
-
-    cryptoOverlayDragMetaRef.current = {
-      startY: event.clientY,
-      startAt: Date.now(),
-      pointerId: event.pointerId,
-      lastDelta: 0,
-      pending: true,
-      source,
-      dragging: false,
-      scrollLocked: false,
-      lockedOverflowY: "",
-    };
-    return true;
-  };
-
-  const handleCryptoOverlayPointerMove = (event) => {
-    const meta = cryptoOverlayDragMetaRef.current;
-    if (!meta?.pending && !meta?.dragging) return;
-    if (meta.pointerId !== event.pointerId) return;
-
-    const delta = event.clientY - meta.startY;
-    if (delta <= 0) return;
-
-    if (!meta.dragging) {
-      if (delta < 8) return;
-      try {
-        cryptoDropdownOverlayRef.current?.setPointerCapture?.(event.pointerId);
-      } catch {
-        // ignore
-      }
-
-      if (meta.source === "list") {
-        const listEl = cryptoDropdownListRef.current;
-        if (listEl && listEl.scrollTop <= 0) {
-          try {
-            meta.lockedOverflowY = listEl.style.overflowY;
-            meta.scrollLocked = true;
-            listEl.style.overflowY = "hidden";
-            listEl.scrollTop = 0;
-          } catch {
-            // ignore
-          }
-        }
-      }
-
-      meta.dragging = true;
-      setCryptoOverlayDragging(true);
-    }
-
-    meta.lastDelta = delta;
-    setCryptoOverlayTranslateY(delta);
-  };
-
-  const handleCryptoOverlayPointerEnd = (event) => {
-    const meta = cryptoOverlayDragMetaRef.current;
-    if (meta.pointerId !== event.pointerId) return;
-
-    const delta = meta.lastDelta || 0;
-    const duration = Math.max(1, Date.now() - (meta.startAt || 0));
-    const velocity = delta / duration; // px/ms
-    const shouldClose = delta > 160 || velocity > 1.0;
-
-    cryptoOverlayDragMetaRef.current.pending = false;
-    cryptoOverlayDragMetaRef.current.dragging = false;
-    setCryptoOverlayDragging(false);
-    releaseCryptoOverlayScrollLock();
-
-    if (shouldClose) {
-      const height = typeof window !== "undefined" ? window.innerHeight : 9999;
-      setCryptoOverlayTranslateY(Math.max(delta, height));
-      window.setTimeout(() => {
-        setCryptoDropdownOpen(false);
-        setCryptoSearch("");
-      }, 180);
-      return;
-    }
-
-    setCryptoOverlayTranslateY(0);
-    cryptoOverlayDragMetaRef.current = {
-      startY: 0,
-      startAt: 0,
-      pointerId: null,
-      lastDelta: 0,
-      pending: false,
-      source: null,
-      dragging: false,
-      scrollLocked: false,
-      lockedOverflowY: "",
-    };
-  };
 
   useEffect(() => {
     if (!isOpen) return;
@@ -913,22 +738,6 @@ const MoonPaySellModal = ({
       ? 1
       : Number(rlusdPerUnitRates?.[currencyUpper])
     : Number.NaN;
-  const allocatedRlusdBalance = Number.parseFloat(
-    selectedToken?.allocatedRlusd ?? Number.NaN,
-  );
-  const availableBalance = (() => {
-    const directBalance = Number.parseFloat(selectedToken?.value ?? 0);
-    if (!isCurrencyLine) return directBalance;
-    if (
-      Number.isFinite(allocatedRlusdBalance) &&
-      allocatedRlusdBalance > 0 &&
-      Number.isFinite(rlusdRate) &&
-      rlusdRate > 0
-    ) {
-      return allocatedRlusdBalance / rlusdRate;
-    }
-    return directBalance;
-  })();
   const hasValidAmount = Number.isFinite(amountValue) && amountValue > 0;
   const conversionMissing =
     isCurrencyLine &&
@@ -938,12 +747,6 @@ const MoonPaySellModal = ({
     isCurrencyLine && hasValidAmount && !conversionMissing
       ? amountValue * rlusdRate
       : null;
-  const balanceLabel = Number.isFinite(availableBalance)
-    ? formatAmountWithSymbol(locale, availableBalance, currencyUpper || "XRP", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      })
-    : null;
   const baseCurrencyCode = isCurrencyLine ? "RLUSD" : currencyUpper;
   const baseCurrencyAmount = isCurrencyLine
     ? Number.isFinite(rlusdEquivalent)
@@ -965,12 +768,6 @@ const MoonPaySellModal = ({
         maximumFractionDigits: 2,
       })
     : `— ${currencyUpper || "USD"}`;
-  const summaryRlusdLabel = Number.isFinite(sourceAmountRlusd)
-    ? formatAmountWithSymbol(locale, sourceAmountRlusd, "RLUSD", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      })
-    : null;
   const reviewTimestampLabel = useMemo(() => {
     if (!reviewTimestamp) return "";
     try {
@@ -1066,7 +863,7 @@ const MoonPaySellModal = ({
   }, [isCurrencyLine, quoteCurrency, resolveRlusdRateForFiat, rlusdRate, sourceAmountRlusd, t]);
 
   const [moonpayFeeEstimates, setMoonpayFeeEstimates] = useState(null);
-  const [moonpayFeeEstimateError, setMoonpayFeeEstimateError] = useState(null);
+  const [, setMoonpayFeeEstimateError] = useState(null);
   const normalizeFeeError = (value) => {
     if (!value) return null;
     if (typeof value === "string") return value;

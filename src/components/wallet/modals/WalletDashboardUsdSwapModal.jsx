@@ -574,7 +574,6 @@ export default function WalletDashboardUsdSwapModal({
   const walletCurrencyShowBalance = walletSourceSelectionEnabled;
   const walletInlineSelectionEnabled =
     walletSourceSelectionEnabled || walletTargetSelectionEnabled;
-  const totalStepsResolved = walletTargetSelectionEnabled ? 2 : 3;
   const sourceCurrencyOptions = useMemo(() => {
     if (!walletInlineSelectionEnabled) return [];
     const seen = new Set();
@@ -1159,32 +1158,6 @@ export default function WalletDashboardUsdSwapModal({
     setCurrenciesError("");
     setWalletAddressExpanded(false);
     setWalletAddressCopied(false);
-  };
-
-  const handleCopyWalletAddress = async (event) => {
-    event?.stopPropagation?.();
-    try {
-      const value = String(walletAddress || "").trim();
-      if (!value) return;
-      if (navigator?.clipboard?.writeText) {
-        await navigator.clipboard.writeText(value);
-      } else {
-        const textarea = document.createElement("textarea");
-        textarea.value = value;
-        textarea.style.position = "fixed";
-        textarea.style.top = "-1000px";
-        textarea.style.left = "-1000px";
-        document.body.appendChild(textarea);
-        textarea.focus();
-        textarea.select();
-        document.execCommand("copy");
-        textarea.remove();
-      }
-      setWalletAddressCopied(true);
-      window.setTimeout(() => setWalletAddressCopied(false), 1400);
-    } catch {
-      // ignore
-    }
   };
 
   useEffect(() => {

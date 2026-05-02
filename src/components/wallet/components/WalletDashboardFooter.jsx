@@ -3,7 +3,6 @@
 import { useTranslation } from "next-i18next";
 
 const MOBILE_MODAL_BG = "#111518";
-const MOBILE_BASE_BG = "#111518";
 
 const mobileFooterStyle = {
   paddingBottom: "0px",

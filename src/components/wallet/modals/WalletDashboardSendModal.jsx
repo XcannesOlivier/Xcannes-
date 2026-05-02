@@ -49,7 +49,6 @@ export default function WalletDashboardSendModal({
   sendProcessing,
   enableSaveAddress = false,
   inline = false,
-  resetSendForm,
   toast,
 }) {
   const { t, i18n } = useTranslation("common");
@@ -581,7 +580,6 @@ export default function WalletDashboardSendModal({
   const payreqSelectorLabel = String(
     requestBeneficiaryLabel || resolvedDestinationLabel || "",
   ).trim();
-  const payreqSelectorValue = payreqSelectorLabel || requestDestination;
   const recipientLabelDetected = hasPaymentRequest
     ? Boolean(payreqSelectorLabel)
     : Boolean(String(resolvedDestinationLabel || "").trim());
@@ -1365,7 +1363,6 @@ export default function WalletDashboardSendModal({
   );
 
   /* ── Dynamic summary – visible as soon as a destination address is set ── */
-  const summaryExpanded = true;
   const inlineSummary = hasDestination ? (
     <div className="space-y-3 transition-all duration-200">
       <div className="rounded-[16px] overflow-hidden">

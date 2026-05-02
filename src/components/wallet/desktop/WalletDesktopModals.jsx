@@ -62,7 +62,6 @@ export default function WalletDesktopModals({
   setShowActivationRequestModal,
   setWalletInfoOpen,
   setDesktopSettingsPage,
-  setSendPaymentRequest,
   setCashBuyPrefill,
   setCashSellSelectTitleOverride,
   setCashSellDestinationMode,

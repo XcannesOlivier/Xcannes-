@@ -1,5 +1,4 @@
 import { useCallback, useMemo, useState, useEffect, useRef } from 'react';
-import Image from 'next/image';
 import { XCircleIcon, CheckCircleIcon, ChevronLeftIcon } from '@heroicons/react/24/outline';
 import ModalSelect from '@/components/ui/ModalSelect';
 import { useTranslation } from 'next-i18next';
@@ -133,7 +132,6 @@ const MoonPayBuyModal = ({
   selectIconByCurrency,
   selectLabelMobileByCurrency,
   prefill = null,
-  embeddedOverlayRootRef = null,
 }) => {
   const { t, i18n } = useTranslation('common');
   const locale = i18n?.language || 'en';
@@ -147,15 +145,8 @@ const MoonPayBuyModal = ({
   const accentText80 = accentVariant === 'simpleswapBlue' ? 'text-[#0870f8]/80' : 'text-xcannes-green/80';
   const accentRing25Bg =
     accentVariant === 'simpleswapBlue' ? 'ring-[#0870f8]/25 bg-[#0870f8]' : 'ring-xcannes-green/25 bg-xcannes-green';
-  const accentRing60 = accentVariant === 'simpleswapBlue' ? 'focus:ring-[#0870f8]/60' : 'focus:ring-white/30';
-  const accentBg10 =
-    accentVariant === 'simpleswapBlue' ? 'bg-[#0870f8]/10 text-white' : 'bg-xcannes-green/10 text-white';
-  const accentCheck = accentVariant === 'simpleswapBlue' ? 'text-[#0870f8]' : 'text-xcannes-green';
-  const accentGlowShadow =
-    accentVariant === 'simpleswapBlue' ? '0_0_8px_rgba(8,112,248,0.22)' : '0_0_8px_rgba(0,255,150,0.15)';
   const modalPanelRef = useRef(null);
   const contentRootRef = useRef(null);
-  const swipeDragStartY = useRef(null);
   const [iframeUrl, setIframeUrl] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -163,10 +154,7 @@ const MoonPayBuyModal = ({
   const displayError = error && /api\.sandbox\.moonpay\.com/i.test(error) ? null : error;
   const moonpayActiveRef = useRef(false);
   const pendingAutoStartRef = useRef(false);
-  const isEmbeddedPwa =
-    typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('embedded') === 'pwa';
   const isIOS = isIOSDevice();
-  const showIOSKycFallback = isEmbeddedPwa && isIOS;
   const moonpayIframeAllow = isIOS
     ? 'camera *; microphone *; clipboard-write'
     : 'camera https://moonpay.com https://buy.moonpay.com https://buy-sandbox.moonpay.com https://sell.moonpay.com https://sell-sandbox.moonpay.com https://wallet.moonpay.com https://*.moonpay.com; clipboard-write';
@@ -174,7 +162,7 @@ const MoonPayBuyModal = ({
   const latestIframeUrlRef = useRef(iframeUrl);
   const [pendingSwapTargetCurrency, setPendingSwapTargetCurrency] = useState('');
   const [pendingSwapDetectedXrp, setPendingSwapDetectedXrp] = useState(null);
-  const [pendingSwapTxHash, setPendingSwapTxHash] = useState('');
+  const [, setPendingSwapTxHash] = useState('');
   const [awaitingXrpSince, setAwaitingXrpSince] = useState(null);
   const [preparedInboundSwap, setPreparedInboundSwap] = useState(null);
   const pendingSwapPollSeenRef = useRef('');
@@ -237,13 +225,12 @@ const MoonPayBuyModal = ({
     return Boolean(window.matchMedia?.('(min-width: 768px)')?.matches);
   });
   const [assetDropdownOpen, setAssetDropdownOpen] = useState(false);
-  const [assetSearch, setAssetSearch] = useState('');
-  const assetDropdownOverlayRef = useRef(null);
+  const [, setAssetSearch] = useState('');
   const assetDropdownListRef = useRef(null);
   const assetDropdownTriggerRef = useRef(null);
   const assetDropdownDesktopPopupRef = useRef(null);
-  const [assetOverlayDragging, setAssetOverlayDragging] = useState(false);
-  const [assetOverlayTranslateY, setAssetOverlayTranslateY] = useState(0);
+  const [, setAssetOverlayDragging] = useState(false);
+  const [, setAssetOverlayTranslateY] = useState(0);
   const assetOverlayDragMetaRef = useRef({
     startY: 0,
     startAt: 0,
@@ -343,11 +330,6 @@ const MoonPayBuyModal = ({
     selectLabelRightByCurrency,
   ]);
 
-  const selectedAssetCurrency = useMemo(() => {
-    const code = String(currency || '').toUpperCase();
-    return supportedCurrencies.find(c => String(c?.code || '').toUpperCase() === code) || null;
-  }, [currency, supportedCurrencies]);
-
   const selectedToken = useMemo(() => {
     const current = String(currency || '').toUpperCase();
     if (!current) return null;
@@ -370,16 +352,8 @@ const MoonPayBuyModal = ({
         ? targetAmountValue * rlusdRate
         : targetAmountValue
       : null;
-  const rlusdEquivalentLabel =
-    Number.isFinite(Number(rlusdEquivalent)) && Number(rlusdEquivalent) > 0
-      ? formatAmountWithSymbol(locale, Number(rlusdEquivalent), 'RLUSD', {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        })
-      : null;
   // Fees are always calculated by the partner (MoonPay/Topper). Avoid showing misleading "fees"
   // derived from FX conversions (e.g. 20,000 DOP vs 329 RLUSD).
-  const estimatedFeeLabel = null;
 
   const formatAmountWithCode = (amount, code, options = {}) => {
     const num = Number(amount);
@@ -550,7 +524,7 @@ const MoonPayBuyModal = ({
   }, [isCurrencyLine, resolvedMoonpayBaseFiatCurrencyCode, resolveRlusdRateForFiat, rlusdEquivalent, rlusdRate, t]);
 
   const [moonpayFeeEstimates, setMoonpayFeeEstimates] = useState(null);
-  const [moonpayFeeEstimateError, setMoonpayFeeEstimateError] = useState(null);
+  const [, setMoonpayFeeEstimateError] = useState(null);
   const normalizeFeeError = value => {
     if (!value) return null;
     if (typeof value === 'string') return value;
@@ -691,47 +665,6 @@ const MoonPayBuyModal = ({
       return '';
     }
   }, [locale, reviewTimestamp]);
-  const estimatedProviderLabel = useSimpleSwapPartner ? 'SimpleSwap' : 'MoonPay / Topper';
-
-  const renderSelectIcon = icon => {
-    if (!icon) return null;
-    if (typeof icon === 'string' || typeof icon === 'number') {
-      return (
-        <span className="text-base leading-none" aria-hidden="true">
-          {icon}
-        </span>
-      );
-    }
-    if (icon?.src) {
-      return <Image src={icon.src} alt={icon.alt || ''} width={22} height={22} className="w-5 h-5 object-contain" />;
-    }
-    return null;
-  };
-
-  const filteredAssetCurrencies = useMemo(() => {
-    const needle = String(assetSearch || '')
-      .trim()
-      .toLowerCase();
-    if (!needle) return supportedCurrencies;
-    return supportedCurrencies.filter(c => {
-      const code = String(c?.code || '').toLowerCase();
-      const label = String(c?.label || c?.labelLeft || '').toLowerCase();
-      const right = String(c?.amountLabel || c?.labelRight || '').toLowerCase();
-      return `${code} ${label} ${right}`.includes(needle);
-    });
-  }, [assetSearch, supportedCurrencies]);
-
-  const selectedAssetTriggerLabel = useMemo(() => {
-    const selectedCode = String(selectedAssetCurrency?.code || currency || '')
-      .trim()
-      .toUpperCase();
-    return (
-      getCurrencyDescription(selectedCode) ||
-      selectedAssetCurrency?.labelLeft ||
-      selectedAssetCurrency?.label ||
-      selectedCode
-    );
-  }, [currency, selectedAssetCurrency]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -810,122 +743,6 @@ const MoonPayBuyModal = ({
       lockedOverflowY: '',
     };
   }, [assetDropdownOpen]);
-
-  const releaseAssetOverlayScrollLock = () => {
-    const meta = assetOverlayDragMetaRef.current;
-    if (meta?.source !== 'list') return;
-    if (!meta?.scrollLocked) return;
-    const listEl = assetDropdownListRef.current;
-    if (!listEl) return;
-    try {
-      listEl.style.overflowY = meta.lockedOverflowY;
-    } catch {
-      // ignore
-    }
-    meta.scrollLocked = false;
-    meta.lockedOverflowY = '';
-  };
-
-  const maybeStartAssetOverlayDrag = (event, source) => {
-    if (!event?.isPrimary) return false;
-    if (event.pointerType === 'mouse') return false;
-    if (event.target?.closest?.('input,textarea,select')) return false;
-
-    if (source === 'list') {
-      const listEl = assetDropdownListRef.current;
-      if (!listEl) return false;
-      if (listEl.scrollTop > 0) return false;
-    }
-
-    assetOverlayDragMetaRef.current = {
-      startY: event.clientY,
-      startAt: Date.now(),
-      pointerId: event.pointerId,
-      lastDelta: 0,
-      pending: true,
-      source,
-      dragging: false,
-      scrollLocked: false,
-      lockedOverflowY: '',
-    };
-    return true;
-  };
-
-  const handleAssetOverlayPointerMove = event => {
-    const meta = assetOverlayDragMetaRef.current;
-    if (!meta?.pending && !meta?.dragging) return;
-    if (meta.pointerId !== event.pointerId) return;
-
-    const delta = event.clientY - meta.startY;
-    if (delta <= 0) return;
-
-    if (!meta.dragging) {
-      if (delta < 8) return;
-      try {
-        assetDropdownOverlayRef.current?.setPointerCapture?.(event.pointerId);
-      } catch {
-        // ignore
-      }
-
-      if (meta.source === 'list') {
-        const listEl = assetDropdownListRef.current;
-        if (listEl && listEl.scrollTop <= 0) {
-          try {
-            meta.lockedOverflowY = listEl.style.overflowY;
-            meta.scrollLocked = true;
-            listEl.style.overflowY = 'hidden';
-            listEl.scrollTop = 0;
-          } catch {
-            // ignore
-          }
-        }
-      }
-
-      meta.dragging = true;
-      setAssetOverlayDragging(true);
-    }
-
-    meta.lastDelta = delta;
-    setAssetOverlayTranslateY(delta);
-  };
-
-  const handleAssetOverlayPointerEnd = event => {
-    const meta = assetOverlayDragMetaRef.current;
-    if (meta.pointerId !== event.pointerId) return;
-
-    const delta = meta.lastDelta || 0;
-    const duration = Math.max(1, Date.now() - (meta.startAt || 0));
-    const velocity = delta / duration;
-    const shouldClose = delta > 160 || velocity > 1.0;
-
-    assetOverlayDragMetaRef.current.pending = false;
-    assetOverlayDragMetaRef.current.dragging = false;
-    setAssetOverlayDragging(false);
-    releaseAssetOverlayScrollLock();
-
-    if (shouldClose) {
-      const height = typeof window !== 'undefined' ? window.innerHeight : 9999;
-      setAssetOverlayTranslateY(Math.max(delta, height));
-      window.setTimeout(() => {
-        setAssetDropdownOpen(false);
-        setAssetSearch('');
-      }, 180);
-      return;
-    }
-
-    setAssetOverlayTranslateY(0);
-    assetOverlayDragMetaRef.current = {
-      startY: 0,
-      startAt: 0,
-      pointerId: null,
-      lastDelta: 0,
-      pending: false,
-      source: null,
-      dragging: false,
-      scrollLocked: false,
-      lockedOverflowY: '',
-    };
-  };
 
   useEffect(() => {
     if (!isOpen) return;

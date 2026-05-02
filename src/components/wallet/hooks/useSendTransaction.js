@@ -276,8 +276,6 @@ export function useSendTransaction({
   saveAddress,
   // Local UI state setters
   setActiveAction,
-  setAddressToSave,
-  setShowSaveAddressPrompt,
   // Layout
   isDesktopPanel,
   // useRlusdPerUnitRates()
@@ -287,7 +285,6 @@ export function useSendTransaction({
   allocatedRlusdByCurrency,
   // useWalletToast()
   toast,
-  confirm,
   // usePayreqStorage()
   removePayreq,
   pendingPayreqs,
