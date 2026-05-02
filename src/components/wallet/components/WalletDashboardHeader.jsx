@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useMemo } from "react";
+import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import WalletConnectButton from "@/components/wallet/WalletConnectButton";
 import WalletSettingsDropdown from "@/components/wallet/components/WalletSettingsDropdown";
 import WalletSetupDropdown from "@/components/wallet/components/WalletSetupDropdown";
@@ -142,7 +142,7 @@ export default function WalletDashboardHeader({
   const toggleSwitcher = () => (isSwitcherOpen && !isSwitcherClosingRef.current ? closeSwitcher() : !isSwitcherOpen ? openSwitcher() : undefined);
   const [labelsByAddress, setLabelsByAddress] = useState({});
 
-  const trimmed = (v) => String(v || "").trim();
+  const trimmed = useCallback((v) => String(v || "").trim(), []);
 
   const walletAddressSet = useMemo(() => {
     const set = new Set();

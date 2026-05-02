@@ -5,6 +5,4 @@
  */
 export {
   greenActionBtnBase,
-  greenActionBtnMuted,
-  MODAL_MAX_H,
 } from "../../wallet/modals/walletModalTokens";
