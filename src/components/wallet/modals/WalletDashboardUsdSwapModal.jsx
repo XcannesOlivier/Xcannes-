@@ -308,6 +308,27 @@ function validateAddressByNetworkFamily(address, family) {
   }
 }
 
+/** Bannière d'erreur inline — fond rouge, texte 11px. */
+const ErrorBanner = ({ children }) => (
+  <div className="rounded-lg ring-1 ring-red-500/20 bg-red-500/10 px-3 py-2 text-[11px] text-red-200">
+    {children}
+  </div>
+);
+
+/** Bannière d'avertissement inline — fond amber, texte 11px. */
+const WarnBanner = ({ children }) => (
+  <div className="rounded-lg ring-1 ring-amber-500/20 bg-amber-500/10 px-3 py-2 text-[11px] text-amber-200">
+    {children}
+  </div>
+);
+
+/** Bannière d'information inline — fond blanc atténué, texte 11px. */
+const InfoBanner = ({ children }) => (
+  <div className="rounded-lg ring-1 ring-white/10 ring-inset bg-white/[0.03] px-3 py-2 text-[11px] text-white/60">
+    {children}
+  </div>
+);
+
 export default function WalletDashboardUsdSwapModal({
   open,
   onClose,
@@ -2695,9 +2716,7 @@ export default function WalletDashboardUsdSwapModal({
                 </div>
 
                 {apiError ? (
-                  <div className="rounded-lg ring-1 ring-red-500/20 bg-red-500/10 px-3 py-2 text-[11px] text-red-200">
-                    {apiError}
-                  </div>
+                  <ErrorBanner>{apiError}</ErrorBanner>
                 ) : null}
 
                 <div className="rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-black/20">
@@ -2844,12 +2863,12 @@ export default function WalletDashboardUsdSwapModal({
                   </div>
                 ) : null}
 
-                <div className="rounded-lg ring-1 ring-amber-500/20 bg-amber-500/10 px-3 py-2 text-[11px] text-amber-200">
+                <WarnBanner>
                   {t(
                     "ui_usd_swap_warning",
                     `Attention : envoyez uniquement ${partnerFromTicker || "l'actif sélectionné"} (${partnerFromNetwork || "réseau sélectionné"}). Envoyer un autre actif ou oublier un Tag/Memo peut entraîner une perte.`,
                   )}
-                </div>
+                </WarnBanner>
 
                 <div className="flex gap-2">
                   {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE ? (
@@ -2980,21 +2999,17 @@ export default function WalletDashboardUsdSwapModal({
                 ) : null}
 
                 {currenciesLoading ? (
-                  <div className="rounded-lg ring-1 ring-white/10 ring-inset bg-white/[0.03] px-3 py-2 text-[11px] text-white/60">
+                  <InfoBanner>
                     {t("ui_usd_swap_loading_currencies", "Chargement des devises SimpleSwap…")}
-                  </div>
+                  </InfoBanner>
                 ) : null}
 
                 {currenciesError ? (
-                  <div className="rounded-lg ring-1 ring-red-500/20 bg-red-500/10 px-3 py-2 text-[11px] text-red-200">
-                    {currenciesError}
-                  </div>
+                  <ErrorBanner>{currenciesError}</ErrorBanner>
                 ) : null}
 
                 {apiError ? (
-                  <div className="rounded-lg ring-1 ring-red-500/20 bg-red-500/10 px-3 py-2 text-[11px] text-red-200">
-                    {apiError}
-                  </div>
+                  <ErrorBanner>{apiError}</ErrorBanner>
                 ) : null}
 
                 {step === "form" ? (
@@ -4254,12 +4269,12 @@ export default function WalletDashboardUsdSwapModal({
                     </div>
 
                     {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE && toNetwork ? (
-                      <div className="rounded-lg ring-1 ring-amber-500/20 bg-amber-500/10 px-3 py-2 text-[11px] text-amber-200">
+                      <WarnBanner>
                         {t(
                           "ui_usd_swap_network_note",
                           `Note : ${toTicker || "Le stablecoin"} sera envoyé sur le réseau ${toNetwork}.`,
                         )}
-                      </div>
+                      </WarnBanner>
                     ) : null}
 
                     <div>

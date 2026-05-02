@@ -52,3 +52,24 @@ export const binanceYellowActionBtnBase = [
   "disabled:bg-[#F0B90B]/45 disabled:text-black/70 disabled:border-white/10 disabled:cursor-not-allowed",
   "disabled:hover:translate-y-0 disabled:hover:scale-100",
 ].join(" ");
+
+/**
+ * ── Surface / layout tokens ──────────────────────────────────────────────────
+ *
+ * Dark surface colours used consistently across wallet modals.
+ * Prefer these over inline Tailwind arbitrary values (`bg-[#101415]` etc.).
+ */
+
+/**
+ * Currency-select trigger button — dark gradient, soft inset ring, depth shadow.
+ * Used for the ModalSelect `buttonClassName` in Buy, Sell and Send modals.
+ */
+export const modalSelectButtonCls =
+  "bg-gradient-to-b from-[#101415] to-[#0d1214] ring-1 ring-white/[0.07] ring-inset rounded-[14px] px-3.5 py-1.5 md:py-2 text-xl md:text-2xl text-white outline-none focus:outline-none cursor-pointer transition-all duration-150 shadow-[0_2px_8px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.06)]";
+
+/**
+ * Currency-select dropdown list — flat dark surface, inset ring, scroll cap.
+ * Used for the ModalSelect `selectClassName` in Buy, Sell and Send modals.
+ */
+export const modalSelectListCls =
+  "xcannes-select w-full bg-[#101415] ring-1 ring-white/10 ring-inset rounded-[14px] px-3.5 py-1.5 md:py-2 text-xl md:text-2xl text-white outline-none focus:outline-none cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4)]";
