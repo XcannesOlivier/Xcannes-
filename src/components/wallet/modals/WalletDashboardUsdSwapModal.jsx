@@ -1156,8 +1156,6 @@ export default function WalletDashboardUsdSwapModal({
     setPreparedSwap(null);
     setSwapSubmitting(false);
     setCurrenciesError("");
-    setWalletAddressExpanded(false);
-    setWalletAddressCopied(false);
   };
 
   useEffect(() => {
