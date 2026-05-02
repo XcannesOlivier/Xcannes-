@@ -82,6 +82,13 @@ export function useWalletRecentActivityBanner({
   const initialLoadDoneRef = useRef(false);
   const labelCacheRef = useRef(new Map());
 
+  useEffect(() => {
+    mountedAtRef.current = Date.now();
+    lastSeenIdRef.current = null;
+    initialLoadDoneRef.current = false;
+    labelCacheRef.current = new Map();
+  }, [backendWalletAddress]);
+
   const savedAddressLabelByAddress = useMemo(() => {
     const map = new Map();
     (savedAddresses || []).forEach((entry) => {

@@ -415,6 +415,17 @@ export default function WalletDashboard({
   // ── Currency lines (backend) — called first so label can feed useWalletLabel
   const backendWalletAddress = wallet || null;
 
+  useEffect(() => {
+    setRecentActivityMessage('');
+    setRecentActivityCreatedAt('');
+    setRecentActivityKind('');
+    setRecentActivityMovementId('');
+    setRecentActivityMovement(null);
+    setHighlightTransactionId(null);
+    setRecentSummaryOpen(false);
+    setActivityTooltipOpen(false);
+  }, [backendWalletAddress]);
+
   const {
     lines: currencyLines,
     summary: currencyLinesSummary,
