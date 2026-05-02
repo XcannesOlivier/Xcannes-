@@ -33,7 +33,6 @@ export function useWalletSwapOrchestrator({
   const [convertBaseCurrency, setConvertBaseCurrency] = useState("USD");
   const [convertQuoteCurrency, setConvertQuoteCurrency] = useState("EUR");
   const [convertAmount, setConvertAmount] = useState("");
-  const [convertPreview, setConvertPreview] = useState("");
   const [convertProcessing, setConvertProcessing] = useState(false);
 
   const resetSwapForm = () => {
@@ -42,7 +41,6 @@ export function useWalletSwapOrchestrator({
     setConvertBaseCurrency("USD");
     setConvertQuoteCurrency("EUR");
     setConvertAmount("");
-    setConvertPreview("");
     setConvertProcessing(false);
   };
 
@@ -115,7 +113,6 @@ export function useWalletSwapOrchestrator({
     setConvertBaseCurrency,
     setConvertQuoteCurrency,
     setConvertAmount,
-    setConvertPreview,
     setConvertProcessing,
     currencyLinesSummary,
     allocatedRlusdByCurrency,
@@ -145,7 +142,6 @@ export function useWalletSwapOrchestrator({
     setConvertQuoteCurrency,
     convertAmount,
     setConvertAmount,
-    convertPreview,
     convertProcessing,
     handleDemoConvert,
     // Options

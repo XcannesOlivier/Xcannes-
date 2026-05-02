@@ -15,14 +15,6 @@ import { useModalTransition } from '@/hooks/useModalTransition';
 import { formatAmountWithSymbol } from '../walletDashboardConfig';
 import { getCurrencyDescription } from '@/utils/currencyDescriptions';
 
-const fmtAmountRight = (raw) => {
-  if (!raw) return null;
-  const str = String(raw);
-  const i = str.lastIndexOf(' ');
-  if (i < 0) return <span>{str}</span>;
-  return <span className="inline-flex items-baseline gap-[3px]">{str.slice(0, i)}<span className="text-[0.78em]">{str.slice(i + 1)}</span></span>;
-};
-
 const ShareIcon = ({ className = '' }) => (
   <svg
     viewBox="0 0 24 24"
@@ -103,22 +95,6 @@ const ChevronLeftIcon = ({ className = '' }) => (
   </svg>
 );
 
-const ArrowDownIcon = ({ className = '' }) => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-    aria-hidden="true"
-  >
-    <line x1="12" y1="5" x2="12" y2="19" />
-    <polyline points="19 12 12 19 5 12" />
-  </svg>
-);
-
 const QrIcon = ({ className = '' }) => (
   <svg
     viewBox="0 0 24 24"
@@ -152,38 +128,6 @@ const RequestIcon = ({ className = '' }) => (
   </svg>
 );
 
-const CheckCircleIcon = ({ className = '' }) => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-    aria-hidden="true"
-  >
-    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-    <polyline points="22 4 12 14.01 9 11.01" />
-  </svg>
-);
-
-const CopySmallIcon = ({ className = '' }) => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-    aria-hidden="true"
-  >
-    <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-  </svg>
-);
-
 export default function WalletDashboardReceiveModal({
   open,
   onClose,
@@ -208,7 +152,6 @@ export default function WalletDashboardReceiveModal({
   rlusdPerUnitSources,
   walletLabel,
   onRequestGenerated,
-  resetReceiveForm,
   inline = false,
 }) {
   const { t, i18n } = useTranslation('common');
@@ -464,40 +407,6 @@ export default function WalletDashboardReceiveModal({
 
 	  const accountDropdownOpenPillClassName = "rounded-3xl rounded-b-none before:content-[''] before:absolute before:inset-0 before:rounded-3xl before:rounded-b-none before:border before:border-white/25 before:border-b-0 before:pointer-events-none";
 	  const accountDropdownMenuClassName = 'bg-elevated box-border !mt-0 !max-h-64 overflow-y-auto overscroll-contain touch-pan-y border border-white/25 border-t-0 rounded-b-[20px] shadow-[0_28px_70px_rgba(0,0,0,0.72)] !z-[10020]';
-
-	  const walletPickerSurfaceClass =
-	    receiveView === 'share' ? 'bg-white/[0.02]' : 'bg-transparent';
-
-	  const walletPicker =
-	    wallet && hasMultipleWallets ? (
-	      <div
-	        className={`rounded-[14px] border border-white/10 p-3 space-y-2 ${walletPickerSurfaceClass}`}
-	      >
-	        <div className="text-[11px] tracking-[0.22em] uppercase text-white/45">
-	          {t('ui_receive_wallet_selector_label', 'Compte de réception')}
-	        </div>
-	        <ModalSelect
-	          value={wallet}
-	          onChange={next => {
-	            const addr = trimmed(next);
-	            if (!addr || addr === wallet) return;
-	            onSwitchWallet?.(addr);
-	          }}
-	          options={walletOptions}
-	          useNativeSelect={false}
-	          iconClassName="inline-flex items-center justify-center leading-none"
-	          optionIconClassName="inline-flex items-center justify-center leading-none opacity-0"
-	          buttonClassName={`${walletPickerSurfaceClass} hover:bg-white/5 ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3 text-base text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer transition-colors duration-150`}
-	          menuClassName={
-	            noticeVariant === 'demo'
-	              ? 'bg-xcannes-surface-demo !max-h-64 overflow-y-auto overscroll-contain touch-pan-y'
-	              : 'bg-[rgba(255,255,255,0.02)] !max-h-64 overflow-y-auto overscroll-contain touch-pan-y'
-	          }
-	          backdropClassName="bg-black/35"
-	          selectClassName={`xcannes-select w-full ${walletPickerSurfaceClass} ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3 text-base text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 transition-colors duration-150`}
-	        />
-	      </div>
-	    ) : null;
 
   const isFxRequest = useMemo(() => {
     if (!selectedRequestToken?.isTrustlineOnly) return false;
@@ -778,39 +687,6 @@ export default function WalletDashboardReceiveModal({
     } catch {
       // noop
 	    }
-	  };
-
-	  const handleCopyWalletAddress = async () => {
-	    const addr = trimmed(wallet);
-	    if (!addr) return;
-	    if (navigator?.clipboard?.writeText) {
-	      try {
-	        await navigator.clipboard.writeText(addr);
-	        flashCopyToast(t('ui_address_copied', 'Adresse copiée'));
-	        return;
-	      } catch {
-	        // fall through to execCommand
-	      }
-	    }
-	    try {
-	      const el = document.createElement('textarea');
-	      el.value = addr;
-	      el.setAttribute('readonly', '');
-	      el.style.position = 'fixed';
-	      el.style.left = '-9999px';
-	      document.body.appendChild(el);
-	      el.focus();
-	      el.select();
-	      const ok = document.execCommand('copy');
-	      document.body.removeChild(el);
-	      if (ok) {
-	        flashCopyToast(t('ui_address_copied', 'Adresse copiée'));
-	        return;
-	      }
-	    } catch {
-	      // fall through
-	    }
-	    flashCopyToast(t('ui_address_copy_failed', "Impossible de copier l'adresse"));
 	  };
 
 	  const handleCopyQr = async (useRequest = hasGeneratedRequest) => {

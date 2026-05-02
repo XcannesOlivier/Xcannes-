@@ -22,7 +22,6 @@ export function useSwapConversion({
   setConvertBaseCurrency,
   setConvertQuoteCurrency,
   setConvertAmount,
-  setConvertPreview,
   setConvertProcessing,
   demoLines,
   setDemoLines,
@@ -152,13 +151,6 @@ export function useSwapConversion({
         const netRlusd = Math.max(0, grossRlusd - spreadFee);
         const quoteUnits = netRlusd / rlusdPerQuote;
 
-        const priceSource =
-          base === "RLUSD"
-            ? `1 RLUSD ≈ ${(1 / rlusdPerQuote).toLocaleString("en-US", {
-                maximumFractionDigits: 2,
-              })} ${quote}`
-            : `Prix implicite via RLUSD (base=${base}, quote=${quote})`;
-
         setDemoLines((prev) => {
           const next = { ...prev };
           const baseLineNext =
@@ -230,20 +222,6 @@ export function useSwapConversion({
           ts: Date.now(),
         });
 
-        const spreadLabel =
-          spread?.isFx && spreadFee > 0
-            ? `, frais ${(Number(spread.spreadFraction) * 100).toFixed(2)}% (≈ ${spreadFee.toLocaleString(
-                "en-US",
-                { maximumFractionDigits: 2 },
-              )} RLUSD)`
-            : "";
-        setConvertPreview(
-          `Démo: ${amountBase.toLocaleString("en-US", {
-            maximumFractionDigits: 2,
-          })} ${base} ≈ ${quoteUnits.toLocaleString("en-US", {
-            maximumFractionDigits: 2,
-          })} ${quote}${spreadLabel} (${priceSource})`,
-        );
         setConvertAmount("");
       } catch (error) {
         console.error("Demo convert error:", error);
@@ -437,23 +415,6 @@ export function useSwapConversion({
         return;
       }
 
-      const spreadLabel =
-        spread?.isFx && spreadFee > 0
-          ? `, frais ${(Number(spread.spreadFraction) * 100).toFixed(2)}% (≈ ${spreadFee.toLocaleString(
-              "en-US",
-              { maximumFractionDigits: 2 },
-            )} RLUSD)`
-          : "";
-      setConvertPreview(
-        `Conversion envoyée: ${amountBase.toLocaleString("en-US", {
-          maximumFractionDigits: 2,
-        })} ${base} → ${amountQuote.toLocaleString("en-US", {
-          maximumFractionDigits: 2,
-        })} ${quote} (≈ ${netRlusd.toLocaleString("en-US", {
-          maximumFractionDigits: 2,
-        })} RLUSD${spreadLabel})`,
-      );
-
       setConvertAmount("");
       if (refreshBalance) setTimeout(() => refreshBalance(), 10000);
       if (refreshCurrencyLines) setTimeout(() => refreshCurrencyLines({ bustCache: true }), 10000);
@@ -481,7 +442,6 @@ export function useSwapConversion({
     refreshCurrencyLines,
     onDemoConvert,
     setConvertAmount,
-    setConvertPreview,
     setConvertProcessing,
     setDemoLines,
     signTransaction,

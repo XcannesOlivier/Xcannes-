@@ -70,13 +70,6 @@ function currencyLabel(cur) {
   return `${ticker} (${network})`;
 }
 
-function truncateMiddle(value, head = 6, tail = 5) {
-  const str = String(value ?? "");
-  if (!str) return "";
-  if (str.length <= head + tail + 1) return str;
-  return `${str.slice(0, head)}…${str.slice(-tail)}`;
-}
-
 function matchStableTarget(currency, { ticker, networkAliases }) {
   const curTicker = String(currency?.ticker || "").trim().toLowerCase();
   const curNetwork = String(currency?.network || "").trim().toLowerCase();
@@ -352,13 +345,6 @@ export default function WalletDashboardUsdSwapModal({
     resolvedAccent === "simpleswap_blue" ||
     resolvedAccent === "simpleswap" ||
     resolvedAccent === "blue";
-  const accentShadowPanel = isBinanceYellow
-    ? "shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(240,185,11,0.22),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]"
-    : isFireOrange
-    ? "shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,106,0,0.22),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]"
-    : isSimpleSwapBlue
-      ? "shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(8,112,248,0.22),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]"
-    : "shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]";
   const accentShadowCard = isBinanceYellow
     ? "shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
     : isFireOrange
@@ -366,20 +352,6 @@ export default function WalletDashboardUsdSwapModal({
     : isSimpleSwapBlue
       ? "shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
     : "shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]";
-  const accentText80 = isBinanceYellow
-    ? "text-[#F0B90B]/85"
-    : isFireOrange
-    ? "text-[#ff6a00]/80"
-    : isSimpleSwapBlue
-      ? "text-[#0870f8]/80"
-      : "text-xcannes-green/80";
-  const accentText90 = isBinanceYellow
-    ? "text-[#F0B90B]/95"
-    : isFireOrange
-    ? "text-[#ff6a00]/90"
-    : isSimpleSwapBlue
-      ? "text-[#0870f8]/90"
-      : "text-xcannes-green/90";
   const accentTextSolid = isBinanceYellow
     ? "text-[#F0B90B]"
     : isFireOrange
@@ -387,13 +359,6 @@ export default function WalletDashboardUsdSwapModal({
     : isSimpleSwapBlue
       ? "text-[#0870f8]"
       : "text-xcannes-green";
-  const accentBadge = isBinanceYellow
-    ? "bg-[#F0B90B]/15 text-[#F0B90B]"
-    : isFireOrange
-    ? "bg-[#ff6a00]/15 text-[#ff6a00]"
-    : isSimpleSwapBlue
-      ? "bg-[#0870f8]/15 text-[#0870f8]"
-    : "bg-xcannes-green/15 text-xcannes-green";
   const accentRing60 = isBinanceYellow
     ? "focus:ring-[#F0B90B]/60"
     : isFireOrange
@@ -446,8 +411,6 @@ export default function WalletDashboardUsdSwapModal({
 
   const [step, setStep] = useState("form"); // form | address | pending | deposit
   const [direction, setDirection] = useState(SWAP_DIRECTIONS.RLUSD_TO_STABLE);
-  const [walletAddressExpanded, setWalletAddressExpanded] = useState(false);
-  const [walletAddressCopied, setWalletAddressCopied] = useState(false);
   const [rlusdCurrency, setRlusdCurrency] = useState(DEFAULT_RLUSD);
   const [currencies, setCurrencies] = useState([]);
   const [currenciesLoading, setCurrenciesLoading] = useState(false);
@@ -612,12 +575,6 @@ export default function WalletDashboardUsdSwapModal({
   const walletInlineSelectionEnabled =
     walletSourceSelectionEnabled || walletTargetSelectionEnabled;
   const totalStepsResolved = walletTargetSelectionEnabled ? 2 : 3;
-  const currentStepIndexResolved =
-    step === "form"
-      ? 1
-      : step === "address"
-        ? 2
-        : totalStepsResolved;
   const sourceCurrencyOptions = useMemo(() => {
     if (!walletInlineSelectionEnabled) return [];
     const seen = new Set();
@@ -846,15 +803,6 @@ export default function WalletDashboardUsdSwapModal({
     "ui_choose_wallet_currency",
     "Choisir une devise",
   );
-  const walletSelectorDialogSubtitle = walletTargetSelectionEnabled
-    ? t(
-        "ui_choose_wallet_currency_target_subtitle",
-        "Sélectionnez la devise créditée sur votre wallet.",
-      )
-    : t(
-        "ui_choose_wallet_currency_subtitle",
-        "Sélectionnez l’actif source du wallet.",
-      );
 
   const quotedReceiveAmount = useMemo(() => parseSimpleSwapEstimateAmount(quote), [quote]);
   const quotedPartnerReceiveAmount = useMemo(() => {

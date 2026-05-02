@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import useIsDesktop from "../hooks/useIsDesktop";
 import TokenAmountInput from "@/components/ui/TokenAmountInput";
 import ModalSelect from "@/components/ui/ModalSelect";
 import WalletCurrencySelector from "@/components/ui/WalletCurrencySelector";
@@ -32,13 +31,8 @@ export default function WalletDashboardSwapModal({
   renderWalletMeta,
   isPreviewMode,
   noticeVariant = "preview",
-  dashboardVariant = "default",
   isConnected,
-  isWalletActivated,
   onConnectWallet,
-  hasOnChainRlusd,
-  onActivateCurrencyLine,
-  currencyLinesLoading,
   currencyLines,
   swapCurrencyOptions,
   convertBaseCurrency,
@@ -47,7 +41,6 @@ export default function WalletDashboardSwapModal({
   setConvertQuoteCurrency,
   convertAmount,
   setConvertAmount,
-  convertPreview,
   handleDemoConvert,
   convertProcessing,
   rlusdPerUnitRates,
@@ -56,12 +49,10 @@ export default function WalletDashboardSwapModal({
   selectLabelRightByCurrency,
   selectIconByCurrency,
   selectLabelMobileByCurrency,
-  resetSwapForm,
   inline = false,
 }) {
   const { t, i18n } = useTranslation("common");
   const locale = i18n?.language || "en";
-  const isDesktop = useIsDesktop();
   const modalPanelRef = useRef(null);
 
   // Résout l'icône (drapeau) pour un code devise, y compris les devises
@@ -94,10 +85,6 @@ export default function WalletDashboardSwapModal({
     return base;
   }, [swapCurrencyOptions, convertQuoteCurrency]);
 
-  const canMutateLines =
-    isPreviewMode ||
-    (isConnected && isWalletActivated === true && hasOnChainRlusd);
-
   const existingCurrencyLinesSet = useMemo(() => {
     const set = new Set();
     (currencyLines || []).forEach((line) => {
@@ -106,12 +93,6 @@ export default function WalletDashboardSwapModal({
     });
     return set;
   }, [currencyLines]);
-  const showDesktopWalletConvertNote =
-    inline &&
-    isDesktop &&
-    noticeVariant !== "demo" &&
-    dashboardVariant === "full";
-  const useDesktopWalletConvertLayout = showDesktopWalletConvertNote;
   const [previewState, setPreviewState] = useState({
     status: "idle",
     error: null,

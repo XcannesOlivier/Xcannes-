@@ -29,8 +29,6 @@ export default function WalletDashboardCashModal({
   onDemoSell,
   buyPrefill,
   cashModalTab,
-  setCashModalTab: _setCashModalTab,
-  renderWalletMeta,
   walletLabel = "",
   preferredFiatCurrency = "",
   signTransaction = null,
@@ -44,7 +42,6 @@ export default function WalletDashboardCashModal({
   sellSelectTitleOverride = "",
   sellDestinationMode = "",
   onOpenUsdSwapOut,
-  resetCashForm: _resetCashForm,
   inline = false,
 }) {
   const { t } = useTranslation("common");
@@ -78,7 +75,6 @@ export default function WalletDashboardCashModal({
   const [walletMenuOpen, setWalletMenuOpen] = useState(false);
   const walletMenuRef = useRef(null);
   const cashContentRootRef = useRef(null);
-  const showWalletMeta = false;
   const shouldAnimate = !inline;
   const { shouldRender, isClosing } = useModalTransition(open, {
     enabled: shouldAnimate,
@@ -248,7 +244,6 @@ export default function WalletDashboardCashModal({
   const forcedProvider = forceSimpleSwapBuy || forceSimpleSwapSell ? "moonpay" : rampProvider;
   const rampActive = forcedProvider === "topper" ? topperActive : moonpayActive;
   const rampEnabled = forcedProvider === "topper" ? topperEnabled : moonpayEnabled;
-  const bothProvidersEnabled = moonpayEnabled && topperEnabled;
 
   const wrapperClass = inline
     ? "relative w-full h-full flex"
