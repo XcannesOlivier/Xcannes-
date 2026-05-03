@@ -79,7 +79,11 @@ export default function WalletDashboardFooter({ onScan, addCurrencySlot, onHisto
               <button
                 type="button"
                 onClick={onHistory}
-                className="inline-flex items-center gap-1.5 text-[13px] font-normal text-white/55 hover:text-white/85 transition-colors px-2.5 py-1.5 rounded-xl border border-white/15 hover:border-white/30"
+                className="inline-flex items-center gap-1.5 text-[13px] font-normal text-white/55 hover:text-white/85 transition-colors px-2.5 py-1.5 rounded-r-full rounded-l-none border-t border-b border-r border-l-0 border-white/15 hover:border-white/30"
+                style={{
+                  WebkitMaskImage: 'radial-gradient(circle 19px at -1px 50%, transparent 18px, black 19px)',
+                  maskImage: 'radial-gradient(circle 19px at -1px 50%, transparent 18px, black 19px)',
+                }}
                 aria-label={t("ui_open_statement", "Ouvrir le relevé des transactions")}
               >
                 <span className="flex flex-col items-start leading-tight">
