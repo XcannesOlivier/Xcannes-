@@ -1358,9 +1358,9 @@ export default function WalletDashboard({
                       onBlur={() => setActivityTooltipOpen(false)}
                       className="w-full text-left focus:outline-none"
                     >
-                      <div className="px-1">
-                        <div className="w-full rounded-[10px] bg-white/[0.04] ring-1 ring-white/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] hover:bg-white/[0.06] transition-colors">
-                          <div className="flex items-center gap-1.5 px-1.5 py-1.5">
+                      <div>
+                        <div className="w-full transition-colors">
+                          <div className="flex items-center gap-1.5 py-1.5">
                             <div
                               className={[
                                 "shrink-0 flex items-center justify-center",
