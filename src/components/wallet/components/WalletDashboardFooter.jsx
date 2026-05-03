@@ -79,24 +79,26 @@ export default function WalletDashboardFooter({ onScan, addCurrencySlot, onHisto
               <button
                 type="button"
                 onClick={onHistory}
-                className="inline-flex items-center gap-1.5 text-[12px] font-normal text-white/55 hover:text-white/85 transition-colors px-2.5 py-1.5 rounded-xl border border-white/15 hover:border-white/30"
+                className="inline-flex items-center gap-1.5 text-[13px] font-normal text-white/55 hover:text-white/85 transition-colors px-2.5 py-1.5 rounded-xl border border-white/15 hover:border-white/30"
                 aria-label={t("ui_open_statement", "Ouvrir le relevé des transactions")}
               >
-                <svg
-                  className="w-3.5 h-3.5 shrink-0"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden
-                >
-                  <circle cx="12" cy="12" r="9" />
-                  <polyline points="12 7 12 12 15.5 14.5" />
-                </svg>
-                <span className="flex flex-col items-center leading-tight">
-                  <span>Voir</span>
+                <span className="flex flex-col items-start leading-tight">
+                  <span className="flex items-center gap-1">
+                    <svg
+                      className="w-3.5 h-3.5 shrink-0"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden
+                    >
+                      <circle cx="12" cy="12" r="9" />
+                      <polyline points="12 7 12 12 15.5 14.5" />
+                    </svg>
+                    <span>Voir</span>
+                  </span>
                   <span>l&apos;historique</span>
                 </span>
               </button>
