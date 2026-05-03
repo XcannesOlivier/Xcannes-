@@ -54,7 +54,7 @@ export default function WalletDashboardFooter({ onScan, addCurrencySlot, onHisto
       <div className="relative bg-[#111518] md:hidden border-t border-white/[0.07] shadow-[inset_0_-16px_28px_rgba(255,255,255,0.03)]">
         <div className="flex items-center h-[60px] px-1">
           {/* Gauche : Ajouter une devise */}
-          <div className="flex-1 flex items-center justify-center">
+          <div className="flex-1 flex items-center justify-end">
             {addCurrencySlot ?? null}
           </div>
 
@@ -74,7 +74,7 @@ export default function WalletDashboardFooter({ onScan, addCurrencySlot, onHisto
           </div>
 
           {/* Droite : Voir l'historique */}
-          <div className="flex-1 flex items-center justify-center">
+          <div className="flex-1 flex items-center justify-start">
             {onHistory ? (
               <button
                 type="button"
