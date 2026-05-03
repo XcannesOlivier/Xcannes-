@@ -97,7 +97,7 @@ export default function WalletDashboardFooter({ onScan, addCurrencySlot, onHisto
                 </svg>
                 <span className="flex flex-col items-center leading-tight">
                   <span>Voir</span>
-                  <span>l'historique</span>
+                  <span>l&apos;historique</span>
                 </span>
               </button>
             ) : null}
