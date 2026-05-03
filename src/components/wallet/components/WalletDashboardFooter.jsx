@@ -79,14 +79,14 @@ export default function WalletDashboardFooter({ onScan, addCurrencySlot, onHisto
               <button
                 type="button"
                 onClick={onHistory}
-                className="w-full inline-flex items-center gap-1.5 text-[13px] font-normal text-white/55 hover:text-white/85 transition-colors px-3 py-1.5 rounded-r-2xl rounded-l-none bg-gradient-to-b from-[#101415] to-[#0d1214] ring-1 ring-white/[0.06] ring-inset shadow-[-5px_5px_14px_3px_rgba(255,255,255,0.05),0_2px_10px_rgba(0,0,0,0.4),inset_0_-14px_18px_rgba(0,0,0,0.8)] border-t border-b border-r border-l-0 border-white/15"
+                className="w-full inline-flex items-center justify-center gap-1.5 text-[13px] font-normal text-white/55 hover:text-white/85 transition-colors px-3 py-1.5 rounded-r-2xl rounded-l-none bg-gradient-to-b from-[#101415] to-[#0d1214] ring-1 ring-white/[0.06] ring-inset shadow-[-5px_5px_14px_3px_rgba(255,255,255,0.05),0_2px_10px_rgba(0,0,0,0.4),inset_0_-14px_18px_rgba(0,0,0,0.8)] border-t border-b border-r border-l-0 border-transparent"
                 style={{
                   WebkitMaskImage: 'radial-gradient(circle 19px at -1px 50%, transparent 18px, black 19px)',
                   maskImage: 'radial-gradient(circle 19px at -1px 50%, transparent 18px, black 19px)',
                 }}
                 aria-label={t("ui_open_statement", "Ouvrir le relevé des transactions")}
               >
-                <span className="flex flex-col items-start leading-tight">
+                <span className="flex flex-col items-center leading-tight">
                   <span className="flex items-center gap-1">
                     <svg
                       className="w-3.5 h-3.5 shrink-0"
