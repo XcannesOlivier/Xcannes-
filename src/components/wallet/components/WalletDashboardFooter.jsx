@@ -79,7 +79,7 @@ export default function WalletDashboardFooter({ onScan, addCurrencySlot, onHisto
               <button
                 type="button"
                 onClick={onHistory}
-                className="inline-flex items-center gap-1.5 text-[13px] font-normal text-white/55 hover:text-white/85 transition-colors px-2.5 py-1.5 rounded-xl border border-white/15 hover:border-white/30"
+                className="inline-flex items-center gap-1.5 text-[12px] font-normal text-white/55 hover:text-white/85 transition-colors px-2.5 py-1.5 rounded-xl border border-white/15 hover:border-white/30"
                 aria-label={t("ui_open_statement", "Ouvrir le relevé des transactions")}
               >
                 <svg
@@ -95,7 +95,10 @@ export default function WalletDashboardFooter({ onScan, addCurrencySlot, onHisto
                   <circle cx="12" cy="12" r="9" />
                   <polyline points="12 7 12 12 15.5 14.5" />
                 </svg>
-                <span>{t("ui_consult_global_statement_desktop", "Voir l'historique")}</span>
+                <span className="flex flex-col items-center leading-tight">
+                  <span>Voir</span>
+                  <span>l'historique</span>
+                </span>
               </button>
             ) : null}
           </div>
