@@ -1544,13 +1544,13 @@ export default function WalletDashboard({
             }
             addCurrencySlot={
               !isDesktopPanel ? (
-                <div style={{ display: 'inline-block', WebkitMaskImage: 'radial-gradient(circle 19px at calc(100% + 1px) 50%, transparent 18px, black 19px)', maskImage: 'radial-gradient(circle 19px at calc(100% + 1px) 50%, transparent 18px, black 19px)' }}>
+                <div style={{ display: 'block', width: '100%', WebkitMaskImage: 'radial-gradient(circle 19px at calc(100% + 1px) 50%, transparent 18px, black 19px)', maskImage: 'radial-gradient(circle 19px at calc(100% + 1px) 50%, transparent 18px, black 19px)' }}>
                   <WalletCurrencySelector
                     value=""
                     onChange={handleAddDevise}
                     triggerVariant="text"
                     triggerLabel={<span className="flex flex-col items-start leading-tight"><span>+ Ajouter</span><span>une devise</span></span>}
-                    buttonClassName="inline-flex items-center gap-1 text-[13px] font-normal text-white/55 hover:text-white/85 transition-colors px-2.5 py-1.5 rounded-l-full rounded-r-none border-t border-b border-l border-r-0 border-white/15 hover:border-white/30"
+                    buttonClassName="w-full inline-flex items-center gap-1 text-[13px] font-normal text-white/55 hover:text-white/85 transition-colors px-3 py-1.5 rounded-l-2xl rounded-r-none border-t border-b border-l border-r-0 border-white/15 hover:border-white/30"
                     placeholder={t('ui_search_all_currencies_c5d6e7f8', 'Search currency...')}
                     excludeCodes={['USD', 'RLUSD', 'XRP']}
                     showQuickAdd={false}

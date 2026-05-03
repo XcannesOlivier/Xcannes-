@@ -79,7 +79,7 @@ export default function WalletDashboardFooter({ onScan, addCurrencySlot, onHisto
               <button
                 type="button"
                 onClick={onHistory}
-                className="inline-flex items-center gap-1.5 text-[13px] font-normal text-white/55 hover:text-white/85 transition-colors px-2.5 py-1.5 rounded-r-full rounded-l-none border-t border-b border-r border-l-0 border-white/15 hover:border-white/30"
+                className="w-full inline-flex items-center gap-1.5 text-[13px] font-normal text-white/55 hover:text-white/85 transition-colors px-3 py-1.5 rounded-r-2xl rounded-l-none border-t border-b border-r border-l-0 border-white/15 hover:border-white/30"
                 style={{
                   WebkitMaskImage: 'radial-gradient(circle 19px at -1px 50%, transparent 18px, black 19px)',
                   maskImage: 'radial-gradient(circle 19px at -1px 50%, transparent 18px, black 19px)',
