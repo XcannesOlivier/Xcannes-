@@ -1307,8 +1307,8 @@ export default function WalletDashboard({
                     value=""
                     onChange={handleAddDevise}
                     triggerVariant="text"
-                    triggerLabel={<><span className="md:hidden">+ Ajouter une devise</span><span className="hidden md:inline">+ Ajouter une devise</span></>}
-                    buttonClassName="shrink-0 inline-flex items-center gap-1 text-[14px] md:text-[15px] font-normal text-white/55 hover:text-white/85 transition-colors px-2.5 md:px-3 py-1.5 md:py-1.5 rounded-lg -ml-1 md:ml-0"
+                    triggerLabel={<span>+ Ajouter une devise</span>}
+                    buttonClassName="shrink-0 hidden md:inline-flex items-center gap-1 text-[14px] md:text-[15px] font-normal text-white/55 hover:text-white/85 transition-colors px-2.5 md:px-3 py-1.5 md:py-1.5 rounded-lg -ml-1 md:ml-0"
                     placeholder={t('ui_search_all_currencies_c5d6e7f8', 'Search currency...')}
                     excludeCodes={['USD', 'RLUSD', 'XRP']}
                     showQuickAdd={false}
@@ -1322,13 +1322,10 @@ export default function WalletDashboard({
                   <div className="hidden md:flex items-center justify-center px-1.5 pointer-events-none md:order-1" aria-hidden>
                     <div className="w-px h-6 bg-white/10" />
                   </div>
-                  <div className="order-1 md:hidden flex-1 flex items-center justify-center pointer-events-none" aria-hidden>
-                    <div className="w-[1.1px] h-5 bg-[#697173]/40" />
-                  </div>
                   <button
                     type="button"
                     onClick={handleOpenGlobalStatementPlain}
-                    className="order-2 md:order-5 shrink-0 inline-flex items-center gap-1.5 text-[14px] md:text-[15px] font-normal text-white/55 hover:text-white/85 transition-colors px-2.5 md:px-3 py-1 md:py-1.5 rounded-lg"
+                    className="hidden md:inline-flex order-2 md:order-5 shrink-0 items-center gap-1.5 text-[14px] md:text-[15px] font-normal text-white/55 hover:text-white/85 transition-colors px-2.5 md:px-3 py-1 md:py-1.5 rounded-lg"
                     title={
                       recentActivityMessage
                         ? recentActivityMessage
@@ -1340,8 +1337,7 @@ export default function WalletDashboard({
                       <circle cx="12" cy="12" r="9" />
                       <polyline points="12 7 12 12 15.5 14.5" />
                     </svg>
-                    <span className="md:hidden">{t('ui_consult_global_statement_desktop', "Voir l'historique")}</span>
-                    <span className="hidden md:inline">{t('ui_consult_global_statement_desktop', "Voir l'historique")}</span>
+                    <span>{t('ui_consult_global_statement_desktop', "Voir l'historique")}</span>
                   </button>
                   <div
                     className={[
@@ -1546,6 +1542,22 @@ export default function WalletDashboard({
                   }
                 : null
             }
+            addCurrencySlot={
+              !isDesktopPanel ? (
+                <WalletCurrencySelector
+                  value=""
+                  onChange={handleAddDevise}
+                  triggerVariant="text"
+                  triggerLabel={<span>+ Ajouter une devise</span>}
+                  buttonClassName="inline-flex items-center gap-1 text-[13px] font-normal text-white/55 hover:text-white/85 transition-colors px-2 py-1.5 rounded-lg"
+                  placeholder={t('ui_search_all_currencies_c5d6e7f8', 'Search currency...')}
+                  excludeCodes={['USD', 'RLUSD', 'XRP']}
+                  showQuickAdd={false}
+                  fullscreen={true}
+                />
+              ) : null
+            }
+            onHistory={!isDesktopPanel ? handleOpenGlobalStatementPlain : null}
           />
           {!isDesktopPanel ? (
             <WalletMobileModals
