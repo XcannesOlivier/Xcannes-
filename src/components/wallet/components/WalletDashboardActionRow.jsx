@@ -10,7 +10,7 @@ export default function WalletDashboardActionRow({ onAction }) {
       className="relative px-3 py-2 md:py-3 space-y-2 md:space-y-3"
     >
       <div className="grid grid-cols-4 gap-2 sm:gap-3 relative z-[1]">
-        <div className="rounded-[20px] bg-gradient-to-b from-[#101415] to-[#0d1214] ring-1 ring-white/[0.06] ring-inset shadow-[-5px_5px_14px_3px_rgba(255,255,255,0.05),0_2px_10px_rgba(0,0,0,0.4),inset_0_-14px_18px_rgba(0,0,0,0.8)] md:shadow-[-5px_5px_14px_3px_rgba(255,255,255,0.10),0_2px_10px_rgba(0,0,0,0.4),inset_0_-14px_18px_rgba(0,0,0,0.8)]">
+        <div className="rounded-[16px] bg-gradient-to-b from-[#101415] to-[#0d1214] ring-1 ring-white/[0.04] ring-inset shadow-[-3px_3px_10px_2px_rgba(255,255,255,0.03),0_2px_8px_rgba(0,0,0,0.35),inset_0_-10px_14px_rgba(0,0,0,0.7)] md:shadow-[-3px_3px_10px_2px_rgba(255,255,255,0.06),0_2px_8px_rgba(0,0,0,0.35),inset_0_-10px_14px_rgba(0,0,0,0.7)]">
         <button
           type="button"
           onClick={() => onAction("sendChoice")}
@@ -18,7 +18,7 @@ export default function WalletDashboardActionRow({ onAction }) {
         >
           <div className="wallet-action-icon">
             <svg
-              className="w-6 h-6"
+              className="w-[22px] h-[22px]"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -30,13 +30,13 @@ export default function WalletDashboardActionRow({ onAction }) {
               <polyline points="5 12 12 5 19 12"></polyline>
             </svg>
 	          </div>
-	          <span className="wallet-action-label !text-[18px] !font-medium">
+	          <span className="wallet-action-label !text-[16px] !font-medium">
 	            {t("ui_send_bee4f9e2f5", "Envoyer")}
 	          </span>
 	        </button>
 	        </div>
 
-        <div className="rounded-[20px] bg-gradient-to-b from-[#101415] to-[#0d1214] ring-1 ring-white/[0.06] ring-inset shadow-[-5px_5px_14px_3px_rgba(255,255,255,0.05),0_2px_10px_rgba(0,0,0,0.4),inset_0_-14px_18px_rgba(0,0,0,0.8)] md:shadow-[-5px_5px_14px_3px_rgba(255,255,255,0.10),0_2px_10px_rgba(0,0,0,0.4),inset_0_-14px_18px_rgba(0,0,0,0.8)]">
+        <div className="rounded-[16px] bg-gradient-to-b from-[#101415] to-[#0d1214] ring-1 ring-white/[0.04] ring-inset shadow-[-3px_3px_10px_2px_rgba(255,255,255,0.03),0_2px_8px_rgba(0,0,0,0.35),inset_0_-10px_14px_rgba(0,0,0,0.7)] md:shadow-[-3px_3px_10px_2px_rgba(255,255,255,0.06),0_2px_8px_rgba(0,0,0,0.35),inset_0_-10px_14px_rgba(0,0,0,0.7)]">
         <button
           type="button"
           onClick={() => onAction("receive")}
@@ -44,7 +44,7 @@ export default function WalletDashboardActionRow({ onAction }) {
         >
           <div className="wallet-action-icon">
             <svg
-              className="w-6 h-6"
+              className="w-[22px] h-[22px]"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -56,13 +56,13 @@ export default function WalletDashboardActionRow({ onAction }) {
               <polyline points="19 12 12 19 5 12"></polyline>
             </svg>
 	          </div>
-	          <span className="wallet-action-label !text-[16px] !font-normal">
+	          <span className="wallet-action-label !text-[15px] !font-normal">
 	            {t("ui_receive_127eab0703", "Recevoir")}
 	          </span>
 	        </button>
 	        </div>
 
-        <div className="rounded-[20px] bg-gradient-to-b from-[#101415] to-[#0d1214] ring-1 ring-white/[0.06] ring-inset shadow-[-5px_5px_14px_3px_rgba(255,255,255,0.05),0_2px_10px_rgba(0,0,0,0.4),inset_0_-14px_18px_rgba(0,0,0,0.8)] md:shadow-[-5px_5px_14px_3px_rgba(255,255,255,0.10),0_2px_10px_rgba(0,0,0,0.4),inset_0_-14px_18px_rgba(0,0,0,0.8)]">
+        <div className="rounded-[16px] bg-gradient-to-b from-[#101415] to-[#0d1214] ring-1 ring-white/[0.04] ring-inset shadow-[-3px_3px_10px_2px_rgba(255,255,255,0.03),0_2px_8px_rgba(0,0,0,0.35),inset_0_-10px_14px_rgba(0,0,0,0.7)] md:shadow-[-3px_3px_10px_2px_rgba(255,255,255,0.06),0_2px_8px_rgba(0,0,0,0.35),inset_0_-10px_14px_rgba(0,0,0,0.7)]">
         <button
           type="button"
           onClick={() => onAction("swap")}
@@ -70,7 +70,7 @@ export default function WalletDashboardActionRow({ onAction }) {
         >
           <div className="wallet-action-icon">
             <svg
-              className="w-6 h-6"
+              className="w-[22px] h-[22px]"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -84,13 +84,13 @@ export default function WalletDashboardActionRow({ onAction }) {
               <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
             </svg>
 	          </div>
-	          <span className="wallet-action-label !text-[16px] !font-normal">
+	          <span className="wallet-action-label !text-[15px] !font-normal">
 	            {t("ui_convert_e0fbc97f15", "Convertir")}
 	          </span>
 	        </button>
 	        </div>
 
-        <div className="rounded-[20px] bg-gradient-to-b from-[#101415] to-[#0d1214] ring-1 ring-white/[0.06] ring-inset shadow-[-5px_5px_14px_3px_rgba(255,255,255,0.05),0_2px_10px_rgba(0,0,0,0.4),inset_0_-14px_18px_rgba(0,0,0,0.8)] md:shadow-[-5px_5px_14px_3px_rgba(255,255,255,0.10),0_2px_10px_rgba(0,0,0,0.4),inset_0_-14px_18px_rgba(0,0,0,0.8)]">
+        <div className="rounded-[16px] bg-gradient-to-b from-[#101415] to-[#0d1214] ring-1 ring-white/[0.04] ring-inset shadow-[-3px_3px_10px_2px_rgba(255,255,255,0.03),0_2px_8px_rgba(0,0,0,0.35),inset_0_-10px_14px_rgba(0,0,0,0.7)] md:shadow-[-3px_3px_10px_2px_rgba(255,255,255,0.06),0_2px_8px_rgba(0,0,0,0.35),inset_0_-10px_14px_rgba(0,0,0,0.7)]">
         <button
           type="button"
           onClick={() => {
@@ -113,7 +113,7 @@ export default function WalletDashboardActionRow({ onAction }) {
         >
           <div className="wallet-action-icon">
             <svg
-              className="w-7 h-7"
+              className="w-[22px] h-[22px]"
               viewBox="0 0 24 24"
               fill="none"
             >
@@ -130,7 +130,7 @@ export default function WalletDashboardActionRow({ onAction }) {
               </text>
             </svg>
 	          </div>
-	          <span className="wallet-action-label !text-[16px] !font-normal">
+	          <span className="wallet-action-label !text-[15px] !font-normal">
 	            {t("ui_funds_action_label", "Fonds")}
 	          </span>
 	        </button>
