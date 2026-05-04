@@ -35,7 +35,7 @@ function ScanIcon() {
         dominantBaseline="middle"
         fill="currentColor"
         stroke="none"
-        fontSize="13"
+        fontSize="15"
         fontWeight="600"
         fontFamily="system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif"
       >
