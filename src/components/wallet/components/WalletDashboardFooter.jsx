@@ -49,7 +49,7 @@ export default function WalletDashboardFooter({ onScan, addCurrencySlot, onHisto
   const { t } = useTranslation("common");
 
   return (
-    <div className="mt-[2px] shrink-0 z-20 bg-transparent md:bg-elevated md:[--bg-elevated:#090c0d] border-t-0 md:mt-auto md:border-t md:border-white/10">
+    <div className="mt-[2px] shrink-0 z-20 bg-transparent md:bg-elevated md:[--bg-elevated:#090c0d] border-t-0 md:mt-auto md:border-t md:border-white/10 lg:border-t-0">
       {/* Mobile footer — barre unique 3 colonnes */}
       <div
         className="relative md:hidden shrink-0"
@@ -114,7 +114,7 @@ export default function WalletDashboardFooter({ onScan, addCurrencySlot, onHisto
       </div>
 
       {/* Desktop footer */}
-      <div className="hidden min-h-[52px] items-center justify-center px-5 py-4 md:flex md:min-h-[56px] md:px-4 md:py-5 md:bg-[#111518] md:shadow-[inset_0_-16px_28px_rgba(255,255,255,0.03),inset_0_46px_70px_rgba(0,0,0,0.55)]">
+      <div className="hidden min-h-[52px] items-center justify-center px-5 py-4 md:flex md:min-h-[36px] md:px-4 md:py-2 md:bg-[#111518] md:shadow-[inset_0_-16px_28px_rgba(255,255,255,0.03),inset_0_46px_70px_rgba(0,0,0,0.55)]">
         <span className="font-orbitron text-xl font-semibold uppercase leading-none tracking-[0.24em] text-white/80">
           {t(BRAND_KEY, "XCANNES")}
         </span>

@@ -1644,6 +1644,7 @@ export default function WalletDashboard({
             </div>
           </div>
 
+          <div className="lg:mr-[200px]">
           <WalletDashboardFooter
             onScan={
               !isDesktopPanel
@@ -1674,6 +1675,7 @@ export default function WalletDashboard({
             }
             onHistory={!isDesktopPanel ? handleOpenGlobalStatementPlain : null}
           />
+          </div>
           {!isDesktopPanel ? (
             <WalletMobileModals
               {...modalProps}
