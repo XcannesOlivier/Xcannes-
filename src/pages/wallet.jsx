@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
 import { useTranslation } from "next-i18next";
 import { getPageTranslations } from "@/i18n/getPageTranslations";
 import WalletDashboard from "@/components/wallet/WalletDashboard";
@@ -486,24 +485,11 @@ export default function Wallet() {
   return (
     <>
       {/* Hide SEO head and nav in embedded mode */}
-      {!isEmbedded && (
-        <>
-          {seoHead}
-
-          <div className="hidden md:flex fixed top-5 left-6 z-40">
-            <Link href="/" className="header-nav-link header-nav-link-compact text-white/70 group relative">
-              <span aria-hidden="true" className="header-nav-arrow wallet-edge-arrow">‹</span>
-              <span className="pointer-events-none absolute left-0 top-full mt-2 whitespace-nowrap rounded-lg border border-white/15 bg-transparent px-3 py-1.5 text-xs text-white/80 opacity-0 translate-y-1 transition-all duration-150 group-hover:opacity-100 group-hover:translate-y-0">
-                {t("nav_home", "Page d'accueil")}
-              </span>
-            </Link>
-          </div>
-        </>
-      )}
+      {!isEmbedded && seoHead}
 
       <main className={`h-[100svh] overflow-hidden md:min-h-screen md:h-screen bg-xcannes-surface-demo text-white font-montserrat${isEmbedded ? " pwa-embedded-main" : ""}`}>
-        <div className={`w-full ${isEmbedded ? "" : "md:max-w-5xl lg:max-w-[1600px]"} h-full mx-0 md:mx-auto px-0 md:px-6 py-0 md:py-6`}>
-          <div className={`bg-xcannes-surface-demo h-full overflow-hidden ${isEmbedded ? "" : "border-0 rounded-none md:border md:border-white/10 md:rounded-xl lg:shadow-[0_0_28px_rgba(0,0,0,0.35)]"}`}>
+        <div className="w-full h-full">
+          <div className="bg-xcannes-surface-demo h-full overflow-hidden">
             <WalletDashboard
               showDesktopStatement={!isEmbedded}
               qrSizingVariant="dex"
