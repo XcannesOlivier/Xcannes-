@@ -1893,7 +1893,7 @@ export default function GlobalStatement({
 
             <div className="mt-6 mb-4 flex justify-center">
             <div className="relative w-auto min-w-[200px] max-w-[260px]" ref={accountDropdownRef}>
-              <p className="text-[14px] md:text-[12px] text-white/85 font-medium mb-1 text-center">
+              <p className="text-[22px] md:text-[21px] text-white/85 font-medium mb-1 text-center">
                 {t("ui_current_account_plain", "Compte actuel")}
               </p>
               <button

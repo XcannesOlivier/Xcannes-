@@ -1719,31 +1719,11 @@ export default function CurrencyStatement({
             />
           )}
           <div className={`space-y-3 ${periodDropdownOpen ? "relative z-[60]" : ""}`}>
-            {/* Balance + USD estimé */}
-            {!isXrpNetworkView ? (
-              <div className="flex flex-col items-center text-center gap-0.5">
-                <p className="text-[24px] md:text-[26px] text-white/60">
-                  {t("ui_balance_445d830d72", "Solde disponible")}
-                </p>
-                <p className="text-4xl text-white font-bold">
-                  {formatAmountWithSymbolLocal(balance)}
-                </p>
-                {estimatedUsd != null && Number.isFinite(estimatedUsd) ? (
-                  <p className="text-[12px] text-white/50 mt-1 whitespace-nowrap">
-                    <span className="text-white/40 mr-1">{t("ui_digital_usd_label", "Équivalent USD numérique")}</span>
-                    ≈ {formatAmountWithSymbol(locale, estimatedUsd, "RLUSD", {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
-                  </p>
-                ) : null}
-              </div>
-            ) : null}
-            {/* Ligne wallet (gauche) + Statement Period (droite) */
+            {/* Ligne wallet (gauche) + Statement Period (droite) */}
             <div className={`flex items-end gap-3 ${periodDropdownOpen ? "relative z-[60]" : ""}`}>
               {/* Wallet selector — gauche */}
               <div className="flex-1 min-w-0">
-                <p className="text-[14px] md:text-[12px] text-white/85 font-medium mb-1 text-center">
+                <p className="text-[22px] md:text-[21px] text-white/85 font-medium mb-1 text-center">
                   {t("ui_current_account_prefix", "Compte actuel")}
                 </p>
                 <div className="relative w-full" ref={accountDropdownRef}>
@@ -1835,7 +1815,7 @@ export default function CurrencyStatement({
                 <div className="flex-1 min-w-0">
                   <StatementMonthSelect
                     label={t("ui_statement_period_6dedec11d9", "Période du relevé")}
-                    labelClassName="text-[14px] md:text-[12px] text-white/85 font-medium mb-1 text-center"
+                    labelClassName="text-[22px] md:text-[21px] text-white/85 font-medium mb-1 text-center"
                     value={selectedMonth}
                     onOpenChange={(open) => {
                       setPeriodDropdownOpen(open);
@@ -1867,6 +1847,14 @@ export default function CurrencyStatement({
                 {estimatedUsd != null && Number.isFinite(estimatedUsd) ? (
                   <p className="text-[12px] text-white/50 mt-1 whitespace-nowrap">
 	                    <span className="text-white/40 mr-1">{t("ui_digital_usd_label", "Équivalent USD numérique")}</span>
+                    ≈ {formatAmountWithSymbol(locale, estimatedUsd, "RLUSD", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </p>
+                ) : null}
+              </div>
+            ) : null}
           </div>
         </div>
 
