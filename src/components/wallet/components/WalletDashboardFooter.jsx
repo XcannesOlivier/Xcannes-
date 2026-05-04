@@ -59,10 +59,10 @@ export default function WalletDashboardFooter({ onScan, addCurrencySlot, onHisto
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[120px] bg-gradient-to-t from-[#0d1012] via-[#0d1012]/70 to-transparent" />
 
         {/* Gradient au-dessus du footer — sépare du contenu */}
-        <div className="pointer-events-none absolute inset-x-0 bottom-full h-[48px] bg-gradient-to-t from-[#0d1012]/80 to-transparent" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-full h-[64px] bg-gradient-to-t from-[#0d1012]/90 to-transparent" />
 
         {/* Barre flottante */}
-        <div className="relative z-10 mx-4 mb-1 h-[50px] flex items-center rounded-[30px] bg-[#0e1214] ring-1 ring-white/[0.03] ring-inset shadow-[0_2px_16px_rgba(0,0,0,0.35),0_1px_3px_rgba(0,0,0,0.2)]">
+        <div className="relative z-10 mx-4 mb-1 h-[46px] flex items-center rounded-[30px] bg-[#0e1214] ring-1 ring-white/[0.02] ring-inset shadow-[0_2px_16px_rgba(0,0,0,0.35),0_1px_3px_rgba(0,0,0,0.2)]">
 
           {/* Gauche : + Devise */}
           <div className="flex-1 flex items-center justify-center h-full min-w-0">
@@ -90,11 +90,11 @@ export default function WalletDashboardFooter({ onScan, addCurrencySlot, onHisto
               <button
                 type="button"
                 onClick={onHistory}
-                className="w-full h-[46px] flex flex-col items-center justify-center gap-[2px] pb-1 transition-colors rounded-r-[30px] px-3 group"
+                className="w-full h-[46px] flex flex-col items-center justify-center gap-[2px] pb-[7px] transition-colors rounded-r-[30px] px-3 group"
                 aria-label={t("ui_open_statement", "Ouvrir le relevé des transactions")}
               >
                 <svg
-                  className="w-[20px] h-[20px] shrink-0 text-white/65 group-hover:text-white/85 transition-colors"
+                  className="w-[20px] h-[20px] shrink-0 text-white/75 group-hover:text-white/90 transition-colors"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
@@ -106,7 +106,7 @@ export default function WalletDashboardFooter({ onScan, addCurrencySlot, onHisto
                   <circle cx="12" cy="12" r="9" />
                   <polyline points="12 7 12 12 15.5 14.5" />
                 </svg>
-                <span className="text-[11px] font-normal tracking-wide leading-none text-white/45 group-hover:text-white/65 transition-colors">Historique</span>
+                <span className="text-[14px] font-normal tracking-wide leading-none text-white/65 group-hover:text-white/85 transition-colors">Historique</span>
               </button>
             ) : null}
           </div>
