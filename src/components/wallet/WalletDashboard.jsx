@@ -1534,7 +1534,7 @@ export default function WalletDashboard({
             />
             </div>
             {/* Vertical action column — desktop only */}
-            <div className="hidden lg:flex flex-col min-h-0 border-l border-white/5 w-[110px] shrink-0">
+            <div className="hidden lg:flex flex-col min-h-0 border-l border-white/5 w-[200px] shrink-0">
               <WalletDashboardActionRow onAction={handleAction} vertical />
             </div>
           </div>
