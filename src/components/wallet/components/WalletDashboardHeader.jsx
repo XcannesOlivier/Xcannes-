@@ -676,10 +676,10 @@ export default function WalletDashboardHeader({
           </div>
         )}
 
-        <div className="text-[22px] md:text-[28px] text-white/60 mb-2 md:mb-0">
+        <div className="text-[21px] md:text-[27px] text-white/55 mb-0.5 md:mb-0">
           {t("ui_total_balance_label_a91b6b8c1e", "Solde total")}
         </div>
-        <p className="text-6xl md:text-6xl lg:text-7xl font-sans font-bold text-white tabular-nums tracking-tight">
+        <p className="text-6xl md:text-6xl lg:text-7xl font-sans font-bold text-white tabular-nums tracking-tight leading-none">
           {totalLabel}
         </p>
         {Number.isFinite(totalInUsd) &&
@@ -687,7 +687,7 @@ export default function WalletDashboardHeader({
           preferredCurrency &&
           preferredCurrency !== "USD" &&
           preferredCurrency !== "RLUSD" && (
-            <div className="text-[11px] md:text-sm text-white/40 -mt-0.5 mb-1.5 md:mb-0 inline-flex items-center gap-2">
+            <div className="text-[11px] md:text-sm text-white/50 mt-0.5 mb-1 md:mb-0 inline-flex items-center gap-2">
               <span>Devises numériques</span>
                 <button
                   type="button"
