@@ -50,28 +50,13 @@ export default function WalletDashboardFooter({ onScan, addCurrencySlot, onHisto
 
   return (
     <div className="mt-[2px] shrink-0 z-20 bg-transparent md:bg-elevated md:[--bg-elevated:#090c0d] border-t-0 md:mt-auto md:border-t md:border-white/10">
-      {/* Mobile footer — Scanner + barre quasi-fusionnés */}
+      {/* Mobile footer — barre unique 3 colonnes */}
       <div
         className="relative md:hidden shrink-0"
         style={{ paddingBottom: 'max(12px, env(safe-area-inset-bottom))' }}
       >
         {/* Gradient de fondu */}
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[120px] bg-gradient-to-t from-[#0d1012] via-[#0d1012]/70 to-transparent" />
-
-        {/* Scanner — s'encastre dans la barre via mb négatif */}
-        {onScan ? (
-          <div className="relative z-20 flex justify-center mb-[-10px]">
-            <button
-              type="button"
-              onClick={onScan}
-              className="flex h-[56px] w-[88px] items-center justify-center rounded-[20px] text-white transition-transform duration-150 hover:scale-[1.02] active:scale-[0.97] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#39d57c]/20"
-              style={scanButtonStyle}
-              aria-label={t(SCAN_LABEL_KEY, "Scan QR Code")}
-            >
-              <ScanIcon />
-            </button>
-          </div>
-        ) : null}
 
         {/* Barre flottante */}
         <div className="relative z-10 mx-4 mb-2 h-[72px] flex items-center rounded-[30px] bg-[#0e1214] ring-1 ring-white/[0.06] ring-inset shadow-[0_4px_24px_rgba(0,0,0,0.5),0_1px_4px_rgba(0,0,0,0.3)]">
@@ -81,8 +66,20 @@ export default function WalletDashboardFooter({ onScan, addCurrencySlot, onHisto
             {addCurrencySlot ?? null}
           </div>
 
-          {/* Espace central — zone sous le Scanner */}
-          <div className="w-[96px] shrink-0" />
+          {/* Centre : Scanner */}
+          {onScan ? (
+            <div className="shrink-0 flex items-center justify-center px-2">
+              <button
+                type="button"
+                onClick={onScan}
+                className="flex h-[52px] w-[88px] items-center justify-center rounded-[20px] text-white transition-transform duration-150 hover:scale-[1.02] active:scale-[0.97] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#39d57c]/20"
+                style={scanButtonStyle}
+                aria-label={t(SCAN_LABEL_KEY, "Scan QR Code")}
+              >
+                <ScanIcon />
+              </button>
+            </div>
+          ) : null}
 
           {/* Droite : Historique */}
           <div className="flex-1 flex items-center justify-center h-full min-w-0">
