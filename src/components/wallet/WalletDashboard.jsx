@@ -1484,7 +1484,7 @@ export default function WalletDashboard({
                       </div>
                     ) : null}
                   </div>
-                  <div className="hidden md:flex items-center justify-between gap-x-2">
+                  <div className="hidden md:flex lg:hidden items-center justify-between gap-x-2">
                     <span className="pl-0.5 text-[13px] font-medium text-white/30 tracking-wide uppercase">
                       Mes devises
                     </span>
@@ -1536,6 +1536,41 @@ export default function WalletDashboard({
             {/* Vertical action column — desktop only */}
             <div className="hidden lg:flex flex-col min-h-0 border-l border-white/5 w-[200px] shrink-0">
               <WalletDashboardActionRow onAction={handleAction} vertical />
+              <div className="border-t border-white/5 flex flex-col gap-1 px-3 py-3">
+                <WalletCurrencySelector
+                  value=""
+                  onChange={handleAddDevise}
+                  triggerVariant="text"
+                  triggerLabel={
+                    <span className="flex items-center gap-2">
+                      <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                      <span>Ajouter une devise</span>
+                    </span>
+                  }
+                  buttonClassName="w-full flex items-center gap-2 text-[13px] font-normal text-white/45 hover:text-white/80 transition-colors px-3 py-2 rounded-lg"
+                  placeholder={t('ui_search_all_currencies_c5d6e7f8', 'Search currency...')}
+                  excludeCodes={['USD', 'RLUSD', 'XRP']}
+                  showQuickAdd={false}
+                  fullscreenPortalTarget={
+                    typeof document !== 'undefined' && isDesktopPanel
+                      ? document.getElementById('wallet-desktop-inline-panel')
+                      : null
+                  }
+                  fullscreen={true}
+                />
+                <button
+                  type="button"
+                  onClick={handleOpenGlobalStatementPlain}
+                  className="w-full flex items-center gap-2 text-[13px] font-normal text-white/45 hover:text-white/80 transition-colors px-3 py-2 rounded-lg"
+                  aria-label={t('ui_open_statement', 'Ouvrir le relevé des transactions')}
+                >
+                  <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                    <circle cx="12" cy="12" r="9" />
+                    <polyline points="12 7 12 12 15.5 14.5" />
+                  </svg>
+                  <span>{t('ui_consult_global_statement_desktop', "Voir l'historique")}</span>
+                </button>
+              </div>
             </div>
           </div>
 
