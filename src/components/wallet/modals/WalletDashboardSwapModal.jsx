@@ -616,7 +616,7 @@ export default function WalletDashboardSwapModal({
                     {renderWalletMeta?.({
                       variant: "pill",
                       className: "w-full flex justify-center wallet-meta--plus-4 wallet-meta--desktop-gap relative z-[120]",
-                      prefix: t("moonpay_from_account", "Depuis le compte"),
+                      prefix: t("moonpay_from_account", "Compte source"),
 	                      labelWrap: false,
 	                      pillClassName: `bg-elevated px-5 py-1 gap-4 ${baseDropdownOpen || quoteDropdownOpen
 	                        ? "ring-1 ring-white/20 ring-inset shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_10px_rgba(255,255,255,0.16)]"

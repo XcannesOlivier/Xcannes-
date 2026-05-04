@@ -2928,7 +2928,7 @@ export default function WalletDashboardUsdSwapModal({
                       <div className="flex justify-center">
                         <div className="inline-flex flex-col items-center gap-1 bg-elevated px-6 py-2 rounded-3xl shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]">
                           <span className="text-white/70 text-[14px] md:text-[15px] font-medium tracking-wide">
-	                            {t("moonpay_from_account", "Compte de réception")}
+	                            {t("moonpay_from_account", "Compte source")}
                           </span>
                           <div className="flex items-center gap-2">
                             <span
