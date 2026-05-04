@@ -437,7 +437,7 @@ export default function WalletDashboardSendChoiceModal({
     ? ''
     : isClosing ? 'wallet-modal-backdrop-out' : 'wallet-modal-backdrop-in';
   const panelClass = [
-    'relative w-full wallet-modal-panel wallet-cash-modal wallet-modal-no-top-highlight-mobile border-white/10 md:border overflow-hidden flex flex-col pointer-events-auto pb-[env(safe-area-inset-bottom)]',
+    'relative w-full wallet-modal-panel wallet-cash-modal wallet-modal-no-top-highlight-mobile border-white/10 md:border lg:border-0 overflow-hidden flex flex-col pointer-events-auto pb-[env(safe-area-inset-bottom)]',
     inline ? 'h-full max-h-none rounded-xl' : 'h-screen md:h-auto md:max-w-lg md:max-h-[100vh] rounded-none md:rounded-2xl',
     'bg-elevated',
     inline ? 'wallet-inline-zoom-in' : '',
