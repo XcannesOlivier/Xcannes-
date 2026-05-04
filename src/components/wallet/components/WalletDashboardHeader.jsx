@@ -303,7 +303,7 @@ export default function WalletDashboardHeader({
       className="panel-header flex flex-col shrink-0 bg-[#111518] shadow-[inset_0_16px_28px_rgba(255,255,255,0.03),inset_0_-46px_70px_rgba(0,0,0,0.55)] px-3 pt-3 pb-2 md:px-5 md:pt-4 md:pb-3"
     >
       {/* Titres discrets en haut */}
-      <div className="flex items-center justify-between mb-0 md:mb-3">
+      <div className="flex items-center justify-between mb-0 md:mb-1">
         <div className="flex items-center gap-3 min-w-0">
             {showMobileHomeLink && (
               <Link
@@ -338,11 +338,11 @@ export default function WalletDashboardHeader({
       <div className="flex flex-col items-center gap-2">
         {/* Bloc wallet — sélecteur + copier + refresh + paramètres */}
         {isConnected && wallet && (
-          <div className="w-full mt-1 md:mt-0 mb-2 md:mb-0 px-1 md:px-2 flex justify-start md:justify-between">
+          <div className="w-full mt-0 md:mt-0 mb-1 md:mb-0 px-1 md:px-2 flex justify-start md:justify-between">
 	            <div className="relative flex items-center gap-2.5 w-full md:w-full">
 
 	              <div className={`flex-none min-w-0 rounded-[12px] px-2 md:px-3 py-1.5 md:py-2 relative z-[41] transition-all duration-150 ${isSwitcherVisible ? 'w-[260px] border-l border-r border-t border-white/20 rounded-b-none' : 'max-w-[220px] md:max-w-[360px]'}`} ref={selectorContainerRef}>
-	                <div className="flex items-start justify-between gap-3" ref={switcherRef}>
+	                <div className="flex items-start justify-between gap-1.5" ref={switcherRef}>
                   <div className="min-w-0 flex-1">
                     {/* Wallet name + address — clickable when multi-wallet */}
                     <button
