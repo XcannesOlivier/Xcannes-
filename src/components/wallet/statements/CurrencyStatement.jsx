@@ -1723,7 +1723,7 @@ export default function CurrencyStatement({
             <div className={`flex items-end gap-3 ${periodDropdownOpen ? "relative z-[60]" : ""}`}>
               {/* Wallet selector — gauche */}
               <div className="flex-1 min-w-0">
-                <p className="text-[22px] md:text-[21px] text-white/85 font-medium mb-1 text-center">
+                <p className="text-[14px] md:text-[12px] text-white/85 font-medium mb-1 text-center">
                   {t("ui_current_account_prefix", "Compte actuel")}
                 </p>
                 <div className="relative w-full" ref={accountDropdownRef}>
@@ -1815,7 +1815,7 @@ export default function CurrencyStatement({
                 <div className="flex-1 min-w-0">
                   <StatementMonthSelect
                     label={t("ui_statement_period_6dedec11d9", "Période du relevé")}
-                    labelClassName="text-[22px] md:text-[21px] text-white/85 font-medium mb-1 text-center"
+                    labelClassName="text-[14px] md:text-[12px] text-white/85 font-medium mb-1 text-center"
                     value={selectedMonth}
                     onOpenChange={(open) => {
                       setPeriodDropdownOpen(open);
