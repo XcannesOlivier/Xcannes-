@@ -722,3 +722,29 @@ body.header-hero-mode .home-content-wrapper {
 .xcannes-scan-ping {
   animation: xcannesScanPing 6s ease-out infinite;
 }
+
+/* ── Desktop inline modal panel ── */
+.inline-panel {
+  position: relative;
+  background:
+    radial-gradient(circle at top center, rgba(20, 120, 70, 0.08), transparent 38%),
+    rgba(3, 9, 8, 0.86);
+  box-shadow: -32px 0 64px rgba(0, 0, 0, 0.30);
+}
+
+.inline-panel::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 28px;
+  bottom: 28px;
+  width: 1px;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(255, 255, 255, 0.14),
+    rgba(20, 180, 95, 0.22),
+    rgba(255, 255, 255, 0.10),
+    transparent
+  );
+}

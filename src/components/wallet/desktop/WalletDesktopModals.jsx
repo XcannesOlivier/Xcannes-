@@ -122,7 +122,7 @@ export default function WalletDesktopModals({
   return (
     <aside
       id="wallet-desktop-inline-panel"
-      className="hidden lg:flex lg:flex-col min-h-0 h-full relative overflow-hidden"
+      className="inline-panel hidden lg:flex lg:flex-col min-h-0 h-full relative overflow-hidden"
     >
       {showInlineQrScanner ? (
         <div className="flex-1 min-h-0">
