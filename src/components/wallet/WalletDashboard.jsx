@@ -1230,7 +1230,7 @@ export default function WalletDashboard({
       <div
         className={`bg-xcannes-surface-demo h-full min-h-0 overflow-hidden ${
           showDesktopStatementPanel
-            ? 'flex flex-col lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(480px,600px)] lg:gap-0'
+            ? 'flex flex-col lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(560px,680px)] lg:gap-0'
             : 'flex flex-col'
         }`}
       >
