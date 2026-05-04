@@ -1362,7 +1362,7 @@ export default function WalletDashboard({
                     >
                       {/* Mini-card activité récente */}
                       <div
-                        className="mx-0 mb-[11px] min-h-[52px] px-4 py-[9px] rounded-[16px] flex flex-col justify-center gap-[2px] transition-colors"
+                        className="mx-0 mb-[18px] min-h-[52px] px-4 py-[9px] rounded-[16px] flex flex-col justify-center gap-[2px] transition-colors"
                         style={{ background: 'rgba(255,255,255,0.008)', border: '1px solid rgba(255,255,255,0.02)' }}
                       >
                         {/* Ligne 1 : icône + type (secondaire) + date */}
