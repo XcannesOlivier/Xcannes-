@@ -1360,172 +1360,89 @@ export default function WalletDashboard({
                       onBlur={() => setActivityTooltipOpen(false)}
                       className="w-full text-left focus:outline-none"
                     >
-                      <div>
-                        <div className="w-full transition-colors">
-                          {/* Mobile : 2 lignes */}
-                          <div className="md:hidden flex flex-col gap-[2px] py-1.5">
-                            {/* Ligne 1 : icône + type + date */}
-                            <div className="flex items-center justify-between gap-1.5">
-                              <div className="flex items-center gap-1.5 min-w-0">
-                                <div
-                                  className={[
-                                    "shrink-0 flex items-center justify-center",
-                                    recentActivityIcon === "receive"
-                                      ? "text-emerald-300"
-                                      : recentActivityIcon === "send"
-                                        ? "text-red-200"
-                                        : "text-emerald-300",
-                                  ].join(" ")}
-                                  aria-hidden
-                                >
-                                  {recentActivityIcon === "send" ? (
-                                    <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                      <path d="M7 17L17 7" />
-                                      <path d="M7 7h10v10" />
-                                    </svg>
-                                  ) : recentActivityIcon === "receive" ? (
-                                    <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                      <path d="M7 7l10 10" />
-                                      <path d="M17 7v10H7" />
-                                    </svg>
-                                  ) : (
-                                    <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                      <polyline points="17 1 21 5 17 9"></polyline>
-                                      <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
-                                      <polyline points="7 23 3 19 7 15"></polyline>
-                                      <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
-                                    </svg>
-                                  )}
-                                </div>
-                                <span className="text-[11px] text-white/65 truncate">
-                                  {recentActivityIcon === "convert"
-                                    ? t("ui_recent_conversion_banner", "Conversion récente")
-                                    : recentActivityIcon === "receive"
-                                      ? t("ui_recent_receive_banner", "Réception récente")
-                                      : recentActivityIcon === "send"
-                                        ? t("ui_recent_send_banner", "Envoi récent")
-                                        : t("ui_recent_activity_banner", "Activité récente")}
-                                </span>
-                              </div>
-                              {recentActivityWhen?.date ? (
-                                <span className="shrink-0 text-[11px] text-white/40 whitespace-nowrap">{recentActivityWhen.date}</span>
-                              ) : null}
-                            </div>
-                            {/* Ligne 2 : montant + heure + chevron */}
-                            <div className="flex items-center justify-between gap-1.5">
-                              <span className="min-w-0 truncate text-[12px] text-white/85 font-medium">
-                                {recentActivityMessageParts.isConversion ? (
-                                  <>
-                                    {String(recentActivityMessageParts.left || "")
-                                      .replace(/^Vous avez converti\s+/i, "")
-                                      .trim()}{" "}
-                                    {recentActivityMessageParts.arrow}{" "}
-                                    <span className="font-semibold">{recentActivityMessageParts.right}</span>
-                                  </>
-                                ) : recentActivityIcon === "receive" && recentActivityReceiveParts ? (
-                                  <span className="text-emerald-300 font-semibold">
-                                    + {recentActivityReceiveParts.amount} {recentActivityReceiveParts.currency}
-                                  </span>
-                                ) : recentActivityIcon === "send" && recentActivitySendParts ? (
-                                  <span className="text-red-200 font-semibold">
-                                    - {recentActivitySendParts.amount} {recentActivitySendParts.currency}
-                                  </span>
-                                ) : (
-                                  recentActivityMessage
-                                )}
-                              </span>
-                              <div className="shrink-0 flex items-center gap-1">
-                                {recentActivityWhen?.time ? (
-                                  <span className="text-[11px] text-white/40 whitespace-nowrap">{recentActivityWhen.time}</span>
-                                ) : null}
-                                <svg className="w-3 h-3 text-white/30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                                  <polyline points="9 18 15 12 9 6" />
+                      {/* Mini-card activité récente */}
+                      <div
+                        className="mx-[26px] mb-[16px] min-h-[58px] px-4 py-[11px] rounded-[18px] flex flex-col justify-center gap-[5px] transition-colors"
+                        style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)' }}
+                      >
+                        {/* Ligne 1 : icône + type (secondaire) + date */}
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <div
+                              className={[
+                                "shrink-0 flex items-center justify-center",
+                                recentActivityIcon === "receive"
+                                  ? "text-emerald-300"
+                                  : recentActivityIcon === "send"
+                                    ? "text-red-200"
+                                    : "text-emerald-300",
+                              ].join(" ")}
+                              aria-hidden
+                            >
+                              {recentActivityIcon === "send" ? (
+                                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                                  <path d="M7 17L17 7" />
+                                  <path d="M7 7h10v10" />
                                 </svg>
-                              </div>
+                              ) : recentActivityIcon === "receive" ? (
+                                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                                  <path d="M7 7l10 10" />
+                                  <path d="M17 7v10H7" />
+                                </svg>
+                              ) : (
+                                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                                  <polyline points="17 1 21 5 17 9"></polyline>
+                                  <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
+                                  <polyline points="7 23 3 19 7 15"></polyline>
+                                  <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
+                                </svg>
+                              )}
                             </div>
+                            <span className="text-[14px] text-white/70 truncate">
+                              {recentActivityIcon === "convert"
+                                ? t("ui_recent_conversion_banner", "Conversion récente")
+                                : recentActivityIcon === "receive"
+                                  ? t("ui_recent_receive_banner", "Réception récente")
+                                  : recentActivityIcon === "send"
+                                    ? t("ui_recent_send_banner", "Envoi récent")
+                                    : t("ui_recent_activity_banner", "Activité récente")}
+                            </span>
                           </div>
+                          {recentActivityWhen?.date ? (
+                            <span className="shrink-0 text-[13px] text-white/55 whitespace-nowrap">{recentActivityWhen.date}</span>
+                          ) : null}
+                        </div>
 
-                          {/* Desktop : 2 lignes */}
-                          <div className="hidden md:flex flex-col gap-[2px] py-1.5">
-                            {/* Ligne 1 : icône + type + date */}
-                            <div className="flex items-center justify-between gap-1.5">
-                              <div className="flex items-center gap-1.5 min-w-0">
-                                <div
-                                  className={[
-                                    "shrink-0 flex items-center justify-center",
-                                    recentActivityIcon === "receive"
-                                      ? "text-emerald-300"
-                                      : recentActivityIcon === "send"
-                                        ? "text-red-200"
-                                        : "text-emerald-300",
-                                  ].join(" ")}
-                                  aria-hidden
-                                >
-                                  {recentActivityIcon === "send" ? (
-                                    <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                      <path d="M7 17L17 7" />
-                                      <path d="M7 7h10v10" />
-                                    </svg>
-                                  ) : recentActivityIcon === "receive" ? (
-                                    <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                      <path d="M7 7l10 10" />
-                                      <path d="M17 7v10H7" />
-                                    </svg>
-                                  ) : (
-                                    <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                      <polyline points="17 1 21 5 17 9"></polyline>
-                                      <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
-                                      <polyline points="7 23 3 19 7 15"></polyline>
-                                      <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
-                                    </svg>
-                                  )}
-                                </div>
-                                <span className="text-[12px] text-white/65 truncate">
-                                  {recentActivityIcon === "convert"
-                                    ? t("ui_recent_conversion_banner", "Conversion récente")
-                                    : recentActivityIcon === "receive"
-                                      ? t("ui_recent_receive_banner", "Réception récente")
-                                      : recentActivityIcon === "send"
-                                        ? t("ui_recent_send_banner", "Envoi récent")
-                                        : t("ui_recent_activity_banner", "Activité récente")}
-                                </span>
-                              </div>
-                              {recentActivityWhen?.date ? (
-                                <span className="shrink-0 text-[12px] text-white/40 whitespace-nowrap">{recentActivityWhen.date}</span>
-                              ) : null}
-                            </div>
-                            {/* Ligne 2 : montant + heure + chevron */}
-                            <div className="flex items-center justify-between gap-1.5">
-                              <span className="min-w-0 truncate text-[13px] text-white/85 font-medium">
-                                {recentActivityMessageParts.isConversion ? (
-                                  <>
-                                    {String(recentActivityMessageParts.left || "")
-                                      .replace(/^Vous avez converti\s+/i, "")
-                                      .trim()}{" "}
-                                    {recentActivityMessageParts.arrow}{" "}
-                                    <span className="font-semibold">{recentActivityMessageParts.right}</span>
-                                  </>
-                                ) : recentActivityIcon === "receive" && recentActivityReceiveParts ? (
-                                  <span className="text-emerald-300 font-semibold">
-                                    + {recentActivityReceiveParts.amount} {recentActivityReceiveParts.currency}
-                                  </span>
-                                ) : recentActivityIcon === "send" && recentActivitySendParts ? (
-                                  <span className="text-red-200 font-semibold">
-                                    - {recentActivitySendParts.amount} {recentActivitySendParts.currency}
-                                  </span>
-                                ) : (
-                                  recentActivityMessage
-                                )}
+                        {/* Ligne 2 : montant principal + heure + chevron */}
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="min-w-0 truncate text-[15px] text-white/90 font-semibold">
+                            {recentActivityMessageParts.isConversion ? (
+                              <>
+                                {String(recentActivityMessageParts.left || "")
+                                  .replace(/^Vous avez converti\s+/i, "")
+                                  .trim()}{" "}
+                                {recentActivityMessageParts.arrow}{" "}
+                                {recentActivityMessageParts.right}
+                              </>
+                            ) : recentActivityIcon === "receive" && recentActivityReceiveParts ? (
+                              <span className="text-emerald-300">
+                                + {recentActivityReceiveParts.amount} {recentActivityReceiveParts.currency}
                               </span>
-                              <div className="shrink-0 flex items-center gap-1">
-                                {recentActivityWhen?.time ? (
-                                  <span className="text-[12px] text-white/40 whitespace-nowrap">{recentActivityWhen.time}</span>
-                                ) : null}
-                                <svg className="w-3 h-3 text-white/30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                                  <polyline points="9 18 15 12 9 6" />
-                                </svg>
-                              </div>
-                            </div>
+                            ) : recentActivityIcon === "send" && recentActivitySendParts ? (
+                              <span className="text-red-200">
+                                - {recentActivitySendParts.amount} {recentActivitySendParts.currency}
+                              </span>
+                            ) : (
+                              recentActivityMessage
+                            )}
+                          </span>
+                          <div className="shrink-0 flex items-center gap-1.5">
+                            {recentActivityWhen?.time ? (
+                              <span className="text-[13px] text-white/55 whitespace-nowrap">{recentActivityWhen.time}</span>
+                            ) : null}
+                            <svg className="w-[18px] h-[18px] text-white/50" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                              <polyline points="9 18 15 12 9 6" />
+                            </svg>
                           </div>
                         </div>
                       </div>
