@@ -514,7 +514,7 @@ export default function WalletDashboardSendChoiceModal({
                     {renderWalletMeta?.({
                       variant: "pill-column",
                       className: "flex justify-center",
-                      prefix: t("moonpay_from_account", "Depuis le compte"),
+                      prefix: t("moonpay_from_account", "Compte source"),
                       pillClassName:
                         "bg-elevated ring-1 ring-white/10 shadow-none",
                     })}
@@ -658,7 +658,7 @@ export default function WalletDashboardSendChoiceModal({
                     {renderWalletMeta?.({
                       variant: 'pill-column',
                       className: 'flex justify-center',
-                      prefix: t('moonpay_from_account', 'Depuis le compte'),
+                      prefix: t('moonpay_from_account', 'Compte source'),
                       pillClassName: 'bg-elevated ring-1 ring-white/10 shadow-none',
                     })}
                   </div>
@@ -946,7 +946,7 @@ export default function WalletDashboardSendChoiceModal({
                     {renderWalletMeta?.({
                       variant: 'pill-column',
                       className: 'flex justify-center',
-                      prefix: t('moonpay_from_account', 'Depuis le compte'),
+                      prefix: t('moonpay_from_account', 'Compte source'),
                       pillClassName: 'bg-elevated shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]',
                       dotClassName: '!bg-[#f5a623] ring-[#f5a623]/20',
                     })}
