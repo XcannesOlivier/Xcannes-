@@ -1550,8 +1550,8 @@ export default function WalletDashboard({
                   triggerVariant="text"
                   triggerLabel={
                     <span className="flex flex-col items-center gap-[2px]">
-                      <span className="text-[18px] font-light leading-none text-white/55 group-hover:text-white/80 transition-colors">+</span>
-                      <span className="text-[11px] font-normal tracking-wide leading-none text-white/30 group-hover:text-white/55 transition-colors">Ajouter</span>
+                      <span className="text-[18px] font-light leading-none text-white/65 group-hover:text-white/85 transition-colors">+</span>
+                      <span className="text-[11px] font-normal tracking-wide leading-none text-white/45 group-hover:text-white/65 transition-colors">Ajouter</span>
                     </span>
                   }
                   buttonClassName="w-full h-[46px] flex flex-col items-center justify-center gap-[2px] pb-1 transition-colors rounded-l-[30px] px-3 group"

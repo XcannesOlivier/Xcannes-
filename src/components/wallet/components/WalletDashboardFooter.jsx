@@ -13,35 +13,32 @@ const SCAN_LABEL_KEY = "ui_scan_qr_code_12fa63d927";
 const BRAND_KEY = "ui_xcannes_3cdc66a392";
 const TAGLINE_KEY = "ui_global_usd_wallet_202f7e48be";
 
-function ScanIcon({ className = "h-7 w-[72px]" }) {
+function ScanIcon() {
   return (
-    <svg
-      viewBox="0 0 80 24"
-      className={className}
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      aria-hidden
-    >
-      <path
-        strokeLinecap="butt"
-        strokeLinejoin="miter"
-        d="M2.5 9V2.5H9M71 2.5H77.5V9M9 21.5H2.5V15M77.5 15V21.5H71"
-      />
-      <text
-        x="40"
-        y="12.6"
-        textAnchor="middle"
-        dominantBaseline="middle"
-        fill="currentColor"
-        stroke="none"
-        fontSize="17"
-        fontWeight="700"
-        fontFamily="system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif"
+    <span className="flex flex-col items-center gap-[5px]">
+      {/* Coins de scan */}
+      <svg
+        viewBox="0 0 80 24"
+        className="h-4 w-[52px]"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        aria-hidden
+      >
+        <path
+          strokeLinecap="butt"
+          strokeLinejoin="miter"
+          d="M2.5 9V2.5H9M71 2.5H77.5V9M9 21.5H2.5V15M77.5 15V21.5H71"
+        />
+      </svg>
+      {/* Label */}
+      <span
+        className="text-[13px] font-semibold leading-none tracking-wide"
+        style={{ fontFamily: 'system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif' }}
       >
         Scanner
-      </text>
-    </svg>
+      </span>
+    </span>
   );
 }
 
@@ -55,11 +52,14 @@ export default function WalletDashboardFooter({ onScan, addCurrencySlot, onHisto
         className="relative md:hidden shrink-0"
         style={{ paddingBottom: 'max(8px, env(safe-area-inset-bottom))' }}
       >
-        {/* Gradient de fondu */}
+        {/* Gradient de fondu sous la barre */}
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[120px] bg-gradient-to-t from-[#0d1012] via-[#0d1012]/70 to-transparent" />
 
+        {/* Gradient au-dessus du footer — sépare du contenu */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-full h-[48px] bg-gradient-to-t from-[#0d1012]/80 to-transparent" />
+
         {/* Barre flottante */}
-        <div className="relative z-10 mx-4 mb-1 h-[56px] flex items-center rounded-[30px] bg-[#0e1214] ring-1 ring-white/[0.03] ring-inset shadow-[0_2px_16px_rgba(0,0,0,0.35),0_1px_3px_rgba(0,0,0,0.2)]">
+        <div className="relative z-10 mx-4 mb-1 h-[50px] flex items-center rounded-[30px] bg-[#0e1214] ring-1 ring-white/[0.03] ring-inset shadow-[0_2px_16px_rgba(0,0,0,0.35),0_1px_3px_rgba(0,0,0,0.2)]">
 
           {/* Gauche : + Devise */}
           <div className="flex-1 flex items-center justify-center h-full min-w-0">
@@ -91,7 +91,7 @@ export default function WalletDashboardFooter({ onScan, addCurrencySlot, onHisto
                 aria-label={t("ui_open_statement", "Ouvrir le relevé des transactions")}
               >
                 <svg
-                  className="w-[20px] h-[20px] shrink-0 text-white/55 group-hover:text-white/80 transition-colors"
+                  className="w-[20px] h-[20px] shrink-0 text-white/65 group-hover:text-white/85 transition-colors"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
@@ -103,7 +103,7 @@ export default function WalletDashboardFooter({ onScan, addCurrencySlot, onHisto
                   <circle cx="12" cy="12" r="9" />
                   <polyline points="12 7 12 12 15.5 14.5" />
                 </svg>
-                <span className="text-[11px] font-normal tracking-wide leading-none text-white/30 group-hover:text-white/55 transition-colors">Historique</span>
+                <span className="text-[11px] font-normal tracking-wide leading-none text-white/45 group-hover:text-white/65 transition-colors">Historique</span>
               </button>
             ) : null}
           </div>
