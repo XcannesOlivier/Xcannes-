@@ -49,7 +49,7 @@ export default function WalletDashboardFooter({ onScan, addCurrencySlot, onHisto
   const { t } = useTranslation("common");
 
   return (
-    <div className="mt-[2px] shrink-0 z-20 bg-transparent md:bg-elevated md:[--bg-elevated:#090c0d] border-t-0 md:mt-auto md:border-t md:border-white/10 lg:border-t-0 lg:border-r lg:border-white/5">
+    <div className="mt-[2px] shrink-0 z-20 bg-transparent md:bg-elevated md:[--bg-elevated:#090c0d] border-t-0 md:mt-auto md:border-t md:border-white/10 lg:border-t lg:border-white/[0.04] lg:border-r lg:border-r-white/5">
       {/* Mobile footer — barre unique 3 colonnes */}
       <div
         className="relative md:hidden shrink-0"
