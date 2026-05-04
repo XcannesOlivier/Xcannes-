@@ -79,10 +79,10 @@ export default function WalletDashboardTokenRow({
   // fond elevated + voile blanc léger + ombres internes.
   const rowSurfaceClass = [
     "bg-elevated",
-    "border border-white/[0.04]",
-    "bg-white/5",
-    "bg-[linear-gradient(to_bottom,rgba(255,255,255,0.05),rgba(255,255,255,0)_85%)]",
-    "hover:bg-none hover:border-white/[0.06]",
+    "border border-white/[0.03]",
+    "bg-white/[0.035]",
+    "bg-[linear-gradient(to_bottom,rgba(255,255,255,0.04),rgba(255,255,255,0)_85%)]",
+    "hover:bg-none hover:border-white/[0.05]",
     "transition-colors duration-150",
   ].join(" ");
 
@@ -105,7 +105,7 @@ export default function WalletDashboardTokenRow({
         className="w-full text-left"
       >
         <div
-          className={`flex items-center gap-3 rounded-[14px] px-3.5 py-2.5 md:py-2 transition-colors cursor-pointer ${rowSurfaceClass} ${tokenRowClass}`}
+          className={`flex items-center gap-3 rounded-[14px] px-3.5 py-2 md:py-1.5 transition-colors cursor-pointer ${rowSurfaceClass} ${tokenRowClass}`}
         >
           <div className={`flex items-center ${iconTextGapClass} min-w-0`}>
             <div
@@ -125,14 +125,14 @@ export default function WalletDashboardTokenRow({
             </div>
           </div>
           <div className="flex-1" />
-          <div className="text-right text-xl md:text-2xl text-white/70 md:text-white/75 shrink-0 leading-tight">
+          <div className="text-right text-lg md:text-xl text-white/65 md:text-white/70 shrink-0 leading-tight">
             <div className="font-mono flex items-center gap-1.5">
               {Number.isFinite(displayValue)
                 ? new Intl.NumberFormat(locale || "en", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(displayValue)
                 : "0.00"}
               {" "}
-              <span className="text-sm md:text-base font-normal text-white/65 md:text-white/70">{displayCode}</span>
-              <svg className="w-3 h-3 shrink-0 text-white/25" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <span className="text-xs md:text-sm font-normal text-white/45 md:text-white/50">{displayCode}</span>
+              <svg className="w-2.5 h-2.5 shrink-0 text-white/18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                 <polyline points="9 18 15 12 9 6" />
               </svg>
             </div>
