@@ -1971,9 +1971,6 @@ export default function CurrencyStatement({
                                   </span>
                                 </div>
                               </button>
-                              {!isLast ? (
-                                <div className="h-px bg-white/10 ml-12 mr-3" />
-                              ) : null}
                             </div>
                           );
                         })}

@@ -110,7 +110,7 @@ export const STATEMENT_LAYOUTS = {
   "inline-desktop": {
     backdropClass: "",
     wrapperClass: "items-stretch justify-stretch p-0",
-    panelClass: "w-full h-full rounded-xl border-l border-white/10",
+    panelClass: "w-full h-full rounded-xl",
   },
 };
 
