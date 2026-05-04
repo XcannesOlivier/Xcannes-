@@ -680,8 +680,8 @@ export default function WalletDashboardHeader({
                   title="Retour à l'accueil"
                 >
                   <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                    <path d="M9 21H5a2 2 0 0 1-2-2V9l8-6 8 6v10a2 2 0 0 1-2 2h-4" />
-                    <polyline points="9 21 9 12 15 12 15 21" />
+                    <path d="M12 2v6" />
+                    <path d="M6.8 6.8a8 8 0 1 0 10.4 0" />
                   </svg>
                   <span>Déconnexion</span>
                 </Link>
