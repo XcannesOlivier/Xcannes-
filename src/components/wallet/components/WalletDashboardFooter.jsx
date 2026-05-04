@@ -13,7 +13,7 @@ const SCAN_LABEL_KEY = "ui_scan_qr_code_12fa63d927";
 const BRAND_KEY = "ui_xcannes_3cdc66a392";
 const TAGLINE_KEY = "ui_global_usd_wallet_202f7e48be";
 
-function ScanIcon({ className = "h-6 w-[58px]" }) {
+function ScanIcon({ className = "h-7 w-[72px]" }) {
   return (
     <svg
       viewBox="0 0 80 24"
@@ -35,7 +35,7 @@ function ScanIcon({ className = "h-6 w-[58px]" }) {
         dominantBaseline="middle"
         fill="currentColor"
         stroke="none"
-        fontSize="14"
+        fontSize="15"
         fontWeight="600"
         fontFamily="system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif"
       >
@@ -53,13 +53,13 @@ export default function WalletDashboardFooter({ onScan, addCurrencySlot, onHisto
       {/* Mobile footer — barre unique 3 colonnes */}
       <div
         className="relative md:hidden shrink-0"
-        style={{ paddingBottom: 'max(12px, env(safe-area-inset-bottom))' }}
+        style={{ paddingBottom: 'max(8px, env(safe-area-inset-bottom))' }}
       >
         {/* Gradient de fondu */}
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[120px] bg-gradient-to-t from-[#0d1012] via-[#0d1012]/70 to-transparent" />
 
         {/* Barre flottante */}
-        <div className="relative z-10 mx-4 mb-2 h-[72px] flex items-center rounded-[30px] bg-[#0e1214] ring-1 ring-white/[0.06] ring-inset shadow-[0_4px_24px_rgba(0,0,0,0.5),0_1px_4px_rgba(0,0,0,0.3)]">
+        <div className="relative z-10 mx-4 mb-1 h-[62px] flex items-center rounded-[30px] bg-[#0e1214] ring-1 ring-white/[0.06] ring-inset shadow-[0_4px_24px_rgba(0,0,0,0.5),0_1px_4px_rgba(0,0,0,0.3)]">
 
           {/* Gauche : + Devise */}
           <div className="flex-1 flex items-center justify-center h-full min-w-0">
@@ -72,7 +72,7 @@ export default function WalletDashboardFooter({ onScan, addCurrencySlot, onHisto
               <button
                 type="button"
                 onClick={onScan}
-                className="flex h-[52px] w-[88px] items-center justify-center rounded-[20px] text-white transition-transform duration-150 hover:scale-[1.02] active:scale-[0.97] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#39d57c]/20"
+                className="flex h-[52px] w-[100px] items-center justify-center rounded-[20px] text-white transition-transform duration-150 hover:scale-[1.02] active:scale-[0.97] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#39d57c]/20"
                 style={scanButtonStyle}
                 aria-label={t(SCAN_LABEL_KEY, "Scan QR Code")}
               >
@@ -87,7 +87,7 @@ export default function WalletDashboardFooter({ onScan, addCurrencySlot, onHisto
               <button
                 type="button"
                 onClick={onHistory}
-                className="w-full h-full flex flex-col items-center justify-center gap-[5px] text-white/45 hover:text-white/70 transition-colors rounded-r-[30px] px-3"
+                className="w-full h-[46px] flex flex-col items-center justify-center gap-[3px] text-white/45 hover:text-white/70 transition-colors rounded-r-[30px] px-3"
                 aria-label={t("ui_open_statement", "Ouvrir le relevé des transactions")}
               >
                 <svg
