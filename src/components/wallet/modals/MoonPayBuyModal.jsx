@@ -245,6 +245,7 @@ const MoonPayBuyModal = ({
   });
   const [wizardStep, setWizardStep] = useState(1); // 1/3 = asset, 2/3 = fiat+amount, 3/3 = MoonPay iframe
   const [reviewTimestamp, setReviewTimestamp] = useState(null);
+  const [xrpPreviewAmount, setXrpPreviewAmount] = useState(null);
 
   const PRODUCT_MIN_USD = 5;
 
@@ -653,6 +654,26 @@ const MoonPayBuyModal = ({
     t,
     wizardStep,
   ]);
+
+  // Aperçu XRP en temps réel (étape 1) — debounced 500 ms
+  useEffect(() => {
+    setXrpPreviewAmount(null);
+    if (!isOpen || demoMode || wizardStep !== 1) return () => {};
+    const rlusdAmt = Number(rlusdEquivalent);
+    if (!Number.isFinite(rlusdAmt) || rlusdAmt <= 0) return () => {};
+    let cancelled = false;
+    const id = window.setTimeout(async () => {
+      try {
+        const q = await xcannesApi.getRlusdXrpQuote({ direction: 'XRP_TO_RLUSD', amountRlusd: rlusdAmt });
+        const xrpAmt = Number(q?.xrpAmount);
+        if (!cancelled && Number.isFinite(xrpAmt) && xrpAmt > 0) setXrpPreviewAmount(xrpAmt);
+      } catch {
+        // ignore — aperçu non bloquant
+      }
+    }, 500);
+    return () => { cancelled = true; window.clearTimeout(id); };
+  }, [demoMode, isOpen, rlusdEquivalent, wizardStep]);
+
   const reviewTimestampLabel = useMemo(() => {
     if (!reviewTimestamp) return '';
     try {
@@ -1739,6 +1760,15 @@ const MoonPayBuyModal = ({
                     : '—'}
                 </span>
                 <span>RLUSD</span>
+              </div>
+            ) : null}
+            {!demoMode && hasValidTargetAmount && !conversionMissing && xrpPreviewAmount !== null ? (
+              <div className="mt-1 flex items-center gap-1.5 text-[13px] text-white/40">
+                <span>≈</span>
+                <span className="font-semibold text-white/55">
+                  {new Intl.NumberFormat(locale, { minimumFractionDigits: 4, maximumFractionDigits: 4 }).format(xrpPreviewAmount)}
+                </span>
+                <span>XRP</span>
               </div>
             ) : null}
             {isCurrencyLine && hasValidTargetAmount && conversionMissing ? (

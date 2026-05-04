@@ -188,6 +188,7 @@ const MoonPaySellModal = ({
   }, [preferredFiatCurrency]);
   const [wizardStep, setWizardStep] = useState(1); // 1/3 = asset+amount, 2/3 = receive in, 3/3 = MoonPay iframe
   const [reviewTimestamp, setReviewTimestamp] = useState(null);
+  const [xrpPreviewAmount, setXrpPreviewAmount] = useState(null);
   const [walletAddressExpanded, setWalletAddressExpanded] = useState(false);
   const [walletAddressCopied, setWalletAddressCopied] = useState(false);
   const [isDesktopViewport, setIsDesktopViewport] = useState(() => {
@@ -990,6 +991,29 @@ const MoonPaySellModal = ({
     wizardStep,
   ]);
 
+  const effectiveRlusdForPreview = Number.isFinite(rlusdEquivalent) && rlusdEquivalent > 0
+    ? rlusdEquivalent
+    : !isCurrencyLine && hasValidAmount ? amountValue : null;
+
+  // Aperçu XRP en temps réel (étape 1) — debounced 500 ms
+  useEffect(() => {
+    setXrpPreviewAmount(null);
+    if (!isOpen || demoMode || wizardStep !== 1) return () => {};
+    const rlusdAmt = Number(effectiveRlusdForPreview);
+    if (!Number.isFinite(rlusdAmt) || rlusdAmt <= 0) return () => {};
+    let cancelled = false;
+    const id = window.setTimeout(async () => {
+      try {
+        const q = await xcannesApi.getRlusdXrpQuote({ direction: "RLUSD_TO_XRP", amountRlusd: rlusdAmt });
+        const xrpAmt = Number(q?.xrpAmount);
+        if (!cancelled && Number.isFinite(xrpAmt) && xrpAmt > 0) setXrpPreviewAmount(xrpAmt);
+      } catch {
+        // ignore — aperçu non bloquant
+      }
+    }, 500);
+    return () => { cancelled = true; window.clearTimeout(id); };
+  }, [demoMode, effectiveRlusdForPreview, isOpen, wizardStep]);
+
   // Générer l'URL MoonPay pour la vente
   const generateSellUrl = async () => {
     if (!walletAddress) {
@@ -1486,6 +1510,15 @@ const MoonPaySellModal = ({
 	                      : '—'}
 	                  </span>
 	                  <span>RLUSD</span>
+	                </div>
+	              ) : null}
+	              {!demoMode && effectiveRlusdForPreview !== null && xrpPreviewAmount !== null ? (
+	                <div className="mt-1 flex items-center gap-1.5 text-[13px] text-white/40">
+	                  <span>≈</span>
+	                  <span className="font-semibold text-white/55">
+	                    {new Intl.NumberFormat(locale, { minimumFractionDigits: 4, maximumFractionDigits: 4 }).format(xrpPreviewAmount)}
+	                  </span>
+	                  <span>XRP</span>
 	                </div>
 	              ) : null}
 	              {isCurrencyLine && hasValidAmount && conversionMissing ? (
