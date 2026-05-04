@@ -1549,12 +1549,12 @@ export default function WalletDashboard({
                   onChange={handleAddDevise}
                   triggerVariant="text"
                   triggerLabel={
-                    <span className="flex flex-col items-center leading-[1.1] gap-0.5">
+                    <span className="flex flex-col items-center gap-[5px]">
                       <span className="text-[18px] font-light leading-none">+</span>
-                      <span className="text-[13px]">Devise</span>
+                      <span className="text-[11px] font-normal tracking-wide leading-none">Devise</span>
                     </span>
                   }
-                  buttonClassName="w-full h-full flex flex-col items-center justify-center text-white/55 hover:text-white/85 transition-colors rounded-l-[26px] px-2"
+                  buttonClassName="w-full h-full flex flex-col items-center justify-center text-white/45 hover:text-white/70 transition-colors rounded-l-[30px] px-3"
                   placeholder={t('ui_search_all_currencies_c5d6e7f8', 'Search currency...')}
                   excludeCodes={['USD', 'RLUSD', 'XRP']}
                   showQuickAdd={false}
