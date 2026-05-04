@@ -655,6 +655,7 @@ export default function WalletDashboardHeader({
 
               {/* Bouton Paramètres (à côté du refresh, même style) */}
               <div className="ml-auto">
+              <div className="lg:hidden">
               <WalletSettingsDropdown
                 position="inline"
                 isDesktopPanel={isDesktopPanel}
@@ -671,6 +672,20 @@ export default function WalletDashboardHeader({
                 onPreferredCurrencyChange={onPreferredCurrencyChange}
                 allowedCurrencyCodes={allowedCurrencyCodes}
               />
+              </div>
+              <div className="hidden lg:flex items-center">
+                <Link
+                  href="/"
+                  className="flex items-center gap-1.5 text-[13px] text-white/45 hover:text-white/80 transition-colors px-2.5 py-1.5 rounded-lg"
+                  title="Retour à l'accueil"
+                >
+                  <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                    <path d="M9 21H5a2 2 0 0 1-2-2V9l8-6 8 6v10a2 2 0 0 1-2 2h-4" />
+                    <polyline points="9 21 9 12 15 12 15 21" />
+                  </svg>
+                  <span>Déconnexion</span>
+                </Link>
+              </div>
               </div>
             </div>
           </div>
