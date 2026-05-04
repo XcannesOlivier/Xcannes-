@@ -35,8 +35,8 @@ function ScanIcon({ className = "h-7 w-[72px]" }) {
         dominantBaseline="middle"
         fill="currentColor"
         stroke="none"
-        fontSize="15"
-        fontWeight="600"
+        fontSize="17"
+        fontWeight="700"
         fontFamily="system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif"
       >
         Scanner
@@ -59,7 +59,7 @@ export default function WalletDashboardFooter({ onScan, addCurrencySlot, onHisto
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[120px] bg-gradient-to-t from-[#0d1012] via-[#0d1012]/70 to-transparent" />
 
         {/* Barre flottante */}
-        <div className="relative z-10 mx-4 mb-1 h-[62px] flex items-center rounded-[30px] bg-[#0e1214] ring-1 ring-white/[0.06] ring-inset shadow-[0_4px_24px_rgba(0,0,0,0.5),0_1px_4px_rgba(0,0,0,0.3)]">
+        <div className="relative z-10 mx-4 mb-1 h-[56px] flex items-center rounded-[30px] bg-[#0e1214] ring-1 ring-white/[0.03] ring-inset shadow-[0_2px_16px_rgba(0,0,0,0.35),0_1px_3px_rgba(0,0,0,0.2)]">
 
           {/* Gauche : + Devise */}
           <div className="flex-1 flex items-center justify-center h-full min-w-0">
@@ -72,7 +72,7 @@ export default function WalletDashboardFooter({ onScan, addCurrencySlot, onHisto
               <button
                 type="button"
                 onClick={onScan}
-                className="flex h-[52px] w-[100px] items-center justify-center rounded-[20px] text-white transition-transform duration-150 hover:scale-[1.02] active:scale-[0.97] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#39d57c]/20"
+                className="flex h-[52px] w-[110px] items-center justify-center rounded-[20px] text-white transition-transform duration-150 hover:scale-[1.02] active:scale-[0.97] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#39d57c]/20"
                 style={scanButtonStyle}
                 aria-label={t(SCAN_LABEL_KEY, "Scan QR Code")}
               >
@@ -87,11 +87,11 @@ export default function WalletDashboardFooter({ onScan, addCurrencySlot, onHisto
               <button
                 type="button"
                 onClick={onHistory}
-                className="w-full h-[46px] flex flex-col items-center justify-center gap-[3px] text-white/45 hover:text-white/70 transition-colors rounded-r-[30px] px-3"
+                className="w-full h-[46px] flex flex-col items-center justify-center gap-[2px] pb-1 transition-colors rounded-r-[30px] px-3 group"
                 aria-label={t("ui_open_statement", "Ouvrir le relevé des transactions")}
               >
                 <svg
-                  className="w-[20px] h-[20px] shrink-0"
+                  className="w-[20px] h-[20px] shrink-0 text-white/55 group-hover:text-white/80 transition-colors"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
@@ -103,7 +103,7 @@ export default function WalletDashboardFooter({ onScan, addCurrencySlot, onHisto
                   <circle cx="12" cy="12" r="9" />
                   <polyline points="12 7 12 12 15.5 14.5" />
                 </svg>
-                <span className="text-[11px] font-normal tracking-wide leading-none">Historique</span>
+                <span className="text-[11px] font-normal tracking-wide leading-none text-white/30 group-hover:text-white/55 transition-colors">Historique</span>
               </button>
             ) : null}
           </div>
