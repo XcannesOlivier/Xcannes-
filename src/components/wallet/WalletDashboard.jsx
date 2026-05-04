@@ -1551,7 +1551,7 @@ export default function WalletDashboard({
                   triggerLabel={
                     <span className="flex flex-col items-center gap-[3px]">
                       <span className="text-[18px] font-light leading-none">+</span>
-                      <span className="text-[11px] font-normal tracking-wide leading-none">Devise</span>
+                      <span className="text-[11px] font-normal tracking-wide leading-none">Ajouter</span>
                     </span>
                   }
                   buttonClassName="w-full h-[46px] flex flex-col items-center justify-center text-white/45 hover:text-white/70 transition-colors rounded-l-[30px] px-3"
