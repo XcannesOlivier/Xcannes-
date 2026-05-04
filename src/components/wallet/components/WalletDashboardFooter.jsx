@@ -15,30 +15,33 @@ const TAGLINE_KEY = "ui_global_usd_wallet_202f7e48be";
 
 function ScanIcon() {
   return (
-    <span className="flex flex-col items-center gap-[5px]">
-      {/* Coins de scan */}
-      <svg
-        viewBox="0 0 80 24"
-        className="h-4 w-[52px]"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        aria-hidden
-      >
-        <path
-          strokeLinecap="butt"
-          strokeLinejoin="miter"
-          d="M2.5 9V2.5H9M71 2.5H77.5V9M9 21.5H2.5V15M77.5 15V21.5H71"
-        />
-      </svg>
-      {/* Label */}
-      <span
-        className="text-[13px] font-semibold leading-none tracking-wide"
-        style={{ fontFamily: 'system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif' }}
+    <svg
+      viewBox="0 0 80 24"
+      className="h-6 w-[68px]"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      aria-hidden
+    >
+      <path
+        strokeLinecap="butt"
+        strokeLinejoin="miter"
+        d="M2.5 9V2.5H9M71 2.5H77.5V9M9 21.5H2.5V15M77.5 15V21.5H71"
+      />
+      <text
+        x="40"
+        y="13"
+        textAnchor="middle"
+        dominantBaseline="middle"
+        fill="currentColor"
+        stroke="none"
+        fontSize="13"
+        fontWeight="600"
+        fontFamily="system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif"
       >
         Scanner
-      </span>
-    </span>
+      </text>
+    </svg>
   );
 }
 
