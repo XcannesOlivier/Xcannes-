@@ -1730,6 +1730,22 @@ const MoonPayBuyModal = ({
                 </span>
               </div>
             </div>{/* /wrapper opaque */}
+            {isCurrencyLine && hasValidTargetAmount && !conversionMissing && currencyUpper !== 'RLUSD' ? (
+              <div className="mt-2 flex items-center gap-1.5 text-[13px] text-white/50">
+                <span>≈</span>
+                <span className="font-semibold text-white/70">
+                  {Number.isFinite(rlusdEquivalent)
+                    ? new Intl.NumberFormat(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(rlusdEquivalent)
+                    : '—'}
+                </span>
+                <span>RLUSD</span>
+              </div>
+            ) : null}
+            {isCurrencyLine && hasValidTargetAmount && conversionMissing ? (
+              <p className="mt-2 text-[11px] text-red-300">
+                {t('ui_rate_unavailable_base_5c1a9b7d2e', 'Rate unavailable for base currency.')}
+              </p>
+            ) : null}
             </div>
           ) : null}
 

@@ -1477,6 +1477,17 @@ const MoonPaySellModal = ({
 	                </span>
 	              </div>
 	            </div>{/* /wrapper opaque */}
+	              {isCurrencyLine && hasValidAmount && !conversionMissing && currencyUpper !== 'RLUSD' ? (
+	                <div className="mt-2 flex items-center gap-1.5 text-[13px] text-white/50">
+	                  <span>≈</span>
+	                  <span className="font-semibold text-white/70">
+	                    {Number.isFinite(rlusdEquivalent)
+	                      ? new Intl.NumberFormat(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(rlusdEquivalent)
+	                      : '—'}
+	                  </span>
+	                  <span>RLUSD</span>
+	                </div>
+	              ) : null}
 	              {isCurrencyLine && hasValidAmount && conversionMissing ? (
 	                <p className="mt-2 text-[11px] text-red-300">
 	                  {t(
