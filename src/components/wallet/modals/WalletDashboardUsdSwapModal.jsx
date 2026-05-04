@@ -829,6 +829,10 @@ export default function WalletDashboardUsdSwapModal({
     const partnerAmount = Number(quote?.partnerEstimatedAmount);
     return Number.isFinite(partnerAmount) && partnerAmount > 0 ? partnerAmount : null;
   }, [quote]);
+  const quotedXrpSentToPartner = useMemo(() => {
+    const xrpAmt = Number(quote?.partnerAmountInXrp);
+    return Number.isFinite(xrpAmt) && xrpAmt > 0 ? xrpAmt : null;
+  }, [quote]);
 
   const rangeLimits = useMemo(() => parseSimpleSwapRanges(ranges), [ranges]);
   const minFromAmount = useMemo(() => {
@@ -3157,6 +3161,21 @@ export default function WalletDashboardUsdSwapModal({
                           </div>
                         </div>
 
+                        {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE && hasValidAmount && quotedXrpSentToPartner ? (
+                          <div className="mt-2 flex items-center gap-1.5 text-[13px] text-white/45">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-3.5 h-3.5 shrink-0 text-white/30" aria-hidden>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M12 19V5M5 12l7-7 7 7" />
+                            </svg>
+                            <span>{t("ui_xrp_sent_to_partner", "XRP envoyé")}</span>
+                            <span className="font-semibold text-white/65">
+                              {formatAmountNumber
+                                ? formatAmountNumber.format(quotedXrpSentToPartner)
+                                : String(quotedXrpSentToPartner)}
+                            </span>
+                            <span>XRP</span>
+                          </div>
+                        ) : null}
+
                         {hasValidAmount && amountOutOfRange && (minFromAmount || maxFromAmount) ? (
                           <div className="mt-2 flex items-center justify-between gap-3 text-[11px] text-white/45">
                             <div className="min-w-0 truncate">
@@ -3354,6 +3373,21 @@ export default function WalletDashboardUsdSwapModal({
                               )}
                             </div>
                           </div>
+
+                          {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD && hasValidAmount && quotedPartnerReceiveAmount ? (
+                            <div className="mt-2 flex items-center gap-1.5 text-[13px] text-white/45">
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-3.5 h-3.5 shrink-0 text-white/30" aria-hidden>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 5v14M5 12l7 7 7-7" />
+                              </svg>
+                              <span>{t("ui_you_get_xrp_first", "Vous recevez d'abord")}</span>
+                              <span className="font-semibold text-white/65">
+                                {formatAmountNumber
+                                  ? formatAmountNumber.format(quotedPartnerReceiveAmount)
+                                  : String(quotedPartnerReceiveAmount)}
+                              </span>
+                              <span>XRP</span>
+                            </div>
+                          ) : null}
 
                           <div className="mt-2 flex items-end justify-between gap-3">
                             <div className="text-white text-4xl md:text-5xl font-semibold tracking-tight truncate">
