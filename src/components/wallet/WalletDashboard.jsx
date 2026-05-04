@@ -1526,6 +1526,7 @@ export default function WalletDashboard({
                       </div>
                     ) : null}
                   </div>
+                  {/* Barre md→lg : boutons Ajouter / Historique */}
                   <div className="hidden md:flex lg:hidden items-center justify-between gap-x-2">
                     <span className="pl-0.5 text-[13px] font-medium text-white/30 tracking-wide uppercase">
                       Mes devises
@@ -1569,6 +1570,14 @@ export default function WalletDashboard({
                     </button>
                     </div>
                   </div>
+                  {/* Header desktop : 3 colonnes */}
+                  <div className="hidden lg:flex items-center justify-between gap-2 px-0.5 pb-1 border-b border-white/[0.06]">
+                    <span className="text-[12px] font-semibold text-white/40 tracking-widest uppercase">Mes devises</span>
+                    <span className="text-[12px] text-white/25">
+                      {(tokenListTokens || []).length > 0 ? `${(tokenListTokens || []).length} devise${(tokenListTokens || []).length > 1 ? 's' : ''}` : ''}
+                    </span>
+                    <span className="text-[12px] text-white/25 tracking-wide">Solde par devise</span>
+                  </div>
                 </div>
               }
               className="relative z-[1] touch-pan-y"
@@ -1578,7 +1587,7 @@ export default function WalletDashboard({
             {/* Vertical action column — desktop only */}
             <div className="hidden lg:flex flex-col min-h-0 border-l border-white/5 w-[200px] shrink-0">
               <WalletDashboardActionRow onAction={handleAction} vertical />
-              <div className="border-t border-white/5 flex flex-col gap-1 px-3 py-3">
+              <div className="border-t border-white/5 flex flex-col gap-1 px-3 py-5">
                 <WalletCurrencySelector
                   value=""
                   onChange={handleAddDevise}
