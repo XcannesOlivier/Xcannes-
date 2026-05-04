@@ -724,27 +724,23 @@ body.header-hero-mode .home-content-wrapper {
 }
 
 /* ── Desktop inline modal panel ── */
-@keyframes inlinePanelFadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
 .inline-panel {
   position: relative;
   background:
     radial-gradient(circle at top center, rgba(20, 120, 70, 0.08), transparent 38%),
     rgba(3, 9, 8, 0.86);
   box-shadow: -32px 0 64px rgba(0, 0, 0, 0.30);
-  animation: inlinePanelFadeIn 0.35s ease both;
 }
 
-.inline-panel::before {
+/* Séparateur gauche/droite — positionné sur le panneau gauche (toujours dans le DOM) */
+.inline-panel-left::after {
   content: "";
   position: absolute;
-  left: 0;
+  right: 0;
   top: 28px;
   bottom: 28px;
   width: 1px;
+  z-index: 10;
   background: linear-gradient(
     to bottom,
     transparent,
@@ -753,5 +749,4 @@ body.header-hero-mode .home-content-wrapper {
     rgba(255, 255, 255, 0.10),
     transparent
   );
-  animation: inlinePanelFadeIn 0.5s ease both;
 }

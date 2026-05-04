@@ -1235,7 +1235,7 @@ export default function WalletDashboard({
             : 'flex flex-col'
         }`}
       >
-        <div className="flex flex-col min-h-0">
+        <div className="flex flex-col min-h-0 relative inline-panel-left">
           {/* Header */}
           <WalletDashboardHeader
             isConnected={isConnected}
