@@ -1272,8 +1272,10 @@ export default function WalletDashboard({
             allowedCurrencyCodes={activeFiatCurrencyCodes}
           />
 
-          {/* Action row: Send / Receive / Exchange / Buy */}
-          <WalletDashboardActionRow onAction={handleAction} />
+          {/* Action row: Send / Receive / Exchange / Buy — mobile only */}
+          <div className="lg:hidden">
+            <WalletDashboardActionRow onAction={handleAction} />
+          </div>
 
           {/* Reconciliation banner (external RLUSD spend detected) */}
           <ReconciliationBanner
@@ -1299,7 +1301,8 @@ export default function WalletDashboard({
           ) : null}
 
           {/* Token list */}
-          <div className="relative flex-1 flex flex-col min-h-0">
+          <div className="relative flex-1 flex flex-col lg:flex-row min-h-0">
+            <div className="flex-1 min-w-0 flex flex-col min-h-0">
             <WalletDashboardTokenList
               tokens={tokenListTokens}
               renderTokenRow={renderTokenRow}
@@ -1529,6 +1532,11 @@ export default function WalletDashboard({
               className="relative z-[1] touch-pan-y"
               style={{ WebkitOverflowScrolling: 'touch' }}
             />
+            </div>
+            {/* Vertical action column — desktop only */}
+            <div className="hidden lg:flex flex-col min-h-0 border-l border-white/5 w-[90px] shrink-0">
+              <WalletDashboardActionRow onAction={handleAction} vertical />
+            </div>
           </div>
 
           <WalletDashboardFooter
