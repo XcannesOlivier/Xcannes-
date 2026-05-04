@@ -13,7 +13,7 @@ const SCAN_LABEL_KEY = "ui_scan_qr_code_12fa63d927";
 const BRAND_KEY = "ui_xcannes_3cdc66a392";
 const TAGLINE_KEY = "ui_global_usd_wallet_202f7e48be";
 
-function ScanIcon({ className = "h-8 w-20" }) {
+function ScanIcon({ className = "h-7 w-[68px]" }) {
   return (
     <svg
       viewBox="0 0 80 24"
@@ -51,63 +51,61 @@ export default function WalletDashboardFooter({ onScan, addCurrencySlot, onHisto
   return (
     <div className="mt-[2px] shrink-0 z-20 bg-transparent md:bg-elevated md:[--bg-elevated:#090c0d] border-t-0 md:mt-auto md:border-t md:border-white/10">
       {/* Mobile footer */}
-      <div className="relative bg-[#111518] md:hidden shadow-[inset_0_-16px_28px_rgba(255,255,255,0.03)]">
-        <div
-          className="flex items-center h-[76px] px-4 pb-2"
-          style={{ paddingBottom: 'max(8px, env(safe-area-inset-bottom))' }}
-        >
-          {/* Gauche : Ajouter une devise */}
-          <div className="flex-1 flex items-center justify-end">
+      <div
+        className="relative md:hidden shrink-0"
+        style={{ paddingBottom: 'max(8px, env(safe-area-inset-bottom))' }}
+      >
+        {/* Gradient de fondu derrière la barre */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[90px] bg-gradient-to-t from-[#0d1012] via-[#0d1012]/80 to-transparent" />
+
+        {/* CTA Scanner — posé au-dessus, visuellement lié à la barre */}
+        {onScan ? (
+          <div className="relative z-10 flex justify-center">
+            <button
+              type="button"
+              onClick={onScan}
+              className="flex h-[46px] w-[106px] items-center justify-center rounded-[26px] text-white transition-transform duration-150 hover:scale-[1.02] active:scale-[0.97] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#39d57c]/20"
+              style={scanButtonStyle}
+              aria-label={t(SCAN_LABEL_KEY, "Scan QR Code")}
+            >
+              <ScanIcon />
+            </button>
+          </div>
+        ) : null}
+
+        {/* Barre flottante — conteneur principal des deux actions */}
+        <div className="relative z-10 mx-4 mt-2 mb-1 h-[52px] flex items-stretch rounded-[26px] bg-gradient-to-b from-[#141a1d] to-[#0d1214] ring-1 ring-white/[0.07] ring-inset shadow-[0_8px_32px_rgba(0,0,0,0.6),0_2px_8px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.08),inset_0_-10px_18px_rgba(0,0,0,0.5)]">
+          {/* Gauche : + Devise */}
+          <div className="flex-1 flex items-stretch min-w-0">
             {addCurrencySlot ?? null}
           </div>
 
-          {/* Centre : Scanner */}
-          <div className="flex-shrink-0 flex items-center justify-center mx-1">
-            {onScan ? (
-              <button
-                type="button"
-                onClick={onScan}
-                className="flex h-[54px] w-[120px] items-center justify-center rounded-[32px] text-white transition-transform duration-150 hover:scale-[1.01] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#39d57c]/20"
-                style={scanButtonStyle}
-                aria-label={t(SCAN_LABEL_KEY, "Scan QR Code")}
-              >
-                <ScanIcon />
-              </button>
-            ) : null}
-          </div>
+          {/* Espace central — réservé au Scanner qui flotte au-dessus */}
+          <div className="w-[114px] shrink-0" />
 
-          {/* Droite : Voir l'historique */}
-          <div className="flex-1 flex items-center justify-start">
+          {/* Droite : Historique */}
+          <div className="flex-1 flex items-stretch min-w-0">
             {onHistory ? (
               <button
                 type="button"
                 onClick={onHistory}
-                className="w-full inline-flex items-center justify-center gap-1.5 text-[13px] font-normal text-white/55 hover:text-white/85 transition-colors px-3 py-2 rounded-r-[26px] rounded-l-none bg-gradient-to-b from-[#101415] to-[#0d1214] ring-1 ring-white/[0.06] ring-inset shadow-[-5px_5px_14px_3px_rgba(255,255,255,0.05),0_2px_10px_rgba(0,0,0,0.4),inset_0_2px_6px_rgba(255,255,255,0.08),inset_0_-14px_18px_rgba(0,0,0,0.8)] border-t border-b border-r border-l-0 border-transparent"
-                style={{
-                  WebkitMaskImage: 'radial-gradient(circle 27px at -1px 50%, transparent 26px, black 27px)',
-                  maskImage: 'radial-gradient(circle 27px at -1px 50%, transparent 26px, black 27px)',
-                }}
+                className="w-full flex flex-col items-center justify-center gap-0.5 text-[13px] font-normal text-white/55 hover:text-white/85 transition-colors rounded-r-[26px] px-2"
                 aria-label={t("ui_open_statement", "Ouvrir le relevé des transactions")}
               >
-                <span className="flex flex-col items-center leading-tight">
-                  <span className="flex items-center gap-1">
-                    <svg
-                      className="w-[21px] h-[21px] shrink-0"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      aria-hidden
-                    >
-                      <circle cx="12" cy="12" r="9" />
-                      <polyline points="12 7 12 12 15.5 14.5" />
-                    </svg>
-                    <span>Voir</span>
-                  </span>
-                  <span>l&apos;historique</span>
-                </span>
+                <svg
+                  className="w-[20px] h-[20px]"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden
+                >
+                  <circle cx="12" cy="12" r="9" />
+                  <polyline points="12 7 12 12 15.5 14.5" />
+                </svg>
+                <span>Historique</span>
               </button>
             ) : null}
           </div>

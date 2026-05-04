@@ -1544,19 +1544,22 @@ export default function WalletDashboard({
             }
             addCurrencySlot={
               !isDesktopPanel ? (
-                <div style={{ display: 'block', width: '100%', WebkitMaskImage: 'radial-gradient(circle 27px at calc(100% + 1px) 50%, transparent 26px, black 27px)', maskImage: 'radial-gradient(circle 27px at calc(100% + 1px) 50%, transparent 26px, black 27px)' }}>
-                  <WalletCurrencySelector
-                    value=""
-                    onChange={handleAddDevise}
-                    triggerVariant="text"
-                    triggerLabel={<span className="flex flex-col items-center leading-tight"><span>+ Ajouter</span><span>une devise</span></span>}
-                    buttonClassName="w-full inline-flex items-center justify-center gap-1 text-[13px] font-normal text-white/55 hover:text-white/85 transition-colors px-3 py-2 rounded-l-[26px] rounded-r-none bg-gradient-to-b from-[#101415] to-[#0d1214] ring-1 ring-white/[0.06] ring-inset shadow-[-5px_5px_14px_3px_rgba(255,255,255,0.05),0_2px_10px_rgba(0,0,0,0.4),inset_0_2px_6px_rgba(255,255,255,0.08),inset_0_-14px_18px_rgba(0,0,0,0.8)] border-t border-b border-l border-r-0 border-transparent"
-                    placeholder={t('ui_search_all_currencies_c5d6e7f8', 'Search currency...')}
-                    excludeCodes={['USD', 'RLUSD', 'XRP']}
-                    showQuickAdd={false}
-                    fullscreen={true}
-                  />
-                </div>
+                <WalletCurrencySelector
+                  value=""
+                  onChange={handleAddDevise}
+                  triggerVariant="text"
+                  triggerLabel={
+                    <span className="flex flex-col items-center leading-[1.1] gap-0.5">
+                      <span className="text-[18px] font-light leading-none">+</span>
+                      <span className="text-[13px]">Devise</span>
+                    </span>
+                  }
+                  buttonClassName="w-full h-full flex flex-col items-center justify-center text-white/55 hover:text-white/85 transition-colors rounded-l-[26px] px-2"
+                  placeholder={t('ui_search_all_currencies_c5d6e7f8', 'Search currency...')}
+                  excludeCodes={['USD', 'RLUSD', 'XRP']}
+                  showQuickAdd={false}
+                  fullscreen={true}
+                />
               ) : null
             }
             onHistory={!isDesktopPanel ? handleOpenGlobalStatementPlain : null}
