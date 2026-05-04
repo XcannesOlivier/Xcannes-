@@ -1719,7 +1719,27 @@ export default function CurrencyStatement({
             />
           )}
           <div className={`space-y-3 ${periodDropdownOpen ? "relative z-[60]" : ""}`}>
-            {/* Ligne wallet (gauche) + Statement Period (droite) */}
+            {/* Balance + USD estimé */}
+            {!isXrpNetworkView ? (
+              <div className="flex flex-col items-center text-center gap-0.5">
+                <p className="text-[24px] md:text-[26px] text-white/60">
+                  {t("ui_balance_445d830d72", "Solde disponible")}
+                </p>
+                <p className="text-4xl text-white font-bold">
+                  {formatAmountWithSymbolLocal(balance)}
+                </p>
+                {estimatedUsd != null && Number.isFinite(estimatedUsd) ? (
+                  <p className="text-[12px] text-white/50 mt-1 whitespace-nowrap">
+                    <span className="text-white/40 mr-1">{t("ui_digital_usd_label", "Équivalent USD numérique")}</span>
+                    ≈ {formatAmountWithSymbol(locale, estimatedUsd, "RLUSD", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </p>
+                ) : null}
+              </div>
+            ) : null}
+            {/* Ligne wallet (gauche) + Statement Period (droite) */
             <div className={`flex items-end gap-3 ${periodDropdownOpen ? "relative z-[60]" : ""}`}>
               {/* Wallet selector — gauche */}
               <div className="flex-1 min-w-0">
@@ -1847,14 +1867,6 @@ export default function CurrencyStatement({
                 {estimatedUsd != null && Number.isFinite(estimatedUsd) ? (
                   <p className="text-[12px] text-white/50 mt-1 whitespace-nowrap">
 	                    <span className="text-white/40 mr-1">{t("ui_digital_usd_label", "Équivalent USD numérique")}</span>
-                    ≈ {formatAmountWithSymbol(locale, estimatedUsd, "RLUSD", {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
-                  </p>
-                ) : null}
-              </div>
-            ) : null}
           </div>
         </div>
 
