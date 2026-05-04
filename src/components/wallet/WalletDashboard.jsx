@@ -1362,15 +1362,15 @@ export default function WalletDashboard({
                     >
                       {/* Mini-card activité récente */}
                       <div
-                        className="mx-0 mb-[16px] min-h-[58px] px-4 py-[11px] rounded-[18px] flex flex-col justify-center gap-[5px] transition-colors"
-                        style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)' }}
+                        className="mx-0 mb-[11px] min-h-[52px] px-4 py-[9px] rounded-[16px] flex flex-col justify-center gap-[4px] transition-colors"
+                        style={{ background: 'rgba(255,255,255,0.015)', border: '1px solid rgba(255,255,255,0.035)' }}
                       >
                         {/* Ligne 1 : icône + type (secondaire) + date */}
                         <div className="flex items-center justify-between gap-2">
-                          <div className="flex items-center gap-2 min-w-0">
+                          <div className="flex items-center gap-1.5 min-w-0">
                             <div
                               className={[
-                                "shrink-0 flex items-center justify-center",
+                                "shrink-0 flex items-center justify-center opacity-70",
                                 recentActivityIcon === "receive"
                                   ? "text-emerald-300"
                                   : recentActivityIcon === "send"
@@ -1380,17 +1380,17 @@ export default function WalletDashboard({
                               aria-hidden
                             >
                               {recentActivityIcon === "send" ? (
-                                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                                <svg className="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                                   <path d="M7 17L17 7" />
                                   <path d="M7 7h10v10" />
                                 </svg>
                               ) : recentActivityIcon === "receive" ? (
-                                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                                <svg className="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                                   <path d="M7 7l10 10" />
                                   <path d="M17 7v10H7" />
                                 </svg>
                               ) : (
-                                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                                <svg className="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                                   <polyline points="17 1 21 5 17 9"></polyline>
                                   <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
                                   <polyline points="7 23 3 19 7 15"></polyline>
@@ -1398,7 +1398,7 @@ export default function WalletDashboard({
                                 </svg>
                               )}
                             </div>
-                            <span className="text-[14px] text-white/70 truncate">
+                            <span className="text-[13px] text-white/55 truncate">
                               {recentActivityIcon === "convert"
                                 ? t("ui_recent_conversion_banner", "Conversion récente")
                                 : recentActivityIcon === "receive"
@@ -1409,13 +1409,13 @@ export default function WalletDashboard({
                             </span>
                           </div>
                           {recentActivityWhen?.date ? (
-                            <span className="shrink-0 text-[13px] text-white/55 whitespace-nowrap">{recentActivityWhen.date}</span>
+                            <span className="shrink-0 text-[12px] text-white/35 whitespace-nowrap">{recentActivityWhen.date}</span>
                           ) : null}
                         </div>
 
                         {/* Ligne 2 : montant principal + heure + chevron */}
                         <div className="flex items-center justify-between gap-2">
-                          <span className="min-w-0 truncate text-[15px] text-white/90 font-semibold">
+                          <span className="min-w-0 truncate text-[14px] text-white/75 font-medium">
                             {recentActivityMessageParts.isConversion ? (
                               <>
                                 {String(recentActivityMessageParts.left || "")
@@ -1425,22 +1425,22 @@ export default function WalletDashboard({
                                 {recentActivityMessageParts.right}
                               </>
                             ) : recentActivityIcon === "receive" && recentActivityReceiveParts ? (
-                              <span className="text-emerald-300">
+                              <span className="text-emerald-300/80">
                                 + {recentActivityReceiveParts.amount} {recentActivityReceiveParts.currency}
                               </span>
                             ) : recentActivityIcon === "send" && recentActivitySendParts ? (
-                              <span className="text-red-200">
+                              <span className="text-red-200/80">
                                 - {recentActivitySendParts.amount} {recentActivitySendParts.currency}
                               </span>
                             ) : (
                               recentActivityMessage
                             )}
                           </span>
-                          <div className="shrink-0 flex items-center gap-1.5">
+                          <div className="shrink-0 flex items-center gap-1">
                             {recentActivityWhen?.time ? (
-                              <span className="text-[13px] text-white/55 whitespace-nowrap">{recentActivityWhen.time}</span>
+                              <span className="text-[12px] text-white/35 whitespace-nowrap">{recentActivityWhen.time}</span>
                             ) : null}
-                            <svg className="w-[18px] h-[18px] text-white/50" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                            <svg className="w-[14px] h-[14px] text-white/30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                               <polyline points="9 18 15 12 9 6" />
                             </svg>
                           </div>
