@@ -547,7 +547,7 @@ export default function WalletSettingsDropdown({
         aria-expanded={isOpen}
       >
         <svg
-          className={inlineButton ? "w-[26px] h-[26px] lg:w-[22px] lg:h-[22px]" : "w-6 h-6 lg:w-5 lg:h-5"}
+          className={inlineButton ? "w-[22px] h-[22px] lg:w-[20px] lg:h-[20px] opacity-70 hover:opacity-90" : "w-6 h-6 lg:w-5 lg:h-5"}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"

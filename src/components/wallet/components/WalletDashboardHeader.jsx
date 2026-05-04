@@ -350,16 +350,16 @@ export default function WalletDashboardHeader({
                       onClick={hasMultipleWallets ? toggleSwitcher : undefined}
                       className={`w-full text-left ${hasMultipleWallets ? "cursor-pointer" : "cursor-default"}`}
                     >
-                      <div className="flex items-center gap-3 min-w-0">
+                      <div className="flex items-center gap-2.5 min-w-0">
                         <span
-                          className={`h-2 w-2 rounded-full ring-4 shrink-0 ${xrplConnectionIndicator.dotClass} ${xrplConnectionIndicator.ringClass} ${
+                          className={`h-2.5 w-2.5 rounded-full ring-[3px] shrink-0 ${xrplConnectionIndicator.dotClass} ${xrplConnectionIndicator.ringClass} ${
                             xrplConnectionIndicator.pulse ? "animate-pulse" : ""
                           }`}
                           title={xrplConnectionIndicator.label}
                           aria-label={xrplConnectionIndicator.label}
                         />
 
-	                        <span className="text-[15px] md:text-[18px] font-semibold text-white/90 truncate">
+	                        <span className="text-[17px] md:text-[19px] font-semibold text-white/85 truncate">
 	                          {activeWalletLabel.length > 11 ? activeWalletLabel.slice(0, 11) + '…' : activeWalletLabel}
 	                        </span>
                       </div>
@@ -630,11 +630,11 @@ export default function WalletDashboardHeader({
                     <button
                       type="button"
                       onClick={toggleSwitcher}
-                      className="p-1 bg-transparent border border-transparent hover:bg-transparent text-white/60 hover:text-white rounded-md transition-all active:scale-95"
+                      className="p-0.5 bg-transparent border border-transparent hover:bg-transparent text-white/55 hover:text-white/80 rounded-md transition-all active:scale-95"
                       aria-label={t("ui_switch_wallet", "Changer de wallet")}
                     >
                       <svg
-                        className={`w-[18px] h-[18px] transition-transform duration-[550ms] ${isSwitcherVisible ? "rotate-180 ease-[cubic-bezier(0.16,1,0.3,1)]" : "ease-[cubic-bezier(0.4,0,1,1)]"}`}
+                        className={`w-[16px] h-[16px] transition-transform duration-[550ms] ${isSwitcherVisible ? "rotate-180 ease-[cubic-bezier(0.16,1,0.3,1)]" : "ease-[cubic-bezier(0.4,0,1,1)]"}`}
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
