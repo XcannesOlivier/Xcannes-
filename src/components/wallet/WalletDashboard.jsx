@@ -1585,7 +1585,7 @@ export default function WalletDashboard({
             />
             </div>
             {/* Vertical action column — desktop only */}
-            <div className="hidden lg:flex flex-col min-h-0 border-l border-white/5 w-[200px] shrink-0">
+            <div className="hidden lg:flex flex-col min-h-0 border-l border-white/5 w-[230px] shrink-0">
               <WalletDashboardActionRow onAction={handleAction} vertical />
               <div className="border-t border-white/5 flex flex-col gap-1 px-3 py-5">
                 <WalletCurrencySelector
@@ -1644,7 +1644,7 @@ export default function WalletDashboard({
             </div>
           </div>
 
-          <div className="lg:mr-[200px]">
+          <div className="lg:mr-[229px]">
           <WalletDashboardFooter
             onScan={
               !isDesktopPanel

@@ -10,7 +10,7 @@ export default function WalletDashboardActionRow({ onAction, vertical = false })
 
   if (vertical) {
     return (
-      <div className="flex flex-col gap-3 h-full py-5 px-8">
+      <div className="flex flex-col gap-4 h-full py-5 px-8">
         <div className={`flex-1 ${CARD_CLASS}`}>
           <button type="button" onClick={() => onAction("sendChoice")} className="wallet-action-btn wallet-action-send group w-full h-full justify-center">
             <div className="wallet-action-icon">
