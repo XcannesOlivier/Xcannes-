@@ -1304,46 +1304,10 @@ export default function WalletDashboard({
               tokens={tokenListTokens}
               renderTokenRow={renderTokenRow}
               headerTitle={
-                <div className="w-full flex flex-wrap md:flex-nowrap items-center justify-start md:justify-between gap-x-2 gap-y-1 md:gap-2">
-                  <WalletCurrencySelector
-                    value=""
-                    onChange={handleAddDevise}
-                    triggerVariant="text"
-                    triggerLabel={<span>+ Ajouter une devise</span>}
-                    buttonClassName="shrink-0 hidden md:inline-flex items-center gap-1 text-[14px] md:text-[15px] font-normal text-white/55 hover:text-white/85 transition-colors px-2.5 md:px-3 py-1.5 md:py-1.5 rounded-lg -ml-1 md:ml-0"
-                    placeholder={t('ui_search_all_currencies_c5d6e7f8', 'Search currency...')}
-                    excludeCodes={['USD', 'RLUSD', 'XRP']}
-                    showQuickAdd={false}
-                    fullscreenPortalTarget={
-                      typeof document !== 'undefined' && isDesktopPanel
-                        ? document.getElementById('wallet-desktop-inline-panel')
-                        : null
-                    }
-                    fullscreen={true}
-                  />
-                  <div className="hidden md:flex items-center justify-center px-1.5 pointer-events-none md:order-1" aria-hidden>
-                    <div className="w-px h-6 bg-white/10" />
-                  </div>
-                  <button
-                    type="button"
-                    onClick={handleOpenGlobalStatementPlain}
-                    className="hidden md:inline-flex order-2 md:order-5 shrink-0 items-center gap-1.5 text-[14px] md:text-[15px] font-normal text-white/55 hover:text-white/85 transition-colors px-2.5 md:px-3 py-1 md:py-1.5 rounded-lg"
-                    title={
-                      recentActivityMessage
-                        ? recentActivityMessage
-                        : t('ui_open_statement', 'Ouvrir le relevé des transactions')
-                    }
-                    aria-label={t('ui_open_statement', 'Ouvrir le relevé des transactions')}
-                  >
-                    <svg className="w-3.5 h-3.5 md:w-4 md:h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                      <circle cx="12" cy="12" r="9" />
-                      <polyline points="12 7 12 12 15.5 14.5" />
-                    </svg>
-                    <span>{t('ui_consult_global_statement_desktop', "Voir l'historique")}</span>
-                  </button>
+                <div className="w-full flex flex-col gap-y-0">
                   <div
                     className={[
-                      "order-4 basis-full md:order-3 md:basis-auto flex-1 min-w-0 overflow-visible relative transition-all duration-500",
+                      "w-full min-w-0 overflow-visible relative transition-all duration-500",
                       recentActivityMessage ? "opacity-100 max-h-20" : "opacity-0 max-h-0 pointer-events-none",
                     ].join(" ")}
                     aria-live="polite"
@@ -1517,8 +1481,48 @@ export default function WalletDashboard({
                       </div>
                     ) : null}
                   </div>
-                  <div className="hidden md:flex items-center justify-center px-1.5 pointer-events-none md:order-4" aria-hidden>
-                    <div className="w-px h-6 bg-white/10" />
+                  <div className="hidden md:flex items-center justify-between gap-x-2">
+                    <span className="pl-0.5 text-[13px] font-medium text-white/30 tracking-wide uppercase">
+                      Mes devises
+                    </span>
+                    <div className="flex items-center gap-x-2">
+                    <WalletCurrencySelector
+                      value=""
+                      onChange={handleAddDevise}
+                      triggerVariant="text"
+                      triggerLabel={<span>+ Ajouter une devise</span>}
+                      buttonClassName="shrink-0 inline-flex items-center gap-1 text-[15px] font-normal text-white/55 hover:text-white/85 transition-colors px-3 py-1.5 rounded-lg -ml-1"
+                      placeholder={t('ui_search_all_currencies_c5d6e7f8', 'Search currency...')}
+                      excludeCodes={['USD', 'RLUSD', 'XRP']}
+                      showQuickAdd={false}
+                      fullscreenPortalTarget={
+                        typeof document !== 'undefined' && isDesktopPanel
+                          ? document.getElementById('wallet-desktop-inline-panel')
+                          : null
+                      }
+                      fullscreen={true}
+                    />
+                    <div className="flex items-center justify-center px-1.5 pointer-events-none" aria-hidden>
+                      <div className="w-px h-6 bg-white/10" />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleOpenGlobalStatementPlain}
+                      className="inline-flex shrink-0 items-center gap-1.5 text-[15px] font-normal text-white/55 hover:text-white/85 transition-colors px-3 py-1.5 rounded-lg"
+                      title={
+                        recentActivityMessage
+                          ? recentActivityMessage
+                          : t('ui_open_statement', 'Ouvrir le relevé des transactions')
+                      }
+                      aria-label={t('ui_open_statement', 'Ouvrir le relevé des transactions')}
+                    >
+                      <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                        <circle cx="12" cy="12" r="9" />
+                        <polyline points="12 7 12 12 15.5 14.5" />
+                      </svg>
+                      <span>{t('ui_consult_global_statement_desktop', "Voir l'historique")}</span>
+                    </button>
+                    </div>
                   </div>
                 </div>
               }
