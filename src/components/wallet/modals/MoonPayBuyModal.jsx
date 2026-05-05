@@ -1677,7 +1677,7 @@ const MoonPayBuyModal = ({
 
           {/* Currency selector */}
           {wizardStep === 1 ? (
-		            <div className="relative z-[120]">
+		            <div className="relative z-[120] mt-7">
               <div className="text-[13px] tracking-normal font-medium text-white/55 mb-2">
                 {t('moonpay_buy_receive_currency_label', 'Devise à recevoir')}
               </div>
@@ -1728,7 +1728,7 @@ const MoonPayBuyModal = ({
           ) : null}
 
           {wizardStep === 1 ? (
-            <div>
+            <div className="mt-6">
               <div className="text-[13px] tracking-normal font-medium text-white/55 mb-2">
                 {t('moonpay_buy_selected_asset_amount', 'Montant')}
               </div>
@@ -1764,10 +1764,10 @@ const MoonPayBuyModal = ({
             ) : null}
 
             {hasValidTargetAmount && !conversionMissing ? (
-              <div className="mt-4 space-y-1">
-                <p className="text-[13px] text-white/55">
+              <div className="mt-4 flex flex-col gap-2 animate-fade-in">
+                <p className="text-[13px] text-white/45 leading-snug">
                   {t('ui_buy_summary_line', {
-                    defaultValue: 'Vous ajoutez {{amount}} {{currency}} à votre compte.',
+                    defaultValue: 'Votre compte sera crédité de {{amount}} {{currency}}.',
                     amount: new Intl.NumberFormat(locale, { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(targetAmountValue),
                     currency: String(currency || '').toUpperCase(),
                   })}
@@ -1775,7 +1775,7 @@ const MoonPayBuyModal = ({
                 <button
                   type="button"
                   onClick={() => setOpDetailsOpen(true)}
-                  className={['text-[13px] font-medium underline underline-offset-2 transition-opacity hover:opacity-80', accentText80].join(' ')}
+                  className={['text-[13px] font-medium underline underline-offset-[3px] decoration-1 transition-opacity hover:opacity-75', accentText80].join(' ')}
                 >
                   {t('ui_op_details_link', 'Détails de l\'opération')}
                 </button>
@@ -1820,7 +1820,7 @@ const MoonPayBuyModal = ({
             }}
             disabled={continueDisabled}
             className={[
-              "md:hidden w-full h-14 rounded-[20px] text-white text-lg font-semibold transition-all duration-200 tracking-[-0.01em]",
+              "md:hidden mt-7 w-full h-14 rounded-[20px] text-white text-lg font-semibold transition-all duration-200 tracking-[-0.01em]",
               continueDisabled
                 ? "opacity-45 cursor-not-allowed"
                 : "hover:scale-[1.01] active:scale-[0.98]",
@@ -1837,7 +1837,7 @@ const MoonPayBuyModal = ({
             onClick={handleContinue}
             disabled={continueDisabled}
             className={[
-              "hidden md:flex items-center justify-center w-full h-14 rounded-[20px] text-white text-lg font-semibold transition-all duration-200 tracking-[-0.01em]",
+              "hidden md:flex mt-7 items-center justify-center w-full h-14 rounded-[20px] text-white text-lg font-semibold transition-all duration-200 tracking-[-0.01em]",
               continueDisabled
                 ? "opacity-45 cursor-not-allowed"
                 : "hover:scale-[1.01] active:scale-[0.98]",
@@ -1850,9 +1850,9 @@ const MoonPayBuyModal = ({
             {continueLabel}
           </button>
 		          {!demoMode && !useSimpleSwapPartner ? (
-		            <div className="text-center text-[12px] md:text-[13px] text-white/55 mt-1 leading-snug">
-		              <p>{t('moonpay_info_buy_live_3c8a1d6b2f', 'Paiement sécurisé via MoonPay ou Topper.')}</p>
-		              <p>{t('moonpay_buy_partner_location_note_cta', 'Conversion automatique si nécessaire.')}</p>
+		            <div className="text-center text-[12px] md:text-[13px] text-white/50 mt-5 leading-relaxed">
+		              <p>{t('moonpay_info_buy_live_3c8a1d6b2f', 'Paiement traité de manière sécurisée par MoonPay ou Topper.')}</p>
+		              <p>{t('moonpay_buy_partner_location_note_cta', 'La conversion est effectuée automatiquement si nécessaire.')}</p>
 		            </div>
 		          ) : null}
         </div>
