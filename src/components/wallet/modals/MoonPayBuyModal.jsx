@@ -249,6 +249,34 @@ const MoonPayBuyModal = ({
   const [reviewTimestamp, setReviewTimestamp] = useState(null);
   const [xrpPreviewAmount, setXrpPreviewAmount] = useState(null);
   const [opDetailsOpen, setOpDetailsOpen] = useState(false);
+  const [sheetDragY, setSheetDragY] = useState(0);
+  const sheetDragRef = useRef({ startY: 0, pointerId: null, dragging: false });
+
+  const handleSheetPointerDown = (e) => {
+    if (e.pointerType === 'mouse') return;
+    if (e.target?.closest?.('button,a,input,textarea')) return;
+    sheetDragRef.current = { startY: e.clientY, pointerId: e.pointerId, dragging: false };
+  };
+  const handleSheetPointerMove = (e) => {
+    const meta = sheetDragRef.current;
+    if (meta.pointerId !== e.pointerId) return;
+    const delta = e.clientY - meta.startY;
+    if (delta < 0) return;
+    if (!meta.dragging && delta > 6) meta.dragging = true;
+    if (meta.dragging) setSheetDragY(delta);
+  };
+  const handleSheetPointerUp = (e) => {
+    const meta = sheetDragRef.current;
+    if (meta.pointerId !== e.pointerId) return;
+    const delta = e.clientY - meta.startY;
+    sheetDragRef.current = { startY: 0, pointerId: null, dragging: false };
+    if (delta > 80) {
+      setSheetDragY(0);
+      setOpDetailsOpen(false);
+    } else {
+      setSheetDragY(0);
+    }
+  };
 
   const PRODUCT_MIN_USD = 5;
 
@@ -2033,9 +2061,16 @@ const MoonPayBuyModal = ({
               onClick={() => setOpDetailsOpen(false)}
             />
             {/* Sheet */}
-            <div className="relative w-full bg-[#141414] rounded-t-3xl ring-1 ring-white/10 shadow-2xl px-6 pt-5 pb-8 max-h-full overflow-y-auto">
-              {/* Handle */}
-              <div className="flex justify-center mb-4">
+            <div
+              className="relative w-full bg-[#141414] rounded-t-3xl ring-1 ring-white/10 shadow-2xl px-6 pt-5 pb-8 max-h-full overflow-y-auto"
+              style={{ transform: `translateY(${sheetDragY}px)`, transition: sheetDragY ? 'none' : 'transform 200ms ease' }}
+              onPointerDown={handleSheetPointerDown}
+              onPointerMove={handleSheetPointerMove}
+              onPointerUp={handleSheetPointerUp}
+              onPointerCancel={handleSheetPointerUp}
+            >
+              {/* Handle — mobile uniquement */}
+              <div className="flex justify-center mb-4 md:hidden">
                 <span className="block w-10 h-1.5 rounded-full bg-white/20" aria-hidden />
               </div>
 
@@ -2046,8 +2081,8 @@ const MoonPayBuyModal = ({
                 </h2>
                 <button
                   type="button"
-                  onClick={() => setOpDetailsOpen(false)}
-                  className="text-white/50 hover:text-white transition-colors text-xl leading-none p-1"
+                  onClick={() => { setSheetDragY(0); setOpDetailsOpen(false); }}
+                  className="hidden md:flex text-white/50 hover:text-white transition-colors text-xl leading-none p-1"
                   aria-label={t('ui_close', 'Fermer')}
                 >
                   ✕
