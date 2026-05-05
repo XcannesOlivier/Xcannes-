@@ -385,10 +385,10 @@ export default function WalletDashboardCashChoiceModal({
                     <span className="block w-12 h-1.5 rounded-full bg-white/20" />
                   </div>
                 ) : null}
-	                <div className="pt-6 md:pt-5 pb-3 flex flex-col items-center text-center px-4">
-                    <h3 className="mt-1 text-[30px] md:text-[32px] font-semibold text-white/95 tracking-tight">
-                      {t('ui_funds_manage_title', 'Gérer vos fonds')}
-                    </h3>
+		                <div className="pt-6 md:pt-[50px] pb-3 flex flex-col items-center text-center px-4">
+	                    <h3 className="mt-1 md:mt-0 text-[30px] md:text-[32px] font-semibold text-white/95 tracking-tight">
+	                      {t('ui_funds_manage_title', 'Gérer vos fonds')}
+	                    </h3>
                     {noticeVariant === 'demo' ? (
                       <span className="mt-2 inline-flex items-center text-white/80 text-sm md:text-base font-semibold px-2 py-1 leading-none">
                         {t('demo_notice_title', 'Mode démo')}
@@ -600,14 +600,14 @@ export default function WalletDashboardCashChoiceModal({
                           <p className="mt-2 text-[12px] md:text-xs text-white/50">{swapInSubhintText}</p>
                         </div>
                       </div>
-                    </button>
-                    <div className="h-0.5" />
+	                    </button>
+	                    <div className="h-0.5" />
 
-                    <p className="pt-3 px-2 w-full md:max-w-[520px] mx-auto text-center text-[11px] md:text-[12px] text-white/65 leading-snug">
-                      {stablecoinLiquidityNote}
-                    </p>
-                  </div>
-                </div>
+	                    <p className="pt-[5px] md:pt-3 px-2 w-full md:max-w-[520px] mx-auto text-center text-[11px] md:text-[12px] text-white/65 leading-snug">
+	                      {stablecoinLiquidityNote}
+	                    </p>
+	                  </div>
+	                </div>
               </div>
             </div>
           </div>
