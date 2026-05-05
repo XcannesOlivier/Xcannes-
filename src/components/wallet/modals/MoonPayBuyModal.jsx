@@ -1757,26 +1757,6 @@ const MoonPayBuyModal = ({
                 </span>
               </div>
             </div>{/* /wrapper opaque */}
-            {isCurrencyLine && hasValidTargetAmount && !conversionMissing && currencyUpper !== 'RLUSD' ? (
-              <div className="mt-2 flex items-center gap-1.5 text-[13px] text-white/50">
-                <span>≈</span>
-                <span className="font-semibold text-white/70">
-                  {Number.isFinite(rlusdEquivalent)
-                    ? new Intl.NumberFormat(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(rlusdEquivalent)
-                    : '—'}
-                </span>
-                <span>RLUSD</span>
-              </div>
-            ) : null}
-            {!demoMode && hasValidTargetAmount && !conversionMissing && xrpPreviewAmount !== null ? (
-              <div className="mt-1 flex items-center gap-1.5 text-[13px] text-white/40">
-                <span>≈</span>
-                <span className="font-semibold text-white/55">
-                  {new Intl.NumberFormat(locale, { minimumFractionDigits: 4, maximumFractionDigits: 4 }).format(xrpPreviewAmount)}
-                </span>
-                <span>XRP</span>
-              </div>
-            ) : null}
             {isCurrencyLine && hasValidTargetAmount && conversionMissing ? (
               <p className="mt-2 text-[11px] text-red-300">
                 {t('ui_rate_unavailable_base_5c1a9b7d2e', 'Rate unavailable for base currency.')}
@@ -2064,7 +2044,7 @@ const MoonPayBuyModal = ({
             />
             {/* Sheet */}
             <div
-              className="relative w-full bg-[#141414] rounded-t-3xl ring-1 ring-white/10 shadow-2xl px-6 pt-5 pb-8 max-h-full overflow-y-auto"
+              className="relative w-full bg-elevated rounded-t-3xl ring-1 ring-white/10 shadow-2xl px-6 pt-5 pb-8 max-h-full overflow-y-auto"
               style={{ transform: `translateY(${sheetDragY}px)`, transition: sheetDragY ? 'none' : 'transform 200ms ease' }}
               onPointerDown={handleSheetPointerDown}
               onPointerMove={handleSheetPointerMove}
@@ -2186,7 +2166,7 @@ const MoonPayBuyModal = ({
             onClick={() => setOpDetailsOpen(false)}
           />
           {/* Sheet */}
-          <div className="relative w-full bg-[#141414] rounded-t-3xl ring-1 ring-white/10 shadow-2xl px-6 pt-5 pb-8 max-h-full overflow-y-auto">
+          <div className="relative w-full bg-elevated rounded-t-3xl ring-1 ring-white/10 shadow-2xl px-6 pt-5 pb-8 max-h-full overflow-y-auto">
             {/* Handle */}
             <div className="flex justify-center mb-4">
               <span className="block w-10 h-1.5 rounded-full bg-white/20" aria-hidden />
