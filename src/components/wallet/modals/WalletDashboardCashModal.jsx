@@ -75,6 +75,7 @@ export default function WalletDashboardCashModal({
   const [walletMenuOpen, setWalletMenuOpen] = useState(false);
   const walletMenuRef = useRef(null);
   const cashContentRootRef = useRef(null);
+  const panelRef = useRef(null);
   const shouldAnimate = !inline;
   const { shouldRender, isClosing } = useModalTransition(open, {
     enabled: shouldAnimate,
@@ -291,6 +292,7 @@ export default function WalletDashboardCashModal({
           onPointerCancel={handleOverlayPointerEnd}
         >
 	        <div
+	          ref={panelRef}
 	          className={panelClass}
 	          onClick={(e) => {
 	            if (!inline) e.stopPropagation();
@@ -429,7 +431,7 @@ export default function WalletDashboardCashModal({
 	                      preferredFiatCurrency={preferredFiatCurrency}
 		                    onProceedToUsdSwapOut={onOpenUsdSwapOut}
 		                      embedded={true}
-		                      embeddedOverlayRootRef={cashContentRootRef}
+		                      embeddedOverlayRootRef={panelRef}
 		                      isPreviewMode={isPreviewMode}
 		                      demoMode={demoMode}
 	                      onDemoSubmit={onDemoBuy}
@@ -468,7 +470,7 @@ export default function WalletDashboardCashModal({
 		                    destinationMode={sellDestinationMode}
 	                      onProceedToUsdSwapOut={onOpenUsdSwapOut}
 		                    embedded={true}
-		                    embeddedOverlayRootRef={cashContentRootRef}
+		                    embeddedOverlayRootRef={panelRef}
 		                    isPreviewMode={isPreviewMode}
 		                    demoMode={demoMode}
 	                    onDemoSubmit={onDemoSell}
