@@ -1533,8 +1533,8 @@ const MoonPaySellModal = ({
               ) : null}
 		            </div>
 
-	            {wizardStep === 1 ? (
-	              <>
+		            {wizardStep === 1 ? (
+		              <>
 	                {/* Arrow down (hide for "other stablecoin" flow) */}
 		                {!isOtherBlockchainsDestination && !isBankSellFlow ? (
 		                  <div className="flex justify-center">
@@ -1561,12 +1561,17 @@ const MoonPaySellModal = ({
 	                    )}
 	                  </p>
 	                ) : null}
-	              </>
-	            ) : null}
+		              </>
+		            ) : null}
 
-	          {demoMode ? (
-	            <div className="rounded-[20px] ring-1 ring-white/10 ring-inset bg-white/[0.03] px-3 py-2 text-[11px] text-white/60">
-	              {t(
+                {/* Spacer to match "Ajouter des fonds" CTA gap (20 + 16 + 20) */}
+                {wizardStep === 1 && isBankSellFlow ? (
+                  <div className="px-1 py-2" aria-hidden="true" />
+                ) : null}
+
+		          {demoMode ? (
+		            <div className="rounded-[20px] ring-1 ring-white/10 ring-inset bg-white/[0.03] px-3 py-2 text-[11px] text-white/60">
+		              {t(
                 "moonpay_info_sell_demo_6d1a9c2b7e",
                 "Mode démo : la vente est simulée (pas de virement bancaire).",
               )}

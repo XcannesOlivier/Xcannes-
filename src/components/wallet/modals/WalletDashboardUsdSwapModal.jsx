@@ -4170,6 +4170,11 @@ export default function WalletDashboardUsdSwapModal({
                       </div>
                     ) : null}
 
+                    {/* Spacer to match "Ajouter des fonds" CTA gap (20 + 16 + 20) */}
+                    {step === "form" ? (
+                      <div className="px-1 py-2" aria-hidden="true" />
+                    ) : null}
+
                     <button
                       type="button"
                       disabled={
