@@ -134,6 +134,7 @@ const MoonPayBuyModal = ({
   selectIconByCurrency,
   selectLabelMobileByCurrency,
   prefill = null,
+  embeddedOverlayRootRef = null,
 }) => {
   const { t, i18n } = useTranslation('common');
   const locale = i18n?.language || 'en';
@@ -2018,18 +2019,21 @@ const MoonPayBuyModal = ({
 
   // Mode embedded: retourner le contenu + le portal du bottom sheet
   if (embedded) {
+    const sheetTarget = embeddedOverlayRootRef?.current || document.body;
+    const sheetPos = embeddedOverlayRootRef?.current ? 'absolute' : 'fixed';
+    const sheetZ = embeddedOverlayRootRef?.current ? 'z-[50]' : 'z-[10040]';
     return (
       <>
         {renderContent()}
         {opDetailsOpen && typeof document !== 'undefined' ? createPortal(
-          <div className="fixed inset-0 z-[10040] flex items-end">
+          <div className={`${sheetPos} inset-0 ${sheetZ} flex items-end`}>
             {/* Backdrop */}
             <div
               className="absolute inset-0 bg-black/70 backdrop-blur-sm"
               onClick={() => setOpDetailsOpen(false)}
             />
             {/* Sheet */}
-            <div className="relative w-full bg-[#141414] rounded-t-3xl ring-1 ring-white/10 shadow-2xl px-6 pt-5 pb-[calc(2rem+env(safe-area-inset-bottom))] max-h-[85dvh] overflow-y-auto">
+            <div className="relative w-full bg-[#141414] rounded-t-3xl ring-1 ring-white/10 shadow-2xl px-6 pt-5 pb-8 max-h-full overflow-y-auto">
               {/* Handle */}
               <div className="flex justify-center mb-4">
                 <span className="block w-10 h-1.5 rounded-full bg-white/20" aria-hidden />
@@ -2072,7 +2076,7 @@ const MoonPayBuyModal = ({
               </div>
             </div>
           </div>,
-          document.body,
+          sheetTarget,
         ) : null}
       </>
     );
