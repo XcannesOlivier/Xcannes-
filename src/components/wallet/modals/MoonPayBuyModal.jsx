@@ -253,11 +253,13 @@ const MoonPayBuyModal = ({
   const sheetDragRef = useRef({ startY: 0, pointerId: null, dragging: false });
 
   const handleSheetPointerDown = (e) => {
+    e.stopPropagation();
     if (e.pointerType === 'mouse') return;
     if (e.target?.closest?.('button,a,input,textarea')) return;
     sheetDragRef.current = { startY: e.clientY, pointerId: e.pointerId, dragging: false };
   };
   const handleSheetPointerMove = (e) => {
+    e.stopPropagation();
     const meta = sheetDragRef.current;
     if (meta.pointerId !== e.pointerId) return;
     const delta = e.clientY - meta.startY;
