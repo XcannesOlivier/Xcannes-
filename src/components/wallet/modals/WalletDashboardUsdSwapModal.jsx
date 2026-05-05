@@ -502,6 +502,34 @@ export default function WalletDashboardUsdSwapModal({
   const [ranges, setRanges] = useState(null);
   const [apiError, setApiError] = useState("");
   const [pairUnavailable, setPairUnavailable] = useState(false);
+  const [opDetailsOpen, setOpDetailsOpen] = useState(false);
+  const [sheetDragY, setSheetDragY] = useState(0);
+  const sheetDragRef = useRef({ startY: 0, pointerId: null, dragging: false });
+
+  const handleSheetPointerDown = (e) => {
+    e.stopPropagation();
+    if (e.pointerType === 'mouse') return;
+    if (e.target?.closest?.('button,a,input,textarea')) return;
+    sheetDragRef.current = { startY: e.clientY, pointerId: e.pointerId, dragging: false };
+  };
+  const handleSheetPointerMove = (e) => {
+    e.stopPropagation();
+    const meta = sheetDragRef.current;
+    if (meta.pointerId !== e.pointerId) return;
+    const delta = e.clientY - meta.startY;
+    if (delta < 0) return;
+    if (!meta.dragging && delta > 6) meta.dragging = true;
+    if (meta.dragging) setSheetDragY(delta);
+  };
+  const handleSheetPointerUp = (e) => {
+    const meta = sheetDragRef.current;
+    if (meta.pointerId !== e.pointerId) return;
+    const delta = e.clientY - meta.startY;
+    sheetDragRef.current = { startY: 0, pointerId: null, dragging: false };
+    if (delta > 80) { setSheetDragY(0); setOpDetailsOpen(false); }
+    else { setSheetDragY(0); }
+  };
+
   const [exchange, setExchange] = useState(null);
   const [exchangeRefreshing, setExchangeRefreshing] = useState(false);
   const [preparedSwap, setPreparedSwap] = useState(null);
@@ -4155,6 +4183,19 @@ export default function WalletDashboardUsdSwapModal({
 	                      </div>
 	                    ) : null}
 
+                    {/* Lien Détails de l'opération */}
+                    {hasValidAmount && !amountOutOfRange && (quotedXrpSentToPartner || quotedPartnerReceiveAmount) ? (
+                      <div className="flex justify-center mb-1">
+                        <button
+                          type="button"
+                          onClick={() => setOpDetailsOpen(true)}
+                          className={["text-[13px] font-medium underline underline-offset-2 transition-opacity hover:opacity-80", accentTextSolid].join(' ')}
+                        >
+                          {t('ui_op_details_link', "Détails de l'opération")}
+                        </button>
+                      </div>
+                    ) : null}
+
                     <button
                       type="button"
                       disabled={
@@ -4496,6 +4537,70 @@ export default function WalletDashboardUsdSwapModal({
         </div>
       </div>
     </div>
+
+    {/* Bottom sheet — Détails de l'opération */}
+    {opDetailsOpen && typeof document !== 'undefined' ? createPortal(
+      <div className="absolute inset-0 z-[50] flex items-end">
+        <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => { setSheetDragY(0); setOpDetailsOpen(false); }} />
+        <div
+          className="relative w-full bg-elevated rounded-t-3xl ring-1 ring-white/10 shadow-2xl px-6 pt-5 pb-8 max-h-full overflow-y-auto"
+          style={{ transform: `translateY(${sheetDragY}px)`, transition: sheetDragY ? 'none' : 'transform 200ms ease' }}
+          onPointerDown={handleSheetPointerDown}
+          onPointerMove={handleSheetPointerMove}
+          onPointerUp={handleSheetPointerUp}
+          onPointerCancel={handleSheetPointerUp}
+        >
+          {/* Handle — mobile uniquement */}
+          <div className="flex justify-center mb-4 md:hidden">
+            <span className="block w-10 h-1.5 rounded-full bg-white/20" aria-hidden />
+          </div>
+          {/* Title + ✕ */}
+          <div className="flex items-center justify-between gap-3 mb-5">
+            <h2 className="text-white font-semibold text-lg leading-tight">
+              {t('ui_op_details_title', "Détails de l'opération")}
+            </h2>
+            <button
+              type="button"
+              onClick={() => { setSheetDragY(0); setOpDetailsOpen(false); }}
+              className="hidden md:flex text-white/50 hover:text-white transition-colors text-xl leading-none p-1"
+              aria-label={t('ui_close', 'Fermer')}
+            >✕</button>
+          </div>
+          {/* Content */}
+          <div className="space-y-5 text-[15px] leading-relaxed text-white/75">
+            {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE ? (
+              <>
+                <p>
+                  {t('ui_op_details_swap_out_p1', 'Votre envoi est traité via SimpleSwap.')}{' '}
+                  {quotedXrpSentToPartner != null ? (
+                    <span className="text-white/55">
+                      ({t('ui_op_details_xrp_hint', { defaultValue: '≈ {{xrp}} XRP', xrp: formatAmountNumber ? formatAmountNumber.format(quotedXrpSentToPartner) : String(quotedXrpSentToPartner) })})
+                    </span>
+                  ) : null}
+                </p>
+                <p>{t('ui_op_details_swap_out_p2', "XRP sert de bridge de liquidité entre le réseau XRPL et la blockchain de destination. La conversion est automatique.")}</p>
+                <p>{t('ui_op_details_swap_out_p3', "Vous n'avez qu'à valider l'opération.")}</p>
+              </>
+            ) : (
+              <>
+                <p>
+                  {t('ui_op_details_swap_in_p1', 'SimpleSwap convertira vos stablecoins et enverra des XRP sur votre portefeuille XCANNES.')}{' '}
+                  {quotedPartnerReceiveAmount != null ? (
+                    <span className="text-white/55">
+                      ({t('ui_op_details_xrp_hint', { defaultValue: '≈ {{xrp}} XRP', xrp: formatAmountNumber ? formatAmountNumber.format(quotedPartnerReceiveAmount) : String(quotedPartnerReceiveAmount) })})
+                    </span>
+                  ) : null}
+                </p>
+                <p>{t('ui_op_details_swap_in_p2', "Ces XRP seront automatiquement convertis en RLUSD selon le cours en vigueur au moment du swap.")}</p>
+                <p>{t('ui_op_details_swap_in_p3', "Tout est automatique : vous n'avez qu'à envoyer vos stablecoins à l'adresse fournie.")}</p>
+              </>
+            )}
+          </div>
+        </div>
+      </div>,
+      modalPanelRef.current || document.body,
+    ) : null}
+
     </>
 	  );
 
