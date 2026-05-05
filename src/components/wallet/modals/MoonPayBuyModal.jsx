@@ -2016,9 +2016,66 @@ const MoonPayBuyModal = ({
     </div>
   );
 
-  // Mode embedded: retourner seulement le contenu
+  // Mode embedded: retourner le contenu + le portal du bottom sheet
   if (embedded) {
-    return renderContent();
+    return (
+      <>
+        {renderContent()}
+        {opDetailsOpen && typeof document !== 'undefined' ? createPortal(
+          <div className="fixed inset-0 z-[10040] flex items-end">
+            {/* Backdrop */}
+            <div
+              className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+              onClick={() => setOpDetailsOpen(false)}
+            />
+            {/* Sheet */}
+            <div className="relative w-full bg-[#141414] rounded-t-3xl ring-1 ring-white/10 shadow-2xl px-6 pt-5 pb-[calc(2rem+env(safe-area-inset-bottom))] max-h-[85dvh] overflow-y-auto">
+              {/* Handle */}
+              <div className="flex justify-center mb-4">
+                <span className="block w-10 h-1.5 rounded-full bg-white/20" aria-hidden />
+              </div>
+
+              {/* Title */}
+              <div className="flex items-center justify-between gap-3 mb-5">
+                <h2 className="text-white font-semibold text-lg leading-tight">
+                  {t('ui_op_details_title', 'Détails de l\'opération')}
+                </h2>
+                <button
+                  type="button"
+                  onClick={() => setOpDetailsOpen(false)}
+                  className="text-white/50 hover:text-white transition-colors text-xl leading-none p-1"
+                  aria-label={t('ui_close', 'Fermer')}
+                >
+                  ✕
+                </button>
+              </div>
+
+              {/* Content */}
+              <div className="space-y-5 text-[15px] leading-relaxed text-white/75">
+                <p>
+                  {t('ui_op_details_p1', 'Le paiement est traité par notre partenaire.')}{' '}
+                  {xrpPreviewAmount !== null ? (
+                    <span className="text-white/55">
+                      ({t('ui_op_details_xrp_hint', {
+                        defaultValue: '≈ {{xrp}} XRP',
+                        xrp: new Intl.NumberFormat(locale, { minimumFractionDigits: 2, maximumFractionDigits: 4 }).format(xrpPreviewAmount),
+                      })})
+                    </span>
+                  ) : null}
+                </p>
+                <p>
+                  {t('ui_op_details_p2', 'Selon la liquidité disponible, une conversion automatique peut être utilisée pour créditer votre compte. XRP peut servir de bridge de liquidité pendant l\'opération.')}
+                </p>
+                <p>
+                  {t('ui_op_details_p3', 'Tout est automatique : vous validez simplement le paiement chez le partenaire.')}
+                </p>
+              </div>
+            </div>
+          </div>,
+          document.body,
+        ) : null}
+      </>
+    );
   }
 
   // Mode standalone: retourner le modal complet
