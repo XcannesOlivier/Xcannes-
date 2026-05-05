@@ -1633,7 +1633,7 @@ const MoonPayBuyModal = ({
         <div className='space-y-5'>
           {/* Title + Wallet pill */}
           {wizardStep === 1 ? (
-	            <div className="relative z-[120] px-4 pt-2 pb-4 text-center">
+	            <div className="relative z-[120] px-4 pt-8 pb-4 text-center">
               {/* Desktop: bouton ← Retour vers "Gérer vos fonds" (embedded) */}
               {embedded ? (
                 <button
@@ -1657,8 +1657,8 @@ const MoonPayBuyModal = ({
                 </div>
               ) : null}
 	              <div className="flex justify-center">
-	                <div className={`inline-flex flex-col items-center gap-1 bg-elevated px-6 py-2 rounded-3xl shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)] ${assetDropdownOpen ? 'ring-1 ring-white/20 ring-inset' : ''}`}>
-                  <span className="text-white/70 text-[14px] md:text-[15px] font-medium tracking-wide">
+	                <div className={`inline-flex flex-col items-center gap-1 bg-elevated px-4 py-2 rounded-3xl shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)] ${assetDropdownOpen ? 'ring-1 ring-white/20 ring-inset' : ''}`}>
+                  <span className="text-white/50 text-[11px] font-medium tracking-wide">
                     {t('moonpay_from_account', 'Compte de réception')}
                   </span>
                   <div className="flex items-center gap-2">
@@ -1666,7 +1666,7 @@ const MoonPayBuyModal = ({
                       className={['h-3 w-3 rounded-full ring-4 shrink-0 animate-pulse', accentRing25Bg].join(' ')}
                       aria-hidden
                     />
-                    <span className="text-white/95 text-[14px] md:text-[15px] font-semibold">
+                    <span className="text-white/95 text-[17px] md:text-[18px] font-semibold">
                       {walletLabel || 'XCANNES'}
                     </span>
                   </div>
