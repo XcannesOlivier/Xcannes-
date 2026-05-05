@@ -4197,7 +4197,7 @@ export default function WalletDashboardUsdSwapModal({
                         setStep("address");
                       }}
                       className={[
-                        "md:hidden mt-7 w-full h-14 rounded-[20px] text-white text-lg font-semibold transition-all duration-200 tracking-[-0.01em]",
+                        "md:hidden mt-11 w-full h-14 rounded-[20px] text-white text-lg font-semibold transition-all duration-200 tracking-[-0.01em]",
                         (!hasValidAmount || amountOutOfRange || insufficientSourceBalance || sourceConversionMissing || targetConversionMissing || hasReceiveAddressValidationError || pairUnavailable || !fromCurrency || !toCurrency || !stableCurrency || ((walletSourceSelectionEnabled || walletTargetSelectionEnabled) && !selectedSourceOption))
                           ? "opacity-45 cursor-not-allowed"
                           : "hover:scale-[1.01] active:scale-[0.98]",
@@ -4241,7 +4241,7 @@ export default function WalletDashboardUsdSwapModal({
                         setStep("address");
                       }}
                       className={[
-                        "hidden md:flex mt-7 items-center justify-center w-full h-14 rounded-[20px] text-white text-lg font-semibold transition-all duration-200 tracking-[-0.01em]",
+                        "hidden md:flex mt-11 items-center justify-center w-full h-14 rounded-[20px] text-white text-lg font-semibold transition-all duration-200 tracking-[-0.01em]",
                         (!hasValidAmount || amountOutOfRange || insufficientSourceBalance || sourceConversionMissing || targetConversionMissing || hasReceiveAddressValidationError || pairUnavailable || !fromCurrency || !toCurrency || !stableCurrency || ((walletSourceSelectionEnabled || walletTargetSelectionEnabled) && !selectedSourceOption))
                           ? "opacity-45 cursor-not-allowed"
                           : "hover:scale-[1.01] active:scale-[0.98]",
@@ -4438,7 +4438,7 @@ export default function WalletDashboardUsdSwapModal({
                         await createExchange({ returnStep: "address" });
                       }}
                       className={[
-                        "md:hidden mt-7 w-full h-14 rounded-[20px] text-white text-lg font-semibold transition-all duration-200 tracking-[-0.01em]",
+                        "md:hidden mt-11 w-full h-14 rounded-[20px] text-white text-lg font-semibold transition-all duration-200 tracking-[-0.01em]",
                         (!hasValidAmount || amountOutOfRange || hasReceiveAddressValidationError || pairUnavailable || !fromCurrency || !toCurrency || !stableCurrency || !effectiveReceiveAddress)
                           ? "opacity-45 cursor-not-allowed"
                           : "hover:scale-[1.01] active:scale-[0.98]",
@@ -4485,7 +4485,7 @@ export default function WalletDashboardUsdSwapModal({
                         await createExchange({ returnStep: "address" });
                       }}
                       className={[
-                        "hidden md:flex mt-7 items-center justify-center w-full h-14 rounded-[20px] text-white text-lg font-semibold transition-all duration-200 tracking-[-0.01em]",
+                        "hidden md:flex mt-11 items-center justify-center w-full h-14 rounded-[20px] text-white text-lg font-semibold transition-all duration-200 tracking-[-0.01em]",
                         (!hasValidAmount || amountOutOfRange || hasReceiveAddressValidationError || pairUnavailable || !fromCurrency || !toCurrency || !stableCurrency || !effectiveReceiveAddress)
                           ? "opacity-45 cursor-not-allowed"
                           : "hover:scale-[1.01] active:scale-[0.98]",
