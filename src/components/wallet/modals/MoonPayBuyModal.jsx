@@ -2137,15 +2137,15 @@ const MoonPayBuyModal = ({
       </div>
 
       {/* Bottom sheet — Détails de l'opération */}
-      {opDetailsOpen && typeof document !== 'undefined' ? createPortal(
-        <div className="fixed inset-0 z-[10040] flex items-end">
+      {opDetailsOpen && typeof document !== 'undefined' && modalPanelRef.current ? createPortal(
+        <div className="absolute inset-0 z-[50] flex items-end">
           {/* Backdrop */}
           <div
             className="absolute inset-0 bg-black/70 backdrop-blur-sm"
             onClick={() => setOpDetailsOpen(false)}
           />
           {/* Sheet */}
-          <div className="relative w-full bg-[#141414] rounded-t-3xl ring-1 ring-white/10 shadow-2xl px-6 pt-5 pb-[calc(2rem+env(safe-area-inset-bottom))] max-h-[85dvh] overflow-y-auto">
+          <div className="relative w-full bg-[#141414] rounded-t-3xl ring-1 ring-white/10 shadow-2xl px-6 pt-5 pb-8 max-h-full overflow-y-auto">
             {/* Handle */}
             <div className="flex justify-center mb-4">
               <span className="block w-10 h-1.5 rounded-full bg-white/20" aria-hidden />
@@ -2188,7 +2188,7 @@ const MoonPayBuyModal = ({
             </div>
           </div>
         </div>,
-        document.body,
+        modalPanelRef.current,
       ) : null}
     </>
   );
