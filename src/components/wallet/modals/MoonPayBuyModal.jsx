@@ -1633,7 +1633,7 @@ const MoonPayBuyModal = ({
         <div className='space-y-5'>
           {/* Title + Wallet pill */}
           {wizardStep === 1 ? (
-	            <div className="relative z-[120] px-4 pt-[60px] pb-4 text-center">
+		          <div className="relative z-[120] px-4 pt-[40px] md:pt-[80px] pb-4 text-center">
               {/* Desktop: bouton ← Retour vers "Gérer vos fonds" (embedded) */}
               {embedded ? (
                 <button

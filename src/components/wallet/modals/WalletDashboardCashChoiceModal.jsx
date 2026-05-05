@@ -408,9 +408,10 @@ export default function WalletDashboardCashChoiceModal({
                   maybeStartOverlayDrag(event, 'list');
                 }}
               >
-                <div className="flex flex-col gap-7 pb-2">
-                  <div className="space-y-4">
-                    {sectionHeader(t('ui_funds_section_agent', 'Compte bancaire'))}
+	                <div className="flex flex-col gap-7 pb-2">
+		                  <div>
+		                    <div className="space-y-4">
+		                    {sectionHeader(t('ui_funds_section_agent', 'Compte bancaire'))}
 
                     <button type="button" onClick={onChooseBuy} className={cardClassName}>
                       <div className="flex items-center gap-3">
@@ -600,14 +601,17 @@ export default function WalletDashboardCashChoiceModal({
                           <p className="mt-2 text-[12px] md:text-xs text-white/50">{swapInSubhintText}</p>
                         </div>
                       </div>
-	                    </button>
-	                    <div className="h-0.5" />
+			                    </button>
+		                    </div>
 
-	                    <p className="pt-[5px] md:pt-3 px-2 w-full md:max-w-[520px] mx-auto text-center text-[11px] md:text-[12px] text-white/65 leading-snug">
-	                      {stablecoinLiquidityNote}
-	                    </p>
-	                  </div>
-	                </div>
+		                    {/* Liquidity note: 7px gap on mobile */}
+		                    <div className="mt-[7px] md:mt-4">
+		                      <p className="px-2 w-full md:max-w-[520px] mx-auto text-center text-[11px] md:text-[12px] text-white/65 leading-snug">
+		                        {stablecoinLiquidityNote}
+		                      </p>
+		                    </div>
+		                  </div>
+		                </div>
               </div>
             </div>
           </div>
