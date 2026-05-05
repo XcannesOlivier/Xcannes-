@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { XCircleIcon, CheckCircleIcon, ChevronLeftIcon } from '@heroicons/react/24/outline';
 import ModalSelect from '@/components/ui/ModalSelect';
 import { useTranslation } from 'next-i18next';
@@ -246,6 +247,7 @@ const MoonPayBuyModal = ({
   const [wizardStep, setWizardStep] = useState(1); // 1/3 = asset, 2/3 = fiat+amount, 3/3 = MoonPay iframe
   const [reviewTimestamp, setReviewTimestamp] = useState(null);
   const [xrpPreviewAmount, setXrpPreviewAmount] = useState(null);
+  const [opDetailsOpen, setOpDetailsOpen] = useState(false);
 
   const PRODUCT_MIN_USD = 5;
 
@@ -1528,17 +1530,9 @@ const MoonPayBuyModal = ({
     ? t('moonpay_action_loading_7c2b1d9a3e', 'Loading...')
     : demoMode
       ? t('moonpay_action_simulate_buy_5a1c9d7b3e', 'Simulate buy')
-      : wizardStep === 2
-        ? t('moonpay_action_continue_buy_8d2a1c6b9f', 'Continuer')
-        : t('ui_next_step', 'Continuer');
+      : t('moonpay_action_continue_buy_8d2a1c6b9f', 'Continuer');
   const continueDisabled =
-    wizardStep === 1
-      ? loading || !hasValidTargetAmount || conversionMissing
-      : loading ||
-        !hasValidTargetAmount ||
-        conversionMissing ||
-        !Number.isFinite(Number(amount || '')) ||
-        Number(amount || 0) <= 0;
+    loading || !hasValidTargetAmount || conversionMissing;
 
   const handleContinue = () => {
     if (wizardStep === 1) {
@@ -1554,8 +1548,7 @@ const MoonPayBuyModal = ({
         });
         return;
       }
-      setReviewTimestamp(new Date());
-      setWizardStep(2);
+      generateBuyUrl();
       return;
     }
     generateBuyUrl();
@@ -1606,25 +1599,7 @@ const MoonPayBuyModal = ({
       `}</style>
       {/* Form */}
       {step === 'form' && (
-        <div className={wizardStep === 2 ? 'space-y-4 md:space-y-5' : 'space-y-5'}>
-          {wizardStep === 2 ? (
-            <div className="relative flex items-center">
-              <button
-                type="button"
-                onClick={() => {
-                  setReviewTimestamp(null);
-                  setWizardStep(1);
-                }}
-                className="hidden md:inline-flex md:absolute md:left-0 md:-top-2 items-center gap-2 text-white/70 hover:text-white transition-colors"
-                aria-label={t('back', 'Back')}
-              >
-                <ChevronLeftIcon className="w-5 h-5" aria-hidden="true" />
-                <span className="text-sm">{t('ui_back', 'Retour')}</span>
-              </button>
-              <div className="ml-auto" />
-            </div>
-          ) : null}
-
+        <div className='space-y-5'>
           {/* Title + Wallet pill */}
           {wizardStep === 1 ? (
 	            <div className="relative z-[120] px-4 pt-2 pb-4 text-center">
@@ -1776,15 +1751,48 @@ const MoonPayBuyModal = ({
                 {t('ui_rate_unavailable_base_5c1a9b7d2e', 'Rate unavailable for base currency.')}
               </p>
             ) : null}
+
+            {hasValidTargetAmount && !conversionMissing ? (
+              <div className="mt-4 space-y-1">
+                <p className="text-[13px] text-white/55">
+                  {t('ui_buy_summary_line', {
+                    defaultValue: 'Vous ajoutez {{amount}} {{currency}} à votre compte.',
+                    amount: new Intl.NumberFormat(locale, { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(targetAmountValue),
+                    currency: String(currency || '').toUpperCase(),
+                  })}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setOpDetailsOpen(true)}
+                  className={['text-[13px] font-medium underline underline-offset-2 transition-opacity hover:opacity-80', accentText80].join(' ')}
+                >
+                  {t('ui_op_details_link', 'Détails de l\'opération')}
+                </button>
+              </div>
+            ) : null}
             </div>
           ) : null}
 
           <div className="px-1 py-2 text-[15px] md:text-sm leading-snug text-white/85">
-            {wizardStep === 2 ? (
+            {demoMode ? (
+              highlightPaymentMethods(
+                t('moonpay_info_buy_demo_1b7d2c9a5e', 'Mode démo : pas de redirection MoonPay. L'achat est simulé.'),
+              )
+            ) : (
               <>
-	                <div className="px-1">
-                  <div className="mb-4 text-[14px] md:text-[16px] font-semibold tracking-[0.08em] text-white/80">
-                    💳 {resolvedTitleOverride || t('ui_funds_add_title', 'Ajouter des fonds')}
+                {useSimpleSwapPartner ? (
+                  <p className="whitespace-pre-line">
+                    {t(
+                      'ui_simpleswap_choose_conversion_stablecoin_and_network_0c0b2b64d1',
+                      'Vous choisirez le stablecoin de conversion (USDC, USDT…)\net le réseau sur la page suivante (SimpleSwap)',
+                    )}
+                  </p>
+                ) : null}
+              </>
+            )}
+          </div>
+
+          {/* Error message */}
                   </div>
                   <div className="text-white text-[36px] md:text-[42px] font-semibold tracking-tight leading-none">
                     {hasValidTargetAmount
@@ -1970,13 +1978,11 @@ const MoonPayBuyModal = ({
             {continueLabel}
           </button>
 		          {!demoMode && !useSimpleSwapPartner ? (
-		            <p className="text-center text-[12px] md:text-[13px] text-white/55 mt-1">
-		              {t('moonpay_info_buy_live_3c8a1d6b2f', 'Transactions sécurisées via MoonPay ou Topper.')}
-		            </p>
+		            <div className="text-center text-[12px] md:text-[13px] text-white/55 mt-1 leading-snug">
+		              <p>{t('moonpay_info_buy_live_3c8a1d6b2f', 'Paiement sécurisé via MoonPay ou Topper.')}</p>
+		              <p>{t('moonpay_buy_partner_location_note_cta', 'Conversion automatique si nécessaire.')}</p>
+		            </div>
 		          ) : null}
-	          <p className="text-center text-[11px] md:text-xs text-white/40 mt-0.5">
-	            {t('moonpay_buy_partner_location_note_cta', 'Le partenaire proposé dépend de votre localisation.')}
-	          </p>
         </div>
       )}
 
@@ -2211,6 +2217,61 @@ const MoonPayBuyModal = ({
           {renderContent()}
         </div>
       </div>
+
+      {/* Bottom sheet — Détails de l'opération */}
+      {opDetailsOpen && typeof document !== 'undefined' ? createPortal(
+        <div className="fixed inset-0 z-[10040] flex items-end">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            onClick={() => setOpDetailsOpen(false)}
+          />
+          {/* Sheet */}
+          <div className="relative w-full bg-[#141414] rounded-t-3xl ring-1 ring-white/10 shadow-2xl px-6 pt-5 pb-[calc(2rem+env(safe-area-inset-bottom))] max-h-[85dvh] overflow-y-auto">
+            {/* Handle */}
+            <div className="flex justify-center mb-4">
+              <span className="block w-10 h-1.5 rounded-full bg-white/20" aria-hidden />
+            </div>
+
+            {/* Title */}
+            <div className="flex items-center justify-between gap-3 mb-5">
+              <h2 className="text-white font-semibold text-lg leading-tight">
+                {t('ui_op_details_title', 'Détails de l\'opération')}
+              </h2>
+              <button
+                type="button"
+                onClick={() => setOpDetailsOpen(false)}
+                className="text-white/50 hover:text-white transition-colors text-xl leading-none p-1"
+                aria-label={t('ui_close', 'Fermer')}
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="space-y-5 text-[15px] leading-relaxed text-white/75">
+              <p>
+                {t('ui_op_details_p1', 'Le paiement est traité par notre partenaire.')}{' '}
+                {xrpPreviewAmount !== null ? (
+                  <span className="text-white/55">
+                    ({t('ui_op_details_xrp_hint', {
+                      defaultValue: '≈ {{xrp}} XRP',
+                      xrp: new Intl.NumberFormat(locale, { minimumFractionDigits: 2, maximumFractionDigits: 4 }).format(xrpPreviewAmount),
+                    })})
+                  </span>
+                ) : null}
+              </p>
+              <p>
+                {t('ui_op_details_p2', 'Selon la liquidité disponible, une conversion automatique peut être utilisée pour créditer votre compte. XRP peut servir de bridge de liquidité pendant l\'opération.')}
+              </p>
+              <p>
+                {t('ui_op_details_p3', 'Tout est automatique : vous validez simplement le paiement chez le partenaire.')}
+              </p>
+            </div>
+          </div>
+        </div>,
+        document.body,
+      ) : null}
     </>
   );
 };

@@ -1,4 +1,5 @@
 import { useCallback, useState, useEffect, useMemo, useRef } from "react";
+import { createPortal } from "react-dom";
 import {
   XCircleIcon,
   CheckCircleIcon,
@@ -189,6 +190,7 @@ const MoonPaySellModal = ({
   const [wizardStep, setWizardStep] = useState(1); // 1/3 = asset+amount, 2/3 = receive in, 3/3 = MoonPay iframe
   const [reviewTimestamp, setReviewTimestamp] = useState(null);
   const [xrpPreviewAmount, setXrpPreviewAmount] = useState(null);
+  const [opDetailsOpen, setOpDetailsOpen] = useState(false);
   const [walletAddressExpanded, setWalletAddressExpanded] = useState(false);
   const [walletAddressCopied, setWalletAddressCopied] = useState(false);
   const [isDesktopViewport, setIsDesktopViewport] = useState(() => {
@@ -1248,25 +1250,9 @@ const MoonPaySellModal = ({
 	    ? t("moonpay_action_loading_7c2b1d9a3e", "Loading...")
 	    : demoMode
 	      ? t("moonpay_action_simulate_sell_4d1a9c7b2e", "Simulate sell")
-	      : wizardStep === 2
-	        ? hasValidAmount && amountForCtaLabel
-	          ? t("ui_send_to_bank_action_with_amount", {
-	              defaultValue: "Envoyer {{amount}} {{currency}} vers la banque",
-	              amount: amountForCtaLabel,
-	              currency:
-	                selectedSellCurrency?.labelLeft ||
-	                selectedSellCurrency?.label ||
-	                String(currency || "").toUpperCase(),
-	            })
-	          : t("ui_send_to_bank_action", "Retirer vers un compte bancaire")
-	        : t("ui_continue", "Continuer");
+	      : t("ui_continue", "Continuer");
   const continueDisabled =
-    wizardStep === 1
-      ? loading || !hasValidAmount || !selectedToken || conversionMissing
-      : loading ||
-        !hasValidAmount ||
-        !selectedToken ||
-        conversionMissing;
+    loading || !hasValidAmount || !selectedToken || conversionMissing;
 
   const handleContinue = () => {
     if (wizardStep === 1) {
@@ -1285,8 +1271,7 @@ const MoonPaySellModal = ({
         });
         return;
       }
-      setReviewTimestamp(new Date());
-      setWizardStep(2);
+      generateSellUrl();
       return;
     }
     generateSellUrl();
@@ -1358,20 +1343,6 @@ const MoonPaySellModal = ({
       {/* Form */}
       {step === "form" && (
         <div className="space-y-5">
-          {wizardStep === 2 ? (
-            <div className="relative flex items-center">
-              <button
-                type="button"
-                onClick={() => setWizardStep(1)}
-                className="hidden md:inline-flex md:absolute md:left-0 md:-top-2 items-center gap-2 text-white/70 hover:text-white transition-colors"
-                aria-label={t("back", "Back")}
-              >
-                <ChevronLeftIcon className="w-5 h-5" aria-hidden="true" />
-                <span className="text-sm">{t("ui_back", "Retour")}</span>
-              </button>
-              <div className="ml-auto" />
-            </div>
-          ) : null}
 
           {/* Title + Wallet pill */}
           {wizardStep === 1 ? (
@@ -1529,6 +1500,25 @@ const MoonPaySellModal = ({
 	                  )}
 	                </p>
 	              ) : null}
+
+              {hasValidAmount && !conversionMissing ? (
+                <div className="mt-4 space-y-1">
+                  <p className="text-[13px] text-white/55">
+                    {t('ui_sell_summary_line', {
+                      defaultValue: 'Vous retirez {{amount}} {{currency}} de votre compte.',
+                      amount: new Intl.NumberFormat(locale, { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(amountValue),
+                      currency: String(currency || '').toUpperCase(),
+                    })}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setOpDetailsOpen(true)}
+                    className={['text-[13px] font-medium underline underline-offset-2 transition-opacity hover:opacity-80', accentText90].join(' ')}
+                  >
+                    {t('ui_op_details_link', "Détails de l'opération")}
+                  </button>
+                </div>
+              ) : null}
 		            </div>
 
 	            {wizardStep === 1 ? (
@@ -1562,11 +1552,7 @@ const MoonPaySellModal = ({
 	              </>
 	            ) : null}
 
-		          {wizardStep === 2 ? (
-		            <>
-                  <div className="px-1">
-                    <div className="mb-4 text-[14px] md:text-[16px] font-semibold tracking-[0.08em] text-white/80">
-                      🏦 {t("ui_send_to_bank_action", "Retirer vers un compte bancaire")}
+	          {demoMode ? (
                     </div>
                     <div className="text-white text-[36px] md:text-[42px] font-semibold tracking-tight leading-none">
                       {summaryAmountLabel}
@@ -1782,16 +1768,11 @@ const MoonPaySellModal = ({
             {continueLabel}
           </button>
 	          {!demoMode && isBankSellFlow ? (
-		            <p className="text-center text-[12px] md:text-[13px] text-white/55 mt-2">
-	              {t(
-	                "moonpay_sell_bank_partner_notice_full",
-	                "Le retrait sera effectué via MoonPay ou Topper.",
-	              )}
-	            </p>
+	            <div className="text-center text-[12px] md:text-[13px] text-white/55 mt-2 leading-snug">
+	              <p>{t("moonpay_sell_bank_partner_notice_full", "Retrait sécurisé via MoonPay ou Topper.")}</p>
+	              <p>{t('moonpay_sell_partner_location_note_cta', 'Conversion automatique si nécessaire.')}</p>
+	            </div>
 	          ) : null}
-	          <p className="text-center text-[11px] md:text-xs text-white/40 mt-1">
-            {t('moonpay_sell_partner_location_note_cta', 'Le partenaire proposé dépend de votre localisation.')}
-          </p>
 	        </div>
 	      )}
 
@@ -1927,6 +1908,54 @@ const MoonPaySellModal = ({
 	          {renderContent()}
 	        </div>
 	      </div>
+
+      {/* Bottom sheet — Détails de l'opération */}
+      {opDetailsOpen && typeof document !== 'undefined' ? createPortal(
+        <div className="fixed inset-0 z-[10040] flex items-end">
+          <div
+            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            onClick={() => setOpDetailsOpen(false)}
+          />
+          <div className="relative w-full bg-[#141414] rounded-t-3xl ring-1 ring-white/10 shadow-2xl px-6 pt-5 pb-[calc(2rem+env(safe-area-inset-bottom))] max-h-[85dvh] overflow-y-auto">
+            <div className="flex justify-center mb-4">
+              <span className="block w-10 h-1.5 rounded-full bg-white/20" aria-hidden />
+            </div>
+            <div className="flex items-center justify-between gap-3 mb-5">
+              <h2 className="text-white font-semibold text-lg leading-tight">
+                {t('ui_op_details_title', "Détails de l'opération")}
+              </h2>
+              <button
+                type="button"
+                onClick={() => setOpDetailsOpen(false)}
+                className="text-white/50 hover:text-white transition-colors text-xl leading-none p-1"
+                aria-label={t('ui_close', 'Fermer')}
+              >
+                ✕
+              </button>
+            </div>
+            <div className="space-y-5 text-[15px] leading-relaxed text-white/75">
+              <p>
+                {t('ui_op_details_sell_p1', 'Le retrait est traité par notre partenaire.')}{' '}
+                {xrpPreviewAmount !== null ? (
+                  <span className="text-white/55">
+                    ({t('ui_op_details_xrp_hint', {
+                      defaultValue: '≈ {{xrp}} XRP',
+                      xrp: new Intl.NumberFormat(locale, { minimumFractionDigits: 2, maximumFractionDigits: 4 }).format(xrpPreviewAmount),
+                    })})
+                  </span>
+                ) : null}
+              </p>
+              <p>
+                {t('ui_op_details_sell_p2', "Selon la liquidité disponible, une conversion automatique peut être utilisée pour débiter votre compte. XRP peut servir de bridge de liquidité pendant l'opération.")}
+              </p>
+              <p>
+                {t('ui_op_details_sell_p3', 'Tout est automatique : vous validez simplement le paiement chez le partenaire.')}
+              </p>
+            </div>
+          </div>
+        </div>,
+        document.body,
+      ) : null}
     </>
   );
 };
