@@ -637,13 +637,6 @@ export default function WalletDashboardSendChoiceModal({
                     <span className="block w-12 h-1.5 rounded-full bg-white/20" />
                   </div>
                 ) : null}
-                {/* Back button – masqué sur mobile (remplacé par le swipe) */}
-                <div className="hidden md:flex px-5 pt-[10px] pb-2 items-center">
-                  <button type="button" onClick={() => setSubModal(null)} className="text-white/55 hover:text-white transition-colors flex items-center gap-1" aria-label={t('ui_back', 'Retour')}>
-                    <svg viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5" aria-hidden><path fillRule="evenodd" d="M11.78 3.22a.75.75 0 0 1 0 1.06L7.06 9l4.72 4.72a.75.75 0 1 1-1.06 1.06l-5.25-5.25a.75.75 0 0 1 0-1.06l5.25-5.25a.75.75 0 0 1 1.06 0Z" clipRule="evenodd" /></svg>
-                    <span className="text-[13px] font-medium">{t('ui_back', 'Retour')}</span>
-                  </button>
-                </div>
                 <div className="px-5 pt-[134px] pb-5 flex flex-col flex-1 min-h-0">
                 {/* Title + subtitle (centered) */}
                 <div className="flex flex-col items-center text-center mb-6">
@@ -925,13 +918,6 @@ export default function WalletDashboardSendChoiceModal({
                     <span className="block w-12 h-1.5 rounded-full bg-white/20" />
                   </div>
                 ) : null}
-                {/* Back button – masqué sur mobile (remplacé par le swipe) */}
-                <div className="hidden md:flex px-5 pt-[10px] pb-2 items-center">
-                  <button type="button" onClick={() => setSubModal(null)} className="text-white/70 hover:text-white transition-colors flex items-center gap-1" aria-label={t('ui_back', 'Retour')}>
-                    <svg viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5" aria-hidden><path fillRule="evenodd" d="M11.78 3.22a.75.75 0 0 1 0 1.06L7.06 9l4.72 4.72a.75.75 0 1 1-1.06 1.06l-5.25-5.25a.75.75 0 0 1 0-1.06l5.25-5.25a.75.75 0 0 1 1.06 0Z" clipRule="evenodd" /></svg>
-                    <span className="text-[13px] font-medium">{t('ui_back', 'Retour')}</span>
-                  </button>
-                </div>
                 <div className="px-5 pt-[134px] pb-5 flex flex-col flex-1 min-h-0">
                 {/* Title + subtitle (centered) */}
                 <div className="flex flex-col items-center text-center mb-6">

@@ -80,21 +80,6 @@ const CopyIcon = ({ className = '' }) => (
   </svg>
 );
 
-const ChevronLeftIcon = ({ className = '' }) => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-    aria-hidden="true"
-  >
-    <polyline points="15 18 9 12 15 6" />
-  </svg>
-);
-
 const QrIcon = ({ className = '' }) => (
   <svg
     viewBox="0 0 24 24"
@@ -1244,22 +1229,6 @@ export default function WalletDashboardReceiveModal({
                   if (!disableSwipeToClose) maybeStartOverlayDrag(event, 'fixed');
                 }}
               >
-	                <button
-	                  type="button"
-	                  onClick={e => {
-	                    e.stopPropagation();
-	                    switchReceiveView(receiveView === 'request_qr' ? 'request' : 'choice');
-	                  }}
-	                  className={`absolute left-0 top-3 md:top-[-10px] shrink-0 h-9 rounded-xl bg-transparent border border-transparent hover:bg-white/5 text-white/50 transition-colors duration-150 items-center ${
-	                    isDesktop ? 'inline-flex px-[5px] gap-[5px]' : 'hidden'
-	                  }`}
-	                  aria-label={t('ui_back', 'Retour')}
-                  title={t('ui_back', 'Retour')}
-                >
-                  <ChevronLeftIcon className="w-4 h-4 stroke-[2.5]" />
-                  {isDesktop ? <span className="text-xs font-semibold text-white/50">{t('ui_back', 'Retour')}</span> : null}
-                </button>
-
                 <h2 className={`${receiveView === 'request' ? 'mt-[46px] md:mt-[70px]' : receiveView === 'request_qr' ? 'mt-4 md:mt-[25px]' : 'mt-[19px] md:mt-[70px]'} text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight`}>
                   {headerTitle}
                 </h2>
