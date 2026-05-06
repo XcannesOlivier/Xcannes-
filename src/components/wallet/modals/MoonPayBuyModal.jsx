@@ -41,6 +41,12 @@ const resolveMoonpayTag = currencyCode => {
   return null;
 };
 
+const resolvePartnerName = (url) => {
+  const raw = String(url || "").toLowerCase();
+  if (raw.includes("topper")) return "Topper";
+  return "MoonPay";
+};
+
 // Cryptos supportées par MoonPay
 const MOONPAY_SUPPORTED_CURRENCIES = [
   { code: 'RLUSD', icon: CRYPTO_ICONS.RLUSD },
@@ -249,8 +255,13 @@ const MoonPayBuyModal = ({
   const [reviewTimestamp, setReviewTimestamp] = useState(null);
   const [xrpPreviewAmount, setXrpPreviewAmount] = useState(null);
   const [opDetailsOpen, setOpDetailsOpen] = useState(false);
+  const [techDetailsOpen, setTechDetailsOpen] = useState(false);
   const [sheetDragY, setSheetDragY] = useState(0);
   const sheetDragRef = useRef({ startY: 0, pointerId: null, dragging: false });
+
+  useEffect(() => {
+    if (!opDetailsOpen) setTechDetailsOpen(false);
+  }, [opDetailsOpen]);
 
   const handleSheetPointerDown = (e) => {
     e.stopPropagation();
@@ -374,6 +385,15 @@ const MoonPayBuyModal = ({
   const targetAmountValue = Number.parseFloat(targetAssetAmount || '');
   const currencyUpper = String(currency || '').toUpperCase();
   const isCurrencyLine = Boolean(selectedToken?.isTrustlineOnly);
+  const partnerName = useMemo(() => resolvePartnerName(iframeUrl), [iframeUrl]);
+  const receiveAmountLabel = useMemo(() => {
+    if (!Number.isFinite(targetAmountValue) || targetAmountValue <= 0) return "-";
+    const code = currencyUpper === "RLUSD" ? "USD" : currencyUpper;
+    return formatAmountWithSymbol(locale, targetAmountValue, code, {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    });
+  }, [currencyUpper, locale, targetAmountValue]);
   const rlusdRate = isCurrencyLine
     ? currencyUpper === 'RLUSD' || currencyUpper === 'USD'
       ? 1
@@ -2044,11 +2064,52 @@ const MoonPayBuyModal = ({
                 <span className="block w-10 h-1.5 rounded-full bg-white/20" aria-hidden />
               </div>
 
-              {/* Title */}
-              <div className="flex items-center justify-between gap-3 mb-5">
-                <h2 className="text-white font-semibold text-lg leading-tight">
-                  {t('ui_op_details_title', 'Détails de l\'opération')}
-                </h2>
+              {/* Header */}
+              <div className="flex items-start justify-between gap-3 mb-5">
+                <div className="flex items-start gap-3 min-w-0">
+                  <span
+                    className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-emerald-500/10 ring-1 ring-emerald-400/20 text-emerald-200"
+                    aria-hidden
+                  >
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="h-5 w-5"
+                    >
+                      <path d="M12 2l7 4v6c0 5-3 9-7 10-4-1-7-5-7-10V6l7-4Z" />
+                      <path d="M9 12l2 2 4-4" />
+                    </svg>
+                  </span>
+                  <div className="min-w-0">
+                    <h2 className="text-white font-semibold text-lg leading-tight">
+                      {t("ui_op_details_buy_header_title", "Paiement sécurisé")}
+                    </h2>
+                    <p className="mt-1 inline-flex items-center gap-1.5 text-[13px] leading-snug text-white/55">
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="h-4 w-4 text-amber-200/80"
+                        aria-hidden="true"
+                      >
+                        <path d="M13 2L3 14h7l-1 8 12-14h-7l1-6Z" />
+                      </svg>
+                      <span>
+                        {t(
+                          "ui_op_details_buy_header_subtitle",
+                          "Ajoutez des fonds en quelques secondes",
+                        )}
+                      </span>
+                    </p>
+                  </div>
+                </div>
                 <button
                   type="button"
                   onClick={() => { setSheetDragY(0); setOpDetailsOpen(false); }}
@@ -2060,62 +2121,260 @@ const MoonPayBuyModal = ({
               </div>
 
               {/* Content */}
-              <div className="space-y-5 text-[15px] leading-relaxed text-white/75">
-                <p>
-                  {t(
-                    "ui_op_details_buy_p1",
-                    "Votre paiement est traité de manière sécurisée par notre partenaire MoonPay.",
-                  )}
-                </p>
-                <p>
-                  {t(
-                    "ui_op_details_buy_p2",
-                    "Vous gardez le contrôle de chaque étape : aucune opération n’est effectuée sans votre validation.",
-                  )}
-                </p>
-                <p>
-                  {t(
-                    "ui_op_details_buy_p3",
-                    "Après confirmation de votre paiement, le montant est automatiquement converti via les services de liquidité de notre partenaire puis crédité sur votre compte XCannes en euros.",
-                  )}
-                </p>
-                <div className="pt-1">
-                  <h3 className="text-white/90 font-semibold">
-                    {t("ui_op_details_buy_how", "Comment ça fonctionne")}
-                  </h3>
-                  <ul className="mt-2 space-y-1.5 list-disc pl-5 text-white/75">
-                    <li>
-                      {t("ui_op_details_buy_step1", "Vous choisissez le montant à ajouter")}
-                    </li>
-                    <li>
-                      {t("ui_op_details_buy_step2", "Vous validez le paiement chez MoonPay")}
-                    </li>
-                    <li>
-                      {t(
-                        "ui_op_details_buy_step3",
-                        "La conversion est exécutée automatiquement après votre confirmation",
-                      )}
-                    </li>
-                    <li>
-                      {t(
-                        "ui_op_details_buy_step4",
-                        "Votre compte est crédité en euros une fois l’opération validée",
-                      )}
-                    </li>
-                  </ul>
+              <div className="mb-5 rounded-2xl bg-white/5 ring-1 ring-white/10 p-4 shadow-[0_14px_28px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.05)]">
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-[12px] text-white/55">
+                    {t("ui_op_details_summary_receive", "Vous recevez")}
+                  </span>
+                  <span className="text-white/90 font-semibold text-[15px]">
+                    {receiveAmountLabel}
+                  </span>
                 </div>
-                {xrpPreviewAmount !== null ? (
-                  <p className="pt-1 text-white/70">
-                    {t("ui_op_details_buy_xrp_used", {
-                      defaultValue:
-                        "≈ {{xrp}} XRP utilisés pendant le traitement de l’opération.",
-                      xrp: new Intl.NumberFormat(locale, {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 4,
-                      }).format(xrpPreviewAmount),
-                    })}
-                  </p>
-                ) : null}
+                <div className="mt-2.5 flex items-center justify-between gap-3">
+                  <span className="text-[12px] text-white/55">
+                    {t("ui_op_details_summary_processing", "Traitement")}
+                  </span>
+                  <span className="inline-flex items-center gap-2 text-white/80 font-medium text-[13px]">
+                    <span className="inline-flex items-center rounded-full bg-white/5 ring-1 ring-white/10 px-2.5 py-1">
+                      {partnerName}
+                    </span>
+                  </span>
+                </div>
+                <div className="mt-3">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-white/5 ring-1 ring-white/10 px-3 py-1 text-[11px] text-white/70">
+                    <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-white/10 text-white/70">
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.4"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="h-3 w-3"
+                        aria-hidden="true"
+                      >
+                        <path d="M20 6L9 17l-5-5" />
+                      </svg>
+                    </span>
+                    {t(
+                      "ui_op_details_summary_auto_conversion",
+                      "Conversion automatique",
+                    )}
+                  </span>
+                </div>
+              </div>
+              <div className="rounded-2xl bg-white/5 ring-1 ring-white/10 p-4 shadow-[0_14px_28px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.05)]">
+                <div className="flex items-start gap-4">
+                  <div className="flex flex-col items-center pt-0.5">
+                    <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10 text-emerald-200">
+                      <CheckCircleIcon className="h-5 w-5" aria-hidden />
+                    </span>
+                    <div className="relative my-2 h-9 w-px bg-gradient-to-b from-white/20 via-emerald-400/20 to-white/10">
+                      <span className="absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-emerald-300/40 motion-safe:animate-pulse" />
+                    </div>
+                    <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10 text-emerald-200">
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="h-5 w-5"
+                        aria-hidden="true"
+                      >
+                        <path d="M12 2l7 4v6c0 5-3 9-7 10-4-1-7-5-7-10V6l7-4Z" />
+                        <path d="M9 12l2 2 4-4" />
+                      </svg>
+                    </span>
+                    <div className="relative my-2 h-9 w-px bg-gradient-to-b from-white/20 via-emerald-400/20 to-white/10">
+                      <span className="absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-emerald-300/30 motion-safe:animate-pulse" />
+                    </div>
+                    <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10 text-emerald-200">
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="h-5 w-5"
+                        aria-hidden="true"
+                      >
+                        <path d="M3 7h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z" />
+                        <path d="M16 11h3" />
+                      </svg>
+                    </span>
+                  </div>
+
+                  <div className="flex-1 min-w-0">
+                    <div className="mb-5 rounded-2xl bg-emerald-500/10 ring-1 ring-emerald-400/20 px-4 py-3 text-[13px] text-emerald-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
+                      <div className="flex items-start gap-2.5">
+                        <span className="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-xl bg-emerald-400/15 ring-1 ring-emerald-300/20 text-emerald-100">
+                          <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2.6"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="h-4 w-4"
+                            aria-hidden="true"
+                          >
+                            <path d="M20 6L9 17l-5-5" />
+                          </svg>
+                        </span>
+                        <p className="leading-snug">
+                          {t(
+                            "ui_op_flow_control_card",
+                            "Aucune opération n’est effectuée sans votre validation.",
+                          )}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="space-y-7 text-[14px] leading-snug text-white/80">
+                      <div>
+                        <div className="text-white/90 font-semibold inline-flex items-center gap-2">
+                          <span className="inline-flex h-7 w-7 items-center justify-center rounded-xl bg-white/5 ring-1 ring-white/10 text-emerald-200">
+                            <svg
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2.6"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              className="h-4 w-4"
+                              aria-hidden="true"
+                            >
+                              <path d="M20 6L9 17l-5-5" />
+                            </svg>
+                          </span>
+                          {t("ui_op_flow_step1_title", "Vous confirmez le paiement")}
+                        </div>
+                        <div className="mt-1 text-white/55">
+                          {t(
+                            "ui_op_flow_step1_subtitle",
+                            "Vous validez l’opération chez {{partner}}.",
+                            { partner: partnerName },
+                          )}
+                        </div>
+                      </div>
+
+                      <div>
+                        <div className="text-white/90 font-semibold inline-flex items-center gap-2">
+                          <span className="inline-flex h-7 w-7 items-center justify-center rounded-xl bg-white/5 ring-1 ring-white/10 text-emerald-200">
+                            <svg
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              className="h-4 w-4"
+                              aria-hidden="true"
+                            >
+                              <path d="M12 2l7 4v6c0 5-3 9-7 10-4-1-7-5-7-10V6l7-4Z" />
+                              <path d="M9 12l2 2 4-4" />
+                            </svg>
+                          </span>
+                          {t("ui_op_flow_step2_title", {
+                            defaultValue: "{{partner}} traite l’opération",
+                            partner: partnerName,
+                          })}
+                        </div>
+                        <div className="mt-1 text-white/55">
+                          {t(
+                            "ui_op_flow_step2_subtitle",
+                            "Conversion automatique via les services de liquidité.",
+                          )}
+                        </div>
+                      </div>
+
+                      <div>
+                        <div className="text-white/90 font-semibold inline-flex items-center gap-2">
+                          <span className="inline-flex h-7 w-7 items-center justify-center rounded-xl bg-white/5 ring-1 ring-white/10 text-emerald-200">
+                            <svg
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              className="h-4 w-4"
+                              aria-hidden="true"
+                            >
+                              <path d="M3 10h18" />
+                              <path d="M5 10V8a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v2" />
+                              <path d="M7 14h10" />
+                              <path d="M5 10v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8" />
+                            </svg>
+                          </span>
+                          {t(
+                            "ui_op_flow_step3_title",
+                            "Votre compte XCannes est crédité",
+                          )}
+                        </div>
+                        <div className="mt-1 text-white/55">
+                          {t(
+                            "ui_op_flow_step3_subtitle",
+                            "Le montant apparaît sur votre solde dès validation.",
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {xrpPreviewAmount !== null ? (
+                      <div className="mt-5">
+                        <button
+                          type="button"
+                          onClick={() => setTechDetailsOpen((v) => !v)}
+                          className="w-full flex items-center justify-between gap-3 rounded-2xl bg-white/5 ring-1 ring-white/10 px-4 py-3 text-left"
+                          aria-expanded={techDetailsOpen}
+                        >
+                          <span className="text-[13px] font-semibold text-white/65">
+                            {t(
+                              "ui_op_details_tech_title",
+                              "Détails techniques",
+                            )}
+                          </span>
+                          <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className={[
+                              "h-4 w-4 text-white/45 transition-transform duration-200",
+                              techDetailsOpen ? "rotate-180" : "",
+                            ].join(" ")}
+                            aria-hidden="true"
+                          >
+                            <polyline points="6 9 12 15 18 9" />
+                          </svg>
+                        </button>
+                        <div
+                          className="overflow-hidden transition-[max-height,opacity] duration-200 ease-out"
+                          style={{
+                            maxHeight: techDetailsOpen ? "120px" : "0px",
+                            opacity: techDetailsOpen ? 1 : 0,
+                          }}
+                        >
+                          <p className="mt-2 px-1 text-[13px] leading-snug text-white/55">
+                            {t("ui_op_details_buy_xrp_used", {
+                              defaultValue:
+                                "≈ {{xrp}} XRP utilisés pendant le traitement de l’opération.",
+                              xrp: new Intl.NumberFormat(locale, {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 4,
+                              }).format(xrpPreviewAmount),
+                            })}
+                          </p>
+                        </div>
+                      </div>
+                    ) : null}
+                  </div>
+                </div>
               </div>
             </div>
           </div>,
@@ -2198,11 +2457,52 @@ const MoonPayBuyModal = ({
               <span className="block w-10 h-1.5 rounded-full bg-white/20" aria-hidden />
             </div>
 
-            {/* Title */}
-            <div className="flex items-center justify-between gap-3 mb-5">
-              <h2 className="text-white font-semibold text-lg leading-tight">
-                {t('ui_op_details_title', 'Détails de l\'opération')}
-              </h2>
+            {/* Header */}
+            <div className="flex items-start justify-between gap-3 mb-5">
+              <div className="flex items-start gap-3 min-w-0">
+                <span
+                  className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-emerald-500/10 ring-1 ring-emerald-400/20 text-emerald-200"
+                  aria-hidden
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="h-5 w-5"
+                  >
+                    <path d="M12 2l7 4v6c0 5-3 9-7 10-4-1-7-5-7-10V6l7-4Z" />
+                    <path d="M9 12l2 2 4-4" />
+                  </svg>
+                </span>
+                <div className="min-w-0">
+                  <h2 className="text-white font-semibold text-lg leading-tight">
+                    {t("ui_op_details_buy_header_title", "Paiement sécurisé")}
+                  </h2>
+                  <p className="mt-1 inline-flex items-center gap-1.5 text-[13px] leading-snug text-white/55">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="h-4 w-4 text-amber-200/80"
+                      aria-hidden="true"
+                    >
+                      <path d="M13 2L3 14h7l-1 8 12-14h-7l1-6Z" />
+                    </svg>
+                    <span>
+                      {t(
+                        "ui_op_details_buy_header_subtitle",
+                        "Ajoutez des fonds en quelques secondes",
+                      )}
+                    </span>
+                  </p>
+                </div>
+              </div>
               <button
                 type="button"
                 onClick={() => setOpDetailsOpen(false)}
@@ -2214,58 +2514,257 @@ const MoonPayBuyModal = ({
             </div>
 
             {/* Content */}
-            <div className="space-y-5 text-[15px] leading-relaxed text-white/75">
-              <p>
-                {t(
-                  "ui_op_details_buy_p1",
-                  "Votre paiement est traité de manière sécurisée par notre partenaire MoonPay.",
-                )}
-              </p>
-              <p>
-                {t(
-                  "ui_op_details_buy_p2",
-                  "Vous gardez le contrôle de chaque étape : aucune opération n’est effectuée sans votre validation.",
-                )}
-              </p>
-              <p>
-                {t(
-                  "ui_op_details_buy_p3",
-                  "Après confirmation de votre paiement, le montant est automatiquement converti via les services de liquidité de notre partenaire puis crédité sur votre compte XCannes en euros.",
-                )}
-              </p>
-              <div className="pt-1">
-                <h3 className="text-white/90 font-semibold">
-                  {t("ui_op_details_buy_how", "Comment ça fonctionne")}
-                </h3>
-                <ul className="mt-2 space-y-1.5 list-disc pl-5 text-white/75">
-                  <li>{t("ui_op_details_buy_step1", "Vous choisissez le montant à ajouter")}</li>
-                  <li>{t("ui_op_details_buy_step2", "Vous validez le paiement chez MoonPay")}</li>
-                  <li>
-                    {t(
-                      "ui_op_details_buy_step3",
-                      "La conversion est exécutée automatiquement après votre confirmation",
-                    )}
-                  </li>
-                  <li>
-                    {t(
-                      "ui_op_details_buy_step4",
-                      "Votre compte est crédité en euros une fois l’opération validée",
-                    )}
-                  </li>
-                </ul>
+            <div className="mb-5 rounded-2xl bg-white/5 ring-1 ring-white/10 p-4 shadow-[0_14px_28px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.05)]">
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-[12px] text-white/55">
+                  {t("ui_op_details_summary_receive", "Vous recevez")}
+                </span>
+                <span className="text-white/90 font-semibold text-[15px]">
+                  {receiveAmountLabel}
+                </span>
               </div>
-              {xrpPreviewAmount !== null ? (
-                <p className="pt-1 text-white/70">
-                  {t("ui_op_details_buy_xrp_used", {
-                    defaultValue:
-                      "≈ {{xrp}} XRP utilisés pendant le traitement de l’opération.",
-                    xrp: new Intl.NumberFormat(locale, {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 4,
-                    }).format(xrpPreviewAmount),
-                  })}
-                </p>
-              ) : null}
+              <div className="mt-2.5 flex items-center justify-between gap-3">
+                <span className="text-[12px] text-white/55">
+                  {t("ui_op_details_summary_processing", "Traitement")}
+                </span>
+                <span className="inline-flex items-center gap-2 text-white/80 font-medium text-[13px]">
+                  <span className="inline-flex items-center rounded-full bg-white/5 ring-1 ring-white/10 px-2.5 py-1">
+                    {partnerName}
+                  </span>
+                </span>
+              </div>
+              <div className="mt-3">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/5 ring-1 ring-white/10 px-3 py-1 text-[11px] text-white/70">
+                  <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-white/10 text-white/70">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.4"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="h-3 w-3"
+                      aria-hidden="true"
+                    >
+                      <path d="M20 6L9 17l-5-5" />
+                    </svg>
+                  </span>
+                  {t(
+                    "ui_op_details_summary_auto_conversion",
+                    "Conversion automatique",
+                  )}
+                </span>
+              </div>
+            </div>
+            <div className="rounded-2xl bg-white/5 ring-1 ring-white/10 p-4 shadow-[0_14px_28px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.05)]">
+              <div className="flex items-start gap-4">
+                <div className="flex flex-col items-center pt-0.5">
+                  <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10 text-emerald-200">
+                    <CheckCircleIcon className="h-5 w-5" aria-hidden />
+                  </span>
+                  <div className="relative my-2 h-9 w-px bg-gradient-to-b from-white/20 via-emerald-400/20 to-white/10">
+                    <span className="absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-emerald-300/40 motion-safe:animate-pulse" />
+                  </div>
+                  <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10 text-emerald-200">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="h-5 w-5"
+                      aria-hidden="true"
+                    >
+                      <path d="M12 2l7 4v6c0 5-3 9-7 10-4-1-7-5-7-10V6l7-4Z" />
+                      <path d="M9 12l2 2 4-4" />
+                    </svg>
+                  </span>
+                  <div className="relative my-2 h-9 w-px bg-gradient-to-b from-white/20 via-emerald-400/20 to-white/10">
+                    <span className="absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-emerald-300/30 motion-safe:animate-pulse" />
+                  </div>
+                  <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10 text-emerald-200">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="h-5 w-5"
+                      aria-hidden="true"
+                    >
+                      <path d="M3 7h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z" />
+                      <path d="M16 11h3" />
+                    </svg>
+                  </span>
+                </div>
+
+                <div className="flex-1 min-w-0">
+                  <div className="mb-5 rounded-2xl bg-emerald-500/10 ring-1 ring-emerald-400/20 px-4 py-3 text-[13px] text-emerald-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
+                    <div className="flex items-start gap-2.5">
+                      <span className="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-xl bg-emerald-400/15 ring-1 ring-emerald-300/20 text-emerald-100">
+                        <svg
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2.6"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="h-4 w-4"
+                          aria-hidden="true"
+                        >
+                          <path d="M20 6L9 17l-5-5" />
+                        </svg>
+                      </span>
+                      <p className="leading-snug">
+                        {t(
+                          "ui_op_flow_control_card",
+                          "Aucune opération n’est effectuée sans votre validation.",
+                        )}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="space-y-7 text-[14px] leading-snug text-white/80">
+                    <div>
+                      <div className="text-white/90 font-semibold inline-flex items-center gap-2">
+                        <span className="inline-flex h-7 w-7 items-center justify-center rounded-xl bg-white/5 ring-1 ring-white/10 text-emerald-200">
+                          <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2.6"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="h-4 w-4"
+                            aria-hidden="true"
+                          >
+                            <path d="M20 6L9 17l-5-5" />
+                          </svg>
+                        </span>
+                        {t("ui_op_flow_step1_title", "Vous confirmez le paiement")}
+                      </div>
+                      <div className="mt-1 text-white/55">
+                        {t(
+                          "ui_op_flow_step1_subtitle",
+                          "Vous validez l’opération chez {{partner}}.",
+                          { partner: partnerName },
+                        )}
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="text-white/90 font-semibold inline-flex items-center gap-2">
+                        <span className="inline-flex h-7 w-7 items-center justify-center rounded-xl bg-white/5 ring-1 ring-white/10 text-emerald-200">
+                          <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="h-4 w-4"
+                            aria-hidden="true"
+                          >
+                            <path d="M12 2l7 4v6c0 5-3 9-7 10-4-1-7-5-7-10V6l7-4Z" />
+                            <path d="M9 12l2 2 4-4" />
+                          </svg>
+                        </span>
+                        {t("ui_op_flow_step2_title", {
+                          defaultValue: "{{partner}} traite l’opération",
+                          partner: partnerName,
+                        })}
+                      </div>
+                      <div className="mt-1 text-white/55">
+                        {t(
+                          "ui_op_flow_step2_subtitle",
+                          "Conversion automatique via les services de liquidité.",
+                        )}
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="text-white/90 font-semibold inline-flex items-center gap-2">
+                        <span className="inline-flex h-7 w-7 items-center justify-center rounded-xl bg-white/5 ring-1 ring-white/10 text-emerald-200">
+                          <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="h-4 w-4"
+                            aria-hidden="true"
+                          >
+                            <path d="M3 10h18" />
+                            <path d="M5 10V8a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v2" />
+                            <path d="M7 14h10" />
+                            <path d="M5 10v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8" />
+                          </svg>
+                        </span>
+                        {t(
+                          "ui_op_flow_step3_title",
+                          "Votre compte XCannes est crédité",
+                        )}
+                      </div>
+                      <div className="mt-1 text-white/55">
+                        {t(
+                          "ui_op_flow_step3_subtitle",
+                          "Le montant apparaît sur votre solde dès validation.",
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {xrpPreviewAmount !== null ? (
+                    <div className="mt-5">
+                      <button
+                        type="button"
+                        onClick={() => setTechDetailsOpen((v) => !v)}
+                        className="w-full flex items-center justify-between gap-3 rounded-2xl bg-white/5 ring-1 ring-white/10 px-4 py-3 text-left"
+                        aria-expanded={techDetailsOpen}
+                      >
+                        <span className="text-[13px] font-semibold text-white/65">
+                          {t("ui_op_details_tech_title", "Détails techniques")}
+                        </span>
+                        <svg
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className={[
+                            "h-4 w-4 text-white/45 transition-transform duration-200",
+                            techDetailsOpen ? "rotate-180" : "",
+                          ].join(" ")}
+                          aria-hidden="true"
+                        >
+                          <polyline points="6 9 12 15 18 9" />
+                        </svg>
+                      </button>
+                      <div
+                        className="overflow-hidden transition-[max-height,opacity] duration-200 ease-out"
+                        style={{
+                          maxHeight: techDetailsOpen ? "120px" : "0px",
+                          opacity: techDetailsOpen ? 1 : 0,
+                        }}
+                      >
+                        <p className="mt-2 px-1 text-[13px] leading-snug text-white/55">
+                          {t("ui_op_details_buy_xrp_used", {
+                            defaultValue:
+                              "≈ {{xrp}} XRP utilisés pendant le traitement de l’opération.",
+                            xrp: new Intl.NumberFormat(locale, {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 4,
+                            }).format(xrpPreviewAmount),
+                          })}
+                        </p>
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
+              </div>
             </div>
           </div>
         </div>,

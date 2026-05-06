@@ -503,8 +503,13 @@ export default function WalletDashboardUsdSwapModal({
   const [apiError, setApiError] = useState("");
   const [pairUnavailable, setPairUnavailable] = useState(false);
   const [opDetailsOpen, setOpDetailsOpen] = useState(false);
+  const [techDetailsOpen, setTechDetailsOpen] = useState(false);
   const [sheetDragY, setSheetDragY] = useState(0);
   const sheetDragRef = useRef({ startY: 0, pointerId: null, dragging: false });
+
+  useEffect(() => {
+    if (!opDetailsOpen) setTechDetailsOpen(false);
+  }, [opDetailsOpen]);
 
   const handleSheetPointerDown = (e) => {
     e.stopPropagation();
@@ -4498,68 +4503,262 @@ export default function WalletDashboardUsdSwapModal({
       </div>
     </div>
 
-    {/* Bottom sheet — Détails de l'opération */}
-    {opDetailsOpen && typeof document !== 'undefined' ? createPortal(
-      <div className="absolute inset-0 z-[50] flex items-end">
-        <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => { setSheetDragY(0); setOpDetailsOpen(false); }} />
-        <div
-          className="relative w-full bg-elevated rounded-t-3xl ring-1 ring-white/10 shadow-2xl px-6 pt-5 pb-8 max-h-full overflow-y-auto"
-          style={{ transform: `translateY(${sheetDragY}px)`, transition: sheetDragY ? 'none' : 'transform 200ms ease' }}
-          onPointerDown={handleSheetPointerDown}
-          onPointerMove={handleSheetPointerMove}
-          onPointerUp={handleSheetPointerUp}
-          onPointerCancel={handleSheetPointerUp}
-        >
-          {/* Handle — mobile uniquement */}
-          <div className="flex justify-center mb-4 md:hidden">
-            <span className="block w-10 h-1.5 rounded-full bg-white/20" aria-hidden />
-          </div>
-          {/* Title + ✕ */}
-          <div className="flex items-center justify-between gap-3 mb-5">
-            <h2 className="text-white font-semibold text-lg leading-tight">
-              {t('ui_op_details_title', "Détails de l'opération")}
-            </h2>
-            <button
-              type="button"
-              onClick={() => { setSheetDragY(0); setOpDetailsOpen(false); }}
-              className="hidden md:flex text-white/50 hover:text-white transition-colors text-xl leading-none p-1"
-              aria-label={t('ui_close', 'Fermer')}
-            >✕</button>
-          </div>
-          {/* Content */}
-          <div className="space-y-5 text-[15px] leading-relaxed text-white/75">
-            {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE ? (
-              <>
-                <p>
-                  {t('ui_op_details_swap_out_p1', 'Votre envoi est traité via SimpleSwap.')}{' '}
-                  {quotedXrpSentToPartner != null ? (
-                    <span className="text-white/55">
-                      ({t('ui_op_details_xrp_hint', { defaultValue: '≈ {{xrp}} XRP', xrp: formatAmountNumber ? formatAmountNumber.format(quotedXrpSentToPartner) : String(quotedXrpSentToPartner) })})
-                    </span>
-                  ) : null}
-                </p>
-                <p>{t('ui_op_details_swap_out_p2', "XRP sert de bridge de liquidité entre le réseau XRPL et la blockchain de destination. La conversion est automatique.")}</p>
-                <p>{t('ui_op_details_swap_out_p3', "Vous n'avez qu'à valider l'opération.")}</p>
-              </>
-            ) : (
-              <>
-                <p>
-                  {t('ui_op_details_swap_in_p1', 'SimpleSwap convertira vos stablecoins et enverra des XRP sur votre portefeuille XCANNES.')}{' '}
-                  {quotedPartnerReceiveAmount != null ? (
-                    <span className="text-white/55">
-                      ({t('ui_op_details_xrp_hint', { defaultValue: '≈ {{xrp}} XRP', xrp: formatAmountNumber ? formatAmountNumber.format(quotedPartnerReceiveAmount) : String(quotedPartnerReceiveAmount) })})
-                    </span>
-                  ) : null}
-                </p>
-                <p>{t('ui_op_details_swap_in_p2', "Ces XRP seront automatiquement convertis en RLUSD selon le cours en vigueur au moment du swap.")}</p>
-                <p>{t('ui_op_details_swap_in_p3', "Tout est automatique : vous n'avez qu'à envoyer vos stablecoins à l'adresse fournie.")}</p>
-              </>
-            )}
-          </div>
-        </div>
-      </div>,
-      modalPanelRef.current || document.body,
-    ) : null}
+	    {/* Bottom sheet — Détails de l'opération */}
+	    {opDetailsOpen && typeof document !== 'undefined' ? createPortal(
+	      <div className="absolute inset-0 z-[50] flex items-end">
+	        <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => { setSheetDragY(0); setOpDetailsOpen(false); }} />
+	        <div
+	          className="relative w-full bg-elevated rounded-t-3xl ring-1 ring-white/10 shadow-2xl px-6 pt-5 pb-8 max-h-full overflow-y-auto"
+	          style={{ transform: `translateY(${sheetDragY}px)`, transition: sheetDragY ? 'none' : 'transform 200ms ease' }}
+	          onPointerDown={handleSheetPointerDown}
+	          onPointerMove={handleSheetPointerMove}
+	          onPointerUp={handleSheetPointerUp}
+	          onPointerCancel={handleSheetPointerUp}
+	        >
+	          {/* Handle — mobile uniquement */}
+	          <div className="flex justify-center mb-4 md:hidden">
+	            <span className="block w-10 h-1.5 rounded-full bg-white/20" aria-hidden />
+	          </div>
+	          {/* Header */}
+	          <div className="flex items-start justify-between gap-3 mb-5">
+	            <div className="flex items-start gap-3 min-w-0">
+	              <span
+	                className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-emerald-500/10 ring-1 ring-emerald-400/20 text-emerald-200"
+	                aria-hidden
+	              >
+	                <svg
+	                  viewBox="0 0 24 24"
+	                  fill="none"
+	                  stroke="currentColor"
+	                  strokeWidth="2"
+	                  strokeLinecap="round"
+	                  strokeLinejoin="round"
+	                  className="h-5 w-5"
+	                >
+	                  <path d="M12 2l7 4v6c0 5-3 9-7 10-4-1-7-5-7-10V6l7-4Z" />
+	                  <path d="M9 12l2 2 4-4" />
+	                </svg>
+	              </span>
+	              <div className="min-w-0">
+	                <h2 className="text-white font-semibold text-lg leading-tight">
+	                  {t("ui_op_details_swap_header_title", "Conversion sécurisée")}
+	                </h2>
+	                <p className="mt-1 inline-flex items-center gap-1.5 text-[13px] leading-snug text-white/55">
+	                  <svg
+	                    viewBox="0 0 24 24"
+	                    fill="none"
+	                    stroke="currentColor"
+	                    strokeWidth="2.2"
+	                    strokeLinecap="round"
+	                    strokeLinejoin="round"
+	                    className="h-4 w-4 text-amber-200/80"
+	                    aria-hidden="true"
+	                  >
+	                    <path d="M13 2L3 14h7l-1 8 12-14h-7l1-6Z" />
+	                  </svg>
+	                  <span>
+	                    {t(
+	                      "ui_op_details_swap_header_subtitle",
+	                      "Conversion automatique via SimpleSwap",
+	                    )}
+	                  </span>
+	                </p>
+	              </div>
+	            </div>
+	            <button
+	              type="button"
+	              onClick={() => { setSheetDragY(0); setOpDetailsOpen(false); }}
+	              className="hidden md:flex text-white/50 hover:text-white transition-colors text-xl leading-none p-1"
+	              aria-label={t('ui_close', 'Fermer')}
+	            >✕</button>
+	          </div>
+
+	          {/* Summary */}
+	          <div className="mb-5 rounded-2xl bg-white/5 ring-1 ring-white/10 p-4 shadow-[0_14px_28px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.05)]">
+	            <div className="flex items-center justify-between gap-3">
+	              <span className="text-[12px] text-white/55">
+	                {t("ui_op_details_summary_send", "Vous envoyez")}
+	              </span>
+	              <span className="text-white/90 font-semibold text-[15px]">
+	                {hasValidAmount ? (formatAmountNumber ? formatAmountNumber.format(parsedAmount) : String(parsedAmount)) : "—"}{" "}
+	                {fromTicker || ""}
+	              </span>
+	            </div>
+	            <div className="mt-2.5 flex items-center justify-between gap-3">
+	              <span className="text-[12px] text-white/55">
+	                {t("ui_op_details_summary_receive", "Vous recevez")}
+	              </span>
+	              <span className="text-white/90 font-semibold text-[15px]">
+	                {Number.isFinite(Number(receiveDisplayAmount)) && Number(receiveDisplayAmount) > 0
+	                  ? (formatAmountNumber ? formatAmountNumber.format(Number(receiveDisplayAmount)) : String(receiveDisplayAmount))
+	                  : "—"}{" "}
+	                {toTicker || ""}
+	              </span>
+	            </div>
+	            <div className="mt-2.5 flex items-center justify-between gap-3">
+	              <span className="text-[12px] text-white/55">
+	                {t("ui_op_details_summary_processing", "Traitement")}
+	              </span>
+	              <span className="inline-flex items-center gap-2 text-white/80 font-medium text-[13px]">
+	                <span className="inline-flex items-center rounded-full bg-white/5 ring-1 ring-white/10 px-2.5 py-1">
+	                  SimpleSwap
+	                </span>
+	              </span>
+	            </div>
+	            <div className="mt-3">
+	              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/5 ring-1 ring-white/10 px-3 py-1 text-[11px] text-white/70">
+	                <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-white/10 text-white/70">
+	                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" className="h-3 w-3" aria-hidden="true">
+	                    <path d="M20 6L9 17l-5-5" />
+	                  </svg>
+	                </span>
+	                {t("ui_op_details_summary_auto_conversion", "Conversion automatique")}
+	              </span>
+	            </div>
+	          </div>
+
+	          {/* Flow */}
+	          <div className="rounded-2xl bg-white/5 ring-1 ring-white/10 p-4 shadow-[0_14px_28px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.05)]">
+	            <div className="mb-5 rounded-2xl bg-emerald-500/10 ring-1 ring-emerald-400/20 px-4 py-3 text-[13px] text-emerald-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
+	              <div className="flex items-start gap-2.5">
+	                <span className="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-xl bg-emerald-400/15 ring-1 ring-emerald-300/20 text-emerald-100">
+	                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4" aria-hidden="true">
+	                    <path d="M20 6L9 17l-5-5" />
+	                  </svg>
+	                </span>
+	                <p className="leading-snug">
+	                  {t("ui_op_flow_control_card", "Aucune opération n’est effectuée sans votre validation.")}
+	                </p>
+	              </div>
+	            </div>
+
+	            <div className="flex items-start gap-4">
+	              <div className="flex flex-col items-center pt-0.5">
+	                <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10 text-emerald-200">
+	                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
+	                    <path d="M20 6L9 17l-5-5" />
+	                  </svg>
+	                </span>
+	                <div className="relative my-2 h-9 w-px bg-gradient-to-b from-white/20 via-emerald-400/20 to-white/10">
+	                  <span className="absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-emerald-300/40 motion-safe:animate-pulse" />
+	                </div>
+	                <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10 text-emerald-200">
+	                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
+	                    <path d="M8 7h-3a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-3" />
+	                    <path d="M16 3h5v5" />
+	                    <path d="M21 3l-9 9" />
+	                  </svg>
+	                </span>
+	                <div className="relative my-2 h-9 w-px bg-gradient-to-b from-white/20 via-emerald-400/20 to-white/10">
+	                  <span className="absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-emerald-300/30 motion-safe:animate-pulse" />
+	                </div>
+	                <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10 text-emerald-200">
+	                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
+	                    <path d="M3 7h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z" />
+	                    <path d="M16 11h3" />
+	                  </svg>
+	                </span>
+	              </div>
+
+	              <div className="flex-1 min-w-0">
+	                <div className="space-y-7 text-[14px] leading-snug text-white/80">
+	                  <div>
+	                    <div className="text-white/90 font-semibold inline-flex items-center gap-2">
+	                      <span className="inline-flex h-7 w-7 items-center justify-center rounded-xl bg-white/5 ring-1 ring-white/10 text-emerald-200">
+	                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4" aria-hidden="true">
+	                          <path d="M20 6L9 17l-5-5" />
+	                        </svg>
+	                      </span>
+	                      {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
+	                        ? t("ui_op_flow_swap_step1_out", "Vous confirmez la conversion")
+	                        : t("ui_op_flow_swap_step1_in", "Vous envoyez vos stablecoins")}
+	                    </div>
+	                    <div className="mt-1 text-white/55">
+	                      {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
+	                        ? t("ui_op_flow_swap_step1_out_sub", "Vous validez l’opération sur XCannes.")
+	                        : t("ui_op_flow_swap_step1_in_sub", "Vous envoyez les fonds à l’adresse SimpleSwap.")}
+	                    </div>
+	                  </div>
+
+	                  <div>
+	                    <div className="text-white/90 font-semibold inline-flex items-center gap-2">
+	                      <span className="inline-flex h-7 w-7 items-center justify-center rounded-xl bg-white/5 ring-1 ring-white/10 text-emerald-200">
+	                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4" aria-hidden="true">
+	                          <path d="M12 2l7 4v6c0 5-3 9-7 10-4-1-7-5-7-10V6l7-4Z" />
+	                          <path d="M9 12l2 2 4-4" />
+	                        </svg>
+	                      </span>
+	                      {t("ui_op_flow_step2_title", { defaultValue: "SimpleSwap traite l’opération" })}
+	                    </div>
+	                    <div className="mt-1 text-white/55">
+	                      {t("ui_op_flow_step2_subtitle", "Conversion automatique via les services de liquidité.")}
+	                    </div>
+	                  </div>
+
+	                  <div>
+	                    <div className="text-white/90 font-semibold inline-flex items-center gap-2">
+	                      <span className="inline-flex h-7 w-7 items-center justify-center rounded-xl bg-white/5 ring-1 ring-white/10 text-emerald-200">
+	                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4" aria-hidden="true">
+	                          <path d="M3 7h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z" />
+	                          <path d="M16 11h3" />
+	                        </svg>
+	                      </span>
+	                      {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
+	                        ? t("ui_op_flow_swap_step3_out", "Le stablecoin est envoyé")
+	                        : t("ui_op_flow_swap_step3_in", "Votre compte XCannes est crédité")}
+	                    </div>
+	                    <div className="mt-1 text-white/55">
+	                      {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
+	                        ? t("ui_op_flow_swap_step3_out_sub", "Envoi vers l’adresse de réception une fois validé.")
+	                        : t("ui_op_flow_swap_step3_in_sub", "Crédit RLUSD après réception des XRP.")}
+	                    </div>
+	                  </div>
+	                </div>
+
+	                {(quotedXrpSentToPartner != null || quotedPartnerReceiveAmount != null) ? (
+	                  <div className="mt-5">
+	                    <button
+	                      type="button"
+	                      onClick={() => setTechDetailsOpen((v) => !v)}
+	                      className="w-full flex items-center justify-between gap-3 rounded-2xl bg-white/5 ring-1 ring-white/10 px-4 py-3 text-left"
+	                      aria-expanded={techDetailsOpen}
+	                    >
+	                      <span className="text-[13px] font-semibold text-white/65">
+	                        {t("ui_op_details_tech_title", "Détails techniques")}
+	                      </span>
+	                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={["h-4 w-4 text-white/45 transition-transform duration-200", techDetailsOpen ? "rotate-180" : ""].join(" ")} aria-hidden="true">
+	                        <polyline points="6 9 12 15 18 9" />
+	                      </svg>
+	                    </button>
+	                    <div
+	                      className="overflow-hidden transition-[max-height,opacity] duration-200 ease-out"
+	                      style={{ maxHeight: techDetailsOpen ? "160px" : "0px", opacity: techDetailsOpen ? 1 : 0 }}
+	                    >
+	                      <p className="mt-2 px-1 text-[13px] leading-snug text-white/55">
+	                        {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
+	                          ? t("ui_op_details_xrp_bridge_out", {
+	                              defaultValue: "≈ {{xrp}} XRP utilisés pendant le traitement de l’opération.",
+	                              xrp: quotedXrpSentToPartner != null
+	                                ? (formatAmountNumber ? formatAmountNumber.format(quotedXrpSentToPartner) : String(quotedXrpSentToPartner))
+	                                : "—",
+	                            })
+	                          : t("ui_op_details_xrp_bridge_in", {
+	                              defaultValue: "≈ {{xrp}} XRP transitent pendant le traitement de l’opération.",
+	                              xrp: quotedPartnerReceiveAmount != null
+	                                ? (formatAmountNumber ? formatAmountNumber.format(quotedPartnerReceiveAmount) : String(quotedPartnerReceiveAmount))
+	                                : "—",
+	                            })}
+	                      </p>
+	                    </div>
+	                  </div>
+	                ) : null}
+	              </div>
+	            </div>
+	          </div>
+	        </div>
+	      </div>,
+	      modalPanelRef.current || document.body,
+	    ) : null}
 
     </>
 	  );
