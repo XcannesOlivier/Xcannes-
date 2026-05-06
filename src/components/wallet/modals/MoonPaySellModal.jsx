@@ -130,6 +130,26 @@ const MoonPaySellModal = ({
       : "ring-xcannes-violet/25 bg-xcannes-violet";
   const accentCheck =
     accentVariant === "fireOrange" ? "text-[#ff6a00]" : "text-xcannes-violet";
+  const sheetAccentChipClass =
+    accentVariant === "fireOrange"
+      ? "bg-[#ff6a00]/10 ring-1 ring-[#ff6a00]/20 text-[#ffd1b5]"
+      : "bg-xcannes-violet/10 ring-1 ring-xcannes-violet/20 text-xcannes-violet/90";
+  const sheetAccentControlCardClass =
+    accentVariant === "fireOrange"
+      ? "bg-[#ff6a00]/10 ring-1 ring-[#ff6a00]/20 text-white/85"
+      : "bg-xcannes-violet/10 ring-1 ring-xcannes-violet/20 text-white/85";
+  const sheetAccentControlIconClass =
+    accentVariant === "fireOrange"
+      ? "bg-[#ff6a00]/15 ring-1 ring-[#ff6a00]/25 text-[#ffe1cf]"
+      : "bg-xcannes-violet/15 ring-1 ring-xcannes-violet/25 text-xcannes-violet/90";
+  const sheetAccentFlowIconText =
+    accentVariant === "fireOrange" ? "text-[#ffb487]" : "text-xcannes-violet/90";
+  const sheetAccentFlowLineVia =
+    accentVariant === "fireOrange" ? "via-[#ff6a00]/20" : "via-xcannes-violet/20";
+  const sheetAccentFlowDotStrong =
+    accentVariant === "fireOrange" ? "bg-[#ff6a00]/40" : "bg-xcannes-violet/40";
+  const sheetAccentFlowDotSoft =
+    accentVariant === "fireOrange" ? "bg-[#ff6a00]/30" : "bg-xcannes-violet/30";
 
   const modalPanelRef = useRef(null);
   const contentRootRef = useRef(null);
@@ -1763,10 +1783,13 @@ const MoonPaySellModal = ({
               {/* Header */}
               <div className="flex items-start justify-between gap-3 mb-5">
                 <div className="flex items-start gap-3 min-w-0">
-                  <span
-                    className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-emerald-500/10 ring-1 ring-emerald-400/20 text-emerald-200"
-                    aria-hidden
-                  >
+	                  <span
+	                    className={[
+	                      "inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl",
+	                      sheetAccentChipClass,
+	                    ].join(" ")}
+	                    aria-hidden
+	                  >
                     <svg
                       viewBox="0 0 24 24"
                       fill="none"
@@ -1845,11 +1868,21 @@ const MoonPaySellModal = ({
 
               {/* Flow */}
               <div className="rounded-2xl bg-white/5 ring-1 ring-white/10 p-4 shadow-[0_14px_28px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.05)]">
-                <div className="mb-5 rounded-2xl bg-emerald-500/10 ring-1 ring-emerald-400/20 px-4 py-3 text-[13px] text-emerald-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
-                  <div className="flex items-start gap-2.5">
-                    <span className="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-xl bg-emerald-400/15 ring-1 ring-emerald-300/20 text-emerald-100">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4" aria-hidden="true">
-                        <path d="M20 6L9 17l-5-5" />
+	                <div
+	                  className={[
+	                    "mb-5 rounded-2xl px-4 py-3 text-[13px] shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]",
+	                    sheetAccentControlCardClass,
+	                  ].join(" ")}
+	                >
+	                  <div className="flex items-start gap-2.5">
+	                    <span
+	                      className={[
+	                        "mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-xl",
+	                        sheetAccentControlIconClass,
+	                      ].join(" ")}
+	                    >
+	                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4" aria-hidden="true">
+	                        <path d="M20 6L9 17l-5-5" />
                       </svg>
                     </span>
                     <p className="leading-snug">
@@ -1858,32 +1891,32 @@ const MoonPaySellModal = ({
                   </div>
                 </div>
 
-                <div className="flex items-start gap-4">
-                  <div className="flex flex-col items-center pt-0.5">
-                    <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10 text-emerald-200">
-                      <CheckCircleIcon className="h-5 w-5" aria-hidden />
-                    </span>
-                    <div className="relative my-2 h-9 w-px bg-gradient-to-b from-white/20 via-emerald-400/20 to-white/10">
-                      <span className="absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-emerald-300/40 motion-safe:animate-pulse" />
-                    </div>
-                    <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10 text-emerald-200">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
-                        <path d="M12 2l7 4v6c0 5-3 9-7 10-4-1-7-5-7-10V6l7-4Z" />
+	                <div className="flex items-start gap-4">
+	                  <div className="flex flex-col items-center pt-0.5">
+	                    <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", sheetAccentFlowIconText].join(" ")}>
+	                      <CheckCircleIcon className="h-5 w-5" aria-hidden />
+	                    </span>
+	                    <div className={["relative my-2 h-9 w-px bg-gradient-to-b from-white/20 to-white/10", sheetAccentFlowLineVia].join(" ")}>
+	                      <span className={["absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full motion-safe:animate-pulse", sheetAccentFlowDotStrong].join(" ")} />
+	                    </div>
+	                    <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", sheetAccentFlowIconText].join(" ")}>
+	                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
+	                        <path d="M12 2l7 4v6c0 5-3 9-7 10-4-1-7-5-7-10V6l7-4Z" />
                         <path d="M9 12l2 2 4-4" />
-                      </svg>
-                    </span>
-                    <div className="relative my-2 h-9 w-px bg-gradient-to-b from-white/20 via-emerald-400/20 to-white/10">
-                      <span className="absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-emerald-300/30 motion-safe:animate-pulse" />
-                    </div>
-                    <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10 text-emerald-200">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
-                        <path d="M3 10h18" />
+	                      </svg>
+	                    </span>
+	                    <div className={["relative my-2 h-9 w-px bg-gradient-to-b from-white/20 to-white/10", sheetAccentFlowLineVia].join(" ")}>
+	                      <span className={["absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full motion-safe:animate-pulse", sheetAccentFlowDotSoft].join(" ")} />
+	                    </div>
+	                    <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", sheetAccentFlowIconText].join(" ")}>
+	                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
+	                        <path d="M3 10h18" />
                         <path d="M5 10V8a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v2" />
                         <path d="M7 14h10" />
                         <path d="M5 10v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8" />
-                      </svg>
-                    </span>
-                  </div>
+	                      </svg>
+	                    </span>
+	                  </div>
 
                   <div className="flex-1 min-w-0">
                     <div className="space-y-7 text-[14px] leading-snug text-white/80">
@@ -2006,10 +2039,13 @@ const MoonPaySellModal = ({
             {/* Header */}
             <div className="flex items-start justify-between gap-3 mb-5">
               <div className="flex items-start gap-3 min-w-0">
-                <span
-                  className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-emerald-500/10 ring-1 ring-emerald-400/20 text-emerald-200"
-                  aria-hidden
-                >
+	                <span
+	                  className={[
+	                    "inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl",
+	                    sheetAccentChipClass,
+	                  ].join(" ")}
+	                  aria-hidden
+	                >
                   <svg
                     viewBox="0 0 24 24"
                     fill="none"
@@ -2078,12 +2114,22 @@ const MoonPaySellModal = ({
             </div>
 
             {/* Flow */}
-            <div className="rounded-2xl bg-white/5 ring-1 ring-white/10 p-4 shadow-[0_14px_28px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.05)]">
-              <div className="mb-5 rounded-2xl bg-emerald-500/10 ring-1 ring-emerald-400/20 px-4 py-3 text-[13px] text-emerald-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
-                <div className="flex items-start gap-2.5">
-                  <span className="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-xl bg-emerald-400/15 ring-1 ring-emerald-300/20 text-emerald-100">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4" aria-hidden="true">
-                      <path d="M20 6L9 17l-5-5" />
+	            <div className="rounded-2xl bg-white/5 ring-1 ring-white/10 p-4 shadow-[0_14px_28px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.05)]">
+	              <div
+	                className={[
+	                  "mb-5 rounded-2xl px-4 py-3 text-[13px] shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]",
+	                  sheetAccentControlCardClass,
+	                ].join(" ")}
+	              >
+	                <div className="flex items-start gap-2.5">
+	                  <span
+	                    className={[
+	                      "mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-xl",
+	                      sheetAccentControlIconClass,
+	                    ].join(" ")}
+	                  >
+	                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4" aria-hidden="true">
+	                      <path d="M20 6L9 17l-5-5" />
                     </svg>
                   </span>
                   <p className="leading-snug">
@@ -2092,26 +2138,26 @@ const MoonPaySellModal = ({
                 </div>
               </div>
 
-              <div className="flex items-start gap-4">
-                <div className="flex flex-col items-center pt-0.5">
-                  <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10 text-emerald-200">
-                    <CheckCircleIcon className="h-5 w-5" aria-hidden />
-                  </span>
-                  <div className="relative my-2 h-9 w-px bg-gradient-to-b from-white/20 via-emerald-400/20 to-white/10">
-                    <span className="absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-emerald-300/40 motion-safe:animate-pulse" />
-                  </div>
-                  <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10 text-emerald-200">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
-                      <path d="M12 2l7 4v6c0 5-3 9-7 10-4-1-7-5-7-10V6l7-4Z" />
+	              <div className="flex items-start gap-4">
+	                <div className="flex flex-col items-center pt-0.5">
+	                  <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", sheetAccentFlowIconText].join(" ")}>
+	                    <CheckCircleIcon className="h-5 w-5" aria-hidden />
+	                  </span>
+	                  <div className={["relative my-2 h-9 w-px bg-gradient-to-b from-white/20 to-white/10", sheetAccentFlowLineVia].join(" ")}>
+	                    <span className={["absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full motion-safe:animate-pulse", sheetAccentFlowDotStrong].join(" ")} />
+	                  </div>
+	                  <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", sheetAccentFlowIconText].join(" ")}>
+	                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
+	                      <path d="M12 2l7 4v6c0 5-3 9-7 10-4-1-7-5-7-10V6l7-4Z" />
                       <path d="M9 12l2 2 4-4" />
-                    </svg>
-                  </span>
-                  <div className="relative my-2 h-9 w-px bg-gradient-to-b from-white/20 via-emerald-400/20 to-white/10">
-                    <span className="absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-emerald-300/30 motion-safe:animate-pulse" />
-                  </div>
-                  <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10 text-emerald-200">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
-                      <path d="M3 10h18" />
+	                    </svg>
+	                  </span>
+	                  <div className={["relative my-2 h-9 w-px bg-gradient-to-b from-white/20 to-white/10", sheetAccentFlowLineVia].join(" ")}>
+	                    <span className={["absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full motion-safe:animate-pulse", sheetAccentFlowDotSoft].join(" ")} />
+	                  </div>
+	                  <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", sheetAccentFlowIconText].join(" ")}>
+	                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
+	                      <path d="M3 10h18" />
                       <path d="M5 10V8a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v2" />
                       <path d="M7 14h10" />
                       <path d="M5 10v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8" />

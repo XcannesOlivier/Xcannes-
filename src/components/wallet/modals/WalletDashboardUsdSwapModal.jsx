@@ -403,6 +403,48 @@ export default function WalletDashboardUsdSwapModal({
       : "border-xcannes-green";
   const accentSwapIconShell = "bg-transparent ring-0";
   const accentSwapIcon = "text-white";
+  const sheetAccentChipClass = isBinanceYellow
+    ? "bg-[#F0B90B]/10 ring-1 ring-[#F0B90B]/20 text-[#F0B90B]"
+    : isFireOrange
+    ? "bg-[#ff6a00]/10 ring-1 ring-[#ff6a00]/20 text-[#ffd1b5]"
+    : isSimpleSwapBlue
+      ? "bg-[#0870f8]/10 ring-1 ring-[#0870f8]/20 text-[#9cc9ff]"
+      : "bg-xcannes-green/10 ring-1 ring-xcannes-green/20 text-xcannes-green/90";
+  const sheetAccentControlCardClass = isBinanceYellow
+    ? "bg-[#F0B90B]/10 ring-1 ring-[#F0B90B]/20 text-white/85"
+    : isFireOrange
+    ? "bg-[#ff6a00]/10 ring-1 ring-[#ff6a00]/20 text-white/85"
+    : isSimpleSwapBlue
+      ? "bg-[#0870f8]/10 ring-1 ring-[#0870f8]/20 text-white/85"
+      : "bg-xcannes-green/10 ring-1 ring-xcannes-green/20 text-white/85";
+  const sheetAccentControlIconClass = isBinanceYellow
+    ? "bg-[#F0B90B]/15 ring-1 ring-[#F0B90B]/25 text-[#fff4c5]"
+    : isFireOrange
+    ? "bg-[#ff6a00]/15 ring-1 ring-[#ff6a00]/25 text-[#ffe1cf]"
+    : isSimpleSwapBlue
+      ? "bg-[#0870f8]/15 ring-1 ring-[#0870f8]/25 text-[#d6e8ff]"
+      : "bg-xcannes-green/15 ring-1 ring-xcannes-green/25 text-xcannes-green/90";
+  const sheetAccentFlowLineVia = isBinanceYellow
+    ? "via-[#F0B90B]/20"
+    : isFireOrange
+    ? "via-[#ff6a00]/20"
+    : isSimpleSwapBlue
+      ? "via-[#0870f8]/20"
+      : "via-xcannes-green/20";
+  const sheetAccentFlowDotStrong = isBinanceYellow
+    ? "bg-[#F0B90B]/40"
+    : isFireOrange
+    ? "bg-[#ff6a00]/40"
+    : isSimpleSwapBlue
+      ? "bg-[#0870f8]/40"
+      : "bg-xcannes-green/40";
+  const sheetAccentFlowDotSoft = isBinanceYellow
+    ? "bg-[#F0B90B]/30"
+    : isFireOrange
+    ? "bg-[#ff6a00]/30"
+    : isSimpleSwapBlue
+      ? "bg-[#0870f8]/30"
+      : "bg-xcannes-green/30";
   const accentActiveCard = isBinanceYellow
     ? "bg-[#F0B90B]/10 ring-[#F0B90B]/35 text-white"
     : isFireOrange
@@ -4522,10 +4564,13 @@ export default function WalletDashboardUsdSwapModal({
 	          {/* Header */}
 	          <div className="flex items-start justify-between gap-3 mb-5">
 	            <div className="flex items-start gap-3 min-w-0">
-	              <span
-	                className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-emerald-500/10 ring-1 ring-emerald-400/20 text-emerald-200"
-	                aria-hidden
-	              >
+		              <span
+		                className={[
+		                  "inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl",
+		                  sheetAccentChipClass,
+		                ].join(" ")}
+		                aria-hidden
+		              >
 	                <svg
 	                  viewBox="0 0 24 24"
 	                  fill="none"
@@ -4604,12 +4649,22 @@ export default function WalletDashboardUsdSwapModal({
 	          </div>
 
 	          {/* Flow */}
-	          <div className="rounded-2xl bg-white/5 ring-1 ring-white/10 p-4 shadow-[0_14px_28px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.05)]">
-	            <div className="mb-5 rounded-2xl bg-emerald-500/10 ring-1 ring-emerald-400/20 px-4 py-3 text-[13px] text-emerald-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
-	              <div className="flex items-start gap-2.5">
-	                <span className="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-xl bg-emerald-400/15 ring-1 ring-emerald-300/20 text-emerald-100">
-	                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4" aria-hidden="true">
-	                    <path d="M20 6L9 17l-5-5" />
+		          <div className="rounded-2xl bg-white/5 ring-1 ring-white/10 p-4 shadow-[0_14px_28px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.05)]">
+		            <div
+		              className={[
+		                "mb-5 rounded-2xl px-4 py-3 text-[13px] shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]",
+		                sheetAccentControlCardClass,
+		              ].join(" ")}
+		            >
+		              <div className="flex items-start gap-2.5">
+		                <span
+		                  className={[
+		                    "mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-xl",
+		                    sheetAccentControlIconClass,
+		                  ].join(" ")}
+		                >
+		                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4" aria-hidden="true">
+		                    <path d="M20 6L9 17l-5-5" />
 	                  </svg>
 	                </span>
 	                <p className="leading-snug">
@@ -4618,29 +4673,29 @@ export default function WalletDashboardUsdSwapModal({
 	              </div>
 	            </div>
 
-	            <div className="flex items-start gap-4">
-	              <div className="flex flex-col items-center pt-0.5">
-	                <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10 text-emerald-200">
-	                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
-	                    <path d="M20 6L9 17l-5-5" />
-	                  </svg>
-	                </span>
-	                <div className="relative my-2 h-9 w-px bg-gradient-to-b from-white/20 via-emerald-400/20 to-white/10">
-	                  <span className="absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-emerald-300/40 motion-safe:animate-pulse" />
-	                </div>
-	                <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10 text-emerald-200">
-	                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
-	                    <path d="M8 7h-3a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-3" />
+		            <div className="flex items-start gap-4">
+		              <div className="flex flex-col items-center pt-0.5">
+		                <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", accentTextSolid].join(" ")}>
+		                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
+		                    <path d="M20 6L9 17l-5-5" />
+		                  </svg>
+		                </span>
+		                <div className={["relative my-2 h-9 w-px bg-gradient-to-b from-white/20 to-white/10", sheetAccentFlowLineVia].join(" ")}>
+		                  <span className={["absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full motion-safe:animate-pulse", sheetAccentFlowDotStrong].join(" ")} />
+		                </div>
+		                <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", accentTextSolid].join(" ")}>
+		                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
+		                    <path d="M8 7h-3a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-3" />
 	                    <path d="M16 3h5v5" />
 	                    <path d="M21 3l-9 9" />
-	                  </svg>
-	                </span>
-	                <div className="relative my-2 h-9 w-px bg-gradient-to-b from-white/20 via-emerald-400/20 to-white/10">
-	                  <span className="absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-emerald-300/30 motion-safe:animate-pulse" />
-	                </div>
-	                <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10 text-emerald-200">
-	                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
-	                    <path d="M3 7h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z" />
+		                  </svg>
+		                </span>
+		                <div className={["relative my-2 h-9 w-px bg-gradient-to-b from-white/20 to-white/10", sheetAccentFlowLineVia].join(" ")}>
+		                  <span className={["absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full motion-safe:animate-pulse", sheetAccentFlowDotSoft].join(" ")} />
+		                </div>
+		                <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", accentTextSolid].join(" ")}>
+		                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
+		                    <path d="M3 7h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z" />
 	                    <path d="M16 11h3" />
 	                  </svg>
 	                </span>
