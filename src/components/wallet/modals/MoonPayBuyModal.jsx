@@ -2088,25 +2088,11 @@ const MoonPayBuyModal = ({
                     <h2 className="text-white font-semibold text-lg leading-tight">
                       {t("ui_op_details_buy_header_title", "Paiement sécurisé")}
                     </h2>
-                    <p className="mt-1 inline-flex items-center gap-1.5 text-[13px] leading-snug text-white/55">
-                      <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2.2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="h-4 w-4 text-amber-200/80"
-                        aria-hidden="true"
-                      >
-                        <path d="M13 2L3 14h7l-1 8 12-14h-7l1-6Z" />
-                      </svg>
-                      <span>
-                        {t(
-                          "ui_op_details_buy_header_subtitle",
-                          "Ajoutez des fonds en quelques secondes",
-                        )}
-                      </span>
+                    <p className="mt-1 text-[13px] leading-snug text-white/55">
+                      {t(
+                        "ui_op_details_buy_header_subtitle",
+                        "Ajoutez des fonds en quelques secondes",
+                      )}
                     </p>
                   </div>
                 </div>
@@ -2234,21 +2220,7 @@ const MoonPayBuyModal = ({
                     </div>
                     <div className="space-y-7 text-[14px] leading-snug text-white/80">
                       <div>
-                        <div className="text-white/90 font-semibold inline-flex items-center gap-2">
-                          <span className="inline-flex h-7 w-7 items-center justify-center rounded-xl bg-white/5 ring-1 ring-white/10 text-emerald-200">
-                            <svg
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2.6"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              className="h-4 w-4"
-                              aria-hidden="true"
-                            >
-                              <path d="M20 6L9 17l-5-5" />
-                            </svg>
-                          </span>
+                        <div className="text-white/90 font-semibold">
                           {t("ui_op_flow_step1_title", "Vous confirmez le paiement")}
                         </div>
                         <div className="mt-1 text-white/55">
@@ -2261,22 +2233,7 @@ const MoonPayBuyModal = ({
                       </div>
 
                       <div>
-                        <div className="text-white/90 font-semibold inline-flex items-center gap-2">
-                          <span className="inline-flex h-7 w-7 items-center justify-center rounded-xl bg-white/5 ring-1 ring-white/10 text-emerald-200">
-                            <svg
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              className="h-4 w-4"
-                              aria-hidden="true"
-                            >
-                              <path d="M12 2l7 4v6c0 5-3 9-7 10-4-1-7-5-7-10V6l7-4Z" />
-                              <path d="M9 12l2 2 4-4" />
-                            </svg>
-                          </span>
+                        <div className="text-white/90 font-semibold">
                           {t("ui_op_flow_step2_title", {
                             defaultValue: "{{partner}} traite l’opération",
                             partner: partnerName,
@@ -2291,24 +2248,7 @@ const MoonPayBuyModal = ({
                       </div>
 
                       <div>
-                        <div className="text-white/90 font-semibold inline-flex items-center gap-2">
-                          <span className="inline-flex h-7 w-7 items-center justify-center rounded-xl bg-white/5 ring-1 ring-white/10 text-emerald-200">
-                            <svg
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              className="h-4 w-4"
-                              aria-hidden="true"
-                            >
-                              <path d="M3 10h18" />
-                              <path d="M5 10V8a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v2" />
-                              <path d="M7 14h10" />
-                              <path d="M5 10v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8" />
-                            </svg>
-                          </span>
+                        <div className="text-white/90 font-semibold">
                           {t(
                             "ui_op_flow_step3_title",
                             "Votre compte XCannes est crédité",
@@ -2481,25 +2421,11 @@ const MoonPayBuyModal = ({
                   <h2 className="text-white font-semibold text-lg leading-tight">
                     {t("ui_op_details_buy_header_title", "Paiement sécurisé")}
                   </h2>
-                  <p className="mt-1 inline-flex items-center gap-1.5 text-[13px] leading-snug text-white/55">
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2.2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="h-4 w-4 text-amber-200/80"
-                      aria-hidden="true"
-                    >
-                      <path d="M13 2L3 14h7l-1 8 12-14h-7l1-6Z" />
-                    </svg>
-                    <span>
-                      {t(
-                        "ui_op_details_buy_header_subtitle",
-                        "Ajoutez des fonds en quelques secondes",
-                      )}
-                    </span>
+                  <p className="mt-1 text-[13px] leading-snug text-white/55">
+                    {t(
+                      "ui_op_details_buy_header_subtitle",
+                      "Ajoutez des fonds en quelques secondes",
+                    )}
                   </p>
                 </div>
               </div>
@@ -2627,21 +2553,7 @@ const MoonPayBuyModal = ({
                   </div>
                   <div className="space-y-7 text-[14px] leading-snug text-white/80">
                     <div>
-                      <div className="text-white/90 font-semibold inline-flex items-center gap-2">
-                        <span className="inline-flex h-7 w-7 items-center justify-center rounded-xl bg-white/5 ring-1 ring-white/10 text-emerald-200">
-                          <svg
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2.6"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            className="h-4 w-4"
-                            aria-hidden="true"
-                          >
-                            <path d="M20 6L9 17l-5-5" />
-                          </svg>
-                        </span>
+                      <div className="text-white/90 font-semibold">
                         {t("ui_op_flow_step1_title", "Vous confirmez le paiement")}
                       </div>
                       <div className="mt-1 text-white/55">
@@ -2654,22 +2566,7 @@ const MoonPayBuyModal = ({
                     </div>
 
                     <div>
-                      <div className="text-white/90 font-semibold inline-flex items-center gap-2">
-                        <span className="inline-flex h-7 w-7 items-center justify-center rounded-xl bg-white/5 ring-1 ring-white/10 text-emerald-200">
-                          <svg
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            className="h-4 w-4"
-                            aria-hidden="true"
-                          >
-                            <path d="M12 2l7 4v6c0 5-3 9-7 10-4-1-7-5-7-10V6l7-4Z" />
-                            <path d="M9 12l2 2 4-4" />
-                          </svg>
-                        </span>
+                      <div className="text-white/90 font-semibold">
                         {t("ui_op_flow_step2_title", {
                           defaultValue: "{{partner}} traite l’opération",
                           partner: partnerName,
@@ -2684,24 +2581,7 @@ const MoonPayBuyModal = ({
                     </div>
 
                     <div>
-                      <div className="text-white/90 font-semibold inline-flex items-center gap-2">
-                        <span className="inline-flex h-7 w-7 items-center justify-center rounded-xl bg-white/5 ring-1 ring-white/10 text-emerald-200">
-                          <svg
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            className="h-4 w-4"
-                            aria-hidden="true"
-                          >
-                            <path d="M3 10h18" />
-                            <path d="M5 10V8a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v2" />
-                            <path d="M7 14h10" />
-                            <path d="M5 10v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8" />
-                          </svg>
-                        </span>
+                      <div className="text-white/90 font-semibold">
                         {t(
                           "ui_op_flow_step3_title",
                           "Votre compte XCannes est crédité",

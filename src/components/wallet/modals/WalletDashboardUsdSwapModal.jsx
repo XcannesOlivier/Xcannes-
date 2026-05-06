@@ -4543,28 +4543,14 @@ export default function WalletDashboardUsdSwapModal({
 	                <h2 className="text-white font-semibold text-lg leading-tight">
 	                  {t("ui_op_details_swap_header_title", "Conversion sécurisée")}
 	                </h2>
-	                <p className="mt-1 inline-flex items-center gap-1.5 text-[13px] leading-snug text-white/55">
-	                  <svg
-	                    viewBox="0 0 24 24"
-	                    fill="none"
-	                    stroke="currentColor"
-	                    strokeWidth="2.2"
-	                    strokeLinecap="round"
-	                    strokeLinejoin="round"
-	                    className="h-4 w-4 text-amber-200/80"
-	                    aria-hidden="true"
-	                  >
-	                    <path d="M13 2L3 14h7l-1 8 12-14h-7l1-6Z" />
-	                  </svg>
-	                  <span>
-	                    {t(
-	                      "ui_op_details_swap_header_subtitle",
-	                      "Conversion automatique via SimpleSwap",
-	                    )}
-	                  </span>
-	                </p>
-	              </div>
-	            </div>
+		                <p className="mt-1 text-[13px] leading-snug text-white/55">
+		                  {t(
+		                    "ui_op_details_swap_header_subtitle",
+		                    "Conversion automatique via SimpleSwap",
+		                  )}
+		                </p>
+		              </div>
+		            </div>
 	            <button
 	              type="button"
 	              onClick={() => { setSheetDragY(0); setOpDetailsOpen(false); }}
@@ -4663,16 +4649,11 @@ export default function WalletDashboardUsdSwapModal({
 	              <div className="flex-1 min-w-0">
 	                <div className="space-y-7 text-[14px] leading-snug text-white/80">
 	                  <div>
-	                    <div className="text-white/90 font-semibold inline-flex items-center gap-2">
-	                      <span className="inline-flex h-7 w-7 items-center justify-center rounded-xl bg-white/5 ring-1 ring-white/10 text-emerald-200">
-	                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4" aria-hidden="true">
-	                          <path d="M20 6L9 17l-5-5" />
-	                        </svg>
-	                      </span>
-	                      {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
-	                        ? t("ui_op_flow_swap_step1_out", "Vous confirmez la conversion")
-	                        : t("ui_op_flow_swap_step1_in", "Vous envoyez vos stablecoins")}
-	                    </div>
+		                    <div className="text-white/90 font-semibold">
+		                      {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
+		                        ? t("ui_op_flow_swap_step1_out", "Vous confirmez la conversion")
+		                        : t("ui_op_flow_swap_step1_in", "Vous envoyez vos stablecoins")}
+		                    </div>
 	                    <div className="mt-1 text-white/55">
 	                      {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
 	                        ? t("ui_op_flow_swap_step1_out_sub", "Vous validez l’opération sur XCannes.")
@@ -4681,32 +4662,20 @@ export default function WalletDashboardUsdSwapModal({
 	                  </div>
 
 	                  <div>
-	                    <div className="text-white/90 font-semibold inline-flex items-center gap-2">
-	                      <span className="inline-flex h-7 w-7 items-center justify-center rounded-xl bg-white/5 ring-1 ring-white/10 text-emerald-200">
-	                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4" aria-hidden="true">
-	                          <path d="M12 2l7 4v6c0 5-3 9-7 10-4-1-7-5-7-10V6l7-4Z" />
-	                          <path d="M9 12l2 2 4-4" />
-	                        </svg>
-	                      </span>
-	                      {t("ui_op_flow_step2_title", { defaultValue: "SimpleSwap traite l’opération" })}
-	                    </div>
+		                    <div className="text-white/90 font-semibold">
+		                      {t("ui_op_flow_step2_title", { defaultValue: "SimpleSwap traite l’opération" })}
+		                    </div>
 	                    <div className="mt-1 text-white/55">
 	                      {t("ui_op_flow_step2_subtitle", "Conversion automatique via les services de liquidité.")}
 	                    </div>
 	                  </div>
 
 	                  <div>
-	                    <div className="text-white/90 font-semibold inline-flex items-center gap-2">
-	                      <span className="inline-flex h-7 w-7 items-center justify-center rounded-xl bg-white/5 ring-1 ring-white/10 text-emerald-200">
-	                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4" aria-hidden="true">
-	                          <path d="M3 7h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z" />
-	                          <path d="M16 11h3" />
-	                        </svg>
-	                      </span>
-	                      {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
-	                        ? t("ui_op_flow_swap_step3_out", "Le stablecoin est envoyé")
-	                        : t("ui_op_flow_swap_step3_in", "Votre compte XCannes est crédité")}
-	                    </div>
+		                    <div className="text-white/90 font-semibold">
+		                      {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
+		                        ? t("ui_op_flow_swap_step3_out", "Le stablecoin est envoyé")
+		                        : t("ui_op_flow_swap_step3_in", "Votre compte XCannes est crédité")}
+		                    </div>
 	                    <div className="mt-1 text-white/55">
 	                      {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
 	                        ? t("ui_op_flow_swap_step3_out_sub", "Envoi vers l’adresse de réception une fois validé.")
