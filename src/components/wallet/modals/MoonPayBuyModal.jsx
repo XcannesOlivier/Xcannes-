@@ -2062,22 +2062,60 @@ const MoonPayBuyModal = ({
               {/* Content */}
               <div className="space-y-5 text-[15px] leading-relaxed text-white/75">
                 <p>
-                  {t('ui_op_details_p1', 'Le paiement est traité par notre partenaire.')}{' '}
-                  {xrpPreviewAmount !== null ? (
-                    <span className="text-white/55">
-                      ({t('ui_op_details_xrp_hint', {
-                        defaultValue: '≈ {{xrp}} XRP',
-                        xrp: new Intl.NumberFormat(locale, { minimumFractionDigits: 2, maximumFractionDigits: 4 }).format(xrpPreviewAmount),
-                      })})
-                    </span>
-                  ) : null}
+                  {t(
+                    "ui_op_details_buy_p1",
+                    "Votre paiement est traité de manière sécurisée par notre partenaire MoonPay.",
+                  )}
                 </p>
                 <p>
-                  {t('ui_op_details_p2', 'Selon la liquidité disponible, une conversion automatique peut être utilisée pour créditer votre compte. XRP peut servir de bridge de liquidité pendant l\'opération.')}
+                  {t(
+                    "ui_op_details_buy_p2",
+                    "Vous gardez le contrôle de chaque étape : aucune opération n’est effectuée sans votre validation.",
+                  )}
                 </p>
                 <p>
-                  {t('ui_op_details_p3', 'Tout est automatique : vous validez simplement le paiement chez le partenaire.')}
+                  {t(
+                    "ui_op_details_buy_p3",
+                    "Après confirmation de votre paiement, le montant est automatiquement converti via les services de liquidité de notre partenaire puis crédité sur votre compte XCannes en euros.",
+                  )}
                 </p>
+                <div className="pt-1">
+                  <h3 className="text-white/90 font-semibold">
+                    {t("ui_op_details_buy_how", "Comment ça fonctionne")}
+                  </h3>
+                  <ul className="mt-2 space-y-1.5 list-disc pl-5 text-white/75">
+                    <li>
+                      {t("ui_op_details_buy_step1", "Vous choisissez le montant à ajouter")}
+                    </li>
+                    <li>
+                      {t("ui_op_details_buy_step2", "Vous validez le paiement chez MoonPay")}
+                    </li>
+                    <li>
+                      {t(
+                        "ui_op_details_buy_step3",
+                        "La conversion est exécutée automatiquement après votre confirmation",
+                      )}
+                    </li>
+                    <li>
+                      {t(
+                        "ui_op_details_buy_step4",
+                        "Votre compte est crédité en euros une fois l’opération validée",
+                      )}
+                    </li>
+                  </ul>
+                </div>
+                {xrpPreviewAmount !== null ? (
+                  <p className="pt-1 text-white/70">
+                    {t("ui_op_details_buy_xrp_used", {
+                      defaultValue:
+                        "≈ {{xrp}} XRP utilisés pendant le traitement de l’opération.",
+                      xrp: new Intl.NumberFormat(locale, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 4,
+                      }).format(xrpPreviewAmount),
+                    })}
+                  </p>
+                ) : null}
               </div>
             </div>
           </div>,
@@ -2178,22 +2216,56 @@ const MoonPayBuyModal = ({
             {/* Content */}
             <div className="space-y-5 text-[15px] leading-relaxed text-white/75">
               <p>
-                {t('ui_op_details_p1', 'Le paiement est traité par notre partenaire.')}{' '}
-                {xrpPreviewAmount !== null ? (
-                  <span className="text-white/55">
-                    ({t('ui_op_details_xrp_hint', {
-                      defaultValue: '≈ {{xrp}} XRP',
-                      xrp: new Intl.NumberFormat(locale, { minimumFractionDigits: 2, maximumFractionDigits: 4 }).format(xrpPreviewAmount),
-                    })})
-                  </span>
-                ) : null}
+                {t(
+                  "ui_op_details_buy_p1",
+                  "Votre paiement est traité de manière sécurisée par notre partenaire MoonPay.",
+                )}
               </p>
               <p>
-                {t('ui_op_details_p2', 'Selon la liquidité disponible, une conversion automatique peut être utilisée pour créditer votre compte. XRP peut servir de bridge de liquidité pendant l\'opération.')}
+                {t(
+                  "ui_op_details_buy_p2",
+                  "Vous gardez le contrôle de chaque étape : aucune opération n’est effectuée sans votre validation.",
+                )}
               </p>
               <p>
-                {t('ui_op_details_p3', 'Tout est automatique : vous validez simplement le paiement chez le partenaire.')}
+                {t(
+                  "ui_op_details_buy_p3",
+                  "Après confirmation de votre paiement, le montant est automatiquement converti via les services de liquidité de notre partenaire puis crédité sur votre compte XCannes en euros.",
+                )}
               </p>
+              <div className="pt-1">
+                <h3 className="text-white/90 font-semibold">
+                  {t("ui_op_details_buy_how", "Comment ça fonctionne")}
+                </h3>
+                <ul className="mt-2 space-y-1.5 list-disc pl-5 text-white/75">
+                  <li>{t("ui_op_details_buy_step1", "Vous choisissez le montant à ajouter")}</li>
+                  <li>{t("ui_op_details_buy_step2", "Vous validez le paiement chez MoonPay")}</li>
+                  <li>
+                    {t(
+                      "ui_op_details_buy_step3",
+                      "La conversion est exécutée automatiquement après votre confirmation",
+                    )}
+                  </li>
+                  <li>
+                    {t(
+                      "ui_op_details_buy_step4",
+                      "Votre compte est crédité en euros une fois l’opération validée",
+                    )}
+                  </li>
+                </ul>
+              </div>
+              {xrpPreviewAmount !== null ? (
+                <p className="pt-1 text-white/70">
+                  {t("ui_op_details_buy_xrp_used", {
+                    defaultValue:
+                      "≈ {{xrp}} XRP utilisés pendant le traitement de l’opération.",
+                    xrp: new Intl.NumberFormat(locale, {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 4,
+                    }).format(xrpPreviewAmount),
+                  })}
+                </p>
+              ) : null}
             </div>
           </div>
         </div>,

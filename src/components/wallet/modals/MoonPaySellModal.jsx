@@ -1742,9 +1742,67 @@ const MoonPaySellModal = ({
                 <button type="button" onClick={() => { setSheetDragY(0); setOpDetailsOpen(false); }} className="hidden md:flex text-white/50 hover:text-white transition-colors text-xl leading-none p-1" aria-label={t('ui_close', 'Fermer')}>✕</button>
               </div>
               <div className="space-y-5 text-[15px] leading-relaxed text-white/75">
-                <p>{t('ui_op_details_sell_p1', 'Le retrait est traité par notre partenaire.')}{' '}{xrpPreviewAmount !== null ? <span className="text-white/55">({t('ui_op_details_xrp_hint', { defaultValue: '≈ {{xrp}} XRP', xrp: new Intl.NumberFormat(locale, { minimumFractionDigits: 2, maximumFractionDigits: 4 }).format(xrpPreviewAmount) })})</span> : null}</p>
-                <p>{t('ui_op_details_sell_p2', "Selon la liquidité disponible, une conversion automatique peut être utilisée pour débiter votre compte. XRP peut servir de bridge de liquidité pendant l'opération.")}</p>
-                <p>{t('ui_op_details_sell_p3', 'Tout est automatique : vous validez simplement le paiement chez le partenaire.')}</p>
+                <p>
+                  {t(
+                    "ui_op_details_sell_new_p1",
+                    "Votre retrait est traité de manière sécurisée par notre partenaire MoonPay.",
+                  )}
+                </p>
+                <p>
+                  {t(
+                    "ui_op_details_sell_new_p2",
+                    "Vous gardez le contrôle de chaque étape : aucune opération n’est effectuée sans votre validation.",
+                  )}
+                </p>
+                <p>
+                  {t(
+                    "ui_op_details_sell_new_p3",
+                    "Après confirmation de votre retrait, le montant est automatiquement converti via les services de liquidité de notre partenaire puis envoyé vers votre compte bancaire.",
+                  )}
+                </p>
+                <div className="pt-1">
+                  <h3 className="text-white/90 font-semibold">
+                    {t("ui_op_details_sell_new_how", "Comment ça fonctionne")}
+                  </h3>
+                  <ul className="mt-2 space-y-1.5 list-disc pl-5 text-white/75">
+                    <li>
+                      {t(
+                        "ui_op_details_sell_new_step1",
+                        "Vous choisissez le montant à retirer",
+                      )}
+                    </li>
+                    <li>
+                      {t(
+                        "ui_op_details_sell_new_step2",
+                        "Vous validez l’opération chez MoonPay",
+                      )}
+                    </li>
+                    <li>
+                      {t(
+                        "ui_op_details_sell_new_step3",
+                        "La conversion est exécutée automatiquement après votre confirmation",
+                      )}
+                    </li>
+                    <li>
+                      {t(
+                        "ui_op_details_sell_new_step4",
+                        "Les fonds sont ensuite transférés vers votre banque",
+                      )}
+                    </li>
+                  </ul>
+                </div>
+                {xrpPreviewAmount !== null ? (
+                  <p className="pt-1 text-white/70">
+                    {t("ui_op_details_sell_new_xrp_used", {
+                      defaultValue:
+                        "≈ {{xrp}} XRP utilisés pendant le traitement de l’opération.",
+                      xrp: new Intl.NumberFormat(locale, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 4,
+                      }).format(xrpPreviewAmount),
+                    })}
+                  </p>
+                ) : null}
               </div>
             </div>
           </div>,
@@ -1818,22 +1876,60 @@ const MoonPaySellModal = ({
             </div>
             <div className="space-y-5 text-[15px] leading-relaxed text-white/75">
               <p>
-                {t('ui_op_details_sell_p1', 'Le retrait est traité par notre partenaire.')}{' '}
-                {xrpPreviewAmount !== null ? (
-                  <span className="text-white/55">
-                    ({t('ui_op_details_xrp_hint', {
-                      defaultValue: '≈ {{xrp}} XRP',
-                      xrp: new Intl.NumberFormat(locale, { minimumFractionDigits: 2, maximumFractionDigits: 4 }).format(xrpPreviewAmount),
-                    })})
-                  </span>
-                ) : null}
+                {t(
+                  "ui_op_details_sell_new_p1",
+                  "Votre retrait est traité de manière sécurisée par notre partenaire MoonPay.",
+                )}
               </p>
               <p>
-                {t('ui_op_details_sell_p2', "Selon la liquidité disponible, une conversion automatique peut être utilisée pour débiter votre compte. XRP peut servir de bridge de liquidité pendant l'opération.")}
+                {t(
+                  "ui_op_details_sell_new_p2",
+                  "Vous gardez le contrôle de chaque étape : aucune opération n’est effectuée sans votre validation.",
+                )}
               </p>
               <p>
-                {t('ui_op_details_sell_p3', 'Tout est automatique : vous validez simplement le paiement chez le partenaire.')}
+                {t(
+                  "ui_op_details_sell_new_p3",
+                  "Après confirmation de votre retrait, le montant est automatiquement converti via les services de liquidité de notre partenaire puis envoyé vers votre compte bancaire.",
+                )}
               </p>
+              <div className="pt-1">
+                <h3 className="text-white/90 font-semibold">
+                  {t("ui_op_details_sell_new_how", "Comment ça fonctionne")}
+                </h3>
+                <ul className="mt-2 space-y-1.5 list-disc pl-5 text-white/75">
+                  <li>
+                    {t("ui_op_details_sell_new_step1", "Vous choisissez le montant à retirer")}
+                  </li>
+                  <li>
+                    {t("ui_op_details_sell_new_step2", "Vous validez l’opération chez MoonPay")}
+                  </li>
+                  <li>
+                    {t(
+                      "ui_op_details_sell_new_step3",
+                      "La conversion est exécutée automatiquement après votre confirmation",
+                    )}
+                  </li>
+                  <li>
+                    {t(
+                      "ui_op_details_sell_new_step4",
+                      "Les fonds sont ensuite transférés vers votre banque",
+                    )}
+                  </li>
+                </ul>
+              </div>
+              {xrpPreviewAmount !== null ? (
+                <p className="pt-1 text-white/70">
+                  {t("ui_op_details_sell_new_xrp_used", {
+                    defaultValue:
+                      "≈ {{xrp}} XRP utilisés pendant le traitement de l’opération.",
+                    xrp: new Intl.NumberFormat(locale, {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 4,
+                    }).format(xrpPreviewAmount),
+                  })}
+                </p>
+              ) : null}
             </div>
           </div>
         </div>,
