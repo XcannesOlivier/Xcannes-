@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { XCircleIcon, CheckCircleIcon, ChevronLeftIcon } from '@heroicons/react/24/outline';
+import { XCircleIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 import ModalSelect from '@/components/ui/ModalSelect';
 import { useTranslation } from 'next-i18next';
 import { CRYPTO_ICONS } from '@/utils/marketConstants';
@@ -1633,22 +1633,10 @@ const MoonPayBuyModal = ({
         <div className='space-y-5'>
           {/* Title + Wallet pill */}
           {wizardStep === 1 ? (
-		          <div className="relative z-[120] px-4 pt-[40px] md:pt-[80px] pb-4 text-center">
-              {/* Desktop: bouton ← Retour vers "Gérer vos fonds" (embedded) */}
-              {embedded ? (
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="hidden md:inline-flex absolute left-0 md:left-[-15px] top-2 md:top-[-10px] items-center gap-2 text-white/70 hover:text-white transition-colors"
-                  aria-label={t('back', 'Back')}
-                >
-                  <ChevronLeftIcon className="w-4 h-4" aria-hidden="true" />
-                  <span className="text-xs">{t('ui_back', 'Retour')}</span>
-                </button>
-              ) : null}
-              <h3 className="text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight mb-2">
-                {resolvedTitleOverride || t('ui_funds_add_title', 'Ajouter des fonds')}
-              </h3>
+		          <div className="relative z-[120] px-4 pt-[40px] md:pt-[90px] pb-4 text-center">
+	              <h3 className="text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight mb-2">
+	                {resolvedTitleOverride || t('ui_funds_add_title', 'Ajouter des fonds')}
+	              </h3>
               {!demoMode && !useSimpleSwapPartner ? (
                 <div className="mb-6 flex flex-col items-center">
                   <p className="mt-2 text-[14px] md:text-[15px] text-white/80 max-w-[34ch] mx-auto leading-relaxed text-center">

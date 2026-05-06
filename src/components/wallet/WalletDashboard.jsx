@@ -1031,6 +1031,10 @@ export default function WalletDashboard({
     flashWalletHeaderToast,
     t,
     toast,
+    resetSendForm,
+    resetReceiveForm,
+    resetSwapForm,
+    resetCashForm,
   });
 
   const handleOpenRecentSummary = useCallback(() => {

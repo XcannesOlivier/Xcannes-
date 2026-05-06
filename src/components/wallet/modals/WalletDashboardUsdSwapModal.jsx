@@ -2633,7 +2633,20 @@ export default function WalletDashboardUsdSwapModal({
                 <div className={`absolute inset-0 hidden md:block ${isBinanceYellow ? 'bg-[radial-gradient(1000px_circle_at_100%_50%,rgba(240,185,11,0.07),transparent_60%)]' : 'bg-[radial-gradient(1000px_circle_at_100%_50%,rgba(8,112,248,0.07),transparent_60%)]'}`} />
               </div>
             ) : null}
-	            {!(step === "form" && walletInlineSelectionEnabled) ? (
+	            {walletInlineSelectionEnabled ? (
+	              !inline && swipeEnabled ? (
+	                <div
+	                  className="md:hidden border-b border-white/10"
+	                  onPointerDown={(event) => {
+	                    maybeStartModalOverlayDrag(event, "fixed");
+	                  }}
+	                >
+	                  <div className="flex justify-center pt-[14px] pb-3 cursor-grab select-none" aria-hidden>
+	                    <span className="block w-12 h-1.5 rounded-full bg-white/20" />
+	                  </div>
+	                </div>
+	              ) : null
+	            ) : (
 	              <div
 	                className="border-b border-white/10"
 	                onPointerDown={
@@ -2646,49 +2659,13 @@ export default function WalletDashboardUsdSwapModal({
 	              >
 	                {!inline ? (
 	                  swipeEnabled ? (
-	                    <div
-	                      className="md:hidden flex justify-center pt-[14px] pb-3 cursor-grab select-none"
-	                      aria-hidden
-	                    >
+	                    <div className="md:hidden flex justify-center pt-[14px] pb-3 cursor-grab select-none" aria-hidden>
 	                      <span className="block w-12 h-1.5 rounded-full bg-white/20" />
 	                    </div>
 	                  ) : null
 	                ) : null}
 	                <div className="p-4">
-	                  <div className="flex items-center justify-between gap-3">
-	                    {inline ? (
-	                      <button
-	                        type="button"
-	                        onClick={handleHeaderBack}
-	                        className="wallet-modal-close wallet-modal-close--force text-white/70 hover:text-white transition-colors text-xl flex items-center justify-center"
-	                        aria-label={t("ui_back", "Retour")}
-	                      >
-	                        <svg viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5" aria-hidden>
-	                          <path
-	                            fillRule="evenodd"
-	                            d="M11.78 3.22a.75.75 0 0 1 0 1.06L7.06 9l4.72 4.72a.75.75 0 1 1-1.06 1.06l-5.25-5.25a.75.75 0 0 1 0-1.06l5.25-5.25a.75.75 0 0 1 1.06 0Z"
-	                            clipRule="evenodd"
-	                          />
-	                        </svg>
-	                        <span className="ml-1 text-sm font-medium">Retour</span>
-	                      </button>
-	                    ) : (
-	                      <button
-	                        type="button"
-	                        onClick={handleHeaderBack}
-	                        className="wallet-modal-close text-white/70 hover:text-white transition-colors text-xl flex items-center justify-center sr-only"
-	                        aria-label={t("ui_back", "Retour")}
-	                      >
-	                        <svg viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5" aria-hidden>
-	                          <path
-	                            fillRule="evenodd"
-	                            d="M11.78 3.22a.75.75 0 0 1 0 1.06L7.06 9l4.72 4.72a.75.75 0 1 1-1.06 1.06l-5.25-5.25a.75.75 0 0 1 0-1.06l5.25-5.25a.75.75 0 0 1 1.06 0Z"
-	                            clipRule="evenodd"
-	                          />
-	                        </svg>
-	                      </button>
-	                    )}
-
+	                  <div className="flex items-center justify-end gap-3">
 	                    {noticeVariant === "demo" ? (
 	                      <span className="inline-flex items-center text-white/80 text-xs md:text-sm font-semibold px-2 py-1 leading-none">
 	                        {t("demo_notice_title", "Mode démo")}
@@ -2711,7 +2688,7 @@ export default function WalletDashboardUsdSwapModal({
 	                  ) : null}
 	                </div>
 	              </div>
-	            ) : null}
+	            )}
 
           <div
             ref={modalOverlayListRef}
@@ -2954,22 +2931,7 @@ export default function WalletDashboardUsdSwapModal({
               <div className="space-y-5 relative z-[2]">
                 {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE || walletTargetSelectionEnabled ? (
 	                  walletInlineSelectionEnabled ? (
-	                    <div className="relative px-4 pt-[40px] md:pt-[70px] pb-4 text-center">
-	                      <button
-	                        type="button"
-	                        onClick={handleHeaderBack}
-	                        className="absolute left-4 top-3 inline-flex items-center gap-2 text-white/70 hover:text-white transition-colors"
-	                        aria-label={t("ui_back", "Retour")}
-	                      >
-	                        <svg viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5" aria-hidden>
-	                          <path
-	                            fillRule="evenodd"
-	                            d="M11.78 3.22a.75.75 0 0 1 0 1.06L7.06 9l4.72 4.72a.75.75 0 1 1-1.06 1.06l-5.25-5.25a.75.75 0 0 1 0-1.06l5.25-5.25a.75.75 0 0 1 1.06 0Z"
-	                            clipRule="evenodd"
-	                          />
-	                        </svg>
-	                        <span className="text-sm font-medium">Retour</span>
-	                      </button>
+	                    <div className="relative px-4 pt-[40px] md:pt-[90px] pb-4 text-center">
 	                      <h3 className="text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight mb-2">
 	                        {flowTitle}
 	                      </h3>

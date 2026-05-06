@@ -4,7 +4,6 @@ import {
   XCircleIcon,
   CheckCircleIcon,
   ArrowDownIcon,
-  ChevronLeftIcon,
 } from "@heroicons/react/24/outline";
 import { useTranslation } from "next-i18next";
 import { useModalTransition } from "@/hooks/useModalTransition";
@@ -1378,19 +1377,7 @@ const MoonPaySellModal = ({
 
           {/* Title + Wallet pill */}
           {wizardStep === 1 ? (
-		          <div className="relative z-[66] px-4 pt-[40px] md:pt-[80px] pb-4 text-center">
-              {/* Desktop: bouton ← Retour vers "Gérer vos fonds" (embedded) */}
-              {embedded ? (
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="hidden md:inline-flex absolute left-0 md:left-[-15px] top-2 md:top-[-10px] items-center gap-2 text-white/70 hover:text-white transition-colors"
-                  aria-label={t("back", "Back")}
-                >
-                  <ChevronLeftIcon className="w-4 h-4" aria-hidden="true" />
-                  <span className="text-xs">{t("ui_back", "Retour")}</span>
-                </button>
-              ) : null}
+		          <div className="relative z-[66] px-4 pt-[40px] md:pt-[90px] pb-4 text-center">
             <h3 className="text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight mb-2">
               {resolvedSelectCryptoTitleOverride ||
                 t("moonpay_sell_withdraw_title_prefix", "Retirer vers un compte bancaire")}

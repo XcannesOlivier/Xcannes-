@@ -48,10 +48,26 @@ export function useWalletNavigation({
   // i18n & toast
   t,
   toast,
+  // optional: reset action forms (desktop-only requirement)
+  resetSendForm,
+  resetReceiveForm,
+  resetSwapForm,
+  resetCashForm,
 }) {
   const refreshTimerRef = useRef(null);
   const cashEnabled = MOONPAY_UI_ENABLED || TOPPER_UI_ENABLED;
   const DESKTOP_INLINE_RETURN_STATE = "__XCANNES_DESKTOP_INLINE_RETURN_STATE__";
+  const SETTINGS_RETURN_FLAG = "__XCANNES_RETURN_TO_SETTINGS_DROPDOWN__";
+
+  const clearDesktopInlineReturnState = useCallback(() => {
+    try {
+      if (typeof window === "undefined") return;
+      window[DESKTOP_INLINE_RETURN_STATE] = null;
+      window[SETTINGS_RETURN_FLAG] = false;
+    } catch {
+      // ignore
+    }
+  }, [DESKTOP_INLINE_RETURN_STATE]);
 
   const stashDesktopInlineReturnState = useCallback(() => {
     try {
@@ -152,6 +168,30 @@ export function useWalletNavigation({
 
   const handleAction = useCallback(
     (nextAction) => {
+      // Desktop requirement: every click on a main wallet action should reset
+      // the corresponding first view and dismiss any other open inline views.
+      if (isDesktopPanel) {
+        clearDesktopInlineReturnState();
+        setShowActivationModal(false);
+        setShowActivationRequestModal(false);
+        setShowGlobalStatement(false);
+        setShowCurrencyStatement(false);
+        setSelectedStatementToken(null);
+
+        if (nextAction === "send" || nextAction === "sendChoice") {
+          resetSendForm?.();
+        }
+        if (nextAction === "receive") {
+          resetReceiveForm?.();
+        }
+        if (nextAction === "swap") {
+          resetSwapForm?.();
+        }
+        if (nextAction === "cash" || nextAction === "cashChoice") {
+          resetCashForm?.();
+        }
+      }
+
       closeInlineQr();
       setWalletInfoOpen(false);
       setDesktopSettingsPage?.(null);
@@ -178,13 +218,24 @@ export function useWalletNavigation({
     },
     [
       cashEnabled,
+      clearDesktopInlineReturnState,
       closeInlineQr,
+      isDesktopPanel,
       setActiveAction,
       setWalletInfoOpen,
       setDesktopSettingsPage,
       setSwapDefaultView,
       setSwapLockedView,
       setCashBuyPrefill,
+      setSelectedStatementToken,
+      setShowActivationModal,
+      setShowActivationRequestModal,
+      setShowCurrencyStatement,
+      setShowGlobalStatement,
+      resetSendForm,
+      resetReceiveForm,
+      resetSwapForm,
+      resetCashForm,
       t,
       toast,
     ],
