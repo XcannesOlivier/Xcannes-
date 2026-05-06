@@ -158,16 +158,12 @@ const MoonPayBuyModal = ({
     accentVariant === 'simpleswapBlue'
       ? 'bg-[#0870f8]/10 ring-1 ring-[#0870f8]/20 text-[#9cc9ff]'
       : 'bg-xcannes-green/10 ring-1 ring-xcannes-green/20 text-xcannes-green/90';
-  const sheetAccentControlCardClass =
-    accentVariant === 'simpleswapBlue'
-      ? 'bg-[#0870f8]/10 ring-1 ring-[#0870f8]/20 text-white/85'
-      : 'bg-xcannes-green/10 ring-1 ring-xcannes-green/20 text-white/85';
-  const sheetAccentControlIconClass =
-    accentVariant === 'simpleswapBlue'
-      ? 'bg-[#0870f8]/15 ring-1 ring-[#0870f8]/25 text-[#d6e8ff]'
-      : 'bg-xcannes-green/15 ring-1 ring-xcannes-green/25 text-xcannes-green/90';
-  const sheetAccentFlowIconText =
-    accentVariant === 'simpleswapBlue' ? 'text-[#9cc9ff]' : 'text-xcannes-green/90';
+	  const sheetAccentControlCardClass =
+	    accentVariant === 'simpleswapBlue'
+	      ? 'bg-[#0870f8]/10 ring-1 ring-[#0870f8]/20 text-white/85'
+	      : 'bg-xcannes-green/10 ring-1 ring-xcannes-green/20 text-white/85';
+	  const sheetAccentFlowIconText =
+	    accentVariant === 'simpleswapBlue' ? 'text-[#9cc9ff]' : 'text-xcannes-green/90';
   const sheetAccentFlowLineVia =
     accentVariant === 'simpleswapBlue' ? 'via-[#0870f8]/20' : 'via-xcannes-green/20';
   const sheetAccentFlowDotStrong =
@@ -2179,34 +2175,13 @@ const MoonPayBuyModal = ({
 	                    sheetAccentControlCardClass,
 	                  ].join(" ")}
 	                >
-	                  <div className="flex items-start gap-2.5">
-	                    <span
-	                      className={[
-	                        "mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-xl",
-	                        sheetAccentControlIconClass,
-	                      ].join(" ")}
-	                    >
-	                      <svg
-	                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2.6"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="h-4 w-4"
-                        aria-hidden="true"
-                      >
-                        <path d="M20 6L9 17l-5-5" />
-                      </svg>
-                    </span>
-                    <p className="leading-snug">
-                      {t(
-                        "ui_op_flow_control_card",
-                        "Aucune opération n’est effectuée sans votre validation.",
-                      )}
-                    </p>
-                  </div>
-                </div>
+		                  <p className="leading-snug">
+		                    {t(
+		                      "ui_op_flow_control_card",
+		                      "Aucune opération n’est effectuée sans votre validation.",
+		                    )}
+		                  </p>
+		                </div>
 
 	                <div className="flex items-start gap-4">
 	                  <div className="flex flex-col items-center pt-0.5">
@@ -2526,34 +2501,13 @@ const MoonPayBuyModal = ({
 	                  sheetAccentControlCardClass,
 	                ].join(" ")}
 	              >
-	                <div className="flex items-start gap-2.5">
-	                  <span
-	                    className={[
-	                      "mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-xl",
-	                      sheetAccentControlIconClass,
-	                    ].join(" ")}
-	                  >
-	                    <svg
-	                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2.6"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="h-4 w-4"
-                      aria-hidden="true"
-                    >
-                      <path d="M20 6L9 17l-5-5" />
-                    </svg>
-                  </span>
-                  <p className="leading-snug">
-                    {t(
-                      "ui_op_flow_control_card",
-                      "Aucune opération n’est effectuée sans votre validation.",
-                    )}
-                  </p>
-                </div>
-              </div>
+		                <p className="leading-snug">
+		                  {t(
+		                    "ui_op_flow_control_card",
+		                    "Aucune opération n’est effectuée sans votre validation.",
+		                  )}
+		                </p>
+	              </div>
 
 	              <div className="flex items-start gap-4">
 	                <div className="flex flex-col items-center pt-0.5">

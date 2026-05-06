@@ -134,16 +134,12 @@ const MoonPaySellModal = ({
     accentVariant === "fireOrange"
       ? "bg-[#ff6a00]/10 ring-1 ring-[#ff6a00]/20 text-[#ffd1b5]"
       : "bg-xcannes-violet/10 ring-1 ring-xcannes-violet/20 text-xcannes-violet/90";
-  const sheetAccentControlCardClass =
-    accentVariant === "fireOrange"
-      ? "bg-[#ff6a00]/10 ring-1 ring-[#ff6a00]/20 text-white/85"
-      : "bg-xcannes-violet/10 ring-1 ring-xcannes-violet/20 text-white/85";
-  const sheetAccentControlIconClass =
-    accentVariant === "fireOrange"
-      ? "bg-[#ff6a00]/15 ring-1 ring-[#ff6a00]/25 text-[#ffe1cf]"
-      : "bg-xcannes-violet/15 ring-1 ring-xcannes-violet/25 text-xcannes-violet/90";
-  const sheetAccentFlowIconText =
-    accentVariant === "fireOrange" ? "text-[#ffb487]" : "text-xcannes-violet/90";
+	  const sheetAccentControlCardClass =
+	    accentVariant === "fireOrange"
+	      ? "bg-[#ff6a00]/10 ring-1 ring-[#ff6a00]/20 text-white/85"
+	      : "bg-xcannes-violet/10 ring-1 ring-xcannes-violet/20 text-white/85";
+	  const sheetAccentFlowIconText =
+	    accentVariant === "fireOrange" ? "text-[#ffb487]" : "text-xcannes-violet/90";
   const sheetAccentFlowLineVia =
     accentVariant === "fireOrange" ? "via-[#ff6a00]/20" : "via-xcannes-violet/20";
   const sheetAccentFlowDotStrong =
@@ -1874,22 +1870,10 @@ const MoonPaySellModal = ({
 	                    sheetAccentControlCardClass,
 	                  ].join(" ")}
 	                >
-	                  <div className="flex items-start gap-2.5">
-	                    <span
-	                      className={[
-	                        "mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-xl",
-	                        sheetAccentControlIconClass,
-	                      ].join(" ")}
-	                    >
-	                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4" aria-hidden="true">
-	                        <path d="M20 6L9 17l-5-5" />
-                      </svg>
-                    </span>
-                    <p className="leading-snug">
-                      {t("ui_op_flow_control_card", "Aucune opération n’est effectuée sans votre validation.")}
-                    </p>
-                  </div>
-                </div>
+		                  <p className="leading-snug">
+		                    {t("ui_op_flow_control_card", "Aucune opération n’est effectuée sans votre validation.")}
+		                  </p>
+		                </div>
 
 	                <div className="flex items-start gap-4">
 	                  <div className="flex flex-col items-center pt-0.5">
@@ -2121,22 +2105,10 @@ const MoonPaySellModal = ({
 	                  sheetAccentControlCardClass,
 	                ].join(" ")}
 	              >
-	                <div className="flex items-start gap-2.5">
-	                  <span
-	                    className={[
-	                      "mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-xl",
-	                      sheetAccentControlIconClass,
-	                    ].join(" ")}
-	                  >
-	                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4" aria-hidden="true">
-	                      <path d="M20 6L9 17l-5-5" />
-                    </svg>
-                  </span>
-                  <p className="leading-snug">
-                    {t("ui_op_flow_control_card", "Aucune opération n’est effectuée sans votre validation.")}
-                  </p>
-                </div>
-              </div>
+		                <p className="leading-snug">
+		                  {t("ui_op_flow_control_card", "Aucune opération n’est effectuée sans votre validation.")}
+		                </p>
+	              </div>
 
 	              <div className="flex items-start gap-4">
 	                <div className="flex flex-col items-center pt-0.5">

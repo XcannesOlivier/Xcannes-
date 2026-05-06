@@ -410,23 +410,16 @@ export default function WalletDashboardUsdSwapModal({
     : isSimpleSwapBlue
       ? "bg-[#0870f8]/10 ring-1 ring-[#0870f8]/20 text-[#9cc9ff]"
       : "bg-xcannes-green/10 ring-1 ring-xcannes-green/20 text-xcannes-green/90";
-  const sheetAccentControlCardClass = isBinanceYellow
-    ? "bg-[#F0B90B]/10 ring-1 ring-[#F0B90B]/20 text-white/85"
-    : isFireOrange
-    ? "bg-[#ff6a00]/10 ring-1 ring-[#ff6a00]/20 text-white/85"
-    : isSimpleSwapBlue
-      ? "bg-[#0870f8]/10 ring-1 ring-[#0870f8]/20 text-white/85"
-      : "bg-xcannes-green/10 ring-1 ring-xcannes-green/20 text-white/85";
-  const sheetAccentControlIconClass = isBinanceYellow
-    ? "bg-[#F0B90B]/15 ring-1 ring-[#F0B90B]/25 text-[#fff4c5]"
-    : isFireOrange
-    ? "bg-[#ff6a00]/15 ring-1 ring-[#ff6a00]/25 text-[#ffe1cf]"
-    : isSimpleSwapBlue
-      ? "bg-[#0870f8]/15 ring-1 ring-[#0870f8]/25 text-[#d6e8ff]"
-      : "bg-xcannes-green/15 ring-1 ring-xcannes-green/25 text-xcannes-green/90";
-  const sheetAccentFlowLineVia = isBinanceYellow
-    ? "via-[#F0B90B]/20"
-    : isFireOrange
+	  const sheetAccentControlCardClass = isBinanceYellow
+	    ? "bg-[#F0B90B]/10 ring-1 ring-[#F0B90B]/20 text-white/85"
+	    : isFireOrange
+	    ? "bg-[#ff6a00]/10 ring-1 ring-[#ff6a00]/20 text-white/85"
+	    : isSimpleSwapBlue
+	      ? "bg-[#0870f8]/10 ring-1 ring-[#0870f8]/20 text-white/85"
+	      : "bg-xcannes-green/10 ring-1 ring-xcannes-green/20 text-white/85";
+	  const sheetAccentFlowLineVia = isBinanceYellow
+	    ? "via-[#F0B90B]/20"
+	    : isFireOrange
     ? "via-[#ff6a00]/20"
     : isSimpleSwapBlue
       ? "via-[#0870f8]/20"
@@ -4656,22 +4649,10 @@ export default function WalletDashboardUsdSwapModal({
 		                sheetAccentControlCardClass,
 		              ].join(" ")}
 		            >
-		              <div className="flex items-start gap-2.5">
-		                <span
-		                  className={[
-		                    "mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-xl",
-		                    sheetAccentControlIconClass,
-		                  ].join(" ")}
-		                >
-		                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4" aria-hidden="true">
-		                    <path d="M20 6L9 17l-5-5" />
-	                  </svg>
-	                </span>
-	                <p className="leading-snug">
-	                  {t("ui_op_flow_control_card", "Aucune opération n’est effectuée sans votre validation.")}
-	                </p>
-	              </div>
-	            </div>
+			              <p className="leading-snug">
+			                {t("ui_op_flow_control_card", "Aucune opération n’est effectuée sans votre validation.")}
+			              </p>
+		            </div>
 
 		            <div className="flex items-start gap-4">
 		              <div className="flex flex-col items-center pt-0.5">
