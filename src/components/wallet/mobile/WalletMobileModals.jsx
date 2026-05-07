@@ -288,7 +288,7 @@ export default function WalletMobileModals({
 		                  accentVariant: "simpleSwapBlue",
 		                  targetSelectionMode: "wallet",
 		                  initialTargetCurrency: "USD",
-		                  titleOverride: "Recevoir des stablecoins",
+		                  titleOverride: "Échanger vos USDC, USDT, RLUSD, ...",
 			                  subtitleOverride:
 			                    "Sélectionnez le stablecoin, le réseau et la devise qui sera créditée sur votre solde.",
 			                });
@@ -302,7 +302,7 @@ export default function WalletMobileModals({
 		                  accentVariant: "binanceYellow",
 		                  sourceSelectionMode: "wallet",
 		                  initialSourceCurrency: "USD",
-			                  titleOverride: "Envoyer vers un portefeuille externe",
+			                  titleOverride: "Acheter des stablecoins",
 			                  subtitleOverride:
 			                    "Choisissez la devise, le montant, le stablecoin et l’adresse de réception.",
 			                });
