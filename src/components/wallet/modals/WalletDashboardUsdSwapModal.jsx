@@ -4732,8 +4732,11 @@ export default function WalletDashboardUsdSwapModal({
 		                  className="w-full flex items-center justify-between gap-3 rounded-2xl bg-white/5 ring-1 ring-white/10 px-4 py-3 text-left"
 		                  aria-expanded={techDetailsOpen}
 		                >
-		                  <span className="text-[13px] font-semibold text-white/65">
-		                    {t("ui_op_details_tech_title", "Détails techniques")}
+			                  <span className="text-[13px] font-semibold text-white/65">
+			                    {t(
+			                      "ui_op_details_network_tech_title",
+			                      "Détails techniques des transactions sur le réseau (XRPL).",
+			                    )}
 		                  </span>
 		                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={["h-4 w-4 text-white/45 transition-transform duration-200", techDetailsOpen ? "rotate-180" : ""].join(" ")} aria-hidden="true">
 		                    <polyline points="6 9 12 15 18 9" />

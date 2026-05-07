@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { XCircleIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
+import { XCircleIcon, CheckCircleIcon, CreditCardIcon } from '@heroicons/react/24/outline';
 import ModalSelect from '@/components/ui/ModalSelect';
 import { useTranslation } from 'next-i18next';
 import { CRYPTO_ICONS } from '@/utils/marketConstants';
@@ -402,13 +402,14 @@ const MoonPayBuyModal = ({
   const currencyUpper = String(currency || '').toUpperCase();
   const isCurrencyLine = Boolean(selectedToken?.isTrustlineOnly);
   const partnerName = useMemo(() => resolvePartnerName(iframeUrl), [iframeUrl]);
-  const receiveAmountLabel = useMemo(() => {
+  const receiveCreditAmountLabel = useMemo(() => {
     if (!Number.isFinite(targetAmountValue) || targetAmountValue <= 0) return "-";
     const code = currencyUpper === "RLUSD" ? "USD" : currencyUpper;
-    return formatAmountWithSymbol(locale, targetAmountValue, code, {
+    const amount = new Intl.NumberFormat(locale, {
       minimumFractionDigits: 0,
       maximumFractionDigits: 2,
-    });
+    }).format(targetAmountValue);
+    return `${amount} ${code}`;
   }, [currencyUpper, locale, targetAmountValue]);
   const rlusdRate = isCurrencyLine
     ? currencyUpper === 'RLUSD' || currencyUpper === 'USD'
@@ -2090,18 +2091,7 @@ const MoonPayBuyModal = ({
 	                    ].join(" ")}
 	                    aria-hidden
 	                  >
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="h-5 w-5"
-                    >
-                      <path d="M12 2l7 4v6c0 5-3 9-7 10-4-1-7-5-7-10V6l7-4Z" />
-                      <path d="M9 12l2 2 4-4" />
-                    </svg>
+	                    <CreditCardIcon className="h-5 w-5" />
                   </span>
                   <div className="min-w-0">
                     <h2 className="text-white font-semibold text-lg leading-tight">
@@ -2127,14 +2117,15 @@ const MoonPayBuyModal = ({
 
               {/* Content */}
               <div className="mb-5 rounded-2xl bg-white/5 ring-1 ring-white/10 p-4 shadow-[0_14px_28px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.05)]">
-                <div className="flex items-center justify-between gap-3">
-                  <span className="text-[12px] text-white/55">
-                    {t("ui_op_details_summary_receive", "Vous recevez")}
-                  </span>
-                  <span className="text-white/90 font-semibold text-[15px]">
-                    {receiveAmountLabel}
-                  </span>
-                </div>
+	                <div className="flex items-center">
+	                  <span className="text-[13px] text-white/80">
+	                    {t(
+	                      "ui_op_details_buy_credit_notice",
+	                      "Votre compte sera crédité de {{amount}}.",
+	                      { amount: receiveCreditAmountLabel },
+	                    )}
+	                  </span>
+	                </div>
                 <div className="mt-2.5 flex items-center justify-between gap-3">
                   <span className="text-[12px] text-white/55">
                     {t("ui_op_details_summary_processing", "Traitement")}
@@ -2272,8 +2263,11 @@ const MoonPayBuyModal = ({
                       className="w-full flex items-center justify-between gap-3 rounded-2xl bg-white/5 ring-1 ring-white/10 px-4 py-3 text-left"
                       aria-expanded={techDetailsOpen}
                     >
-                      <span className="text-[13px] font-semibold text-white/65">
-                        {t("ui_op_details_tech_title", "Détails techniques")}
+	                      <span className="text-[13px] font-semibold text-white/65">
+	                        {t(
+	                          "ui_op_details_buy_tech_network_title",
+	                          "Détails techniques des transactions sur le réseau (XRPL).",
+	                        )}
                       </span>
                       <svg
                         viewBox="0 0 24 24"
@@ -2403,18 +2397,7 @@ const MoonPayBuyModal = ({
 	                  ].join(" ")}
 	                  aria-hidden
 	                >
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="h-5 w-5"
-                  >
-                    <path d="M12 2l7 4v6c0 5-3 9-7 10-4-1-7-5-7-10V6l7-4Z" />
-                    <path d="M9 12l2 2 4-4" />
-                  </svg>
+	                  <CreditCardIcon className="h-5 w-5" />
                 </span>
                 <div className="min-w-0">
                   <h2 className="text-white font-semibold text-lg leading-tight">
@@ -2440,14 +2423,15 @@ const MoonPayBuyModal = ({
 
             {/* Content */}
             <div className="mb-5 rounded-2xl bg-white/5 ring-1 ring-white/10 p-4 shadow-[0_14px_28px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.05)]">
-              <div className="flex items-center justify-between gap-3">
-                <span className="text-[12px] text-white/55">
-                  {t("ui_op_details_summary_receive", "Vous recevez")}
-                </span>
-                <span className="text-white/90 font-semibold text-[15px]">
-                  {receiveAmountLabel}
-                </span>
-              </div>
+	              <div className="flex items-center">
+	                <span className="text-[13px] text-white/80">
+	                  {t(
+	                    "ui_op_details_buy_credit_notice",
+	                    "Votre compte sera crédité de {{amount}}.",
+	                    { amount: receiveCreditAmountLabel },
+	                  )}
+	                </span>
+	              </div>
               <div className="mt-2.5 flex items-center justify-between gap-3">
                 <span className="text-[12px] text-white/55">
                   {t("ui_op_details_summary_processing", "Traitement")}
@@ -2585,8 +2569,11 @@ const MoonPayBuyModal = ({
                     className="w-full flex items-center justify-between gap-3 rounded-2xl bg-white/5 ring-1 ring-white/10 px-4 py-3 text-left"
                     aria-expanded={techDetailsOpen}
                   >
-                    <span className="text-[13px] font-semibold text-white/65">
-                      {t("ui_op_details_tech_title", "Détails techniques")}
+	                    <span className="text-[13px] font-semibold text-white/65">
+	                      {t(
+	                        "ui_op_details_buy_tech_network_title",
+	                        "Détails techniques des transactions sur le réseau (XRPL).",
+	                      )}
                     </span>
                     <svg
                       viewBox="0 0 24 24"

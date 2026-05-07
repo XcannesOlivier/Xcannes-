@@ -1058,7 +1058,7 @@
   "ui_funds_add_title": "Ajouter des fonds",
   "ui_funds_increase_balances_title": "Augmenter vos soldes",
   "ui_funds_add_hint": "Carte ou virement bancaire",
-  "ui_funds_withdraw_title": "Envoyer vers la banque",
+  "ui_funds_withdraw_title": "Transférer vers la banque",
   "ui_funds_withdraw_hint": "Vers votre compte bancaire",
   "ui_funds_section_digital_dollars": "Stablecoins USD",
   "ui_funds_stablecoin_liquidity_note": "Optimisé via stablecoins USD (RLUSD) et la liquidité du réseau XRP",

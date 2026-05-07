@@ -4,6 +4,7 @@ import {
   XCircleIcon,
   CheckCircleIcon,
   ArrowDownIcon,
+  BanknotesIcon,
 } from "@heroicons/react/24/outline";
 import { useTranslation } from "next-i18next";
 import { useModalTransition } from "@/hooks/useModalTransition";
@@ -831,13 +832,14 @@ const MoonPaySellModal = ({
         maximumFractionDigits: 2,
       })
     : `— ${currencyUpper || "USD"}`;
-  const withdrawAmountLabel = useMemo(() => {
+  const transferAmountLabel = useMemo(() => {
     if (!hasValidAmount || conversionMissing) return "-";
     const code = currencyUpper === "RLUSD" ? "USD" : currencyUpper;
-    return formatAmountWithSymbol(locale, amountValue, code, {
+    const amount = new Intl.NumberFormat(locale, {
       minimumFractionDigits: 0,
       maximumFractionDigits: 2,
-    });
+    }).format(amountValue);
+    return `${amount} ${code}`;
   }, [amountValue, conversionMissing, currencyUpper, hasValidAmount, locale]);
   const reviewTimestampLabel = useMemo(() => {
     if (!reviewTimestamp) return "";
@@ -1416,7 +1418,7 @@ const MoonPaySellModal = ({
 		          <div className="relative z-[66] px-4 pt-[40px] md:pt-[90px] pb-4 text-center">
             <h3 className="text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight mb-2">
               {resolvedSelectCryptoTitleOverride ||
-                t("moonpay_sell_withdraw_title_prefix", "Retirer vers un compte bancaire")}
+                t("moonpay_sell_withdraw_title_prefix", "Transférer vers la banque")}
             </h3>
             {isBankSellFlow ? (
               <div className="mb-4 flex flex-col items-center">
@@ -1450,7 +1452,7 @@ const MoonPaySellModal = ({
 		          {/* Currency selector */}
 			          <div className={wizardStep === 1 ? "relative z-[66] mt-7" : "hidden"}>
 		              <div className="text-[13px] tracking-normal font-medium text-white/55 mb-2">
-		                {t("moonpay_sell_send_currency_label", "Devise à retirer")}
+		                {t("moonpay_sell_send_currency_label", "Devise à transférer")}
 		              </div>
 			              <ModalSelect
 			                value={currency}
@@ -1540,7 +1542,7 @@ const MoonPaySellModal = ({
                 <div className="mt-4 flex flex-col gap-2 animate-fade-in">
                   <p className="text-[13px] text-white/45 leading-snug">
                     {t('ui_sell_summary_line', {
-                      defaultValue: 'Votre compte sera débité de {{amount}} {{currency}}.',
+                      defaultValue: 'Vous transférez {{amount}} {{currency}} vers votre compte bancaire',
                       amount: new Intl.NumberFormat(locale, { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(amountValue),
                       currency: String(currency || '').toUpperCase(),
                     })}
@@ -1786,18 +1788,7 @@ const MoonPaySellModal = ({
 	                    ].join(" ")}
 	                    aria-hidden
 	                  >
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="h-5 w-5"
-                    >
-                      <path d="M12 2l7 4v6c0 5-3 9-7 10-4-1-7-5-7-10V6l7-4Z" />
-                      <path d="M9 12l2 2 4-4" />
-                    </svg>
+	                    <BanknotesIcon className="h-5 w-5" />
                   </span>
                   <div className="min-w-0">
                     <h2 className="text-white font-semibold text-lg leading-tight">
@@ -1823,14 +1814,21 @@ const MoonPaySellModal = ({
 
               {/* Summary */}
               <div className="mb-5 rounded-2xl bg-white/5 ring-1 ring-white/10 p-4 shadow-[0_14px_28px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.05)]">
-                <div className="flex items-center justify-between gap-3">
-                  <span className="text-[12px] text-white/55">
-                    {t("ui_op_details_summary_receive", "Vous recevez")}
-                  </span>
-                  <span className="text-white/90 font-semibold text-[15px]">
-                    {withdrawAmountLabel}
-                  </span>
-                </div>
+	                <div className="space-y-1.5">
+	                  <p className="text-[13px] font-medium leading-snug text-white/85">
+	                    {t(
+	                      "ui_op_details_sell_bank_transfer_notice",
+	                      "Vous transférez {{amount}} vers votre compte bancaire *",
+	                      { amount: transferAmountLabel },
+	                    )}
+	                  </p>
+	                  <p className="text-[11px] leading-snug text-white/45">
+	                    {t(
+	                      "ui_op_details_sell_bank_transfer_variation_note",
+	                      "Le montant reçu peut varier selon le mode de transfert utilisé via MoonPay.",
+	                    )}
+	                  </p>
+	                </div>
                 <div className="mt-2.5 flex items-center justify-between gap-3">
                   <span className="text-[12px] text-white/55">
                     {t("ui_op_details_summary_processing", "Traitement")}
@@ -1871,8 +1869,11 @@ const MoonPaySellModal = ({
 			                      <div className="text-white/90 font-semibold">
 			                        {t("ui_op_flow_sell_step1_title", "Vous confirmez le retrait")}
 			                      </div>
-			                      <div className="mt-1 text-white/55">
-			                        {t("ui_op_flow_step1_subtitle", "Vous validez l’opération chez {{partner}}.", { partner: partnerName })}
+				                      <div className="mt-1 text-white/55">
+				                        {t(
+				                          "ui_op_flow_sell_step1_conversion_subtitle",
+				                          "Conversion automatique via les services de liquidité.",
+				                        )}
 			                      </div>
 			                  </div>
 
@@ -1895,8 +1896,12 @@ const MoonPaySellModal = ({
 			                      <div className="text-white/90 font-semibold">
 			                        {t("ui_op_flow_step2_title", { defaultValue: "{{partner}} traite l’opération", partner: partnerName })}
 			                      </div>
-			                      <div className="mt-1 text-white/55">
-			                        {t("ui_op_flow_step2_subtitle", "Conversion automatique via les services de liquidité.")}
+				                      <div className="mt-1 text-white/55">
+				                        {t(
+				                          "ui_op_flow_sell_step2_validation_subtitle",
+				                          "Vous validez l’opération chez {{partner}}.",
+				                          { partner: partnerName },
+				                        )}
 			                      </div>
 			                  </div>
 
@@ -1935,8 +1940,11 @@ const MoonPaySellModal = ({
                       className="w-full flex items-center justify-between gap-3 rounded-2xl bg-white/5 ring-1 ring-white/10 px-4 py-3 text-left"
                       aria-expanded={techDetailsOpen}
                     >
-                      <span className="text-[13px] font-semibold text-white/65">
-                        {t("ui_op_details_tech_title", "Détails techniques")}
+	                      <span className="text-[13px] font-semibold text-white/65">
+	                        {t(
+	                          "ui_op_details_network_tech_title",
+	                          "Détails techniques des transactions sur le réseau (XRPL).",
+	                        )}
                       </span>
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={["h-4 w-4 text-white/45 transition-transform duration-200", techDetailsOpen ? "rotate-180" : ""].join(" ")} aria-hidden="true">
                         <polyline points="6 9 12 15 18 9" />
@@ -2023,18 +2031,7 @@ const MoonPaySellModal = ({
 	                  ].join(" ")}
 	                  aria-hidden
 	                >
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="h-5 w-5"
-                  >
-                    <path d="M12 2l7 4v6c0 5-3 9-7 10-4-1-7-5-7-10V6l7-4Z" />
-                    <path d="M9 12l2 2 4-4" />
-                  </svg>
+	                  <BanknotesIcon className="h-5 w-5" />
                 </span>
                 <div className="min-w-0">
                   <h2 className="text-white font-semibold text-lg leading-tight">
@@ -2060,14 +2057,21 @@ const MoonPaySellModal = ({
 
             {/* Summary */}
             <div className="mb-5 rounded-2xl bg-white/5 ring-1 ring-white/10 p-4 shadow-[0_14px_28px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.05)]">
-              <div className="flex items-center justify-between gap-3">
-                <span className="text-[12px] text-white/55">
-                  {t("ui_op_details_summary_receive", "Vous recevez")}
-                </span>
-                <span className="text-white/90 font-semibold text-[15px]">
-                  {withdrawAmountLabel}
-                </span>
-              </div>
+	              <div className="space-y-1.5">
+	                <p className="text-[13px] font-medium leading-snug text-white/85">
+	                  {t(
+	                    "ui_op_details_sell_bank_transfer_notice",
+	                    "Vous transférez {{amount}} vers votre compte bancaire *",
+	                    { amount: transferAmountLabel },
+	                  )}
+	                </p>
+	                <p className="text-[11px] leading-snug text-white/45">
+	                  {t(
+	                    "ui_op_details_sell_bank_transfer_variation_note",
+	                    "Le montant reçu peut varier selon le mode de transfert utilisé via MoonPay.",
+	                  )}
+	                </p>
+	              </div>
               <div className="mt-2.5 flex items-center justify-between gap-3">
                 <span className="text-[12px] text-white/55">
                   {t("ui_op_details_summary_processing", "Traitement")}
@@ -2108,8 +2112,11 @@ const MoonPaySellModal = ({
 			                    <div className="text-white/90 font-semibold">
 			                      {t("ui_op_flow_sell_step1_title", "Vous confirmez le retrait")}
 			                    </div>
-			                    <div className="mt-1 text-white/55">
-			                      {t("ui_op_flow_step1_subtitle", "Vous validez l’opération chez {{partner}}.", { partner: partnerName })}
+				                    <div className="mt-1 text-white/55">
+				                      {t(
+				                        "ui_op_flow_sell_step1_conversion_subtitle",
+				                        "Conversion automatique via les services de liquidité.",
+				                      )}
 			                    </div>
 			                </div>
 
@@ -2132,8 +2139,12 @@ const MoonPaySellModal = ({
 			                    <div className="text-white/90 font-semibold">
 			                      {t("ui_op_flow_step2_title", { defaultValue: "{{partner}} traite l’opération", partner: partnerName })}
 			                    </div>
-			                    <div className="mt-1 text-white/55">
-			                      {t("ui_op_flow_step2_subtitle", "Conversion automatique via les services de liquidité.")}
+				                    <div className="mt-1 text-white/55">
+				                      {t(
+				                        "ui_op_flow_sell_step2_validation_subtitle",
+				                        "Vous validez l’opération chez {{partner}}.",
+				                        { partner: partnerName },
+				                      )}
 			                    </div>
 			                </div>
 
@@ -2172,8 +2183,11 @@ const MoonPaySellModal = ({
                     className="w-full flex items-center justify-between gap-3 rounded-2xl bg-white/5 ring-1 ring-white/10 px-4 py-3 text-left"
                     aria-expanded={techDetailsOpen}
                   >
-                    <span className="text-[13px] font-semibold text-white/65">
-                      {t("ui_op_details_tech_title", "Détails techniques")}
+	                    <span className="text-[13px] font-semibold text-white/65">
+	                      {t(
+	                        "ui_op_details_network_tech_title",
+	                        "Détails techniques des transactions sur le réseau (XRPL).",
+	                      )}
                     </span>
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={["h-4 w-4 text-white/45 transition-transform duration-200", techDetailsOpen ? "rotate-180" : ""].join(" ")} aria-hidden="true">
                       <polyline points="6 9 12 15 18 9" />
