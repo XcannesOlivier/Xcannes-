@@ -4654,18 +4654,18 @@ export default function WalletDashboardUsdSwapModal({
 			              </p>
 		            </div>
 
-		            <div className="space-y-7 text-[14px] leading-snug text-white/80">
-		              <div className="flex items-start gap-4">
-		                <div className="flex flex-col items-center pt-0.5">
-		                  <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", accentTextSolid].join(" ")}>
-		                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
-		                      <path d="M20 6L9 17l-5-5" />
-		                    </svg>
-		                  </span>
-		                  <div className={["relative my-2 h-9 w-px bg-gradient-to-b from-white/20 to-white/10", sheetAccentFlowLineVia].join(" ")}>
-		                    <span className={["absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full motion-safe:animate-pulse", sheetAccentFlowDotStrong].join(" ")} />
-		                  </div>
-		                </div>
+			            <div className="space-y-0 text-[14px] leading-snug text-white/80">
+			              <div className="flex items-stretch gap-4 pb-7">
+			                <div className="flex flex-col items-center pt-0.5">
+			                  <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", accentTextSolid].join(" ")}>
+			                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
+			                      <path d="M20 6L9 17l-5-5" />
+			                    </svg>
+			                  </span>
+			                  <div className={["relative mt-2 flex-1 w-px bg-gradient-to-b from-white/20 to-white/10", sheetAccentFlowLineVia].join(" ")}>
+			                    <span className={["absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full motion-safe:animate-pulse", sheetAccentFlowDotStrong].join(" ")} />
+			                  </div>
+			                </div>
 		                <div className="flex-1 min-w-0">
 		                  <div className="text-white/90 font-semibold">
 		                    {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
@@ -4680,19 +4680,19 @@ export default function WalletDashboardUsdSwapModal({
 		                </div>
 		              </div>
 
-		              <div className="flex items-start gap-4">
-		                <div className="flex flex-col items-center pt-0.5">
-		                  <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", accentTextSolid].join(" ")}>
-		                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
-		                      <path d="M8 7h-3a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-3" />
-		                      <path d="M16 3h5v5" />
-		                      <path d="M21 3l-9 9" />
-		                    </svg>
-		                  </span>
-		                  <div className={["relative my-2 h-9 w-px bg-gradient-to-b from-white/20 to-white/10", sheetAccentFlowLineVia].join(" ")}>
-		                    <span className={["absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full motion-safe:animate-pulse", sheetAccentFlowDotSoft].join(" ")} />
-		                  </div>
-		                </div>
+			              <div className="flex items-stretch gap-4 pb-7">
+			                <div className="flex flex-col items-center pt-0.5">
+			                  <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", accentTextSolid].join(" ")}>
+			                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
+			                      <path d="M8 7h-3a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-3" />
+			                      <path d="M16 3h5v5" />
+			                      <path d="M21 3l-9 9" />
+			                    </svg>
+			                  </span>
+			                  <div className={["relative mt-2 flex-1 w-px bg-gradient-to-b from-white/20 to-white/10", sheetAccentFlowLineVia].join(" ")}>
+			                    <span className={["absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full motion-safe:animate-pulse", sheetAccentFlowDotSoft].join(" ")} />
+			                  </div>
+			                </div>
 		                <div className="flex-1 min-w-0">
 		                  <div className="text-white/90 font-semibold">
 		                    {t("ui_op_flow_step2_title", { defaultValue: "SimpleSwap traite l’opération" })}
@@ -4703,10 +4703,10 @@ export default function WalletDashboardUsdSwapModal({
 		                </div>
 		              </div>
 
-		              <div className="flex items-start gap-4">
-		                <div className="flex flex-col items-center pt-0.5">
-		                  <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", accentTextSolid].join(" ")}>
-		                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
+			              <div className="flex items-stretch gap-4">
+			                <div className="flex flex-col items-center pt-0.5">
+			                  <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", accentTextSolid].join(" ")}>
+			                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
 		                      <path d="M3 7h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z" />
 		                      <path d="M16 11h3" />
 		                    </svg>

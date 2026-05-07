@@ -1875,16 +1875,16 @@ const MoonPaySellModal = ({
 		                  </p>
 		                </div>
 
-	                <div className="space-y-7 text-[14px] leading-snug text-white/80">
-	                  <div className="flex items-start gap-4">
-	                    <div className="flex flex-col items-center pt-0.5">
-	                      <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", sheetAccentFlowIconText].join(" ")}>
-	                        <CheckCircleIcon className="h-5 w-5" aria-hidden />
-	                      </span>
-	                      <div className={["relative my-2 h-9 w-px bg-gradient-to-b from-white/20 to-white/10", sheetAccentFlowLineVia].join(" ")}>
-	                        <span className={["absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full motion-safe:animate-pulse", sheetAccentFlowDotStrong].join(" ")} />
-	                      </div>
-	                    </div>
+		                <div className="space-y-0 text-[14px] leading-snug text-white/80">
+		                  <div className="flex items-stretch gap-4 pb-7">
+		                    <div className="flex flex-col items-center pt-0.5">
+		                      <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", sheetAccentFlowIconText].join(" ")}>
+		                        <CheckCircleIcon className="h-5 w-5" aria-hidden />
+		                      </span>
+		                      <div className={["relative mt-2 flex-1 w-px bg-gradient-to-b from-white/20 to-white/10", sheetAccentFlowLineVia].join(" ")}>
+		                        <span className={["absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full motion-safe:animate-pulse", sheetAccentFlowDotStrong].join(" ")} />
+		                      </div>
+		                    </div>
 	                    <div className="flex-1 min-w-0">
 	                      <div className="text-white/90 font-semibold">
 	                        {t("ui_op_flow_sell_step1_title", "Vous confirmez le retrait")}
@@ -1895,18 +1895,18 @@ const MoonPaySellModal = ({
 	                    </div>
 	                  </div>
 
-	                  <div className="flex items-start gap-4">
-	                    <div className="flex flex-col items-center pt-0.5">
-	                      <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", sheetAccentFlowIconText].join(" ")}>
-	                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
-	                          <path d="M12 2l7 4v6c0 5-3 9-7 10-4-1-7-5-7-10V6l7-4Z" />
-	                          <path d="M9 12l2 2 4-4" />
-	                        </svg>
-	                      </span>
-	                      <div className={["relative my-2 h-9 w-px bg-gradient-to-b from-white/20 to-white/10", sheetAccentFlowLineVia].join(" ")}>
-	                        <span className={["absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full motion-safe:animate-pulse", sheetAccentFlowDotSoft].join(" ")} />
-	                      </div>
-	                    </div>
+		                  <div className="flex items-stretch gap-4 pb-7">
+		                    <div className="flex flex-col items-center pt-0.5">
+		                      <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", sheetAccentFlowIconText].join(" ")}>
+		                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
+		                          <path d="M12 2l7 4v6c0 5-3 9-7 10-4-1-7-5-7-10V6l7-4Z" />
+		                          <path d="M9 12l2 2 4-4" />
+		                        </svg>
+		                      </span>
+		                      <div className={["relative mt-2 flex-1 w-px bg-gradient-to-b from-white/20 to-white/10", sheetAccentFlowLineVia].join(" ")}>
+		                        <span className={["absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full motion-safe:animate-pulse", sheetAccentFlowDotSoft].join(" ")} />
+		                      </div>
+		                    </div>
 	                    <div className="flex-1 min-w-0">
 	                      <div className="text-white/90 font-semibold">
 	                        {t("ui_op_flow_step2_title", { defaultValue: "{{partner}} traite l’opération", partner: partnerName })}
@@ -1917,17 +1917,17 @@ const MoonPaySellModal = ({
 	                    </div>
 	                  </div>
 
-	                  <div className="flex items-start gap-4">
-	                    <div className="flex flex-col items-center pt-0.5">
-	                      <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", sheetAccentFlowIconText].join(" ")}>
-	                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
-	                          <path d="M3 10h18" />
-	                          <path d="M5 10V8a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v2" />
-	                          <path d="M7 14h10" />
-	                          <path d="M5 10v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8" />
-	                        </svg>
-	                      </span>
-	                    </div>
+		                  <div className="flex items-stretch gap-4">
+		                    <div className="flex flex-col items-center pt-0.5">
+		                      <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", sheetAccentFlowIconText].join(" ")}>
+		                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
+		                          <path d="M3 10h18" />
+		                          <path d="M5 10V8a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v2" />
+		                          <path d="M7 14h10" />
+		                          <path d="M5 10v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8" />
+		                        </svg>
+		                      </span>
+		                    </div>
 	                    <div className="flex-1 min-w-0">
 	                      <div className="text-white/90 font-semibold">
 	                        {t("ui_op_flow_sell_step3_title", "Les fonds sont transférés vers votre banque")}
@@ -2115,16 +2115,16 @@ const MoonPaySellModal = ({
 		                </p>
 	              </div>
 
-	              <div className="space-y-7 text-[14px] leading-snug text-white/80">
-	                <div className="flex items-start gap-4">
-	                  <div className="flex flex-col items-center pt-0.5">
-	                    <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", sheetAccentFlowIconText].join(" ")}>
-	                      <CheckCircleIcon className="h-5 w-5" aria-hidden />
-	                    </span>
-	                    <div className={["relative my-2 h-9 w-px bg-gradient-to-b from-white/20 to-white/10", sheetAccentFlowLineVia].join(" ")}>
-	                      <span className={["absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full motion-safe:animate-pulse", sheetAccentFlowDotStrong].join(" ")} />
-	                    </div>
-	                  </div>
+		              <div className="space-y-0 text-[14px] leading-snug text-white/80">
+		                <div className="flex items-stretch gap-4 pb-7">
+		                  <div className="flex flex-col items-center pt-0.5">
+		                    <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", sheetAccentFlowIconText].join(" ")}>
+		                      <CheckCircleIcon className="h-5 w-5" aria-hidden />
+		                    </span>
+		                    <div className={["relative mt-2 flex-1 w-px bg-gradient-to-b from-white/20 to-white/10", sheetAccentFlowLineVia].join(" ")}>
+		                      <span className={["absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full motion-safe:animate-pulse", sheetAccentFlowDotStrong].join(" ")} />
+		                    </div>
+		                  </div>
 	                  <div className="flex-1 min-w-0">
 	                    <div className="text-white/90 font-semibold">
 	                      {t("ui_op_flow_sell_step1_title", "Vous confirmez le retrait")}
@@ -2135,18 +2135,18 @@ const MoonPaySellModal = ({
 	                  </div>
 	                </div>
 
-	                <div className="flex items-start gap-4">
-	                  <div className="flex flex-col items-center pt-0.5">
-	                    <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", sheetAccentFlowIconText].join(" ")}>
-	                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
-	                        <path d="M12 2l7 4v6c0 5-3 9-7 10-4-1-7-5-7-10V6l7-4Z" />
-	                        <path d="M9 12l2 2 4-4" />
-	                      </svg>
-	                    </span>
-	                    <div className={["relative my-2 h-9 w-px bg-gradient-to-b from-white/20 to-white/10", sheetAccentFlowLineVia].join(" ")}>
-	                      <span className={["absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full motion-safe:animate-pulse", sheetAccentFlowDotSoft].join(" ")} />
-	                    </div>
-	                  </div>
+		                <div className="flex items-stretch gap-4 pb-7">
+		                  <div className="flex flex-col items-center pt-0.5">
+		                    <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", sheetAccentFlowIconText].join(" ")}>
+		                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
+		                        <path d="M12 2l7 4v6c0 5-3 9-7 10-4-1-7-5-7-10V6l7-4Z" />
+		                        <path d="M9 12l2 2 4-4" />
+		                      </svg>
+		                    </span>
+		                    <div className={["relative mt-2 flex-1 w-px bg-gradient-to-b from-white/20 to-white/10", sheetAccentFlowLineVia].join(" ")}>
+		                      <span className={["absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full motion-safe:animate-pulse", sheetAccentFlowDotSoft].join(" ")} />
+		                    </div>
+		                  </div>
 	                  <div className="flex-1 min-w-0">
 	                    <div className="text-white/90 font-semibold">
 	                      {t("ui_op_flow_step2_title", { defaultValue: "{{partner}} traite l’opération", partner: partnerName })}
@@ -2157,11 +2157,11 @@ const MoonPaySellModal = ({
 	                  </div>
 	                </div>
 
-	                <div className="flex items-start gap-4">
-	                  <div className="flex flex-col items-center pt-0.5">
-	                    <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", sheetAccentFlowIconText].join(" ")}>
-	                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
-	                        <path d="M3 10h18" />
+		                <div className="flex items-stretch gap-4">
+		                  <div className="flex flex-col items-center pt-0.5">
+		                    <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", sheetAccentFlowIconText].join(" ")}>
+		                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
+		                        <path d="M3 10h18" />
 	                        <path d="M5 10V8a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v2" />
 	                        <path d="M7 14h10" />
 	                        <path d="M5 10v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8" />
