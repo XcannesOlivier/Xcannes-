@@ -4629,16 +4629,11 @@ export default function WalletDashboardUsdSwapModal({
 	                </span>
 	              </span>
 	            </div>
-	            <div className="mt-3">
-	              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/5 ring-1 ring-white/10 px-3 py-1 text-[11px] text-white/70">
-	                <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-white/10 text-white/70">
-	                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" className="h-3 w-3" aria-hidden="true">
-	                    <path d="M20 6L9 17l-5-5" />
-	                  </svg>
-	                </span>
-	                {t("ui_op_details_summary_auto_conversion", "Conversion automatique")}
-	              </span>
-	            </div>
+		            <div className="mt-3">
+		              <span className="inline-flex rounded-full bg-white/5 ring-1 ring-white/10 px-3 py-1 text-[11px] text-white/70">
+		                {t("ui_op_details_summary_auto_conversion", "Conversion automatique")}
+		              </span>
+		            </div>
 	          </div>
 
 	          {/* Flow */}
@@ -4654,77 +4649,75 @@ export default function WalletDashboardUsdSwapModal({
 			              </p>
 		            </div>
 
-				            <div className="grid grid-cols-[2.5rem_minmax(0,1fr)] gap-x-4 text-[14px] leading-snug text-white/80">
-				              <div className="flex flex-col items-center pt-0.5">
-				                <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", accentTextSolid].join(" ")}>
-				                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
-				                    <path d="M20 6L9 17l-5-5" />
-				                  </svg>
-				                </span>
-				              </div>
-				              <div className="min-w-0">
-				                <div className="text-white/90 font-semibold">
-				                  {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
-				                    ? t("ui_op_flow_swap_step1_out", "Vous confirmez la conversion")
-				                    : t("ui_op_flow_swap_step1_in", "Vous envoyez vos stablecoins")}
+				            <div className="text-[14px] leading-snug text-white/80">
+				              <div className="grid grid-cols-[2.5rem_minmax(0,1fr)] gap-x-4 pb-6">
+				                <div className="flex h-full flex-col items-center">
+				                  <span className={["mt-0.5 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", accentTextSolid].join(" ")}>
+				                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
+				                      <path d="M20 6L9 17l-5-5" />
+				                    </svg>
+				                  </span>
+				                  <div className={["relative mt-2 flex-1 w-px bg-gradient-to-b from-white/20 to-white/10", sheetAccentFlowLineVia].join(" ")}>
+				                    <span className={["absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full motion-safe:animate-pulse", sheetAccentFlowDotStrong].join(" ")} />
+				                  </div>
 				                </div>
-				                <div className="mt-1 text-white/55">
-				                  {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
-				                    ? t("ui_op_flow_swap_step1_out_sub", "Vous validez l’opération sur XCannes.")
-				                    : t("ui_op_flow_swap_step1_in_sub", "Vous envoyez les fonds à l’adresse SimpleSwap.")}
-				                </div>
-				              </div>
-
-				              <div className="flex flex-col items-center">
-				                <div className={["relative my-2 h-9 w-px bg-gradient-to-b from-white/20 to-white/10", sheetAccentFlowLineVia].join(" ")}>
-				                  <span className={["absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full motion-safe:animate-pulse", sheetAccentFlowDotStrong].join(" ")} />
-				                </div>
-				              </div>
-				              <div />
-
-				              <div className="flex flex-col items-center pt-0.5">
-				                <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", accentTextSolid].join(" ")}>
-				                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
-				                    <path d="M8 7h-3a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-3" />
-				                    <path d="M16 3h5v5" />
-				                    <path d="M21 3l-9 9" />
-				                  </svg>
-				                </span>
-				              </div>
-				              <div className="min-w-0">
-				                <div className="text-white/90 font-semibold">
-				                  {t("ui_op_flow_step2_title", { defaultValue: "SimpleSwap traite l’opération" })}
-				                </div>
-				                <div className="mt-1 text-white/55">
-				                  {t("ui_op_flow_step2_subtitle", "Conversion automatique via les services de liquidité.")}
+				                <div className="min-w-0">
+				                  <div className="text-white/90 font-semibold">
+				                    {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
+				                      ? t("ui_op_flow_swap_step1_out", "Vous confirmez la conversion")
+				                      : t("ui_op_flow_swap_step1_in", "Vous envoyez vos stablecoins")}
+				                  </div>
+				                  <div className="mt-1 text-white/55">
+				                    {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
+				                      ? t("ui_op_flow_swap_step1_out_sub", "Vous validez l’opération sur XCannes.")
+				                      : t("ui_op_flow_swap_step1_in_sub", "Vous envoyez les fonds à l’adresse SimpleSwap.")}
+				                  </div>
 				                </div>
 				              </div>
 
-				              <div className="flex flex-col items-center">
-				                <div className={["relative my-2 h-9 w-px bg-gradient-to-b from-white/20 to-white/10", sheetAccentFlowLineVia].join(" ")}>
-				                  <span className={["absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full motion-safe:animate-pulse", sheetAccentFlowDotSoft].join(" ")} />
+				              <div className="grid grid-cols-[2.5rem_minmax(0,1fr)] gap-x-4 pb-6">
+				                <div className="flex h-full flex-col items-center">
+				                  <span className={["mt-0.5 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", accentTextSolid].join(" ")}>
+				                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
+				                      <path d="M8 7h-3a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-3" />
+				                      <path d="M16 3h5v5" />
+				                      <path d="M21 3l-9 9" />
+				                    </svg>
+				                  </span>
+				                  <div className={["relative mt-2 flex-1 w-px bg-gradient-to-b from-white/20 to-white/10", sheetAccentFlowLineVia].join(" ")}>
+				                    <span className={["absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full motion-safe:animate-pulse", sheetAccentFlowDotSoft].join(" ")} />
+				                  </div>
+				                </div>
+				                <div className="min-w-0">
+				                  <div className="text-white/90 font-semibold">
+				                    {t("ui_op_flow_step2_title", { defaultValue: "SimpleSwap traite l’opération" })}
+				                  </div>
+				                  <div className="mt-1 text-white/55">
+				                    {t("ui_op_flow_step2_subtitle", "Conversion automatique via les services de liquidité.")}
+				                  </div>
 				                </div>
 				              </div>
-				              <div />
 
-				              <div className="flex flex-col items-center pt-0.5">
-				                <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", accentTextSolid].join(" ")}>
-				                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
-				                    <path d="M3 7h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z" />
-				                    <path d="M16 11h3" />
-				                  </svg>
-				                </span>
-				              </div>
-				              <div className="min-w-0">
-				                <div className="text-white/90 font-semibold">
-				                  {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
-				                    ? t("ui_op_flow_swap_step3_out", "Le stablecoin est envoyé")
-				                    : t("ui_op_flow_swap_step3_in", "Votre compte XCannes est crédité")}
+				              <div className="grid grid-cols-[2.5rem_minmax(0,1fr)] gap-x-4">
+				                <div className="flex h-full flex-col items-center">
+				                  <span className={["mt-0.5 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", accentTextSolid].join(" ")}>
+				                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
+				                      <path d="M3 7h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z" />
+				                      <path d="M16 11h3" />
+				                    </svg>
+				                  </span>
 				                </div>
-				                <div className="mt-1 text-white/55">
-				                  {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
-				                    ? t("ui_op_flow_swap_step3_out_sub", "Envoi vers l’adresse de réception une fois validé.")
-				                    : t("ui_op_flow_swap_step3_in_sub", "Crédit RLUSD après réception des XRP.")}
+				                <div className="min-w-0">
+				                  <div className="text-white/90 font-semibold">
+				                    {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
+				                      ? t("ui_op_flow_swap_step3_out", "Le stablecoin est envoyé")
+				                      : t("ui_op_flow_swap_step3_in", "Votre compte XCannes est crédité")}
+				                  </div>
+				                  <div className="mt-1 text-white/55">
+				                    {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
+				                      ? t("ui_op_flow_swap_step3_out_sub", "Envoi vers l’adresse de réception une fois validé.")
+				                      : t("ui_op_flow_swap_step3_in_sub", "Crédit RLUSD après réception des XRP.")}
+				                  </div>
 				                </div>
 				              </div>
 				            </div>

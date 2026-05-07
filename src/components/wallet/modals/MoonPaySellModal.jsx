@@ -1841,25 +1841,11 @@ const MoonPaySellModal = ({
                     </span>
                   </span>
                 </div>
-                <div className="mt-3">
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-white/5 ring-1 ring-white/10 px-3 py-1 text-[11px] text-white/70">
-                    <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-white/10 text-white/70">
-                      <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2.4"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="h-3 w-3"
-                        aria-hidden="true"
-                      >
-                        <path d="M20 6L9 17l-5-5" />
-                      </svg>
-                    </span>
-                    {t("ui_op_details_summary_auto_conversion", "Conversion automatique")}
-                  </span>
-                </div>
+	                <div className="mt-3">
+	                  <span className="inline-flex rounded-full bg-white/5 ring-1 ring-white/10 px-3 py-1 text-[11px] text-white/70">
+	                    {t("ui_op_details_summary_auto_conversion", "Conversion automatique")}
+	                  </span>
+	                </div>
               </div>
 
               {/* Flow */}
@@ -1875,68 +1861,66 @@ const MoonPaySellModal = ({
 		                  </p>
 		                </div>
 
-			                <div className="grid grid-cols-[2.5rem_minmax(0,1fr)] gap-x-4 text-[14px] leading-snug text-white/80">
-			                  <div className="flex flex-col items-center pt-0.5">
-			                    <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", sheetAccentFlowIconText].join(" ")}>
-			                      <CheckCircleIcon className="h-5 w-5" aria-hidden />
-			                    </span>
-			                  </div>
-			                  <div className="min-w-0">
-			                    <div className="text-white/90 font-semibold">
-			                      {t("ui_op_flow_sell_step1_title", "Vous confirmez le retrait")}
+			                <div className="text-[14px] leading-snug text-white/80">
+			                  <div className="grid grid-cols-[2.5rem_minmax(0,1fr)] gap-x-4 pb-6">
+			                    <div className="flex h-full flex-col items-center">
+			                      <span className={["mt-0.5 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", sheetAccentFlowIconText].join(" ")}>
+			                        <CheckCircleIcon className="h-5 w-5" aria-hidden />
+			                      </span>
+			                      <div className={["relative mt-2 flex-1 w-px bg-gradient-to-b from-white/20 to-white/10", sheetAccentFlowLineVia].join(" ")}>
+			                        <span className={["absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full motion-safe:animate-pulse", sheetAccentFlowDotStrong].join(" ")} />
+			                      </div>
 			                    </div>
-			                    <div className="mt-1 text-white/55">
-			                      {t("ui_op_flow_step1_subtitle", "Vous validez l’opération chez {{partner}}.", { partner: partnerName })}
-			                    </div>
-			                  </div>
-
-			                  <div className="flex flex-col items-center">
-			                    <div className={["relative my-2 h-9 w-px bg-gradient-to-b from-white/20 to-white/10", sheetAccentFlowLineVia].join(" ")}>
-			                      <span className={["absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full motion-safe:animate-pulse", sheetAccentFlowDotStrong].join(" ")} />
-			                    </div>
-			                  </div>
-			                  <div />
-
-			                  <div className="flex flex-col items-center pt-0.5">
-			                    <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", sheetAccentFlowIconText].join(" ")}>
-			                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
-			                        <path d="M12 2l7 4v6c0 5-3 9-7 10-4-1-7-5-7-10V6l7-4Z" />
-			                        <path d="M9 12l2 2 4-4" />
-			                      </svg>
-			                    </span>
-			                  </div>
-			                  <div className="min-w-0">
-			                    <div className="text-white/90 font-semibold">
-			                      {t("ui_op_flow_step2_title", { defaultValue: "{{partner}} traite l’opération", partner: partnerName })}
-			                    </div>
-			                    <div className="mt-1 text-white/55">
-			                      {t("ui_op_flow_step2_subtitle", "Conversion automatique via les services de liquidité.")}
+			                    <div className="min-w-0">
+			                      <div className="text-white/90 font-semibold">
+			                        {t("ui_op_flow_sell_step1_title", "Vous confirmez le retrait")}
+			                      </div>
+			                      <div className="mt-1 text-white/55">
+			                        {t("ui_op_flow_step1_subtitle", "Vous validez l’opération chez {{partner}}.", { partner: partnerName })}
+			                      </div>
 			                    </div>
 			                  </div>
 
-			                  <div className="flex flex-col items-center">
-			                    <div className={["relative my-2 h-9 w-px bg-gradient-to-b from-white/20 to-white/10", sheetAccentFlowLineVia].join(" ")}>
-			                      <span className={["absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full motion-safe:animate-pulse", sheetAccentFlowDotSoft].join(" ")} />
+			                  <div className="grid grid-cols-[2.5rem_minmax(0,1fr)] gap-x-4 pb-6">
+			                    <div className="flex h-full flex-col items-center">
+			                      <span className={["mt-0.5 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", sheetAccentFlowIconText].join(" ")}>
+			                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
+			                          <path d="M12 2l7 4v6c0 5-3 9-7 10-4-1-7-5-7-10V6l7-4Z" />
+			                          <path d="M9 12l2 2 4-4" />
+			                        </svg>
+			                      </span>
+			                      <div className={["relative mt-2 flex-1 w-px bg-gradient-to-b from-white/20 to-white/10", sheetAccentFlowLineVia].join(" ")}>
+			                        <span className={["absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full motion-safe:animate-pulse", sheetAccentFlowDotSoft].join(" ")} />
+			                      </div>
+			                    </div>
+			                    <div className="min-w-0">
+			                      <div className="text-white/90 font-semibold">
+			                        {t("ui_op_flow_step2_title", { defaultValue: "{{partner}} traite l’opération", partner: partnerName })}
+			                      </div>
+			                      <div className="mt-1 text-white/55">
+			                        {t("ui_op_flow_step2_subtitle", "Conversion automatique via les services de liquidité.")}
+			                      </div>
 			                    </div>
 			                  </div>
-			                  <div />
 
-			                  <div className="flex flex-col items-center pt-0.5">
-			                    <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", sheetAccentFlowIconText].join(" ")}>
-			                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
-			                        <path d="M3 10h18" />
-			                        <path d="M5 10V8a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v2" />
-			                        <path d="M7 14h10" />
-			                        <path d="M5 10v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8" />
-			                      </svg>
-			                    </span>
-			                  </div>
-			                  <div className="min-w-0">
-			                    <div className="text-white/90 font-semibold">
-			                      {t("ui_op_flow_sell_step3_title", "Les fonds sont transférés vers votre banque")}
+			                  <div className="grid grid-cols-[2.5rem_minmax(0,1fr)] gap-x-4">
+			                    <div className="flex h-full flex-col items-center">
+			                      <span className={["mt-0.5 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", sheetAccentFlowIconText].join(" ")}>
+			                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
+			                          <path d="M3 10h18" />
+			                          <path d="M5 10V8a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v2" />
+			                          <path d="M7 14h10" />
+			                          <path d="M5 10v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8" />
+			                        </svg>
+			                      </span>
 			                    </div>
-			                    <div className="mt-1 text-white/55">
-			                      {t("ui_op_flow_sell_step3_subtitle", "Virement vers votre compte bancaire une fois validé.")}
+			                    <div className="min-w-0">
+			                      <div className="text-white/90 font-semibold">
+			                        {t("ui_op_flow_sell_step3_title", "Les fonds sont transférés vers votre banque")}
+			                      </div>
+			                      <div className="mt-1 text-white/55">
+			                        {t("ui_op_flow_sell_step3_subtitle", "Virement vers votre compte bancaire une fois validé.")}
+			                      </div>
 			                    </div>
 			                  </div>
 			                </div>
@@ -2092,16 +2076,11 @@ const MoonPaySellModal = ({
                   </span>
                 </span>
               </div>
-              <div className="mt-3">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/5 ring-1 ring-white/10 px-3 py-1 text-[11px] text-white/70">
-                  <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-white/10 text-white/70">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" className="h-3 w-3" aria-hidden="true">
-                      <path d="M20 6L9 17l-5-5" />
-                    </svg>
-                  </span>
-                  {t("ui_op_details_summary_auto_conversion", "Conversion automatique")}
-                </span>
-              </div>
+            <div className="mt-3">
+              <span className="inline-flex rounded-full bg-white/5 ring-1 ring-white/10 px-3 py-1 text-[11px] text-white/70">
+                {t("ui_op_details_summary_auto_conversion", "Conversion automatique")}
+              </span>
+            </div>
             </div>
 
             {/* Flow */}
@@ -2117,68 +2096,66 @@ const MoonPaySellModal = ({
 		                </p>
 	              </div>
 
-			              <div className="grid grid-cols-[2.5rem_minmax(0,1fr)] gap-x-4 text-[14px] leading-snug text-white/80">
-			                <div className="flex flex-col items-center pt-0.5">
-			                  <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", sheetAccentFlowIconText].join(" ")}>
-			                    <CheckCircleIcon className="h-5 w-5" aria-hidden />
-			                  </span>
-			                </div>
-			                <div className="min-w-0">
-			                  <div className="text-white/90 font-semibold">
-			                    {t("ui_op_flow_sell_step1_title", "Vous confirmez le retrait")}
+			              <div className="text-[14px] leading-snug text-white/80">
+			                <div className="grid grid-cols-[2.5rem_minmax(0,1fr)] gap-x-4 pb-6">
+			                  <div className="flex h-full flex-col items-center">
+			                    <span className={["mt-0.5 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", sheetAccentFlowIconText].join(" ")}>
+			                      <CheckCircleIcon className="h-5 w-5" aria-hidden />
+			                    </span>
+			                    <div className={["relative mt-2 flex-1 w-px bg-gradient-to-b from-white/20 to-white/10", sheetAccentFlowLineVia].join(" ")}>
+			                      <span className={["absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full motion-safe:animate-pulse", sheetAccentFlowDotStrong].join(" ")} />
+			                    </div>
 			                  </div>
-			                  <div className="mt-1 text-white/55">
-			                    {t("ui_op_flow_step1_subtitle", "Vous validez l’opération chez {{partner}}.", { partner: partnerName })}
-			                  </div>
-			                </div>
-
-			                <div className="flex flex-col items-center">
-			                  <div className={["relative my-2 h-9 w-px bg-gradient-to-b from-white/20 to-white/10", sheetAccentFlowLineVia].join(" ")}>
-			                    <span className={["absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full motion-safe:animate-pulse", sheetAccentFlowDotStrong].join(" ")} />
-			                  </div>
-			                </div>
-			                <div />
-
-			                <div className="flex flex-col items-center pt-0.5">
-			                  <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", sheetAccentFlowIconText].join(" ")}>
-			                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
-			                      <path d="M12 2l7 4v6c0 5-3 9-7 10-4-1-7-5-7-10V6l7-4Z" />
-			                      <path d="M9 12l2 2 4-4" />
-			                    </svg>
-			                  </span>
-			                </div>
-			                <div className="min-w-0">
-			                  <div className="text-white/90 font-semibold">
-			                    {t("ui_op_flow_step2_title", { defaultValue: "{{partner}} traite l’opération", partner: partnerName })}
-			                  </div>
-			                  <div className="mt-1 text-white/55">
-			                    {t("ui_op_flow_step2_subtitle", "Conversion automatique via les services de liquidité.")}
+			                  <div className="min-w-0">
+			                    <div className="text-white/90 font-semibold">
+			                      {t("ui_op_flow_sell_step1_title", "Vous confirmez le retrait")}
+			                    </div>
+			                    <div className="mt-1 text-white/55">
+			                      {t("ui_op_flow_step1_subtitle", "Vous validez l’opération chez {{partner}}.", { partner: partnerName })}
+			                    </div>
 			                  </div>
 			                </div>
 
-			                <div className="flex flex-col items-center">
-			                  <div className={["relative my-2 h-9 w-px bg-gradient-to-b from-white/20 to-white/10", sheetAccentFlowLineVia].join(" ")}>
-			                    <span className={["absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full motion-safe:animate-pulse", sheetAccentFlowDotSoft].join(" ")} />
+			                <div className="grid grid-cols-[2.5rem_minmax(0,1fr)] gap-x-4 pb-6">
+			                  <div className="flex h-full flex-col items-center">
+			                    <span className={["mt-0.5 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", sheetAccentFlowIconText].join(" ")}>
+			                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
+			                        <path d="M12 2l7 4v6c0 5-3 9-7 10-4-1-7-5-7-10V6l7-4Z" />
+			                        <path d="M9 12l2 2 4-4" />
+			                      </svg>
+			                    </span>
+			                    <div className={["relative mt-2 flex-1 w-px bg-gradient-to-b from-white/20 to-white/10", sheetAccentFlowLineVia].join(" ")}>
+			                      <span className={["absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full motion-safe:animate-pulse", sheetAccentFlowDotSoft].join(" ")} />
+			                    </div>
+			                  </div>
+			                  <div className="min-w-0">
+			                    <div className="text-white/90 font-semibold">
+			                      {t("ui_op_flow_step2_title", { defaultValue: "{{partner}} traite l’opération", partner: partnerName })}
+			                    </div>
+			                    <div className="mt-1 text-white/55">
+			                      {t("ui_op_flow_step2_subtitle", "Conversion automatique via les services de liquidité.")}
+			                    </div>
 			                  </div>
 			                </div>
-			                <div />
 
-			                <div className="flex flex-col items-center pt-0.5">
-			                  <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", sheetAccentFlowIconText].join(" ")}>
-			                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
-			                      <path d="M3 10h18" />
-			                      <path d="M5 10V8a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v2" />
-			                      <path d="M7 14h10" />
-			                      <path d="M5 10v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8" />
-			                    </svg>
-			                  </span>
-			                </div>
-			                <div className="min-w-0">
-			                  <div className="text-white/90 font-semibold">
-			                    {t("ui_op_flow_sell_step3_title", "Les fonds sont transférés vers votre banque")}
+			                <div className="grid grid-cols-[2.5rem_minmax(0,1fr)] gap-x-4">
+			                  <div className="flex h-full flex-col items-center">
+			                    <span className={["mt-0.5 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", sheetAccentFlowIconText].join(" ")}>
+			                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
+			                        <path d="M3 10h18" />
+			                        <path d="M5 10V8a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v2" />
+			                        <path d="M7 14h10" />
+			                        <path d="M5 10v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8" />
+			                      </svg>
+			                    </span>
 			                  </div>
-			                  <div className="mt-1 text-white/55">
-			                    {t("ui_op_flow_sell_step3_subtitle", "Virement vers votre compte bancaire une fois validé.")}
+			                  <div className="min-w-0">
+			                    <div className="text-white/90 font-semibold">
+			                      {t("ui_op_flow_sell_step3_title", "Les fonds sont transférés vers votre banque")}
+			                    </div>
+			                    <div className="mt-1 text-white/55">
+			                      {t("ui_op_flow_sell_step3_subtitle", "Virement vers votre compte bancaire une fois validé.")}
+			                    </div>
 			                  </div>
 			                </div>
 			              </div>
