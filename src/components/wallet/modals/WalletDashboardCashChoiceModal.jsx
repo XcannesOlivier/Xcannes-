@@ -15,6 +15,7 @@ export default function WalletDashboardCashChoiceModal({
   onChooseUsdSwapIn,
   noticeVariant = 'preview',
   inline = false,
+  walletLabel = '',
 }) {
   const { t } = useTranslation('common');
   const isDesktop = useIsDesktop();
@@ -432,18 +433,10 @@ export default function WalletDashboardCashChoiceModal({
                               />
                             </svg>
                           </div>
-                          <p className="mt-1 text-[15px] md:text-sm leading-snug text-xcannes-green/90">
-                            {(() => {
-                              const parts = String(addHintText || '').split(' ou ');
-                              if (parts.length === 2) {
-                                return (
-                                  <>
-                                    {parts[0]} <span className="text-white/60">ou</span> {parts[1]}
-                                  </>
-                                );
-                              }
-                              return addHintText;
-                            })()}
+                          <p className="mt-1 text-[15px] md:text-sm leading-snug text-white/55 flex items-center gap-1.5">
+                            <span>{t('ui_funds_add_hint_account', 'À votre compte')}</span>
+                            <span className="h-2 w-2 rounded-full bg-xcannes-green shrink-0 animate-pulse" aria-hidden />
+                            <span className="text-white/90 font-semibold">{walletLabel || 'XCANNES'}</span>
                           </p>
                         </div>
                       </div>
@@ -459,7 +452,7 @@ export default function WalletDashboardCashChoiceModal({
                             <p className="text-[18px] md:text-[19px] text-white font-semibold truncate">
                               {isDesktop
                                 ? t('ui_funds_withdraw_title', 'Transférer vers la banque')
-                                : t('ui_funds_withdraw_title_mobile', 'Transférer')}
+                                : t('ui_funds_withdraw_title_mobile', 'Transférer vers la banque')}
                             </p>
                             <svg className="w-5 h-5 text-white/45" viewBox="0 0 24 24" fill="none" aria-hidden>
                               <path

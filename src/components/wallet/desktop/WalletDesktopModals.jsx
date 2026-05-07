@@ -209,6 +209,7 @@ export default function WalletDesktopModals({
 	        <WalletDashboardCashChoiceModal
 	          open
 	          inline
+	          walletLabel={cashModalProps?.walletLabel || ""}
 	          onClose={() => {
 	            resetCashForm?.();
 	            setActiveAction(null);

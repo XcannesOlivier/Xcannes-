@@ -259,6 +259,7 @@ export default function WalletMobileModals({
 
 	            <WalletDashboardCashChoiceModal
 	              open={activeAction === "cashChoice"}
+	              walletLabel={cashModalProps?.walletLabel || ""}
 	              onClose={() => {
 	                resetCashForm?.();
 	                setActiveAction(null);
