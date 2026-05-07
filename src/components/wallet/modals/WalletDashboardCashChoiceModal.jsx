@@ -35,9 +35,9 @@ export default function WalletDashboardCashChoiceModal({
       ),
     );
   };
-  const swapOutHintText = t('ui_funds_swap_out_hint', 'Vers votre compte XCannes');
+  const swapOutHintText = t('ui_funds_swap_out_hint', 'Créditer votre compte XCannes');
   const swapOutSubhintText = t('ui_funds_swap_out_subhint', 'Ajoutés automatiquement à votre solde');
-  const swapInHintText = t('ui_funds_swap_in_hint', 'Et envoyer les vers vos portefeuilles externes');
+  const swapInHintText = t('ui_funds_swap_in_hint', 'Envoyer à vos portefeuilles externes');
   const swapInSubhintText = t('ui_funds_swap_in_subhint', 'Conversion automatique si nécessaire');
   const stablecoinLiquidityNote = t(
     'ui_funds_stablecoin_liquidity_note',
@@ -496,7 +496,7 @@ export default function WalletDashboardCashChoiceModal({
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center justify-between gap-2">
                             <p className="text-[18px] md:text-[19px] text-white font-semibold truncate">
-                              {t('ui_funds_swap_out_title', 'Échanger vos stablecoins')}
+                              {t('ui_funds_swap_out_title', 'Échanger vos USDC, USDT, RLUSD, ...')}
                             </p>
                             <svg className="w-5 h-5 text-white/45" viewBox="0 0 24 24" fill="none" aria-hidden>
                               <path
