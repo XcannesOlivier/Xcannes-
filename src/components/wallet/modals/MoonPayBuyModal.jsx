@@ -2169,17 +2169,13 @@ const MoonPayBuyModal = ({
 		                  </p>
 		                </div>
 
-		                <div className="text-[14px] leading-snug text-white/80">
-		                  <div className="grid grid-cols-[2.5rem_minmax(0,1fr)] gap-x-4 pb-6">
-		                    <div className="relative flex h-full flex-col items-center">
-		                      <span className={["mt-0.5 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", sheetAccentFlowIconText].join(" ")}>
+		                <div className="grid grid-cols-[2.5rem_minmax(0,1fr)] gap-x-4 text-[14px] leading-snug text-white/80">
+		                  <div className="flex h-10 items-center justify-center">
+		                    <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", sheetAccentFlowIconText].join(" ")}>
 		                        <CheckCircleIcon className="h-5 w-5" aria-hidden />
 		                      </span>
-		                      <div className={["absolute left-1/2 top-[2.75rem] bottom-0 w-px -translate-x-1/2", sheetAccentFlowLineVia].join(" ")}>
-		                        <span className={["absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full motion-safe:animate-pulse", sheetAccentFlowDotStrong].join(" ")} />
-		                      </div>
-		                    </div>
-		                    <div className="min-w-0">
+		                  </div>
+		                  <div className="min-w-0 self-center">
 		                      <div className="text-white/90 font-semibold">
 		                        {t("ui_op_flow_step1_title", "Vous confirmez le paiement")}
 		                      </div>
@@ -2190,12 +2186,17 @@ const MoonPayBuyModal = ({
 		                          { partner: partnerName },
 		                        )}
 		                      </div>
-		                    </div>
 		                  </div>
 
-		                  <div className="grid grid-cols-[2.5rem_minmax(0,1fr)] gap-x-4 pb-6">
-		                    <div className="relative flex h-full flex-col items-center">
-		                      <span className={["mt-0.5 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", sheetAccentFlowIconText].join(" ")}>
+		                  <div className="flex h-8 items-center justify-center">
+		                    <div className={["relative h-full w-px", sheetAccentFlowLineVia].join(" ")}>
+		                      <span className={["absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full motion-safe:animate-pulse", sheetAccentFlowDotStrong].join(" ")} />
+		                    </div>
+		                  </div>
+		                  <div />
+
+		                  <div className="flex h-10 items-center justify-center">
+		                    <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", sheetAccentFlowIconText].join(" ")}>
 		                        <svg
 		                          viewBox="0 0 24 24"
 		                          fill="none"
@@ -2210,11 +2211,8 @@ const MoonPayBuyModal = ({
 		                          <path d="M9 12l2 2 4-4" />
 		                        </svg>
 		                      </span>
-		                      <div className={["absolute left-1/2 top-[2.75rem] bottom-0 w-px -translate-x-1/2", sheetAccentFlowLineVia].join(" ")}>
-		                        <span className={["absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full motion-safe:animate-pulse", sheetAccentFlowDotSoft].join(" ")} />
-		                      </div>
-		                    </div>
-		                    <div className="min-w-0">
+		                  </div>
+		                  <div className="min-w-0 self-center">
 		                      <div className="text-white/90 font-semibold">
 		                        {t("ui_op_flow_step2_title", {
 		                          defaultValue: "{{partner}} traite l’opération",
@@ -2227,12 +2225,17 @@ const MoonPayBuyModal = ({
 		                          "Conversion automatique via les services de liquidité.",
 		                        )}
 		                      </div>
-		                    </div>
 		                  </div>
 
-		                  <div className="grid grid-cols-[2.5rem_minmax(0,1fr)] gap-x-4">
-		                    <div className="flex h-full flex-col items-center">
-		                      <span className={["mt-0.5 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", sheetAccentFlowIconText].join(" ")}>
+		                  <div className="flex h-8 items-center justify-center">
+		                    <div className={["relative h-full w-px", sheetAccentFlowLineVia].join(" ")}>
+		                      <span className={["absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full motion-safe:animate-pulse", sheetAccentFlowDotSoft].join(" ")} />
+		                    </div>
+		                  </div>
+		                  <div />
+
+		                  <div className="flex h-10 items-center justify-center">
+		                    <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", sheetAccentFlowIconText].join(" ")}>
 		                        <svg
 		                          viewBox="0 0 24 24"
 		                          fill="none"
@@ -2247,8 +2250,8 @@ const MoonPayBuyModal = ({
 		                          <path d="M16 11h3" />
 		                        </svg>
 		                      </span>
-		                    </div>
-		                    <div className="min-w-0">
+		                  </div>
+		                  <div className="min-w-0 self-center">
 		                      <div className="text-white/90 font-semibold">
 		                        {t("ui_op_flow_step3_title", "Votre compte XCannes est crédité")}
 		                      </div>
@@ -2258,7 +2261,6 @@ const MoonPayBuyModal = ({
 		                          "Le montant apparaît sur votre solde dès validation.",
 		                        )}
 		                      </div>
-		                    </div>
 		                  </div>
 		                </div>
 
@@ -2480,17 +2482,13 @@ const MoonPayBuyModal = ({
 		                </p>
 	              </div>
 
-		              <div className="text-[14px] leading-snug text-white/80">
-		                <div className="grid grid-cols-[2.5rem_minmax(0,1fr)] gap-x-4 pb-6">
-		                  <div className="relative flex h-full flex-col items-center">
-		                    <span className={["mt-0.5 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", sheetAccentFlowIconText].join(" ")}>
+		              <div className="grid grid-cols-[2.5rem_minmax(0,1fr)] gap-x-4 text-[14px] leading-snug text-white/80">
+		                <div className="flex h-10 items-center justify-center">
+		                  <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", sheetAccentFlowIconText].join(" ")}>
 		                      <CheckCircleIcon className="h-5 w-5" aria-hidden />
 		                    </span>
-		                    <div className={["absolute left-1/2 top-[2.75rem] bottom-0 w-px -translate-x-1/2", sheetAccentFlowLineVia].join(" ")}>
-		                      <span className={["absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full motion-safe:animate-pulse", sheetAccentFlowDotStrong].join(" ")} />
-		                    </div>
-		                  </div>
-		                  <div className="min-w-0">
+		                </div>
+		                <div className="min-w-0 self-center">
 		                    <div className="text-white/90 font-semibold">
 		                      {t("ui_op_flow_step1_title", "Vous confirmez le paiement")}
 		                    </div>
@@ -2501,12 +2499,17 @@ const MoonPayBuyModal = ({
 		                        { partner: partnerName },
 		                      )}
 		                    </div>
-		                  </div>
 		                </div>
 
-		                <div className="grid grid-cols-[2.5rem_minmax(0,1fr)] gap-x-4 pb-6">
-		                  <div className="relative flex h-full flex-col items-center">
-		                    <span className={["mt-0.5 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", sheetAccentFlowIconText].join(" ")}>
+		                <div className="flex h-8 items-center justify-center">
+		                  <div className={["relative h-full w-px", sheetAccentFlowLineVia].join(" ")}>
+		                    <span className={["absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full motion-safe:animate-pulse", sheetAccentFlowDotStrong].join(" ")} />
+		                  </div>
+		                </div>
+		                <div />
+
+		                <div className="flex h-10 items-center justify-center">
+		                  <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", sheetAccentFlowIconText].join(" ")}>
 		                      <svg
 		                        viewBox="0 0 24 24"
 		                        fill="none"
@@ -2521,11 +2524,8 @@ const MoonPayBuyModal = ({
 		                        <path d="M9 12l2 2 4-4" />
 		                      </svg>
 		                    </span>
-		                    <div className={["absolute left-1/2 top-[2.75rem] bottom-0 w-px -translate-x-1/2", sheetAccentFlowLineVia].join(" ")}>
-		                      <span className={["absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full motion-safe:animate-pulse", sheetAccentFlowDotSoft].join(" ")} />
-		                    </div>
-		                  </div>
-		                  <div className="min-w-0">
+		                </div>
+		                <div className="min-w-0 self-center">
 		                    <div className="text-white/90 font-semibold">
 		                      {t("ui_op_flow_step2_title", {
 		                        defaultValue: "{{partner}} traite l’opération",
@@ -2538,12 +2538,17 @@ const MoonPayBuyModal = ({
 		                        "Conversion automatique via les services de liquidité.",
 		                      )}
 		                    </div>
-		                  </div>
 		                </div>
 
-		                <div className="grid grid-cols-[2.5rem_minmax(0,1fr)] gap-x-4">
-		                  <div className="flex h-full flex-col items-center">
-		                    <span className={["mt-0.5 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", sheetAccentFlowIconText].join(" ")}>
+		                <div className="flex h-8 items-center justify-center">
+		                  <div className={["relative h-full w-px", sheetAccentFlowLineVia].join(" ")}>
+		                    <span className={["absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full motion-safe:animate-pulse", sheetAccentFlowDotSoft].join(" ")} />
+		                  </div>
+		                </div>
+		                <div />
+
+		                <div className="flex h-10 items-center justify-center">
+		                  <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", sheetAccentFlowIconText].join(" ")}>
 		                      <svg
 		                        viewBox="0 0 24 24"
 		                        fill="none"
@@ -2558,8 +2563,8 @@ const MoonPayBuyModal = ({
 		                        <path d="M16 11h3" />
 		                      </svg>
 		                    </span>
-		                  </div>
-		                  <div className="min-w-0">
+		                </div>
+		                <div className="min-w-0 self-center">
 		                    <div className="text-white/90 font-semibold">
 		                      {t("ui_op_flow_step3_title", "Votre compte XCannes est crédité")}
 		                    </div>
@@ -2569,7 +2574,6 @@ const MoonPayBuyModal = ({
 		                        "Le montant apparaît sur votre solde dès validation.",
 		                      )}
 		                    </div>
-		                  </div>
 		                </div>
 		              </div>
 
