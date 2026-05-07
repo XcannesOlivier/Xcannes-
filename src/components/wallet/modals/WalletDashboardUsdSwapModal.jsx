@@ -417,13 +417,13 @@ export default function WalletDashboardUsdSwapModal({
 	    : isSimpleSwapBlue
 	      ? "bg-[#0870f8]/10 ring-1 ring-[#0870f8]/20 text-white/85"
 	      : "bg-xcannes-green/10 ring-1 ring-xcannes-green/20 text-white/85";
-	  const sheetAccentFlowLineVia = isBinanceYellow
-	    ? "via-[#F0B90B]/20"
-	    : isFireOrange
-    ? "via-[#ff6a00]/20"
-    : isSimpleSwapBlue
-      ? "via-[#0870f8]/20"
-      : "via-xcannes-green/20";
+		  const sheetAccentFlowLineVia = isBinanceYellow
+		    ? "bg-[#F0B90B]/30"
+		    : isFireOrange
+	    ? "bg-[#ff6a00]/30"
+	    : isSimpleSwapBlue
+	      ? "bg-[#0870f8]/30"
+	      : "bg-xcannes-green/30";
   const sheetAccentFlowDotStrong = isBinanceYellow
     ? "bg-[#F0B90B]/40"
     : isFireOrange
@@ -4651,13 +4651,13 @@ export default function WalletDashboardUsdSwapModal({
 
 				            <div className="text-[14px] leading-snug text-white/80">
 				              <div className="grid grid-cols-[2.5rem_minmax(0,1fr)] gap-x-4 pb-6">
-				                <div className="flex h-full flex-col items-center">
+					                <div className="relative flex h-full flex-col items-center">
 				                  <span className={["mt-0.5 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", accentTextSolid].join(" ")}>
 				                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
 				                      <path d="M20 6L9 17l-5-5" />
 				                    </svg>
 				                  </span>
-				                  <div className={["relative mt-2 flex-1 w-px bg-gradient-to-b from-white/20 to-white/10", sheetAccentFlowLineVia].join(" ")}>
+					                  <div className={["absolute left-1/2 top-[2.75rem] bottom-0 w-px -translate-x-1/2", sheetAccentFlowLineVia].join(" ")}>
 				                    <span className={["absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full motion-safe:animate-pulse", sheetAccentFlowDotStrong].join(" ")} />
 				                  </div>
 				                </div>
@@ -4676,7 +4676,7 @@ export default function WalletDashboardUsdSwapModal({
 				              </div>
 
 				              <div className="grid grid-cols-[2.5rem_minmax(0,1fr)] gap-x-4 pb-6">
-				                <div className="flex h-full flex-col items-center">
+					                <div className="relative flex h-full flex-col items-center">
 				                  <span className={["mt-0.5 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", accentTextSolid].join(" ")}>
 				                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
 				                      <path d="M8 7h-3a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-3" />
@@ -4684,7 +4684,7 @@ export default function WalletDashboardUsdSwapModal({
 				                      <path d="M21 3l-9 9" />
 				                    </svg>
 				                  </span>
-				                  <div className={["relative mt-2 flex-1 w-px bg-gradient-to-b from-white/20 to-white/10", sheetAccentFlowLineVia].join(" ")}>
+					                  <div className={["absolute left-1/2 top-[2.75rem] bottom-0 w-px -translate-x-1/2", sheetAccentFlowLineVia].join(" ")}>
 				                    <span className={["absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full motion-safe:animate-pulse", sheetAccentFlowDotSoft].join(" ")} />
 				                  </div>
 				                </div>
