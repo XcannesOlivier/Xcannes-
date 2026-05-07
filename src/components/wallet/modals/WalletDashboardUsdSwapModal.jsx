@@ -4682,8 +4682,8 @@ export default function WalletDashboardUsdSwapModal({
 	                </span>
 	              </div>
 
-	              <div className="flex-1 min-w-0">
-	                <div className="space-y-7 text-[14px] leading-snug text-white/80">
+		              <div className="flex-1 min-w-0">
+		                <div className="space-y-7 text-[14px] leading-snug text-white/80">
 	                  <div>
 		                    <div className="text-white/90 font-semibold">
 		                      {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
@@ -4718,49 +4718,49 @@ export default function WalletDashboardUsdSwapModal({
 	                        : t("ui_op_flow_swap_step3_in_sub", "Crédit RLUSD après réception des XRP.")}
 	                    </div>
 	                  </div>
-	                </div>
+		                </div>
+		              </div>
+		            </div>
 
-	                {(quotedXrpSentToPartner != null || quotedPartnerReceiveAmount != null) ? (
-	                  <div className="mt-5">
-	                    <button
-	                      type="button"
-	                      onClick={() => setTechDetailsOpen((v) => !v)}
-	                      className="w-full flex items-center justify-between gap-3 rounded-2xl bg-white/5 ring-1 ring-white/10 px-4 py-3 text-left"
-	                      aria-expanded={techDetailsOpen}
-	                    >
-	                      <span className="text-[13px] font-semibold text-white/65">
-	                        {t("ui_op_details_tech_title", "Détails techniques")}
-	                      </span>
-	                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={["h-4 w-4 text-white/45 transition-transform duration-200", techDetailsOpen ? "rotate-180" : ""].join(" ")} aria-hidden="true">
-	                        <polyline points="6 9 12 15 18 9" />
-	                      </svg>
-	                    </button>
-	                    <div
-	                      className="overflow-hidden transition-[max-height,opacity] duration-200 ease-out"
-	                      style={{ maxHeight: techDetailsOpen ? "160px" : "0px", opacity: techDetailsOpen ? 1 : 0 }}
-	                    >
-	                      <p className="mt-2 px-1 text-[13px] leading-snug text-white/55">
-	                        {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
-	                          ? t("ui_op_details_xrp_bridge_out", {
-	                              defaultValue: "≈ {{xrp}} XRP utilisés pendant le traitement de l’opération.",
-	                              xrp: quotedXrpSentToPartner != null
-	                                ? (formatAmountNumber ? formatAmountNumber.format(quotedXrpSentToPartner) : String(quotedXrpSentToPartner))
-	                                : "—",
-	                            })
-	                          : t("ui_op_details_xrp_bridge_in", {
-	                              defaultValue: "≈ {{xrp}} XRP transitent pendant le traitement de l’opération.",
-	                              xrp: quotedPartnerReceiveAmount != null
-	                                ? (formatAmountNumber ? formatAmountNumber.format(quotedPartnerReceiveAmount) : String(quotedPartnerReceiveAmount))
-	                                : "—",
-	                            })}
-	                      </p>
-	                    </div>
-	                  </div>
-	                ) : null}
-	              </div>
-	            </div>
-	          </div>
-	        </div>
+		            {(quotedXrpSentToPartner != null || quotedPartnerReceiveAmount != null) ? (
+		              <div className="mt-5">
+		                <button
+		                  type="button"
+		                  onClick={() => setTechDetailsOpen((v) => !v)}
+		                  className="w-full flex items-center justify-between gap-3 rounded-2xl bg-white/5 ring-1 ring-white/10 px-4 py-3 text-left"
+		                  aria-expanded={techDetailsOpen}
+		                >
+		                  <span className="text-[13px] font-semibold text-white/65">
+		                    {t("ui_op_details_tech_title", "Détails techniques")}
+		                  </span>
+		                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={["h-4 w-4 text-white/45 transition-transform duration-200", techDetailsOpen ? "rotate-180" : ""].join(" ")} aria-hidden="true">
+		                    <polyline points="6 9 12 15 18 9" />
+		                  </svg>
+		                </button>
+		                <div
+		                  className="overflow-hidden transition-[max-height,opacity] duration-200 ease-out"
+		                  style={{ maxHeight: techDetailsOpen ? "160px" : "0px", opacity: techDetailsOpen ? 1 : 0 }}
+		                >
+		                  <p className="mt-2 px-1 text-[13px] leading-snug text-white/55">
+		                    {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
+		                      ? t("ui_op_details_xrp_bridge_out", {
+		                          defaultValue: "≈ {{xrp}} XRP utilisés pendant le traitement de l’opération.",
+		                          xrp: quotedXrpSentToPartner != null
+		                            ? (formatAmountNumber ? formatAmountNumber.format(quotedXrpSentToPartner) : String(quotedXrpSentToPartner))
+		                            : "—",
+		                        })
+		                      : t("ui_op_details_xrp_bridge_in", {
+		                          defaultValue: "≈ {{xrp}} XRP transitent pendant le traitement de l’opération.",
+		                          xrp: quotedPartnerReceiveAmount != null
+		                            ? (formatAmountNumber ? formatAmountNumber.format(quotedPartnerReceiveAmount) : String(quotedPartnerReceiveAmount))
+		                            : "—",
+		                        })}
+		                  </p>
+		                </div>
+		              </div>
+		            ) : null}
+		          </div>
+		        </div>
 	      </div>,
 	      modalPanelRef.current || document.body,
 	    ) : null}

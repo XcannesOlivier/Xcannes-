@@ -1931,37 +1931,37 @@ const MoonPaySellModal = ({
                         </div>
                       </div>
                     </div>
-
-                    {xrpPreviewAmount !== null ? (
-                      <div className="mt-5">
-                        <button
-                          type="button"
-                          onClick={() => setTechDetailsOpen((v) => !v)}
-                          className="w-full flex items-center justify-between gap-3 rounded-2xl bg-white/5 ring-1 ring-white/10 px-4 py-3 text-left"
-                          aria-expanded={techDetailsOpen}
-                        >
-                          <span className="text-[13px] font-semibold text-white/65">
-                            {t("ui_op_details_tech_title", "Détails techniques")}
-                          </span>
-                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={["h-4 w-4 text-white/45 transition-transform duration-200", techDetailsOpen ? "rotate-180" : ""].join(" ")} aria-hidden="true">
-                            <polyline points="6 9 12 15 18 9" />
-                          </svg>
-                        </button>
-                        <div
-                          className="overflow-hidden transition-[max-height,opacity] duration-200 ease-out"
-                          style={{ maxHeight: techDetailsOpen ? "120px" : "0px", opacity: techDetailsOpen ? 1 : 0 }}
-                        >
-                          <p className="mt-2 px-1 text-[13px] leading-snug text-white/55">
-                            {t("ui_op_details_sell_new_xrp_used", {
-                              defaultValue: "≈ {{xrp}} XRP utilisés pendant le traitement de l’opération.",
-                              xrp: new Intl.NumberFormat(locale, { minimumFractionDigits: 2, maximumFractionDigits: 4 }).format(xrpPreviewAmount),
-                            })}
-                          </p>
-                        </div>
-                      </div>
-                    ) : null}
                   </div>
                 </div>
+
+                {xrpPreviewAmount !== null ? (
+                  <div className="mt-5">
+                    <button
+                      type="button"
+                      onClick={() => setTechDetailsOpen((v) => !v)}
+                      className="w-full flex items-center justify-between gap-3 rounded-2xl bg-white/5 ring-1 ring-white/10 px-4 py-3 text-left"
+                      aria-expanded={techDetailsOpen}
+                    >
+                      <span className="text-[13px] font-semibold text-white/65">
+                        {t("ui_op_details_tech_title", "Détails techniques")}
+                      </span>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={["h-4 w-4 text-white/45 transition-transform duration-200", techDetailsOpen ? "rotate-180" : ""].join(" ")} aria-hidden="true">
+                        <polyline points="6 9 12 15 18 9" />
+                      </svg>
+                    </button>
+                    <div
+                      className="overflow-hidden transition-[max-height,opacity] duration-200 ease-out"
+                      style={{ maxHeight: techDetailsOpen ? "120px" : "0px", opacity: techDetailsOpen ? 1 : 0 }}
+                    >
+                      <p className="mt-2 px-1 text-[13px] leading-snug text-white/55">
+                        {t("ui_op_details_sell_new_xrp_used", {
+                          defaultValue: "≈ {{xrp}} XRP utilisés pendant le traitement de l’opération.",
+                          xrp: new Intl.NumberFormat(locale, { minimumFractionDigits: 2, maximumFractionDigits: 4 }).format(xrpPreviewAmount),
+                        })}
+                      </p>
+                    </div>
+                  </div>
+                ) : null}
               </div>
             </div>
           </div>,
@@ -2166,37 +2166,37 @@ const MoonPaySellModal = ({
                       </div>
                     </div>
                   </div>
-
-                  {xrpPreviewAmount !== null ? (
-                    <div className="mt-5">
-                      <button
-                        type="button"
-                        onClick={() => setTechDetailsOpen((v) => !v)}
-                        className="w-full flex items-center justify-between gap-3 rounded-2xl bg-white/5 ring-1 ring-white/10 px-4 py-3 text-left"
-                        aria-expanded={techDetailsOpen}
-                      >
-                        <span className="text-[13px] font-semibold text-white/65">
-                          {t("ui_op_details_tech_title", "Détails techniques")}
-                        </span>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={["h-4 w-4 text-white/45 transition-transform duration-200", techDetailsOpen ? "rotate-180" : ""].join(" ")} aria-hidden="true">
-                          <polyline points="6 9 12 15 18 9" />
-                        </svg>
-                      </button>
-                      <div
-                        className="overflow-hidden transition-[max-height,opacity] duration-200 ease-out"
-                        style={{ maxHeight: techDetailsOpen ? "120px" : "0px", opacity: techDetailsOpen ? 1 : 0 }}
-                      >
-                        <p className="mt-2 px-1 text-[13px] leading-snug text-white/55">
-                          {t("ui_op_details_sell_new_xrp_used", {
-                            defaultValue: "≈ {{xrp}} XRP utilisés pendant le traitement de l’opération.",
-                            xrp: new Intl.NumberFormat(locale, { minimumFractionDigits: 2, maximumFractionDigits: 4 }).format(xrpPreviewAmount),
-                          })}
-                        </p>
-                      </div>
-                    </div>
-                  ) : null}
                 </div>
               </div>
+
+              {xrpPreviewAmount !== null ? (
+                <div className="mt-5">
+                  <button
+                    type="button"
+                    onClick={() => setTechDetailsOpen((v) => !v)}
+                    className="w-full flex items-center justify-between gap-3 rounded-2xl bg-white/5 ring-1 ring-white/10 px-4 py-3 text-left"
+                    aria-expanded={techDetailsOpen}
+                  >
+                    <span className="text-[13px] font-semibold text-white/65">
+                      {t("ui_op_details_tech_title", "Détails techniques")}
+                    </span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={["h-4 w-4 text-white/45 transition-transform duration-200", techDetailsOpen ? "rotate-180" : ""].join(" ")} aria-hidden="true">
+                      <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                  </button>
+                  <div
+                    className="overflow-hidden transition-[max-height,opacity] duration-200 ease-out"
+                    style={{ maxHeight: techDetailsOpen ? "120px" : "0px", opacity: techDetailsOpen ? 1 : 0 }}
+                  >
+                    <p className="mt-2 px-1 text-[13px] leading-snug text-white/55">
+                      {t("ui_op_details_sell_new_xrp_used", {
+                        defaultValue: "≈ {{xrp}} XRP utilisés pendant le traitement de l’opération.",
+                        xrp: new Intl.NumberFormat(locale, { minimumFractionDigits: 2, maximumFractionDigits: 4 }).format(xrpPreviewAmount),
+                      })}
+                    </p>
+                  </div>
+                </div>
+              ) : null}
             </div>
           </div>
         </div>,
