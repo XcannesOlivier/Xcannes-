@@ -867,7 +867,8 @@ export default function WalletDashboardSendChoiceModal({
                     </div>
                   </div>
 
-                </div>                </div>
+                </div>
+
                 </div>
               </div>
             </div>
