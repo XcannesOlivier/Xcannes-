@@ -1627,7 +1627,7 @@ const MoonPaySellModal = ({
             style={continueDisabled
               ? isSendToWalletFlow
                 ? { background: 'linear-gradient(180deg, rgba(255,106,0,0.65) 0%, rgba(232,95,0,0.65) 100%)', color: 'rgba(255,255,255,0.4)' }
-                : { background: 'rgba(124,58,237,0.07)', color: 'rgba(100,200,130,0.6)' }
+                : { background: 'rgba(124,58,237,0.07)', color: 'rgba(255,255,255,0.2)' }
               : { background: isSendToWalletFlow
                   ? 'linear-gradient(180deg, rgba(255,106,0,1) 0%, rgba(232,95,0,1) 100%)'
                   : 'linear-gradient(180deg, rgba(124,58,237,1) 0%, rgba(91,33,182,1) 100%)',
@@ -1635,7 +1635,7 @@ const MoonPaySellModal = ({
             }
           >
             {continueDisabled && !isSendToWalletFlow
-              ? <span className="inline-flex items-center gap-1.5" style={{ color: 'rgba(100,200,130,0.6)' }}>
+              ? <span className="inline-flex items-center gap-1.5" style={{ color: 'rgba(255,255,255,0.2)' }}>
                   <span>{t('ui_sell_fill_cta', 'Choisissez la devise et le montant')}</span>
                   <span className="inline-flex items-end gap-[3px] mb-[-1px]">
                     <span className="sell-dot" style={{ animationDelay: '0s' }}>·</span>
@@ -1660,7 +1660,7 @@ const MoonPaySellModal = ({
             style={continueDisabled
               ? isSendToWalletFlow
                 ? { background: 'linear-gradient(180deg, rgba(255,106,0,0.65) 0%, rgba(232,95,0,0.65) 100%)', color: 'rgba(255,255,255,0.4)' }
-                : { background: 'rgba(124,58,237,0.07)', color: 'rgba(100,200,130,0.6)' }
+                : { background: 'rgba(124,58,237,0.07)', color: 'rgba(255,255,255,0.2)' }
               : { background: isSendToWalletFlow
                   ? 'linear-gradient(180deg, rgba(255,106,0,1) 0%, rgba(232,95,0,1) 100%)'
                   : 'linear-gradient(180deg, rgba(124,58,237,1) 0%, rgba(91,33,182,1) 100%)',
@@ -1668,7 +1668,7 @@ const MoonPaySellModal = ({
             }
           >
             {continueDisabled && !isSendToWalletFlow
-              ? <span className="inline-flex items-center gap-1.5" style={{ color: 'rgba(100,200,130,0.6)' }}>
+              ? <span className="inline-flex items-center gap-1.5" style={{ color: 'rgba(255,255,255,0.2)' }}>
                   <span>{t('ui_sell_fill_cta', 'Choisissez la devise et le montant')}</span>
                   <span className="inline-flex items-end gap-[3px] mb-[-1px]">
                     <span className="sell-dot" style={{ animationDelay: '0s' }}>·</span>
