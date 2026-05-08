@@ -73,7 +73,7 @@ export default function WalletDashboardSendChoiceModal({
     setSubModal(name);
   }, []);
   const [showSteps, setShowSteps] = useState(false);
-  const [showPayreqSteps, setShowPayreqSteps] = useState(true);
+  const [showPayreqSteps, setShowPayreqSteps] = useState(false);
   const [payreqPasteValue, setPayreqPasteValue] = useState('');
   const [payreqSelfSendError, setPayreqSelfSendError] = useState(false);
   const [simpleSendSelfError, setSimpleSendSelfError] = useState(false);
@@ -656,8 +656,9 @@ export default function WalletDashboardSendChoiceModal({
                       </div>
                     </button>
                     {/* Steps toggle */}
-                    <button type="button" onClick={(e) => { e.stopPropagation(); setShowPayreqSteps(s => !s); }} className="mt-3 text-[13px] text-[#f5a623]/80 hover:text-[#f5a623] transition-colors duration-150 font-medium self-start text-left">
-                      {showPayreqSteps ? t('ui_hide_steps', 'Masquer les étapes') : t('ui_show_steps', 'Voir les étapes de paiement')}
+                    <button type="button" onClick={(e) => { e.stopPropagation(); setShowPayreqSteps(s => !s); }} className="mt-3 inline-flex items-center gap-1 text-[13px] text-white/80 hover:text-white transition-colors duration-150 font-medium self-start text-left">
+                      <span>{showPayreqSteps ? t('ui_hide_steps', 'Masquer les étapes') : t('ui_show_steps', 'Voir les étapes de paiement')}</span>
+                      <svg className={`w-3.5 h-3.5 flex-shrink-0 transition-transform duration-200 ${showPayreqSteps ? 'rotate-180' : 'rotate-0'}`} viewBox="0 0 24 24" fill="none" aria-hidden><path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
                     </button>
                     {/* Steps guide (collapsible) */}
                     <div className="overflow-hidden transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]" style={{ maxHeight: showPayreqSteps ? '200px' : '0px', opacity: showPayreqSteps ? 1 : 0 }}>
@@ -721,7 +722,7 @@ export default function WalletDashboardSendChoiceModal({
                   </div>
                 </div>
 
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-3 md:gap-5">
 
                   {/* 4. Choisir un contact */}
                   <div className="relative rounded-[20px] bg-elevated" ref={quickscanSavedPickerRef}>
@@ -1024,7 +1025,7 @@ export default function WalletDashboardSendChoiceModal({
                   </div>
                 </div>
 
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-4 md:gap-5">
 
                   {/* 1. Scanner un QR code */}
                   <div className="rounded-[20px] bg-elevated">
