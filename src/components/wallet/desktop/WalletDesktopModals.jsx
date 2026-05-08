@@ -85,6 +85,8 @@ export default function WalletDesktopModals({
   const [usdSwapSubtitleOverride, setUsdSwapSubtitleOverride] = useState("");
   const scanFromSendChoiceRef = useRef(false);
   const qrScanResultCallbackRef = useRef(null);
+  const scanFromPayreqRef = useRef(false);
+  const qrPayreqResultCallbackRef = useRef(null);
 
   const openUsdSwapOut = useCallback(
     (amount, options = {}) => {
@@ -132,6 +134,15 @@ export default function WalletDesktopModals({
             isOpen
             embedded
             onScan={(data) => {
+              if (scanFromPayreqRef.current) {
+                scanFromPayreqRef.current = false;
+                setQrScannerOpen(false);
+                setActiveAction?.('sendChoice');
+                setTimeout(() => {
+                  qrPayreqResultCallbackRef.__inject?.(data);
+                }, 120);
+                return;
+              }
               if (scanFromSendChoiceRef.current) {
                 scanFromSendChoiceRef.current = false;
                 setQrScannerOpen(false);
@@ -163,6 +174,11 @@ export default function WalletDesktopModals({
             setActiveAction(null);
             setQrScannerOpen(true);
           }}
+          onChoosePayreqScan={() => {
+            scanFromPayreqRef.current = true;
+            setActiveAction(null);
+            setQrScannerOpen(true);
+          }}
           onChooseSimpleSend={() => {
             setActiveAction("send");
           }}
@@ -177,6 +193,7 @@ export default function WalletDesktopModals({
           toast={sendModalProps?.toast}
           renderWalletMeta={sendModalProps?.renderWalletMeta}
           onQrScanResult={qrScanResultCallbackRef}
+          onQrPayreqScanResult={qrPayreqResultCallbackRef}
         />
       ) : null}
 

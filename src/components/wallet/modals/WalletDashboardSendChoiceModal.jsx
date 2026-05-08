@@ -55,6 +55,8 @@ export default function WalletDashboardSendChoiceModal({
   renderWalletMeta,
   inline = false,
   onQrScanResult, // callback appelé par le parent quand le scan caméra retourne un résultat
+  onQrPayreqScanResult, // callback pour injecter le résultat scan caméra dans le flow payreq
+  onChoosePayreqScan, // ouvrir le scanner depuis le sub-modal payreq
 }) {
   const { t } = useTranslation('common');
   const shouldAnimate = !inline;
@@ -81,6 +83,9 @@ export default function WalletDashboardSendChoiceModal({
   const [scannedDisplay, setScannedDisplay] = useState('');
   const [importedDisplay, setImportedDisplay] = useState('');
   const [pendingDestination, setPendingDestination] = useState({ address: '', label: '' });
+  const [pendingPayreq, setPendingPayreq] = useState('');
+  const [payreqScannedDisplay, setPayreqScannedDisplay] = useState('');
+  const [payreqImportedDisplay, setPayreqImportedDisplay] = useState('');
   const [savedAddressesVisible, setSavedAddressesVisible] = useState(false);
   const [savedAddressModes, setSavedAddressModes] = useState({});
   const quickscanSavedPickerRef = useRef(null);
@@ -114,6 +119,9 @@ export default function WalletDashboardSendChoiceModal({
       setPayreqPasteValue('');
       setPayreqSelfSendError(false);
       setSimpleSendSelfError(false);
+      setPendingPayreq('');
+      setPayreqScannedDisplay('');
+      setPayreqImportedDisplay('');
       setQuickscanPasteValue('');
       setShowQuickscanSavedPicker(false);
       setSavedAddressesVisible(false);
@@ -166,6 +174,20 @@ export default function WalletDashboardSendChoiceModal({
     return Boolean(dest && dest === normalizedCurrentWallet);
   }, [normalizedCurrentWallet, extractPayreqDestination]);
 
+  // Exposer un handler pour injecter le résultat scan caméra dans le flow payreq
+  useEffect(() => {
+    if (onQrPayreqScanResult) {
+      onQrPayreqScanResult.__inject = (raw) => {
+        if (!raw) return;
+        const str = raw.trim();
+        if (isPayreqSelfSend(str)) { setPayreqSelfSendError(true); return; }
+        setPayreqSelfSendError(false);
+        setPayreqScannedDisplay(str);
+        setPendingPayreq(str);
+      };
+    }
+  }, [onQrPayreqScanResult, isPayreqSelfSend]);
+
   // ── QR file decode (shared) ──────────────────────────────────
   const handleManualQrFile = useCallback(async (file, { isPayreq = false } = {}) => {
     if (!file) return;
@@ -186,8 +208,8 @@ export default function WalletDashboardSendChoiceModal({
       if (decodedText) {
         if (isPayreq) {
           if (isPayreqSelfSend(decodedText)) { setPayreqSelfSendError(true); return; }
-          handlePaymentRequestScan?.(decodedText);
-          onChoosePayRequest?.();
+          setPayreqImportedDisplay(decodedText.trim());
+          setPendingPayreq(decodedText.trim());
         } else {
           // Check if it looks like a payment request or just an address
           const looksLikePayreq = /^(xcannes-payreq|xcannes-request)(?::\/\/|:)/i.test(decodedText) ||
@@ -240,9 +262,8 @@ export default function WalletDashboardSendChoiceModal({
     if (!raw) return;
     if (isPayreqSelfSend(raw)) { setPayreqSelfSendError(true); return; }
     setPayreqSelfSendError(false);
-    handlePaymentRequestScan?.(raw);
-    onChoosePayRequest?.();
-  }, [payreqPasteValue, handlePaymentRequestScan, onChoosePayRequest, isPayreqSelfSend]);
+    setPendingPayreq(raw);
+  }, [payreqPasteValue, isPayreqSelfSend]);
 
   // ── Icons ────────────────────────────────────────────────────
   const QuickScanIcon = () => (
@@ -1009,7 +1030,7 @@ export default function WalletDashboardSendChoiceModal({
                   <div className="rounded-[20px] bg-elevated">
                   <button
                     type="button"
-                    onClick={onChooseQuickScan}
+                    onClick={onChoosePayreqScan || onChooseQuickScan}
                     className="w-full flex items-center gap-4 bg-white/5 border border-white/10 rounded-[20px] shadow-[inset_0_-34px_34px_-20px_rgba(0,0,0,0.95),inset_0_-18px_70px_-45px_rgba(0,0,0,0.9)] px-4 py-4 hover:bg-transparent hover:border-white/15 transition-colors duration-150 text-left"
                   >
                     <div className="w-11 h-11 flex items-center justify-center flex-shrink-0">
@@ -1017,7 +1038,13 @@ export default function WalletDashboardSendChoiceModal({
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="text-[15px] font-medium text-white/85">{t('ui_scan_card_title', 'Scanner un QR code')}</p>
-                      <p className="text-[13px] text-white/40 mt-0.5">{t('ui_scan_payreq_hint', 'Utilisez la caméra pour scanner une demande de paiement')}</p>
+                      {payreqScannedDisplay ? (
+                        <div className="flex items-center mt-1.5 bg-black/80 ring-1 ring-white/10 ring-inset rounded-xl pl-3 pr-3 py-2">
+                          <span className="text-[13px] truncate text-white/85">{payreqScannedDisplay}</span>
+                        </div>
+                      ) : (
+                        <p className="text-[13px] text-white/40 mt-0.5">{t('ui_scan_payreq_hint', 'Utilisez la caméra pour scanner une demande de paiement')}</p>
+                      )}
                     </div>
                   </button>
                   </div>
@@ -1034,7 +1061,13 @@ export default function WalletDashboardSendChoiceModal({
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="text-[13px] font-medium text-white/85">{t('ui_import_card_title', 'Importer un QR code')}</p>
-                      <p className="text-[11px] text-white/40 mt-0.5">{t('ui_import_payreq_hint', 'Importez une image ou un fichier contenant un QR code')}</p>
+                      {payreqImportedDisplay ? (
+                        <div className="flex items-center mt-1.5 bg-black/80 ring-1 ring-white/10 ring-inset rounded-xl pl-3 pr-3 py-2">
+                          <span className="text-[11px] truncate text-white/85">{payreqImportedDisplay}</span>
+                        </div>
+                      ) : (
+                        <p className="text-[11px] text-white/40 mt-0.5">{t('ui_import_payreq_hint', 'Importez une image ou un fichier contenant un QR code')}</p>
+                      )}
                     </div>
                   </button>
                   </div>
@@ -1049,7 +1082,7 @@ export default function WalletDashboardSendChoiceModal({
                       <div className="min-w-0 flex-1">
                         <p className="text-[13px] font-medium text-white/85">{t('ui_paste_payreq_card_title', 'Saisir une demande')}</p>
                         <div className="relative mt-1.5">
-                          <input type="text" value={payreqPasteValue} onChange={(e) => { setPayreqPasteValue(e.target.value); setPayreqSelfSendError(false); }} onKeyDown={(e) => { if (e.key === 'Enter') handlePayreqPasteSubmit(); }} onPaste={(e) => { const text = (e.clipboardData?.getData('text') || '').trim(); if (text) { e.preventDefault(); setPayreqPasteValue(text); if (isPayreqSelfSend(text)) { setPayreqSelfSendError(true); return; } setPayreqSelfSendError(false); setTimeout(() => { handlePaymentRequestScan?.(text); onChoosePayRequest?.(); }, 50); } }} placeholder={t('ui_paste_payreq_placeholder', 'Saisir une demande de paiement')} className="w-full bg-black/80 ring-1 ring-white/10 ring-inset rounded-xl shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30)] pl-3 pr-10 py-2 text-[13px] text-white placeholder:text-white/30 outline-none focus:ring-white/25 focus:shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30),0_0_0_1px_rgba(255,255,255,0.10),0_0_24px_rgba(255,255,255,0.06)] transition-all duration-200" />
+                          <input type="text" value={payreqPasteValue} onChange={(e) => { setPayreqPasteValue(e.target.value); setPayreqSelfSendError(false); }} onKeyDown={(e) => { if (e.key === 'Enter') handlePayreqPasteSubmit(); }} onPaste={(e) => { const text = (e.clipboardData?.getData('text') || '').trim(); if (text) { e.preventDefault(); setPayreqPasteValue(text); if (isPayreqSelfSend(text)) { setPayreqSelfSendError(true); return; } setPayreqSelfSendError(false); setPendingPayreq(text); } }} placeholder={t('ui_paste_payreq_placeholder', 'Saisir une demande de paiement')} className="w-full bg-black/80 ring-1 ring-white/10 ring-inset rounded-xl shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30)] pl-3 pr-10 py-2 text-[13px] text-white placeholder:text-white/30 outline-none focus:ring-white/25 focus:shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30),0_0_0_1px_rgba(255,255,255,0.10),0_0_24px_rgba(255,255,255,0.06)] transition-all duration-200" />
                           {payreqPasteValue.trim() ? (<button type="button" onClick={handlePayreqPasteSubmit} className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-lg text-white/30 hover:text-white/60 transition-colors" title={t('ui_go_label', 'Valider')}><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M12 5l7 7-7 7" /></svg></button>) : null}
                         </div>
                         {payreqSelfSendError && (
@@ -1063,6 +1096,45 @@ export default function WalletDashboardSendChoiceModal({
                   </div>
                   </div>
 
+                </div>
+
+                {/* CTA — Valider la demande de paiement */}
+                <div className="pt-6 md:pt-12">
+                  <button
+                    type="button"
+                    disabled={!pendingPayreq}
+                    onClick={() => {
+                      if (pendingPayreq) {
+                        setPayreqSelfSendError(false);
+                        handlePaymentRequestScan?.(pendingPayreq);
+                        onChoosePayRequest?.();
+                      }
+                    }}
+                    className={`w-full py-3.5 rounded-[14px] text-[16px] font-semibold transition-all duration-200 ${
+                      pendingPayreq
+                        ? 'text-white hover:scale-[1.01] active:scale-[0.98]'
+                        : 'cursor-not-allowed ring-[0.5px] ring-[#f5a623]/40 ring-inset'
+                    }`}
+                    style={pendingPayreq
+                      ? { background: 'linear-gradient(180deg, #f5a623 0%, #d98c0f 100%)', boxShadow: '0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)' }
+                      : { background: 'rgba(245,166,35,0.07)', color: 'rgba(255,255,255,0.2)' }}
+                  >
+                    {pendingPayreq
+                      ? t('ui_validate_payreq', 'Valider la demande de paiement')
+                      : <span className="inline-flex items-center gap-1.5">
+                          <span className="text-xs">{t('ui_fill_payreq', 'Renseignez la demande de paiement')}</span>
+                          <span className="inline-flex items-end gap-[3px] mb-[-1px]">
+                            <span className="payreq-cta-dot" style={{ animationDelay: '0s' }}>·</span>
+                            <span className="payreq-cta-dot" style={{ animationDelay: '0.6s' }}>·</span>
+                            <span className="payreq-cta-dot" style={{ animationDelay: '1.2s' }}>·</span>
+                          </span>
+                        </span>
+                    }
+                  </button>
+                  <style>{`
+                    @keyframes payreqCtaDotBlink { 0%, 70%, 100% { opacity: 0.1; } 35% { opacity: 0.9; } }
+                    .payreq-cta-dot { font-size: 20px; line-height: 1; animation: payreqCtaDotBlink 2.4s ease-in-out infinite; color: inherit; }
+                  `}</style>
                 </div>
                 </div>
               </div>

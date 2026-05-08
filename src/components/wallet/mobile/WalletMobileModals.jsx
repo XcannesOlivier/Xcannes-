@@ -108,6 +108,8 @@ export default function WalletMobileModals({
   const scanCloseRequested = useRef(false);
   const scanFromSendChoiceRef = useRef(false);
   const qrScanResultCallbackRef = useRef(null);
+  const scanFromPayreqRef = useRef(false);
+  const qrPayreqResultCallbackRef = useRef(null);
 
   useEffect(() => {
     if (qrScannerOpen) {
@@ -214,6 +216,11 @@ export default function WalletMobileModals({
                 setActiveAction(null);
                 setQrScannerOpen(true);
               }}
+              onChoosePayreqScan={() => {
+                scanFromPayreqRef.current = true;
+                setActiveAction(null);
+                setQrScannerOpen(true);
+              }}
               onChooseSimpleSend={() => {
                 setActiveAction("send");
               }}
@@ -228,6 +235,7 @@ export default function WalletMobileModals({
               toast={sendModalProps?.toast}
               renderWalletMeta={sendModalProps?.renderWalletMeta}
               onQrScanResult={qrScanResultCallbackRef}
+              onQrPayreqScanResult={qrPayreqResultCallbackRef}
             />
 
             <WalletDashboardSendModal
@@ -402,6 +410,15 @@ export default function WalletMobileModals({
                   <QRScanner
                     isOpen={true}
                     onScan={(data) => {
+                      if (scanFromPayreqRef.current) {
+                        scanFromPayreqRef.current = false;
+                        setQrScannerOpen(false);
+                        setActiveAction('sendChoice');
+                        setTimeout(() => {
+                          qrPayreqResultCallbackRef.__inject?.(data);
+                        }, 120);
+                        return;
+                      }
                       if (scanFromSendChoiceRef.current) {
                         scanFromSendChoiceRef.current = false;
                         setQrScannerOpen(false);
