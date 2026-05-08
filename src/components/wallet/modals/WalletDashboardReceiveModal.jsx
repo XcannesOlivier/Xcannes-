@@ -85,7 +85,7 @@ const QrIcon = ({ className = '' }) => (
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
-    strokeWidth="2"
+    strokeWidth="0.9"
     strokeLinecap="round"
     strokeLinejoin="round"
     className={className}
@@ -100,7 +100,7 @@ const RequestIcon = ({ className = '' }) => (
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
-    strokeWidth="1.5"
+    strokeWidth="0.9"
     strokeLinecap="round"
     strokeLinejoin="round"
     className={className}
@@ -1100,7 +1100,7 @@ export default function WalletDashboardReceiveModal({
     receiveView === 'choice'
       ? t('ui_receive_title_short', 'Recevoir')
       : receiveView === 'share'
-        ? t('ui_receive_choice_share_title', 'Coordonnées de réception')
+        ? t('ui_receive_share_header_title', 'Votre adresse de compte')
         : receiveView === 'request_qr'
 	          ? t('ui_request_generated_label', 'Demande prête')
         : t('ui_receive_choice_request_title', 'Demander un paiement');
@@ -1270,13 +1270,13 @@ export default function WalletDashboardReceiveModal({
                       }}
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-13 h-13 rounded-[16px] bg-black/30 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0 text-xcannes-green/90">
-                          <QrIcon className="w-6 h-6" />
+                        <div className="w-11 h-11 rounded-[16px] bg-black/30 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0 text-xcannes-green/90">
+                          <QrIcon className="w-11 h-11" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between gap-2">
                             <div className="text-[18px] md:text-[19px] font-semibold text-white truncate">
-                              {t('ui_receive_choice_share_title', 'Coordonnées de réception')}
+                              {t('ui_receive_choice_share_title', 'Partager votre adresse')}
                             </div>
                             <ChevronRightIcon className="w-5 h-5 text-white/45" />
                           </div>
@@ -1299,8 +1299,8 @@ export default function WalletDashboardReceiveModal({
                       }}
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-13 h-13 rounded-[16px] bg-black/30 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0 text-white/85">
-                          <RequestIcon className="w-6 h-6" />
+                        <div className="w-11 h-11 rounded-[16px] bg-black/30 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0 text-white/85">
+                          <RequestIcon className="w-11 h-11" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between gap-2">
@@ -1596,7 +1596,7 @@ export default function WalletDashboardReceiveModal({
 	                    </div>
 
 	                    {/* ── Actions ── */}
-	                    <div className="grid grid-cols-2 gap-3 mt-[30px] md:mt-[14px]">
+	                    <div className="grid grid-cols-2 gap-3 mt-[50px] md:mt-[28px]">
 	                      <button
 	                        type="button"
 	                        onClick={async e => {

@@ -49,7 +49,7 @@ export default function WalletDashboardCashChoiceModal({
   });
 
   const FundsCardAddIcon = () => (
-    <svg viewBox="0 0 48 48" className="w-9 h-9" fill="none" aria-hidden>
+    <svg viewBox="0 0 48 48" className="w-11 h-11" fill="none" aria-hidden>
       <rect
         x="6"
         y="14"
@@ -66,7 +66,7 @@ export default function WalletDashboardCashChoiceModal({
   );
 
   const FundsCardBankIcon = () => (
-    <svg viewBox="0 0 48 48" className="w-9 h-9" fill="none" aria-hidden>
+    <svg viewBox="0 0 48 48" className="w-11 h-11" fill="none" aria-hidden>
       <path
         d="M10 18l14-8 14 8"
         className="stroke-white/80"
@@ -82,7 +82,7 @@ export default function WalletDashboardCashChoiceModal({
   );
 
   const FundsCardWalletIcon = () => (
-    <svg viewBox="0 0 48 48" className="w-9 h-9" fill="none" aria-hidden>
+    <svg viewBox="0 0 48 48" className="w-11 h-11" fill="none" aria-hidden>
       <path
         d="M14 18c0-2.2 1.8-4 4-4h16c2.2 0 4 1.8 4 4v16c0 2.2-1.8 4-4 4H18c-2.2 0-4-1.8-4-4V18Z"
         className="fill-[#0870f8]/8 stroke-white/35"
@@ -106,7 +106,7 @@ export default function WalletDashboardCashChoiceModal({
   );
 
   const FundsCardSendIcon = () => (
-    <svg viewBox="0 0 48 48" className="w-9 h-9" fill="none" aria-hidden>
+    <svg viewBox="0 0 48 48" className="w-11 h-11" fill="none" aria-hidden>
       <path
         d="M10 22l28-12-10 28-6-10-12-6Z"
         className="fill-[#ff6a00]/8 stroke-white/45"
@@ -415,7 +415,7 @@ export default function WalletDashboardCashChoiceModal({
 
                     <button type="button" onClick={onChooseBuy} className={cardClassName}>
                       <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-[16px] bg-transparent ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
+                        <div className="w-11 h-11 rounded-[16px] bg-transparent flex items-center justify-center flex-shrink-0">
                           <FundsCardAddIcon />
                         </div>
                         <div className="min-w-0 flex-1">
@@ -444,7 +444,7 @@ export default function WalletDashboardCashChoiceModal({
 
                     <button type="button" onClick={onChooseSell} className={cardClassName}>
                       <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-[16px] bg-transparent ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
+                        <div className="w-11 h-11 rounded-[16px] bg-transparent flex items-center justify-center flex-shrink-0">
                           <FundsCardBankIcon />
                         </div>
                         <div className="min-w-0 flex-1">
@@ -490,7 +490,7 @@ export default function WalletDashboardCashChoiceModal({
 
                     <button type="button" onClick={onChooseUsdSwapOut} className={cardClassName}>
                       <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-[16px] bg-transparent ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
+                        <div className="w-11 h-11 rounded-[16px] bg-transparent flex items-center justify-center flex-shrink-0">
                           <FundsCardWalletIcon />
                         </div>
                         <div className="min-w-0 flex-1">
@@ -550,7 +550,7 @@ export default function WalletDashboardCashChoiceModal({
 
                     <button type="button" onClick={onChooseUsdSwapIn} className={cardClassName}>
                       <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-[16px] bg-transparent ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
+                        <div className="w-11 h-11 rounded-[16px] bg-transparent flex items-center justify-center flex-shrink-0">
                           <FundsCardSendIcon />
                         </div>
                         <div className="min-w-0 flex-1">
