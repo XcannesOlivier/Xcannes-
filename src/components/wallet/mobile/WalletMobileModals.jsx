@@ -408,7 +408,7 @@ export default function WalletMobileModals({
                         setActiveAction('sendChoice');
                         // Injecter l'adresse dans le modal send-choice via le ref callback
                         setTimeout(() => {
-                          qrScanResultCallbackRef.current?.__inject?.(data);
+                          qrScanResultCallbackRef.__inject?.(data);
                         }, 120);
                         return;
                       }

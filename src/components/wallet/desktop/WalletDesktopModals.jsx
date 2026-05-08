@@ -137,7 +137,7 @@ export default function WalletDesktopModals({
                 setQrScannerOpen(false);
                 setActiveAction?.('sendChoice');
                 setTimeout(() => {
-                  qrScanResultCallbackRef.current?.__inject?.(data);
+                  qrScanResultCallbackRef.__inject?.(data);
                 }, 120);
                 return;
               }
