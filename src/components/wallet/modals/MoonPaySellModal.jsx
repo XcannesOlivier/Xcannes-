@@ -1621,7 +1621,7 @@ const MoonPaySellModal = ({
               continueDisabled
                 ? isSendToWalletFlow
                   ? "cursor-not-allowed opacity-45"
-                  : "cursor-not-allowed ring-[0.5px] ring-xcannes-green/40 ring-inset"
+                  : "cursor-not-allowed ring-[0.5px] ring-violet-500/40 ring-inset"
                 : "text-white hover:scale-[1.01] active:scale-[0.98]",
             ].join(" ")}
             style={continueDisabled
@@ -1654,7 +1654,7 @@ const MoonPaySellModal = ({
               continueDisabled
                 ? isSendToWalletFlow
                   ? "cursor-not-allowed opacity-45"
-                  : "cursor-not-allowed ring-[0.5px] ring-xcannes-green/40 ring-inset"
+                  : "cursor-not-allowed ring-[0.5px] ring-violet-500/40 ring-inset"
                 : "text-white hover:scale-[1.01] active:scale-[0.98]",
             ].join(" ")}
             style={continueDisabled
