@@ -927,6 +927,7 @@ export default function WalletDashboardSwapModal({
                       {t("wallet_connect_cta", "Connect wallet")}
                     </button>
                   ) : (
+                    <>
                     <button
                       type="button"
                       onClick={(e) => {
@@ -973,6 +974,7 @@ export default function WalletDashboardSwapModal({
                         line-height: 1;
                       }
                     `}</style>
+                    </>
                   )}
                 </div>
               </div>
