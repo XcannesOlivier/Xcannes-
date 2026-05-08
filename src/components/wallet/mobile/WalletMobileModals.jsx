@@ -106,6 +106,8 @@ export default function WalletMobileModals({
   const scanOverlayRef = useRef(null);
   const scanDragMeta = useRef({ startY: 0, startAt: 0, pointerId: null, lastDelta: 0, pending: false, dragging: false });
   const scanCloseRequested = useRef(false);
+  const scanFromSendChoiceRef = useRef(false);
+  const qrScanResultCallbackRef = useRef(null);
 
   useEffect(() => {
     if (qrScannerOpen) {
@@ -208,6 +210,7 @@ export default function WalletMobileModals({
                 setActiveAction(null);
               }}
               onChooseQuickScan={() => {
+                scanFromSendChoiceRef.current = true;
                 setActiveAction(null);
                 setQrScannerOpen(true);
               }}
@@ -224,6 +227,7 @@ export default function WalletMobileModals({
               currentWalletAddress={sendModalProps?.currentWalletAddress}
               toast={sendModalProps?.toast}
               renderWalletMeta={sendModalProps?.renderWalletMeta}
+              onQrScanResult={qrScanResultCallbackRef}
             />
 
             <WalletDashboardSendModal
@@ -398,6 +402,16 @@ export default function WalletMobileModals({
                   <QRScanner
                     isOpen={true}
                     onScan={(data) => {
+                      if (scanFromSendChoiceRef.current) {
+                        scanFromSendChoiceRef.current = false;
+                        setQrScannerOpen(false);
+                        setActiveAction('sendChoice');
+                        // Injecter l'adresse dans le modal send-choice via le ref callback
+                        setTimeout(() => {
+                          qrScanResultCallbackRef.current?.__inject?.(data);
+                        }, 120);
+                        return;
+                      }
                       const result = handlePaymentRequestScan?.(data);
                       if (result?.relayChallenge || result?.navigate) {
                         setQrScannerOpen(false);

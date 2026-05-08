@@ -7,7 +7,7 @@
  */
 
 import QRScanner from "../components/QRScanner";
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import WalletDashboardSendModal from "../modals/WalletDashboardSendModal";
 import WalletDashboardReceiveModal from "../modals/WalletDashboardReceiveModal";
 import WalletDashboardSwapModal from "../modals/WalletDashboardSwapModal";
@@ -83,6 +83,8 @@ export default function WalletDesktopModals({
   const [usdSwapInitialTargetCurrency, setUsdSwapInitialTargetCurrency] = useState("");
   const [usdSwapTitleOverride, setUsdSwapTitleOverride] = useState("");
   const [usdSwapSubtitleOverride, setUsdSwapSubtitleOverride] = useState("");
+  const scanFromSendChoiceRef = useRef(false);
+  const qrScanResultCallbackRef = useRef(null);
 
   const openUsdSwapOut = useCallback(
     (amount, options = {}) => {
@@ -129,7 +131,18 @@ export default function WalletDesktopModals({
           <QRScanner
             isOpen
             embedded
-            onScan={handleAddressScan}
+            onScan={(data) => {
+              if (scanFromSendChoiceRef.current) {
+                scanFromSendChoiceRef.current = false;
+                setQrScannerOpen(false);
+                setActiveAction?.('sendChoice');
+                setTimeout(() => {
+                  qrScanResultCallbackRef.current?.__inject?.(data);
+                }, 120);
+                return;
+              }
+              handleAddressScan?.(data);
+            }}
             onClose={() => setQrScannerOpen(false)}
             hideTitle
             hideWhenUnavailable
@@ -146,6 +159,7 @@ export default function WalletDesktopModals({
             setActiveAction(null);
           }}
           onChooseQuickScan={() => {
+            scanFromSendChoiceRef.current = true;
             setActiveAction(null);
             setQrScannerOpen(true);
           }}
@@ -162,6 +176,7 @@ export default function WalletDesktopModals({
           currentWalletAddress={sendModalProps?.currentWalletAddress}
           toast={sendModalProps?.toast}
           renderWalletMeta={sendModalProps?.renderWalletMeta}
+          onQrScanResult={qrScanResultCallbackRef}
         />
       ) : null}
 

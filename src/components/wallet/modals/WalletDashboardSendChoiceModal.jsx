@@ -54,6 +54,7 @@ export default function WalletDashboardSendChoiceModal({
   toast,
   renderWalletMeta,
   inline = false,
+  onQrScanResult, // callback appelé par le parent quand le scan caméra retourne un résultat
 }) {
   const { t } = useTranslation('common');
   const shouldAnimate = !inline;
@@ -90,6 +91,20 @@ export default function WalletDashboardSendChoiceModal({
     `choice-qr-reader-${Math.random().toString(36).slice(2, 10)}`,
   );
   const manualQrScannerRef = useRef(null);
+
+  // Exposer un handler pour que le parent puisse injecter le résultat du scan caméra
+  useEffect(() => {
+    if (onQrScanResult) {
+      onQrScanResult.__inject = (address) => {
+        if (!address) return;
+        const addr = address.trim();
+        if (normalizedCurrentWallet && addr === normalizedCurrentWallet) { setSimpleSendSelfError(true); return; }
+        setScannedDisplay(addr);
+        setQuickscanPasteValue(addr);
+        setPendingDestination({ address: addr, label: '' });
+      };
+    }
+  }, [onQrScanResult, normalizedCurrentWallet]);
 
   useEffect(() => {
     if (!open) {
@@ -184,8 +199,7 @@ export default function WalletDashboardSendChoiceModal({
           } else {
             if (normalizedCurrentWallet && decodedText.trim() === normalizedCurrentWallet) { setSimpleSendSelfError(true); return; }
             setImportedDisplay(decodedText.trim());
-            setSendDestination?.(decodedText);
-            setSendDestinationLabel?.('');
+            setQuickscanPasteValue(decodedText.trim());
             setPendingDestination({ address: decodedText.trim(), label: '' });
           }
         }
@@ -209,8 +223,6 @@ export default function WalletDashboardSendChoiceModal({
     if (normalizedCurrentWallet && raw === normalizedCurrentWallet) { setSimpleSendSelfError(true); return; }
     setSimpleSendSelfError(false);
     if (looksLikeXrplAddress(raw)) {
-      setSendDestination?.(raw);
-      setSendDestinationLabel?.('');
       setPendingDestination({ address: raw, label: '' });
     } else {
       const result = handlePaymentRequestScan?.(raw);
@@ -218,8 +230,6 @@ export default function WalletDashboardSendChoiceModal({
         onClose?.();
         return;
       }
-      setSendDestination?.(raw);
-      setSendDestinationLabel?.('');
       setPendingDestination({ address: raw, label: '' });
     }
   }, [quickscanPasteValue, setSendDestination, setSendDestinationLabel, onChooseSimpleSend, handlePaymentRequestScan, onClose, normalizedCurrentWallet]);
@@ -737,7 +747,7 @@ export default function WalletDashboardSendChoiceModal({
                               <button
                                 key={`qs-${addrStr}-${idx}`}
                                 type="button"
-                                onClick={() => { if (!addrStr) return; setQuickscanPasteValue(addrStr); setSendDestination?.(addrStr); setSendDestinationLabel?.(label); setSelectedContactDisplay(label || addrStr); setShowQuickscanSavedPicker(false); setPendingDestination({ address: addrStr, label: label || addrStr }); }}
+                                onClick={() => { if (!addrStr) return; setQuickscanPasteValue(addrStr); setSelectedContactDisplay(label || addrStr); setShowQuickscanSavedPicker(false); setPendingDestination({ address: addrStr, label: label || addrStr }); }}
                                 className={`w-full text-left px-4 py-3 flex items-center gap-3 transition-colors ${isSelected ? 'bg-xcannes-green/10' : 'hover:bg-white/5'} ${idx < filtered.length - 1 ? 'border-b border-white/[0.04]' : ''}`}
                               >
                                 <div className="min-w-0 flex-1">
@@ -858,7 +868,7 @@ export default function WalletDashboardSendChoiceModal({
                       <div className="min-w-0 flex-1">
                         <p className="text-[13px] font-medium text-white/85">{t('ui_paste_card_title', 'Saisir une adresse')}</p>
                         <div className="relative mt-1.5">
-                          <input id="quickscan-paste-input" type="text" value={quickscanPasteValue} onChange={(e) => { setQuickscanPasteValue(e.target.value); setShowQuickscanSavedPicker(false); setSimpleSendSelfError(false); }} onKeyDown={(e) => { if (e.key === 'Enter') handleQuickscanPasteSubmit(); }} onPaste={(e) => { const text = (e.clipboardData?.getData('text') || '').trim(); if (text) { e.preventDefault(); setQuickscanPasteValue(text); setShowQuickscanSavedPicker(false); if (normalizedCurrentWallet && text === normalizedCurrentWallet) { setSimpleSendSelfError(true); return; } setSimpleSendSelfError(false); setSendDestination?.(text); setSendDestinationLabel?.(''); setPendingDestination({ address: text, label: '' }); } }} placeholder={t('ui_paste_address_placeholder', 'Entrez manuellement une adresse')} className="w-full bg-black/80 ring-1 ring-white/10 ring-inset rounded-xl shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30)] pl-3 pr-10 py-2 text-[13px] text-white placeholder:text-white/30 outline-none focus:ring-white/25 focus:shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30),0_0_0_1px_rgba(255,255,255,0.10),0_0_24px_rgba(255,255,255,0.06)] transition-all duration-200" />
+                          <input id="quickscan-paste-input" type="text" value={quickscanPasteValue} onChange={(e) => { setQuickscanPasteValue(e.target.value); setShowQuickscanSavedPicker(false); setSimpleSendSelfError(false); }} onKeyDown={(e) => { if (e.key === 'Enter') handleQuickscanPasteSubmit(); }} onPaste={(e) => { const text = (e.clipboardData?.getData('text') || '').trim(); if (text) { e.preventDefault(); setQuickscanPasteValue(text); setShowQuickscanSavedPicker(false); if (normalizedCurrentWallet && text === normalizedCurrentWallet) { setSimpleSendSelfError(true); return; } setSimpleSendSelfError(false); setPendingDestination({ address: text, label: '' }); } }} placeholder={t('ui_paste_address_placeholder', 'Entrez manuellement une adresse')} className="w-full bg-black/80 ring-1 ring-white/10 ring-inset rounded-xl shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30)] pl-3 pr-10 py-2 text-[13px] text-white placeholder:text-white/30 outline-none focus:ring-white/25 focus:shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30),0_0_0_1px_rgba(255,255,255,0.10),0_0_24px_rgba(255,255,255,0.06)] transition-all duration-200" />
                           {quickscanPasteValue.trim() ? (<button type="button" onClick={handleQuickscanPasteSubmit} className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-lg text-white/30 hover:text-white/60 transition-colors" title={t('ui_go_label', 'Valider')}><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M12 5l7 7-7 7" /></svg></button>) : null}
                         </div>
                         {simpleSendSelfError && (
@@ -892,7 +902,7 @@ export default function WalletDashboardSendChoiceModal({
                   <button
                     type="button"
                     disabled={!pendingDestination.address}
-                    onClick={() => { if (pendingDestination.address) onChooseSimpleSend?.(); }}
+                    onClick={() => { if (pendingDestination.address) { setSendDestination?.(pendingDestination.address); setSendDestinationLabel?.(pendingDestination.label); onChooseSimpleSend?.(); } }}
                     className={`w-full py-3.5 rounded-[14px] text-[16px] font-semibold transition-all duration-200 ${
                       pendingDestination.address
                         ? 'bg-xcannes-green text-white shadow-[0_4px_24px_rgba(0,200,100,0.25)] hover:brightness-110 active:scale-[0.98]'
