@@ -57,11 +57,11 @@ export default function WalletDashboardCashChoiceModal({
         height="22"
         rx="6"
         className="fill-xcannes-green/15 stroke-xcannes-green/45"
-        strokeWidth="1.5"
+        strokeWidth="0.9"
       />
       <rect x="10" y="18" width="18" height="4" rx="2" className="fill-xcannes-green/35" />
       <rect x="10" y="26" width="12" height="3" rx="1.5" className="fill-xcannes-green/25" />
-      <path d="M36 24v8m-4-4h8" className="stroke-xcannes-green" strokeWidth="2.5" strokeLinecap="round" />
+      <path d="M36 24v8m-4-4h8" className="stroke-xcannes-green" strokeWidth="1.8" strokeLinecap="round" />
     </svg>
   );
 
@@ -70,14 +70,14 @@ export default function WalletDashboardCashChoiceModal({
       <path
         d="M10 18l14-8 14 8"
         className="stroke-white/80"
-        strokeWidth="2"
+        strokeWidth="0.9"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      <path d="M14 18h20" className="stroke-white/80" strokeWidth="2" strokeLinecap="round" />
-      <path d="M16 18v16m6-16v16m6-16v16m6-16v16" className="stroke-white/60" strokeWidth="2" strokeLinecap="round" />
-      <path d="M12 34h24" className="stroke-white/80" strokeWidth="2" strokeLinecap="round" />
-      <path d="M10 38h28" className="stroke-white/75" strokeWidth="2" strokeLinecap="round" />
+      <path d="M14 18h20" className="stroke-white/80" strokeWidth="0.9" strokeLinecap="round" />
+      <path d="M16 18v16m6-16v16m6-16v16m6-16v16" className="stroke-white/60" strokeWidth="0.9" strokeLinecap="round" />
+      <path d="M12 34h24" className="stroke-white/80" strokeWidth="0.9" strokeLinecap="round" />
+      <path d="M10 38h28" className="stroke-white/75" strokeWidth="0.9" strokeLinecap="round" />
     </svg>
   );
 
@@ -86,19 +86,19 @@ export default function WalletDashboardCashChoiceModal({
       <path
         d="M14 18c0-2.2 1.8-4 4-4h16c2.2 0 4 1.8 4 4v16c0 2.2-1.8 4-4 4H18c-2.2 0-4-1.8-4-4V18Z"
         className="fill-[#0870f8]/8 stroke-white/35"
-        strokeWidth="1.5"
+        strokeWidth="0.9"
       />
       <path
         d="M14 20h20c2.2 0 4 1.8 4 4v0H28c-2.2 0-4 1.8-4 4v0H14"
         className="stroke-white/55"
-        strokeWidth="1.5"
+        strokeWidth="0.9"
         strokeLinejoin="round"
       />
       <circle cx="30.5" cy="27" r="5.5" className="fill-[#0870f8]/15" />
       <path
         d="M30.5 23.6v6.8m-2.4-4.4c0-.8 1-1.4 2.4-1.4s2.4.6 2.4 1.4-1 1.4-2.4 1.4-2.4.6-2.4 1.4 1 1.4 2.4 1.4 2.4-.6 2.4-1.4"
         className="stroke-white/85"
-        strokeWidth="1.4"
+        strokeWidth="0.8"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
@@ -110,11 +110,11 @@ export default function WalletDashboardCashChoiceModal({
       <path
         d="M10 22l28-12-10 28-6-10-12-6Z"
         className="fill-[#ff6a00]/8 stroke-white/45"
-        strokeWidth="1.5"
+        strokeWidth="0.9"
         strokeLinejoin="round"
       />
-      <path d="M38 10L22 28" className="stroke-white/75" strokeWidth="1.8" strokeLinecap="round" />
-      <path d="M22 28l0 10" className="stroke-white/45" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M38 10L22 28" className="stroke-white/75" strokeWidth="1.2" strokeLinecap="round" />
+      <path d="M22 28l0 10" className="stroke-white/45" strokeWidth="0.9" strokeLinecap="round" />
     </svg>
   );
 
@@ -415,7 +415,7 @@ export default function WalletDashboardCashChoiceModal({
 
                     <button type="button" onClick={onChooseBuy} className={cardClassName}>
                       <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-[16px] bg-black/30 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
+                        <div className="w-12 h-12 rounded-[16px] bg-transparent ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
                           <FundsCardAddIcon />
                         </div>
                         <div className="min-w-0 flex-1">
@@ -444,7 +444,7 @@ export default function WalletDashboardCashChoiceModal({
 
                     <button type="button" onClick={onChooseSell} className={cardClassName}>
                       <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-[16px] bg-black/30 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
+                        <div className="w-12 h-12 rounded-[16px] bg-transparent ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
                           <FundsCardBankIcon />
                         </div>
                         <div className="min-w-0 flex-1">
@@ -490,7 +490,7 @@ export default function WalletDashboardCashChoiceModal({
 
                     <button type="button" onClick={onChooseUsdSwapOut} className={cardClassName}>
                       <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-[16px] bg-black/30 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
+                        <div className="w-12 h-12 rounded-[16px] bg-transparent ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
                           <FundsCardWalletIcon />
                         </div>
                         <div className="min-w-0 flex-1">
@@ -550,7 +550,7 @@ export default function WalletDashboardCashChoiceModal({
 
                     <button type="button" onClick={onChooseUsdSwapIn} className={cardClassName}>
                       <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-[16px] bg-black/30 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
+                        <div className="w-12 h-12 rounded-[16px] bg-transparent ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
                           <FundsCardSendIcon />
                         </div>
                         <div className="min-w-0 flex-1">

@@ -703,7 +703,7 @@ export default function WalletSettingsDropdown({
                   }}
                   className={settingsRowClassName}
                 >
-                  <span className={`${settingsIconShellClassName} bg-black text-white/60`}>
+                  <span className={`${settingsIconShellClassName} bg-transparent text-white/60`}>
                     <SettingsAddWalletIcon />
                   </span>
                   <div className="min-w-0 flex-1">
@@ -739,7 +739,7 @@ export default function WalletSettingsDropdown({
                     }}
                     className={settingsRowClassName}
                   >
-                    <span className={settingsIconShellClassName}>
+                    <span className={`${settingsIconShellClassName} bg-transparent`}>
                       <SettingsXrplIcon />
                     </span>
                     <div className="min-w-0 flex-1">

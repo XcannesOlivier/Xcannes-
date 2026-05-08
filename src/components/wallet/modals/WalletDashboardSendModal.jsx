@@ -1414,7 +1414,7 @@ export default function WalletDashboardSendModal({
         <p className="text-[14px] md:text-[15px] text-white/60 max-w-[34ch] mx-auto leading-relaxed">
 	          {t("ui_payreq_summary_subtitle", "Vérifiez les détails avant de confirmer le paiement.")}
         </p>
-        <div className="mt-4 flex justify-center">
+        <div className="mt-[40px] flex justify-center">
           {renderWalletMeta?.({
             variant: "pill-column",
             className: "flex justify-center",
@@ -1703,7 +1703,7 @@ export default function WalletDashboardSendModal({
               </div>
             ) : null}
             <div
-              className={`flex items-start justify-between gap-3 relative z-[65] touch-none ${hasPaymentRequest ? 'mb-[110px] md:mb-[116px]' : 'mb-[54px] md:mb-[60px]'}`}
+              className={`flex items-start justify-between gap-3 relative z-[65] touch-none ${hasPaymentRequest ? 'mb-[110px] md:mb-[140px]' : 'mb-[54px] md:mb-[60px]'}`}
               onPointerDown={(event) => {
                 maybeStartOverlayDrag(event, "fixed");
               }}

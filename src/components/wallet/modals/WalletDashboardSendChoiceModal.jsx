@@ -596,7 +596,7 @@ export default function WalletDashboardSendChoiceModal({
                       className="w-full text-left"
                     >
                       <div className="flex items-center gap-3 md:gap-4">
-                        <div className="w-12 h-12 md:w-14 md:h-14 rounded-[16px] bg-black/30 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
+                        <div className="w-12 h-12 md:w-14 md:h-14 rounded-[16px] bg-transparent ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
                           <QuickScanIcon />
                         </div>
                         <div className="min-w-0 flex-1">
@@ -638,7 +638,7 @@ export default function WalletDashboardSendChoiceModal({
                       className="w-full text-left"
                     >
                       <div className="flex items-center gap-3 md:gap-4">
-                        <div className="w-12 h-12 md:w-14 md:h-14 rounded-[16px] bg-black/30 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
+                        <div className="w-12 h-12 md:w-14 md:h-14 rounded-[16px] bg-transparent ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
                           <PayRequestIcon />
                         </div>
                         <div className="min-w-0 flex-1">
@@ -1026,7 +1026,7 @@ export default function WalletDashboardSendChoiceModal({
                   </div>
                 </div>
 
-                <div className="flex flex-col gap-4 md:gap-5">
+                <div className="flex flex-col gap-4 md:gap-7">
 
                   {/* 1. Scanner un QR code */}
                   <div className="rounded-[20px] bg-elevated">
@@ -1122,7 +1122,7 @@ export default function WalletDashboardSendChoiceModal({
                       : { background: 'rgba(245,166,35,0.07)', color: 'rgba(255,255,255,0.2)' }}
                   >
                     {pendingPayreq
-                      ? t('ui_validate_payreq', 'Valider la demande de paiement')
+                      ? t('ui_validate_payreq', 'Vérifier la demande de paiement')
                       : <span className="inline-flex items-center gap-1.5">
                           <span className="text-xs">{t('ui_fill_payreq', 'Renseignez la demande de paiement')}</span>
                           <span className="inline-flex items-end gap-[3px] mb-[-1px]">

@@ -1335,7 +1335,7 @@ export default function WalletDashboard({
                       {/* Mini-card activité récente */}
                       <div
                         className="mx-0 mb-[18px] px-4 py-[9px] rounded-[16px] transition-colors"
-                        style={{ background: 'rgba(255,255,255,0.008)', border: '1px solid rgba(255,255,255,0.02)' }}
+                        style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.02)' }}
                       >
                         {/* Mobile : deux lignes */}
                         <div className="lg:hidden flex flex-col justify-center gap-[2px] min-h-[52px]">
@@ -1387,9 +1387,9 @@ export default function WalletDashboard({
                               {recentActivityMessageParts.isConversion ? (
                                 <>{String(recentActivityMessageParts.left || "").replace(/^Vous avez converti\s+/i, "").trim()}{" "}{recentActivityMessageParts.arrow}{" "}{recentActivityMessageParts.right}</>
                               ) : recentActivityIcon === "receive" && recentActivityReceiveParts ? (
-                                <span className="text-emerald-300/80">+ {recentActivityReceiveParts.amount} {recentActivityReceiveParts.currency}</span>
+                                <span className="text-emerald-400">+ {recentActivityReceiveParts.amount} {recentActivityReceiveParts.currency}</span>
                               ) : recentActivityIcon === "send" && recentActivitySendParts ? (
-                                <span className="text-red-200/80">- {recentActivitySendParts.amount} {recentActivitySendParts.currency}</span>
+                                <span className="text-red-400">- {recentActivitySendParts.amount} {recentActivitySendParts.currency}</span>
                               ) : recentActivityMessage}
                             </span>
                             <div className="shrink-0 flex items-center gap-1">
@@ -1441,9 +1441,9 @@ export default function WalletDashboard({
                             {recentActivityMessageParts.isConversion ? (
                               <>{String(recentActivityMessageParts.left || "").replace(/^Vous avez converti\s+/i, "").trim()}{" "}{recentActivityMessageParts.arrow}{" "}{recentActivityMessageParts.right}</>
                             ) : recentActivityIcon === "receive" && recentActivityReceiveParts ? (
-                              <span className="text-emerald-300/80">+ {recentActivityReceiveParts.amount} {recentActivityReceiveParts.currency}</span>
+                              <span className="text-emerald-400">+ {recentActivityReceiveParts.amount} {recentActivityReceiveParts.currency}</span>
                             ) : recentActivityIcon === "send" && recentActivitySendParts ? (
-                              <span className="text-red-200/80">- {recentActivitySendParts.amount} {recentActivitySendParts.currency}</span>
+                              <span className="text-red-400">- {recentActivitySendParts.amount} {recentActivitySendParts.currency}</span>
                             ) : recentActivityMessage}
                           </span>
                           <div className="shrink-0 flex items-center gap-2 text-white/30">
