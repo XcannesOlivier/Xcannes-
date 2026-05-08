@@ -672,10 +672,10 @@ export default function WalletDashboardSendChoiceModal({
                   </ol>
                 </div>
 
-                <div className="flex flex-col gap-3 bg-elevated rounded-[24px]">
+                <div className="flex flex-col gap-3">
 
                   {/* 4. Choisir un contact */}
-                  <div className="relative" ref={quickscanSavedPickerRef}>
+                  <div className="relative rounded-[20px] bg-elevated" ref={quickscanSavedPickerRef}>
                     <button
                       type="button"
                       onClick={() => {
@@ -811,6 +811,7 @@ export default function WalletDashboardSendChoiceModal({
                   </div>
 
                   {/* 1. Scanner un QR code */}
+                  <div className="rounded-[20px] bg-elevated">
                   <button
                     type="button"
                     onClick={onChooseQuickScan}
@@ -825,8 +826,10 @@ export default function WalletDashboardSendChoiceModal({
                     </div>
                     <svg className="w-5 h-5 text-white/40 flex-shrink-0" viewBox="0 0 24 24" fill="none"><path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                   </button>
+                  </div>
 
                   {/* 2. Importer un QR code */}
+                  <div className="rounded-[20px] bg-elevated">
                   <button
                     type="button"
                     onClick={() => handleFileUpload(quickscanFileInputId, false)}
@@ -841,8 +844,10 @@ export default function WalletDashboardSendChoiceModal({
                     </div>
                     <svg className="w-5 h-5 text-white/40 flex-shrink-0" viewBox="0 0 24 24" fill="none"><path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                   </button>
+                  </div>
 
                   {/* 3. Saisir une adresse */}
+                  <div className="rounded-[20px] bg-elevated">
                   <div className="bg-white/5 border border-white/10 rounded-[20px] shadow-[inset_0_-34px_34px_-20px_rgba(0,0,0,0.95),inset_0_-18px_70px_-45px_rgba(0,0,0,0.9)] overflow-hidden">
                     <div className="flex items-center gap-4 px-4 py-3">
                       <div className="w-11 h-11 flex items-center justify-center flex-shrink-0">
@@ -851,7 +856,7 @@ export default function WalletDashboardSendChoiceModal({
                       <div className="min-w-0 flex-1">
                         <p className="text-[13px] font-medium text-white/85">{t('ui_paste_card_title', 'Saisir une adresse')}</p>
                         <div className="relative mt-1.5">
-                          <input id="quickscan-paste-input" type="text" value={quickscanPasteValue} onChange={(e) => { setQuickscanPasteValue(e.target.value); setShowQuickscanSavedPicker(false); setSimpleSendSelfError(false); }} onKeyDown={(e) => { if (e.key === 'Enter') handleQuickscanPasteSubmit(); }} onPaste={(e) => { const text = (e.clipboardData?.getData('text') || '').trim(); if (text) { e.preventDefault(); setQuickscanPasteValue(text); setShowQuickscanSavedPicker(false); if (normalizedCurrentWallet && text === normalizedCurrentWallet) { setSimpleSendSelfError(true); return; } setSimpleSendSelfError(false); setTimeout(() => { setSendDestination?.(text); setSendDestinationLabel?.(''); onChooseSimpleSend?.(); }, 50); } }} placeholder={t('ui_paste_address_placeholder', 'Entrez manuellement une adresse')} className="w-full bg-white/10 ring-1 ring-white/10 ring-inset rounded-xl shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30)] pl-3 pr-10 py-2 text-[13px] text-white placeholder:text-white/80 outline-none focus:ring-white/25 focus:shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30),0_0_0_1px_rgba(255,255,255,0.10),0_0_24px_rgba(255,255,255,0.06)] transition-all duration-200" />
+                          <input id="quickscan-paste-input" type="text" value={quickscanPasteValue} onChange={(e) => { setQuickscanPasteValue(e.target.value); setShowQuickscanSavedPicker(false); setSimpleSendSelfError(false); }} onKeyDown={(e) => { if (e.key === 'Enter') handleQuickscanPasteSubmit(); }} onPaste={(e) => { const text = (e.clipboardData?.getData('text') || '').trim(); if (text) { e.preventDefault(); setQuickscanPasteValue(text); setShowQuickscanSavedPicker(false); if (normalizedCurrentWallet && text === normalizedCurrentWallet) { setSimpleSendSelfError(true); return; } setSimpleSendSelfError(false); setTimeout(() => { setSendDestination?.(text); setSendDestinationLabel?.(''); onChooseSimpleSend?.(); }, 50); } }} placeholder={t('ui_paste_address_placeholder', 'Entrez manuellement une adresse')} className="w-full bg-white/[0.18] ring-1 ring-white/10 ring-inset rounded-xl shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30)] pl-3 pr-10 py-2 text-[13px] text-white placeholder:text-white/40 outline-none focus:ring-white/25 focus:shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30),0_0_0_1px_rgba(255,255,255,0.10),0_0_24px_rgba(255,255,255,0.06)] transition-all duration-200" />
                           {quickscanPasteValue.trim() ? (<button type="button" onClick={handleQuickscanPasteSubmit} className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg bg-xcannes-green/20 hover:bg-xcannes-green/30 text-xcannes-green transition-colors" title={t('ui_go_label', 'Valider')}><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg></button>) : null}
                         </div>
                         {simpleSendSelfError && (
@@ -862,6 +867,7 @@ export default function WalletDashboardSendChoiceModal({
                         )}
                       </div>
                     </div>
+                  </div>
                   </div>
 
                 </div>
