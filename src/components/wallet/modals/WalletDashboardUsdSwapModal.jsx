@@ -4240,7 +4240,7 @@ export default function WalletDashboardUsdSwapModal({
                     >
                       {(!hasValidAmount || amountOutOfRange || insufficientSourceBalance || sourceConversionMissing || targetConversionMissing || hasReceiveAddressValidationError || pairUnavailable || !fromCurrency || !toCurrency || !stableCurrency || ((walletSourceSelectionEnabled || walletTargetSelectionEnabled) && !selectedSourceOption))
                         ? <span className="inline-flex items-center gap-1.5" style={{ color: isBinanceYellow ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.2)' }}>
-                            <span>{t('ui_usdswap_fill_cta', 'Choisissez la devise, le stablecoin et le montant')}</span>
+                            <span className="text-xs">{t('ui_usdswap_fill_cta', 'Choisissez les actifs et le montant')}</span>
                             <span className="inline-flex items-end gap-[3px] mb-[-1px]">
                               <span className="usdswap-dot" style={{ animationDelay: '0s' }}>·</span>
                               <span className="usdswap-dot" style={{ animationDelay: '0.6s' }}>·</span>
@@ -4293,7 +4293,7 @@ export default function WalletDashboardUsdSwapModal({
                     >
                       {(!hasValidAmount || amountOutOfRange || insufficientSourceBalance || sourceConversionMissing || targetConversionMissing || hasReceiveAddressValidationError || pairUnavailable || !fromCurrency || !toCurrency || !stableCurrency || ((walletSourceSelectionEnabled || walletTargetSelectionEnabled) && !selectedSourceOption))
                         ? <span className="inline-flex items-center gap-1.5" style={{ color: isBinanceYellow ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.2)' }}>
-                            <span>{t('ui_usdswap_fill_cta', 'Choisissez la devise, le stablecoin et le montant')}</span>
+                            <span className="text-xs">{t('ui_usdswap_fill_cta', 'Choisissez les actifs et le montant')}</span>
                             <span className="inline-flex items-end gap-[3px] mb-[-1px]">
                               <span className="usdswap-dot" style={{ animationDelay: '0s' }}>·</span>
                               <span className="usdswap-dot" style={{ animationDelay: '0.6s' }}>·</span>
@@ -4510,7 +4510,7 @@ export default function WalletDashboardUsdSwapModal({
                     >
                       {(!hasValidAmount || amountOutOfRange || hasReceiveAddressValidationError || pairUnavailable || !fromCurrency || !toCurrency || !stableCurrency || !effectiveReceiveAddress)
                         ? <span className="inline-flex items-center gap-1.5" style={{ color: isBinanceYellow ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.2)' }}>
-                            <span>{t('ui_usdswap_fill_cta', 'Choisissez la devise, le stablecoin et le montant')}</span>
+                            <span className="text-xs">{t('ui_usdswap_fill_cta', 'Choisissez les actifs et le montant')}</span>
                             <span className="inline-flex items-end gap-[3px] mb-[-1px]">
                               <span className="usdswap-dot" style={{ animationDelay: '0s' }}>·</span>
                               <span className="usdswap-dot" style={{ animationDelay: '0.6s' }}>·</span>
@@ -4566,7 +4566,7 @@ export default function WalletDashboardUsdSwapModal({
                     >
                       {(!hasValidAmount || amountOutOfRange || hasReceiveAddressValidationError || pairUnavailable || !fromCurrency || !toCurrency || !stableCurrency || !effectiveReceiveAddress)
                         ? <span className="inline-flex items-center gap-1.5" style={{ color: isBinanceYellow ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.2)' }}>
-                            <span>{t('ui_usdswap_fill_cta', 'Choisissez la devise, le stablecoin et le montant')}</span>
+                            <span className="text-xs">{t('ui_usdswap_fill_cta', 'Choisissez les actifs et le montant')}</span>
                             <span className="inline-flex items-end gap-[3px] mb-[-1px]">
                               <span className="usdswap-dot" style={{ animationDelay: '0s' }}>·</span>
                               <span className="usdswap-dot" style={{ animationDelay: '0.6s' }}>·</span>

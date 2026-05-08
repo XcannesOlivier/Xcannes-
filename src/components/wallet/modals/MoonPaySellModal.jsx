@@ -1636,7 +1636,7 @@ const MoonPaySellModal = ({
           >
             {continueDisabled && !isSendToWalletFlow
               ? <span className="inline-flex items-center gap-1.5" style={{ color: 'rgba(255,255,255,0.2)' }}>
-                  <span>{t('ui_sell_fill_cta', 'Choisissez la devise et le montant')}</span>
+                  <span className="text-xs">{t('ui_sell_fill_cta', 'Choisissez la devise et le montant')}</span>
                   <span className="inline-flex items-end gap-[3px] mb-[-1px]">
                     <span className="sell-dot" style={{ animationDelay: '0s' }}>·</span>
                     <span className="sell-dot" style={{ animationDelay: '0.6s' }}>·</span>
@@ -1669,7 +1669,7 @@ const MoonPaySellModal = ({
           >
             {continueDisabled && !isSendToWalletFlow
               ? <span className="inline-flex items-center gap-1.5" style={{ color: 'rgba(255,255,255,0.2)' }}>
-                  <span>{t('ui_sell_fill_cta', 'Choisissez la devise et le montant')}</span>
+                  <span className="text-xs">{t('ui_sell_fill_cta', 'Choisissez la devise et le montant')}</span>
                   <span className="inline-flex items-end gap-[3px] mb-[-1px]">
                     <span className="sell-dot" style={{ animationDelay: '0s' }}>·</span>
                     <span className="sell-dot" style={{ animationDelay: '0.6s' }}>·</span>

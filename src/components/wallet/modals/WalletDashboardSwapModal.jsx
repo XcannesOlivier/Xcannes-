@@ -951,7 +951,7 @@ export default function WalletDashboardSwapModal({
                     >
                       {convertButtonDisabled && !convertProcessing
                         ? <span className="inline-flex items-center gap-1.5 text-white/20">
-                            <span>{t('ui_swap_fill_cta', 'Choisissez les devises et le montant')}</span>
+                            <span className="text-xs">{t('ui_swap_fill_cta', 'Choisissez les devises et le montant')}</span>
                             <span className="inline-flex items-end gap-[3px] mb-[-1px]">
                               <span className="swap-dot" style={{ animationDelay: '0s' }}>·</span>
                               <span className="swap-dot" style={{ animationDelay: '0.6s' }}>·</span>

@@ -1989,7 +1989,7 @@ export default function WalletDashboardReceiveModal({
                         >
                           {generateButtonDisabled
                             ? <span className="inline-flex items-center gap-1.5 text-white/20">
-                                <span>{t('ui_complete_request_cta', 'Compléter votre demande')}</span>
+                                <span className="text-xs">{t('ui_complete_request_cta', 'Compléter votre demande')}</span>
                                 <span className="inline-flex items-end gap-[3px] mb-[-1px]">
                                   <span className="receive-req-dot" style={{ animationDelay: '0s' }}>·</span>
                                   <span className="receive-req-dot" style={{ animationDelay: '0.6s' }}>·</span>
