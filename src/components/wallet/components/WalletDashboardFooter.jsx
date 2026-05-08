@@ -75,7 +75,7 @@ export default function WalletDashboardFooter({ onScan, addCurrencySlot, onHisto
               <button
                 type="button"
                 onClick={onScan}
-                className="flex h-[52px] w-[110px] items-center justify-center rounded-[20px] text-white transition-transform duration-150 hover:scale-[1.02] active:scale-[0.97] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#39d57c]/20"
+                className="flex h-[44px] w-[110px] items-center justify-center rounded-[20px] text-white transition-transform duration-150 hover:scale-[1.02] active:scale-[0.97] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#39d57c]/20"
                 style={scanButtonStyle}
                 aria-label={t(SCAN_LABEL_KEY, "Scan QR Code")}
               >

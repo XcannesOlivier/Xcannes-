@@ -568,83 +568,83 @@ export default function WalletDashboardSendChoiceModal({
                   />
 
                   {/* ── 1. Envoi simple ── */}
-                  <div>
-                  <button
-                    type="button"
-                    onClick={() => openSubModal('quickscan')}
-                    className={cardClassName}
-                  >
-                    <div className="flex items-center gap-3 md:gap-4">
-                      <div className="w-12 h-12 md:w-14 md:h-14 rounded-[16px] bg-black/30 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
-                        <QuickScanIcon />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center justify-between gap-2">
-                          <p className="text-[18px] md:text-[22px] text-white font-semibold truncate">
-                            {t('ui_send_simple_title', 'Envoi simple')}
-                          </p>
-                          <svg className="w-5 h-5 md:w-6 md:h-6 text-white/45 flex-shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden>
-                            <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                          </svg>
+                  <div className={cardClassName}>
+                    <button
+                      type="button"
+                      onClick={() => openSubModal('quickscan')}
+                      className="w-full text-left"
+                    >
+                      <div className="flex items-center gap-3 md:gap-4">
+                        <div className="w-12 h-12 md:w-14 md:h-14 rounded-[16px] bg-black/30 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
+                          <QuickScanIcon />
                         </div>
-                        <p className="mt-1 text-[15px] md:text-[16px] leading-snug text-white/60">
-                          {t('ui_send_simple_hint_long', 'Saisissez une adresse, choisissez la devise et indiquez le montant.')}
-                        </p>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center justify-between gap-2">
+                            <p className="text-[18px] md:text-[22px] text-white font-semibold truncate">
+                              {t('ui_send_simple_title', 'Envoi simple')}
+                            </p>
+                            <svg className="w-5 h-5 md:w-6 md:h-6 text-white/45 flex-shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden>
+                              <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                          </div>
+                          <p className="mt-1 text-[15px] md:text-[16px] leading-snug text-white/60">
+                            {t('ui_send_simple_hint_long', 'Saisissez une adresse, choisissez la devise et indiquez le montant.')}
+                          </p>
+                        </div>
                       </div>
+                    </button>
+                    {/* Steps toggle */}
+                    <button type="button" onClick={(e) => { e.stopPropagation(); setShowSteps(s => !s); }} className="mt-3 text-[13px] text-xcannes-green/80 hover:text-xcannes-green transition-colors duration-150 font-medium self-start text-left">
+                      {showSteps ? t('ui_hide_steps', 'Masquer les étapes') : t('ui_show_steps', 'Voir les étapes de l’envoi')}
+                    </button>
+                    {/* Steps guide (collapsible) */}
+                    <div className="overflow-hidden transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]" style={{ maxHeight: showSteps ? '300px' : '0px', opacity: showSteps ? 1 : 0 }}>
+                      <ol className="space-y-2 text-[12px] leading-relaxed pt-3 pb-1">
+                        <li className="flex gap-2"><span className="flex-shrink-0 w-5 h-5 rounded-full bg-xcannes-green/15 text-xcannes-green text-[11px] font-bold flex items-center justify-center">1</span><span className="text-white/60">{t('ui_step_1', 'Renseignez l\'adresse du destinataire — scannez, saisissez, importez ou choisissez dans votre liste.')}</span></li>
+                        <li className="flex gap-2"><span className="flex-shrink-0 w-5 h-5 rounded-full bg-xcannes-green/15 text-xcannes-green text-[11px] font-bold flex items-center justify-center">2</span><span className="text-white/60">{t('ui_step_2', 'Sélectionnez la devise parmi celles disponibles sur votre compte.')}</span></li>
+                        <li className="flex gap-2"><span className="flex-shrink-0 w-5 h-5 rounded-full bg-xcannes-green/15 text-xcannes-green text-[11px] font-bold flex items-center justify-center">3</span><span className="text-white/60">{t('ui_step_3', 'Indiquez le montant à envoyer.')}</span></li>
+                        <li className="flex gap-2"><span className="flex-shrink-0 w-5 h-5 rounded-full bg-xcannes-green/15 text-xcannes-green text-[11px] font-bold flex items-center justify-center">4</span><span className="text-white/60">{t('ui_step_4', 'Vérifiez et validez en toute sécurité.')}</span></li>
+                      </ol>
                     </div>
-                  </button>
-                  {/* Steps toggle */}
-                  <button type="button" onClick={() => setShowSteps(s => !s)} className="mt-2 text-[13px] text-xcannes-green/80 hover:text-xcannes-green transition-colors duration-150 font-medium self-start text-left">
-                    {showSteps ? t('ui_hide_steps', 'Masquer les étapes') : t('ui_show_steps', 'Voir les étapes de l’envoi')}
-                  </button>
-                  {/* Steps guide (collapsible) */}
-                  <div className="overflow-hidden transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]" style={{ maxHeight: showSteps ? '300px' : '0px', opacity: showSteps ? 1 : 0 }}>
-                    <ol className="space-y-2 text-[12px] leading-relaxed pt-3 pb-2">
-                      <li className="flex gap-2"><span className="flex-shrink-0 w-5 h-5 rounded-full bg-xcannes-green/15 text-xcannes-green text-[11px] font-bold flex items-center justify-center">1</span><span className="text-white/60">{t('ui_step_1', 'Renseignez l\'adresse du destinataire — scannez, saisissez, importez ou choisissez dans votre liste.')}</span></li>
-                      <li className="flex gap-2"><span className="flex-shrink-0 w-5 h-5 rounded-full bg-xcannes-green/15 text-xcannes-green text-[11px] font-bold flex items-center justify-center">2</span><span className="text-white/60">{t('ui_step_2', 'Sélectionnez la devise parmi celles disponibles sur votre compte.')}</span></li>
-                      <li className="flex gap-2"><span className="flex-shrink-0 w-5 h-5 rounded-full bg-xcannes-green/15 text-xcannes-green text-[11px] font-bold flex items-center justify-center">3</span><span className="text-white/60">{t('ui_step_3', 'Indiquez le montant à envoyer.')}</span></li>
-                      <li className="flex gap-2"><span className="flex-shrink-0 w-5 h-5 rounded-full bg-xcannes-green/15 text-xcannes-green text-[11px] font-bold flex items-center justify-center">4</span><span className="text-white/60">{t('ui_step_4', 'Vérifiez et validez en toute sécurité.')}</span></li>
-                    </ol>
-                  </div>
                   </div>
 
                   {/* ── 2. Payer une demande ── */}
-                  <div>
-                  <button
-                    type="button"
-                    onClick={() => openSubModal('payreq')}
-                    className={`${cardClassName} md:py-4`}
-                  >
-                    <div className="flex items-center gap-3 md:gap-4">
-                      <div className="w-12 h-12 md:w-14 md:h-14 rounded-[16px] bg-black/30 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
-                        <PayRequestIcon />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center justify-between gap-2">
-                          <p className="text-[18px] md:text-[22px] text-white font-semibold truncate md:whitespace-normal md:break-words">
-                            {t('ui_send_choice_pay_request_title', 'Payer une demande')}
-                          </p>
-                          <svg className="w-5 h-5 md:w-6 md:h-6 text-white/45 flex-shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden>
-                            <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                          </svg>
+                  <div className={`${cardClassName} md:py-4`}>
+                    <button
+                      type="button"
+                      onClick={() => openSubModal('payreq')}
+                      className="w-full text-left"
+                    >
+                      <div className="flex items-center gap-3 md:gap-4">
+                        <div className="w-12 h-12 md:w-14 md:h-14 rounded-[16px] bg-black/30 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
+                          <PayRequestIcon />
                         </div>
-                        <p className="mt-1 text-[15px] md:text-[16px] leading-snug text-white/60">
-                          {t('ui_send_pay_request_hint', 'Scannez, importez un QR code ou saisissez une demande de paiement.')}
-                        </p>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center justify-between gap-2">
+                            <p className="text-[18px] md:text-[22px] text-white font-semibold truncate md:whitespace-normal md:break-words">
+                              {t('ui_send_choice_pay_request_title', 'Payer une demande')}
+                            </p>
+                            <svg className="w-5 h-5 md:w-6 md:h-6 text-white/45 flex-shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden>
+                              <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                          </div>
+                          <p className="mt-1 text-[15px] md:text-[16px] leading-snug text-white/60">
+                            {t('ui_send_pay_request_hint', 'Scannez, importez un QR code ou saisissez une demande de paiement.')}
+                          </p>
+                        </div>
                       </div>
+                    </button>
+                    {/* Steps toggle */}
+                    <button type="button" onClick={(e) => { e.stopPropagation(); setShowPayreqSteps(s => !s); }} className="mt-3 text-[13px] text-[#f5a623]/80 hover:text-[#f5a623] transition-colors duration-150 font-medium self-start text-left">
+                      {showPayreqSteps ? t('ui_hide_steps', 'Masquer les étapes') : t('ui_show_steps', 'Voir les étapes de paiement')}
+                    </button>
+                    {/* Steps guide (collapsible) */}
+                    <div className="overflow-hidden transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]" style={{ maxHeight: showPayreqSteps ? '200px' : '0px', opacity: showPayreqSteps ? 1 : 0 }}>
+                      <ol className="space-y-2 text-[12px] leading-relaxed pt-3 pb-1">
+                        <li className="flex gap-2"><span className="flex-shrink-0 w-5 h-5 rounded-full bg-[#f5a623]/15 text-[#f5a623] text-[11px] font-bold flex items-center justify-center">1</span><span className="text-white/60">{t('ui_payreq_step_1', 'Renseignez le code ou QR code — scannez, saisissez, importez.')}</span></li>
+                        <li className="flex gap-2"><span className="flex-shrink-0 w-5 h-5 rounded-full bg-[#f5a623]/15 text-[#f5a623] text-[11px] font-bold flex items-center justify-center">2</span><span className="text-white/60">{t('ui_payreq_step_2', 'Vérifiez et validez en toute sécurité.')}</span></li>
+                      </ol>
                     </div>
-                  </button>
-                  {/* Steps toggle */}
-                  <button type="button" onClick={() => setShowPayreqSteps(s => !s)} className="mt-2 text-[13px] text-[#f5a623]/80 hover:text-[#f5a623] transition-colors duration-150 font-medium self-start text-left">
-                    {showPayreqSteps ? t('ui_hide_steps', 'Masquer les étapes') : t('ui_show_steps', 'Voir les étapes de paiement')}
-                  </button>
-                  {/* Steps guide (collapsible) */}
-                  <div className="overflow-hidden transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]" style={{ maxHeight: showPayreqSteps ? '200px' : '0px', opacity: showPayreqSteps ? 1 : 0 }}>
-                    <ol className="space-y-2 text-[12px] leading-relaxed pt-3 pb-2">
-                      <li className="flex gap-2"><span className="flex-shrink-0 w-5 h-5 rounded-full bg-[#f5a623]/15 text-[#f5a623] text-[11px] font-bold flex items-center justify-center">1</span><span className="text-white/60">{t('ui_payreq_step_1', 'Renseignez le code ou QR code — scannez, saisissez, importez.')}</span></li>
-                      <li className="flex gap-2"><span className="flex-shrink-0 w-5 h-5 rounded-full bg-[#f5a623]/15 text-[#f5a623] text-[11px] font-bold flex items-center justify-center">2</span><span className="text-white/60">{t('ui_payreq_step_2', 'Vérifiez et validez en toute sécurité.')}</span></li>
-                    </ol>
-                  </div>
                   </div>
 
                   {/* Hidden div for html5-qrcode reader */}
