@@ -536,7 +536,7 @@ export default function WalletDashboardSendChoiceModal({
               <div className="flex-1 min-h-0 flex flex-col">
                 {/* Title + subtitle + arrow */}
                 <div
-                  className="pt-[96px] md:pt-[76px] pb-3 flex flex-col items-center text-center"
+                  className="pt-[70px] md:pt-[96px] pb-3 flex flex-col items-center text-center"
                   onPointerDown={event => { maybeStartOverlayDrag(event, 'fixed'); }}
                 >
                   <h3 className="mt-1 px-6 text-[30px] md:text-[32px] font-semibold text-white/95 tracking-tight">
@@ -546,7 +546,7 @@ export default function WalletDashboardSendChoiceModal({
                     {t('ui_send_choice_hint', 'Choisissez le type d’envoi qui correspond à votre besoin.')}
                   </p>
                   {/* Wallet meta pill */}
-                  <div className="mt-6 flex justify-center px-4 w-full">
+                  <div className="mt-[40px] flex justify-center px-4 w-full">
                     {renderWalletMeta?.({
                       variant: "pill-column",
                       className: "flex justify-center",
@@ -560,7 +560,7 @@ export default function WalletDashboardSendChoiceModal({
                 {/* Cards — vertically centred in remaining space */}
                 <div
                   ref={overlayListRef}
-                  className={`flex-1 min-h-0 flex flex-col justify-start gap-4 mt-8 pt-1 px-4 md:px-5 [--list-pad:1rem] md:[--list-pad:1.25rem] ${showQuickscanSavedPicker ? 'overflow-visible' : 'overflow-y-auto'}`}
+                  className={`flex-1 min-h-0 flex flex-col justify-start gap-[32px] mt-8 pt-1 px-4 md:px-5 [--list-pad:1rem] md:[--list-pad:1.25rem] ${showQuickscanSavedPicker ? 'overflow-visible' : 'overflow-y-auto'}`}
                   onPointerDown={event => { maybeStartOverlayDrag(event, 'list'); }}
                 >
 
@@ -615,8 +615,9 @@ export default function WalletDashboardSendChoiceModal({
                       </div>
                     </button>
                     {/* Steps toggle */}
-                    <button type="button" onClick={(e) => { e.stopPropagation(); setShowSteps(s => !s); }} className="mt-3 text-[13px] text-xcannes-green/80 hover:text-xcannes-green transition-colors duration-150 font-medium self-start text-left">
-                      {showSteps ? t('ui_hide_steps', 'Masquer les étapes') : t('ui_show_steps', 'Voir les étapes de l’envoi')}
+                    <button type="button" onClick={(e) => { e.stopPropagation(); setShowSteps(s => !s); }} className="mt-3 inline-flex items-center gap-1 text-[13px] text-white/80 hover:text-white transition-colors duration-150 font-medium self-start text-left">
+                      <span>{showSteps ? t('ui_hide_steps', 'Masquer les étapes') : t('ui_show_steps', "Voir les étapes de l'envoi")}</span>
+                      <svg className={`w-3.5 h-3.5 flex-shrink-0 transition-transform duration-200 ${showSteps ? 'rotate-180' : 'rotate-0'}`} viewBox="0 0 24 24" fill="none" aria-hidden><path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
                     </button>
                     {/* Steps guide (collapsible) */}
                     <div className="overflow-hidden transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]" style={{ maxHeight: showSteps ? '300px' : '0px', opacity: showSteps ? 1 : 0 }}>
