@@ -935,29 +935,44 @@ export default function WalletDashboardSwapModal({
                       }}
                       disabled={convertButtonDisabled}
                       className={[
-                        "w-full h-14 rounded-[20px] text-white text-lg font-semibold transition-all duration-200 tracking-[-0.01em]",
+                        "w-full h-14 rounded-[20px] text-lg font-semibold transition-all duration-200 tracking-[-0.01em]",
                         convertButtonDisabled
-                          ? "cursor-not-allowed"
-                          : "hover:scale-[1.01] hover:brightness-110 active:scale-[0.98] active:brightness-95",
+                          ? "bg-xcannes-green/[0.07] text-xcannes-green/60 cursor-not-allowed ring-[0.5px] ring-xcannes-green/40 ring-inset"
+                          : "text-white hover:scale-[1.01] hover:brightness-110 active:scale-[0.98] active:brightness-95",
                       ].join(" ")}
                       style={convertButtonDisabled
-                        ? {
-                            background: 'linear-gradient(180deg, rgba(34,154,86,0.42) 0%, rgba(14,103,58,0.42) 100%)',
-                            boxShadow: '0 0 0 1px rgba(255,255,255,0.06) inset',
-                            color: 'rgba(255,255,255,0.40)',
-                            letterSpacing: '0.01em',
-                          }
+                        ? undefined
                         : {
                             background: 'linear-gradient(180deg, #2da861 0%, #0d6b3a 100%)',
                             boxShadow: '0 8px 24px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.07) inset, inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -10px 18px rgba(0,0,0,0.22), 0 0 18px rgba(34,180,90,0.18)',
                           }
                       }
                     >
-                      {convertProcessing
-                        ? convertButtonLabel
-                        : `${t("ui_convert_cta_fr", "Convertir")}${Number.isFinite(amountValue) && amountValue > 0 && baseCode ? ` ${Number(amountValue).toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${getDisplayCurrencyCode(baseCode)}` : ""}`
+                      {convertButtonDisabled && !convertProcessing
+                        ? <span className="inline-flex items-center gap-1.5 text-white/20">
+                            <span>{t('ui_swap_fill_cta', 'Choisissez les devises et le montant')}</span>
+                            <span className="inline-flex items-end gap-[3px] mb-[-1px]">
+                              <span className="swap-dot" style={{ animationDelay: '0s' }}>·</span>
+                              <span className="swap-dot" style={{ animationDelay: '0.6s' }}>·</span>
+                              <span className="swap-dot" style={{ animationDelay: '1.2s' }}>·</span>
+                            </span>
+                          </span>
+                        : convertProcessing
+                          ? convertButtonLabel
+                          : `${t("ui_convert_cta_fr", "Convertir")}${Number.isFinite(amountValue) && amountValue > 0 && baseCode ? ` ${Number(amountValue).toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${getDisplayCurrencyCode(baseCode)}` : ""}`
                       }
                     </button>
+                    <style>{`
+                      @keyframes swapDotBlink {
+                        0%, 100% { opacity: 0.18; }
+                        50% { opacity: 0.7; }
+                      }
+                      .swap-dot {
+                        animation: swapDotBlink 2.4s ease-in-out infinite;
+                        font-size: 1.3em;
+                        line-height: 1;
+                      }
+                    `}</style>
                   )}
                 </div>
               </div>

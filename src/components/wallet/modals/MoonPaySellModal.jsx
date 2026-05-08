@@ -1617,45 +1617,78 @@ const MoonPaySellModal = ({
             onClick={handleContinue}
             disabled={continueDisabled}
             className={[
-              "md:hidden mt-11 w-full h-14 rounded-[20px] text-white text-lg font-semibold transition-all duration-200 tracking-[-0.01em]",
+              "md:hidden mt-11 w-full h-14 rounded-[20px] text-lg font-semibold transition-all duration-200 tracking-[-0.01em]",
               continueDisabled
-                ? "opacity-45 cursor-not-allowed"
-                : "hover:scale-[1.01] active:scale-[0.98]",
+                ? isSendToWalletFlow
+                  ? "cursor-not-allowed opacity-45"
+                  : "cursor-not-allowed ring-[0.5px] ring-xcannes-green/40 ring-inset"
+                : "text-white hover:scale-[1.01] active:scale-[0.98]",
             ].join(" ")}
             style={continueDisabled
-              ? { background: isSendToWalletFlow
-                  ? 'linear-gradient(180deg, rgba(255,106,0,0.65) 0%, rgba(232,95,0,0.65) 100%)'
-                  : 'linear-gradient(180deg, rgba(124,58,237,0.65) 0%, rgba(91,33,182,0.65) 100%)' }
+              ? isSendToWalletFlow
+                ? { background: 'linear-gradient(180deg, rgba(255,106,0,0.65) 0%, rgba(232,95,0,0.65) 100%)', color: 'rgba(255,255,255,0.4)' }
+                : { background: 'rgba(124,58,237,0.07)', color: 'rgba(100,200,130,0.6)' }
               : { background: isSendToWalletFlow
                   ? 'linear-gradient(180deg, rgba(255,106,0,1) 0%, rgba(232,95,0,1) 100%)'
                   : 'linear-gradient(180deg, rgba(124,58,237,1) 0%, rgba(91,33,182,1) 100%)',
                 boxShadow: '0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)' }
             }
           >
-            {continueLabel}
+            {continueDisabled && !isSendToWalletFlow
+              ? <span className="inline-flex items-center gap-1.5" style={{ color: 'rgba(100,200,130,0.6)' }}>
+                  <span>{t('ui_sell_fill_cta', 'Choisissez la devise et le montant')}</span>
+                  <span className="inline-flex items-end gap-[3px] mb-[-1px]">
+                    <span className="sell-dot" style={{ animationDelay: '0s' }}>·</span>
+                    <span className="sell-dot" style={{ animationDelay: '0.6s' }}>·</span>
+                    <span className="sell-dot" style={{ animationDelay: '1.2s' }}>·</span>
+                  </span>
+                </span>
+              : continueLabel}
           </button>
           <button
             type="button"
             onClick={handleContinue}
             disabled={continueDisabled}
             className={[
-              "hidden md:flex mt-11 items-center justify-center w-full h-14 rounded-[20px] text-white text-lg font-semibold transition-all duration-200 tracking-[-0.01em]",
+              "hidden md:flex mt-11 items-center justify-center w-full h-14 rounded-[20px] text-lg font-semibold transition-all duration-200 tracking-[-0.01em]",
               continueDisabled
-                ? "opacity-45 cursor-not-allowed"
-                : "hover:scale-[1.01] active:scale-[0.98]",
+                ? isSendToWalletFlow
+                  ? "cursor-not-allowed opacity-45"
+                  : "cursor-not-allowed ring-[0.5px] ring-xcannes-green/40 ring-inset"
+                : "text-white hover:scale-[1.01] active:scale-[0.98]",
             ].join(" ")}
             style={continueDisabled
-              ? { background: isSendToWalletFlow
-                  ? 'linear-gradient(180deg, rgba(255,106,0,0.65) 0%, rgba(232,95,0,0.65) 100%)'
-                  : 'linear-gradient(180deg, rgba(124,58,237,0.65) 0%, rgba(91,33,182,0.65) 100%)' }
+              ? isSendToWalletFlow
+                ? { background: 'linear-gradient(180deg, rgba(255,106,0,0.65) 0%, rgba(232,95,0,0.65) 100%)', color: 'rgba(255,255,255,0.4)' }
+                : { background: 'rgba(124,58,237,0.07)', color: 'rgba(100,200,130,0.6)' }
               : { background: isSendToWalletFlow
                   ? 'linear-gradient(180deg, rgba(255,106,0,1) 0%, rgba(232,95,0,1) 100%)'
                   : 'linear-gradient(180deg, rgba(124,58,237,1) 0%, rgba(91,33,182,1) 100%)',
                 boxShadow: '0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)' }
             }
           >
-            {continueLabel}
+            {continueDisabled && !isSendToWalletFlow
+              ? <span className="inline-flex items-center gap-1.5" style={{ color: 'rgba(100,200,130,0.6)' }}>
+                  <span>{t('ui_sell_fill_cta', 'Choisissez la devise et le montant')}</span>
+                  <span className="inline-flex items-end gap-[3px] mb-[-1px]">
+                    <span className="sell-dot" style={{ animationDelay: '0s' }}>·</span>
+                    <span className="sell-dot" style={{ animationDelay: '0.6s' }}>·</span>
+                    <span className="sell-dot" style={{ animationDelay: '1.2s' }}>·</span>
+                  </span>
+                </span>
+              : continueLabel}
           </button>
+          <style>{`
+            @keyframes sellDotBlink {
+              0%, 100% { opacity: 0.18; }
+              50% { opacity: 0.7; }
+            }
+            .sell-dot {
+              animation: sellDotBlink 2.4s ease-in-out infinite;
+              font-size: 1.3em;
+              line-height: 1;
+            }
+          `}</style>
 	          {!demoMode && isBankSellFlow ? (
 	            <div className="text-center text-[12px] md:text-[13px] text-white/50 mt-5 leading-relaxed">
 	              <p>{t("moonpay_sell_bank_partner_notice_full", "Transfert sécurisé via MoonPay ou Topper.")}</p>

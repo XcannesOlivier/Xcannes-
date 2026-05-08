@@ -1511,17 +1511,26 @@ export default function WalletDashboardSendModal({
         }}
         disabled={sendButtonDisabled}
         className={[
-          "md:hidden w-full h-14 rounded-[20px] text-white text-lg font-semibold transition-all duration-200 tracking-[-0.01em]",
+          "md:hidden w-full h-14 rounded-[20px] text-lg font-semibold transition-all duration-200 tracking-[-0.01em]",
           sendButtonDisabled
-            ? "opacity-45 cursor-not-allowed"
-            : "hover:scale-[1.01] active:scale-[0.98]",
+            ? sendProcessing ? "opacity-45 cursor-not-allowed" : "bg-xcannes-green/[0.07] text-xcannes-green/60 cursor-not-allowed ring-[0.5px] ring-xcannes-green/40 ring-inset"
+            : "text-white hover:scale-[1.01] active:scale-[0.98]",
         ].join(" ")}
         style={sendButtonDisabled
-          ? { background: 'linear-gradient(180deg, rgba(34,154,86,0.65) 0%, rgba(14,103,58,0.65) 100%)' }
+          ? sendProcessing ? { background: 'linear-gradient(180deg, rgba(34,154,86,0.65) 0%, rgba(14,103,58,0.65) 100%)', color: 'rgba(255,255,255,0.4)' } : undefined
           : { background: 'linear-gradient(180deg, rgba(34,154,86,1) 0%, rgba(14,103,58,1) 100%)', boxShadow: '0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)' }
         }
       >
-        {sendButtonLabel}
+        {sendButtonDisabled && !sendProcessing
+          ? <span className="inline-flex items-center gap-1.5 text-white/20">
+              <span>{t('ui_send_fill_cta', 'Choisissez la devise et le montant')}</span>
+              <span className="inline-flex items-end gap-[3px] mb-[-1px]">
+                <span className="send-modal-dot" style={{ animationDelay: '0s' }}>·</span>
+                <span className="send-modal-dot" style={{ animationDelay: '0.6s' }}>·</span>
+                <span className="send-modal-dot" style={{ animationDelay: '1.2s' }}>·</span>
+              </span>
+            </span>
+          : sendButtonLabel}
       </button>
       <button
         type="button"
@@ -1531,18 +1540,38 @@ export default function WalletDashboardSendModal({
         }}
         disabled={sendButtonDisabled}
         className={[
-          "hidden md:flex items-center justify-center w-full h-14 rounded-[20px] text-white text-lg font-semibold transition-all duration-200 tracking-[-0.01em]",
+          "hidden md:flex items-center justify-center w-full h-14 rounded-[20px] text-lg font-semibold transition-all duration-200 tracking-[-0.01em]",
           sendButtonDisabled
-            ? "opacity-45 cursor-not-allowed"
-            : "hover:scale-[1.01] active:scale-[0.98]",
+            ? sendProcessing ? "opacity-45 cursor-not-allowed" : "bg-xcannes-green/[0.07] text-xcannes-green/60 cursor-not-allowed ring-[0.5px] ring-xcannes-green/40 ring-inset"
+            : "text-white hover:scale-[1.01] active:scale-[0.98]",
         ].join(" ")}
         style={sendButtonDisabled
-          ? { background: 'linear-gradient(180deg, rgba(34,154,86,0.65) 0%, rgba(14,103,58,0.65) 100%)' }
+          ? sendProcessing ? { background: 'linear-gradient(180deg, rgba(34,154,86,0.65) 0%, rgba(14,103,58,0.65) 100%)', color: 'rgba(255,255,255,0.4)' } : undefined
           : { background: 'linear-gradient(180deg, rgba(34,154,86,1) 0%, rgba(14,103,58,1) 100%)', boxShadow: '0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)' }
         }
       >
-        {sendButtonLabel}
+        {sendButtonDisabled && !sendProcessing
+          ? <span className="inline-flex items-center gap-1.5 text-white/20">
+              <span>{t('ui_send_fill_cta', 'Choisissez la devise et le montant')}</span>
+              <span className="inline-flex items-end gap-[3px] mb-[-1px]">
+                <span className="send-modal-dot" style={{ animationDelay: '0s' }}>·</span>
+                <span className="send-modal-dot" style={{ animationDelay: '0.6s' }}>·</span>
+                <span className="send-modal-dot" style={{ animationDelay: '1.2s' }}>·</span>
+              </span>
+            </span>
+          : sendButtonLabel}
       </button>
+      <style>{`
+        @keyframes sendModalDotBlink {
+          0%, 100% { opacity: 0.18; }
+          50% { opacity: 0.7; }
+        }
+        .send-modal-dot {
+          animation: sendModalDotBlink 2.4s ease-in-out infinite;
+          font-size: 1.3em;
+          line-height: 1;
+        }
+      `}</style>
     </div>
   );
 

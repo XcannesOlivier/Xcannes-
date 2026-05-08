@@ -4223,22 +4223,31 @@ export default function WalletDashboardUsdSwapModal({
                         setStep("address");
                       }}
                       className={[
-                        "md:hidden mt-11 w-full h-14 rounded-[20px] text-white text-lg font-semibold transition-all duration-200 tracking-[-0.01em]",
+                        "md:hidden mt-11 w-full h-14 rounded-[20px] text-lg font-semibold transition-all duration-200 tracking-[-0.01em]",
                         (!hasValidAmount || amountOutOfRange || insufficientSourceBalance || sourceConversionMissing || targetConversionMissing || hasReceiveAddressValidationError || pairUnavailable || !fromCurrency || !toCurrency || !stableCurrency || ((walletSourceSelectionEnabled || walletTargetSelectionEnabled) && !selectedSourceOption))
-                          ? "opacity-45 cursor-not-allowed"
-                          : "hover:scale-[1.01] active:scale-[0.98]",
+                          ? isBinanceYellow ? "cursor-not-allowed ring-[0.5px] ring-yellow-400/40 ring-inset" : "cursor-not-allowed ring-[0.5px] ring-blue-500/40 ring-inset"
+                          : "text-white hover:scale-[1.01] active:scale-[0.98]",
                       ].join(" ")}
                       style={(!hasValidAmount || amountOutOfRange || insufficientSourceBalance || sourceConversionMissing || targetConversionMissing || hasReceiveAddressValidationError || pairUnavailable || !fromCurrency || !toCurrency || !stableCurrency || ((walletSourceSelectionEnabled || walletTargetSelectionEnabled) && !selectedSourceOption))
-                        ? { background: isBinanceYellow
-                            ? 'linear-gradient(180deg, rgba(240,185,11,0.45) 0%, rgba(217,168,10,0.45) 100%)'
-                            : 'linear-gradient(180deg, rgba(8,112,248,0.45) 0%, rgba(7,101,223,0.45) 100%)' }
+                        ? isBinanceYellow
+                          ? { background: 'rgba(240,185,11,0.07)', color: 'rgba(240,200,80,0.6)' }
+                          : { background: 'rgba(8,112,248,0.07)', color: 'rgba(100,160,255,0.6)' }
                         : { background: isBinanceYellow
                             ? 'linear-gradient(180deg, rgba(240,185,11,1) 0%, rgba(217,168,10,1) 100%)'
                             : 'linear-gradient(180deg, rgba(8,112,248,1) 0%, rgba(7,101,223,1) 100%)',
                           boxShadow: '0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)' }
                       }
                     >
-                      {t("ui_action_continue", "Continuer")}
+                      {(!hasValidAmount || amountOutOfRange || insufficientSourceBalance || sourceConversionMissing || targetConversionMissing || hasReceiveAddressValidationError || pairUnavailable || !fromCurrency || !toCurrency || !stableCurrency || ((walletSourceSelectionEnabled || walletTargetSelectionEnabled) && !selectedSourceOption))
+                        ? <span className="inline-flex items-center gap-1.5" style={{ color: isBinanceYellow ? 'rgba(240,200,80,0.6)' : 'rgba(100,160,255,0.6)' }}>
+                            <span>{t('ui_usdswap_fill_cta', 'Choisissez la devise, le stablecoin et le montant')}</span>
+                            <span className="inline-flex items-end gap-[3px] mb-[-1px]">
+                              <span className="usdswap-dot" style={{ animationDelay: '0s' }}>·</span>
+                              <span className="usdswap-dot" style={{ animationDelay: '0.6s' }}>·</span>
+                              <span className="usdswap-dot" style={{ animationDelay: '1.2s' }}>·</span>
+                            </span>
+                          </span>
+                        : t("ui_action_continue", "Continuer")}
                     </button>
                     <button
                       type="button"
@@ -4267,23 +4276,43 @@ export default function WalletDashboardUsdSwapModal({
                         setStep("address");
                       }}
                       className={[
-                        "hidden md:flex mt-11 items-center justify-center w-full h-14 rounded-[20px] text-white text-lg font-semibold transition-all duration-200 tracking-[-0.01em]",
+                        "hidden md:flex mt-11 items-center justify-center w-full h-14 rounded-[20px] text-lg font-semibold transition-all duration-200 tracking-[-0.01em]",
                         (!hasValidAmount || amountOutOfRange || insufficientSourceBalance || sourceConversionMissing || targetConversionMissing || hasReceiveAddressValidationError || pairUnavailable || !fromCurrency || !toCurrency || !stableCurrency || ((walletSourceSelectionEnabled || walletTargetSelectionEnabled) && !selectedSourceOption))
-                          ? "opacity-45 cursor-not-allowed"
-                          : "hover:scale-[1.01] active:scale-[0.98]",
+                          ? isBinanceYellow ? "cursor-not-allowed ring-[0.5px] ring-yellow-400/40 ring-inset" : "cursor-not-allowed ring-[0.5px] ring-blue-500/40 ring-inset"
+                          : "text-white hover:scale-[1.01] active:scale-[0.98]",
                       ].join(" ")}
                       style={(!hasValidAmount || amountOutOfRange || insufficientSourceBalance || sourceConversionMissing || targetConversionMissing || hasReceiveAddressValidationError || pairUnavailable || !fromCurrency || !toCurrency || !stableCurrency || ((walletSourceSelectionEnabled || walletTargetSelectionEnabled) && !selectedSourceOption))
-                        ? { background: isBinanceYellow
-                            ? 'linear-gradient(180deg, rgba(240,185,11,0.45) 0%, rgba(217,168,10,0.45) 100%)'
-                            : 'linear-gradient(180deg, rgba(8,112,248,0.45) 0%, rgba(7,101,223,0.45) 100%)' }
+                        ? isBinanceYellow
+                          ? { background: 'rgba(240,185,11,0.07)', color: 'rgba(240,200,80,0.6)' }
+                          : { background: 'rgba(8,112,248,0.07)', color: 'rgba(100,160,255,0.6)' }
                         : { background: isBinanceYellow
                             ? 'linear-gradient(180deg, rgba(240,185,11,1) 0%, rgba(217,168,10,1) 100%)'
                             : 'linear-gradient(180deg, rgba(8,112,248,1) 0%, rgba(7,101,223,1) 100%)',
                           boxShadow: '0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)' }
                       }
                     >
-                      {t("ui_action_continue", "Continuer")}
+                      {(!hasValidAmount || amountOutOfRange || insufficientSourceBalance || sourceConversionMissing || targetConversionMissing || hasReceiveAddressValidationError || pairUnavailable || !fromCurrency || !toCurrency || !stableCurrency || ((walletSourceSelectionEnabled || walletTargetSelectionEnabled) && !selectedSourceOption))
+                        ? <span className="inline-flex items-center gap-1.5" style={{ color: isBinanceYellow ? 'rgba(240,200,80,0.6)' : 'rgba(100,160,255,0.6)' }}>
+                            <span>{t('ui_usdswap_fill_cta', 'Choisissez la devise, le stablecoin et le montant')}</span>
+                            <span className="inline-flex items-end gap-[3px] mb-[-1px]">
+                              <span className="usdswap-dot" style={{ animationDelay: '0s' }}>·</span>
+                              <span className="usdswap-dot" style={{ animationDelay: '0.6s' }}>·</span>
+                              <span className="usdswap-dot" style={{ animationDelay: '1.2s' }}>·</span>
+                            </span>
+                          </span>
+                        : t("ui_action_continue", "Continuer")}
                     </button>
+                    <style>{`
+                      @keyframes usdswapDotBlink {
+                        0%, 100% { opacity: 0.18; }
+                        50% { opacity: 0.7; }
+                      }
+                      .usdswap-dot {
+                        animation: usdswapDotBlink 2.4s ease-in-out infinite;
+                        font-size: 1.3em;
+                        line-height: 1;
+                      }
+                    `}</style>
 			                    {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE || walletTargetSelectionEnabled ? (
 			                      <div className="mt-2 flex items-center justify-center gap-2 text-[11px] md:text-xs text-white/60">
 			                        <span>
@@ -4464,22 +4493,31 @@ export default function WalletDashboardUsdSwapModal({
                         await createExchange({ returnStep: "address" });
                       }}
                       className={[
-                        "md:hidden mt-11 w-full h-14 rounded-[20px] text-white text-lg font-semibold transition-all duration-200 tracking-[-0.01em]",
+                        "md:hidden mt-11 w-full h-14 rounded-[20px] text-lg font-semibold transition-all duration-200 tracking-[-0.01em]",
                         (!hasValidAmount || amountOutOfRange || hasReceiveAddressValidationError || pairUnavailable || !fromCurrency || !toCurrency || !stableCurrency || !effectiveReceiveAddress)
-                          ? "opacity-45 cursor-not-allowed"
-                          : "hover:scale-[1.01] active:scale-[0.98]",
+                          ? isBinanceYellow ? "cursor-not-allowed ring-[0.5px] ring-yellow-400/40 ring-inset" : "cursor-not-allowed ring-[0.5px] ring-blue-500/40 ring-inset"
+                          : "text-white hover:scale-[1.01] active:scale-[0.98]",
                       ].join(" ")}
                       style={(!hasValidAmount || amountOutOfRange || hasReceiveAddressValidationError || pairUnavailable || !fromCurrency || !toCurrency || !stableCurrency || !effectiveReceiveAddress)
-                        ? { background: isBinanceYellow
-                            ? 'linear-gradient(180deg, rgba(240,185,11,0.45) 0%, rgba(217,168,10,0.45) 100%)'
-                            : 'linear-gradient(180deg, rgba(8,112,248,0.45) 0%, rgba(7,101,223,0.45) 100%)' }
+                        ? isBinanceYellow
+                          ? { background: 'rgba(240,185,11,0.07)', color: 'rgba(240,200,80,0.6)' }
+                          : { background: 'rgba(8,112,248,0.07)', color: 'rgba(100,160,255,0.6)' }
                         : { background: isBinanceYellow
                             ? 'linear-gradient(180deg, rgba(240,185,11,1) 0%, rgba(217,168,10,1) 100%)'
                             : 'linear-gradient(180deg, rgba(8,112,248,1) 0%, rgba(7,101,223,1) 100%)',
                           boxShadow: '0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)' }
                       }
                     >
-                      {t("ui_action_continue", "Continuer")}
+                      {(!hasValidAmount || amountOutOfRange || hasReceiveAddressValidationError || pairUnavailable || !fromCurrency || !toCurrency || !stableCurrency || !effectiveReceiveAddress)
+                        ? <span className="inline-flex items-center gap-1.5" style={{ color: isBinanceYellow ? 'rgba(240,200,80,0.6)' : 'rgba(100,160,255,0.6)' }}>
+                            <span>{t('ui_usdswap_fill_cta', 'Choisissez la devise, le stablecoin et le montant')}</span>
+                            <span className="inline-flex items-end gap-[3px] mb-[-1px]">
+                              <span className="usdswap-dot" style={{ animationDelay: '0s' }}>·</span>
+                              <span className="usdswap-dot" style={{ animationDelay: '0.6s' }}>·</span>
+                              <span className="usdswap-dot" style={{ animationDelay: '1.2s' }}>·</span>
+                            </span>
+                          </span>
+                        : t("ui_action_continue", "Continuer")}
                     </button>
                     <button
                       type="button"
@@ -4511,22 +4549,31 @@ export default function WalletDashboardUsdSwapModal({
                         await createExchange({ returnStep: "address" });
                       }}
                       className={[
-                        "hidden md:flex mt-11 items-center justify-center w-full h-14 rounded-[20px] text-white text-lg font-semibold transition-all duration-200 tracking-[-0.01em]",
+                        "hidden md:flex mt-11 items-center justify-center w-full h-14 rounded-[20px] text-lg font-semibold transition-all duration-200 tracking-[-0.01em]",
                         (!hasValidAmount || amountOutOfRange || hasReceiveAddressValidationError || pairUnavailable || !fromCurrency || !toCurrency || !stableCurrency || !effectiveReceiveAddress)
-                          ? "opacity-45 cursor-not-allowed"
-                          : "hover:scale-[1.01] active:scale-[0.98]",
+                          ? isBinanceYellow ? "cursor-not-allowed ring-[0.5px] ring-yellow-400/40 ring-inset" : "cursor-not-allowed ring-[0.5px] ring-blue-500/40 ring-inset"
+                          : "text-white hover:scale-[1.01] active:scale-[0.98]",
                       ].join(" ")}
                       style={(!hasValidAmount || amountOutOfRange || hasReceiveAddressValidationError || pairUnavailable || !fromCurrency || !toCurrency || !stableCurrency || !effectiveReceiveAddress)
-                        ? { background: isBinanceYellow
-                            ? 'linear-gradient(180deg, rgba(240,185,11,0.45) 0%, rgba(217,168,10,0.45) 100%)'
-                            : 'linear-gradient(180deg, rgba(8,112,248,0.45) 0%, rgba(7,101,223,0.45) 100%)' }
+                        ? isBinanceYellow
+                          ? { background: 'rgba(240,185,11,0.07)', color: 'rgba(240,200,80,0.6)' }
+                          : { background: 'rgba(8,112,248,0.07)', color: 'rgba(100,160,255,0.6)' }
                         : { background: isBinanceYellow
                             ? 'linear-gradient(180deg, rgba(240,185,11,1) 0%, rgba(217,168,10,1) 100%)'
                             : 'linear-gradient(180deg, rgba(8,112,248,1) 0%, rgba(7,101,223,1) 100%)',
                           boxShadow: '0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)' }
                       }
                     >
-                      {t("ui_action_continue", "Continuer")}
+                      {(!hasValidAmount || amountOutOfRange || hasReceiveAddressValidationError || pairUnavailable || !fromCurrency || !toCurrency || !stableCurrency || !effectiveReceiveAddress)
+                        ? <span className="inline-flex items-center gap-1.5" style={{ color: isBinanceYellow ? 'rgba(240,200,80,0.6)' : 'rgba(100,160,255,0.6)' }}>
+                            <span>{t('ui_usdswap_fill_cta', 'Choisissez la devise, le stablecoin et le montant')}</span>
+                            <span className="inline-flex items-end gap-[3px] mb-[-1px]">
+                              <span className="usdswap-dot" style={{ animationDelay: '0s' }}>·</span>
+                              <span className="usdswap-dot" style={{ animationDelay: '0.6s' }}>·</span>
+                              <span className="usdswap-dot" style={{ animationDelay: '1.2s' }}>·</span>
+                            </span>
+                          </span>
+                        : t("ui_action_continue", "Continuer")}
                     </button>
                   </>
                 ) : null}

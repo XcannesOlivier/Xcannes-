@@ -1845,35 +1845,64 @@ const MoonPayBuyModal = ({
             }}
             disabled={continueDisabled}
             className={[
-              "md:hidden mt-7 w-full h-14 rounded-[20px] text-white text-lg font-semibold transition-all duration-200 tracking-[-0.01em]",
+              "md:hidden mt-7 w-full h-14 rounded-[20px] text-lg font-semibold transition-all duration-200 tracking-[-0.01em]",
               continueDisabled
-                ? "opacity-45 cursor-not-allowed"
-                : "hover:scale-[1.01] active:scale-[0.98]",
+                ? "bg-xcannes-green/[0.07] text-xcannes-green/60 cursor-not-allowed ring-[0.5px] ring-xcannes-green/40 ring-inset"
+                : "text-white hover:scale-[1.01] active:scale-[0.98]",
             ].join(" ")}
             style={continueDisabled
-              ? { background: 'linear-gradient(180deg, rgba(34,154,86,0.65) 0%, rgba(14,103,58,0.65) 100%)' }
+              ? undefined
               : { background: 'linear-gradient(180deg, rgba(34,154,86,1) 0%, rgba(14,103,58,1) 100%)', boxShadow: '0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)' }
             }
           >
-            {continueLabel}
+            {continueDisabled
+              ? <span className="inline-flex items-center gap-1.5 text-white/20">
+                  <span>{t('ui_buy_fill_cta', 'Choisissez la devise et le montant')}</span>
+                  <span className="inline-flex items-end gap-[3px] mb-[-1px]">
+                    <span className="buy-dot" style={{ animationDelay: '0s' }}>·</span>
+                    <span className="buy-dot" style={{ animationDelay: '0.6s' }}>·</span>
+                    <span className="buy-dot" style={{ animationDelay: '1.2s' }}>·</span>
+                  </span>
+                </span>
+              : continueLabel}
           </button>
           <button
             type="button"
             onClick={handleContinue}
             disabled={continueDisabled}
             className={[
-              "hidden md:flex mt-7 items-center justify-center w-full h-14 rounded-[20px] text-white text-lg font-semibold transition-all duration-200 tracking-[-0.01em]",
+              "hidden md:flex mt-7 items-center justify-center w-full h-14 rounded-[20px] text-lg font-semibold transition-all duration-200 tracking-[-0.01em]",
               continueDisabled
-                ? "opacity-45 cursor-not-allowed"
-                : "hover:scale-[1.01] active:scale-[0.98]",
+                ? "bg-xcannes-green/[0.07] text-xcannes-green/60 cursor-not-allowed ring-[0.5px] ring-xcannes-green/40 ring-inset"
+                : "text-white hover:scale-[1.01] active:scale-[0.98]",
             ].join(" ")}
             style={continueDisabled
-              ? { background: 'linear-gradient(180deg, rgba(34,154,86,0.65) 0%, rgba(14,103,58,0.65) 100%)' }
+              ? undefined
               : { background: 'linear-gradient(180deg, rgba(34,154,86,1) 0%, rgba(14,103,58,1) 100%)', boxShadow: '0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)' }
             }
           >
-            {continueLabel}
+            {continueDisabled
+              ? <span className="inline-flex items-center gap-1.5 text-white/20">
+                  <span>{t('ui_buy_fill_cta', 'Choisissez la devise et le montant')}</span>
+                  <span className="inline-flex items-end gap-[3px] mb-[-1px]">
+                    <span className="buy-dot" style={{ animationDelay: '0s' }}>·</span>
+                    <span className="buy-dot" style={{ animationDelay: '0.6s' }}>·</span>
+                    <span className="buy-dot" style={{ animationDelay: '1.2s' }}>·</span>
+                  </span>
+                </span>
+              : continueLabel}
           </button>
+          <style>{`
+            @keyframes buyDotBlink {
+              0%, 100% { opacity: 0.18; }
+              50% { opacity: 0.7; }
+            }
+            .buy-dot {
+              animation: buyDotBlink 2.4s ease-in-out infinite;
+              font-size: 1.3em;
+              line-height: 1;
+            }
+          `}</style>
 		          {!demoMode && !useSimpleSwapPartner ? (
 		            <div className="text-center text-[12px] md:text-[13px] text-white/50 mt-5 leading-relaxed">
 		              <p>{t('moonpay_info_buy_live_3c8a1d6b2f', 'Paiement traité de manière sécurisée par MoonPay ou Topper.')}</p>
