@@ -905,9 +905,12 @@ export default function WalletDashboardSendChoiceModal({
                     onClick={() => { if (pendingDestination.address) { setSendDestination?.(pendingDestination.address); setSendDestinationLabel?.(pendingDestination.label); onChooseSimpleSend?.(); } }}
                     className={`w-full py-3.5 rounded-[14px] text-[16px] font-semibold transition-all duration-200 ${
                       pendingDestination.address
-                        ? 'bg-xcannes-green text-white shadow-[0_4px_24px_rgba(0,200,100,0.25)] hover:brightness-110 active:scale-[0.98]'
-                        : 'bg-xcannes-green/[0.07] text-xcannes-green/60 cursor-not-allowed ring-1 ring-xcannes-green/40 ring-inset'
+                        ? 'text-white hover:scale-[1.01] active:scale-[0.98]'
+                        : 'bg-xcannes-green/[0.07] text-xcannes-green/60 cursor-not-allowed ring-[0.5px] ring-xcannes-green/40 ring-inset'
                     }`}
+                    style={pendingDestination.address
+                      ? { background: 'linear-gradient(180deg, rgba(34,154,86,1) 0%, rgba(14,103,58,1) 100%)', boxShadow: '0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)' }
+                      : undefined}
                   >
                     {pendingDestination.address
                       ? t('ui_validate_recipient_address', "Valider l'adresse du destinataire")
