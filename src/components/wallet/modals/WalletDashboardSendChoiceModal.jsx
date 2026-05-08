@@ -1005,7 +1005,7 @@ export default function WalletDashboardSendChoiceModal({
                     <span className="block w-12 h-1.5 rounded-full bg-white/20" />
                   </div>
                 ) : null}
-                <div className="px-5 pt-[86px] md:pt-[75px] pb-5 flex flex-col flex-1 min-h-0 overflow-y-auto overscroll-contain">
+                <div className="px-5 pt-[70px] md:pt-[90px] pb-5 flex flex-col flex-1 min-h-0 overflow-y-auto overscroll-contain">
                 {/* Title + subtitle (centered) */}
                 <div className="flex flex-col items-center text-center mb-[40px]">
                   <h3 className="mt-1 text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight">
@@ -1015,7 +1015,7 @@ export default function WalletDashboardSendChoiceModal({
                     {t('ui_send_pay_request_hint', 'Scannez, importez un QR code ou saisissez une demande de paiement.')}
                   </p>
                   {/* Wallet meta pill */}
-                  <div className="mt-4 flex justify-center px-4 w-full">
+                  <div className="mt-[40px] flex justify-center px-4 w-full">
                     {renderWalletMeta?.({
                       variant: 'pill-column',
                       className: 'flex justify-center',
