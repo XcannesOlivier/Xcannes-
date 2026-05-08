@@ -898,11 +898,33 @@ export default function WalletDashboardSendChoiceModal({
                     className={`w-full py-3.5 rounded-[20px] text-[15px] font-semibold transition-all duration-200 ${
                       pendingDestination.address
                         ? 'bg-xcannes-green text-black shadow-[0_4px_24px_rgba(0,200,100,0.25)] hover:brightness-110 active:scale-[0.98]'
-                        : 'bg-white/5 text-white/25 cursor-not-allowed border border-white/10'
+                        : 'bg-xcannes-green/[0.07] text-xcannes-green/60 cursor-not-allowed border border-xcannes-green/30'
                     }`}
                   >
-                    {t('ui_validate_recipient_address', "Valider l'adresse du destinataire")}
+                    {pendingDestination.address
+                      ? t('ui_validate_recipient_address', "Valider l'adresse du destinataire")
+                      : <span className="inline-flex items-center gap-1.5">
+                          <span>{t('ui_fill_recipient_address', "Renseigner l'adresse du destinataire")}</span>
+                          <span className="inline-flex items-end gap-[3px] mb-[-1px]">
+                            <span className="send-dot" style={{ animationDelay: '0s' }}>·</span>
+                            <span className="send-dot" style={{ animationDelay: '0.3s' }}>·</span>
+                            <span className="send-dot" style={{ animationDelay: '0.6s' }}>·</span>
+                          </span>
+                        </span>
+                    }
                   </button>
+                  <style>{`
+                    @keyframes sendDotBlink {
+                      0%, 80%, 100% { opacity: 0.15; }
+                      40% { opacity: 1; }
+                    }
+                    .send-dot {
+                      font-size: 20px;
+                      line-height: 1;
+                      animation: sendDotBlink 1.2s ease-in-out infinite;
+                      color: inherit;
+                    }
+                  `}</style>
                 </div>
 
                 </div>
