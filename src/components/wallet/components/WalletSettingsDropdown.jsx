@@ -680,6 +680,7 @@ export default function WalletSettingsDropdown({
 	                  {t("ui_settings_section_accounts", "Comptes")}
 	                </div>
 
+                <div className="rounded-[20px] bg-elevated">
                 <button
                   type="button"
                   onClick={(e) => {
@@ -718,6 +719,7 @@ export default function WalletSettingsDropdown({
 	                  </div>
                   <span className="text-white/25 text-lg">›</span>
                 </button>
+                </div>
               </div>
 
               {/* Section: Réseau */}
@@ -727,6 +729,7 @@ export default function WalletSettingsDropdown({
                     {t("ui_settings_section_network", "Réseau")}
                   </div>
 
+                  <div className="rounded-[20px] bg-elevated">
                   <button
                     type="button"
                     onClick={() => {
@@ -755,6 +758,7 @@ export default function WalletSettingsDropdown({
                     </div>
                     <span className="text-white/25 text-lg">›</span>
                   </button>
+                  </div>
                 </div>
               ) : null}
 
@@ -765,6 +769,7 @@ export default function WalletSettingsDropdown({
 	                    <div className="px-1.5 pb-2 text-[10px] font-semibold tracking-[0.22em] text-white/35">
 	                      {t("ui_settings_section_preferences", "Préférences")}
 	                    </div>
+	                    <div className="rounded-[20px] bg-elevated">
 	                    <div className="rounded-[20px] border border-white/10 bg-white/5 shadow-[inset_0_-34px_34px_-20px_rgba(0,0,0,0.95),inset_0_-18px_70px_-45px_rgba(0,0,0,0.9)] p-2.5 transition-colors duration-150">
 	                      <PreferredCurrencySelector
 	                        currentCurrency={preferredCurrency}
@@ -777,6 +782,7 @@ export default function WalletSettingsDropdown({
                         }}
                         onOpen={onLoadFawazCurrencies}
                       />
+                    </div>
                     </div>
                   </div>
                 </>
