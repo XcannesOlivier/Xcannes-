@@ -53,7 +53,7 @@ export default function WalletDashboardFooter({ onScan, addCurrencySlot, onHisto
       {/* Mobile footer — barre unique 3 colonnes */}
       <div
         className="relative md:hidden shrink-0"
-        style={{ paddingBottom: 'max(8px, env(safe-area-inset-bottom))' }}
+        style={{ paddingBottom: 'max(4px, env(safe-area-inset-bottom))' }}
       >
         {/* Gradient de fondu sous la barre */}
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[120px] bg-gradient-to-t from-[#0d1012] via-[#0d1012]/70 to-transparent" />
