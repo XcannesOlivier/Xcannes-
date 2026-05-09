@@ -1270,7 +1270,7 @@ export default function WalletDashboardReceiveModal({
                       }}
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-11 h-11 rounded-[16px] bg-black/30 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0 text-xcannes-green/90">
+                        <div className="w-11 h-11 rounded-[16px] bg-black/30 flex items-center justify-center flex-shrink-0 text-xcannes-green/90">
                           <QrIcon className="w-11 h-11" />
                         </div>
                         <div className="flex-1 min-w-0">
@@ -1299,7 +1299,7 @@ export default function WalletDashboardReceiveModal({
                       }}
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-11 h-11 rounded-[16px] bg-black/30 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0 text-white/85">
+                        <div className="w-11 h-11 rounded-[16px] bg-black/30 flex items-center justify-center flex-shrink-0 text-white/85">
                           <RequestIcon className="w-11 h-11" />
                         </div>
                         <div className="flex-1 min-w-0">
@@ -1596,7 +1596,7 @@ export default function WalletDashboardReceiveModal({
 	                    </div>
 
 	                    {/* ── Actions ── */}
-	                    <div className="grid grid-cols-2 gap-3 mt-[50px] md:mt-[28px]">
+	                    <div className="grid grid-cols-2 gap-3">
 	                      <button
 	                        type="button"
 	                        onClick={async e => {
@@ -1607,6 +1607,7 @@ export default function WalletDashboardReceiveModal({
 	                          'w-full h-11 rounded-[20px] bg-[#101415] ring-1 ring-white/10 ring-inset text-white/85 text-xs font-semibold',
 	                          'shadow-[0_4px_12px_rgba(0,0,0,0.4)] hover:ring-white/20 hover:bg-white/[0.04] transition-all duration-[140ms] active:scale-[0.99]',
 	                        ].join(' ')}
+	                        style={{ marginTop: '50px' }}
 	                      >
 	                        {t('ui_copy_address', 'Copier l’adresse')}
 	                      </button>
@@ -1617,7 +1618,7 @@ export default function WalletDashboardReceiveModal({
 	                          await handleShareQr(false);
 	                        }}
                           className="w-full h-11 rounded-[20px] bg-[#101415] text-white text-[17px] font-bold tracking-wide py-2 px-6 transition-all duration-[140ms] inline-flex items-center justify-center gap-2.5 hover:bg-white/[0.04] scale-[1.04] active:scale-[0.98]"
-                          style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(255,255,255,0.10), inset 0 1px 0 rgba(255,255,255,0.06), inset 0 -8px 16px rgba(0,0,0,0.25)' }}
+                          style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(255,255,255,0.10), inset 0 1px 0 rgba(255,255,255,0.06), inset 0 -8px 16px rgba(0,0,0,0.25)', marginTop: '50px' }}
 	                      >
 	                        <ShareIcon className="w-5 h-5" />
 	                        <span>{shareActionLabel}</span>
