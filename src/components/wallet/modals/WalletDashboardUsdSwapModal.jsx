@@ -4614,7 +4614,7 @@ export default function WalletDashboardUsdSwapModal({
 	                  strokeLinejoin="round"
 	                  className="h-[40px] w-[40px]"
 	                >
-	                  <path d="M12 2l7 4v6c0 5-3 9-7 10-4-1-7-5-7-10V6l7-4Z" />
+	                  <path d="M12 2l7 4v6c0 5-3 9-7 10-4-1-7-5-7-10V6l7-4Z" strokeWidth="0.5" />
 	                  <path d="M9 12l2 2 4-4" />
 	                </svg>
 	              </span>
