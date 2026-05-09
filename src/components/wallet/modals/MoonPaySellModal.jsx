@@ -131,10 +131,7 @@ const MoonPaySellModal = ({
       : "ring-xcannes-violet/25 bg-xcannes-violet";
   const accentCheck =
     accentVariant === "fireOrange" ? "text-[#ff6a00]" : "text-xcannes-violet";
-  const sheetAccentChipClass =
-    accentVariant === "fireOrange"
-      ? "bg-[#ff6a00]/10 ring-1 ring-[#ff6a00]/20 text-[#ffd1b5]"
-      : "bg-xcannes-violet/10 ring-1 ring-xcannes-violet/20 text-xcannes-violet/90";
+  const sheetAccentChipClass = "bg-white/5 text-white/80";
 	  const sheetAccentControlCardClass =
 	    accentVariant === "fireOrange"
 	      ? "bg-[#ff6a00]/10 ring-1 ring-[#ff6a00]/20 text-white/85"
@@ -1846,7 +1843,7 @@ const MoonPaySellModal = ({
               </div>
 
               {/* Summary */}
-              <div className="mb-5 rounded-2xl bg-white/5 ring-1 ring-white/10 p-4 shadow-[0_14px_28px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.05)]">
+              <div className="mb-5 rounded-2xl bg-black/40 backdrop-blur-sm ring-1 ring-white/10 ring-inset p-4 shadow-[0_14px_28px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.05)]">
 	                <div className="space-y-1.5">
 	                  <p className="text-[13px] font-medium leading-snug text-white/85">
 	                    {t(
@@ -1880,7 +1877,7 @@ const MoonPaySellModal = ({
               </div>
 
               {/* Flow */}
-              <div className="rounded-2xl bg-white/5 ring-1 ring-white/10 p-4 shadow-[0_14px_28px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.05)]">
+              <div className="rounded-2xl bg-black/40 backdrop-blur-sm ring-1 ring-white/10 ring-inset p-4 shadow-[0_14px_28px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.05)]">
 	                <div
 	                  className={[
 	                    "mb-5 rounded-2xl px-4 py-3 text-[13px] shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]",
@@ -2089,7 +2086,7 @@ const MoonPaySellModal = ({
             </div>
 
             {/* Summary */}
-            <div className="mb-5 rounded-2xl bg-white/5 ring-1 ring-white/10 p-4 shadow-[0_14px_28px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.05)]">
+            <div className="mb-5 rounded-2xl bg-black/40 backdrop-blur-sm ring-1 ring-white/10 ring-inset p-4 shadow-[0_14px_28px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.05)]">
 	              <div className="space-y-1.5">
 	                <p className="text-[13px] font-medium leading-snug text-white/85">
 	                  {t(
@@ -2123,7 +2120,7 @@ const MoonPaySellModal = ({
             </div>
 
             {/* Flow */}
-	            <div className="rounded-2xl bg-white/5 ring-1 ring-white/10 p-4 shadow-[0_14px_28px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.05)]">
+	            <div className="rounded-2xl bg-black/40 backdrop-blur-sm ring-1 ring-white/10 ring-inset p-4 shadow-[0_14px_28px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.05)]">
 	              <div
 	                className={[
 	                  "mb-5 rounded-2xl px-4 py-3 text-[13px] shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]",

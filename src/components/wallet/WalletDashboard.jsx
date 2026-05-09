@@ -1346,10 +1346,10 @@ export default function WalletDashboard({
                                 className={[
                                   "shrink-0 flex items-center justify-center opacity-70",
                                   recentActivityIcon === "receive"
-                                    ? "text-emerald-300"
+                                    ? "text-emerald-400"
                                     : recentActivityIcon === "send"
-                                      ? "text-red-200"
-                                      : "text-emerald-300",
+                                      ? "text-red-400"
+                                      : "text-emerald-400",
                                 ].join(" ")}
                                 aria-hidden
                               >
@@ -1408,9 +1408,9 @@ export default function WalletDashboard({
                           <div
                             className={[
                               "shrink-0 flex items-center justify-center opacity-70",
-                              recentActivityIcon === "receive" ? "text-emerald-300"
-                                : recentActivityIcon === "send" ? "text-red-200"
-                                : "text-emerald-300",
+                              recentActivityIcon === "receive" ? "text-emerald-400"
+                                : recentActivityIcon === "send" ? "text-red-400"
+                                : "text-emerald-400",
                             ].join(" ")}
                             aria-hidden
                           >
