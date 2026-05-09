@@ -97,7 +97,7 @@ export default function WalletDashboardCashChoiceModal({
       <path
         d="M30.5 20v14m-4-10.5c0-1.4 1.8-2.5 4-2.5s4 1.1 4 2.5-1.8 2.4-4 2.5c-2.2.1-4 1.1-4 2.5s1.8 2.5 4 2.5 4-1.1 4-2.5"
         className="stroke-white/85"
-        strokeWidth="1.2"
+        strokeWidth="0.8"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
