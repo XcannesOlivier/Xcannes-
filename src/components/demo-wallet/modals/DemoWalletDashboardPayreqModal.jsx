@@ -122,12 +122,12 @@ export default function DemoWalletDashboardPayreqModal({
 
   const wrapperClass = inline
     ? "relative w-full h-full flex"
-    : "fixed inset-0 z-[10001] flex items-stretch md:items-center justify-center md:px-4 pointer-events-none";
+    : "fixed inset-0 z-[10001] flex items-end justify-center pointer-events-none";
   const panelClass = [
-    "relative w-full wallet-modal-panel wallet-send-modal wallet-payreq-modal border-0 md:border md:border-white/10 p-4 md:p-5 space-y-3 md:space-y-4 overflow-y-auto flex flex-col min-h-0 overscroll-contain pointer-events-auto",
+    "relative w-full wallet-modal-panel wallet-send-modal wallet-payreq-modal wallet-modal-no-top-highlight-mobile p-4 pt-0 space-y-3 overflow-y-auto flex flex-col min-h-0 overscroll-contain pointer-events-auto pb-[env(safe-area-inset-bottom)] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-26px_46px_rgba(0,0,0,0.55)]",
     inline
       ? "h-full max-h-none rounded-xl"
-      : "h-[100dvh] md:h-auto max-w-none md:max-w-lg md:max-h-[92vh] rounded-none md:rounded-2xl",
+      : "h-screen rounded-none",
     noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-elevated",
     noticeVariant === "demo" ? "demo-wallet-tooltip-scope" : "",
     inline ? "wallet-inline-zoom-in" : "",
@@ -228,7 +228,7 @@ export default function DemoWalletDashboardPayreqModal({
         onConfirm={handleManualSend}
         disabled={sendProcessing || !canManualSend}
         variant="green"
-        className="mt-2 md:hidden"
+        className="mt-2"
       />
       <button
         type="button"
@@ -237,7 +237,7 @@ export default function DemoWalletDashboardPayreqModal({
           handleManualSend();
         }}
         disabled={sendProcessing || !canManualSend}
-        className={`hidden md:block w-full mt-2 text-sm py-3 ${greenActionBtnBase}`}
+        className={`hidden w-full mt-2 text-sm py-3 ${greenActionBtnBase}`}
       >
         {sendProcessing
           ? t("ui_sending_3b8c1a7d5e", "Sending...")
@@ -250,7 +250,7 @@ export default function DemoWalletDashboardPayreqModal({
     <>
       {!inline ? (
         <div
-          className={`fixed inset-0 z-[10000] bg-black/80 md:backdrop-blur-sm ${
+          className={`fixed inset-0 z-[10000] bg-black/80 ${
             isClosing ? "wallet-modal-backdrop-out" : "wallet-modal-backdrop-in"
           }`}
           onClick={onClose}

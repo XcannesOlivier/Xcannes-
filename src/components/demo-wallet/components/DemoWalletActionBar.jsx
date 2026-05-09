@@ -120,7 +120,7 @@ export default function DemoWalletActionBar({
           type="button"
           onClick={() => {
             if (!cashEnabled) return;
-            setCashModalTab("buy");
+            setCashModalTab("choice");
             setActiveAction("cash");
           }}
           title={t("demo_tt_cash", "Acheter ou vendre des cryptos (démo).")}

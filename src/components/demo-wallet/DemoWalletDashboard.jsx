@@ -55,7 +55,7 @@ export default function DemoWalletDashboard({
   const setState = isExternalState ? setDemoState : setLocalState;
   const [activeWalletId, setActiveWalletId] = useState(resolvedDefaultWalletId);
   const [activeAction, setActiveAction] = useState(null); // send | receive | swap | cash | null
-  const [cashModalTab, setCashModalTab] = useState("buy"); // buy | sell
+  const [cashModalTab, setCashModalTab] = useState("choice"); // choice | buy | sell
   const [showGlobalStatement, setShowGlobalStatement] = useState(false);
   const [showCurrencyStatement, setShowCurrencyStatement] = useState(false);
   const [walletInfoOpen, setWalletInfoOpen] = useState(false);
@@ -217,7 +217,7 @@ export default function DemoWalletDashboard({
       setConvertPreview("");
     }
     if (prevAction === "cash" && activeAction !== "cash") {
-      setCashModalTab("buy");
+      setCashModalTab("choice");
     }
     prevActiveActionRef.current = activeAction;
   }, [

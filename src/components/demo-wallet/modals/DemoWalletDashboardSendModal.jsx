@@ -8,7 +8,11 @@ import { createPortal } from "react-dom";
 import { useTranslation } from "next-i18next";
 import { useModalTransition } from "@/hooks/useModalTransition";
 import { formatAmountWithSymbol } from "../demoWalletDashboardConfig";
-import { greenActionBtnBase } from "./demoWalletModalTokens";
+import {
+  greenActionBtnBase,
+  modalSelectButtonCls,
+  modalSelectListCls,
+} from "./demoWalletModalTokens";
 import { normalizeQrImageFile } from "../utils/demoQrImage";
 
 const XRPL_ADDRESS_RE = /^(?:xrpl:)?r[1-9A-HJ-NP-Za-km-z]{24,34}$/;
@@ -347,12 +351,12 @@ export default function DemoWalletDashboardSendModal({
 
   const wrapperClass = inline
     ? "relative w-full h-full flex"
-    : "fixed inset-0 z-[10001] flex items-end md:items-center justify-center md:px-4 pointer-events-none";
+    : "fixed inset-0 z-[10001] flex items-end justify-center pointer-events-none";
   const panelClass = [
-    "relative w-full wallet-modal-panel wallet-send-modal border-white/10 md:border p-4 md:p-5 space-y-4 flex flex-col pointer-events-auto shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-26px_46px_rgba(0,0,0,0.55)]",
+    "relative w-full wallet-modal-panel wallet-send-modal wallet-modal-no-top-highlight-mobile p-4 pt-0 space-y-4 flex flex-col pointer-events-auto pb-[env(safe-area-inset-bottom)] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-26px_46px_rgba(0,0,0,0.55)]",
     inline
       ? "h-full max-h-none rounded-xl"
-      : "h-screen md:h-auto md:max-w-lg md:max-h-[100vh] rounded-none md:rounded-2xl",
+      : "h-screen rounded-none",
     noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-elevated",
     noticeVariant === "demo" ? "demo-wallet-tooltip-scope" : "",
     inline ? "wallet-inline-zoom-in" : "",
@@ -367,7 +371,7 @@ export default function DemoWalletDashboardSendModal({
     <div className="space-y-4">
       {/* 1) Recipient input */}
       <div className="space-y-2">
-        <label className="block text-base md:text-lg text-white/60">
+        <label className="block text-base text-white/60">
           {t("ui_send_to_label", "Destinataire")}
         </label>
         <div className="relative">
@@ -375,7 +379,7 @@ export default function DemoWalletDashboardSendModal({
             type="text"
             value={requestDestination}
             readOnly
-            className="w-full bg-[#0F141A] ring-1 ring-white/15 ring-inset rounded-xl px-4 pr-24 py-3 text-base text-white/90 outline-none truncate focus:outline-none focus:ring-2 focus:ring-xcannes-green/80"
+            className="w-full bg-[#101415] ring-1 ring-white/15 ring-inset rounded-[20px] shadow-[0_4px_12px_rgba(0,0,0,0.4)] px-4 pr-24 py-3 text-base text-white/90 outline-none truncate focus:outline-none"
           />
           <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
             <button
@@ -606,7 +610,7 @@ export default function DemoWalletDashboardSendModal({
   const recipientCard = !hasPaymentRequest ? (
     <div className="space-y-2">
       <label
-        className="block text-base md:text-lg text-white/60 mb-1.5"
+        className="block text-base text-white/60 mb-1.5"
         title={t("ui_send_destination_tip", "Adresse XRPL du destinataire.")}
       >
         {t("ui_send_to_label", "Destinataire")}
@@ -626,7 +630,7 @@ export default function DemoWalletDashboardSendModal({
             "ui_import_or_choose_recipient",
             "Import or choose address",
           )}
-          className="w-full bg-black/40 ring-1 ring-white/15 ring-inset rounded-xl pl-8 pr-28 h-12 md:h-auto py-0 md:py-3 text-base text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/80"
+          className="w-full bg-[#101415] ring-1 ring-white/15 ring-inset rounded-[20px] shadow-[0_4px_12px_rgba(0,0,0,0.4)] pl-8 pr-28 py-3 text-base text-white outline-none focus:outline-none"
         />
 
         {/* Saved addresses picker (vertically centered) */}
@@ -803,9 +807,28 @@ export default function DemoWalletDashboardSendModal({
                 : "opacity-30 pointer-events-none select-none",
             ].join(" ")}
           >
+            <h3 className="text-[30px] font-bold text-white/95 tracking-tight text-center leading-snug">
+              {t("ui_send_modal_title", "Montant à envoyer")}
+            </h3>
+            <p className="text-[14px] text-white/55 text-center leading-relaxed -mt-2">
+              {t(
+                "ui_send_devise_hint",
+                "Choisissez la devise, saisissez le montant, puis vérifiez avant l’envoi.",
+              )}
+            </p>
+            <div className="flex justify-center relative z-[65]">
+              <div className="rounded-[18px] bg-elevated ring-1 ring-white/10 ring-inset px-4 py-3 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]">
+                <div className="text-[11px] text-white/45 text-center">
+                  {t("moonpay_from_account", "Compte source")}
+                </div>
+                <div className="mt-1 flex justify-center">
+                  {renderWalletMeta?.("text-center [&_.font-mono]:hidden")}
+                </div>
+              </div>
+            </div>
             <div>
               <label
-                className="block text-base md:text-lg text-white/60 mb-1.5"
+                className="block text-base text-white/60 mb-1.5"
                 title={t(
                   "ui_send_asset_tip",
                   "Sélectionnez la devise à envoyer.",
@@ -843,19 +866,24 @@ export default function DemoWalletDashboardSendModal({
                 useNativeSelect={false}
                 showMobileOptionRight={true}
                 iconClassName="text-3xl leading-none"
-	                buttonClassName="bg-black/40 ring-1 ring-white/15 ring-inset rounded-xl px-4 py-4 text-2xl text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/80 appearance-none cursor-pointer [&_.tabular-nums]:text-lg [&_.tabular-nums]:text-white/35"
-	                menuClassName={
-	                  noticeVariant === "demo"
-	                    ? "bg-xcannes-surface-demo border-white/15 ring-1 ring-white/10"
-	                    : "bg-elevated border-white/15 ring-1 ring-white/10"
-	                }
-	                selectClassName="xcannes-select w-full bg-black/40 ring-1 ring-white/15 ring-inset rounded-xl px-4 py-4 text-2xl text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/80 appearance-none cursor-pointer"
+                optionIconClassName="text-2xl leading-none opacity-60"
+                optionClassName="py-2 !text-base !text-white/60"
+                menuHeader={t("ui_your_balances_header", "Vos soldes")}
+                backdropClassName="bg-black/80 backdrop-blur-[4px] !z-[45]"
+                buttonClassName={modalSelectButtonCls}
+                openButtonClassName="!bg-white/10 !border !border-white/10 !border-b-0 !rounded-b-none !ring-1 !ring-white/10 !shadow-[0_8px_18px_rgba(0,0,0,0.45)]"
+                menuClassName={
+                  noticeVariant === "demo"
+                    ? "bg-xcannes-surface-demo !border-white/10 !ring-1 !ring-white/10 ring-inset rounded-b-[14px] max-h-[420px]"
+                    : "bg-[#101415] !border-white/10 !ring-1 !ring-white/10 ring-inset rounded-b-[14px] max-h-[420px]"
+                }
+                selectClassName={modalSelectListCls}
 	              />
             </div>
 
             <div>
               <label
-                className="block text-base md:text-lg text-white/60 mb-1.5"
+                className="block text-base text-white/60 mb-1.5"
                 title={t(
                   "ui_send_amount_tip",
                   "Saisissez le montant à envoyer.",
@@ -863,19 +891,21 @@ export default function DemoWalletDashboardSendModal({
               >
                 {t("ui_amount_52cea2dd3d", "Montant")}
               </label>
-              <TokenAmountInput
-                value={sendAmount}
-                onChange={setSendAmount}
-                placeholder="0.0000"
-                token={
-                  selectedSendToken
-                    ? selectLabelByAssetKey?.[selectedSendToken.currency] ||
-                      selectedSendToken.currency
-                    : "RLUSD"
-                }
-                tokenClassName="text-white/45 text-xl font-semibold"
-                containerClassName="py-4 !rounded-xl !bg-black/30 ring-1 ring-white/15 ring-inset focus-within:ring-2 focus-within:ring-xcannes-green/80 transition-colors duration-150"
-              />
+              <div className="bg-[#111518] rounded-[18px]">
+                <TokenAmountInput
+                  value={sendAmount}
+                  onChange={setSendAmount}
+                  placeholder="0.00"
+                  token={
+                    selectedSendToken
+                      ? selectLabelByAssetKey?.[selectedSendToken.currency] ||
+                        selectedSendToken.currency
+                      : "RLUSD"
+                  }
+                  tokenClassName="text-white/70 drop-shadow-sm text-2xl font-semibold"
+                  containerClassName="pt-5 pb-5 rounded-[18px] bg-[#111518] ring-1 ring-white/10 ring-inset transition-all duration-200 shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30)] focus-within:ring-white/25 focus-within:shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30),0_0_0_1px_rgba(255,255,255,0.10),0_0_24px_rgba(255,255,255,0.06)] wallet-amount-shimmer [&_input]:!text-4xl [&_input]:font-bold [&_input]:placeholder:text-white/35"
+                />
+              </div>
             </div>
 
             {sendFxInfo && (
@@ -1049,7 +1079,7 @@ export default function DemoWalletDashboardSendModal({
       {/* Backdrop */}
       {!inline ? (
         <div
-          className={`fixed inset-0 z-[10000] bg-black/80 md:backdrop-blur-sm ${
+          className={`fixed inset-0 z-[10000] bg-black/80 ${
             isClosing ? "wallet-modal-backdrop-out" : "wallet-modal-backdrop-in"
           }`}
           onClick={onClose}
@@ -1065,30 +1095,29 @@ export default function DemoWalletDashboardSendModal({
             if (!inline) e.stopPropagation();
           }}
         >
-          <div className="flex items-start justify-between gap-3 mb-1 pr-6">
-            <div className="flex min-w-0 flex-col gap-1.5">
-              <div>
-                {renderWalletMeta?.(
-                  "pr-8 wallet-meta--plus-4 wallet-meta--desktop-gap [&_.font-mono]:hidden",
-                )}
-              </div>
+          {!inline ? (
+            <div className="flex justify-center pt-0 pb-0 touch-none" aria-hidden>
+              <span className="block w-12 h-1.5 rounded-full bg-white/20" />
+            </div>
+          ) : null}
+          <div
+            className={`flex items-start justify-between gap-3 relative z-[65] touch-none ${
+              hasPaymentRequest ? "mb-[110px]" : "mb-[54px]"
+            }`}
+          >
+            <div className="flex min-w-0 flex-col gap-1.5 w-full">
               <div className="flex flex-wrap items-center gap-2">
+                {noticeVariant === "demo" ? (
+                  <span className="inline-flex items-center text-white/80 text-sm font-semibold px-2 py-1 leading-none">
+                    {t("demo_notice_title", "Mode démo")}
+                  </span>
+                ) : null}
               </div>
             </div>
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onClose();
-              }}
-              className="wallet-modal-close md:absolute md:top-4 md:right-4 text-white/60 hover:text-white transition-colors text-xl z-10"
-            >
-              ✕
-            </button>
           </div>
           <div
             ref={scrollContainerRef}
-            className="flex-1 overflow-y-auto -mx-4 px-4 md:-mx-5 md:px-5"
+            className="flex-1 overflow-y-auto -mx-4 px-4"
           >
             <div className="flex flex-col gap-3">
               {hasPaymentRequest ? (

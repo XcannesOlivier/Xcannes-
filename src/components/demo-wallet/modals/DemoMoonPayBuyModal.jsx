@@ -5,7 +5,7 @@ import ModalSelect from "@/components/ui/ModalSelect";
 import { useTranslation } from "next-i18next";
 import { CRYPTO_ICONS } from "../utils/demoMarketConstants";
 import { useModalTransition } from "@/hooks/useModalTransition";
-import { greenActionBtnBase } from "@/components/wallet/modals/walletModalTokens";
+import { greenActionBtnBase } from "./demoWalletModalTokens";
 
 // Static fiat currencies for the demo wallet (no MoonPay API call needed)
 const DEMO_FIAT_CURRENCIES = [
@@ -406,7 +406,7 @@ const DemoMoonPayBuyModal = ({
     <>
       {/* Backdrop */}
       <div
-        className={`fixed inset-0 z-[10000] bg-black/80 md:backdrop-blur-sm ${
+        className={`fixed inset-0 z-[10000] bg-black/80 ${
           isClosing ? "wallet-modal-backdrop-out" : "wallet-modal-backdrop-in"
         }`}
         onClick={step === "iframe" ? null : onClose}

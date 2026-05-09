@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { XCircleIcon, CheckCircleIcon, CreditCardIcon } from '@heroicons/react/24/outline';
+import { XCircleIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 import ModalSelect from '@/components/ui/ModalSelect';
 import { useTranslation } from 'next-i18next';
 import { CRYPTO_ICONS } from '@/utils/marketConstants';
