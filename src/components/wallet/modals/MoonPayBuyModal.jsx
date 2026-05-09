@@ -2569,7 +2569,7 @@ const MoonPayBuyModal = ({
 		                        className="h-[40px] w-[40px]"
 		                        aria-hidden="true"
 		                      >
-		                        <path d="M3 7h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z" strokeWidth="0.7" />
+		                        <path d="M3 7h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z" />
 		                        <path d="M16 11h3" />
 		                      </svg>
 		                    </span>
