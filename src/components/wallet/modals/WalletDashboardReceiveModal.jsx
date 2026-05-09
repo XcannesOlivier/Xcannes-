@@ -88,15 +88,15 @@ const ShareAddressIcon = ({ className = '' }) => (
     className={className}
     aria-hidden="true"
   >
-    <path d="m 111.4077,90.352932 h 210 q 30,0 30,29.999998 v 70" strokeWidth="14" strokeLinecap="round" strokeLinejoin="round" />
-    <path d="m 111.4077,90.352932 q -30,0 -30,29.999998 v 270 q 0,30 30,30 h 190" strokeWidth="14" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="m 111.4077,90.352932 h 210 q 30,0 30,29.999998 v 70" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="m 111.4077,90.352932 q -30,0 -30,29.999998 v 270 q 0,30 30,30 h 190" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
     <circle cx="211.4077" cy="180.35294" r="40" strokeWidth="14" strokeLinecap="round" strokeLinejoin="round" />
     <path d="m 161.4077,270.35293 q 0,-50 50,-50 50,0 50,50 z" strokeWidth="14" strokeLinecap="round" strokeLinejoin="round" />
     <line x1="151.4077" y1="320.35294" x2="261.40771" y2="320.35294" strokeWidth="14" strokeLinecap="round" strokeLinejoin="round" />
     <line x1="151.4077" y1="360.35294" x2="231.4077" y2="360.35294" strokeWidth="14" strokeLinecap="round" strokeLinejoin="round" />
     <path d="m 331.4077,230.35293 a 110,110 0 0 1 150,40" strokeWidth="14" strokeLinecap="round" strokeLinejoin="round" />
     <path d="m 482.23792,248.22696 -1.2558,23.90549 -18.84109,-8.17252" strokeWidth="14" strokeLinecap="round" strokeLinejoin="round" />
-    <circle cx="380.40771" cy="340.35294" r="95" strokeWidth="14" strokeLinecap="round" strokeLinejoin="round" />
+    <circle cx="380.40771" cy="340.35294" r="95" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
     <circle cx="332.08789" cy="337.79172" r="16" strokeWidth="14" strokeLinecap="round" strokeLinejoin="round" />
     <circle cx="412.25491" cy="299.17853" r="16" strokeWidth="14" strokeLinecap="round" strokeLinejoin="round" />
     <circle cx="416.71741" cy="382.14252" r="16" strokeWidth="14" strokeLinecap="round" strokeLinejoin="round" />
