@@ -94,11 +94,10 @@ export default function WalletDashboardCashChoiceModal({
         strokeWidth="0.9"
         strokeLinejoin="round"
       />
-      <circle cx="30.5" cy="27" r="5.5" className="fill-[#0870f8]/15" />
       <path
-        d="M30.5 23.6v6.8m-2.4-4.4c0-.8 1-1.4 2.4-1.4s2.4.6 2.4 1.4-1 1.4-2.4 1.4-2.4.6-2.4 1.4 1 1.4 2.4 1.4 2.4-.6 2.4-1.4"
+        d="M30.5 20v14m-4-10.5c0-1.4 1.8-2.5 4-2.5s4 1.1 4 2.5-1.8 2.4-4 2.5c-2.2.1-4 1.1-4 2.5s1.8 2.5 4 2.5 4-1.1 4-2.5"
         className="stroke-white/85"
-        strokeWidth="0.8"
+        strokeWidth="1.2"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
