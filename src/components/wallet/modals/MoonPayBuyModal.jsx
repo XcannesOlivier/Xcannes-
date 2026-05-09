@@ -154,7 +154,7 @@ const MoonPayBuyModal = ({
   const accentText80 = accentVariant === 'simpleswapBlue' ? 'text-[#0870f8]/80' : 'text-xcannes-green/80';
   const accentRing25Bg =
     accentVariant === 'simpleswapBlue' ? 'ring-[#0870f8]/25 bg-[#0870f8]' : 'ring-xcannes-green/25 bg-xcannes-green';
-  const sheetAccentChipClass = 'bg-white/5 text-white/80';
+  const sheetAccentChipClass = 'bg-transparent text-white/80';
 	  const sheetAccentControlCardClass =
 	    accentVariant === 'simpleswapBlue'
 	      ? 'bg-[#0870f8]/10 ring-1 ring-[#0870f8]/20 text-white/85'
@@ -2117,7 +2117,7 @@ const MoonPayBuyModal = ({
 	                    ].join(" ")}
 	                    aria-hidden
 	                  >
-	                    <CreditCardIcon className="h-5 w-5" />
+	                    <CreditCardIcon className="h-[40px] w-[40px]" style={{ strokeWidth: 1 }} />
                   </span>
                   <div className="min-w-0">
                     <h2 className="text-white font-semibold text-lg leading-tight">
@@ -2423,7 +2423,7 @@ const MoonPayBuyModal = ({
 	                  ].join(" ")}
 	                  aria-hidden
 	                >
-	                  <CreditCardIcon className="h-5 w-5" />
+	                  <CreditCardIcon className="h-[40px] w-[40px]" style={{ strokeWidth: 1 }} />
                 </span>
                 <div className="min-w-0">
                   <h2 className="text-white font-semibold text-lg leading-tight">

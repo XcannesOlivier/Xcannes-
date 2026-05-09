@@ -131,7 +131,7 @@ const MoonPaySellModal = ({
       : "ring-xcannes-violet/25 bg-xcannes-violet";
   const accentCheck =
     accentVariant === "fireOrange" ? "text-[#ff6a00]" : "text-xcannes-violet";
-  const sheetAccentChipClass = "bg-white/5 text-white/80";
+  const sheetAccentChipClass = "bg-transparent text-white/80";
 	  const sheetAccentControlCardClass =
 	    accentVariant === "fireOrange"
 	      ? "bg-[#ff6a00]/10 ring-1 ring-[#ff6a00]/20 text-white/85"
@@ -1818,7 +1818,7 @@ const MoonPaySellModal = ({
 	                    ].join(" ")}
 	                    aria-hidden
 	                  >
-	                    <BanknotesIcon className="h-5 w-5" />
+	                    <BanknotesIcon className="h-[40px] w-[40px]" style={{ strokeWidth: 1 }} />
                   </span>
                   <div className="min-w-0">
                     <h2 className="text-white font-semibold text-lg leading-tight">
@@ -2061,7 +2061,7 @@ const MoonPaySellModal = ({
 	                  ].join(" ")}
 	                  aria-hidden
 	                >
-	                  <BanknotesIcon className="h-5 w-5" />
+	                  <BanknotesIcon className="h-[40px] w-[40px]" style={{ strokeWidth: 1 }} />
                 </span>
                 <div className="min-w-0">
                   <h2 className="text-white font-semibold text-lg leading-tight">

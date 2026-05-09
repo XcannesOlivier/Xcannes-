@@ -403,7 +403,7 @@ export default function WalletDashboardUsdSwapModal({
       : "border-xcannes-green";
   const accentSwapIconShell = "bg-transparent ring-0";
   const accentSwapIcon = "text-white";
-  const sheetAccentChipClass = "bg-white/5 text-white/80";
+  const sheetAccentChipClass = "bg-transparent text-white/80";
 	  const sheetAccentControlCardClass = isBinanceYellow
 	    ? "bg-[#F0B90B]/10 ring-1 ring-[#F0B90B]/20 text-white/85"
 	    : isFireOrange
@@ -4609,10 +4609,10 @@ export default function WalletDashboardUsdSwapModal({
 	                  viewBox="0 0 24 24"
 	                  fill="none"
 	                  stroke="currentColor"
-	                  strokeWidth="2"
+	                  strokeWidth="1"
 	                  strokeLinecap="round"
 	                  strokeLinejoin="round"
-	                  className="h-5 w-5"
+	                  className="h-[40px] w-[40px]"
 	                >
 	                  <path d="M12 2l7 4v6c0 5-3 9-7 10-4-1-7-5-7-10V6l7-4Z" />
 	                  <path d="M9 12l2 2 4-4" />
