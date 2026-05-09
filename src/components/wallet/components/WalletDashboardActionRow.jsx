@@ -48,7 +48,7 @@ export default function WalletDashboardActionRow({ onAction, vertical = false })
                 <text x="12" y="17" textAnchor="middle" fill="currentColor" fontSize="18" fontWeight="700" fontFamily="system-ui, sans-serif">+/−</text>
               </svg>
             </div>
-            <span className="wallet-action-label !text-[15px] !font-normal">{t("ui_funds_action_label", "Fonds")}</span>
+            <span className="wallet-action-label !text-[10px] !font-normal !whitespace-nowrap">{t("ui_funds_action_label", "Banque & Swap")}</span>
           </button>
         </div>
       </div>
@@ -180,8 +180,8 @@ export default function WalletDashboardActionRow({ onAction, vertical = false })
               </text>
             </svg>
 	          </div>
-	          <span className="wallet-action-label !text-[15px] !font-normal">
-	            {t("ui_funds_action_label", "Fonds")}
+	          <span className="wallet-action-label !text-[10px] !font-normal !whitespace-nowrap">
+	            {t("ui_funds_action_label", "Banque & Swap")}
 	          </span>
 	        </button>
 	        </div>
