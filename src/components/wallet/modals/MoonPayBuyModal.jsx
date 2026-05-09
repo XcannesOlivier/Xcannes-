@@ -2117,7 +2117,7 @@ const MoonPayBuyModal = ({
 	                    ].join(" ")}
 	                    aria-hidden
 	                  >
-	                    <CreditCardIcon className="h-[40px] w-[40px]" style={{ strokeWidth: 1 }} />
+	                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" className="h-[40px] w-[40px]" aria-hidden="true"><path strokeWidth="0.5" d="M2 7a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7z" /><path strokeWidth="0.7" d="M2 10h20" /></svg>
                   </span>
                   <div className="min-w-0">
                     <h2 className="text-white font-semibold text-lg leading-tight">
@@ -2263,7 +2263,7 @@ const MoonPayBuyModal = ({
 		                          className="h-[40px] w-[40px]"
 		                          aria-hidden="true"
 		                        >
-		                          <path d="M3 7h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z" />
+		                          <path d="M3 7h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z" strokeWidth="0.5" />
 		                          <path d="M16 11h3" />
 		                        </svg>
 		                      </span>
@@ -2423,7 +2423,7 @@ const MoonPayBuyModal = ({
 	                  ].join(" ")}
 	                  aria-hidden
 	                >
-	                  <CreditCardIcon className="h-[40px] w-[40px]" style={{ strokeWidth: 1 }} />
+	                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" className="h-[40px] w-[40px]" aria-hidden="true"><path strokeWidth="0.7" d="M2 7a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7z" /><path strokeWidth="0.9" d="M2 10h20" /></svg>
                 </span>
                 <div className="min-w-0">
                   <h2 className="text-white font-semibold text-lg leading-tight">
@@ -2495,7 +2495,7 @@ const MoonPayBuyModal = ({
 		              <div className="grid grid-cols-[2.5rem_minmax(0,1fr)] gap-x-4 text-[14px] leading-snug text-white/80">
 		                <div className="flex h-10 items-center justify-center">
 		                  <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-transparent", sheetAccentFlowIconText].join(" ")}>
-		                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" className="h-[40px] w-[40px]" aria-hidden="true"><path strokeWidth="0.5" d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" /><path strokeWidth="1" d="M9 12.75 11.25 15 15 9.75" /></svg>
+		                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" className="h-[40px] w-[40px]" aria-hidden="true"><path strokeWidth="0.7" d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" /><path strokeWidth="1" d="M9 12.75 11.25 15 15 9.75" /></svg>
 		                    </span>
 		                </div>
 		                <div className="min-w-0 self-center">
@@ -2530,7 +2530,7 @@ const MoonPayBuyModal = ({
 		                        className="h-[40px] w-[40px]"
 		                        aria-hidden="true"
 		                      >
-		                        <path d="M12 2l7 4v6c0 5-3 9-7 10-4-1-7-5-7-10V6l7-4Z" strokeWidth="0.5" />
+		                        <path d="M12 2l7 4v6c0 5-3 9-7 10-4-1-7-5-7-10V6l7-4Z" strokeWidth="0.7" />
 		                        <path d="M9 12l2 2 4-4" />
 		                      </svg>
 		                    </span>
@@ -2569,7 +2569,7 @@ const MoonPayBuyModal = ({
 		                        className="h-[40px] w-[40px]"
 		                        aria-hidden="true"
 		                      >
-		                        <path d="M3 7h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z" />
+		                        <path d="M3 7h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z" strokeWidth="0.7" />
 		                        <path d="M16 11h3" />
 		                      </svg>
 		                    </span>
