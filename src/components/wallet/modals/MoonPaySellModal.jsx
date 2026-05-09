@@ -5,6 +5,7 @@ import {
   CheckCircleIcon,
   ArrowDownIcon,
   BanknotesIcon,
+  ShieldCheckIcon,
 } from "@heroicons/react/24/outline";
 import { useTranslation } from "next-i18next";
 import { useModalTransition } from "@/hooks/useModalTransition";
@@ -1916,10 +1917,7 @@ const MoonPaySellModal = ({
 
 			                  <div className="flex h-10 items-center justify-center">
 			                    <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-transparent", sheetAccentFlowIconText].join(" ")}>
-			                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="h-[40px] w-[40px]" aria-hidden="true">
-			                          <path strokeWidth="0.5" d="M12 2l7 4v6c0 5-3 9-7 10-4-1-7-5-7-10V6l7-4Z" />
-			                          <path d="M9 12l2 2 4-4" />
-			                        </svg>
+			                        <ShieldCheckIcon className="h-[40px] w-[40px]" style={{ strokeWidth: 0.5 }} />
 			                      </span>
 			                  </div>
 			                  <div className="min-w-0 self-center">
@@ -2159,10 +2157,7 @@ const MoonPaySellModal = ({
 
 			                <div className="flex h-10 items-center justify-center">
 			                  <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-transparent", sheetAccentFlowIconText].join(" ")}>
-			                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="h-[40px] w-[40px]" aria-hidden="true">
-			                        <path d="M12 2l7 4v6c0 5-3 9-7 10-4-1-7-5-7-10V6l7-4Z" />
-			                        <path d="M9 12l2 2 4-4" />
-			                      </svg>
+			                      <ShieldCheckIcon className="h-[40px] w-[40px]" />
 			                    </span>
 			                </div>
 			                <div className="min-w-0 self-center">
