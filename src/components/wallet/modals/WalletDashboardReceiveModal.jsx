@@ -80,18 +80,28 @@ const CopyIcon = ({ className = '' }) => (
   </svg>
 );
 
-const QrIcon = ({ className = '' }) => (
+const ShareAddressIcon = ({ className = '' }) => (
   <svg
-    viewBox="0 0 24 24"
+    viewBox="0 0 512 512"
     fill="none"
     stroke="currentColor"
-    strokeWidth="0.9"
-    strokeLinecap="round"
-    strokeLinejoin="round"
     className={className}
     aria-hidden="true"
   >
-    <path d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+    <path d="m 111.4077,90.352932 h 210 q 30,0 30,29.999998 v 70" strokeWidth="14" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="m 111.4077,90.352932 q -30,0 -30,29.999998 v 270 q 0,30 30,30 h 190" strokeWidth="14" strokeLinecap="round" strokeLinejoin="round" />
+    <circle cx="211.4077" cy="180.35294" r="40" strokeWidth="14" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="m 161.4077,270.35293 q 0,-50 50,-50 50,0 50,50 z" strokeWidth="14" strokeLinecap="round" strokeLinejoin="round" />
+    <line x1="151.4077" y1="320.35294" x2="261.40771" y2="320.35294" strokeWidth="14" strokeLinecap="round" strokeLinejoin="round" />
+    <line x1="151.4077" y1="360.35294" x2="231.4077" y2="360.35294" strokeWidth="14" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="m 331.4077,230.35293 a 110,110 0 0 1 150,40" strokeWidth="14" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="m 482.23792,248.22696 -1.2558,23.90549 -18.84109,-8.17252" strokeWidth="14" strokeLinecap="round" strokeLinejoin="round" />
+    <circle cx="380.40771" cy="340.35294" r="95" strokeWidth="14" strokeLinecap="round" strokeLinejoin="round" />
+    <circle cx="332.08789" cy="337.79172" r="16" strokeWidth="14" strokeLinecap="round" strokeLinejoin="round" />
+    <circle cx="412.25491" cy="299.17853" r="16" strokeWidth="14" strokeLinecap="round" strokeLinejoin="round" />
+    <circle cx="416.71741" cy="382.14252" r="16" strokeWidth="14" strokeLinecap="round" strokeLinejoin="round" />
+    <line x1="346.5" y1="330.8" x2="397.8" y2="306.1" strokeWidth="14" strokeLinecap="round" />
+    <line x1="346.3" y1="345.2" x2="402.5" y2="374.7" strokeWidth="14" strokeLinecap="round" />
   </svg>
 );
 
@@ -1271,7 +1281,7 @@ export default function WalletDashboardReceiveModal({
                     >
                       <div className="flex items-center gap-3">
                         <div className="w-11 h-11 rounded-[16px] bg-transparent flex items-center justify-center flex-shrink-0 text-xcannes-green/90">
-                          <QrIcon className="w-11 h-11" />
+                          <ShareAddressIcon className="w-11 h-11" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between gap-2">
