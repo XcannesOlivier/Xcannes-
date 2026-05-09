@@ -1891,8 +1891,8 @@ const MoonPaySellModal = ({
 
 			                <div className="grid grid-cols-[2.5rem_minmax(0,1fr)] gap-x-4 text-[14px] leading-snug text-white/80">
 			                  <div className="flex h-10 items-center justify-center">
-			                    <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", sheetAccentFlowIconText].join(" ")}>
-			                        <CheckCircleIcon className="h-5 w-5" aria-hidden />
+			                    <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-transparent", sheetAccentFlowIconText].join(" ")}>
+			                        <CheckCircleIcon className="h-[40px] w-[40px]" style={{ strokeWidth: 1 }} aria-hidden />
 			                      </span>
 			                  </div>
 			                  <div className="min-w-0 self-center">
@@ -1915,8 +1915,8 @@ const MoonPaySellModal = ({
 			                  <div />
 
 			                  <div className="flex h-10 items-center justify-center">
-			                    <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", sheetAccentFlowIconText].join(" ")}>
-			                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
+			                    <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-transparent", sheetAccentFlowIconText].join(" ")}>
+			                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="h-[40px] w-[40px]" aria-hidden="true">
 			                          <path d="M12 2l7 4v6c0 5-3 9-7 10-4-1-7-5-7-10V6l7-4Z" />
 			                          <path d="M9 12l2 2 4-4" />
 			                        </svg>
@@ -1943,8 +1943,8 @@ const MoonPaySellModal = ({
 			                  <div />
 
 			                  <div className="flex h-10 items-center justify-center">
-			                    <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", sheetAccentFlowIconText].join(" ")}>
-			                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
+			                    <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-transparent", sheetAccentFlowIconText].join(" ")}>
+			                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="h-[40px] w-[40px]" aria-hidden="true">
 			                          <path d="M3 10h18" />
 			                          <path d="M5 10V8a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v2" />
 			                          <path d="M7 14h10" />
@@ -2134,8 +2134,8 @@ const MoonPaySellModal = ({
 
 			              <div className="grid grid-cols-[2.5rem_minmax(0,1fr)] gap-x-4 text-[14px] leading-snug text-white/80">
 			                <div className="flex h-10 items-center justify-center">
-			                  <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", sheetAccentFlowIconText].join(" ")}>
-			                      <CheckCircleIcon className="h-5 w-5" aria-hidden />
+			                  <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-transparent", sheetAccentFlowIconText].join(" ")}>
+			                      <CheckCircleIcon className="h-[40px] w-[40px]" style={{ strokeWidth: 1 }} aria-hidden />
 			                    </span>
 			                </div>
 			                <div className="min-w-0 self-center">
@@ -2158,8 +2158,8 @@ const MoonPaySellModal = ({
 			                <div />
 
 			                <div className="flex h-10 items-center justify-center">
-			                  <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", sheetAccentFlowIconText].join(" ")}>
-			                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
+			                  <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-transparent", sheetAccentFlowIconText].join(" ")}>
+			                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="h-[40px] w-[40px]" aria-hidden="true">
 			                        <path d="M12 2l7 4v6c0 5-3 9-7 10-4-1-7-5-7-10V6l7-4Z" />
 			                        <path d="M9 12l2 2 4-4" />
 			                      </svg>
@@ -2186,8 +2186,8 @@ const MoonPaySellModal = ({
 			                <div />
 
 			                <div className="flex h-10 items-center justify-center">
-			                  <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", sheetAccentFlowIconText].join(" ")}>
-			                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
+			                  <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-transparent", sheetAccentFlowIconText].join(" ")}>
+			                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="h-[40px] w-[40px]" aria-hidden="true">
 			                        <path d="M3 10h18" />
 			                        <path d="M5 10V8a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v2" />
 			                        <path d="M7 14h10" />

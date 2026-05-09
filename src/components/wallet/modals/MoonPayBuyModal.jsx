@@ -2188,8 +2188,8 @@ const MoonPayBuyModal = ({
 
 		                <div className="grid grid-cols-[2.5rem_minmax(0,1fr)] gap-x-4 text-[14px] leading-snug text-white/80">
 		                  <div className="flex h-10 items-center justify-center">
-		                    <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", sheetAccentFlowIconText].join(" ")}>
-		                        <CheckCircleIcon className="h-5 w-5" aria-hidden />
+		                    <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-transparent", sheetAccentFlowIconText].join(" ")}>
+		                        <CheckCircleIcon className="h-[40px] w-[40px]" style={{ strokeWidth: 1 }} aria-hidden />
 		                      </span>
 		                  </div>
 		                  <div className="min-w-0 self-center">
@@ -2213,15 +2213,15 @@ const MoonPayBuyModal = ({
 		                  <div />
 
 		                  <div className="flex h-10 items-center justify-center">
-		                    <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", sheetAccentFlowIconText].join(" ")}>
+		                    <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-transparent", sheetAccentFlowIconText].join(" ")}>
 		                        <svg
 		                          viewBox="0 0 24 24"
 		                          fill="none"
 		                          stroke="currentColor"
-		                          strokeWidth="2"
+		                          strokeWidth="1"
 		                          strokeLinecap="round"
 		                          strokeLinejoin="round"
-		                          className="h-5 w-5"
+		                          className="h-[40px] w-[40px]"
 		                          aria-hidden="true"
 		                        >
 		                          <path d="M12 2l7 4v6c0 5-3 9-7 10-4-1-7-5-7-10V6l7-4Z" />
@@ -2252,15 +2252,15 @@ const MoonPayBuyModal = ({
 		                  <div />
 
 		                  <div className="flex h-10 items-center justify-center">
-		                    <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", sheetAccentFlowIconText].join(" ")}>
+		                    <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-transparent", sheetAccentFlowIconText].join(" ")}>
 		                        <svg
 		                          viewBox="0 0 24 24"
 		                          fill="none"
 		                          stroke="currentColor"
-		                          strokeWidth="2"
+		                          strokeWidth="1"
 		                          strokeLinecap="round"
 		                          strokeLinejoin="round"
-		                          className="h-5 w-5"
+		                          className="h-[40px] w-[40px]"
 		                          aria-hidden="true"
 		                        >
 		                          <path d="M3 7h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z" />
@@ -2494,8 +2494,8 @@ const MoonPayBuyModal = ({
 
 		              <div className="grid grid-cols-[2.5rem_minmax(0,1fr)] gap-x-4 text-[14px] leading-snug text-white/80">
 		                <div className="flex h-10 items-center justify-center">
-		                  <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", sheetAccentFlowIconText].join(" ")}>
-		                      <CheckCircleIcon className="h-5 w-5" aria-hidden />
+		                  <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-transparent", sheetAccentFlowIconText].join(" ")}>
+		                      <CheckCircleIcon className="h-[40px] w-[40px]" style={{ strokeWidth: 1 }} aria-hidden />
 		                    </span>
 		                </div>
 		                <div className="min-w-0 self-center">
@@ -2519,15 +2519,15 @@ const MoonPayBuyModal = ({
 		                <div />
 
 		                <div className="flex h-10 items-center justify-center">
-		                  <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", sheetAccentFlowIconText].join(" ")}>
+		                  <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-transparent", sheetAccentFlowIconText].join(" ")}>
 		                      <svg
 		                        viewBox="0 0 24 24"
 		                        fill="none"
 		                        stroke="currentColor"
-		                        strokeWidth="2"
+		                        strokeWidth="1"
 		                        strokeLinecap="round"
 		                        strokeLinejoin="round"
-		                        className="h-5 w-5"
+		                        className="h-[40px] w-[40px]"
 		                        aria-hidden="true"
 		                      >
 		                        <path d="M12 2l7 4v6c0 5-3 9-7 10-4-1-7-5-7-10V6l7-4Z" />
@@ -2558,15 +2558,15 @@ const MoonPayBuyModal = ({
 		                <div />
 
 		                <div className="flex h-10 items-center justify-center">
-		                  <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10", sheetAccentFlowIconText].join(" ")}>
+		                  <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-transparent", sheetAccentFlowIconText].join(" ")}>
 		                      <svg
 		                        viewBox="0 0 24 24"
 		                        fill="none"
 		                        stroke="currentColor"
-		                        strokeWidth="2"
+		                        strokeWidth="1"
 		                        strokeLinecap="round"
 		                        strokeLinejoin="round"
-		                        className="h-5 w-5"
+		                        className="h-[40px] w-[40px]"
 		                        aria-hidden="true"
 		                      >
 		                        <path d="M3 7h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z" />
