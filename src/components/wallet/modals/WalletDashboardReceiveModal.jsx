@@ -1281,7 +1281,7 @@ export default function WalletDashboardReceiveModal({
                     >
                       <div className="flex items-center gap-3">
                         <div className="w-13 h-13 rounded-[16px] bg-transparent flex items-center justify-center flex-shrink-0 text-white/90">
-                          <ShareAddressIcon className="w-11 h-11" />
+                          <ShareAddressIcon className="w-12 h-12" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between gap-2">
