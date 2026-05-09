@@ -107,29 +107,19 @@ const ShareAddressIcon = ({ className = '' }) => (
 
 const RequestIcon = ({ className = '' }) => (
   <svg
-    viewBox="0 0 100 100"
+    viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
+    strokeWidth="0.9"
     strokeLinecap="round"
     strokeLinejoin="round"
     className={className}
     aria-hidden="true"
   >
-    {/* Coin circle */}
-    <circle cx="62" cy="34" r="18" strokeWidth="2.2" />
-    {/* Dollar sign */}
-    <path d="M62 24v20M57.5 27.5c0-1.8 2-3 4.5-3s4.5 1.2 4.5 3-2 2.8-4.5 3c-2.5.2-4.5 1.2-4.5 3s2 3 4.5 3 4.5-1.2 4.5-3" strokeWidth="2" />
-    {/* Refresh arc around coin */}
-    <path d="M38 22 a28,28 0 1 0 28,40" strokeWidth="2.2" fill="none" />
-    {/* Arrow head on arc */}
-    <polyline points="33,17 38,22 44,18" strokeWidth="2.2" />
-    {/* Hand palm */}
-    <path d="M18 65 Q16 58 22 56 L48 54 Q54 53 56 58 L70 58 Q76 58 76 64 Q76 70 70 70 L44 70" strokeWidth="2.2" />
-    {/* Fingers */}
-    <path d="M44 70 Q38 72 34 78 Q30 84 24 84 L18 84 Q14 84 14 80 L14 72 Q14 68 18 67 L44 65" strokeWidth="2.2" />
-    <line x1="48" y1="54" x2="44" y2="65" strokeWidth="2" />
-    <line x1="54" y1="55" x2="50" y2="66" strokeWidth="2" />
-    <line x1="60" y1="57" x2="56" y2="67" strokeWidth="2" />
+    <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7l-5-5Z" />
+    <path d="M15 2v5h5" />
+    <path d="M12 10v6" />
+    <path d="M10 11.5c0-.83.67-1.5 2-1.5s2 .67 2 1.5-.9 1.3-2 1.5c-1.1.2-2 .67-2 1.5 0 .83.67 1.5 2 1.5s2-.67 2-1.5" />
   </svg>
 );
 
