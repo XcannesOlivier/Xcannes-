@@ -2,6 +2,8 @@
 
 Objectif : rendre la **page principale du wallet demo** visuellement **quasi identique** au **wallet réel (UI mobile)**, y compris sur desktop.
 
+Statut : ✅ **validée** (2026-05-10)
+
 Contraintes :
 - Ne pas modifier le code du **wallet réel** (`Xcannes-/src/components/wallet/**`).
 - Éviter le partage de composants/imports entre demo et réel : on **copie** et on adapte côté demo.

@@ -51,8 +51,21 @@ export default function DemoWalletDashboardSendModal({
   const [scanActive, setScanActive] = useState(false);
   const [scanKey, setScanKey] = useState(0);
   const [cameraUnavailable, setCameraUnavailable] = useState(false);
+  const [scanDragging, setScanDragging] = useState(false);
+  const [scanTranslateY, setScanTranslateY] = useState(0);
+  const scanOverlayRef = useRef(null);
+  const scanDragMetaRef = useRef({
+    startY: 0,
+    startAt: 0,
+    pointerId: null,
+    lastDelta: 0,
+    pending: false,
+    dragging: false,
+  });
+  const scanCloseRequested = useRef(false);
   const [showSavedPicker, setShowSavedPicker] = useState(false);
   const [selectedSavedLabel, setSelectedSavedLabel] = useState("");
+  const [sendAssetDropdownOpen, setSendAssetDropdownOpen] = useState(false);
   const savedPickerRef = useRef(null);
   const savedMenuRef = useRef(null);
   const destinationInputRef = useRef(null);
@@ -256,6 +269,74 @@ export default function DemoWalletDashboardSendModal({
     }
   };
 
+  const scanSwipeStart = (event) => {
+    if (!scanActive) return;
+    if (event.pointerType === "mouse" && event.button !== 0) return;
+    scanDragMetaRef.current = {
+      startY: event.clientY,
+      startAt: Date.now(),
+      pointerId: event.pointerId,
+      lastDelta: 0,
+      pending: true,
+      dragging: false,
+    };
+    try {
+      scanOverlayRef.current?.setPointerCapture?.(event.pointerId);
+    } catch {
+      // ignore
+    }
+  };
+
+  const scanSwipeMove = (event) => {
+    const meta = scanDragMetaRef.current;
+    if (!meta?.pending) return;
+    const delta = Math.max(0, event.clientY - meta.startY);
+    meta.lastDelta = delta;
+    if (!meta.dragging) {
+      if (delta < 8) return;
+      meta.dragging = true;
+      setScanDragging(true);
+    }
+    setScanTranslateY(delta);
+  };
+
+  const scanSwipeEnd = () => {
+    const meta = scanDragMetaRef.current;
+    if (!meta?.pending) return;
+    const delta = meta.lastDelta || 0;
+    const duration = Math.max(1, Date.now() - (meta.startAt || 0));
+    const velocity = delta / duration;
+    const height = typeof window !== "undefined" ? window.innerHeight : 800;
+    const closeDistance = Math.max(220, Math.min(320, height * 0.28));
+    const shouldClose =
+      delta > closeDistance || (delta > closeDistance * 0.6 && velocity > 1.25);
+
+    scanDragMetaRef.current.pending = false;
+    scanDragMetaRef.current.dragging = false;
+    setScanDragging(false);
+
+    if (shouldClose) {
+      if (!scanCloseRequested.current) {
+        scanCloseRequested.current = true;
+        setScanTranslateY(Math.max(delta, height));
+        window.setTimeout(() => {
+          setScanActive(false);
+          setCameraUnavailable(false);
+        }, 180);
+      }
+      return;
+    }
+    setScanTranslateY(0);
+    scanDragMetaRef.current = {
+      startY: 0,
+      startAt: 0,
+      pointerId: null,
+      lastDelta: 0,
+      pending: false,
+      dragging: false,
+    };
+  };
+
   // Close saved picker when clicking outside.
   useEffect(() => {
     if (!showSavedPicker) return;
@@ -312,6 +393,7 @@ export default function DemoWalletDashboardSendModal({
       setCameraUnavailable(false);
       setShowSavedPicker(false);
       setSelectedSavedLabel("");
+      setSendAssetDropdownOpen(false);
     }
   }, [open]);
 
@@ -334,6 +416,25 @@ export default function DemoWalletDashboardSendModal({
     }
     setCameraUnavailable(false);
   }, [open]);
+
+  useEffect(() => {
+    if (scanActive) {
+      scanCloseRequested.current = false;
+      setScanDragging(false);
+      setScanTranslateY(0);
+      scanDragMetaRef.current = {
+        startY: 0,
+        startAt: 0,
+        pointerId: null,
+        lastDelta: 0,
+        pending: false,
+        dragging: false,
+      };
+    } else {
+      setScanDragging(false);
+      if (!scanCloseRequested.current) setScanTranslateY(0);
+    }
+  }, [scanActive]);
 
   useEffect(() => {
     if (!canSaveDestination) {
@@ -570,34 +671,38 @@ export default function DemoWalletDashboardSendModal({
     <div
       ref={savedMenuRef}
       className={[
-        "rounded-xl ring-1 ring-white/10 ring-inset overflow-hidden shadow-lg",
-        noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-elevated",
+        "rounded-xl ring-1 ring-white/15 ring-inset overflow-hidden shadow-lg",
+        noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-[#101415]",
       ].join(" ")}
       onClick={(e) => e.stopPropagation()}
     >
       <div className="max-h-56 overflow-y-auto">
-        {(savedAddresses || []).length > 0 ? (
-          (savedAddresses || []).map((addr, idx) => (
-            <button
-              key={`${addr.address}-${idx}`}
-              type="button"
-              onClick={() => {
-                const value = String(addr?.address || "").trim();
-                if (!value) return;
-                setSendDestination(value);
-                setShowSavedPicker(false);
-              }}
-              className="w-full text-left px-3 py-2 text-xs text-white/90 hover:bg-white/5 transition-colors"
-            >
-              <span className="block font-semibold">
-                {String(addr?.label || "").trim() ||
-                  t("ui_wallet_unknown", "Unknown wallet")}
-              </span>
-              <span className="block font-mono text-[11px] text-white/60 truncate">
-                {addr.address}
-              </span>
-            </button>
-          ))
+        {(savedAddresses || []).filter((entry) =>
+          Boolean(String(entry?.address || "").trim()),
+        ).length > 0 ? (
+          (savedAddresses || [])
+            .filter((entry) => Boolean(String(entry?.address || "").trim()))
+            .map((addr, idx) => (
+              <button
+                key={`${addr.address}-${idx}`}
+                type="button"
+                onClick={() => {
+                  const value = String(addr?.address || "").trim();
+                  if (!value) return;
+                  setSendDestination(value);
+                  setShowSavedPicker(false);
+                }}
+                className="w-full text-left px-3 py-2 text-sm text-white/90 hover:bg-white/5 transition-colors border-b border-white/10 last:border-b-0"
+              >
+                <span className="block font-semibold">
+                  {String(addr?.label || "").trim() ||
+                    t("ui_wallet_unknown", "Unknown wallet")}
+                </span>
+                <span className="block font-mono text-xs text-white/60 truncate">
+                  {addr.address}
+                </span>
+              </button>
+            ))
         ) : (
           <div className="px-3 py-2 text-xs text-white/60">
             {t("ui_no_saved_addresses", "No saved addresses yet")}
@@ -633,89 +738,83 @@ export default function DemoWalletDashboardSendModal({
           className="w-full bg-[#101415] ring-1 ring-white/15 ring-inset rounded-[20px] shadow-[0_4px_12px_rgba(0,0,0,0.4)] pl-8 pr-28 py-3 text-base text-white outline-none focus:outline-none"
         />
 
-        {/* Saved addresses picker (vertically centered) */}
-        <div className="absolute left-2 inset-y-0 flex items-center">
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              setShowSavedPicker((prev) => !prev);
-            }}
-            className="p-2 rounded-lg bg-transparent border-none outline-none cursor-pointer hover:bg-white/5 transition-colors"
-            title={t("ui_saved_addresses_label", "Adresses enregistrées")}
-            aria-expanded={showSavedPicker}
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            setShowSavedPicker((prev) => !prev);
+          }}
+          className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-lg hover:bg-white/5 transition-colors text-white/60"
+          title={t("ui_saved_addresses_label", "Adresses enregistrées")}
+          aria-expanded={showSavedPicker}
+        >
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            strokeWidth={2}
           >
-            <svg
-              className="w-4 h-4 text-white/60"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M19 9l-7 7-7-7"
-              />
-            </svg>
-          </button>
-        </div>
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M19 9l-7 7-7-7"
+            />
+          </svg>
+        </button>
 
-        {/* Actions droite (import + scan) */}
-        <div className="absolute right-2 inset-y-0 flex items-center gap-1">
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleScanQrUpload();
-            }}
-            className="p-2 rounded-lg bg-transparent border-none outline-none cursor-pointer hover:bg-white/5 transition-colors"
-            title={t(
-              "ui_or_upload_a_qr_image_works_e_df6baa8039",
-              "Charger une image qrcode",
-            )}
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleScanQrUpload();
+          }}
+          className="absolute right-11 top-1/2 -translate-y-1/2 p-2 rounded-lg hover:bg-white/5 transition-colors text-white/60"
+          title={t(
+            "ui_or_upload_a_qr_image_works_e_df6baa8039",
+            "Charger une image qrcode",
+          )}
+        >
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            strokeWidth={2}
           >
-            <svg
-              className="w-5 h-5 text-white/60"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              strokeWidth={2}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M12 4v12m0 0l-3-3m3 3l3-3"
-              />
-            </svg>
-          </button>
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M12 4v12m0 0l-3-3m3 3l3-3"
+            />
+          </svg>
+        </button>
 
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              setScanActive(true);
-              setScanKey((prev) => prev + 1);
-              setCameraUnavailable(false);
-            }}
-            className="p-2 rounded-lg bg-transparent border-none outline-none cursor-pointer hover:bg-white/5 transition-colors"
-            title={t("ui_scan_qr_code_12fa63d927", "Scan QR Code")}
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            setScanActive(true);
+            setScanKey((prev) => prev + 1);
+            setCameraUnavailable(false);
+          }}
+          className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-lg hover:bg-white/5 transition-colors text-white/60"
+          title={t("ui_scan_qr_code_12fa63d927", "Scan QR Code")}
+        >
+          <svg
+            className="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            strokeWidth={2}
           >
-            <svg
-              className="w-6 h-6 text-white/60"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"
-              />
-            </svg>
-          </button>
-        </div>
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"
+            />
+          </svg>
+        </button>
 
         {!inline && savedPickerMenu ? (
           <div className="absolute left-0 right-0 top-full mt-2 z-20">
@@ -723,13 +822,6 @@ export default function DemoWalletDashboardSendModal({
           </div>
         ) : null}
       </div>
-
-      {hasDestination && resolvedDestinationLabel ? (
-        <div className="text-[11px] text-white/40">
-          {t("ui_selected_recipient", "Sélectionné")} :{" "}
-          <span className="text-white/60">{resolvedDestinationLabel}</span>
-        </div>
-      ) : null}
 
       {hasDestination ? saveAddressBlock : null}
     </div>
@@ -807,17 +899,24 @@ export default function DemoWalletDashboardSendModal({
                 : "opacity-30 pointer-events-none select-none",
             ].join(" ")}
           >
-            <h3 className="text-[30px] font-bold text-white/95 tracking-tight text-center leading-snug">
+            <h3 className="relative z-[50] text-[30px] font-bold text-white/95 tracking-tight text-center leading-snug">
               {t("ui_send_modal_title", "Montant à envoyer")}
             </h3>
-            <p className="text-[14px] text-white/55 text-center leading-relaxed -mt-2">
+            <p className="relative z-[50] text-[14px] text-white/55 text-center leading-relaxed -mt-2">
               {t(
                 "ui_send_devise_hint",
                 "Choisissez la devise, saisissez le montant, puis vérifiez avant l’envoi.",
               )}
             </p>
             <div className="flex justify-center relative z-[65]">
-              <div className="rounded-[18px] bg-elevated ring-1 ring-white/10 ring-inset px-4 py-3 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]">
+              <div
+                className={[
+                  "rounded-[18px] bg-elevated ring-1 ring-white/10 ring-inset px-4 py-3",
+                  sendAssetDropdownOpen
+                    ? "shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_10px_rgba(255,255,255,0.16)]"
+                    : "shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]",
+                ].join(" ")}
+              >
                 <div className="text-[11px] text-white/45 text-center">
                   {t("moonpay_from_account", "Compte source")}
                 </div>
@@ -839,6 +938,7 @@ export default function DemoWalletDashboardSendModal({
               <ModalSelect
                 value={selectedSendToken ? selectedSendToken.key : ""}
                 onChange={setSendAssetKey}
+                onOpenChange={setSendAssetDropdownOpen}
                 options={(augmentedTokens || []).map((token) => {
                   const labelLeft =
                     selectLabelByAssetKey?.[token.key] ||
@@ -1004,42 +1104,47 @@ export default function DemoWalletDashboardSendModal({
   const scannerModal =
     scanActive && typeof document !== "undefined"
       ? createPortal(
-          <div
-            className="fixed inset-0 z-[10002] flex flex-col"
-          >
+          <div className="fixed inset-0 z-[10002] flex flex-col">
             {/* Backdrop */}
             <div
-              className="absolute inset-0 bg-black/90 backdrop-blur-sm"
+              className="absolute inset-0 bg-[#101415] backdrop-blur-sm"
               onClick={() => {
                 setScanActive(false);
                 setCameraUnavailable(false);
               }}
+              style={
+                scanTranslateY > 0
+                  ? {
+                      opacity: Math.max(
+                        0,
+                        Math.min(1, 1 - scanTranslateY / 420),
+                      ),
+                    }
+                  : undefined
+              }
             />
-            {/* Scanner container */}
-            <div className="relative flex-1 flex flex-col items-center justify-center">
-              <button
-                type="button"
-                onClick={() => {
-                  setScanActive(false);
-                  setCameraUnavailable(false);
-                }}
-                className="absolute top-4 right-4 z-10 flex items-center justify-center w-10 h-10 rounded-full bg-white/10 ring-1 ring-white/20 ring-inset text-white/80 hover:bg-white/20 hover:text-white transition-colors"
-                aria-label={t("close", "Fermer")}
-              >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
+            {/* Swipeable scanner wrapper */}
+            <div
+              ref={scanOverlayRef}
+              className="relative flex-1 flex flex-col items-center justify-center"
+              style={{
+                transform: `translateY(${Math.max(0, scanTranslateY)}px)`,
+                transition: scanDragging
+                  ? "none"
+                  : "transform 220ms cubic-bezier(0.2,0,0,1)",
+                willChange: scanTranslateY ? "transform" : undefined,
+                touchAction: "none",
+              }}
+              onPointerDown={scanSwipeStart}
+              onPointerMove={scanSwipeMove}
+              onPointerUp={scanSwipeEnd}
+              onPointerCancel={scanSwipeEnd}
+            >
+              {/* Swipe bar */}
+              <div className="flex justify-center pt-3 pb-0" aria-hidden>
+                <span className="block w-12 h-1.5 rounded-full bg-white/20" />
+              </div>
+              {/* Scanner */}
               <div className="flex-1 w-full">
                 <DemoQRScanner
                   key={scanKey}
@@ -1048,11 +1153,12 @@ export default function DemoWalletDashboardSendModal({
                   embedded={true}
                   edgeToEdge={true}
                   showClose={false}
+                  hideTitle={true}
                   enableCamera={true}
                   hideWhenUnavailable
                   onCameraUnavailableChange={setCameraUnavailable}
                   showFauxQrBackground={false}
-                  className="bg-black w-full h-full flex flex-col justify-center [&_video]:w-full [&_video]:h-full [&_video]:object-cover"
+                  className="bg-[#101415] w-full h-full flex flex-col justify-center [&_video]:w-full [&_video]:h-full [&_video]:object-cover"
                 />
               </div>
               {inline && cameraUnavailable ? (

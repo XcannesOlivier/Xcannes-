@@ -8,6 +8,7 @@
 
 import DemoWalletDashboardSendModal from "../modals/DemoWalletDashboardSendModal";
 import DemoWalletDashboardPayreqModal from "../modals/DemoWalletDashboardPayreqModal";
+import DemoWalletDashboardSendChoiceModal from "../modals/DemoWalletDashboardSendChoiceModal";
 import DemoWalletDashboardReceiveModal from "../modals/DemoWalletDashboardReceiveModal";
 import DemoWalletDashboardSwapModal from "../modals/DemoWalletDashboardSwapModal";
 import DemoWalletDashboardCashModal from "../modals/DemoWalletDashboardCashModal";
@@ -96,6 +97,7 @@ export default function DemoWalletModals({
   qrScannerOpen,
   handleDemoQrScan,
   setQrScannerOpen,
+  onOpenSendAfterScan,
   showDemoMobileScannerQr,
   isDesktop,
   demoScannerQrSize,
@@ -104,6 +106,29 @@ export default function DemoWalletModals({
 
   return (
     <>
+      <DemoWalletDashboardSendChoiceModal
+        open={activeAction === "sendChoice"}
+        onClose={() => setActiveAction(null)}
+        renderWalletMeta={renderWalletMeta}
+        onChooseSimpleSend={() => {
+          setSendPaymentRequest(null);
+          setActiveAction("send");
+        }}
+        onChooseQuickScan={() => {
+          setSendPaymentRequest(null);
+          onOpenSendAfterScan?.();
+          setActiveAction(null);
+          setQrScannerOpen(true);
+        }}
+        onChoosePayRequest={() => {
+          setSendPaymentRequest(null);
+          onOpenSendAfterScan?.();
+          setActiveAction(null);
+          setQrScannerOpen(true);
+        }}
+        inline={false}
+      />
+
       <DemoWalletInfoModal
         isOpen={walletInfoOpen}
         onClose={() => setWalletInfoOpen(false)}

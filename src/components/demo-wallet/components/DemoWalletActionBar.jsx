@@ -26,7 +26,7 @@ export default function DemoWalletActionBar({
             type="button"
             onClick={() => {
               setSendTab("manual");
-              setActiveAction("send");
+              setActiveAction("sendChoice");
             }}
             title={t("demo_tt_send", "Envoyer un paiement dans la devise choisie.")}
             className="wallet-action-btn wallet-action-send group w-full"

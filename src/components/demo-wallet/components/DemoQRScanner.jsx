@@ -16,6 +16,7 @@ export default function DemoQRScanner({
   embedded = false,
   edgeToEdge = false,
   showClose = true,
+  hideTitle = false,
   className = "",
   fileInputId,
   enableCamera = true,
@@ -425,15 +426,17 @@ export default function DemoQRScanner({
         ) : null}
 
         {/* Title */}
-        <h3
-          className={
-            embedded
-              ? "text-sm font-orbitron font-bold text-white mb-3"
-              : "text-xl font-orbitron font-bold text-white mb-4 text-center"
-          }
-        >
-          {t("ui_scan_qr_code_481606b590", "Scan QR Code")}
-        </h3>
+        {!hideTitle ? (
+          <h3
+            className={
+              embedded
+                ? "text-sm font-orbitron font-bold text-white mb-3"
+                : "text-xl font-orbitron font-bold text-white mb-4 text-center"
+            }
+          >
+            {t("ui_scan_qr_code_481606b590", "Scan QR Code")}
+          </h3>
+        ) : null}
 
         {/* Scanner / Static Demo */}
         {showStaticQr ? (

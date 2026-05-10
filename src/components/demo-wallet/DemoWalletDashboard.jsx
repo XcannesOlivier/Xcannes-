@@ -54,7 +54,7 @@ export default function DemoWalletDashboard({
   const state = isExternalState ? demoState : localState;
   const setState = isExternalState ? setDemoState : setLocalState;
   const [activeWalletId, setActiveWalletId] = useState(resolvedDefaultWalletId);
-  const [activeAction, setActiveAction] = useState(null); // send | receive | swap | cash | null
+  const [activeAction, setActiveAction] = useState(null); // sendChoice | send | receive | swap | cash | null
   const [cashModalTab, setCashModalTab] = useState("choice"); // choice | buy | sell
   const [showGlobalStatement, setShowGlobalStatement] = useState(false);
   const [showCurrencyStatement, setShowCurrencyStatement] = useState(false);
@@ -458,14 +458,19 @@ export default function DemoWalletDashboard({
   );
   const showDemoMobileScannerQr = !isDesktop;
   const demoScannerQrSize = 220;
+  const openSendAfterScanRef = useRef(false);
 
   const handleDemoQrScan = useCallback(
     (data) => {
       // Support both plain XRPL addresses and XCANNES payreq payloads.
       handlePaymentRequestScan?.(data);
       setQrScannerOpen(false);
+      if (openSendAfterScanRef.current) {
+        openSendAfterScanRef.current = false;
+        setActiveAction("send");
+      }
     },
-    [handlePaymentRequestScan, setQrScannerOpen],
+    [handlePaymentRequestScan, setActiveAction, setQrScannerOpen],
   );
 
   useEffect(() => {
@@ -598,6 +603,9 @@ export default function DemoWalletDashboard({
         qrScannerOpen={qrScannerOpen}
         handleDemoQrScan={handleDemoQrScan}
         setQrScannerOpen={setQrScannerOpen}
+        onOpenSendAfterScan={() => {
+          openSendAfterScanRef.current = true;
+        }}
         showDemoMobileScannerQr={showDemoMobileScannerQr}
         isDesktop={isDesktop}
         demoScannerQrSize={demoScannerQrSize}
