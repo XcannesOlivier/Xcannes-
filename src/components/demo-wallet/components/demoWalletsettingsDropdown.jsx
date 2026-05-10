@@ -17,6 +17,9 @@ export default function DemoWalletSettingsDropdown({
   fawazLoading = false,
   onLoadFawazCurrencies,
   onPreferredCurrencyChange,
+  onCopyAddress,
+  onResetDemo,
+  resetDisabled = false,
 }) {
   const { t } = useTranslation("common");
   const [isOpen, setIsOpen] = useState(false);
@@ -77,34 +80,26 @@ export default function DemoWalletSettingsDropdown({
           <button
             type="button"
             aria-label={t("close", "Fermer")}
-            className="fixed inset-0 z-40 bg-black/60 backdrop-blur-[2px] md:hidden"
+            className="fixed inset-0 z-40 bg-black/60 backdrop-blur-[2px]"
             onClick={() => setIsOpen(false)}
           />
 
           <div
             role="menu"
             className={[
-              "fixed inset-0 z-50 overflow-y-auto bg-xcannes-surface-demo demo-wallet-tooltip-scope",
-              "md:inset-auto md:w-[320px] md:rounded-xl md:border md:border-white/10 md:bg-xcannes-surface-demo md:shadow-[0_28px_90px_rgba(0,0,0,0.6)] md:overflow-visible md:animate-walletSettingsIn",
-              "md:absolute md:right-0 md:top-full md:mt-1.5",
+              "fixed inset-0 z-50 overflow-y-auto bg-xcannes-surface-demo demo-wallet-tooltip-scope animate-walletSettingsIn",
             ].join(" ")}
           >
-            {/* Pointer (desktop) */}
-            <div
-              className="hidden md:block absolute h-3.5 w-3.5 bg-xcannes-surface-demo border border-white/10 md:top-[-7px] md:right-3 md:rotate-45"
-              aria-hidden
-            />
-
             {/* Mobile header */}
-            <div className="flex items-center justify-between px-4 pt-4 pb-3 md:hidden">
+            <div className="flex items-center justify-between px-4 pt-4 pb-3">
               <div className="min-w-0">
                 <div className="text-[11px] font-semibold tracking-[0.24em] uppercase text-white/60">
                   {t("ui_settings_label", "Paramètres")}
                 </div>
-	                <div className="text-[12px] text-white/80 mt-1 truncate">
-	                  {t("ui_wallet_settings_subtitle", "Gestion du compte")}
-	                </div>
-	              </div>
+                <div className="text-[12px] text-white/80 mt-1 truncate">
+                  {t("ui_wallet_settings_subtitle", "Gestion du compte")}
+                </div>
+              </div>
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
@@ -115,47 +110,9 @@ export default function DemoWalletSettingsDropdown({
               </button>
             </div>
 
-            {/* Desktop header */}
-            <div className="hidden md:flex items-center justify-between px-4 py-3">
-              <div className="flex items-center gap-2 min-w-0">
-                <span className="inline-flex h-6 w-6 items-center justify-center rounded-lg bg-white/5 border border-white/10 text-white/60">
-                  <svg
-                    className="w-3.5 h-3.5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.8}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.573-1.066z"
-                    />
-                    <circle cx="12" cy="12" r="3" />
-                  </svg>
-                </span>
-                <div className="min-w-0">
-                  <div className="text-[11px] font-semibold tracking-[0.22em] uppercase text-white/60">
-                    {t("ui_settings_label", "Paramètres")}
-	                  </div>
-	                  <div className="text-[12px] text-white/80 truncate">
-	                    {t("ui_wallet_settings_subtitle", "Gestion du compte")}
-	                  </div>
-	                </div>
-	              </div>
-              <button
-                type="button"
-                onClick={() => setIsOpen(false)}
-                className="h-8 w-8 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white/50 hover:text-white/80 flex items-center justify-center transition-colors duration-150"
-                aria-label={t("close", "Fermer")}
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className="px-3 pb-4 md:px-3 md:pb-3">
+            <div className="px-3 pb-4">
               {/* Comptes */}
-              <div className="pt-2 md:pt-2.5">
+              <div className="pt-2">
                 <div className="px-1.5 pb-2 text-[10px] font-semibold tracking-[0.22em] text-white/35">
                   {t("ui_settings_section_accounts", "Comptes")}
                 </div>
@@ -255,6 +212,91 @@ export default function DemoWalletSettingsDropdown({
                   </div>
                   <span className="text-white/20 text-lg">↗</span>
                 </a>
+
+                {(onCopyAddress || onResetDemo) ? (
+                  <div className="mt-2 space-y-2">
+                    {onCopyAddress ? (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          onCopyAddress?.();
+                          setIsOpen(false);
+                        }}
+                        className="w-full flex items-center gap-3 px-3 py-3 rounded-[10px] border border-transparent hover:border-white/10 hover:bg-white/5 transition-colors duration-150 text-left focus-visible:outline-none focus-visible:border-xcannes-green/60 focus-visible:ring-2 focus-visible:ring-xcannes-green/20"
+                      >
+                        <span className="inline-flex h-9 w-9 items-center justify-center rounded-[10px] bg-white/5 border border-white/10 text-white/55 shrink-0">
+                          <svg
+                            className="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            strokeWidth={1.8}
+                            aria-hidden
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M9 9h10v12H9z"
+                            />
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"
+                            />
+                          </svg>
+                        </span>
+                        <div className="min-w-0 flex-1">
+                          <div className="text-[13px] font-medium text-white/85">
+                            {t(
+                              "ui_copy_xrpl_address_4f63ed10fc",
+                              "Copier l'adresse XRPL",
+                            )}
+                          </div>
+                          <div className="text-[11px] text-white/40 mt-0.5">
+                            {t("ui_copy_address_82d1cf6e94", "Copier l'adresse")}
+                          </div>
+                        </div>
+                        <span className="text-white/20 text-lg">›</span>
+                      </button>
+                    ) : null}
+
+                    {onResetDemo ? (
+                      <button
+                        type="button"
+                        disabled={resetDisabled}
+                        onClick={() => {
+                          if (resetDisabled) return;
+                          onResetDemo?.();
+                          setIsOpen(false);
+                        }}
+                        className={[
+                          "w-full flex items-center gap-3 px-3 py-3 rounded-[10px] border border-transparent hover:border-white/10 hover:bg-white/5 transition-colors duration-150 text-left focus-visible:outline-none focus-visible:border-xcannes-green/60 focus-visible:ring-2 focus-visible:ring-xcannes-green/20",
+                          resetDisabled ? "opacity-50 cursor-not-allowed" : "",
+                        ].join(" ")}
+                      >
+                        <span className="inline-flex h-9 w-9 items-center justify-center rounded-[10px] bg-white/5 border border-white/10 text-white/55 shrink-0">
+                          <svg
+                            className="w-5 h-5"
+                            fill="currentColor"
+                            viewBox="0 0 24 24"
+                            aria-hidden
+                          >
+                            <path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 .34-.02.67-.07 1h2.02c.03-.33.05-.66.05-1 0-4.42-3.58-8-8-8zm-6.93 7H3.05c-.03.33-.05.66-.05 1 0 4.42 3.58 8 8 8v3l4-4-4-4v3c-3.31 0-6-2.69-6-6 0-.34.02-.67.07-1z" />
+                          </svg>
+                        </span>
+                        <div className="min-w-0 flex-1">
+                          <div className="text-[13px] font-medium text-white/85">
+                            {t("demo_reset", "Réinitialiser")}
+                          </div>
+                          <div className="text-[11px] text-white/40 mt-0.5">
+                            {t("demo_tt_reset", "Réinitialiser la démo.")}
+                          </div>
+                        </div>
+                        <span className="text-white/20 text-lg">›</span>
+                      </button>
+                    ) : null}
+                  </div>
+                ) : null}
 
                 <button
                   type="button"

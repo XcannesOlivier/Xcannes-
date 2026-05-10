@@ -62,7 +62,7 @@ export function useDemoStatementData({
 
   // ── Wallet events (newest → oldest) ──
   const walletEvents = useMemo(() => {
-    return (state.events || []).filter((evt) => {
+    const filtered = (state.events || []).filter((evt) => {
       if (!evt) return false;
       if (evt.kind === "send") {
         return evt.from === activeWalletId || evt.to === activeWalletId;
@@ -70,7 +70,109 @@ export function useDemoStatementData({
       if (evt.wallet) return evt.wallet === activeWalletId;
       return false;
     });
+    return [...filtered].sort((a, b) => {
+      const tsA = Number(a?.ts || 0);
+      const tsB = Number(b?.ts || 0);
+      return tsB - tsA;
+    });
   }, [activeWalletId, state.events]);
+
+  // ── Recent activity (banner above token list) ──
+  const recentActivity = useMemo(() => {
+    const evt = (walletEvents || [])[0];
+    if (!evt) return null;
+    const parsed = new Date(evt.ts);
+    if (!Number.isFinite(parsed.getTime())) return null;
+
+    const dateLocale = String(locale || "").toLowerCase().startsWith("fr")
+      ? "fr-FR"
+      : locale || "en";
+    const date = new Intl.DateTimeFormat(dateLocale, {
+      day: "numeric",
+      month: "short",
+    }).format(parsed);
+    const time = new Intl.DateTimeFormat(dateLocale, {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    }).format(parsed);
+
+    const fmtAmount = (amount) => {
+      const v = Number(amount);
+      if (!Number.isFinite(v)) return "";
+      return new Intl.NumberFormat(dateLocale, {
+        maximumFractionDigits: 2,
+      }).format(v);
+    };
+
+    const kind = String(evt.kind || "").trim().toLowerCase();
+    if (kind === "convert") {
+      const from = getDisplayCurrencyCode(evt.fromCurrency);
+      const to = getDisplayCurrencyCode(evt.toCurrency);
+      return {
+        icon: "convert",
+        bannerLabel: t(
+          "ui_recent_conversion_banner",
+          "Conversion récente",
+        ),
+        date,
+        time,
+        createdAt: parsed.toISOString(),
+        message: `${from} → ${to}`,
+        eventId: evt.id || null,
+        raw: evt,
+      };
+    }
+
+    if (kind === "send") {
+      const currency = getDisplayCurrencyCode(evt.currency);
+      const amount = fmtAmount(evt.amount);
+      const isOutgoing = evt.from === activeWalletId;
+      return {
+        icon: isOutgoing ? "send" : "receive",
+        bannerLabel: isOutgoing
+          ? t("ui_recent_send_banner", "Envoi récent")
+          : t("ui_recent_receive_banner", "Réception récente"),
+        date,
+        time,
+        createdAt: parsed.toISOString(),
+        amount: amount ? `${amount} ${currency}` : "",
+        isOutgoing,
+        eventId: evt.id || null,
+        raw: evt,
+      };
+    }
+
+    if (kind === "buy" || kind === "sell") {
+      const currency = getDisplayCurrencyCode(evt.currency || "RLUSD");
+      const amount = fmtAmount(evt.amount);
+      const isOutgoing = kind === "sell";
+      return {
+        icon: "convert",
+        bannerLabel: isOutgoing
+          ? t("demo_recent_sell_banner", "Vente récente")
+          : t("demo_recent_buy_banner", "Achat récent"),
+        date,
+        time,
+        createdAt: parsed.toISOString(),
+        amount: amount ? `${amount} ${currency}` : "",
+        isOutgoing,
+        eventId: evt.id || null,
+        raw: evt,
+      };
+    }
+
+    return {
+      icon: null,
+      bannerLabel: t("ui_recent_activity_banner", "Activité récente"),
+      date,
+      time,
+      createdAt: parsed.toISOString(),
+      message: t("demo_statement_movement", "Mouvement"),
+      eventId: evt.id || null,
+      raw: evt,
+    };
+  }, [activeWalletId, locale, t, walletEvents]);
 
   // ── Global movements (for the global statement modal) ──
   const previewGlobalMovements = useMemo(() => {
@@ -410,5 +512,6 @@ export function useDemoStatementData({
     previewCurrencyTransactions,
     statementBalance,
     highlightTransactionId,
+    recentActivity,
   };
 }

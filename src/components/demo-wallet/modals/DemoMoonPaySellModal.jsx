@@ -302,7 +302,7 @@ const DemoMoonPaySellModal = ({
 
   // Mode embedded: retourner seulement le contenu
   const renderContent = () => (
-    <div className={embedded ? "" : "p-4 md:p-5"}>
+    <div className={embedded ? "" : "p-4"}>
       {/* Form */}
       {step === "form" && (
         <div className="space-y-5">
@@ -392,11 +392,11 @@ const DemoMoonPaySellModal = ({
               {t("moonpay_from_wallet", "From wallet")}
             </p>
             {hideWalletAddress && String(walletLabel || "").trim() ? (
-              <p className="text-[16px] md:text-[17px] text-white font-semibold truncate mb-1">
+              <p className="text-[16px] text-white font-semibold truncate mb-1">
                 {walletLabel}
               </p>
             ) : (
-              <p className="text-[10px] md:text-[11px] text-white/60 font-mono break-all">
+              <p className="text-[10px] text-white/60 font-mono break-all">
                 {walletAddress}
               </p>
             )}
@@ -437,13 +437,12 @@ const DemoMoonPaySellModal = ({
             onConfirm={generateSellUrl}
             disabled={continueDisabled}
             variant="xcannesGreen"
-            className="md:hidden"
           />
           <button
             type="button"
             onClick={generateSellUrl}
             disabled={continueDisabled}
-            className={`hidden md:block w-full text-xl py-4 ${greenActionBtnBase}`}
+            className={`hidden w-full text-xl py-4 ${greenActionBtnBase}`}
           >
             {continueLabel}
           </button>
@@ -538,10 +537,10 @@ const DemoMoonPaySellModal = ({
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="flex items-center justify-between p-4 md:p-5 border-b border-white/10">
+          <div className="flex items-center justify-between p-4 border-b border-white/10">
             <div>
               <div className="flex items-center gap-2 flex-wrap">
-                <h3 className="text-lg md:text-xl font-orbitron font-bold text-white">
+                <h3 className="text-lg font-orbitron font-bold text-white">
                   {t(
                     "ui_sell_crypto_for_fiat_1167ce7e08",
                     "Sell Crypto for Fiat",

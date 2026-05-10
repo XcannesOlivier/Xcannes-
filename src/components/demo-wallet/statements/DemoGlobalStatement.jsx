@@ -5,8 +5,6 @@ import { createPortal } from "react-dom";
 import Image from "next/image";
 import { useTranslation } from "next-i18next";
 import {
-  buildCsvString,
-  downloadTextFile,
   escapeHtml,
   openPrintWindow,
   sha256Hex,
@@ -410,63 +408,6 @@ export default function DemoGlobalStatement({
     }
   }, [buildPrintHtml, docHash, t]);
 
-  const handlePrint = useCallback(() => {
-    const suffix = docHash ? docHash.slice(0, 12) : "draft";
-    const ok = openPrintWindow({
-      title: `XCANNES Historique ${suffix}`,
-      bodyHtml: buildPrintHtml(),
-    });
-    if (!ok && typeof window !== "undefined") {
-      window.alert(
-        t(
-          "ui_popup_blocked_1c7a9d3b5e",
-          "Popup blocked. Please allow popups to export or print.",
-        ),
-      );
-    }
-  }, [buildPrintHtml, docHash, t]);
-
-  const handleExportCsv = useCallback(() => {
-    setExportFormat("csv");
-    try {
-      const suffix = docHash ? docHash.slice(0, 12) : "draft";
-      const headers = [
-        "created_at",
-        "kind",
-        "from_currency",
-        "to_currency",
-        "amount_rlusd",
-        "fx_rate",
-        "fx_source",
-        "tx_hash",
-        "total_balance_usd",
-        "ledger_status",
-        "doc_hash",
-      ];
-      const rows = (movements || []).map((m) => [
-        m?.createdAt || "",
-        m?.kind || "",
-        m?.fromCurrencyCode || "",
-        m?.toCurrencyCode || "",
-        Number.isFinite(Number(m?.amountRlusd)) ? Number(m.amountRlusd) : "",
-        Number.isFinite(Number(m?.fxRate)) ? Number(m.fxRate) : "",
-        m?.fxSource || "",
-        m?.txHash || "",
-        Number.isFinite(Number(totalBalance)) ? Number(totalBalance) : "",
-        ledgerStatus,
-        docHash || "",
-      ]);
-      const csv = buildCsvString(headers, rows);
-      downloadTextFile({
-        filename: `xcannes-statement-global-${suffix}.csv`,
-        content: csv,
-        type: "text/csv;charset=utf-8",
-      });
-    } finally {
-      setExportFormat(null);
-    }
-  }, [docHash, ledgerStatus, movements, totalBalance]);
-
   const getCurrencyFlag = (currency) => {
     const code = String(currency || "")
       .trim()
@@ -624,27 +565,27 @@ export default function DemoGlobalStatement({
 
   const STATEMENT_LAYOUTS = {
     full: {
-      backdropClass: "bg-black/80 md:backdrop-blur-sm",
-      wrapperClass: "items-stretch justify-center px-0 md:items-center md:px-4",
+      backdropClass: "bg-black/80",
+      wrapperClass: "items-stretch justify-center px-0",
       panelClass:
-        "w-full h-[100dvh] max-h-[100dvh] rounded-none border-0 md:h-auto md:max-w-5xl md:rounded-2xl md:max-h-[92vh] lg:max-w-6xl",
+        "w-full h-[100dvh] max-h-[100dvh] rounded-none border-0",
     },
     "dex-desktop": {
-      backdropClass: "bg-black/75 md:backdrop-blur-sm",
-      wrapperClass: "items-center justify-center px-3 md:px-4",
+      backdropClass: "bg-black/75",
+      wrapperClass: "items-center justify-center px-3",
       panelClass:
-        "max-w-4xl lg:max-w-5xl rounded-2xl max-h-[90vh]",
+        "max-w-4xl rounded-2xl max-h-[90vh]",
     },
     "dex-mobile": {
-      backdropClass: "bg-black/90 md:backdrop-blur-sm",
+      backdropClass: "bg-black/90",
       wrapperClass: "items-stretch justify-center px-0",
       panelClass: "w-full h-[100dvh] max-h-[100dvh] rounded-none border-0",
     },
     default: {
-      backdropClass: "bg-black/80 md:backdrop-blur-sm",
+      backdropClass: "bg-black/80",
       wrapperClass: "items-center justify-center px-4",
       panelClass:
-        "max-w-5xl lg:max-w-6xl rounded-2xl max-h-[92vh]",
+        "max-w-5xl rounded-2xl max-h-[92vh]",
     },
     "inline-desktop": {
       backdropClass: "",
@@ -653,8 +594,9 @@ export default function DemoGlobalStatement({
     },
   };
 
-  const resolvedLayout =
-    STATEMENT_LAYOUTS[variant] || STATEMENT_LAYOUTS.default;
+  const resolvedLayout = inline
+    ? STATEMENT_LAYOUTS[variant] || STATEMENT_LAYOUTS["inline-desktop"]
+    : STATEMENT_LAYOUTS["dex-mobile"];
   const wrapperBaseClass = inline
     ? "relative w-full h-full flex"
     : "fixed inset-0 z-[10200] flex";
@@ -687,61 +629,51 @@ export default function DemoGlobalStatement({
       >
         {/* Header */}
         <div
-          className={`relative flex-shrink-0 ${modalBgClass} px-4 md:px-5 py-4 before:content-[''] before:absolute before:left-0 before:right-0 before:bottom-0 before:h-px before:bg-white/10`}
+          className="relative flex-shrink-0 bg-[#111518] shadow-[inset_0_16px_28px_rgba(255,255,255,0.03),inset_0_-46px_70px_rgba(0,0,0,0.55)] px-4 py-4 before:content-[''] before:absolute before:left-0 before:right-0 before:bottom-0 before:h-px before:bg-white/10"
         >
-          <div className="flex items-start justify-between gap-3">
-            <div className="flex items-start gap-3 min-w-0">
-              <Image
-                src="/assets/statement.svg"
-                alt={t("ui_statement_a87c93acb8", "Statement")}
-                width={32}
-                height={32}
-                className="hidden md:block flex-shrink-0 w-7 h-7 md:w-8 md:h-8 mt-0.5"
-              />
-              <div className="min-w-0">
-                <div className="flex items-center gap-2 min-w-0">
-                  <h2 className="text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight min-w-0 inline-flex items-baseline gap-2">
-                    <span className="break-words">
-                      {t(
-                        "ui_global_statement_13e29aa8aa",
-                        "Historique de vos dernières transactions",
-                      )}
-                    </span>
-                  </h2>
-                  {noticeVariant === "demo" ? (
-                    <span className="inline-flex items-center text-white/80 text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
-                      {t("demo_notice_title", "Mode démo")}
-                    </span>
-                  ) : null}
-                </div>
-                <div className="mt-1 flex flex-wrap items-center gap-2 min-w-0">
-                  <span className="text-sm text-white font-semibold whitespace-nowrap">
-                    {walletLabel || t("nav_wallet", "Wallet")}
+          <div className="flex justify-center -mt-1 pt-1 pb-2" aria-hidden>
+            <span className="block w-12 h-1.5 rounded-full bg-white/20" />
+          </div>
+          <div className="flex justify-center">
+            <div className="min-w-0 flex flex-col items-center justify-center text-center">
+              <div className="flex items-center justify-center flex-wrap">
+                <h2 className="text-[30px] font-bold text-white/95 tracking-tight leading-tight text-center">
+                  {t(
+                    "ui_global_statement_13e29aa8aa",
+                    "Historique de vos dernières transactions",
+                  )}
+                </h2>
+                {noticeVariant === "demo" ? (
+                  <span className="ml-2 inline-flex items-center text-white/80 text-sm font-semibold px-2 py-0.5 leading-none">
+                    {t("demo_notice_title", "Mode démo")}
                   </span>
-                  {walletAddress ? (
-                    <span className="text-xs md:text-sm text-white/60 font-mono break-all">
-                      {walletAddress}
-                    </span>
-                  ) : null}
-                </div>
+                ) : null}
+              </div>
+              <p className="mt-2 text-[14px] text-white/60 max-w-[52ch] leading-relaxed">
+                {t(
+                  "ui_global_statement_subtitle_recent_20",
+                  "Consultez vos transactions récentes et ouvrez-en une pour voir les détails.",
+                )}
+              </p>
+              <div className="mt-3 flex flex-col items-center gap-1 min-w-0">
+                <span className="text-sm text-white font-semibold">
+                  {walletLabel || t("nav_wallet", "Wallet")}
+                </span>
+                {walletAddress ? (
+                  <span className="text-xs text-white/60 font-mono break-all">
+                    {walletAddress}
+                  </span>
+                ) : null}
               </div>
             </div>
-            {!inline ? (
-              <button
-                type="button"
-                onClick={onClose}
-                className="wallet-modal-close text-white/60 hover:text-white transition-colors text-2xl leading-none flex-shrink-0"
-              >
-                ✕
-              </button>
-            ) : null}
+            {/* close via swipe/backdrop */}
           </div>
 
           <div className="mt-4 rounded-[14px] p-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
             <div className="text-xs text-white/60">
               {t("ui_total_assets_label_fr", "Total des actifs")}
             </div>
-            <div className="mt-1 text-3xl md:text-[32px] font-semibold text-white/95">
+            <div className="mt-1 text-3xl font-semibold text-white/95">
               ≈ {formatAmountWithSymbol(locale, totalBalance, "USD")}
             </div>
             <div className="mt-1 text-xs text-white/50">
@@ -751,9 +683,9 @@ export default function DemoGlobalStatement({
         </div>
 
         {/* Content */}
-        <div className="flex-1 min-h-0 overflow-y-auto px-4 md:px-5 py-4 flex flex-col gap-4">
+        <div className="flex-1 min-h-0 overflow-y-auto px-4 py-4 flex flex-col gap-4">
           {/* Controls */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 items-end">
+          <div className="grid grid-cols-1 gap-3 items-end">
             <div>
               <div className="text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
                 {t("ui_statement_period_4674b18f25", "Période")}
@@ -773,7 +705,7 @@ export default function DemoGlobalStatement({
               />
             </div>
 
-            <div className="md:justify-self-end">
+            <div>
               <div className="text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
                 {t("ui_sort_label", "Tri")}
               </div>
@@ -892,10 +824,10 @@ export default function DemoGlobalStatement({
           </div>
 
           {/* Watermark */}
-          <div className="hidden sm:block text-center py-3 sm:py-4">
+          <div className="hidden">
             <div className="space-y-1">
               {ledgerLastIndex != null ? (
-                <p className="text-[9px] sm:text-xs text-white/30 font-mono px-2">
+                <p className="text-[9px] text-white/30 font-mono px-2">
                   {t("ui_ledger_index_label_0c2a1d9b5e", "Ledger index:")}{" "}
                   {ledgerLastIndex}
                 </p>
@@ -905,38 +837,17 @@ export default function DemoGlobalStatement({
         </div>
 
         {/* Footer Actions */}
-        <div className="relative px-4 md:px-6 py-3 md:py-4 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2 bg-transparent md:bg-black/30 before:content-[''] before:absolute before:left-0 before:right-0 before:top-0 before:h-px before:bg-white/10">
-          <div className="flex gap-2 flex-wrap">
+        <div className="relative px-4 py-3 pb-2 flex flex-row items-stretch gap-2 bg-[#111518] shadow-[inset_0_-16px_28px_rgba(255,255,255,0.03),inset_0_46px_70px_rgba(0,0,0,0.55)] before:content-[''] before:absolute before:left-0 before:right-0 before:top-0 before:h-px before:bg-white/10">
+          <div className="flex flex-1 items-center rounded-[16px] p-1 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-[#101415] to-[#0d1214] justify-end">
             <button
               onClick={handleExportPdf}
               disabled={exportFormat === "pdf"}
-              className="flex-1 md:flex-none px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 bg-transparent md:bg-white/10 md:hover:bg-white/15 text-white/80"
+              className="shrink-0 px-2 py-2 text-white/60 hover:text-white transition-colors disabled:opacity-40"
+              aria-label={t("ui_export_pdf_9c8d16b4fe", "Télécharger")}
             >
-              {exportFormat === "pdf" ? (
-                <>
-                  <span className="md:hidden" aria-hidden>
-                    <ShareIcon className="w-5 h-5 opacity-60" />
-                  </span>
-                  <span className="hidden md:inline text-[13px] sm:text-inherit">
-                    {t("ui_loading_1386baebe9", "Loading…")}
-                  </span>
-                </>
-              ) : (
-                <>
-                  <span className="md:hidden" aria-hidden>
-                    <ShareIcon className="w-5 h-5" />
-                  </span>
-                  <span className="hidden md:inline text-[13px] sm:text-inherit">
-                    {t("ui_export_pdf_9c8d16b4fe", "📄 Export PDF")}
-                  </span>
-                </>
-              )}
-            </button>
-            <button
-              onClick={handlePrint}
-              className="hidden md:inline-flex md:flex-none px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors bg-white/10 hover:bg-white/15 text-white/80"
-            >
-              {t("ui_print_eb5de3a228", "🖨️ Print")}
+              <ShareIcon
+                className={`w-5 h-5 ${exportFormat === "pdf" ? "opacity-40" : ""}`}
+              />
             </button>
           </div>
         </div>

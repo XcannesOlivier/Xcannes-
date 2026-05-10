@@ -12,8 +12,6 @@ import Image from "next/image";
 import { getCurrencyDescription } from "../utils/demoCurrencyDescriptions";
 import { CRYPTO_ICONS } from "../utils/demoMarketConstants";
 import {
-  buildCsvString,
-  downloadTextFile,
   escapeHtml,
   openPrintWindow,
   sha256Hex,
@@ -156,7 +154,7 @@ export default function DemoCurrencyStatement({
   const [filter, setFilter] = useState("all"); // all, credit, debit, conversion
   const [exportFormat, setExportFormat] = useState(null);
   const [selectedMonth, setSelectedMonth] = useState(0); // 0 = current month, 1 = last month, etc.
-  const [isMobileDate, setIsMobileDate] = useState(variant === "dex-mobile");
+  const isMobileDate = true;
   const [reserveOpen, setReserveOpen] = useState(false);
   const [docHash, setDocHash] = useState("");
   const resolvedLabelOverride = String(walletLabelOverride || "").trim();
@@ -179,16 +177,6 @@ export default function DemoCurrencyStatement({
     "Archives (12+ months)",
   );
   const fallbackPeriod = period || defaultPeriod;
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const update = () => {
-      setIsMobileDate(window.innerWidth < 640);
-    };
-    update();
-    window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
-  }, []);
 
   useEffect(() => {
     if (!highlightTransactionId) return undefined;
@@ -1064,99 +1052,28 @@ export default function DemoCurrencyStatement({
     }
   }, [buildPrintHtml, docHash, displayCurrency, t]);
 
-  const handlePrint = useCallback(() => {
-    const suffix = docHash ? docHash.slice(0, 12) : "draft";
-    const ok = openPrintWindow({
-      title: `XCANNES ${displayCurrency || "Statement"} ${suffix}`,
-      bodyHtml: buildPrintHtml(),
-    });
-    if (!ok && typeof window !== "undefined") {
-      window.alert(
-        t(
-          "ui_popup_blocked_1c7a9d3b5e",
-          "Popup blocked. Please allow popups to export or print.",
-        ),
-      );
-    }
-  }, [buildPrintHtml, docHash, displayCurrency, t]);
-
-  const handleExportCsv = useCallback(() => {
-    setExportFormat("csv");
-    try {
-      const suffix = docHash ? docHash.slice(0, 12) : "draft";
-      const headers = [
-        "date",
-        "type",
-        "category",
-        "description",
-        "amount",
-        "running_balance",
-        "statement_balance",
-        "counterparty",
-        "currency",
-        "ledger_status",
-        "ledger_index",
-        "doc_hash",
-      ];
-      const rows = (transactionsWithDisplayBalance || []).map((tx) => [
-        tx?.date || "",
-        tx?.type || "",
-        tx?.category || "",
-        getLocalizedDescription(tx),
-        Number.isFinite(Number(tx?.amount)) ? Number(tx.amount) : "",
-        Number.isFinite(Number(tx?.displayRunningBalance))
-          ? Number(tx.displayRunningBalance)
-          : Number.isFinite(Number(tx?.runningBalance))
-            ? Number(tx.runningBalance)
-            : "",
-        Number.isFinite(Number(balance)) ? Number(balance) : "",
-        tx?.counterparty || "",
-        displayCurrency || "",
-        ledgerStatus,
-        ledgerLastIndex != null ? ledgerLastIndex : "",
-        docHash || "",
-      ]);
-      const csv = buildCsvString(headers, rows);
-      downloadTextFile({
-        filename: `xcannes-statement-${String(displayCurrency || "currency").toLowerCase()}-${suffix}.csv`,
-        content: csv,
-        type: "text/csv;charset=utf-8",
-      });
-    } finally {
-      setExportFormat(null);
-    }
-  }, [
-    balance,
-    docHash,
-    displayCurrency,
-    getLocalizedDescription,
-    transactionsWithDisplayBalance,
-    ledgerLastIndex,
-    ledgerStatus,
-  ]);
-
   const STATEMENT_LAYOUTS = {
     full: {
-      backdropClass: "bg-black/80 md:backdrop-blur-sm",
-      wrapperClass: "items-stretch justify-center px-0 md:items-center md:px-4",
+      backdropClass: "bg-black/80",
+      wrapperClass: "items-stretch justify-center px-0",
       panelClass:
-        "w-full h-[100dvh] max-h-[100dvh] rounded-none border-0 md:h-auto md:max-w-4xl md:rounded-2xl md:max-h-[92vh] lg:max-w-5xl",
+        "w-full h-[100dvh] max-h-[100dvh] rounded-none border-0",
     },
     "dex-desktop": {
-      backdropClass: "bg-black/75 md:backdrop-blur-sm",
-      wrapperClass: "items-center justify-center px-3 md:px-4",
-      panelClass: "max-w-4xl lg:max-w-5xl rounded-2xl max-h-[90vh]",
+      backdropClass: "bg-black/75",
+      wrapperClass: "items-center justify-center px-3",
+      panelClass: "max-w-4xl rounded-2xl max-h-[90vh]",
     },
     "dex-mobile": {
-      backdropClass: "bg-black/90 md:backdrop-blur-sm",
+      backdropClass: "bg-black/90",
       wrapperClass: "items-stretch justify-center px-0",
       panelClass:
         "w-full h-[100dvh] max-h-[100dvh] rounded-none border-0",
     },
     default: {
-      backdropClass: "bg-black/80 md:backdrop-blur-sm",
+      backdropClass: "bg-black/80",
       wrapperClass: "items-center justify-center px-4",
-      panelClass: "max-w-4xl lg:max-w-5xl rounded-2xl max-h-[92vh]",
+      panelClass: "max-w-4xl rounded-2xl max-h-[92vh]",
     },
     "inline-desktop": {
       backdropClass: "",
@@ -1165,8 +1082,9 @@ export default function DemoCurrencyStatement({
     },
   };
 
-  const resolvedLayout =
-    STATEMENT_LAYOUTS[variant] || STATEMENT_LAYOUTS.default;
+  const resolvedLayout = inline
+    ? STATEMENT_LAYOUTS[variant] || STATEMENT_LAYOUTS["inline-desktop"]
+    : STATEMENT_LAYOUTS["dex-mobile"];
   const wrapperBaseClass = inline
     ? "relative w-full h-full flex"
     : "fixed inset-0 z-[10200] flex";
@@ -1275,7 +1193,7 @@ export default function DemoCurrencyStatement({
               onClick={closeTxDetails}
             />
             <div
-              className={`relative w-full max-w-md rounded-[14px] ${modalBgClass} p-4 md:p-5 ring-1 ring-white/10 ring-inset shadow-[0_24px_60px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-26px_46px_rgba(0,0,0,0.55)] wallet-modal-lift-in`}
+              className={`relative w-full max-w-md rounded-[14px] ${modalBgClass} p-4 ring-1 ring-white/10 ring-inset shadow-[0_24px_60px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-26px_46px_rgba(0,0,0,0.55)] wallet-modal-lift-in`}
             >
               {/* Header */}
               <div className="flex items-start justify-between gap-3">
@@ -1284,7 +1202,7 @@ export default function DemoCurrencyStatement({
                     {detailTypeLabel || t("ui_transaction", "Transaction")}
                   </div>
                   <div
-                    className={`mt-1 text-[22px] md:text-[26px] font-bold font-mono whitespace-nowrap ${
+                    className={`mt-1 text-[22px] font-bold font-mono whitespace-nowrap ${
                       detailTx?.type === "debit"
                         ? "text-red-400"
                         : "text-xcannes-green"
@@ -1497,56 +1415,59 @@ export default function DemoCurrencyStatement({
       >
         {/* Header avec Account Info intégré */}
         <div
-          className={`relative flex-shrink-0 ${modalBgClass} px-4 md:px-6 py-3 md:py-4 before:content-[''] before:absolute before:left-0 before:right-0 before:bottom-0 before:h-px before:bg-white/10`}
+          className={`relative flex-shrink-0 bg-[#111518] shadow-[inset_0_16px_28px_rgba(255,255,255,0.03),inset_0_-46px_70px_rgba(0,0,0,0.55)] px-4 py-3 before:content-[''] before:absolute before:left-0 before:right-0 before:bottom-0 before:h-px before:bg-white/10`}
         >
-          <div className="flex items-start justify-between gap-3 mb-3">
-            <div className="flex items-center gap-2 md:gap-3 min-w-0 flex-1">
-              {CRYPTO_ICONS?.[displayCurrency] ? (
-                isSvgIcon(CRYPTO_ICONS[displayCurrency]) ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={CRYPTO_ICONS[displayCurrency]}
-                    alt={displayCurrency}
-                    width={32}
-                    height={32}
-                    className="flex-shrink-0 w-8 h-8 md:w-8 md:h-8 rounded-md"
-                  />
+          <div className="flex justify-center -mt-1 pt-1 pb-2" aria-hidden>
+            <span className="block w-12 h-1.5 rounded-full bg-white/20" />
+          </div>
+          <div className="flex items-start justify-between gap-3 mb-3 relative z-[65]">
+            <div className="flex flex-col items-center text-center gap-1 min-w-0 flex-1">
+              <div className="flex items-center justify-center gap-2 flex-wrap min-w-0">
+                {CRYPTO_ICONS?.[displayCurrency] ? (
+                  isSvgIcon(CRYPTO_ICONS[displayCurrency]) ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={CRYPTO_ICONS[displayCurrency]}
+                      alt={displayCurrency}
+                      width={32}
+                      height={32}
+                      className="flex-shrink-0 w-8 h-8 rounded-md"
+                    />
+                  ) : (
+                    <Image
+                      src={CRYPTO_ICONS[displayCurrency]}
+                      alt={displayCurrency}
+                      width={32}
+                      height={32}
+                      className="flex-shrink-0 w-8 h-8 rounded-md"
+                    />
+                  )
                 ) : (
-                  <Image
-                    src={CRYPTO_ICONS[displayCurrency]}
-                    alt={displayCurrency}
-                    width={32}
-                    height={32}
-                    className="flex-shrink-0 w-8 h-8 md:w-8 md:h-8 rounded-md"
-                  />
-                )
-              ) : (
-                <span className="text-3xl md:text-3xl flex-shrink-0 leading-none inline-block translate-y-[8px]">
-                  {getCurrencyFlag(displayCurrency)}
-                </span>
-              )}
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2 min-w-0">
-                  <h2 className="text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight min-w-0 inline-flex items-baseline gap-2">
-                    <span className="truncate">
-                      {currencyDescription || displayCurrency}
-                    </span>
-                  </h2>
-
-                </div>
-                {/* Description merged into title */}
+                  <span className="text-3xl flex-shrink-0 leading-none">
+                    {getCurrencyFlag(displayCurrency)}
+                  </span>
+                )}
+                <h2 className="text-[30px] font-bold text-white/95 tracking-tight min-w-0 truncate">
+                  {currencyDescription || displayCurrency}
+                </h2>
+                {noticeVariant === "demo" ? (
+                  <span className="inline-flex items-center text-white/80 text-sm font-semibold px-2 py-0.5 leading-none">
+                    {t("demo_notice_title", "Mode démo")}
+                  </span>
+                ) : null}
               </div>
+              <p className="mt-1 text-[13px] text-white/55 leading-relaxed">
+                {t(
+                  "ui_currency_statement_subtitle_periods",
+                  "Suivez le solde et les mouvements de cette devise.",
+                )}
+              </p>
             </div>
-            <button
-              onClick={onClose}
-              className="wallet-modal-close text-white/60 hover:text-xcannes-green transition-colors text-2xl md:text-3xl leading-none flex-shrink-0 w-10 h-10 flex items-center justify-center -mr-2"
-            >
-              ×
-            </button>
+            {/* close via swipe/backdrop */}
           </div>
 
           {/* Account Info dans le header */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 gap-3">
             <div>
               <p className="text-sm text-white font-semibold truncate">
                 {walletLabel || t("nav_wallet", "Wallet")}
@@ -1558,7 +1479,7 @@ export default function DemoCurrencyStatement({
               ) : null}
             </div>
             <div>
-              <p className="text-[22px] md:text-[21px] text-white/85 font-medium mb-1 text-center md:text-left">
+              <p className="text-[22px] text-white/85 font-medium mb-1 text-center">
                 {t("ui_statement_period_6dedec11d9", "Statement Period")}
               </p>
               {/* Month Selector - Version simplifiée */}
@@ -1579,7 +1500,7 @@ export default function DemoCurrencyStatement({
             <div>
               <div className="flex items-start justify-between gap-3">
                 <div className="pl-1">
-                  <p className="text-[20px] md:text-[21px] text-white/60 mb-1">
+                  <p className="text-[20px] text-white/60 mb-1">
                     {t("ui_balance_445d830d72", "Balance")}
                   </p>
                   <p className="text-sm text-white font-semibold">
@@ -1600,10 +1521,10 @@ export default function DemoCurrencyStatement({
         </div>
 
         {/* Content - Zone scrollable avec flex-1 pour prendre l'espace restant */}
-        <div className="flex-1 overflow-hidden px-4 md:px-6 py-4 md:py-6 flex flex-col gap-4 min-h-0 overscroll-contain">
+        <div className="flex-1 overflow-hidden px-4 py-4 flex flex-col gap-4 min-h-0 overscroll-contain">
           {/* Archive Notice */}
           {selectedMonth === "archives" && (
-            <div className="bg-blue-500/10 rounded-lg p-3 md:p-4">
+            <div className="bg-blue-500/10 rounded-lg p-3">
               <p className="text-sm text-blue-300 flex items-center gap-2">
                 <span className="text-xl">📁</span>
                 <span>
@@ -1646,7 +1567,7 @@ export default function DemoCurrencyStatement({
                   key={item.key}
                   type="button"
                   onClick={() => setFilter(item.key)}
-                  className={`px-3 py-1.5 rounded-lg text-xs md:text-sm font-medium transition-colors whitespace-nowrap ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors whitespace-nowrap ${
                     filter === item.key
                       ? "bg-white/5 text-white"
                       : "text-white/60 hover:text-white/80 hover:bg-white/5"
@@ -1665,7 +1586,7 @@ export default function DemoCurrencyStatement({
                 {error}
               </div>
             )}
-            <div className="flex-1 min-h-0 overflow-y-auto md:max-h-[420px]">
+            <div className="flex-1 min-h-0 overflow-y-auto">
               {loading ? (
                 <div className="py-14 text-center text-white/40 text-sm">
                   {t("ui_loading_948e39804b", "Loading…")}
@@ -1759,7 +1680,7 @@ export default function DemoCurrencyStatement({
           )}
 
           {/* Watermark */}
-          <div className="hidden sm:block text-center py-3 md:py-4">
+          <div className="hidden">
             <div className="space-y-1">
               {ledgerLastIndex != null ? (
                 <p className="text-xs text-white/30 font-mono">
@@ -1772,38 +1693,17 @@ export default function DemoCurrencyStatement({
         </div>
 
         {/* Footer Actions */}
-        <div className="relative px-4 md:px-6 py-3 md:py-4 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2 bg-transparent md:bg-black/30 before:content-[''] before:absolute before:left-0 before:right-0 before:top-0 before:h-px before:bg-white/10">
-          <div className="flex gap-2 flex-wrap">
+        <div className="relative px-4 py-3 pb-2 flex flex-row items-stretch gap-2 bg-[#111518] shadow-[inset_0_-16px_28px_rgba(255,255,255,0.03),inset_0_46px_70px_rgba(0,0,0,0.55)] before:content-[''] before:absolute before:left-0 before:right-0 before:top-0 before:h-px before:bg-white/10">
+          <div className="flex flex-1 items-center rounded-[16px] p-1 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-[#101415] to-[#0d1214] justify-end">
             <button
               onClick={handleExportPdf}
               disabled={exportFormat === "pdf"}
-              className="flex-1 md:flex-none px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 bg-transparent md:bg-white/10 md:hover:bg-white/15 text-white/80"
+              className="shrink-0 px-2 py-2 text-white/60 hover:text-white transition-colors disabled:opacity-40"
+              aria-label={t("ui_export_pdf_9c8d16b4fe", "Télécharger")}
             >
-              {exportFormat === "pdf" ? (
-                <>
-                  <span className="md:hidden" aria-hidden>
-                    <ShareIcon className="w-5 h-5 opacity-60" />
-                  </span>
-                  <span className="hidden md:inline text-[13px] sm:text-inherit">
-                    {t("ui_loading_1386baebe9", "Loading…")}
-                  </span>
-                </>
-              ) : (
-                <>
-                  <span className="md:hidden" aria-hidden>
-                    <ShareIcon className="w-5 h-5" />
-                  </span>
-                  <span className="hidden md:inline text-[13px] sm:text-inherit">
-                    {t("ui_export_pdf_9c8d16b4fe", "📄 Export PDF")}
-                  </span>
-                </>
-              )}
-            </button>
-            <button
-              onClick={handlePrint}
-              className="hidden md:inline-flex md:flex-none px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors bg-white/10 hover:bg-white/15 text-white/80"
-            >
-              {t("ui_print_1313eff37c", "🖨️ Print")}
+              <ShareIcon
+                className={`w-5 h-5 ${exportFormat === "pdf" ? "opacity-40" : ""}`}
+              />
             </button>
           </div>
         </div>

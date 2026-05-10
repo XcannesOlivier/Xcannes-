@@ -428,7 +428,7 @@ export default function DemoQRScanner({
         <h3
           className={
             embedded
-              ? "text-sm md:text-base font-orbitron font-bold text-white mb-3"
+              ? "text-sm font-orbitron font-bold text-white mb-3"
               : "text-xl font-orbitron font-bold text-white mb-4 text-center"
           }
         >

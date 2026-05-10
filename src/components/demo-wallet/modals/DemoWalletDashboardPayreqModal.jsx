@@ -1,12 +1,10 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import SwipeConfirmButton from "@/components/ui/SwipeConfirmButton";
 import { createPortal } from "react-dom";
 import { useTranslation } from "next-i18next";
 import { useModalTransition } from "@/hooks/useModalTransition";
 import { formatAmountWithSymbol } from "../demoWalletDashboardConfig";
-import { greenActionBtnBase } from "./demoWalletModalTokens";
 
 export default function DemoWalletDashboardPayreqModal({
   open,
@@ -28,7 +26,6 @@ export default function DemoWalletDashboardPayreqModal({
   const locale = i18n?.language || "en";
 
   const [saveNewAddress, setSaveNewAddress] = useState(false);
-  const [saveNewAddressLabel, setSaveNewAddressLabel] = useState("");
   const [showFullAccountNumber, setShowFullAccountNumber] = useState(false);
 
   const normalizedDestination = useMemo(
@@ -90,18 +87,16 @@ export default function DemoWalletDashboardPayreqModal({
     const result = await handleSendSubmit?.({
       saveDestination:
         saveNewAddress && canSaveDestination ? normalizedDestination : "",
-      saveLabel: saveNewAddressLabel,
+      saveLabel: "",
     });
     if (result?.ok) {
       setSaveNewAddress(false);
-      setSaveNewAddressLabel("");
     }
   };
 
   useEffect(() => {
     if (!open) {
       setSaveNewAddress(false);
-      setSaveNewAddressLabel("");
       setShowFullAccountNumber(false);
     }
   }, [open]);
@@ -109,7 +104,6 @@ export default function DemoWalletDashboardPayreqModal({
   useEffect(() => {
     if (!canSaveDestination) {
       setSaveNewAddress(false);
-      setSaveNewAddressLabel("");
     }
   }, [canSaveDestination]);
 
@@ -138,113 +132,10 @@ export default function DemoWalletDashboardPayreqModal({
       : "",
   ].join(" ");
 
-  const requestDetailsPanel = sendPaymentRequest ? (
-    <div className="rounded-xl border border-amber-300/20 bg-amber-300/10 p-3 space-y-2">
-      <div className="text-[11px] uppercase tracking-wide text-amber-200/70 font-semibold">
-        {t("ui_payment_request_details", "Payment request")}
-      </div>
-      <div className="space-y-1 text-xs text-white/80">
-        <div className="flex items-center justify-between gap-3">
-          <span className="text-white/60">
-            {t("ui_beneficiary_label", "Bénéficiaire")}
-          </span>
-          <span className="font-semibold text-white/90">
-            {requestBeneficiaryLabel ||
-              t("ui_wallet_unknown", "Unknown wallet")}
-          </span>
-        </div>
-        {requestDestination ? (
-          <div className="flex items-center justify-between gap-3">
-            <span className="text-white/60">
-              {t("ui_account_number_label", "N° de compte")}
-            </span>
-            <span className="font-mono text-white/80">
-              {requestDestinationLabel || requestDestination}
-            </span>
-          </div>
-        ) : null}
-        {canSaveDestination ? (
-          <div className="mt-2 rounded-lg border border-white/10 bg-black/20 px-3 py-2 space-y-2">
-            <label className="flex items-center gap-2 text-[11px] text-white/70">
-              <input
-                type="checkbox"
-                checked={saveNewAddress}
-                onChange={(e) => setSaveNewAddress(e.target.checked)}
-                className="accent-xcannes-green"
-              />
-              {t("ui_save_this_address_7ef65aa11c", "Save this address?")}
-            </label>
-            {saveNewAddress ? (
-              <div className="space-y-1">
-                <div className="text-[11px] text-white/60">
-                  {t("ui_label_optional_3b6a3c454c", "Label (optional)")}
-                </div>
-                <input
-                  type="text"
-                  value={saveNewAddressLabel}
-                  onChange={(e) => setSaveNewAddressLabel(e.target.value)}
-                  placeholder={t(
-                    "ui_e_g_exchange_friend_11008b5e9e",
-                    "e.g., Exchange, Friend, ...",
-                  )}
-                  className="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-xcannes-green/80"
-                />
-              </div>
-            ) : null}
-          </div>
-        ) : null}
-        {requestCurrencyCode ? (
-          <div className="flex items-center justify-between gap-3">
-            <span className="text-white/60">
-              {t("ui_currency_label", "Currency")}
-            </span>
-            <span className="font-semibold text-white/90">
-              {requestCurrencyCode}
-            </span>
-          </div>
-        ) : null}
-        {requestAmountLabel ? (
-          <div className="flex items-center justify-between gap-3">
-            <span className="text-white/60">
-              {t("ui_amount_52cea2dd3d", "Amount")}
-            </span>
-            <span className="font-mono text-white/90">
-              {requestAmountLabel}
-            </span>
-          </div>
-        ) : null}
-      </div>
-    </div>
-  ) : null;
-
-  const sendActions = (
-    <div className={inline ? "mt-auto pt-2 border-t border-white/10" : ""}>
-      <SwipeConfirmButton
-        label={
-          sendProcessing
-            ? t("ui_sending_3b8c1a7d5e", "Sending...")
-            : t("ui_send_504b64a87b", "Send")
-        }
-        onConfirm={handleManualSend}
-        disabled={sendProcessing || !canManualSend}
-        variant="green"
-        className="mt-2"
-      />
-      <button
-        type="button"
-        onClick={(e) => {
-          e.stopPropagation();
-          handleManualSend();
-        }}
-        disabled={sendProcessing || !canManualSend}
-        className={`hidden w-full mt-2 text-sm py-3 ${greenActionBtnBase}`}
-      >
-        {sendProcessing
-          ? t("ui_sending_3b8c1a7d5e", "Sending...")
-          : t("ui_send_504b64a87b", "Send")}
-      </button>
-    </div>
-  );
+  const sendButtonDisabled = sendProcessing || !canManualSend;
+  const sendButtonLabel = sendProcessing
+    ? t("ui_sending_3b8c1a7d5e", "Sending...")
+    : t("ui_confirm_payment_button", "Confirmer le paiement");
 
   const content = (
     <>
@@ -265,50 +156,195 @@ export default function DemoWalletDashboardPayreqModal({
             if (!inline) e.stopPropagation();
           }}
         >
-          <div className="flex items-start justify-between gap-3 mb-5 pr-6">
-            <div className="min-w-0">
-              {renderWalletMeta?.(
-                "wallet-meta--plus-4 [&_.font-mono]:hidden",
-              )}
+          {!inline ? (
+            <div className="flex justify-center -mt-1 pt-1 pb-2" aria-hidden>
+              <span className="block w-12 h-1.5 rounded-full bg-white/20" />
             </div>
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onClose();
-              }}
-              className="wallet-modal-close text-white/60 hover:text-white transition-colors text-xl z-10"
-              aria-label={t("close", "Fermer")}
-            >
-              ✕
-            </button>
-          </div>
+          ) : null}
+
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onClose?.();
+            }}
+            className="sr-only"
+          >
+            {t("close", "Fermer")}
+          </button>
 
           <div className={inline ? "flex-1 min-h-0 flex flex-col" : ""}>
-            <div className="space-y-4">
-              {sendPaymentRequest ? (
-                <div className="text-[17px] md:text-lg text-white/60">
-                  {t("ui_send_to_label", "Envoyé à")}
+            <div className="space-y-6">
+              <div className="text-center space-y-2 pt-1">
+                <h3 className="text-[26px] font-semibold text-white/95 tracking-tight">
+                  {t("ui_payreq_summary_title", "Résumé de la demande")}
+                </h3>
+                <p className="text-[14px] text-white/60 max-w-[34ch] mx-auto leading-relaxed">
+                  {t(
+                    "ui_payreq_summary_subtitle",
+                    "Vérifiez les détails avant de confirmer le paiement.",
+                  )}
+                </p>
+
+                {noticeVariant === "demo" ? (
+                  <span className="mt-2 inline-flex items-center text-white/80 text-sm font-semibold px-2 py-1 leading-none">
+                    {t("demo_notice_title", "Mode démo")}
+                  </span>
+                ) : null}
+
+                <div className="mt-[40px] flex justify-center">
+                  {renderWalletMeta?.({
+                    variant: "pill-column",
+                    className: "flex justify-center",
+                    prefix: t("moonpay_from_account", "Compte source"),
+                    pillClassName:
+                      "bg-elevated shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]",
+                  })}
                 </div>
-              ) : null}
-              {sendPaymentRequest && requestDestination ? (
-                <button
-                  type="button"
-                  onClick={() => setShowFullAccountNumber((prev) => !prev)}
-                  title={requestDestination}
-                  className="w-full bg-black/40 border border-white/15 rounded-xl px-4 py-3 text-base text-white outline-none focus-visible:border-xcannes-green/80 focus-visible:border-[0.5px] text-left"
-                >
-                  <span
-                    className={showFullAccountNumber ? "break-all" : "truncate"}
+              </div>
+
+              <div className="space-y-4">
+                <div className="flex items-baseline justify-between gap-4">
+                  <span className="text-[15px] text-white/50">
+                    {t("ui_payreq_requested_by_label", "Demandé par")}
+                  </span>
+                  <span className="text-[22px] font-semibold text-white truncate text-right">
+                    {requestBeneficiaryLabel ||
+                      t("ui_wallet_unknown", "Unknown wallet")}
+                  </span>
+                </div>
+
+                <div className="flex items-baseline justify-between gap-4">
+                  <span className="text-[15px] text-white/50">
+                    {t("ui_address", "Adresse")}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setShowFullAccountNumber((prev) => !prev)}
+                    className="font-mono text-[15px] text-white/70 text-right underline decoration-white/25 underline-offset-2 hover:decoration-white/60 transition-colors truncate max-w-[60%]"
+                    title={t(
+                      "ui_toggle_full_account_number",
+                      "Afficher/masquer l'adresse complète",
+                    )}
                   >
                     {showFullAccountNumber
                       ? requestDestination
-                      : requestDestinationLabel || requestDestination}
+                      : requestDestinationLabel || requestDestination || "—"}
+                  </button>
+                </div>
+
+                <div className="flex items-baseline justify-between gap-4">
+                  <span className="text-[15px] text-white/50">
+                    {t("ui_currency_label", "Devise")}
                   </span>
-                </button>
+                  <span className="text-[17px] text-white/90">
+                    {requestCurrencyCode || "—"}
+                  </span>
+                </div>
+
+                <div className="flex items-baseline justify-between gap-4">
+                  <span className="text-[20px] text-white/90">
+                    {t("ui_total_to_send_label", "Total à envoyer")}
+                  </span>
+                  <span className="text-3xl font-semibold text-white">
+                    {requestAmountLabel || "—"}
+                  </span>
+                </div>
+              </div>
+
+              {canSaveDestination ? (
+                <div className="rounded-lg bg-gradient-to-b from-white/[0.08] to-white/[0.03] px-3 py-2 space-y-2 ring-1 ring-white/10 ring-inset shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
+                  <label className="flex items-center gap-2 text-xs text-white/60">
+                    <input
+                      type="checkbox"
+                      checked={saveNewAddress}
+                      onChange={(e) => setSaveNewAddress(e.target.checked)}
+                      className="accent-xcannes-green"
+                    />
+                    {t("ui_save_this_address_7ef65aa11c", "Save this address?")}
+                  </label>
+                </div>
               ) : null}
-              {requestDetailsPanel}
-              {sendActions}
+
+              <div className="pt-6 pb-[env(safe-area-inset-bottom)]">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleManualSend();
+                  }}
+                  disabled={sendButtonDisabled}
+                  className={[
+                    "w-full h-14 rounded-[20px] text-lg font-semibold transition-all duration-200 tracking-[-0.01em]",
+                    sendButtonDisabled
+                      ? sendProcessing
+                        ? "opacity-45 cursor-not-allowed"
+                        : "bg-xcannes-green/[0.07] text-xcannes-green/60 cursor-not-allowed ring-[0.5px] ring-xcannes-green/40 ring-inset"
+                      : "text-white hover:scale-[1.01] active:scale-[0.98]",
+                  ].join(" ")}
+                  style={
+                    sendButtonDisabled
+                      ? sendProcessing
+                        ? {
+                            background:
+                              "linear-gradient(180deg, rgba(34,154,86,0.65) 0%, rgba(14,103,58,0.65) 100%)",
+                            color: "rgba(255,255,255,0.4)",
+                          }
+                        : undefined
+                      : {
+                          background:
+                            "linear-gradient(180deg, rgba(34,154,86,1) 0%, rgba(14,103,58,1) 100%)",
+                          boxShadow:
+                            "0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)",
+                        }
+                  }
+                >
+                  {sendButtonDisabled && !sendProcessing ? (
+                    <span className="inline-flex items-center gap-1.5 text-white/20">
+                      <span className="text-xs">
+                        {t(
+                          "ui_send_fill_cta",
+                          "Choisissez la devise et le montant",
+                        )}
+                      </span>
+                      <span className="inline-flex items-end gap-[3px] mb-[-1px]">
+                        <span
+                          className="payreq-modal-dot"
+                          style={{ animationDelay: "0s" }}
+                        >
+                          ·
+                        </span>
+                        <span
+                          className="payreq-modal-dot"
+                          style={{ animationDelay: "0.6s" }}
+                        >
+                          ·
+                        </span>
+                        <span
+                          className="payreq-modal-dot"
+                          style={{ animationDelay: "1.2s" }}
+                        >
+                          ·
+                        </span>
+                      </span>
+                    </span>
+                  ) : (
+                    sendButtonLabel
+                  )}
+                </button>
+                <style>{`
+                  @keyframes payreqModalDotBlink {
+                    0%, 70%, 100% { opacity: 0.1; }
+                    35% { opacity: 0.9; }
+                  }
+                  .payreq-modal-dot {
+                    font-size: 20px;
+                    line-height: 1;
+                    animation: payreqModalDotBlink 2.4s ease-in-out infinite;
+                    color: inherit;
+                  }
+                `}</style>
+              </div>
             </div>
           </div>
         </div>

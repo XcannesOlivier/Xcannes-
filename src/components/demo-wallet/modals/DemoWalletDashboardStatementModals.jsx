@@ -72,7 +72,7 @@ export default function DemoWalletDashboardStatementModals({
           noticeVariant={noticeVariant}
           period="December 2025"
           isFullPage={isFullPageView}
-          variant={statementVariant}
+          variant="dex-mobile"
           usdRates={usdRates}
           totalBalanceOverride={statementTotalBalanceUsd}
           movements={previewMovements}
@@ -105,7 +105,7 @@ export default function DemoWalletDashboardStatementModals({
           isPreviewMode={isPreviewMode}
           noticeVariant={noticeVariant}
           isFullPage={isFullPageView}
-          variant={statementVariant}
+          variant="dex-mobile"
           usdRates={usdRates}
           rlusdBalance={rlusdBalance}
           transactions={previewTransactions}

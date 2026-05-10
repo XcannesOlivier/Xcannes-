@@ -69,7 +69,7 @@ export default function DemoWalletDashboard({
     loadFawazCurrencies,
   } = usePreferredCurrency();
   const [selectedStatementToken, setSelectedStatementToken] = useState(null);
-  const [isDesktop, setIsDesktop] = useState(false);
+  const isDesktop = false;
 
   const activeWallet = state.wallets[activeWalletId];
   const isWalletLabelLocked = Boolean(activeWallet?.labelLocked);
@@ -275,6 +275,7 @@ export default function DemoWalletDashboard({
     previewCurrencyTransactions,
     statementBalance,
     highlightTransactionId,
+    recentActivity,
   } = useDemoStatementData({
     state,
     activeWalletId,
@@ -370,19 +371,6 @@ export default function DemoWalletDashboard({
     if (!selectedSendToken) return;
     if (!sendAssetKey) setSendAssetKey(selectedSendToken.key);
   }, [selectedSendToken, sendAssetKey, setSendAssetKey]);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const media = window.matchMedia("(min-width: 768px)");
-    const handleChange = () => setIsDesktop(media.matches);
-    handleChange();
-    if (media.addEventListener) {
-      media.addEventListener("change", handleChange);
-      return () => media.removeEventListener("change", handleChange);
-    }
-    media.addListener(handleChange);
-    return () => media.removeListener(handleChange);
-  }, []);
 
   const sendFxInfo = useMemo(() => {
     if (!selectedSendToken) return null;
@@ -488,9 +476,8 @@ export default function DemoWalletDashboard({
   return (
     <div
       className={[
-        "h-full flex flex-col min-h-0 ring-1 rounded-md overflow-hidden bg-xcannes-surface-demo border border-white/10",
+        "bg-xcannes-surface-demo h-full min-h-0 overflow-hidden flex flex-col",
         "demo-wallet-tooltip-scope",
-        "ring-white/10",
       ].join(" ")}
     >
       <DemoWalletHeader
@@ -528,12 +515,17 @@ export default function DemoWalletDashboard({
         augmentedTokens={augmentedTokens}
         renderDemoTokenIcon={renderDemoTokenIcon}
         getDemoCurrencyLabel={getDemoCurrencyLabel}
+        recentActivity={recentActivity}
         setSelectedStatementToken={setSelectedStatementToken}
         setShowGlobalStatement={setShowGlobalStatement}
         setShowCurrencyStatement={setShowCurrencyStatement}
       />
 
-      <DemoWalletFooter />
+      <DemoWalletFooter
+        onAddCurrency={() => setWalletInfoOpen(true)}
+        onScan={() => setQrScannerOpen(true)}
+        onHistory={() => setShowGlobalStatement(true)}
+      />
 
       <DemoWalletModals
         walletInfoOpen={walletInfoOpen}
