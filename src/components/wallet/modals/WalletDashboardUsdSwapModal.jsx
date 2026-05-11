@@ -4657,7 +4657,7 @@ export default function WalletDashboardUsdSwapModal({
 	                {Number.isFinite(Number(receiveDisplayAmount)) && Number(receiveDisplayAmount) > 0
 	                  ? (formatAmountNumber ? formatAmountNumber.format(Number(receiveDisplayAmount)) : String(receiveDisplayAmount))
 	                  : "—"}{" "}
-	                {toTicker || ""}
+	                {(walletTargetSelectionEnabled ? selectedSourceCurrencyCode : toTicker) || ""}
 	              </span>
 	            </div>
 	            <div className="mt-2.5 flex items-center justify-between gap-3">
