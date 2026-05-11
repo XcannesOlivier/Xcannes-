@@ -2761,17 +2761,27 @@ export default function WalletDashboardUsdSwapModal({
           >
             {step === "deposit" ? (
               <div className="space-y-5">
-                <div className="flex items-center gap-3 px-1">
-                  <div className="text-sm text-white/80 font-semibold">
-                    {t("ui_transfer_deposit", "Transférer le dépôt")}
+                {/* Barre swipe mobile / croix fermeture desktop */}
+                <div className="flex items-center justify-between">
+                  <div className="md:hidden flex justify-center w-full cursor-grab select-none" aria-hidden>
+                    <span className="block w-12 h-1.5 rounded-full bg-white/20" />
                   </div>
+                  <button
+                    type="button"
+                    onClick={closeModal}
+                    aria-label="Fermer"
+                    className="hidden md:flex ml-auto items-center justify-center w-8 h-8 rounded-full text-white/50 hover:text-white hover:bg-white/10 transition-colors"
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="w-5 h-5" aria-hidden>
+                      <path d="M18 6L6 18M6 6l12 12" />
+                    </svg>
+                  </button>
                 </div>
-
                 <div className="text-center pt-1">
                   <div className="text-white font-semibold text-2xl leading-tight">
                     {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
                       ? t("ui_execute_swap_and_send", "Swap XRPL puis dépôt partenaire")
-                      : t("ui_send_your_funds", "Envoyez vos fonds")}
+                      : t("ui_send_your_funds", "Envoyer vos stablecoins")}
                   </div>
                   <div className="mt-2 text-sm text-white/60 max-w-sm mx-auto">
                     {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
@@ -2781,7 +2791,7 @@ export default function WalletDashboardUsdSwapModal({
                         )
                       : t(
                           "ui_usd_swap_created_body_external_xrp",
-                          "Envoyez le stablecoin demandé vers SimpleSwap. Une fois le XRP reçu sur votre wallet XCANNES, signez la conversion XRP → RLUSD.",
+                          "Envoyez le stablecoin que vous avez choisi vers SimpleSwap.",
                         )}
                   </div>
                 </div>
@@ -2892,45 +2902,25 @@ export default function WalletDashboardUsdSwapModal({
                   <div className="rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-black/20">
                     <div className="flex items-center justify-between gap-3">
                       <div className="text-white/60 text-xs">
-                        {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD
-                          ? t("ui_you_get_xrp_first", "Vous recevez d’abord")
-                          : t("ui_you_get", "Vous obtenez")}
+                        {t("ui_you_get", "Vous recevez")}
                       </div>
-                      {partnerToNetwork ? (
+                      {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE && partnerToNetwork ? (
                         <span className="shrink-0 rounded-full bg-white/10 text-white/70 text-xs font-semibold px-2.5 py-1">
                           {partnerToNetwork}
                         </span>
                       ) : null}
                     </div>
                     <div className="mt-1 text-white font-semibold text-lg leading-tight">
-                      {String(receiveAmountExact || "").trim()
-                        ? `${receiveAmountExact} ${direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD ? "XRP" : partnerToTicker}`
-                        : (direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD
-                            ? quotedPartnerReceiveAmount
-                            : quotedReceiveAmount)
-                          ? `≈${
-                              formatAmountNumber
-                                ? formatAmountNumber.format(
-                                    direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD
-                                      ? quotedPartnerReceiveAmount
-                                      : quotedReceiveAmount,
-                                  )
-                                : String(
-                                    direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD
-                                      ? quotedPartnerReceiveAmount
-                                      : quotedReceiveAmount,
-                                  )
-                            } ${direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD ? "XRP" : partnerToTicker}`
-                          : `— ${direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD ? "XRP" : partnerToTicker}`}
+                      {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD
+                        ? (Number.isFinite(Number(receiveDisplayAmount)) && Number(receiveDisplayAmount) > 0
+                            ? `≈${formatAmountNumber ? formatAmountNumber.format(Number(receiveDisplayAmount)) : String(receiveDisplayAmount)} ${selectedSourceCurrencyCode}`
+                            : `— ${selectedSourceCurrencyCode}`)
+                        : (String(receiveAmountExact || "").trim()
+                            ? `${receiveAmountExact} ${partnerToTicker}`
+                            : quotedReceiveAmount
+                              ? `≈${formatAmountNumber ? formatAmountNumber.format(quotedReceiveAmount) : String(quotedReceiveAmount)} ${partnerToTicker}`
+                              : `— ${partnerToTicker}`)}
                     </div>
-                    {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD ? (
-                      <div className="mt-3 text-[11px] text-white/55">
-                        {t(
-                          "ui_usd_swap_convert_after_receive",
-                          "Quand le dépôt partenaire est terminé et que le XRP est crédité sur XRPL, signez la conversion XRP → RLUSD ci-dessous.",
-                        )}
-                      </div>
-                    ) : null}
                   </div>
                 ) : null}
 
@@ -2963,26 +2953,9 @@ export default function WalletDashboardUsdSwapModal({
                     >
                       {swapSubmitting
                         ? t("ui_signing_swap", "Signature…")
-                        : t("ui_convert_xrp_to_rlusd", "Convertir le XRP en RLUSD")}
+                        : t("ui_convert_xrp_to_rlusd", "Finaliser la transaction")}
                     </button>
                   ) : null}
-                  <button
-                    type="button"
-                    onClick={refreshExchange}
-                    disabled={!exchangeId || exchangeRefreshing || swapSubmitting}
-                    className="flex-1 rounded-lg border border-white/10 bg-black/20 text-white/80 font-semibold py-3 transition-colors hover:bg-black/30 hover:text-white disabled:opacity-50"
-                  >
-                    {exchangeRefreshing
-                      ? t("ui_refreshing", "Rafraîchit…")
-                      : t("ui_refresh", "Rafraîchir")}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={closeModal}
-                    className={`flex-1 py-3 ${actionBtnBase}`}
-                  >
-                    {t("ui_close_08378568ba", "Fermer")}
-                  </button>
                 </div>
               </div>
             ) : (
