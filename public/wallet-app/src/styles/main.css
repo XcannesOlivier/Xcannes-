@@ -309,11 +309,9 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
 }
 
 #screen-confirm-secure .logo {
-  border-color: rgba(0, 200, 83, 0.16);
-  box-shadow:
-    0 0 0 1px rgba(0, 200, 83, 0.10) inset,
-    0 0 22px rgba(0, 200, 83, 0.14),
-    0 24px 60px rgba(0, 0, 0, 0.60);
+  background: transparent;
+  border: none;
+  box-shadow: none;
   margin-bottom: 18px;
 }
 
@@ -485,11 +483,9 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
 }
 
 #screen-choice .logo {
-  border-color: rgba(0, 200, 83, 0.20);
-  box-shadow:
-    0 0 0 1px rgba(0, 200, 83, 0.10) inset,
-    0 0 22px rgba(0, 200, 83, 0.16),
-    0 24px 60px rgba(0, 0, 0, 0.60);
+  background: transparent;
+  border: none;
+  box-shadow: none;
   margin-bottom: 18px;
 }
 
@@ -716,19 +712,15 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
 .logo {
   width: 72px;
   height: 72px;
-  border-radius: var(--radius-xl);
-  background: var(--bg-primary);
-  border: 1px solid var(--border-light);
+  background: transparent;
+  border: none;
+  box-shadow: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: var(--font-orbitron);
-  font-size: 28px;
-  font-weight: 800;
-  color: var(--text-primary);
-  text-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
   margin-bottom: 20px;
   flex-shrink: 0;
+  object-fit: contain;
 }
 
 .logo-sm {
@@ -847,12 +839,9 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
 #screen-pin-unlock .logo {
   width: 86px;
   height: 86px;
-  border-radius: 22px;
-  border-color: rgba(0, 200, 83, 0.18);
-  box-shadow:
-    0 0 0 1px rgba(0, 200, 83, 0.10) inset,
-    0 0 28px rgba(0, 200, 83, 0.14),
-    0 26px 70px rgba(0, 0, 0, 0.60);
+  background: transparent;
+  border: none;
+  box-shadow: none;
   margin-bottom: 22px;
 }
 
@@ -932,12 +921,9 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
 #screen-unlock .logo {
   width: 86px;
   height: 86px;
-  border-radius: 22px;
-  border-color: rgba(0, 200, 83, 0.18);
-  box-shadow:
-    0 0 0 1px rgba(0, 200, 83, 0.10) inset,
-    0 0 28px rgba(0, 200, 83, 0.14),
-    0 26px 70px rgba(0, 0, 0, 0.60);
+  background: transparent;
+  border: none;
+  box-shadow: none;
   margin-bottom: 22px;
 }
 
@@ -1216,12 +1202,9 @@ h3 {
 }
 
 #screen-welcome .logo {
-  border-color: rgba(22, 163, 74, 0.22);
-  box-shadow:
-    0 0 0 1px rgba(22, 163, 74, 0.15) inset,
-    0 0 22px rgba(0, 200, 83, 0.22),
-    0 24px 60px rgba(0, 0, 0, 0.6);
-  text-shadow: 0 0 18px rgba(255, 255, 255, 0.25);
+  background: transparent;
+  border: none;
+  box-shadow: none;
   margin-bottom: 18px;
 }
 
