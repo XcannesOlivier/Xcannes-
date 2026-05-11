@@ -258,9 +258,11 @@ export default function WalletDashboardCashModal({
     noticeVariant === "demo" ? "demo-wallet-tooltip-scope" : "",
     inline ? "wallet-inline-zoom-in" : "",
     !inline
-      ? isClosing
-        ? "wallet-modal-lift-out"
-        : "wallet-modal-lift-in"
+      ? closeRequestedRef.current
+        ? ""
+        : isClosing
+          ? "wallet-modal-lift-out"
+          : "wallet-modal-lift-in"
       : "",
   ].join(" ");
 
@@ -270,10 +272,20 @@ export default function WalletDashboardCashModal({
       {!inline ? (
         <div
           className={`fixed inset-0 z-[10000] bg-black/80 md:backdrop-blur-sm ${
-            isClosing ? "wallet-modal-backdrop-out" : "wallet-modal-backdrop-in"
+            closeRequestedRef.current
+              ? ""
+              : isClosing
+                ? "wallet-modal-backdrop-out"
+                : "wallet-modal-backdrop-in"
           }`}
           onClick={onClose}
-          style={overlayTranslateY > 0 ? { opacity: Math.max(0, Math.min(1, 1 - overlayTranslateY / 420)) } : undefined}
+          style={
+            overlayTranslateY > 0
+              ? { opacity: Math.max(0, Math.min(1, 1 - overlayTranslateY / 420)) }
+              : closeRequestedRef.current
+                ? { opacity: 0 }
+                : undefined
+          }
         />
       ) : null}
 

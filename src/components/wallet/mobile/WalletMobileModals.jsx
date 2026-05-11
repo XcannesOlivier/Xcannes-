@@ -274,7 +274,7 @@ export default function WalletMobileModals({
 	              walletLabel={cashModalProps?.walletLabel || ""}
 	              onClose={() => {
 	                resetCashForm?.();
-	                setActiveAction(null);
+	                setActiveAction((prev) => (prev === "cashChoice" ? null : prev));
 	                setCashBuyPrefill(null);
 	              }}
 		              onChooseBuy={() => {
