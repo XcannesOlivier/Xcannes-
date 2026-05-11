@@ -2963,62 +2963,7 @@ export default function WalletDashboardUsdSwapModal({
               </div>
             ) : (
               <div className="space-y-5 relative z-[2]">
-                {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE && false ? (
-	                    <div className="relative px-4 pt-[40px] md:pt-[90px] pb-4 text-center">
-	                      <h3 className="text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight mb-2">
-	                        {flowTitle}
-	                      </h3>
-                      <p className="mb-4 text-[14px] md:text-[15px] text-white/80 leading-relaxed">
-                        {flowSubtitle}
-                      </p>
-                      <div className="flex justify-center">
-                        <div className="inline-flex flex-col items-center gap-1 bg-elevated px-4 py-2 rounded-3xl shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]">
-                          <span className="text-white/50 text-[11px] font-medium tracking-wide">
-	                            {t("moonpay_from_account", "Compte source")}
-                          </span>
-                          <div className="flex items-center gap-2">
-                            <span
-                              className={`h-3 w-3 rounded-full ring-4 shrink-0 animate-pulse ${accentPulseDot}`}
-                              aria-hidden
-                            />
-                            <span className="text-white/95 text-[17px] md:text-[18px] font-semibold">
-                              {walletLabel || "XCANNES"}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <div
-                      className={[
-                        "rounded-t-[14px] rounded-b-none px-4 py-4 ring-1 ring-white/10 ring-inset bg-[#101415]",
-                        "shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]",
-                      ].join(" ")}
-                    >
-                      <p className="text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
-                        {walletTargetSelectionEnabled
-                          ? t("moonpay_destination_wallet", "Vers le compte")
-	                          : t("moonpay_from_account", "Compte de réception")}
-                      </p>
-                      {String(walletLabel || "").trim() ? (
-                        <div className="flex items-center gap-2 mb-1">
-                          <span
-                            className={`h-3 w-3 rounded-full ring-4 shrink-0 animate-pulse ${accentPulseDot}`}
-                            aria-hidden
-                          />
-                          <p className="min-w-0 text-[16px] md:text-[17px] text-white font-semibold truncate">
-                            {walletLabel}
-                          </p>
-                        </div>
-                      ) : null}
-                      {String(walletAddress || "").trim() ? (
-                        <p className="text-[13px] md:text-sm font-mono break-all md:tracking-[0.06em] text-white/70">
-                          {walletAddress}
-                        </p>
-                      ) : null}
-                    </div>
-                  )
-                ) : null}
+                {null /* Compte source masqué */}
 
                 {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE || walletTargetSelectionEnabled ? (
                   <div className="px-1">
