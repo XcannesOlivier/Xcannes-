@@ -879,7 +879,7 @@ export default function WalletDashboardUsdSwapModal({
         )
 	      : t(
 	          "ui_swap_subtitle_out",
-	          "Choisissez la devise, le montant, le stablecoin et l’adresse de réception.",
+	          "Choisissez la devise, le montant et le stablecoin.",
 	        ));
   const walletSelectorDialogTitle = t(
     "ui_choose_wallet_currency",
@@ -3016,13 +3016,14 @@ export default function WalletDashboardUsdSwapModal({
 				                              ? t("ui_usd_swap_you_receive", "Choisissez le montant et le stablecoin")
 				                              : (
 				                                <span className="inline-flex items-center gap-1.5 flex-wrap">
-				                                  <span>{t("ui_swap_you_send_pre", "Choisissez le montant et la devise,")}</span>
+				                                  <span>{t("ui_swap_you_send_from", "Depuis le compte")}</span>
 				                                  {String(walletLabel || "").trim() ? (
 				                                    <span className="inline-flex items-center gap-1 rounded-full bg-black/60 ring-1 ring-white/10 px-2 py-0.5 text-white/85 animate-pulse">
 				                                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block" />
 				                                      <span className="font-medium">{walletLabel}</span>
 				                                    </span>
 				                                  ) : null}
+				                                  <span>{t("ui_swap_you_send_pre", ", choisissez le montant et la devise")}</span>
 				                                </span>
 				                              )}
 	                          </div>
@@ -3245,7 +3246,7 @@ export default function WalletDashboardUsdSwapModal({
 			                                  ) : null}
 			                                  <span>{t("ui_usd_swap_credited_post", "sera crédité de")}</span>
 			                                </span>
-			                              ) : t("ui_usd_swap_recipient_receives", "Le wallet destinataire reçoit")}
+			                              ) : t("ui_usd_swap_recipient_receives", "Le wallet destinataire recevra")}
 		                            </div>
                             <div className="flex items-center gap-2">
                               {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE ? (

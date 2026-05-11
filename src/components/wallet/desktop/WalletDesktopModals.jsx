@@ -286,7 +286,7 @@ export default function WalletDesktopModals({
 		              initialSourceCurrency: "USD",
 			              titleOverride: "Acheter des stablecoins",
 			              subtitleOverride:
-			                "Choisissez la devise, le montant, le stablecoin et l’adresse de réception.",
+			                "Choisissez la devise, le montant et le stablecoin.",
 			            });
 			          }}
 	        />
