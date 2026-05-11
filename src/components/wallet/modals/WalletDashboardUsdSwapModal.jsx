@@ -2967,16 +2967,12 @@ export default function WalletDashboardUsdSwapModal({
 
                 {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE || walletTargetSelectionEnabled ? (
                   <div className="px-1">
-                    {!walletInlineSelectionEnabled ? (
-                      <h3 className="text-white font-semibold text-base md:text-lg leading-tight">
-                        {flowTitleDisplay}
-                      </h3>
-                    ) : null}
-                    {!walletInlineSelectionEnabled ? (
-                      <p className="mt-1 text-[15px] md:text-sm leading-snug text-white/85">
-                        {flowSubtitle}
-                      </p>
-                    ) : null}
+                    <h3 className="text-white font-semibold text-base md:text-lg leading-tight">
+                      {flowTitleDisplay}
+                    </h3>
+                    <p className="mt-1 text-[15px] md:text-sm leading-snug text-white/85">
+                      {flowSubtitle}
+                    </p>
                   </div>
                 ) : null}
 
