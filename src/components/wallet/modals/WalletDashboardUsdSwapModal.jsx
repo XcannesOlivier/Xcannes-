@@ -2425,7 +2425,25 @@ export default function WalletDashboardUsdSwapModal({
   }, [direction, open, receiveAddress, walletAddress]);
 
   useEffect(() => {
-    if (open) return;
+    if (open) {
+      // Réouverture : toujours remettre le panel à sa position initiale
+      // (modalOverlayTranslateY peut être encore à window.innerHeight après un swipe-close)
+      modalCloseRequestedRef.current = false;
+      setModalOverlayDragging(false);
+      setModalOverlayTranslateY(0);
+      modalOverlayDragMetaRef.current = {
+        startY: 0,
+        startAt: 0,
+        pointerId: null,
+        lastDelta: 0,
+        pending: false,
+        source: null,
+        dragging: false,
+        scrollLocked: false,
+        lockedOverflowY: "",
+      };
+      return;
+    }
     const wasSwipeClosed = modalCloseRequestedRef.current;
     modalCloseRequestedRef.current = false;
     try {
