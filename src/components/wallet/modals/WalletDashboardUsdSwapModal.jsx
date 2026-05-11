@@ -2426,6 +2426,7 @@ export default function WalletDashboardUsdSwapModal({
 
   useEffect(() => {
     if (open) return;
+    const wasSwipeClosed = modalCloseRequestedRef.current;
     modalCloseRequestedRef.current = false;
     try {
       const listEl = modalOverlayListRef.current;
@@ -2437,7 +2438,7 @@ export default function WalletDashboardUsdSwapModal({
       // ignore
     }
     setModalOverlayDragging(false);
-    setModalOverlayTranslateY(0);
+    if (!wasSwipeClosed) setModalOverlayTranslateY(0);
     modalOverlayDragMetaRef.current = {
       startY: 0,
       startAt: 0,
