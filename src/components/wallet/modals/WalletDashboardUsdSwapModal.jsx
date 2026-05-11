@@ -2599,6 +2599,7 @@ export default function WalletDashboardUsdSwapModal({
   const wrapperClass = inline
     ? "relative w-full h-full flex"
     : "fixed inset-0 z-[10001] flex items-end md:items-center justify-center md:px-4 pointer-events-none";
+  const isSwipeClosing = isClosing && modalOverlayTranslateY > 0;
   const panelClass = [
     "relative w-full wallet-modal-panel wallet-convert-modal wallet-modal-no-top-highlight-mobile border-white/10 md:border lg:border-0 overflow-hidden flex flex-col min-h-0 pointer-events-auto pb-[env(safe-area-inset-bottom)] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-26px_46px_rgba(0,0,0,0.55)]",
     inline
@@ -2608,9 +2609,11 @@ export default function WalletDashboardUsdSwapModal({
     noticeVariant === "demo" ? "demo-wallet-tooltip-scope" : "",
     inline ? "wallet-inline-zoom-in" : "",
     !inline
-      ? isClosing
+      ? isClosing && !isSwipeClosing
         ? "wallet-modal-lift-out"
-        : "wallet-modal-lift-in"
+        : isClosing
+          ? ""
+          : "wallet-modal-lift-in"
       : "",
   ].join(" ");
 
@@ -2619,18 +2622,20 @@ export default function WalletDashboardUsdSwapModal({
       {!inline ? (
         <div
           className={`fixed inset-0 z-[10000] bg-black/80 md:backdrop-blur-sm ${
-            isClosing ? "wallet-modal-backdrop-out" : "wallet-modal-backdrop-in"
+            isClosing && !isSwipeClosing ? "wallet-modal-backdrop-out" : "wallet-modal-backdrop-in"
           }`}
           onClick={closeModal}
           style={
-            modalOverlayTranslateY > 0
-              ? {
-                  opacity: Math.max(
-                    0,
-                    Math.min(1, 1 - modalOverlayTranslateY / 420),
-                  ),
-                }
-              : undefined
+            isSwipeClosing
+              ? { opacity: 0 }
+              : modalOverlayTranslateY > 0
+                ? {
+                    opacity: Math.max(
+                      0,
+                      Math.min(1, 1 - modalOverlayTranslateY / 420),
+                    ),
+                  }
+                : undefined
           }
         />
       ) : null}
