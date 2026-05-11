@@ -18,6 +18,19 @@ import { normalizeQrImageFile } from "../utils/demoQrImage";
 const XRPL_ADDRESS_RE = /^(?:xrpl:)?r[1-9A-HJ-NP-Za-km-z]{24,34}$/;
 const DEMO_ADDRESS_RE = /^[A-Za-z][A-Za-z0-9_]{10,}$/;
 
+const fmtAmountRight = (raw) => {
+  if (!raw) return null;
+  const str = String(raw);
+  const i = str.lastIndexOf(" ");
+  if (i < 0) return <span>{str}</span>;
+  return (
+    <span className="inline-flex items-baseline gap-[3px]">
+      {str.slice(0, i)}
+      <span className="text-[0.78em]">{str.slice(i + 1)}</span>
+    </span>
+  );
+};
+
 export default function DemoWalletDashboardSendModal({
   open,
   onClose,
@@ -48,6 +61,9 @@ export default function DemoWalletDashboardSendModal({
   const locale = i18n?.language || "en";
   const [saveNewAddress, setSaveNewAddress] = useState(false);
   const [saveNewAddressLabel, setSaveNewAddressLabel] = useState("");
+  const [showFullRecipientAccount, setShowFullRecipientAccount] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState("idle"); // idle | processing | success | error
+  const [submitError, setSubmitError] = useState("");
   const [scanActive, setScanActive] = useState(false);
   const [scanKey, setScanKey] = useState(0);
   const [cameraUnavailable, setCameraUnavailable] = useState(false);
@@ -82,6 +98,11 @@ export default function DemoWalletDashboardSendModal({
     () => String(sendDestination || "").trim(),
     [sendDestination],
   );
+  const compactDestinationLabel = normalizedDestination
+    ? normalizedDestination.length > 14
+      ? `${normalizedDestination.slice(0, 6)}…${normalizedDestination.slice(-4)}`
+      : normalizedDestination
+    : "";
   const hasDestination = useMemo(() => {
     if (!normalizedDestination) return false;
     return (
@@ -158,15 +179,30 @@ export default function DemoWalletDashboardSendModal({
         )
       : null;
   const handleManualSend = async () => {
+    if (submitStatus === "processing") return;
+    setSubmitStatus("processing");
+    setSubmitError("");
     const result = await handleSendSubmit?.({
       saveDestination:
         saveNewAddress && canSaveDestination ? normalizedDestination : "",
       saveLabel: saveNewAddressLabel,
+      closeOnSuccess: false,
     });
     if (result?.ok) {
       setSaveNewAddress(false);
       setSaveNewAddressLabel("");
+      setSubmitStatus("success");
+      window.setTimeout(() => {
+        onClose?.();
+      }, 650);
+      return;
     }
+    if (result?.error) {
+      setSubmitError(String(result.error));
+    } else {
+      setSubmitError(t("demo_error_generic", "Action impossible (démo)."));
+    }
+    setSubmitStatus("error");
   };
   const handleManualQrFile = async (file) => {
     if (!file) return;
@@ -394,6 +430,9 @@ export default function DemoWalletDashboardSendModal({
       setShowSavedPicker(false);
       setSelectedSavedLabel("");
       setSendAssetDropdownOpen(false);
+      setShowFullRecipientAccount(false);
+      setSubmitStatus("idle");
+      setSubmitError("");
     }
   }, [open]);
 
@@ -416,6 +455,14 @@ export default function DemoWalletDashboardSendModal({
     }
     setCameraUnavailable(false);
   }, [open]);
+
+  useEffect(() => {
+    setShowFullRecipientAccount(false);
+  }, [normalizedDestination]);
+
+  useEffect(() => {
+    setShowFullRecipientAccount(false);
+  }, [normalizedDestination]);
 
   useEffect(() => {
     if (scanActive) {
@@ -829,48 +876,49 @@ export default function DemoWalletDashboardSendModal({
 
   const inlineSummary = hasDestination ? (
     <div className="space-y-3 transition-all duration-200">
-      <div className="text-[11px] text-white/45">
-        {t(
-          "ui_verify_before_sending",
-          "Vérifiez les informations avant d’envoyer",
-        )}
-      </div>
-      <div className="rounded-[14px] p-4 space-y-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
-        <div className="text-xs uppercase tracking-wide text-white/60 font-semibold">
-          {t("ui_send_confirmation_title", "Résumé de l'envoi")}
-        </div>
-        <div className="space-y-3 text-sm text-white/80">
-          <div className="flex items-center justify-between gap-3">
-            <span className="text-white/60 shrink-0">
-              {t("ui_beneficiary_label", "Destinataire")}
-            </span>
-            <span className="font-semibold text-white/90">
+      <div className="rounded-[16px] overflow-hidden">
+        <div className="flex flex-col gap-1 px-6 pt-3 pb-2">
+          <span className="text-[13px] text-white/45 font-normal">
+            {t("ui_beneficiary_label", "Destinataire")} —{" "}
+            <span className="text-white/85 font-semibold">
               {resolvedDestinationLabel ||
                 t("ui_wallet_unknown", "Unknown wallet")}
             </span>
-          </div>
-
-          <div className="flex items-center justify-between gap-3">
-            <span className="text-white/60">
-              {t("ui_amount_52cea2dd3d", "Montant")}
+          </span>
+          {normalizedDestination ? (
+            <span className="text-[13px] text-white/45 font-normal tabular-nums">
+              {t("ui_account_number_label", "N° de compte")} —{" "}
+              <button
+                type="button"
+                onClick={() => setShowFullRecipientAccount((prev) => !prev)}
+                className="font-mono text-xcannes-green/80 hover:text-xcannes-green/95 transition-colors underline decoration-white/25 underline-offset-2 hover:decoration-white/60"
+                title={t(
+                  "ui_toggle_full_account_number",
+                  "Afficher/masquer l'adresse complète",
+                )}
+              >
+                {showFullRecipientAccount
+                  ? normalizedDestination
+                  : compactDestinationLabel}
+              </button>
             </span>
-            <span
-              className={`font-mono ${
-                summaryAmount > 0 ? "text-white/90" : "text-white/40"
-              }`}
-            >
-              {confirmAmountLabel || "0"}
-            </span>
-          </div>
-
-          <div className="flex items-center justify-between gap-3 pt-2 mt-1 relative before:content-[''] before:absolute before:top-0 before:left-0 before:right-0 before:h-px before:bg-white/10">
-            <span className="text-white/70 font-semibold">
-              {t("ui_total", "Total")}
-            </span>
-            <span className="font-mono text-white/90 font-semibold">
-              {confirmAmountLabel || "0"}
-            </span>
-          </div>
+          ) : null}
+        </div>
+        <div className="px-3 mt-3 mb-0">
+          <div className="h-px bg-white/45 rounded-full" />
+        </div>
+        <div className="flex items-center justify-between px-4 pt-4 pb-4 mt-0.5 mx-1 mb-1 rounded-[12px]">
+          <span className="text-[15px] text-white/45 font-normal tracking-[0.02em]">
+            {t("ui_total_to_send_label", "Total à envoyer")}
+          </span>
+          <span
+            className={
+              "text-3xl font-bold tracking-tight " +
+              (summaryAmount > 0 ? "text-white" : "text-white/75")
+            }
+          >
+            {confirmAmountLabel || "0"}
+          </span>
         </div>
       </div>
     </div>
@@ -939,28 +987,73 @@ export default function DemoWalletDashboardSendModal({
                 value={selectedSendToken ? selectedSendToken.key : ""}
                 onChange={setSendAssetKey}
                 onOpenChange={setSendAssetDropdownOpen}
+                hideSelected
                 options={(augmentedTokens || []).map((token) => {
-                  const labelLeft =
+                  const currency = String(token?.currency || "").toUpperCase();
+                  const fullName =
                     selectLabelByAssetKey?.[token.key] ||
-                    selectLabelByAssetKey?.[token.currency] ||
+                    selectLabelByAssetKey?.[currency] ||
                     token.currency;
-                  const labelRight =
+                  const labelLeftText =
+                    String(fullName || "").length > 15
+                      ? String(fullName || "").slice(0, 15) + "…"
+                      : String(fullName || "");
+                  const labelLeft = (
+                    <span className="text-[1.12em]">{labelLeftText}</span>
+                  );
+                  const labelRightRaw =
                     selectLabelRightByAssetKey?.[token.key] ||
-                    selectLabelRightByAssetKey?.[token.currency] ||
+                    selectLabelRightByAssetKey?.[currency] ||
                     null;
+                  const isSelected =
+                    String(token.key) === String(selectedSendToken?.key || "");
+                  const labelRight =
+                    !sendAssetDropdownOpen && isSelected
+                      ? (
+                          <span className="inline-flex items-center gap-[3px] text-[10px] text-white/30 tracking-normal font-normal">
+                            <svg
+                              width="11"
+                              height="11"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              aria-hidden="true"
+                              className="opacity-50 shrink-0"
+                            >
+                              <path
+                                d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6Z"
+                                stroke="currentColor"
+                                strokeWidth="1.5"
+                              />
+                              <circle
+                                cx="12"
+                                cy="12"
+                                r="3"
+                                stroke="currentColor"
+                                strokeWidth="1.5"
+                              />
+                            </svg>
+                            <span>
+                              {t(
+                                "ui_balances_short_label_aa12",
+                                "Solde disponible",
+                              )}
+                            </span>
+                          </span>
+                        )
+                      : fmtAmountRight(labelRightRaw);
                   return {
                     value: token.key,
                     icon:
                       selectIconByAssetKey?.[token.key] ||
                       selectIconByAssetKey?.[token.currency] ||
                       null,
-                    label: labelLeft,
+                    label: labelLeftText,
                     labelLeft,
                     labelRight,
                     labelMobile:
                       selectLabelMobileByAssetKey?.[token.key] ||
                       selectLabelMobileByAssetKey?.[token.currency] ||
-                      labelLeft,
+                      labelLeftText,
                   };
                 })}
                 useNativeSelect={false}
@@ -1009,16 +1102,16 @@ export default function DemoWalletDashboardSendModal({
             </div>
 
             {sendFxInfo && (
-              <div className="rounded-[14px] p-3 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
-                <div className="text-[11px] font-semibold text-white/80">
+              <div className="rounded-[20px] p-4 space-y-3 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
+                <div className="text-xs uppercase tracking-wide text-white/60 font-semibold">
                   {t(
                     "ui_payment_fx_base_usd_r_gleme_4818b8a6c3",
                     "Paiement FX (base USD · règlement XRPL via USD)",
                   )}
                 </div>
-                <p className="mt-1 text-[11px] text-white/60">
-                  ≈{" "}
-                  <span className="font-mono">
+                <p className="text-[13px] text-white/70">
+                  <span className="text-white/50">≈ </span>
+                  <span className="font-mono text-white/85">
                     {formatAmountWithSymbol(
                       locale,
                       Number(sendFxInfo.paymentRlusd || 0),
@@ -1026,19 +1119,21 @@ export default function DemoWalletDashboardSendModal({
                       { minimumFractionDigits: 0, maximumFractionDigits: 6 },
                     )}
                   </span>{" "}
-                  {t("ui_au_recipient_67dcc85cec", "au destinataire")}
+                  <span className="text-white/55">
+                    {t("ui_au_recipient_67dcc85cec", "au destinataire")}
+                  </span>
                 </p>
                 {Number(sendFxInfo.spreadFeeRlusd || 0) > 0 && (
-                  <p className="mt-1 text-[11px] text-white/60">
+                  <p className="text-[13px] text-white/70">
                     {t(
                       "ui_spread_xcannes_tier_7ad17576d3",
-                      "Conversion fee (1%)",
+                      "Frais de conversion (1%)",
                     )}
                     {sendFxInfo.fxSource ? (
                       <>
                         {" "}
                         · {t("ui_source_507c065942", "source")}{" "}
-                        <span className="font-mono">
+                        <span className="font-mono text-white/80">
                           {String(sendFxInfo.fxSource).toUpperCase()}
                         </span>
                       </>
@@ -1053,7 +1148,7 @@ export default function DemoWalletDashboardSendModal({
                       </>
                     )}
                     :{" "}
-                    <span className="font-mono">
+                    <span className="font-mono text-white/85">
                       {formatAmountWithSymbol(
                         locale,
                         Number(sendFxInfo.spreadFeeRlusd || 0),
@@ -1063,7 +1158,7 @@ export default function DemoWalletDashboardSendModal({
                     </span>
                   </p>
                 )}
-                <p className="mt-2 text-[10px] text-white/40">
+                <p className="text-[11px] text-white/40">
                   {Number(sendFxInfo.spreadFeeRlusd || 0) > 0
                     ? t(
                         "demo_send_flow_with_fee_f4",
@@ -1083,21 +1178,114 @@ export default function DemoWalletDashboardSendModal({
     </div>
   ) : null;
 
+  const sendButtonDisabled = sendProcessing || !canManualSend;
+  const sendButtonLabel = sendProcessing
+    ? t("ui_sending_3b8c1a7d5e", "Sending...")
+    : t("ui_send_504b64a87b", "Envoyer");
+
   const sendActions = (
-    <div className={inline ? "mt-auto pt-2 relative before:content-[''] before:absolute before:top-0 before:left-0 before:right-0 before:h-px before:bg-white/10" : ""}>
+    <div className="sticky bottom-0 pt-8 pb-3 mt-auto space-y-2 bg-inherit z-10 relative">
+      {submitStatus === "error" && submitError ? (
+        <div className="rounded-[16px] ring-1 ring-orange-400/30 ring-inset bg-orange-400/10 px-4 py-3 text-xs text-orange-200/90">
+          <div className="font-semibold">
+            {t("ui_send_failed", "Envoi impossible")}
+          </div>
+          <div className="mt-1 text-orange-200/80">{submitError}</div>
+        </div>
+      ) : null}
       <button
         type="button"
         onClick={(e) => {
           e.stopPropagation();
           handleManualSend();
         }}
-        disabled={sendProcessing || !canManualSend}
-        className={`w-full text-xl py-4 ${greenActionBtnBase}`}
+        disabled={
+          sendButtonDisabled ||
+          submitStatus === "processing" ||
+          submitStatus === "success"
+        }
+        className={[
+          "w-full h-14 rounded-[20px] text-lg font-semibold transition-all duration-200 tracking-[-0.01em]",
+          sendButtonDisabled
+            ? sendProcessing
+              ? "opacity-45 cursor-not-allowed"
+              : "bg-xcannes-green/[0.07] text-xcannes-green/60 cursor-not-allowed ring-[0.5px] ring-xcannes-green/40 ring-inset"
+            : "text-white hover:scale-[1.01] active:scale-[0.98]",
+        ].join(" ")}
+        style={
+          sendButtonDisabled
+            ? sendProcessing
+              ? {
+                  background:
+                    "linear-gradient(180deg, rgba(34,154,86,0.65) 0%, rgba(14,103,58,0.65) 100%)",
+                  color: "rgba(255,255,255,0.4)",
+                }
+              : undefined
+            : {
+                background:
+                  "linear-gradient(180deg, rgba(34,154,86,1) 0%, rgba(14,103,58,1) 100%)",
+                boxShadow:
+                  "0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)",
+              }
+        }
       >
-        {sendProcessing
-          ? t("ui_sending_3b8c1a7d5e", "Sending...")
-          : t("ui_send_504b64a87b", "Send")}
+        {submitStatus === "success" ? (
+          <span className="inline-flex items-center justify-center gap-2 text-white/90">
+            <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-white/10 ring-1 ring-white/15 ring-inset">
+              <svg
+                className="w-3.5 h-3.5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+            </span>
+            {t("ui_done", "Terminé")}
+          </span>
+        ) : sendButtonDisabled && !sendProcessing ? (
+          <span className="inline-flex items-center gap-1.5 text-white/20">
+            <span className="text-xs">
+              {t("ui_send_fill_cta", "Choisissez la devise et le montant")}
+            </span>
+            <span className="inline-flex items-end gap-[3px] mb-[-1px]">
+              <span className="send-modal-dot" style={{ animationDelay: "0s" }}>
+                ·
+              </span>
+              <span
+                className="send-modal-dot"
+                style={{ animationDelay: "0.6s" }}
+              >
+                ·
+              </span>
+              <span
+                className="send-modal-dot"
+                style={{ animationDelay: "1.2s" }}
+              >
+                ·
+              </span>
+            </span>
+          </span>
+        ) : (
+          sendButtonLabel
+        )}
       </button>
+      <style>{`
+        @keyframes sendModalDotBlink {
+          0%, 100% { opacity: 0.18; }
+          50% { opacity: 0.7; }
+        }
+        .send-modal-dot {
+          animation: sendModalDotBlink 2.4s ease-in-out infinite;
+          font-size: 1.3em;
+          line-height: 1;
+        }
+      `}</style>
     </div>
   );
 

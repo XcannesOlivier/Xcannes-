@@ -280,6 +280,7 @@ export function useDemoActions({
   const handleSendSubmit = async ({
     saveDestination = "",
     saveLabel = "",
+    closeOnSuccess = true,
   } = {}) => {
     if (!selectedSendToken) return { ok: false };
     const amountNum = Number.parseFloat(sendAmount || "0");
@@ -328,25 +329,25 @@ export function useDemoActions({
       setSendDestination(dest);
     }
     if (!dest) {
-      alert(
-        t(
+      return {
+        ok: false,
+        error: t(
           "demo_error_destination_required",
           "Veuillez saisir une adresse de destination (démo).",
         ),
-      );
-      return { ok: false };
+      };
     }
     if (
       sendPaymentRequest?.to &&
       dest !== String(sendPaymentRequest.to).trim()
     ) {
-      alert(
-        t(
+      return {
+        ok: false,
+        error: t(
           "demo_error_request_destination_mismatch",
           "La destination de la demande de paiement ne correspond pas (démo).",
         ),
-      );
-      return { ok: false };
+      };
     }
 
     const currency = String(selectedSendToken.currency || "").toUpperCase();
@@ -356,14 +357,14 @@ export function useDemoActions({
       .trim()
       .toUpperCase();
     if (requestTargetCurrency && requestTargetCurrency !== currency) {
-      alert(
-        t("demo_error_request_currency_mismatch", {
+      return {
+        ok: false,
+        error: t("demo_error_request_currency_mismatch", {
           defaultValue:
             "Cette demande est en {{currency}}.\nVeuillez sélectionner {{currency}} pour payer.",
           currency: requestTargetCurrency,
         }),
-      );
-      return { ok: false };
+      };
     }
 
     const isFxSend =
@@ -381,8 +382,7 @@ export function useDemoActions({
         paymentRequest: sendPaymentRequest,
       });
       if (res?.error) {
-        alert(res.error);
-        return { ok: false };
+        return { ok: false, error: res.error };
       }
       const normalizedSaveDestination = String(saveDestination || "").trim();
       if (normalizedSaveDestination && normalizedSaveDestination === dest) {
@@ -396,9 +396,11 @@ export function useDemoActions({
           );
         }
       }
-      setActiveAction(null);
-      setSendPaymentRequest(null);
-      return { ok: true };
+      if (closeOnSuccess) {
+        setActiveAction(null);
+        setSendPaymentRequest(null);
+      }
+      return { ok: true, event: res?.event || null };
     } finally {
       setSendProcessing(false);
     }

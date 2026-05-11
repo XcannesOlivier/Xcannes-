@@ -36,27 +36,27 @@ Important :
   - Aligner le bloc scanner : boutons (upload/paste), cards, textes d’aide, état “camera unavailable”.
   - Fichiers : `Xcannes-/src/components/demo-wallet/modals/DemoWalletDashboardSendModal.jsx`, `Xcannes-/src/components/demo-wallet/components/DemoQRScanner.jsx`
 
-- [ ] 6) **Sélecteur token + montant**
+- [x] 6) **Sélecteur token + montant**
   - Aligner le look des selects + `TokenAmountInput` : label, surface, ring, spacing, typography.
   - Fichier : `Xcannes-/src/components/demo-wallet/modals/DemoWalletDashboardSendModal.jsx`
 
-- [ ] 7) **Bloc FX / infos (si affiché)**
+- [x] 7) **Bloc FX / infos (si affiché)**
   - Harmoniser le card/info FX (si `sendFxInfo`) : layout, bullets, emphasis, couleurs.
   - Fichier : `Xcannes-/src/components/demo-wallet/modals/DemoWalletDashboardSendModal.jsx`
 
-- [ ] 8) **Review / confirmation (UI)**
+- [x] 8) **Review / confirmation (UI)**
   - Le résumé (destinataire, montant, devise) + CTA (swipe/confirm) doit matcher le réel mobile.
   - Fichier : `Xcannes-/src/components/demo-wallet/modals/DemoWalletDashboardSendModal.jsx`
 
-- [ ] 9) **États “processing / success / error”**
+- [x] 9) **États “processing / success / error”**
   - Loading, disabled, success screen, error box : mêmes surfaces/typos/spacings.
   - Fichier : `Xcannes-/src/components/demo-wallet/modals/DemoWalletDashboardSendModal.jsx`
 
-- [ ] 10) **Payreq modal (UI)**
+- [x] 10) **Payreq modal (UI)**
   - Aligner la présentation d’une demande (payreq) : header, infos bénéficiaire, montant, CTA, save address.
   - Fichier : `Xcannes-/src/components/demo-wallet/modals/DemoWalletDashboardPayreqModal.jsx`
 
-- [ ] 11) **Mobile-only (garde-fou)**
+- [x] 11) **Mobile-only (garde-fou)**
   - Vérifier qu’aucune variante responsive “desktop” ne change le rendu du parcours Envoyer.
   - Scope : `Xcannes-/src/components/demo-wallet/**`
 
