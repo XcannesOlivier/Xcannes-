@@ -2,6 +2,8 @@
 
 Objectif : reproduire **uniquement l’UI** du parcours **Envoyer** du wallet réel (mobile) dans le **wallet demo**.
 
+Statut : ✅ **validée** (2026-05-11)
+
 Important :
 - On **ne change pas la mécanique** demo (state/flows peuvent différer du réel) → on aligne **visuel / structure / micro-copy** uniquement.
 - Ne pas modifier le code du **wallet réel** (`Xcannes-/src/components/wallet/**`) : référence visuelle uniquement.

@@ -110,15 +110,10 @@ export default function DemoWalletModals({
         open={activeAction === "sendChoice"}
         onClose={() => setActiveAction(null)}
         renderWalletMeta={renderWalletMeta}
+        savedAddresses={demoSavedAddresses}
         onChooseSimpleSend={() => {
           setSendPaymentRequest(null);
           setActiveAction("send");
-        }}
-        onChooseQuickScan={() => {
-          setSendPaymentRequest(null);
-          onOpenSendAfterScan?.();
-          setActiveAction(null);
-          setQrScannerOpen(true);
         }}
         onChoosePayRequest={() => {
           setSendPaymentRequest(null);
