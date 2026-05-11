@@ -3073,7 +3073,7 @@ export default function WalletDashboardUsdSwapModal({
 		                            }
 		                          >
 				                            {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD
-				                              ? t("ui_usd_swap_you_receive", "Vous recevez")
+				                              ? t("ui_usd_swap_you_receive", "Choisissez le montant et le stablecoin")
 				                              : t("ui_swap_you_send", "Vous envoyez")}
 	                          </div>
                           <div className="flex items-center gap-2">
@@ -3192,15 +3192,6 @@ export default function WalletDashboardUsdSwapModal({
                             className="w-full bg-transparent text-white text-4xl md:text-5xl font-semibold tracking-tight focus:outline-none xcannes-no-spinner"
                           />
                           <div className="text-sm text-white/50 whitespace-nowrap pb-1">
-                            {hasValidAmount
-                              ? `~${
-                                  formatUsdNumber && Number.isFinite(sendApproxUsdAmount)
-                                    ? formatUsdNumber.format(sendApproxUsdAmount)
-                                    : Number.isFinite(sendApproxUsdAmount)
-                                      ? sendApproxUsdAmount.toFixed(2)
-                                      : parsedAmount.toFixed(2)
-                                }$`
-                              : ""}
                           </div>
                         </div>
 
@@ -3293,9 +3284,18 @@ export default function WalletDashboardUsdSwapModal({
 		                                  : "text-[11px] tracking-[0.22em] uppercase text-white/45"
 		                              }
 		                            >
-			                              {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD
-			                                ? t("ui_usd_swap_credited_in", "Crédité en")
-			                                : t("ui_usd_swap_recipient_receives", "Le destinataire reçoit")}
+			                              {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD ? (
+			                                <span className="inline-flex items-center gap-1.5 flex-wrap">
+			                                  <span>{t("ui_usd_swap_credited_pre", "Votre compte")}</span>
+			                                  {String(walletLabel || "").trim() ? (
+			                                    <span className="inline-flex items-center gap-1 rounded-full bg-white/10 ring-1 ring-white/15 px-2 py-0.5 text-white/85 animate-pulse">
+			                                      <span className="w-1.5 h-1.5 rounded-full bg-xcannes-green inline-block" />
+			                                      <span className="font-medium">{walletLabel}</span>
+			                                    </span>
+			                                  ) : null}
+			                                  <span>{t("ui_usd_swap_credited_post", "sera crédité de")}</span>
+			                                </span>
+			                              ) : t("ui_usd_swap_recipient_receives", "Le destinataire reçoit")}
 		                            </div>
                             <div className="flex items-center gap-2">
                               {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE ? (
@@ -3425,9 +3425,6 @@ export default function WalletDashboardUsdSwapModal({
                               )}
                             </div>
                             <div className="text-sm text-white/50 whitespace-nowrap pb-1">
-                              {hasValidAmount && receiveApproxUsdAmount
-                                ? `~${formatUsdNumber ? formatUsdNumber.format(receiveApproxUsdAmount) : Number(receiveApproxUsdAmount).toFixed(2)}$`
-                                : ""}
                             </div>
                           </div>
 
