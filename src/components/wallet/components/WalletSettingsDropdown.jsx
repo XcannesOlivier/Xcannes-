@@ -98,11 +98,6 @@ export default function WalletSettingsDropdown({
   const [showHelpModal, setShowHelpModal] = useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [helpOpenIndex, setHelpOpenIndex] = useState(0);
-  const [showAddAccountModal, setShowAddAccountModal] = useState(false);
-  const [addAccountDragging, setAddAccountDragging] = useState(false);
-  const [addAccountTranslateY, setAddAccountTranslateY] = useState(0);
-  const addAccountOverlayRef = useRef(null);
-  const addAccountDragMetaRef = useRef({ startY: 0, startAt: 0, pointerId: null, lastDelta: 0, pending: false, dragging: false });
   const ref = useRef(null);
   const buttonRef = useRef(null);
   const menuRef = useRef(null);
@@ -703,8 +698,7 @@ export default function WalletSettingsDropdown({
                     if (isDesktop) {
                       setShowQrModal(true);
                     } else {
-                      // Non-PWA mobile: show add account modal
-                      setShowAddAccountModal(true);
+                      window.open("/wallet-app/?action=choice", "_blank");
                     }
                   }}
                   className={settingsRowClassName}
@@ -953,114 +947,6 @@ export default function WalletSettingsDropdown({
               animation: walletSettingsIn 150ms ease-out both;
             }
           `}</style>
-        </>
-      )}
-
-      {/* Add account modal (mobile, non-PWA) */}
-      {showAddAccountModal && (
-        <>
-          {/* Backdrop */}
-          <div
-            className="fixed inset-0 z-[10001] bg-black/70"
-            onClick={() => setShowAddAccountModal(false)}
-            style={addAccountTranslateY > 0 ? { opacity: Math.max(0, Math.min(1, 1 - addAccountTranslateY / 420)) } : undefined}
-          />
-          {/* Bottom sheet */}
-          <div
-            ref={addAccountOverlayRef}
-            className="fixed bottom-0 left-0 right-0 z-[10002] bg-elevated rounded-t-[28px] border-t border-white/10 pb-[env(safe-area-inset-bottom)] will-change-transform"
-            style={{
-              transform: `translateY(${Math.max(0, addAccountTranslateY)}px)`,
-              transition: addAccountDragging ? 'none' : 'transform 220ms cubic-bezier(0.2,0,0,1)',
-              opacity: addAccountTranslateY > 0 ? Math.max(0, Math.min(1, 1 - addAccountTranslateY / 420)) : undefined,
-            }}
-            onPointerMove={(event) => {
-              const meta = addAccountDragMetaRef.current;
-              if (!meta?.pending && !meta?.dragging) return;
-              if (meta.pointerId !== event.pointerId) return;
-              const delta = event.clientY - meta.startY;
-              if (delta <= 0) return;
-              if (!meta.dragging) {
-                if (delta < 8) return;
-                try { addAccountOverlayRef.current?.setPointerCapture?.(event.pointerId); } catch {}
-                meta.dragging = true;
-                setAddAccountDragging(true);
-              }
-              meta.lastDelta = delta;
-              setAddAccountTranslateY(delta);
-            }}
-            onPointerUp={(event) => {
-              const meta = addAccountDragMetaRef.current;
-              if (meta.pointerId !== event.pointerId) return;
-              const delta = meta.lastDelta || 0;
-              const duration = Math.max(1, Date.now() - (meta.startAt || 0));
-              const velocity = delta / duration;
-              meta.pending = false;
-              meta.dragging = false;
-              setAddAccountDragging(false);
-              if (delta > 160 || velocity > 1.0) {
-                const h = typeof window !== 'undefined' ? window.innerHeight : 9999;
-                setAddAccountTranslateY(Math.max(delta, h));
-                window.setTimeout(() => { setShowAddAccountModal(false); setAddAccountTranslateY(0); }, 180);
-                return;
-              }
-              setAddAccountTranslateY(0);
-            }}
-            onPointerCancel={(event) => {
-              const meta = addAccountDragMetaRef.current;
-              if (meta.pointerId !== event.pointerId) return;
-              meta.pending = false;
-              meta.dragging = false;
-              setAddAccountDragging(false);
-              setAddAccountTranslateY(0);
-            }}
-          >
-            {/* Swipe bar */}
-            <div
-              className="flex justify-center pt-3 pb-1"
-              onPointerDown={(event) => {
-                if (!event?.isPrimary || event.pointerType === 'mouse') return;
-                addAccountDragMetaRef.current = { startY: event.clientY, startAt: Date.now(), pointerId: event.pointerId, lastDelta: 0, pending: true, dragging: false };
-              }}
-            >
-              <span className="block w-12 h-1.5 rounded-full bg-white/20" aria-hidden />
-            </div>
-
-            {/* Title */}
-            <div className="px-6 pt-5 pb-6 text-center">
-              <h2 className="text-[24px] font-bold text-white/95 tracking-tight">
-                {t('ui_add_wallet', 'Ajouter un compte')}
-              </h2>
-              <p className="mt-2 text-[14px] text-white/50">
-                {t('ui_add_wallet_hint', 'Créer ou importer un compte existant')}
-              </p>
-            </div>
-
-            {/* Buttons */}
-            <div className="px-4 pb-8 space-y-3">
-              <button
-                type="button"
-                onClick={() => {
-                  setShowAddAccountModal(false);
-                  window.open('/wallet-app/?action=create', '_blank');
-                }}
-                className="w-full h-14 rounded-[20px] text-[16px] font-semibold text-white transition-all duration-200 hover:scale-[1.01] active:scale-[0.98]"
-                style={{ background: 'linear-gradient(180deg, rgba(34,154,86,1) 0%, rgba(14,103,58,1) 100%)', boxShadow: '0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)' }}
-              >
-                {t('ui_create_new_account', 'Créer un nouveau compte')}
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setShowAddAccountModal(false);
-                  window.open('/wallet-app/?action=import', '_blank');
-                }}
-                className="w-full h-14 rounded-[20px] text-[16px] font-semibold text-white/85 bg-white/[0.06] ring-1 ring-white/15 ring-inset transition-all duration-200 hover:bg-white/[0.09] active:scale-[0.98] shadow-[0_4px_14px_rgba(0,0,0,0.4)]"
-              >
-                {t('ui_import_existing_account', 'Importer un compte existant')}
-              </button>
-            </div>
-          </div>
         </>
       )}
 
