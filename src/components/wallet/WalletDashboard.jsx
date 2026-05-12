@@ -365,7 +365,6 @@ export default function WalletDashboard({
   const [highlightTransactionId, setHighlightTransactionId] = useState(null);
   const [recentActivityMovement, setRecentActivityMovement] = useState(null);
   const [recentSummaryOpen, setRecentSummaryOpen] = useState(false);
-  const recentActivityTimerRef = useRef(null);
   const [activityTooltipOpen, setActivityTooltipOpen] = useState(false);
   const activityTooltipTriggerRef = useRef(null);
 
@@ -785,19 +784,6 @@ export default function WalletDashboard({
     setRecentActivityKind(String(movement?.kind || '').trim());
     setRecentActivityMovementId(String(movement?.movementId || movement?._id || movement?.txHash || '').trim());
     setRecentActivityMovement(movement || null);
-    if (recentActivityTimerRef.current) {
-      window.clearTimeout(recentActivityTimerRef.current);
-      recentActivityTimerRef.current = null;
-    }
-  }, []);
-
-  useEffect(() => {
-    return () => {
-      if (recentActivityTimerRef.current) {
-        window.clearTimeout(recentActivityTimerRef.current);
-        recentActivityTimerRef.current = null;
-      }
-    };
   }, []);
 
   useWalletRecentActivityBanner({

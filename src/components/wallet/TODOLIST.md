@@ -5,8 +5,8 @@
 - [x] **1. `activityTooltipOpen` — tooltip jamais visible**
   Ajout de `onMouseEnter` / `onMouseLeave` sur le bouton d'activité récente pour ouvrir/fermer le tooltip au survol.
 
-- [ ] **2. `recentActivityTimerRef` — timer jamais armé**
-  Le ref est `clearTimeout`'é dans `flashRecentActivity` et dans un `useEffect` de cleanup, mais `window.setTimeout(...)` n'est **jamais appelé**. Le ref vaut toujours `null`, les deux `if (recentActivityTimerRef.current)` ne s'exécutent jamais.
+- [x] **2. `recentActivityTimerRef` — timer jamais armé**
+  Supprimé : `recentActivityTimerRef`, les deux blocs `clearTimeout` dans `flashRecentActivity` et l'`useEffect` de cleanup.
 
 ---
 
