@@ -28,8 +28,8 @@
 
 ## 🟡 Duplication JSX
 
-- [ ] **7. SVG d'icônes copié 2× (mobile 18px + desktop 16px)**
-  Les 3 SVG (send / receive / convert) sont répétés à l'identique pour mobile et desktop, seule la taille de classe change. Un petit composant `<ActivityIcon size icon />` éliminerait ~60 lignes.
+- [x] **7. SVG d'icônes copié 2× (mobile 18px + desktop 16px)**
+  Extrait en composant `ActivityIconSvg({ icon, size })` avant le composant principal. Les 2 blocs JSX remplacés par `<ActivityIconSvg icon={recentActivityIcon} size={18/16} />`.
 
 - [ ] **8. Label d'activité i18n dupliqué**
   Le bloc ternaire à 4 branches (`convert` / `receive` / `send` / default) avec `t(...)` est répété **2 fois** dans le JSX. Extraire dans une variable `const recentActivityLabel`.
