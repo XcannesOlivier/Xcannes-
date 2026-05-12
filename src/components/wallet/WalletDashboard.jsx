@@ -361,7 +361,6 @@ export default function WalletDashboard({
   const [recentActivityMessage, setRecentActivityMessage] = useState('');
   const [recentActivityCreatedAt, setRecentActivityCreatedAt] = useState('');
   const [recentActivityKind, setRecentActivityKind] = useState('');
-  const [, setRecentActivityMovementId] = useState('');
   const [highlightTransactionId, setHighlightTransactionId] = useState(null);
   const [recentActivityMovement, setRecentActivityMovement] = useState(null);
   const [recentSummaryOpen, setRecentSummaryOpen] = useState(false);
@@ -417,7 +416,6 @@ export default function WalletDashboard({
     setRecentActivityMessage('');
     setRecentActivityCreatedAt('');
     setRecentActivityKind('');
-    setRecentActivityMovementId('');
     setRecentActivityMovement(null);
     setHighlightTransactionId(null);
     setRecentSummaryOpen(false);
@@ -782,7 +780,6 @@ export default function WalletDashboard({
     setRecentActivityMessage(text);
     setRecentActivityCreatedAt(String(movement?.createdAt || '').trim());
     setRecentActivityKind(String(movement?.kind || '').trim());
-    setRecentActivityMovementId(String(movement?.movementId || movement?._id || movement?.txHash || '').trim());
     setRecentActivityMovement(movement || null);
   }, []);
 

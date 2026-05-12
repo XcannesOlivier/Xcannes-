@@ -12,8 +12,8 @@
 
 ## 🟠 Variables / états inutiles
 
-- [ ] **3. `[, setRecentActivityMovementId]`**
-  La valeur n'est jamais lue (getter ignoré avec `,`). Le setter est appelé dans `flashRecentActivity`, mais cet ID n'est utilisé **nulle part dans le rendu**. État purement mort.
+- [x] **3. `[, setRecentActivityMovementId]`**
+  Supprimé : déclaration du state, reset dans le `useEffect` wallet-switch, et appel dans `flashRecentActivity`.
 
 - [ ] **4. `hasRlusdTrustline = hasOnChainRlusd`**
   Alias direct, aucune logique supplémentaire. Remplacer les usages par `hasOnChainRlusd` directement.
