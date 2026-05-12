@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import Image from "next/image";
 import { useTranslation } from "next-i18next";
 import { QRCodeCanvas } from "qrcode.react";
 import { useModalTransition } from "@/hooks/useModalTransition";

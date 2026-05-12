@@ -22,8 +22,6 @@ import { useWalletModalProps } from './hooks/useWalletModalProps';
 import { useWalletActivation } from './hooks/useWalletActivation';
 import { useTransactionProgress } from './hooks/useTransactionProgress';
 import useIsDesktop from './hooks/useIsDesktop';
-import useIsDesktop from './hooks/useIsDesktop';
-import useIsDesktop from './hooks/useIsDesktop';
 import { useWalletToast } from './hooks/useWalletToast';
 import WalletDesktopModals from './desktop/WalletDesktopModals';
 import WalletMobileModals from './mobile/WalletMobileModals';
