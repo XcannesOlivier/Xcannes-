@@ -20,6 +20,10 @@ import WalletDashboardTokenList from './components/WalletDashboardTokenList';
 import WalletDashboardTokenRow from './components/WalletDashboardTokenRow';
 import { useWalletModalProps } from './hooks/useWalletModalProps';
 import { useWalletActivation } from './hooks/useWalletActivation';
+import { useTransactionProgress } from './hooks/useTransactionProgress';
+import useIsDesktop from './hooks/useIsDesktop';
+import useIsDesktop from './hooks/useIsDesktop';
+import useIsDesktop from './hooks/useIsDesktop';
 import { useWalletToast } from './hooks/useWalletToast';
 import WalletDesktopModals from './desktop/WalletDesktopModals';
 import WalletMobileModals from './mobile/WalletMobileModals';
@@ -29,78 +33,23 @@ import { useTokenDisplayLabels } from './hooks/useTokenDisplayLabels';
 import WalletPendingPayreqs from './components/WalletPendingPayreqs';
 import ReconciliationBanner from './components/ReconciliationBanner';
 import { useTranslation } from 'next-i18next';
-import xcannesApi from '@/lib/xcannesApi';
 import GlobalStatement from './statements/GlobalStatement';
-import { WALLET_LAYOUT, USD_STABLECOINS, WALLET_ACCEPTED_TOKENS } from './walletDashboardConfig';
+import { WALLET_LAYOUT, USD_STABLECOINS } from './walletDashboardConfig';
+import { isAcceptedOnChainToken, normalizeMovementKind, resolveIncomingXrpAmount } from './utils/movementUtils';
+import ActivityIconSvg from './components/ActivityIconSvg';
 
 // Sub-orchestrator hooks
 import { useWalletSendOrchestrator } from './hooks/useWalletSendOrchestrator';
 import { useWalletSwapOrchestrator } from './hooks/useWalletSwapOrchestrator';
 import { useWalletIncomingToast } from './hooks/useWalletIncomingToast';
-import { useWalletRecentActivityBanner } from './hooks/useWalletRecentActivityBanner';
+import { useMoonpayBuySettlement } from './hooks/useMoonpayBuySettlement';
+import { useActivityBanner } from './hooks/useActivityBanner';
 import { useDesktopInlineFlags } from './hooks/useDesktopInlineFlags';
 import { useAugmentedCurrencyLines } from './hooks/useAugmentedCurrencyLines';
 import { useReconciliation } from './hooks/useReconciliation';
 import { usePreferredCurrency } from './hooks/usePreferredCurrency';
 import WalletCurrencySelector from '@/components/ui/WalletCurrencySelector';
 import WalletSettingsDropdown from '@/components/wallet/components/WalletSettingsDropdown';
-
-import {
-  MOONPAY_AUTOOPEN_TAB_KEY,
-  MOONPAY_BUY_RESUME_MAX_AGE_MS,
-  readMoonpayBuyResumeState,
-  saveMoonpayBuyResumeState,
-  returnToMoonpaySellWidget,
-} from './moonpayClientUtils';
-
-function isAcceptedOnChainToken(currency) {
-  const code = String(currency || '').toUpperCase();
-  return WALLET_ACCEPTED_TOKENS.has(code);
-}
-
-function normalizeMovementKind(value) {
-  return String(value || '')
-    .trim()
-    .toUpperCase();
-}
-
-function resolveIncomingXrpAmount(movement) {
-  const displayAmount = Number(movement?.displayAmount);
-  if (Number.isFinite(displayAmount) && displayAmount > 0) return displayAmount;
-  const amountXrp = Number(movement?.amountXrp);
-  if (Number.isFinite(amountXrp) && amountXrp > 0) return amountXrp;
-  const amount = Number(movement?.amount);
-  if (Number.isFinite(amount) && amount > 0) return amount;
-  const amountRlusd = Number(movement?.amountRlusd);
-  const fxRate = Number(movement?.fxRate);
-  if (Number.isFinite(amountRlusd) && amountRlusd > 0 && Number.isFinite(fxRate) && fxRate > 0) {
-    return amountRlusd / fxRate;
-  }
-  return Number.NaN;
-}
-
-function ActivityIconSvg({ icon, size }) {
-  const cls = `w-[${size}px] h-[${size}px]`;
-  if (icon === 'send') {
-    return (
-      <svg className={cls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M7 17L17 7" /><path d="M7 7h10v10" />
-      </svg>
-    );
-  }
-  if (icon === 'receive') {
-    return (
-      <svg className={cls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M7 7l10 10" /><path d="M17 7v10H7" />
-      </svg>
-    );
-  }
-  return (
-    <svg className={cls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="17 1 21 5 17 9" /><path d="M3 11V9a4 4 0 0 1 4-4h14" /><polyline points="7 23 3 19 7 15" /><path d="M21 13v2a4 4 0 0 1-4 4H3" />
-    </svg>
-  );
-}
 
 export default function WalletDashboard({
   showDesktopStatement = false,
@@ -136,142 +85,16 @@ export default function WalletDashboard({
     switchWallet(addr);
   }, [wallet, switchWallet]);
 
-  // ── Transaction progress modal state ────────────────────────
-  const [txProgress, setTxProgress] = useState({
-    visible: false,
-    status: 'pending',
-    actionLabel: '',
-    actionKey: '',
-    errorMessage: '',
-    details: null,
-  });
-
-  const TX_ACTION_LABELS = useMemo(
-    () => ({
-      'wallet:convert': t('ui_tx_label_conversion', 'Conversion'),
-      'wallet:swap': t('ui_tx_label_swap', 'Swap XRPL'),
-      'wallet:send': t('ui_tx_label_payment', 'Paiement'),
-      'moonpay:sell': t('ui_tx_label_moonpay_sell', 'Envoi MoonPay'),
-      'wallet:reconcile': t('ui_tx_label_reconciliation', 'Réconciliation'),
-      'wallet:activate_xrp': t('ui_tx_label_activation', 'Activation'),
-      'wallet:setup': t('ui_tx_label_setup', 'Configuration'),
-    }),
-    [t],
-  );
-
   // ── UI state (needs to exist before callbacks deps) ───────
   const [activeAction, setActiveAction] = useState(null);
 
-  const handleTxProgressClose = useCallback(() => {
-    let shouldCloseAction = false;
-    let shouldReturnToMoonpay = false;
-    let moonpayReturnUrl = '';
-
-    setTxProgress(prev => {
-      if (prev.status === 'success') {
-        shouldCloseAction =
-          prev.actionKey === 'wallet:convert' || prev.actionKey === 'wallet:send' || prev.actionKey === 'moonpay:sell';
-        shouldReturnToMoonpay = prev.actionKey === 'moonpay:sell';
-        moonpayReturnUrl = String(prev.details?.moonpayReturnUrl || '').trim();
-      }
-      return { ...prev, visible: false };
-    });
-    if (shouldCloseAction) {
-      setActiveAction(null);
-    }
-    if (shouldReturnToMoonpay) {
-      returnToMoonpaySellWidget(moonpayReturnUrl);
-    }
-  }, [setActiveAction]);
-
-  /**
-   * Poll XRPL tx-status endpoint until the transaction is validated
-   * on-ledger, or give up after ~12 s.
-   */
-  const waitForTxValidation = useCallback(async hash => {
-    const MAX_POLLS = 12;
-    const INTERVAL = 1000; // 1 s
-    for (let i = 0; i < MAX_POLLS; i++) {
-      try {
-        const res = await fetch(apiUrl(`/wallet/tx-status?hash=${encodeURIComponent(hash)}`));
-        if (res.ok) {
-          const data = await res.json();
-          if (data.validated) return true;
-        }
-      } catch {
-        /* network hiccup — keep polling */
-      }
-      await new Promise(r => setTimeout(r, INTERVAL));
-    }
-    return false; // timeout — show success anyway (tesSUCCESS was received)
-  }, []);
-
-  /**
-   * Wrapper around signTransaction — Xumm-style progress overlay
-   * AFTER Face ID validation (post-sign). Flow:
-   *   1. signTransaction() → QR → Face ID → XRPL submit (no modal yet)
-   *   2. signed:true → show "pending" with 3 blinking dots
-   *   3. poll XRPL for validated:true on the tx hash (non-blocking)
-   *   4. validated → "Validé" + confetti
-   *
-   * IMPORTANT: polling runs in background — does NOT block the return.
-   * Each hook's post-sign logic (toast, form reset, refreshBalance) runs immediately.
-   */
-  const signTransactionWithProgress = useCallback(
-    async (txjson, options) => {
-      const actionKey = options?.action || '';
-      const label = TX_ACTION_LABELS[actionKey] || t('ui_tx_label_default', 'Transaction');
-
-      try {
-        const result = await signTransaction(txjson, options);
-
-        if (result?.signed) {
-          // Show "en cours" with 3 blinking dots
-          setTxProgress({
-            visible: true,
-            status: 'pending',
-            actionLabel: label,
-            actionKey: actionKey,
-            errorMessage: '',
-            details: options?.progressDetails || null,
-          });
-
-          // Fire-and-forget: poll XRPL then switch to success
-          const txHash = result.hash || '';
-          (async () => {
-            if (txHash) {
-              await waitForTxValidation(txHash);
-            }
-            setTxProgress(prev => (prev.visible ? { ...prev, status: 'success' } : prev));
-          })();
-        } else if (result?.rejected) {
-          // XRPL rejected the transaction (tem*, tef*, tel*)
-          setTxProgress({
-            visible: true,
-            status: 'error',
-            actionLabel: label,
-            actionKey: actionKey,
-            errorMessage: result.engineMessage || result.engineResult || t('ui_tx_rejected', 'Transaction rejetée'),
-            details: options?.progressDetails || null,
-          });
-        }
-        // If result is null (cancelled/expired), don't show anything
-
-        return result;
-      } catch (err) {
-        setTxProgress({
-          visible: true,
-          status: 'error',
-          actionLabel: label,
-          actionKey: actionKey,
-          errorMessage: err?.message || String(err),
-          details: options?.progressDetails || null,
-        });
-        throw err;
-      }
-    },
-    [signTransaction, TX_ACTION_LABELS, t, waitForTxValidation],
-  );
+  // ── Transaction progress modal ─────────────────────────────
+  const {
+    txProgress,
+    setTxProgress,
+    signTransactionWithProgress,
+    handleTxProgressClose,
+  } = useTransactionProgress({ signTransaction, t, setActiveAction });
 
   // ── Token computation ──────────────────────────────────────
   const baseTokens = useMemo(
@@ -306,71 +129,24 @@ export default function WalletDashboard({
   const [desktopSettingsPage, setDesktopSettingsPage] = useState(null);
   const [selectedStatementToken, setSelectedStatementToken] = useState(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [isDesktopPanel, setIsDesktopPanel] = useState(false);
   const desktopDefaultActionSetRef = useRef(false);
-  const [recentActivityMessage, setRecentActivityMessage] = useState('');
-  const [recentActivityCreatedAt, setRecentActivityCreatedAt] = useState('');
-  const [recentActivityKind, setRecentActivityKind] = useState('');
-  const [highlightTransactionId, setHighlightTransactionId] = useState(null);
-  const [recentActivityMovement, setRecentActivityMovement] = useState(null);
-  const [recentSummaryOpen, setRecentSummaryOpen] = useState(false);
-  const [activityTooltipOpen, setActivityTooltipOpen] = useState(false);
-  const activityTooltipTriggerRef = useRef(null);
 
   // ── Desktop panel media query ──────────────────────────────
+  // ── Desktop panel: derived from showDesktopStatementPanel + media query
+  const isLargeViewport = useIsDesktop(1024);
+  const isDesktopPanel = showDesktopStatementPanel && isLargeViewport;
+
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-    if (!showDesktopStatementPanel) {
-      setIsDesktopPanel(false);
-      desktopDefaultActionSetRef.current = false;
-      return;
-    }
-    const media = window.matchMedia('(min-width: 1024px)');
-    const handleChange = () => setIsDesktopPanel(media.matches);
-    handleChange();
-    if (media.addEventListener) {
-      media.addEventListener('change', handleChange);
-      return () => media.removeEventListener('change', handleChange);
-    }
-    media.addListener(handleChange);
-    return () => media.removeListener(handleChange);
-  }, [showDesktopStatementPanel]);
+    if (!isDesktopPanel) desktopDefaultActionSetRef.current = false;
+  }, [isDesktopPanel]);
 
   useEffect(() => {
     if (isDesktopPanel) return;
     setDesktopSettingsPage(null);
   }, [isDesktopPanel]);
 
-  useEffect(() => {
-    if (!activityTooltipOpen) return;
-
-    const handlePointerDown = (event) => {
-      const target = event?.target;
-      if (!target) return;
-      if (activityTooltipTriggerRef.current && activityTooltipTriggerRef.current.contains(target)) return;
-      setActivityTooltipOpen(false);
-    };
-
-    document.addEventListener('mousedown', handlePointerDown);
-    document.addEventListener('touchstart', handlePointerDown, { passive: true });
-    return () => {
-      document.removeEventListener('mousedown', handlePointerDown);
-      document.removeEventListener('touchstart', handlePointerDown);
-    };
-  }, [activityTooltipOpen]);
-
   // ── Currency lines (backend) — called first so label can feed useWalletLabel
   const backendWalletAddress = wallet || null;
-
-  useEffect(() => {
-    setRecentActivityMessage('');
-    setRecentActivityCreatedAt('');
-    setRecentActivityKind('');
-    setRecentActivityMovement(null);
-    setHighlightTransactionId(null);
-    setRecentSummaryOpen(false);
-    setActivityTooltipOpen(false);
-  }, [backendWalletAddress]);
 
   const {
     lines: currencyLines,
@@ -562,7 +338,6 @@ export default function WalletDashboard({
   const { startMoonpaySellRequest } = sendState;
 
   const handledMoonpaySellRequestRef = useRef('');
-  const moonpayBuyAutoOpenRef = useRef('');
 
   useEffect(() => {
     const request = initialMoonpaySellRequest;
@@ -587,239 +362,39 @@ export default function WalletDashboard({
 
   useWalletIncomingToast({ backendWalletAddress, flashWalletHeaderToast });
 
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    if (!isConnected || !wallet) return;
-    if (window.self !== window.top) return;
+  useMoonpayBuySettlement({
+    wallet,
+    isConnected,
+    activeAction,
+    setActiveAction,
+    setCashModalTab: swapState.setCashModalTab,
+  });
 
-    const resume = readMoonpayBuyResumeState(wallet);
-    if (!resume) {
-      moonpayBuyAutoOpenRef.current = '';
-      return;
-    }
-
-    const shouldAutoOpen =
-      !activeAction &&
-      Number.isFinite(Number(resume.detectedXrpAmount)) &&
-      Number(resume.detectedXrpAmount) > 0 &&
-      resume.preparedInboundSwap?.txjson;
-    if (!shouldAutoOpen) return;
-
-    const resumeKey =
-      String(resume.detectedXrpTxHash || '').trim() ||
-      String(resume.flowId || '').trim() ||
-      String(resume.ts || '').trim();
-    if (!resumeKey || moonpayBuyAutoOpenRef.current === resumeKey) return;
-
-    moonpayBuyAutoOpenRef.current = resumeKey;
-    setCashModalTab('buy');
-    setActiveAction('cash');
-  }, [activeAction, isConnected, setActiveAction, setCashModalTab, wallet]);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    if (!isConnected || !wallet) return;
-    if (activeAction === 'cash') return;
-
-    const resume = readMoonpayBuyResumeState(wallet);
-    if (!resume) return;
-    if (
-      Number.isFinite(Number(resume.detectedXrpAmount)) &&
-      Number(resume.detectedXrpAmount) > 0 &&
-      resume.preparedInboundSwap?.txjson
-    ) {
-      return;
-    }
-
-    let cancelled = false;
-    const seenMovementIdRef = { current: '' };
-
-    const pollMoonpayBuySettlement = async () => {
-      if (cancelled) return;
-      const freshResume = readMoonpayBuyResumeState(wallet);
-      if (!freshResume) return;
-      if (
-        Number.isFinite(Number(freshResume.detectedXrpAmount)) &&
-        Number(freshResume.detectedXrpAmount) > 0 &&
-        freshResume.preparedInboundSwap?.txjson
-      ) {
-        return;
-      }
-
-      try {
-        const params = new URLSearchParams();
-        params.set('address', String(wallet || ''));
-        params.set('limit', '10');
-        params.set('source', 'onchain');
-        const response = await fetch(apiUrl(`/wallet/statement?${params.toString()}`));
-        const data = await response.json().catch(() => ({}));
-        if (!response.ok) return;
-
-        const movements = Array.isArray(data?.movements) ? data.movements : [];
-        const incomingXrp = movements.find(movement => {
-          const kind = normalizeMovementKind(movement?.kind);
-          if (kind !== 'PAYMENT_IN' && kind !== 'XRPL_PAYMENT_IN') return false;
-          const currencyCode = String(
-            movement?.toCurrencyCode || movement?.fromCurrencyCode || movement?.displayCurrency || '',
-          )
-            .trim()
-            .toUpperCase();
-          if (currencyCode !== 'XRP') return false;
-          const movementId = String(movement?.movementId || movement?._id || movement?.txHash || '').trim();
-          if (movementId && movementId === seenMovementIdRef.current) return false;
-          const createdAtMs = movement?.createdAt ? new Date(movement.createdAt).getTime() : Number.NaN;
-          const awaitingXrpSince = Number(freshResume.awaitingXrpSince);
-          if (Number.isFinite(awaitingXrpSince) && Number.isFinite(createdAtMs) && createdAtMs < awaitingXrpSince) {
-            return false;
-          }
-          return Number.isFinite(resolveIncomingXrpAmount(movement));
-        });
-
-        if (!incomingXrp) return;
-
-        const movementId = String(incomingXrp?.movementId || incomingXrp?._id || incomingXrp?.txHash || '').trim();
-        if (movementId) {
-          seenMovementIdRef.current = movementId;
-        }
-
-        const detectedAmount = resolveIncomingXrpAmount(incomingXrp);
-        if (!Number.isFinite(detectedAmount) || detectedAmount <= 0) return;
-
-        const preparedInboundSwap = await xcannesApi.prepareRlusdXrpSwap({
-          address: wallet,
-          direction: 'XRP_TO_RLUSD',
-          amountXrp: detectedAmount,
-        });
-        if (cancelled) return;
-
-        const nextResume = {
-          ...freshResume,
-          detectedXrpAmount: detectedAmount,
-          detectedXrpTxHash: String(incomingXrp?.txHash || '').trim(),
-          preparedInboundSwap,
-        };
-        saveMoonpayBuyResumeState(nextResume);
-
-        if (!activeAction && window.self === window.top) {
-          const resumeKey =
-            String(nextResume.detectedXrpTxHash || '').trim() ||
-            String(nextResume.flowId || '').trim() ||
-            String(Date.now());
-          moonpayBuyAutoOpenRef.current = resumeKey;
-          setCashModalTab('buy');
-          setActiveAction('cash');
-        }
-      } catch {
-        // ignore transient partner/XRPL errors; next poll retries
-      }
-    };
-
-    pollMoonpayBuySettlement();
-    const intervalId = window.setInterval(pollMoonpayBuySettlement, 8000);
-    return () => {
-      cancelled = true;
-      window.clearInterval(intervalId);
-    };
-  }, [activeAction, isConnected, setActiveAction, setCashModalTab, wallet]);
-
-  const flashRecentActivity = useCallback((message, movement) => {
-    const text = String(message || '').trim();
-    if (!text) return;
-    setRecentActivityMessage(text);
-    setRecentActivityCreatedAt(String(movement?.createdAt || '').trim());
-    setRecentActivityKind(String(movement?.kind || '').trim());
-    setRecentActivityMovement(movement || null);
-  }, []);
-
-  useWalletRecentActivityBanner({
+  // ── Recent activity banner ─────────────────────────────────────
+  const {
+    recentActivityMessage,
+    recentActivityMovement,
+    recentSummaryOpen,
+    setRecentSummaryOpen,
+    activityTooltipOpen,
+    setActivityTooltipOpen,
+    activityTooltipTriggerRef,
+    highlightTransactionId,
+    setHighlightTransactionId,
+    flashRecentActivity,
+    recentActivityWhen,
+    recentActivityMessageParts,
+    recentActivityReceiveParts,
+    recentActivitySendParts,
+    recentActivityIcon,
+    recentActivityLabel,
+  } = useActivityBanner({
     backendWalletAddress,
     rlusdPerUnitRates,
     savedAddresses: sendState?.savedAddresses || [],
-    onActivity: ({ movement, message }) => flashRecentActivity(message, movement),
+    locale,
+    t,
   });
-
-  const recentActivityWhen = useMemo(() => {
-    const raw = String(recentActivityCreatedAt || "").trim();
-    if (!raw) return { mobile: "", desktop: "" };
-    const parsed = new Date(raw);
-    if (!Number.isFinite(parsed.getTime())) return { mobile: "", desktop: "" };
-
-    const dateLocale = String(locale || "").toLowerCase().startsWith("fr")
-      ? "fr-FR"
-      : locale;
-
-    const date = new Intl.DateTimeFormat(dateLocale, {
-      day: "numeric",
-      month: "short",
-    }).format(parsed);
-    const time = new Intl.DateTimeFormat(dateLocale, {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
-    }).format(parsed);
-
-    return {
-      label: `${date} • ${time}`,
-      date,
-      time,
-    };
-  }, [locale, recentActivityCreatedAt]);
-
-  const recentActivityMessageParts = useMemo(() => {
-    const text = String(recentActivityMessage || "").trim();
-    if (!text) return { isConversion: false, text: "" };
-    const match = text.match(/^(.*?)(?:\s*)(→|->)(?:\s*)(.+)$/);
-    if (!match) return { isConversion: false, text };
-    return {
-      isConversion: true,
-      left: match[1].trim(),
-      arrow: match[2] === "->" ? "→" : match[2],
-      right: match[3].trim(),
-    };
-  }, [recentActivityMessage]);
-
-  const recentActivityReceiveParts = useMemo(() => {
-    const text = String(recentActivityMessage || "").trim();
-    if (!text) return null;
-    const match = text.match(/^Vous avez reçu\s+([0-9][0-9\s.,]*?)\s+([A-Z0-9]{2,10})(.*)$/i);
-    if (!match) return null;
-    return {
-      prefix: "Vous avez reçu",
-      amount: match[1].trim(),
-      currency: match[2].trim(),
-      suffix: String(match[3] || ""),
-    };
-  }, [recentActivityMessage]);
-
-  const recentActivitySendParts = useMemo(() => {
-    const text = String(recentActivityMessage || "").trim();
-    if (!text) return null;
-    const match = text.match(/^Vous avez envoyé\s+([0-9][0-9\s.,]*?)\s+([A-Z0-9]{2,10})(.*)$/i);
-    if (!match) return null;
-    return {
-      prefix: "Vous avez envoyé",
-      amount: match[1].trim(),
-      currency: match[2].trim(),
-      suffix: String(match[3] || ""),
-    };
-  }, [recentActivityMessage]);
-
-  const recentActivityIcon = useMemo(() => {
-    const kind = String(recentActivityKind || "").trim().toUpperCase();
-    if (kind === "CONVERSION") return "convert";
-    if (kind === "PAYMENT_IN" || kind === "XRPL_PAYMENT_IN") return "receive";
-    if (kind === "PAYMENT_OUT" || kind === "XRPL_PAYMENT_OUT") return "send";
-    return null;
-  }, [recentActivityKind]);
-
-  const recentActivityLabel =
-    recentActivityIcon === "convert"
-      ? t("ui_recent_conversion_banner", "Conversion récente")
-      : recentActivityIcon === "receive"
-        ? t("ui_recent_receive_banner", "Réception récente")
-        : recentActivityIcon === "send"
-          ? t("ui_recent_send_banner", "Envoi récent")
-          : t("ui_recent_activity_banner", "Activité récente");
 
   // ── Reset previous action state on desktop inline switch ──
   const prevActionRef = useRef(null);
