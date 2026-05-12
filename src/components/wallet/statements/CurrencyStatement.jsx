@@ -34,6 +34,8 @@ import useStatementDocHash from "./useStatementDocHash";
 import useCurrencyStatementData from "./useCurrencyStatementData";
 import useCurrencyStatementFormatters from "./useCurrencyStatementFormatters";
 import XrpNetworkStatement from "./XrpNetworkStatement";
+import { isXrplAddress } from "../utils/xrplAddress";
+import { useFlashNotice } from "../hooks/useFlashNotice";
 
 /**
  * Composant de relevé bancaire pour une devise spécifique.
@@ -146,11 +148,9 @@ export default function CurrencyStatement({
   const [detailLabelLoading, setDetailLabelLoading] = useState(false);
   const [copiedHash, setCopiedHash] = useState(false);
   const [copiedAddress, setCopiedAddress] = useState(false);
-  const [shareNotice, setShareNotice] = useState("");
-  const [shareNoticeTone, setShareNoticeTone] = useState("success");
+  const { notice: shareNotice, noticeTone: shareNoticeTone, flashNotice: _flashNotice, resetNotice: resetShareNotice } = useFlashNotice();
   const copiedHashTimerRef = useRef(null);
   const copiedAddressTimerRef = useRef(null);
-  const shareNoticeTimerRef = useRef(null);
   const [counterpartyLabels, setCounterpartyLabels] = useState({});
   const labelCacheRef = useRef(new Map());
   const highlightRowRef = useRef(null);
@@ -241,8 +241,7 @@ export default function CurrencyStatement({
     setDetailLabelLoading(false);
     setCopiedHash(false);
     setCopiedAddress(false);
-    setShareNotice("");
-    setShareNoticeTone("success");
+    resetShareNotice();
     if (copiedHashTimerRef.current) {
       window.clearTimeout(copiedHashTimerRef.current);
       copiedHashTimerRef.current = null;
@@ -251,29 +250,11 @@ export default function CurrencyStatement({
       window.clearTimeout(copiedAddressTimerRef.current);
       copiedAddressTimerRef.current = null;
     }
-    if (shareNoticeTimerRef.current) {
-      window.clearTimeout(shareNoticeTimerRef.current);
-      shareNoticeTimerRef.current = null;
-    }
-  }, []);
+  }, [resetShareNotice]);
 
   const flashShareNotice = useCallback(
-    (message, { tone = "success", autoClose = true } = {}) => {
-      const text = String(message || "").trim();
-      if (!text) return;
-      setShareNotice(text);
-      setShareNoticeTone(tone === "error" ? "error" : "success");
-      if (shareNoticeTimerRef.current) {
-        window.clearTimeout(shareNoticeTimerRef.current);
-        shareNoticeTimerRef.current = null;
-      }
-      if (!autoClose) return;
-      shareNoticeTimerRef.current = window.setTimeout(() => {
-        shareNoticeTimerRef.current = null;
-        closeTxDetails();
-      }, 1100);
-    },
-    [closeTxDetails],
+    (message, opts = {}) => _flashNotice(message, { ...opts, onAutoClose: closeTxDetails }),
+    [_flashNotice, closeTxDetails],
   );
 
   const formatDateTime = useCallback(
@@ -298,11 +279,6 @@ export default function CurrencyStatement({
       return parsed.toLocaleString(locale);
     },
     [isMobileDate, locale],
-  );
-
-  const isXrplAddress = useCallback(
-    (value) => /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(String(value || "").trim()),
-    [],
   );
 
   const getCounterpartyAddressFromTx = useCallback(
@@ -360,7 +336,7 @@ export default function CurrencyStatement({
 
       return candidates.find((addr) => isXrplAddress(addr)) || "";
     },
-    [isXrplAddress],
+    [],
   );
 
   useEffect(() => {
@@ -405,7 +381,7 @@ export default function CurrencyStatement({
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [detailOpen, detailTx, getCounterpartyAddressFromTx, isXrplAddress]);
+  }, [detailOpen, detailTx, getCounterpartyAddressFromTx]);
 
   /* ── prefetch counterparty labels for the list ─────────── */
   useEffect(() => {
@@ -459,7 +435,7 @@ export default function CurrencyStatement({
     return () => {
       cancelled = true;
     };
-  }, [transactionsWithDisplayBalance, counterpartyLabels, getCounterpartyAddressFromTx, isXrplAddress]);
+  }, [transactionsWithDisplayBalance, counterpartyLabels, getCounterpartyAddressFromTx]);
 
   /* ── doc hash ──────────────────────────────────────────── */
   const statementHashInput = useMemo(() => {

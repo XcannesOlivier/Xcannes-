@@ -13,6 +13,8 @@ import { ShareIcon } from "./statementShared";
 import useStatementWalletLabel from "./useStatementWalletLabel";
 import useStatementDocHash from "./useStatementDocHash";
 import { useSavedAddresses } from "../hooks/useSavedAddresses";
+import { useFlashNotice } from "../hooks/useFlashNotice";
+import { isXrplAddress } from "../utils/xrplAddress";
 
 /**
  * Composant de relevé bancaire global (toutes les devises consolidées).
@@ -61,11 +63,9 @@ export default function GlobalStatement({
   const [copiedHash, setCopiedHash] = useState(false);
   const [copiedCounterparty, setCopiedCounterparty] = useState(false);
   const [isMobileDate, setIsMobileDate] = useState(false);
-  const [shareNotice, setShareNotice] = useState("");
-  const [shareNoticeTone, setShareNoticeTone] = useState("success");
+  const { notice: shareNotice, noticeTone: shareNoticeTone, flashNotice: _flashNotice, resetNotice: resetShareNotice } = useFlashNotice();
   const [counterpartyLabels, setCounterpartyLabels] = useState({});
   const labelCacheRef = useRef(new Map());
-  const shareNoticeTimerRef = useRef(null);
   const [overlayDragging, setOverlayDragging] = useState(false);
   const [overlayTranslateY, setOverlayTranslateY] = useState(0);
   const [txFilter, setTxFilter] = useState("all");
@@ -253,12 +253,6 @@ export default function GlobalStatement({
     sortMovementsDesc,
   ]);
 
-  const isXrplAddress = useCallback(
-    (value) =>
-      /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(String(value || "").trim()),
-    [],
-  );
-
   const getOnChainLabelForAddress = useCallback(
     (address) => {
       const key = String(address || "").trim();
@@ -271,7 +265,7 @@ export default function GlobalStatement({
       if (fromState) return fromState;
       return "";
     },
-    [counterpartyLabels, isXrplAddress, savedAddressLabelByAddress],
+    [counterpartyLabels, savedAddressLabelByAddress],
   );
 
   useEffect(() => {
@@ -310,7 +304,6 @@ export default function GlobalStatement({
     counterpartyLabels,
     detailMovement,
     detailOpen,
-    isXrplAddress,
     savedAddressLabelByAddress,
   ]);
 
@@ -358,7 +351,6 @@ export default function GlobalStatement({
     };
   }, [
     counterpartyLabels,
-    isXrplAddress,
     recentMovements,
     savedAddressLabelByAddress,
   ]);
@@ -555,16 +547,11 @@ export default function GlobalStatement({
     setDetailMovement(null);
     setCopiedHash(false);
     setCopiedCounterparty(false);
-    setShareNotice("");
-    setShareNoticeTone("success");
-    if (shareNoticeTimerRef.current) {
-      window.clearTimeout(shareNoticeTimerRef.current);
-      shareNoticeTimerRef.current = null;
-    }
+    resetShareNotice();
     if (detailOnly) {
       onClose?.();
     }
-  }, [detailOnly, onClose]);
+  }, [detailOnly, onClose, resetShareNotice]);
 
   useEffect(() => {
     if (!detailOnly) return;
@@ -575,22 +562,8 @@ export default function GlobalStatement({
   }, [detailOnly, detailOpen, initialDetailMovement]);
 
   const flashShareNotice = useCallback(
-    (message, { tone = "success", autoClose = true } = {}) => {
-      const text = String(message || "").trim();
-      if (!text) return;
-      setShareNotice(text);
-      setShareNoticeTone(tone === "error" ? "error" : "success");
-      if (shareNoticeTimerRef.current) {
-        window.clearTimeout(shareNoticeTimerRef.current);
-        shareNoticeTimerRef.current = null;
-      }
-      if (!autoClose) return;
-      shareNoticeTimerRef.current = window.setTimeout(() => {
-        shareNoticeTimerRef.current = null;
-        closeMovementDetails();
-      }, 1100);
-    },
-    [closeMovementDetails],
+    (message, opts = {}) => _flashNotice(message, { ...opts, onAutoClose: closeMovementDetails }),
+    [_flashNotice, closeMovementDetails],
   );
 
   const getUsdValue = useCallback(
@@ -977,7 +950,6 @@ export default function GlobalStatement({
     getMovementUiType,
     getOnChainLabelForAddress,
     globalTitle,
-    isXrplAddress,
     isPreviewMode,
     normalizeKind,
     rlusdToLocal,
@@ -1404,7 +1376,6 @@ export default function GlobalStatement({
   }, [
     detailMovement,
     getOnChainLabelForAddress,
-    isXrplAddress,
     truncateMiddle,
   ]);
 
@@ -1425,7 +1396,6 @@ export default function GlobalStatement({
   }, [
     detailMovement,
     getOnChainLabelForAddress,
-    isXrplAddress,
     truncateMiddle,
   ]);
 

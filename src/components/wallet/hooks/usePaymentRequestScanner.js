@@ -25,7 +25,8 @@ export function usePaymentRequestScanner({
       setSendDestinationLabel?.("");
       setQrScannerOpen(false);
     },
-    [setSendDestination, setSendDestinationLabel],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
   );
 
   const handlePaymentRequestScan = useCallback(

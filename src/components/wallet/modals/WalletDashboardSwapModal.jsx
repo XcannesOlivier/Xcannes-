@@ -16,14 +16,8 @@ import {
 } from "../walletDashboardConfig";
 import { CRYPTO_ICONS } from "@/utils/marketConstants";
 import { getCurrencyDescription } from "@/utils/currencyDescriptions";
-
-const fmtAmountRight = (raw) => {
-  if (!raw) return null;
-  const str = String(raw);
-  const i = str.lastIndexOf(' ');
-  if (i < 0) return <span>{str}</span>;
-  return <span className="inline-flex items-baseline gap-[3px]">{str.slice(0, i)}<span className="text-[0.78em]">{str.slice(i + 1)}</span></span>;
-};
+import { normalizeCurrencyCode } from "../utils/normalizeCurrencyCode";
+import { fmtAmountRight } from "./walletModalShared";
 
 export default function WalletDashboardSwapModal({
   open,
@@ -74,7 +68,7 @@ export default function WalletDashboardSwapModal({
           .toUpperCase() !== "RLUSD",
     );
     // Inclure la quote sélectionnée même si elle n'est pas encore dans le wallet
-    const quoteUpper = String(convertQuoteCurrency || "").trim().toUpperCase();
+    const quoteUpper = normalizeCurrencyCode(convertQuoteCurrency);
     if (
       quoteUpper &&
       quoteUpper !== "RLUSD" &&
@@ -88,7 +82,7 @@ export default function WalletDashboardSwapModal({
   const existingCurrencyLinesSet = useMemo(() => {
     const set = new Set();
     (currencyLines || []).forEach((line) => {
-      const code = String(line?.currencyCode || "").toUpperCase();
+      const code = normalizeCurrencyCode(line?.currencyCode);
       if (code) set.add(code);
     });
     return set;
@@ -148,7 +142,7 @@ export default function WalletDashboardSwapModal({
     }
 
     const baseLine = (currencyLines || []).find(
-      (l) => String(l?.currencyCode || "").toUpperCase() === baseCode,
+      (l) => normalizeCurrencyCode(l?.currencyCode) === baseCode,
     );
     const availableRlusd = Number(baseLine?.allocatedRlusd ?? 0);
     if (Number.isFinite(availableRlusd) && availableRlusd + epsilon < grossRlusd) {

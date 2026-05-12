@@ -141,19 +141,15 @@ export function useWalletModalProps({
   resetCashForm,
 }) {
   // --- Shared selector bundles ---
-  const selectByAssetKeyProps = useMemo(
-    () => ({ selectLabelByAssetKey, selectLabelRightByAssetKey, selectIconByAssetKey, selectLabelMobileByAssetKey }),
-    [selectLabelByAssetKey, selectLabelRightByAssetKey, selectIconByAssetKey, selectLabelMobileByAssetKey],
-  );
-  const selectByCurrencyProps = useMemo(
-    () => ({
+  const { selectByAssetKeyProps, selectByCurrencyProps } = useMemo(() => ({
+    selectByAssetKeyProps: { selectLabelByAssetKey, selectLabelRightByAssetKey, selectIconByAssetKey, selectLabelMobileByAssetKey },
+    selectByCurrencyProps: {
       selectLabelByCurrency: selectLabelByAssetKey,
       selectLabelRightByCurrency: selectLabelRightByAssetKey,
       selectIconByCurrency: selectIconByAssetKey,
       selectLabelMobileByCurrency: selectLabelMobileByAssetKey,
-    }),
-    [selectLabelByAssetKey, selectLabelRightByAssetKey, selectIconByAssetKey, selectLabelMobileByAssetKey],
-  );
+    },
+  }), [selectLabelByAssetKey, selectLabelRightByAssetKey, selectIconByAssetKey, selectLabelMobileByAssetKey]);
 
   // --- Send modal props ---
   const sendModalProps = useMemo(

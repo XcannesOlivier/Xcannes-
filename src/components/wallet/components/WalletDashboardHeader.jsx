@@ -192,7 +192,7 @@ export default function WalletDashboardHeader({
       writeWalletLabelCache(next);
       return next;
     });
-  }, [hasMultipleWallets, isWalletLabelLocked, walletAddresses, walletAddressSet, wallet, walletLabel]);
+  }, [hasMultipleWallets, isWalletLabelLocked, walletAddresses, walletAddressSet, wallet, walletLabel, trimmed]);
 
   // Best-effort: resolve missing wallet labels in the background (prefetch).
   // In native relay mode, the multi-wallet list may not have labels.
@@ -262,7 +262,7 @@ export default function WalletDashboardHeader({
     const fromMap = trimmed(labelsByAddress?.[wallet]);
     if (fromMap) return fromMap;
     return "Compte";
-  }, [labelsByAddress, wallet, walletAddresses, walletLabel]);
+  }, [labelsByAddress, wallet, walletAddresses, walletLabel, trimmed]);
 
   const otherWalletEntries = useMemo(() => {
     const out = [];

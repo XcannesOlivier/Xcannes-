@@ -15,74 +15,27 @@ import { getCurrencyDescription } from "@/utils/currencyDescriptions";
 import { modalSelectButtonCls, modalSelectListCls } from "./walletModalTokens";
 import { isIOSDevice } from "@/utils/deviceDetect";
 import ModalSelect from "@/components/ui/ModalSelect";
+import { normalizeCurrencyCode } from "../utils/normalizeCurrencyCode";
+import {
+  DEBUG_LOGS,
+  MOONPAY_ORIGIN_SUFFIX,
+  MOONPAY_ACTIVE_STORAGE_KEY,
+  MOONPAY_AUTOOPEN_TAB_KEY,
+  MOONPAY_WALLET_ADDRESS_KEY,
+  MOONPAY_RESUME_MAX_AGE_MS,
+  MOONPAY_FLOW_MAX_AGE_MS,
+  fmtAmountRight,
+  isTrustedMoonPayOrigin,
+  resolvePartnerName,
+  notifyPwaMoonpayActive,
+  normalizeFiatCurrencyCode,
+  truncateMiddle,
+} from "./walletModalShared";
 
-const fmtAmountRight = (raw) => {
-  if (!raw) return null;
-  const str = String(raw);
-  const i = str.lastIndexOf(' ');
-  if (i < 0) return <span>{str}</span>;
-  return <span className="inline-flex items-baseline gap-[3px]">{str.slice(0, i)}<span className="text-[0.78em]">{str.slice(i + 1)}</span></span>;
-};
-
-
-const DEBUG_LOGS = process.env.NEXT_PUBLIC_DEBUG_LOGS === "true";
-const MOONPAY_ORIGIN_SUFFIX = ".moonpay.com";
-const MOONPAY_ACTIVE_STORAGE_KEY = "xcannes_moonpay_active";
+// Sell-only constants
 const MOONPAY_SELL_RESUME_KEY = "xcannes_moonpay_resume_sell_v1";
-const MOONPAY_AUTOOPEN_TAB_KEY = "xcannes_moonpay_autoopen_tab";
 const MOONPAY_SELL_FLOW_KEY = "xcannes_moonpay_sell_flow_v1";
 const MOONPAY_SELL_SOURCE_KEY = "xcannes_moonpay_sell_source_v1";
-const MOONPAY_WALLET_ADDRESS_KEY = "xcannes_moonpay_wallet_address_v1";
-const MOONPAY_RESUME_MAX_AGE_MS = 5 * 60 * 1000;
-const MOONPAY_FLOW_MAX_AGE_MS = 8 * 60 * 60 * 1000;
-
-const resolvePartnerName = (url) => {
-  const raw = String(url || "").toLowerCase();
-  if (raw.includes("topper")) return "Topper";
-  return "MoonPay";
-};
-
-const isTrustedMoonPayOrigin = (origin) => {
-  try {
-    const url = new URL(origin);
-    if (url.protocol !== "https:") return false;
-    const host = url.hostname.toLowerCase();
-    return host === "moonpay.com" || host.endsWith(MOONPAY_ORIGIN_SUFFIX);
-  } catch (_) {
-    return false;
-  }
-};
-
-const notifyPwaMoonpayActive = (active, tab = "sell") => {
-  if (typeof window === "undefined") return;
-  try {
-    const params = new URLSearchParams(window.location.search);
-    const isPwaEmbedded =
-      params.get("embedded") === "pwa" || Boolean(window.__XCANNES_PWA_EMBEDDED__);
-    if (!isPwaEmbedded) return;
-    if (!window.parent || window.parent === window) return;
-    window.parent.postMessage(
-      { type: "MOONPAY_ACTIVE", active: Boolean(active), tab },
-      "*",
-    );
-  } catch {
-    // ignore
-  }
-};
-
-const truncateMiddle = (value, head = 6, tail = 5) => {
-  const str = String(value ?? "");
-  if (!str) return "";
-  if (str.length <= head + tail + 1) return str;
-  return `${str.slice(0, head)}…${str.slice(-tail)}`;
-};
-
-const normalizeFiatCurrencyCode = (value) => {
-  const upper = String(value || "").trim().toUpperCase();
-  if (!upper) return "";
-  if (upper === "XRP" || upper === "RLUSD") return "";
-  return upper;
-};
 
 /**
  * MoonPaySellModal - Modal pour vendre des cryptos contre fiat
@@ -291,9 +244,9 @@ const MoonPaySellModal = ({
             kind: "sell",
             ts: Date.now(),
             walletAddress: String(walletAddress || ""),
-            currency: String(currency || "").toUpperCase(),
+            currency: normalizeCurrencyCode(currency),
             amount: String(amount || ""),
-            quoteCurrency: String(quoteCurrency || "").toUpperCase(),
+            quoteCurrency: normalizeCurrencyCode(quoteCurrency),
             ...extra,
           }),
         );
@@ -400,7 +353,7 @@ const MoonPaySellModal = ({
             flowId: String(data?.flowId || "").trim() || null,
             walletAddress: String(walletAddress || "").trim() || null,
             sourceCurrencyCode:
-              String(data?.sourceCurrencyCode || "").trim().toUpperCase() || null,
+              normalizeCurrencyCode(data?.sourceCurrencyCode) || null,
             sourceAmount:
               Number.isFinite(Number(data?.sourceAmount)) && Number(data?.sourceAmount) > 0
                 ? Number(data.sourceAmount)
@@ -411,7 +364,7 @@ const MoonPaySellModal = ({
                 ? Number(data.sourceAmountRlusd)
                 : null,
             baseCurrencyCode:
-              String(data?.baseCurrencyCode || "").trim().toUpperCase() || null,
+              normalizeCurrencyCode(data?.baseCurrencyCode) || null,
             baseCurrencyAmount:
               Number.isFinite(Number(data?.baseCurrencyAmount)) &&
               Number(data?.baseCurrencyAmount) > 0
@@ -546,11 +499,11 @@ const MoonPaySellModal = ({
     const seen = new Set();
     const orderedTokens = [
       ...(availableTokens || []).filter((token) => {
-        const code = String(token?.currency || "").toUpperCase();
+        const code = normalizeCurrencyCode(token?.currency);
         return code === "XRP" || code === "RLUSD";
       }),
       ...(availableTokens || []).filter((token) => {
-        const code = String(token?.currency || "").toUpperCase();
+        const code = normalizeCurrencyCode(token?.currency);
         return code !== "XRP" && code !== "RLUSD";
       }),
     ];
@@ -558,7 +511,7 @@ const MoonPaySellModal = ({
 	    return orderedTokens
 	      .map((token) => {
 	        const currencyRaw = token?.currency;
-	        const currency = String(currencyRaw || "").toUpperCase();
+	        const currency = normalizeCurrencyCode(currencyRaw);
 	        // Do not offer XRP in the sell flow selector.
 	        if (currency === "XRP") return null;
 	        if (!currency || seen.has(currency)) return null;
@@ -609,8 +562,8 @@ const MoonPaySellModal = ({
 	  ]);
 
   const selectedSellCurrency = useMemo(() => {
-    const code = String(currency || "").toUpperCase();
-    return supportedCurrencies.find((c) => String(c?.code || "").toUpperCase() === code) || null;
+    const code = normalizeCurrencyCode(currency);
+    return supportedCurrencies.find((c) => normalizeCurrencyCode(c?.code) === code) || null;
   }, [currency, supportedCurrencies]);
 
   useEffect(() => {
@@ -696,7 +649,7 @@ const MoonPaySellModal = ({
     if (!isOpen) return;
     if (!supportedCurrencies.length) return;
     setCurrency((prev) => {
-      const current = String(prev || "").toUpperCase();
+      const current = normalizeCurrencyCode(prev);
       if (supportedCurrencies.some((curr) => curr.code === current)) {
         return current;
       }
@@ -723,7 +676,7 @@ const MoonPaySellModal = ({
   useEffect(() => {
     if (!isOpen) return;
     if (!supportedCurrencies.length) return;
-    const current = String(currency || "").toUpperCase();
+    const current = normalizeCurrencyCode(currency);
     if (current === "XRP") {
       setCurrency(supportedCurrencies[0].code);
     }
@@ -750,7 +703,7 @@ const MoonPaySellModal = ({
       return;
     }
 
-    const nextCurrency = String(resume.currency || "").toUpperCase();
+    const nextCurrency = normalizeCurrencyCode(resume.currency);
     if (nextCurrency) setCurrency(nextCurrency);
     if (resume.amount != null) setAmount(String(resume.amount));
     if (resume.quoteCurrency) {
@@ -782,17 +735,17 @@ const MoonPaySellModal = ({
   }, [demoMode, isOpen]);
 
   const selectedToken = useMemo(() => {
-    const current = String(currency || "").toUpperCase();
+    const current = normalizeCurrencyCode(currency);
     if (!current) return null;
     return (
       (availableTokens || []).find(
-        (token) => String(token?.currency || "").toUpperCase() === current,
+        (token) => normalizeCurrencyCode(token?.currency) === current,
       ) || null
     );
   }, [availableTokens, currency]);
 
   const amountValue = Number.parseFloat(amount || "");
-  const currencyUpper = String(currency || "").toUpperCase();
+  const currencyUpper = normalizeCurrencyCode(currency);
   const isCurrencyLine = Boolean(selectedToken?.isTrustlineOnly);
   const partnerName = useMemo(() => resolvePartnerName(iframeUrl), [iframeUrl]);
   const rlusdRate = isCurrencyLine
@@ -856,7 +809,7 @@ const MoonPaySellModal = ({
   const formatAmountWithCode = (value, code, options = {}) => {
     const num = Number(value);
     if (!Number.isFinite(num)) return "-";
-    const upper = String(code || "").toUpperCase();
+    const upper = normalizeCurrencyCode(code);
     const {
       minimumFractionDigits = 2,
       maximumFractionDigits = 2,
@@ -871,7 +824,7 @@ const MoonPaySellModal = ({
   };
 
   const resolveRlusdRateForFiat = useCallback((code) => {
-    const upper = String(code || "").trim().toUpperCase();
+    const upper = normalizeCurrencyCode(code);
     if (!upper) return Number.NaN;
     if (upper === "USD" || upper === "RLUSD") return 1;
     const rate = Number(rlusdPerUnitRates?.[upper]);
@@ -1167,7 +1120,7 @@ const MoonPaySellModal = ({
 
       setStep("loading");
 
-      let effectiveBaseCurrencyCode = String(baseCurrencyCode || "").toUpperCase();
+      let effectiveBaseCurrencyCode = normalizeCurrencyCode(baseCurrencyCode);
       let effectiveBaseCurrencyAmount = baseCurrencyAmount;
 
       if (effectiveBaseCurrencyCode !== "XRP") {
@@ -1454,7 +1407,7 @@ const MoonPaySellModal = ({
 		              </div>
 			              <ModalSelect
 			                value={currency}
-			                onChange={(val) => setCurrency(String(val || "").toUpperCase())}
+			                onChange={(val) => setCurrency(normalizeCurrencyCode(val))}
 			                onOpenChange={setCryptoDropdownOpen}
 			                portalTarget={embedded ? contentRootRef.current : modalPanelRef.current}
 			                options={(supportedCurrencies || []).map((opt) => {
@@ -1542,7 +1495,7 @@ const MoonPaySellModal = ({
                     {t('ui_sell_summary_line', {
                       defaultValue: 'Vous transférez {{amount}} {{currency}} vers votre compte bancaire',
                       amount: new Intl.NumberFormat(locale, { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(amountValue),
-                      currency: String(currency || '').toUpperCase(),
+                      currency: normalizeCurrencyCode(currency),
                     })}
                   </p>
                   <button

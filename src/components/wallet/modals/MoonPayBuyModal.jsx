@@ -11,40 +11,33 @@ import { apiUrl } from '@/lib/runtimeConfig';
 import { getCurrencyFlag, formatAmountWithSymbol } from '../walletDashboardConfig';
 import { getCurrencyDescription } from '@/utils/currencyDescriptions';
 import { modalSelectButtonCls, modalSelectListCls } from './walletModalTokens';
+import {
+  DEBUG_LOGS,
+  MOONPAY_ORIGIN_SUFFIX,
+  MOONPAY_ACTIVE_STORAGE_KEY,
+  MOONPAY_AUTOOPEN_TAB_KEY,
+  MOONPAY_WALLET_ADDRESS_KEY,
+  MOONPAY_RESUME_MAX_AGE_MS,
+  MOONPAY_FLOW_MAX_AGE_MS,
+  fmtAmountRight,
+  isTrustedMoonPayOrigin,
+  resolvePartnerName,
+  notifyPwaMoonpayActive,
+  normalizeFiatCurrencyCode,
+  truncateMiddle,
+} from './walletModalShared';
 
-const fmtAmountRight = (raw) => {
-  if (!raw) return null;
-  const str = String(raw);
-  const i = str.lastIndexOf(' ');
-  if (i < 0) return <span>{str}</span>;
-  return <span className="inline-flex items-baseline gap-[3px]">{str.slice(0, i)}<span className="text-[0.78em]">{str.slice(i + 1)}</span></span>;
-};
-
-const DEBUG_LOGS = process.env.NEXT_PUBLIC_DEBUG_LOGS === 'true';
-const MOONPAY_ORIGIN_SUFFIX = '.moonpay.com';
-const MOONPAY_ACTIVE_STORAGE_KEY = 'xcannes_moonpay_active';
+// Buy-only constants
 const MOONPAY_BUY_RESUME_KEY = 'xcannes_moonpay_resume_buy_v1';
-const MOONPAY_AUTOOPEN_TAB_KEY = 'xcannes_moonpay_autoopen_tab';
 const MOONPAY_BUY_FLOW_KEY = 'xcannes_moonpay_buy_flow_v1';
-const MOONPAY_WALLET_ADDRESS_KEY = 'xcannes_moonpay_wallet_address_v1';
-const MOONPAY_RESUME_MAX_AGE_MS = 5 * 60 * 1000;
-const MOONPAY_FLOW_MAX_AGE_MS = 8 * 60 * 60 * 1000;
 const MOONPAY_TAG_XRP = Number.parseInt(process.env.NEXT_PUBLIC_MOONPAY_TAG_XRP || '589', 10);
 const MOONPAY_TAG_RLUSD = Number.parseInt(process.env.NEXT_PUBLIC_MOONPAY_TAG_RLUSD || '590', 10);
 
 const resolveMoonpayTag = currencyCode => {
-  const code = String(currencyCode || '')
-    .trim()
-    .toUpperCase();
+  const code = String(currencyCode || '').trim().toUpperCase();
   if (code === 'XRP') return Number.isFinite(MOONPAY_TAG_XRP) ? MOONPAY_TAG_XRP : null;
   if (code === 'RLUSD') return Number.isFinite(MOONPAY_TAG_RLUSD) ? MOONPAY_TAG_RLUSD : null;
   return null;
-};
-
-const resolvePartnerName = (url) => {
-  const raw = String(url || "").toLowerCase();
-  if (raw.includes("topper")) return "Topper";
-  return "MoonPay";
 };
 
 // Cryptos supportées par MoonPay
@@ -53,43 +46,8 @@ const MOONPAY_SUPPORTED_CURRENCIES = [
   { code: 'XRP', icon: CRYPTO_ICONS.XRP },
 ];
 
-const isTrustedMoonPayOrigin = origin => {
-  try {
-    const url = new URL(origin);
-    if (url.protocol !== 'https:') return false;
-    const host = url.hostname.toLowerCase();
-    return host === 'moonpay.com' || host.endsWith(MOONPAY_ORIGIN_SUFFIX);
-  } catch (_) {
-    return false;
-  }
-};
-
-const notifyPwaMoonpayActive = (active, tab = 'buy') => {
-  if (typeof window === 'undefined') return;
-  try {
-    const params = new URLSearchParams(window.location.search);
-    const isPwaEmbedded = params.get('embedded') === 'pwa' || Boolean(window.__XCANNES_PWA_EMBEDDED__);
-    if (!isPwaEmbedded) return;
-    if (!window.parent || window.parent === window) return;
-    window.parent.postMessage({ type: 'MOONPAY_ACTIVE', active: Boolean(active), tab }, '*');
-  } catch {
-    // ignore
-  }
-};
-
-const normalizeFiatCurrencyCode = value => {
-  const upper = String(value || '')
-    .trim()
-    .toUpperCase();
-  if (!upper) return '';
-  if (upper === 'XRP' || upper === 'RLUSD') return '';
-  return upper;
-};
-
 const normalizeMovementKind = value =>
-  String(value || '')
-    .trim()
-    .toUpperCase();
+  String(value || '').trim().toUpperCase();
 
 const resolveIncomingXrpAmount = movement => {
   const displayAmount = Number(movement?.displayAmount);
@@ -104,13 +62,6 @@ const resolveIncomingXrpAmount = movement => {
     return amountRlusd / fxRate;
   }
   return Number.NaN;
-};
-
-const truncateMiddle = (value, head = 6, tail = 5) => {
-  const str = String(value ?? '');
-  if (!str) return '';
-  if (str.length <= head + tail + 1) return str;
-  return `${str.slice(0, head)}…${str.slice(-tail)}`;
 };
 
 /**

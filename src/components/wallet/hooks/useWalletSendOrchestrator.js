@@ -209,7 +209,8 @@ export function useWalletSendOrchestrator({
       if (amount !== undefined) setSendAmount(amount);
       setSendPaymentRequest(paymentRequest ?? null);
     },
-    [setSendDestination, setSendDestinationLabel, setSendAssetKey, setSendAmount, setSendPaymentRequest],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
   );
 
   // ── Resume a saved payment request ─────────────────────────

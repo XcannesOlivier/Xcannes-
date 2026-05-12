@@ -17,6 +17,7 @@ import {
 } from "./walletModalTokens";
 import { CRYPTO_ICONS } from "@/utils/marketConstants";
 import useIsDesktop from "../hooks/useIsDesktop";
+import { normalizeCurrencyCode } from "../utils/normalizeCurrencyCode";
 
 const DEFAULT_RLUSD = { ticker: "rlusd", network: "xrp" };
 const PRIORITY_TICKERS = ["usdc", "usdt", "dai", "usdp", "tusd", "fdusd", "pyusd"];
@@ -63,8 +64,8 @@ function currencyKey(cur) {
 }
 
 function currencyLabel(cur) {
-  const ticker = String(cur?.ticker || "").trim().toUpperCase();
-  const network = String(cur?.network || "").trim().toUpperCase();
+  const ticker = normalizeCurrencyCode(cur?.ticker);
+  const network = normalizeCurrencyCode(cur?.network);
   const name = String(cur?.name || "").trim();
   if (name) return `${ticker} (${network}) — ${name}`;
   return `${ticker} (${network})`;
@@ -661,9 +662,9 @@ export default function WalletDashboardUsdSwapModal({
     if (!walletInlineSelectionEnabled) return [];
     const seen = new Set();
     const orderedTokens = [
-      ...availableTokens.filter((token) => String(token?.currency || "").toUpperCase() === "RLUSD"),
+      ...availableTokens.filter((token) => normalizeCurrencyCode(token?.currency) === "RLUSD"),
       ...availableTokens.filter((token) => {
-        const code = String(token?.currency || "").toUpperCase();
+        const code = normalizeCurrencyCode(token?.currency);
         return code !== "RLUSD" && code !== "XRP";
       }),
     ];
@@ -671,7 +672,7 @@ export default function WalletDashboardUsdSwapModal({
     return orderedTokens
       .map((token) => {
         const currencyRaw = token?.currency;
-        const currency = String(currencyRaw || "").trim().toUpperCase();
+        const currency = normalizeCurrencyCode(currencyRaw);
         if (!currency || seen.has(currency) || currency === "XRP") return null;
         if (currency !== "RLUSD" && currency !== "USD" && !token?.isTrustlineOnly) {
           return null;
@@ -734,11 +735,11 @@ export default function WalletDashboardUsdSwapModal({
   }, [sourceCurrencyOptions, sourceSearch]);
   const [sourceCurrencyCode, setSourceCurrencyCode] = useState("");
   const selectedSourceOption = useMemo(() => {
-    const current = String(sourceCurrencyCode || "").trim().toUpperCase();
+    const current = normalizeCurrencyCode(sourceCurrencyCode);
     if (!current) return sourceCurrencyOptions[0] || null;
     return (
       sourceCurrencyOptions.find(
-        (option) => String(option?.code || "").trim().toUpperCase() === current,
+        (option) => normalizeCurrencyCode(option?.code) === current,
       ) || sourceCurrencyOptions[0] || null
     );
   }, [sourceCurrencyCode, sourceCurrencyOptions]);
@@ -827,10 +828,10 @@ export default function WalletDashboardUsdSwapModal({
   const fromCurrencyKey = currencyKey(fromCurrency);
   const toCurrencyKey = currencyKey(toCurrency);
   const toLabel = toCurrency ? currencyLabel(toCurrency) : "";
-  const fromTicker = String(fromCurrency?.ticker || "").trim().toUpperCase();
-  const fromNetwork = String(fromCurrency?.network || "").trim().toUpperCase();
-  const toTicker = String(toCurrency?.ticker || "").trim().toUpperCase();
-  const toNetwork = String(toCurrency?.network || "").trim().toUpperCase();
+  const fromTicker = normalizeCurrencyCode(fromCurrency?.ticker);
+  const fromNetwork = normalizeCurrencyCode(fromCurrency?.network);
+  const toTicker = normalizeCurrencyCode(toCurrency?.ticker);
+  const toNetwork = normalizeCurrencyCode(toCurrency?.network);
   const defaultReceiveAddress = direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD ? String(walletAddress || "").trim() : "";
   const effectiveReceiveAddress = String(receiveAddress || defaultReceiveAddress || "").trim();
   const expectedReceiveTicker =
@@ -1272,7 +1273,7 @@ export default function WalletDashboardUsdSwapModal({
     if (
       initial &&
       sourceCurrencyOptions.some(
-        (option) => String(option?.code || "").trim().toUpperCase() === initial,
+        (option) => normalizeCurrencyCode(option?.code) === initial,
       )
     ) {
       setSourceCurrencyCode((prev) => (prev ? prev : initial));
@@ -3044,12 +3045,12 @@ export default function WalletDashboardUsdSwapModal({
                                   )}
                                   <span className="text-sm font-semibold">
                                     {stableCurrency
-                                      ? String(stableCurrency?.ticker || "").toUpperCase()
+                                      ? normalizeCurrencyCode(stableCurrency?.ticker)
                                       : t("ui_choose", "Choisir")}
                                   </span>
                                   <span className="text-[10px] tracking-[0.18em] uppercase px-2 py-0.5 rounded-full bg-white/10 text-white/70">
                                     {stableCurrency
-                                      ? String(stableCurrency?.network || "").toUpperCase()
+                                      ? normalizeCurrencyCode(stableCurrency?.network)
                                       : "—"}
                                   </span>
                                   <svg
@@ -3265,12 +3266,12 @@ export default function WalletDashboardUsdSwapModal({
                                     )}
                                     <span className="text-sm font-semibold">
                                       {stableCurrency
-                                        ? String(stableCurrency?.ticker || "").toUpperCase()
+                                        ? normalizeCurrencyCode(stableCurrency?.ticker)
                                         : t("ui_choose", "Choisir")}
                                     </span>
                                     <span className="text-[10px] tracking-[0.18em] uppercase px-2 py-0.5 rounded-full bg-white/10 text-white/70">
                                       {stableCurrency
-                                        ? String(stableCurrency?.network || "").toUpperCase()
+                                        ? normalizeCurrencyCode(stableCurrency?.network)
                                         : "—"}
                                     </span>
                                     <svg
@@ -3543,9 +3544,9 @@ export default function WalletDashboardUsdSwapModal({
 		                                          {renderCurrencyIcon(cur)}
 		                                          <div className="min-w-0 flex-1">
 		                                            <div className="text-[15px] font-semibold truncate">
-		                                              {String(cur?.ticker || "").toUpperCase()}
+		                                              {normalizeCurrencyCode(cur?.ticker)}
 		                                              <span className="text-white/50 font-normal">
-		                                                ({String(cur?.network || "").toUpperCase()})
+		                                                ({normalizeCurrencyCode(cur?.network)})
 		                                              </span>
 		                                              <span className="mx-1.5 text-white/30 font-normal">—</span>
 		                                              <span className="text-white/55 font-normal text-[13px]">
@@ -3753,9 +3754,9 @@ export default function WalletDashboardUsdSwapModal({
 	                                          {renderCurrencyIcon(cur)}
 	                                          <div className="min-w-0 flex-1">
 	                                            <div className="text-[15px] font-semibold truncate">
-	                                              {String(cur?.ticker || "").toUpperCase()}
+	                                              {normalizeCurrencyCode(cur?.ticker)}
 	                                              <span className="text-white/50 font-normal">
-	                                                ({String(cur?.network || "").toUpperCase()})
+	                                                ({normalizeCurrencyCode(cur?.network)})
 	                                              </span>
 	                                              <span className="mx-1.5 text-white/30 font-normal">—</span>
 	                                              <span className="text-white/55 font-normal text-[13px]">
@@ -3870,7 +3871,7 @@ export default function WalletDashboardUsdSwapModal({
                                   {filteredSourceCurrencyOptions.length ? (
                                     filteredSourceCurrencyOptions.map((option) => {
                                       const active =
-                                        String(option?.code || "").trim().toUpperCase() ===
+                                        normalizeCurrencyCode(option?.code) ===
                                         selectedSourceCurrencyCode;
                                       return (
                                         <button
@@ -4029,7 +4030,7 @@ export default function WalletDashboardUsdSwapModal({
                                   {filteredSourceCurrencyOptions.length ? (
                                     filteredSourceCurrencyOptions.map((option) => {
                                       const active =
-                                        String(option?.code || "").trim().toUpperCase() ===
+                                        normalizeCurrencyCode(option?.code) ===
                                         selectedSourceCurrencyCode;
                                       return (
                                         <button

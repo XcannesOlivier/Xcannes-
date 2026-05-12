@@ -229,7 +229,7 @@ export default function WalletDashboardSendChoiceModal({
     } catch {
       toast?.error(t('ui_qr_decode_failed_3b5d7f9a2c', 'Unable to decode this image. Try a clearer screenshot.'));
     }
-  }, [handlePaymentRequestScan, normalizedCurrentWallet, setSendDestination, setSendDestinationLabel, onChooseSimpleSend, onChoosePayRequest, isPayreqSelfSend, toast, t]);
+  }, [handlePaymentRequestScan, normalizedCurrentWallet, onChoosePayRequest, isPayreqSelfSend, toast, t]);
 
   const handleFileUpload = useCallback((inputId) => {
     const input = document.getElementById(inputId);
@@ -254,7 +254,7 @@ export default function WalletDashboardSendChoiceModal({
       }
       setPendingDestination({ address: raw, label: '' });
     }
-  }, [quickscanPasteValue, setSendDestination, setSendDestinationLabel, onChooseSimpleSend, handlePaymentRequestScan, onClose, normalizedCurrentWallet]);
+  }, [quickscanPasteValue, handlePaymentRequestScan, onClose, normalizedCurrentWallet]);
 
   // ── Paste handler for "Payer une demande" ────────────────────
   const handlePayreqPasteSubmit = useCallback(() => {

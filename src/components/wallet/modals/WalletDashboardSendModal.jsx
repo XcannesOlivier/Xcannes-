@@ -11,14 +11,8 @@ import { useModalDragToClose } from "../hooks/useModalDragToClose";
 import { formatAmountWithSymbol } from "../walletDashboardConfig";
 import { getCurrencyDescription } from "@/utils/currencyDescriptions";
 import { modalSelectButtonCls, modalSelectListCls } from "./walletModalTokens";
+import { fmtAmountRight } from "./walletModalShared";
 
-const fmtAmountRight = (raw) => {
-  if (!raw) return null;
-  const str = String(raw);
-  const i = str.lastIndexOf(' ');
-  if (i < 0) return <span>{str}</span>;
-  return <span className="inline-flex items-baseline gap-[3px]">{str.slice(0, i)}<span className="text-[0.78em]">{str.slice(i + 1)}</span></span>;
-};
 import { normalizeQrImageFile } from "@/utils/qrImage";
 import { apiUrl } from "@/lib/runtimeConfig";
 
