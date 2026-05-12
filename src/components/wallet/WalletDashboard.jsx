@@ -817,11 +817,7 @@ export default function WalletDashboard({
       ? "fr-FR"
       : locale;
 
-    const dateMobile = new Intl.DateTimeFormat(dateLocale, {
-      day: "numeric",
-      month: "short",
-    }).format(parsed);
-    const dateDesktop = new Intl.DateTimeFormat(dateLocale, {
+    const date = new Intl.DateTimeFormat(dateLocale, {
       day: "numeric",
       month: "short",
     }).format(parsed);
@@ -832,31 +828,12 @@ export default function WalletDashboard({
     }).format(parsed);
 
     return {
-      mobile: `${dateMobile} • ${time}`,
-      desktop: `${dateDesktop} • ${time}`,
-      date: dateMobile,
+      mobile: `${date} • ${time}`,
+      desktop: `${date} • ${time}`,
+      date,
       time,
     };
   }, [locale, recentActivityCreatedAt]);
-
-  const recentActivityMessageMobile = useMemo(() => {
-    const text = String(recentActivityMessage || "").trim();
-    if (!text) return "";
-    return text;
-  }, [recentActivityMessage]);
-
-  const recentActivityMessageMobileParts = useMemo(() => {
-    const text = String(recentActivityMessageMobile || "").trim();
-    if (!text) return { isConversion: false, text: "" };
-    const match = text.match(/^(.*?)(?:\s*)(→|->)(?:\s*)(.+)$/);
-    if (!match) return { isConversion: false, text };
-    return {
-      isConversion: true,
-      left: match[1].trim(),
-      arrow: match[2] === '->' ? '→' : match[2],
-      right: match[3].trim(),
-    };
-  }, [recentActivityMessageMobile]);
 
   const recentActivityMessageParts = useMemo(() => {
     const text = String(recentActivityMessage || "").trim();
@@ -1186,15 +1163,15 @@ export default function WalletDashboard({
     setShowGlobalStatement,
     showCurrencyStatement,
     setShowCurrencyStatement,
-	    selectedStatementToken,
-	    setSelectedStatementToken,
-	    statementBalance,
-	    highlightTransactionId,
-	    toast,
-	    // Spread sub-orchestrator state (keys match useWalletModalProps params)
-	    ...sendState,
-	    ...swapState,
-	  });
+    selectedStatementToken,
+    setSelectedStatementToken,
+    statementBalance,
+    highlightTransactionId,
+    toast,
+    // Spread sub-orchestrator state (keys match useWalletModalProps params)
+    ...sendState,
+    ...swapState,
+  });
 
   // ── Body scroll lock ───────────────────────────────────────
   const allowBackgroundScrollForStatements = !isDesktopPanel && (showGlobalStatement || showCurrencyStatement);
@@ -1470,11 +1447,11 @@ export default function WalletDashboard({
                         ) : null}
                         <div>
                           <span className="md:hidden text-[13px] text-white/65 font-semibold">
-                            {recentActivityMessageMobileParts.isConversion ? (
+                            {recentActivityMessageParts.isConversion ? (
                               <>
-                                {recentActivityMessageMobileParts.left} {recentActivityMessageMobileParts.arrow}{' '}
+                                {recentActivityMessageParts.left} {recentActivityMessageParts.arrow}{' '}
                                 <span className="text-[14px] text-white/90 font-semibold">
-                                  {recentActivityMessageMobileParts.right}
+                                  {recentActivityMessageParts.right}
                                 </span>
                               </>
                             ) : recentActivityIcon === "receive" && recentActivityReceiveParts ? (
@@ -1494,7 +1471,7 @@ export default function WalletDashboard({
                                 {recentActivitySendParts.suffix}
                               </>
                             ) : (
-                              recentActivityMessageMobileParts.text
+                              recentActivityMessageParts.text
                             )}
                           </span>
                           <span className="hidden md:inline text-[14px] text-white/85 font-semibold">
