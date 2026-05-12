@@ -45,11 +45,6 @@ import { usePreferredCurrency } from './hooks/usePreferredCurrency';
 import WalletCurrencySelector from '@/components/ui/WalletCurrencySelector';
 import WalletSettingsDropdown from '@/components/wallet/components/WalletSettingsDropdown';
 
-function isAcceptedOnChainToken(currency) {
-  const code = String(currency || '').toUpperCase();
-  return WALLET_ACCEPTED_TOKENS.has(code);
-}
-
 import {
   MOONPAY_AUTOOPEN_TAB_KEY,
   MOONPAY_BUY_RESUME_MAX_AGE_MS,
@@ -57,6 +52,11 @@ import {
   saveMoonpayBuyResumeState,
   returnToMoonpaySellWidget,
 } from './moonpayClientUtils';
+
+function isAcceptedOnChainToken(currency) {
+  const code = String(currency || '').toUpperCase();
+  return WALLET_ACCEPTED_TOKENS.has(code);
+}
 
 function normalizeMovementKind(value) {
   return String(value || '')
@@ -911,9 +911,7 @@ export default function WalletDashboard({
     handleAction,
     handleOpenCurrencyStatement,
     handleOpenInfo,
-    handleOpenSecurity,
-    handleOpenHelp,
-    handleOpenTerms,
+    handleOpenDesktopSettingsPage,
     handleOpenGlobalStatement,
     handleCopyAddress,
     handleRefreshWallet,
@@ -1176,9 +1174,9 @@ export default function WalletDashboard({
             isDesktopPanel={isDesktopPanel}
             onOpenInfo={handleOpenInfo}
             onOpenXrplActivity={handleOpenXrplActivity}
-            onOpenSecurity={handleOpenSecurity}
-            onOpenHelp={handleOpenHelp}
-            onOpenTerms={handleOpenTerms}
+            onOpenSecurity={() => handleOpenDesktopSettingsPage('security')}
+            onOpenHelp={() => handleOpenDesktopSettingsPage('help')}
+            onOpenTerms={() => handleOpenDesktopSettingsPage('terms')}
             isWalletActivated={isWalletActivated}
             hasRlusdTrustline={hasOnChainRlusd}
             onActivateWallet={handleOpenActivationModal}
@@ -1512,9 +1510,9 @@ export default function WalletDashboard({
                     isDesktopPanel={isDesktopPanel}
                     onOpenInfo={handleOpenInfo}
                     onOpenXrplActivity={handleOpenXrplActivity}
-                    onOpenSecurity={handleOpenSecurity}
-                    onOpenHelp={handleOpenHelp}
-                    onOpenTerms={handleOpenTerms}
+                    onOpenSecurity={() => handleOpenDesktopSettingsPage('security')}
+                    onOpenHelp={() => handleOpenDesktopSettingsPage('help')}
+                    onOpenTerms={() => handleOpenDesktopSettingsPage('terms')}
                     preferredCurrency={preferredCurrency}
                     topCurrencies={prefTopCurrencies}
                     fawazCurrencies={prefFawazCurrencies}

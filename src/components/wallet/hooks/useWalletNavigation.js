@@ -365,21 +365,6 @@ export function useWalletNavigation({
     ],
   );
 
-  const handleOpenSecurity = useCallback(
-    () => handleOpenDesktopSettingsPage("security"),
-    [handleOpenDesktopSettingsPage],
-  );
-
-  const handleOpenHelp = useCallback(
-    () => handleOpenDesktopSettingsPage("help"),
-    [handleOpenDesktopSettingsPage],
-  );
-
-  const handleOpenTerms = useCallback(
-    () => handleOpenDesktopSettingsPage("terms"),
-    [handleOpenDesktopSettingsPage],
-  );
-
   // ─── Copy wallet address ──────────────────────────────────────────────
 
   const handleCopyAddress = useCallback(async () => {
@@ -507,9 +492,7 @@ export function useWalletNavigation({
     handleAction,
     handleOpenCurrencyStatement,
     handleOpenInfo,
-    handleOpenSecurity,
-    handleOpenHelp,
-    handleOpenTerms,
+    handleOpenDesktopSettingsPage,
     handleOpenGlobalStatement,
     handleCopyAddress,
     handleRefreshWallet,

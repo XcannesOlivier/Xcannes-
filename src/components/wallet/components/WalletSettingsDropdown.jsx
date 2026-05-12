@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useLayoutEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useLayoutEffect, useCallback, useMemo } from "react";
 import Image from "next/image";
 import { useTranslation } from "next-i18next";
 import { QRCodeSVG } from "qrcode.react";
@@ -8,6 +8,15 @@ import { ChevronLeftIcon } from "@heroicons/react/24/outline";
 import { useWallet } from "@/context/WalletContext";
 import PreferredCurrencySelector from "./PreferredCurrencySelector";
 import { createPortal } from "react-dom";
+
+function useEscapeClose(isOpen, onClose) {
+  useEffect(() => {
+    if (!isOpen) return;
+    const handler = (e) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [isOpen, onClose]);
+}
 
 /**
  * Settings gear button + dropdown menu.
@@ -166,20 +175,13 @@ export default function WalletSettingsDropdown({
     }
   }, []);
 
-  const closeSecurityModal = useCallback(() => {
-    setShowSecurityModal(false);
-    reopenSettingsDropdown();
-  }, [reopenSettingsDropdown]);
-
-  const closeHelpModal = useCallback(() => {
-    setShowHelpModal(false);
-    reopenSettingsDropdown();
-  }, [reopenSettingsDropdown]);
-
-  const closeTermsModal = useCallback(() => {
-    setShowTermsModal(false);
-    reopenSettingsDropdown();
-  }, [reopenSettingsDropdown]);
+  const makeModalCloser = useCallback(
+    (setter) => () => { setter(false); reopenSettingsDropdown(); },
+    [reopenSettingsDropdown],
+  );
+  const closeSecurityModal = useMemo(() => makeModalCloser(setShowSecurityModal), [makeModalCloser]);
+  const closeHelpModal     = useMemo(() => makeModalCloser(setShowHelpModal),     [makeModalCloser]);
+  const closeTermsModal    = useMemo(() => makeModalCloser(setShowTermsModal),    [makeModalCloser]);
 
   // Allow the PWA host to reopen the dropdown after returning from "add account" flow.
   useEffect(() => {
@@ -201,44 +203,10 @@ export default function WalletSettingsDropdown({
   }, [isOpen]);
 
   // Close on Escape
-  useEffect(() => {
-    if (!isOpen) return;
-    const handler = (e) => {
-      if (e.key === "Escape") setIsOpen(false);
-    };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-  }, [isOpen]);
-
-  // Close help modal on Escape
-  useEffect(() => {
-    if (!showHelpModal) return;
-    const handler = (e) => {
-      if (e.key === "Escape") closeHelpModal();
-    };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-  }, [closeHelpModal, showHelpModal]);
-
-  // Close security modal on Escape
-  useEffect(() => {
-    if (!showSecurityModal) return;
-    const handler = (e) => {
-      if (e.key === "Escape") closeSecurityModal();
-    };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-  }, [closeSecurityModal, showSecurityModal]);
-
-  // Close terms modal on Escape
-  useEffect(() => {
-    if (!showTermsModal) return;
-    const handler = (e) => {
-      if (e.key === "Escape") closeTermsModal();
-    };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-  }, [closeTermsModal, showTermsModal]);
+  useEscapeClose(isOpen, () => setIsOpen(false));
+  useEscapeClose(showHelpModal, closeHelpModal);
+  useEscapeClose(showSecurityModal, closeSecurityModal);
+  useEscapeClose(showTermsModal, closeTermsModal);
 
   const HELP_QA = [
     {

@@ -12,6 +12,19 @@
 
 import { createPortal } from "react-dom";
 import { useCallback, useEffect, useRef, useState } from "react";
+
+const INITIAL_SCAN_DRAG_META = { startY: 0, startAt: 0, pointerId: null, lastDelta: 0, pending: false, dragging: false };
+
+const INITIAL_USD_SWAP_STATE = {
+  prefillAmount: "",
+  accentVariant: "",
+  sourceSelectionMode: "",
+  initialSourceCurrency: "",
+  targetSelectionMode: "",
+  initialTargetCurrency: "",
+  titleOverride: "",
+  subtitleOverride: "",
+};
 import QRScanner from "../components/QRScanner";
 import WalletDashboardSendModal from "../modals/WalletDashboardSendModal";
 import WalletDashboardReceiveModal from "../modals/WalletDashboardReceiveModal";
@@ -74,26 +87,30 @@ export default function WalletMobileModals({
   // mobile cash uses augmentedTokens (not selectableTokens)
   augmentedTokens,
 }) {
-  const [usdSwapPrefillAmount, setUsdSwapPrefillAmount] = useState("");
-  const [usdSwapAccentVariant, setUsdSwapAccentVariant] = useState("");
-  const [usdSwapSourceSelectionMode, setUsdSwapSourceSelectionMode] = useState("");
-  const [usdSwapInitialSourceCurrency, setUsdSwapInitialSourceCurrency] = useState("");
-  const [usdSwapTargetSelectionMode, setUsdSwapTargetSelectionMode] = useState("");
-  const [usdSwapInitialTargetCurrency, setUsdSwapInitialTargetCurrency] = useState("");
-  const [usdSwapTitleOverride, setUsdSwapTitleOverride] = useState("");
-  const [usdSwapSubtitleOverride, setUsdSwapSubtitleOverride] = useState("");
+  const [usdSwapState, setUsdSwapState] = useState(INITIAL_USD_SWAP_STATE);
+  const {
+    prefillAmount: usdSwapPrefillAmount,
+    accentVariant: usdSwapAccentVariant,
+    sourceSelectionMode: usdSwapSourceSelectionMode,
+    initialSourceCurrency: usdSwapInitialSourceCurrency,
+    targetSelectionMode: usdSwapTargetSelectionMode,
+    initialTargetCurrency: usdSwapInitialTargetCurrency,
+    titleOverride: usdSwapTitleOverride,
+    subtitleOverride: usdSwapSubtitleOverride,
+  } = usdSwapState;
 
   const openUsdSwapOut = useCallback(
     (amount, options = {}) => {
-      const next = amount == null ? "" : String(amount);
-      setUsdSwapPrefillAmount(next);
-      setUsdSwapAccentVariant(String(options?.accentVariant || "").trim());
-      setUsdSwapSourceSelectionMode(String(options?.sourceSelectionMode || "").trim());
-      setUsdSwapInitialSourceCurrency(String(options?.initialSourceCurrency || "").trim());
-      setUsdSwapTargetSelectionMode(String(options?.targetSelectionMode || "").trim());
-      setUsdSwapInitialTargetCurrency(String(options?.initialTargetCurrency || "").trim());
-      setUsdSwapTitleOverride(String(options?.titleOverride || "").trim());
-      setUsdSwapSubtitleOverride(String(options?.subtitleOverride || "").trim());
+      setUsdSwapState({
+        prefillAmount: amount == null ? "" : String(amount),
+        accentVariant: String(options?.accentVariant || "").trim(),
+        sourceSelectionMode: String(options?.sourceSelectionMode || "").trim(),
+        initialSourceCurrency: String(options?.initialSourceCurrency || "").trim(),
+        targetSelectionMode: String(options?.targetSelectionMode || "").trim(),
+        initialTargetCurrency: String(options?.initialTargetCurrency || "").trim(),
+        titleOverride: String(options?.titleOverride || "").trim(),
+        subtitleOverride: String(options?.subtitleOverride || "").trim(),
+      });
       const dir = String(options?.direction || "").trim().toLowerCase();
       setActiveAction?.(dir === "stable_to_rlusd" ? "cashUsdSwapIn" : "cashUsdSwapOut");
     },
@@ -101,10 +118,16 @@ export default function WalletMobileModals({
   );
 
   /* ── QR Scanner swipe-to-close (mobile) ── */
+
+  const handleQrScanResult = useCallback((data, callbackRef) => {
+    setQrScannerOpen(false);
+    setActiveAction('sendChoice');
+    setTimeout(() => { callbackRef.__inject?.(data); }, 120);
+  }, [setQrScannerOpen, setActiveAction]);
   const [scanDragging, setScanDragging] = useState(false);
   const [scanTranslateY, setScanTranslateY] = useState(0);
   const scanOverlayRef = useRef(null);
-  const scanDragMeta = useRef({ startY: 0, startAt: 0, pointerId: null, lastDelta: 0, pending: false, dragging: false });
+  const scanDragMeta = useRef({ ...INITIAL_SCAN_DRAG_META });
   const scanCloseRequested = useRef(false);
   const scanFromSendChoiceRef = useRef(false);
   const qrScanResultCallbackRef = useRef(null);
@@ -116,11 +139,11 @@ export default function WalletMobileModals({
       scanCloseRequested.current = false;
       setScanDragging(false);
       setScanTranslateY(0);
-      scanDragMeta.current = { startY: 0, startAt: 0, pointerId: null, lastDelta: 0, pending: false, dragging: false };
+      scanDragMeta.current = { ...INITIAL_SCAN_DRAG_META };
     } else {
       setScanDragging(false);
       if (!scanCloseRequested.current) setScanTranslateY(0);
-      scanDragMeta.current = { startY: 0, startAt: 0, pointerId: null, lastDelta: 0, pending: false, dragging: false };
+      scanDragMeta.current = { ...INITIAL_SCAN_DRAG_META };
     }
   }, [qrScannerOpen]);
 
@@ -165,7 +188,7 @@ export default function WalletMobileModals({
       return;
     }
     setScanTranslateY(0);
-    scanDragMeta.current = { startY: 0, startAt: 0, pointerId: null, lastDelta: 0, pending: false, dragging: false };
+    scanDragMeta.current = { ...INITIAL_SCAN_DRAG_META };
   };
 
   return (
@@ -326,14 +349,7 @@ export default function WalletMobileModals({
                 activeAction === "cashUsdSwapOut" || activeAction === "cashUsdSwapIn"
               }
               onClose={() => {
-                setUsdSwapPrefillAmount("");
-                setUsdSwapAccentVariant("");
-                setUsdSwapSourceSelectionMode("");
-                setUsdSwapInitialSourceCurrency("");
-                setUsdSwapTargetSelectionMode("");
-                setUsdSwapInitialTargetCurrency("");
-                setUsdSwapTitleOverride("");
-                setUsdSwapSubtitleOverride("");
+                setUsdSwapState(INITIAL_USD_SWAP_STATE);
                 setActiveAction(null);
               }}
               walletLabel={cashModalProps?.walletLabel || ""}
@@ -412,21 +428,12 @@ export default function WalletMobileModals({
                     onScan={(data) => {
                       if (scanFromPayreqRef.current) {
                         scanFromPayreqRef.current = false;
-                        setQrScannerOpen(false);
-                        setActiveAction('sendChoice');
-                        setTimeout(() => {
-                          qrPayreqResultCallbackRef.__inject?.(data);
-                        }, 120);
+                        handleQrScanResult(data, qrPayreqResultCallbackRef);
                         return;
                       }
                       if (scanFromSendChoiceRef.current) {
                         scanFromSendChoiceRef.current = false;
-                        setQrScannerOpen(false);
-                        setActiveAction('sendChoice');
-                        // Injecter l'adresse dans le modal send-choice via le ref callback
-                        setTimeout(() => {
-                          qrScanResultCallbackRef.__inject?.(data);
-                        }, 120);
+                        handleQrScanResult(data, qrScanResultCallbackRef);
                         return;
                       }
                       const result = handlePaymentRequestScan?.(data);

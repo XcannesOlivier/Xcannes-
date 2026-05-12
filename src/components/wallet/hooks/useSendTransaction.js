@@ -291,8 +291,33 @@ export function useSendTransaction({
   clearMoonpaySellRequest,
 }) {
   // ------------------------------------------------------------------
-  // handleSendSubmit
+  // Helpers
   // ------------------------------------------------------------------
+  function removeMatchingPayreq() {
+    if (!sendPaymentRequest || !removePayreq || !pendingPayreqs?.length) return;
+    const matchDest = String(sendPaymentRequest.to || "").trim();
+    const matchAmount = Number(
+      sendPaymentRequest.amountRlusd ||
+        sendPaymentRequest.displayAmount ||
+        0,
+    );
+    const matchCurrency = String(
+      sendPaymentRequest.targetCurrencyCode ||
+        sendPaymentRequest.displayCurrency ||
+        "",
+    ).toUpperCase();
+    const match = pendingPayreqs.find((p) => {
+      const pd = String(p.payreq?.to || "").trim();
+      const pa = Number(
+        p.payreq?.amountRlusd || p.payreq?.displayAmount || 0,
+      );
+      const pc = String(
+        p.payreq?.targetCurrencyCode || p.payreq?.displayCurrency || "",
+      ).toUpperCase();
+      return pd === matchDest && pa === matchAmount && pc === matchCurrency;
+    });
+    if (match) removePayreq(match.id);
+  }
   const handleSendSubmit = async ({
     saveDestination = "",
     saveLabel = "",
@@ -662,30 +687,7 @@ export function useSendTransaction({
       setSendAmount("");
       setSendDestination("");
       // Auto-suppression de la payreq des demandes en attente
-      if (sendPaymentRequest && removePayreq && pendingPayreqs?.length) {
-        const matchDest = String(sendPaymentRequest.to || "").trim();
-        const matchAmount = Number(
-          sendPaymentRequest.amountRlusd ||
-            sendPaymentRequest.displayAmount ||
-            0,
-        );
-        const matchCurrency = String(
-          sendPaymentRequest.targetCurrencyCode ||
-            sendPaymentRequest.displayCurrency ||
-            "",
-        ).toUpperCase();
-        const match = pendingPayreqs.find((p) => {
-          const pd = String(p.payreq?.to || "").trim();
-          const pa = Number(
-            p.payreq?.amountRlusd || p.payreq?.displayAmount || 0,
-          );
-          const pc = String(
-            p.payreq?.targetCurrencyCode || p.payreq?.displayCurrency || "",
-          ).toUpperCase();
-          return pd === matchDest && pa === matchAmount && pc === matchCurrency;
-        });
-        if (match) removePayreq(match.id);
-      }
+      removeMatchingPayreq();
       setSendPaymentRequest(null);
       clearMoonpaySellRequest?.();
       // Balance refresh is handled automatically via WebSocket wallet:address channel
@@ -855,30 +857,7 @@ export function useSendTransaction({
       setSendAmount("");
       setSendDestination("");
       // Auto-suppression de la payreq des demandes en attente
-      if (sendPaymentRequest && removePayreq && pendingPayreqs?.length) {
-        const matchDest = String(sendPaymentRequest.to || "").trim();
-        const matchAmount = Number(
-          sendPaymentRequest.amountRlusd ||
-            sendPaymentRequest.displayAmount ||
-            0,
-        );
-        const matchCurrency = String(
-          sendPaymentRequest.targetCurrencyCode ||
-            sendPaymentRequest.displayCurrency ||
-            "",
-        ).toUpperCase();
-        const match = pendingPayreqs.find((p) => {
-          const pd = String(p.payreq?.to || "").trim();
-          const pa = Number(
-            p.payreq?.amountRlusd || p.payreq?.displayAmount || 0,
-          );
-          const pc = String(
-            p.payreq?.targetCurrencyCode || p.payreq?.displayCurrency || "",
-          ).toUpperCase();
-          return pd === matchDest && pa === matchAmount && pc === matchCurrency;
-        });
-        if (match) removePayreq(match.id);
-      }
+      removeMatchingPayreq();
       setSendPaymentRequest(null);
       clearMoonpaySellRequest?.();
       // Balance refresh is handled automatically via WebSocket wallet:address channel
