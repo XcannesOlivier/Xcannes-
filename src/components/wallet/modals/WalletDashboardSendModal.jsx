@@ -182,6 +182,9 @@ export default function WalletDashboardSendModal({
   const requestBeneficiaryLabel = sendPaymentRequest?.beneficiaryLabel
     ? String(sendPaymentRequest.beneficiaryLabel)
     : "";
+  const requestMemo = sendPaymentRequest?.memo
+    ? String(sendPaymentRequest.memo).trim()
+    : "";
   const requestDestination = String(
     sendPaymentRequest?.to || normalizedDestination || "",
   ).trim();
@@ -1195,6 +1198,12 @@ export default function WalletDashboardSendModal({
           <span className="text-[15px] text-white/50">{t("ui_currency_label", "Devise")}</span>
           <span className="text-[17px] text-white/90">{requestCurrencyCode || confirmCurrencyCode || "—"}</span>
         </div>
+        {requestMemo ? (
+          <div className="flex items-baseline justify-between gap-4">
+            <span className="text-[15px] text-white/50">{t("ui_memo_label", "Motif")}</span>
+            <span className="text-[15px] text-white/80 text-right max-w-[60%] break-words">{requestMemo}</span>
+          </div>
+        ) : null}
         <div className="flex items-baseline justify-between gap-4">
 	          <span className="text-[20px] text-white/90">{t("ui_total_to_send_label", "Total à envoyer")}</span>
           <span className="text-3xl font-semibold text-white">{requestAmountLabel || "—"}</span>
