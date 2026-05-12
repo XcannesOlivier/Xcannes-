@@ -450,9 +450,8 @@ export default function WalletDashboard({
     externalDefaultCurrency: clDefaultCurrency,
     onRefresh: refreshCurrencyLines,
   });
-  const defaultWalletLabel = t('nav_wallet', 'Wallet');
   const walletHasCustomLabel = Boolean(
-    String(walletLabel || '').trim() && String(walletLabel || '').trim() !== defaultWalletLabel,
+    String(walletLabel || '').trim() && String(walletLabel || '').trim() !== t('nav_wallet', 'Wallet'),
   );
   const { renderWalletMeta } = useWalletMeta({
     walletAddress: wallet,
@@ -529,7 +528,6 @@ export default function WalletDashboard({
       }),
     [augmentedTokens],
   );
-  const hasRlusdTrustline = hasOnChainRlusd;
 
   // ===== SUB-ORCHESTRATORS ===================================
   // swapState MUST be created before useRlusdPerUnitRates so that
@@ -811,8 +809,7 @@ export default function WalletDashboard({
     }).format(parsed);
 
     return {
-      mobile: `${date} • ${time}`,
-      desktop: `${date} • ${time}`,
+      label: `${date} • ${time}`,
       date,
       time,
     };
@@ -936,7 +933,7 @@ export default function WalletDashboard({
     signTransaction: signTransactionWithProgress,
     refreshBalance,
     loadWalletLabel,
-    hasRlusdTrustline,
+    hasRlusdTrustline: hasOnChainRlusd,
     toast,
     confirm,
     closeInlineQr: sendState.closeInlineQr,
@@ -1224,7 +1221,7 @@ export default function WalletDashboard({
             onOpenHelp={handleOpenHelp}
             onOpenTerms={handleOpenTerms}
             isWalletActivated={isWalletActivated}
-            hasRlusdTrustline={hasRlusdTrustline}
+            hasRlusdTrustline={hasOnChainRlusd}
             onActivateWallet={handleOpenActivationModal}
             onConfirmSetup={handleRlusdSetupConfirm}
             activeAction={activeAction}
@@ -1284,8 +1281,8 @@ export default function WalletDashboard({
                       type="button"
                       ref={activityTooltipTriggerRef}
                       title={
-                        (recentActivityWhen?.desktop || recentActivityWhen?.mobile)
-                          ? `${recentActivityWhen?.desktop || recentActivityWhen?.mobile} — ${recentActivityMessage}`
+                        recentActivityWhen?.label
+                          ? `${recentActivityWhen.label} — ${recentActivityMessage}`
                           : recentActivityMessage
                       }
                       onClick={handleOpenRecentSummary}
@@ -1424,10 +1421,9 @@ export default function WalletDashboard({
                     </button>
                     {activityTooltipOpen && recentActivityMessage ? (
                       <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50 w-max max-w-[260px] bg-[#1e2628] text-white/85 text-[11px] leading-snug rounded-lg px-3 py-2 shadow-xl ring-1 ring-white/10 pointer-events-none">
-                        {recentActivityWhen?.mobile || recentActivityWhen?.desktop ? (
+                        {recentActivityWhen?.label ? (
                           <div className="text-white/60 text-[11px] md:text-[12px] mb-1">
-                            <span className="md:hidden">{recentActivityWhen.mobile}</span>
-                            <span className="hidden md:inline">{recentActivityWhen.desktop}</span>
+                            <span>{recentActivityWhen.label}</span>
                           </div>
                         ) : null}
                         <div>
