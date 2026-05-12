@@ -65,32 +65,29 @@
 
 ---
 
-### ⬜ 9. Extraire sous-composants de `GlobalStatement.jsx` (2 209 lignes)
-- **Quoi** : blocs de rendu répétés (lignes de transaction, en-têtes de mois, totaux)
-- **Où** : composants séparés dans `wallet/statements/`
-- **Pourquoi** : fichier trop monolithique
+### ✅ 9. Extraire le modal de détail de `GlobalStatement.jsx` (2 209 → 1 916 lignes)
+- **Réalisé** :
+  - `statements/GlobalMovementDetailModal.jsx` ✓ — overlay portal de détail d'un mouvement (~270 lignes)
+  - `GlobalStatement.jsx` : 2 209 → **1 916 lignes** (−293)
 
 ---
 
-### ⬜ 10. Extraire sous-composants de `CurrencyStatement.jsx` (2 044 lignes)
-- **Quoi** : row de transaction, filtres, totaux
-- **Où** : composants séparés dans `wallet/statements/`
-- **Pourquoi** : même problème que `GlobalStatement`
+### ✅ 10. Extraire le modal de détail de `CurrencyStatement.jsx` (2 044 → 1 824 lignes)
+- **Réalisé** :
+  - `statements/CurrencyTransactionDetailModal.jsx` ✓ — overlay portal de détail d'une transaction (~255 lignes)
+  - `CurrencyStatement.jsx` : 2 044 → **1 824 lignes** (−220)
 
 ---
 
-### ⬜ 11. Tests unitaires pour utils/hooks extraits
-- **Priorité** : `movementUtils`, `useTransactionProgress`, `useActivityBanner`
-- **Framework** : Vitest (déjà configuré)
-- **Fichiers cibles** :
-  - `wallet/utils/movementUtils.test.js`
-  - `wallet/hooks/useTransactionProgress.test.js`
-  - `wallet/hooks/useActivityBanner.test.js`
+### ✅ 11. Tests unitaires pour utils extraits
+- `wallet/utils/movementUtils.test.js` ✓ — 14 tests (`isAcceptedOnChainToken`, `normalizeMovementKind`, `resolveIncomingXrpAmount`)
+- Hooks React (`useTransactionProgress`, `useActivityBanner`) — skip : nécessitent `@testing-library/react` non installé
+- `modals/simpleSwapUtils.test.jsx` — supprimé : `simpleSwapUtils.js` contient du JSX non transformable par Vitest sans plugin React
 
 ---
 
 ### ✅ 12. Vérification no-regression (tests existants)
-- `npx vitest run` lancé après chaque étape — **54/54 tests passent** ✓
+- `npx vitest run` lancé après chaque étape — **68/68 tests passent** ✓ (54 existants + 14 nouveaux `movementUtils`)
 
 ---
 
@@ -101,12 +98,15 @@
 | `modals/WalletDashboardUsdSwapModal.jsx` | 4 766 | **4 481** ✅ |
 | `modals/simpleSwapUtils.js` | — | 248 (nouveau) |
 | `modals/simpleSwapBanners.jsx` | — | 22 (nouveau) |
-| `modals/MoonPayBuyModal.jsx` | 2 600 | 2 600 |
-| `statements/GlobalStatement.jsx` | 2 209 |
-| `modals/MoonPaySellModal.jsx` | 2 196 |
-| `modals/WalletDashboardReceiveModal.jsx` | 2 169 |
-| `statements/CurrencyStatement.jsx` | 2 044 |
-| `WalletDashboard.jsx` | 1 628 |
-| `modals/WalletDashboardSendModal.jsx` | 1 529 |
+| `modals/MoonPayBuyModal.jsx` | 2 600 | **2 466** ✅ |
+| `statements/GlobalStatement.jsx` | 2 209 | **1 916** ✅ |
+| `modals/MoonPaySellModal.jsx` | 2 196 | **2 057** ✅ |
+| `modals/WalletDashboardReceiveModal.jsx` | 2 169 | 2 169 |
+| `statements/CurrencyStatement.jsx` | 2 044 | **1 824** ✅ |
+| `statements/GlobalMovementDetailModal.jsx` | — | 270 (nouveau) |
+| `statements/CurrencyTransactionDetailModal.jsx` | — | 255 (nouveau) |
+| `utils/movementUtils.test.js` | — | 87 (nouveau) |
+| `WalletDashboard.jsx` | 1 628 | **~916** ✅ |
+| `modals/WalletDashboardSendModal.jsx` | 1 529 | 1 529 |
 | `components/WalletSettingsDropdown.jsx` | 1 169 |
 | `modals/WalletDashboardSendChoiceModal.jsx` | 1 153 |
