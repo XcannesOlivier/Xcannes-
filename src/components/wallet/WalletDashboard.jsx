@@ -1306,6 +1306,8 @@ export default function WalletDashboard({
                           : recentActivityMessage
                       }
                       onClick={handleOpenRecentSummary}
+                      onMouseEnter={() => setActivityTooltipOpen(true)}
+                      onMouseLeave={() => setActivityTooltipOpen(false)}
                       onBlur={() => setActivityTooltipOpen(false)}
                       className="w-full text-left focus:outline-none"
                     >
