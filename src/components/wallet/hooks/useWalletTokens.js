@@ -1,8 +1,8 @@
 "use client";
 
 import { useMemo } from "react";
-import {
 import { normalizeCurrencyCode } from "../utils/normalizeCurrencyCode";
+import {
   WALLET_CURRENCY_LINE_ORDER,
   WALLET_ACCEPTED_TOKENS,
 } from "../walletDashboardConfig";

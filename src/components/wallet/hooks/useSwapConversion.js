@@ -2,11 +2,11 @@ import { useCallback, useEffect } from "react";
 import xcannesApi from "@/lib/xcannesApi";
 import { buildXrplJsonMemo, buildConversionMemo } from "@/utils/xrplMemo";
 import {
-import { normalizeCurrencyCode } from "../utils/normalizeCurrencyCode";
   buildRlusdPaymentTxjson,
   computeSpreadQuote,
   XCANNES_ACTIVATION_WALLET_ADDRESS,
 } from "@/utils/walletSpread";
+import { normalizeCurrencyCode } from "../utils/normalizeCurrencyCode";
 
 const RLUSD_USD_RATE = 1;
 const EPSILON = 1e-9;
