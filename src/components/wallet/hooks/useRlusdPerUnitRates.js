@@ -2,12 +2,13 @@
 
 import { useEffect, useMemo, useState } from "react";
 import xcannesApi from "@/lib/xcannesApi";
+import { normalizeCurrencyCode } from "../utils/normalizeCurrencyCode";
 
 // Crypto/XRPL assets that should never go through the Fawaz FX endpoint.
 const CRYPTO_CODES = new Set(["XRP", "BTC", "ETH", "SOL", "DOGE", "LTC", "ADA", "DOT", "AVAX", "MATIC"]);
 
 async function resolveUsdPerUnit(code, fawazSet) {
-  const upper = String(code || "").toUpperCase();
+  const upper = normalizeCurrencyCode(code);
   if (!upper) return { rate: Number.NaN, source: null };
   if (upper === "USD" || upper === "RLUSD") return { rate: 1, source: "FAWAZ" };
 
@@ -36,7 +37,7 @@ async function resolveUsdPerUnit(code, fawazSet) {
 export function useRlusdPerUnitRates(currencyCodes = []) {
   const codesKey = useMemo(() => {
     const normalized = (currencyCodes || [])
-      .map((c) => String(c || "").toUpperCase())
+      .map((c) => normalizeCurrencyCode(c))
       .filter(Boolean);
     return Array.from(new Set(normalized)).sort().join("|");
   }, [currencyCodes]);

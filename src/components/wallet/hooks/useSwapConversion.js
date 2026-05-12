@@ -2,6 +2,7 @@ import { useCallback, useEffect } from "react";
 import xcannesApi from "@/lib/xcannesApi";
 import { buildXrplJsonMemo, buildConversionMemo } from "@/utils/xrplMemo";
 import {
+import { normalizeCurrencyCode } from "../utils/normalizeCurrencyCode";
   buildRlusdPaymentTxjson,
   computeSpreadQuote,
   XCANNES_ACTIVATION_WALLET_ADDRESS,
@@ -68,7 +69,7 @@ export function useSwapConversion({
 
   const getRlusdPerUnit = useCallback(
     async (currencyCode) => {
-      const code = String(currencyCode || "").toUpperCase();
+      const code = normalizeCurrencyCode(currencyCode);
       if (!code) return Number.NaN;
       if (code === "RLUSD" || code === "USD") return RLUSD_USD_RATE;
 
@@ -99,8 +100,8 @@ export function useSwapConversion({
 
   const handleDemoConvert = useCallback(async () => {
     if (isPreviewMode) {
-      const base = String(convertBaseCurrency || "").toUpperCase();
-      const quote = String(convertQuoteCurrency || "").toUpperCase();
+      const base = normalizeCurrencyCode(convertBaseCurrency);
+      const quote = normalizeCurrencyCode(convertQuoteCurrency);
       const amountBase = Number(convertAmount || "0");
 
       if (!base || !quote || base === quote) {
@@ -249,8 +250,8 @@ export function useSwapConversion({
       return;
     }
 
-    const base = String(convertBaseCurrency || "").toUpperCase();
-    const quote = String(convertQuoteCurrency || "").toUpperCase();
+    const base = normalizeCurrencyCode(convertBaseCurrency);
+    const quote = normalizeCurrencyCode(convertQuoteCurrency);
     const amountBase = Number(convertAmount || "0");
 
     if (!base || !quote || base === quote) {

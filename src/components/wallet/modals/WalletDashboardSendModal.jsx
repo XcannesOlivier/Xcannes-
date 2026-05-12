@@ -7,6 +7,7 @@ import QRScanner from "../components/QRScanner";
 import { createPortal } from "react-dom";
 import { useTranslation } from "next-i18next";
 import { useModalTransition } from "@/hooks/useModalTransition";
+import { useModalDragToClose } from "../hooks/useModalDragToClose";
 import { formatAmountWithSymbol } from "../walletDashboardConfig";
 import { getCurrencyDescription } from "@/utils/currencyDescriptions";
 import { modalSelectButtonCls, modalSelectListCls } from "./walletModalTokens";
@@ -65,11 +66,6 @@ export default function WalletDashboardSendModal({
   const [showFullPayreqAddress, setShowFullPayreqAddress] = useState(false);
   const [scanUnavailable, setScanUnavailable] = useState(false);
   /* ── Scanner swipe-to-close (mobile) ── */
-  const [scanDragging, setScanDragging] = useState(false);
-  const [scanTranslateY, setScanTranslateY] = useState(0);
-  const scanOverlayRef = useRef(null);
-  const scanDragMeta = useRef({ startY: 0, startAt: 0, pointerId: null, lastDelta: 0, pending: false, dragging: false });
-  const scanCloseRequested = useRef(false);
   const [showFullRecipientAccount, setShowFullRecipientAccount] =
     useState(false);
   const [sendAssetDropdownOpen, setSendAssetDropdownOpen] = useState(false);
@@ -134,64 +130,34 @@ export default function WalletDashboardSendModal({
     normalizedSendAmount > 0;
   const hasPaymentRequest = Boolean(sendPaymentRequest);
 
-  // ── Insufficient balance detection (payreq mode) ──
-  const insufficientBalance = useMemo(() => {
-    if (!sendPaymentRequest || !selectedSendToken) return false;
-
-    const requiredAmount = Number(sendAmount || 0);
-    if (!Number.isFinite(requiredAmount) || requiredAmount <= 0) return false;
-
-    // Trustline-only tokens (EUR, GBP, etc.) are backed by RLUSD allocation.
-    // In payreq mode, we can estimate required RLUSD via sendFxInfo.paymentRlusd.
-    if (selectedSendToken.isTrustlineOnly) {
-      const code = String(selectedSendToken?.currency || "")
-        .trim()
-        .toUpperCase();
-      const requiredRlusd =
-        code === "USD" ? requiredAmount : Number(sendFxInfo?.paymentRlusd);
-      const availableAllocatedRlusd = Number(selectedSendToken.allocatedRlusd);
-      if (!Number.isFinite(requiredRlusd) || requiredRlusd <= 0) return false;
-      if (!Number.isFinite(availableAllocatedRlusd) || availableAllocatedRlusd < 0)
-        return false;
-      return availableAllocatedRlusd < requiredRlusd;
-    }
-
-    const available = Number(selectedSendToken.value || 0);
-    if (!Number.isFinite(available)) return false;
-    return available < requiredAmount;
-  }, [sendPaymentRequest, selectedSendToken, sendAmount, sendFxInfo]);
-
-  // ── Insufficient balance detection (manual send) ──
-  const manualInsufficientBalance = useMemo(() => {
-    if (sendPaymentRequest || !selectedSendToken) return false;
-
-    const requiredAmount = Number(sendAmount || 0);
-    if (!Number.isFinite(requiredAmount) || requiredAmount <= 0) return false;
-
-    const code = String(selectedSendToken?.currency || "")
-      .trim()
-      .toUpperCase();
-
-    if (selectedSendToken.isTrustlineOnly) {
-      const availableAllocatedRlusd = Number(selectedSendToken.allocatedRlusd);
-      if (
-        !Number.isFinite(availableAllocatedRlusd) ||
-        availableAllocatedRlusd < 0
-      ) {
-        return false;
+  // ── Insufficient balance detection (shared logic, payreq + manual) ──
+  const { insufficientBalance, manualInsufficientBalance } = useMemo(() => {
+    const check = (requiresPayreq) => {
+      const hasPayreq = Boolean(sendPaymentRequest);
+      if (requiresPayreq ? !hasPayreq : hasPayreq) return false;
+      if (!selectedSendToken) return false;
+      const requiredAmount = Number(sendAmount || 0);
+      if (!Number.isFinite(requiredAmount) || requiredAmount <= 0) return false;
+      // Trustline-only tokens (EUR, GBP, etc.) are backed by RLUSD allocation.
+      // In payreq mode, sendFxInfo.paymentRlusd provides the RLUSD estimate.
+      if (selectedSendToken.isTrustlineOnly) {
+        const code = String(selectedSendToken?.currency || "").trim().toUpperCase();
+        const requiredRlusd =
+          code === "USD" ? requiredAmount : Number(sendFxInfo?.paymentRlusd);
+        const availableAllocatedRlusd = Number(selectedSendToken.allocatedRlusd);
+        if (!Number.isFinite(requiredRlusd) || requiredRlusd <= 0) return false;
+        if (!Number.isFinite(availableAllocatedRlusd) || availableAllocatedRlusd < 0) return false;
+        return availableAllocatedRlusd < requiredRlusd;
       }
-
-      // USD "pool non alloué" is a 1:1 RLUSD amount.
-      const requiredRlusd =
-        code === "USD" ? requiredAmount : Number(sendFxInfo?.paymentRlusd);
-      if (!Number.isFinite(requiredRlusd) || requiredRlusd <= 0) return false;
-      return availableAllocatedRlusd < requiredRlusd;
-    }
-
-    const available = Number(selectedSendToken.value || 0);
-    if (!Number.isFinite(available)) return false;
-    return available < requiredAmount;
-  }, [sendAmount, sendFxInfo, sendPaymentRequest, selectedSendToken]);
+      const available = Number(selectedSendToken.value || 0);
+      if (!Number.isFinite(available)) return false;
+      return available < requiredAmount;
+    };
+    return {
+      insufficientBalance: check(true),
+      manualInsufficientBalance: check(false),
+    };
+  }, [sendPaymentRequest, selectedSendToken, sendAmount, sendFxInfo]);
 
   const requestCurrencyCode = String(
     sendPaymentRequest?.displayCurrency ||
@@ -428,63 +394,21 @@ export default function WalletDashboardSendModal({
     }
   }, [scanActive]);
 
-  /* ── Scanner swipe-to-close reset ── */
-  useEffect(() => {
-    if (scanActive) {
-      scanCloseRequested.current = false;
-      setScanDragging(false);
-      setScanTranslateY(0);
-      scanDragMeta.current = { startY: 0, startAt: 0, pointerId: null, lastDelta: 0, pending: false, dragging: false };
-    } else {
-      setScanDragging(false);
-      if (!scanCloseRequested.current) setScanTranslateY(0);
-      scanDragMeta.current = { startY: 0, startAt: 0, pointerId: null, lastDelta: 0, pending: false, dragging: false };
-    }
-  }, [scanActive]);
-
-  const scanSwipeStart = (event) => {
-    if (!event?.isPrimary) return;
-    if (event.pointerType === "mouse") return;
-    scanDragMeta.current = { startY: event.clientY, startAt: Date.now(), pointerId: event.pointerId, lastDelta: 0, pending: true, dragging: false };
-  };
-  const scanSwipeMove = (event) => {
-    const m = scanDragMeta.current;
-    if (!m.pending && !m.dragging) return;
-    if (m.pointerId !== event.pointerId) return;
-    const delta = event.clientY - m.startY;
-    if (delta <= 0) return;
-    if (!m.dragging) {
-      if (delta < 8) return;
-      try { scanOverlayRef.current?.setPointerCapture?.(event.pointerId); } catch { /* */ }
-      m.dragging = true;
-      setScanDragging(true);
-    }
-    m.lastDelta = delta;
-    setScanTranslateY(delta);
-  };
-  const scanSwipeEnd = (event) => {
-    const m = scanDragMeta.current;
-    if (m.pointerId !== event.pointerId) return;
-    const delta = m.lastDelta || 0;
-    const duration = Math.max(1, Date.now() - (m.startAt || 0));
-    const velocity = delta / duration;
-    const h = typeof window !== "undefined" ? window.innerHeight : 800;
-    const closeDistance = Math.max(220, Math.min(320, h * 0.28));
-    const shouldClose = delta > closeDistance || (delta > closeDistance * 0.6 && velocity > 1.25);
-    m.pending = false;
-    m.dragging = false;
-    setScanDragging(false);
-    if (shouldClose) {
-      if (!scanCloseRequested.current) {
-        scanCloseRequested.current = true;
-        setScanTranslateY(Math.max(delta, h));
-        window.setTimeout(() => { setScanActive(false); }, 180);
-      }
-      return;
-    }
-    setScanTranslateY(0);
-    scanDragMeta.current = { startY: 0, startAt: 0, pointerId: null, lastDelta: 0, pending: false, dragging: false };
-  };
+  /* ── Scanner swipe-to-close (hook) ── */
+  const {
+    dragging: scanDragging,
+    translateY: scanTranslateY,
+    overlayRef: scanOverlayRef,
+    maybeStartDrag: _scanStartDrag,
+    handlePointerMove: scanSwipeMove,
+    handlePointerEnd: scanSwipeEnd,
+  } = useModalDragToClose({
+    open: scanActive,
+    inline: false,
+    onClose: () => setScanActive(false),
+    scrollContainerRef: null,
+  });
+  const scanSwipeStart = (e) => _scanStartDrag(e, 'fixed');
 
   useEffect(() => {
     setShowFullPayreqAddress(false);
@@ -741,191 +665,21 @@ export default function WalletDashboardSendModal({
     enabled: shouldAnimate,
   });
 
-  const [overlayDragging, setOverlayDragging] = useState(false);
-  const [overlayTranslateY, setOverlayTranslateY] = useState(0);
-  const overlayRef = useRef(null);
-  const overlayDragMetaRef = useRef({
-    startY: 0,
-    startAt: 0,
-    pointerId: null,
-    lastDelta: 0,
-    pending: false,
-    source: null,
-    dragging: false,
-    scrollLocked: false,
-    lockedOverflowY: "",
+  const {
+    dragging: overlayDragging,
+    translateY: overlayTranslateY,
+    overlayRef,
+    closeRequestedRef,
+    maybeStartDrag: maybeStartOverlayDrag,
+    handlePointerMove: handleOverlayPointerMove,
+    handlePointerEnd: handleOverlayPointerEnd,
+  } = useModalDragToClose({
+    open,
+    inline,
+    onClose,
+    scrollContainerRef: scrollContainerRef,
+    extraGuard: () => scanActive,
   });
-  const closeRequestedRef = useRef(false);
-
-  useEffect(() => {
-    const resetMeta = {
-      startY: 0,
-      startAt: 0,
-      pointerId: null,
-      lastDelta: 0,
-      pending: false,
-      source: null,
-      dragging: false,
-      scrollLocked: false,
-      lockedOverflowY: "",
-    };
-
-    if (open) {
-      closeRequestedRef.current = false;
-      setOverlayDragging(false);
-      setOverlayTranslateY(0);
-      overlayDragMetaRef.current = resetMeta;
-      // Reset scroll position so the swipe guard (scrollTop > 0) n'est pas déclenché
-      // au premier rendu quand sendDestination est pré-rempli depuis un sous-modal.
-      requestAnimationFrame(() => {
-        try {
-          if (scrollContainerRef.current) scrollContainerRef.current.scrollTop = 0;
-        } catch { /* ignore */ }
-      });
-      return;
-    }
-
-    try {
-      const listEl = scrollContainerRef.current;
-      const meta = overlayDragMetaRef.current;
-      if (listEl && meta?.scrollLocked) {
-        listEl.style.overflowY = meta.lockedOverflowY;
-      }
-    } catch {
-      // ignore
-    }
-    setOverlayDragging(false);
-    if (!closeRequestedRef.current) setOverlayTranslateY(0);
-    overlayDragMetaRef.current = resetMeta;
-  }, [open]);
-
-  const releaseOverlayScrollLock = () => {
-    const meta = overlayDragMetaRef.current;
-    if (meta?.source !== "list") return;
-    if (!meta?.scrollLocked) return;
-    const listEl = scrollContainerRef.current;
-    if (!listEl) return;
-    try {
-      listEl.style.overflowY = meta.lockedOverflowY;
-    } catch {
-      // ignore
-    }
-    meta.scrollLocked = false;
-    meta.lockedOverflowY = "";
-  };
-
-  const maybeStartOverlayDrag = (event, source) => {
-    if (inline) return false;
-    if (scanActive) return false;
-    if (!event?.isPrimary) return false;
-    if (event.pointerType === "mouse") return false;
-    if (event.target?.closest?.("input,textarea,select")) return false;
-
-    if (source === "list") {
-      const listEl = scrollContainerRef.current;
-      if (!listEl) return false;
-      if (listEl.scrollTop > 0) return false;
-    }
-
-    overlayDragMetaRef.current = {
-      startY: event.clientY,
-      startAt: Date.now(),
-      pointerId: event.pointerId,
-      lastDelta: 0,
-      pending: true,
-      source,
-      dragging: false,
-      scrollLocked: false,
-      lockedOverflowY: "",
-    };
-    return true;
-  };
-
-  const handleOverlayPointerMove = (event) => {
-    if (inline) return;
-    if (scanActive) return;
-    const meta = overlayDragMetaRef.current;
-    if (!meta?.pending && !meta?.dragging) return;
-    if (meta.pointerId !== event.pointerId) return;
-
-    const delta = event.clientY - meta.startY;
-    if (delta <= 0) return;
-
-    if (!meta.dragging) {
-      if (delta < 8) return;
-      try {
-        overlayRef.current?.setPointerCapture?.(event.pointerId);
-      } catch {
-        // ignore
-      }
-
-      if (meta.source === "list") {
-        const listEl = scrollContainerRef.current;
-        if (listEl && listEl.scrollTop <= 0) {
-          try {
-            meta.lockedOverflowY = listEl.style.overflowY;
-            meta.scrollLocked = true;
-            listEl.style.overflowY = "hidden";
-            listEl.scrollTop = 0;
-          } catch {
-            // ignore
-          }
-        }
-      }
-
-      meta.dragging = true;
-      setOverlayDragging(true);
-    }
-
-    meta.lastDelta = delta;
-    setOverlayTranslateY(delta);
-  };
-
-  const handleOverlayPointerEnd = (event) => {
-    if (inline) return;
-    if (scanActive) return;
-    const meta = overlayDragMetaRef.current;
-    if (meta.pointerId !== event.pointerId) return;
-
-    const delta = meta.lastDelta || 0;
-    const duration = Math.max(1, Date.now() - (meta.startAt || 0));
-    const velocity = delta / duration; // px/ms
-    const height = typeof window !== "undefined" ? window.innerHeight : 800;
-    const closeDistance = Math.max(220, Math.min(320, height * 0.28));
-    const shouldClose =
-      delta > closeDistance ||
-      (delta > closeDistance * 0.6 && velocity > 1.25);
-
-    overlayDragMetaRef.current.pending = false;
-    overlayDragMetaRef.current.dragging = false;
-    setOverlayDragging(false);
-    releaseOverlayScrollLock();
-
-    if (shouldClose) {
-      if (!closeRequestedRef.current) {
-        closeRequestedRef.current = true;
-        const height = typeof window !== "undefined" ? window.innerHeight : 9999;
-        setOverlayTranslateY(Math.max(delta, height));
-        window.setTimeout(() => {
-          onClose?.();
-        }, 180);
-      }
-      return;
-    }
-
-    setOverlayTranslateY(0);
-    overlayDragMetaRef.current = {
-      startY: 0,
-      startAt: 0,
-      pointerId: null,
-      lastDelta: 0,
-      pending: false,
-      source: null,
-      dragging: false,
-      scrollLocked: false,
-      lockedOverflowY: "",
-    };
-  };
 
   if (!shouldRender) return null;
 

@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 import {
+import { normalizeCurrencyCode } from "../utils/normalizeCurrencyCode";
   WALLET_CURRENCY_LINE_ORDER,
   WALLET_ACCEPTED_TOKENS,
 } from "../walletDashboardConfig";
@@ -17,7 +18,7 @@ export function useWalletTokens({ displayTokens, currencyLines }) {
       : [];
     const index = new Map();
     entries.forEach((code, idx) => {
-      const upper = String(code || "").toUpperCase();
+      const upper = normalizeCurrencyCode(code);
       if (!upper) return;
       if (!index.has(upper)) index.set(upper, idx);
     });
@@ -27,9 +28,7 @@ export function useWalletTokens({ displayTokens, currencyLines }) {
   const allocatedRlusdByCurrency = useMemo(() => {
     const map = new Map();
     (currencyLines || []).forEach((line) => {
-      const code = String(line?.currencyCode || "")
-        .trim()
-        .toUpperCase();
+      const code = normalizeCurrencyCode(line?.currencyCode);
       if (!code) return;
       const allocated = Number.parseFloat(line?.allocatedRlusd ?? 0);
       map.set(code, Number.isFinite(allocated) ? allocated : 0);
@@ -40,9 +39,7 @@ export function useWalletTokens({ displayTokens, currencyLines }) {
   const augmentedTokens = useMemo(() => {
     const byCurrency = new Map();
     (displayTokens || []).forEach((token) => {
-      const code = String(token?.currency || "")
-        .trim()
-        .toUpperCase();
+      const code = normalizeCurrencyCode(token?.currency);
       if (!code) return;
       // Accepter uniquement XRP (natif) et les tokens de la whitelist (RLUSD).
       // Les lignes de devises internes (EUR, GBP…) sont injectées plus bas via currencyLines.
@@ -53,9 +50,7 @@ export function useWalletTokens({ displayTokens, currencyLines }) {
     });
 
     (currencyLines || []).forEach((line) => {
-      const code = String(line?.currencyCode || "")
-        .trim()
-        .toUpperCase();
+      const code = normalizeCurrencyCode(line?.currencyCode);
       // USD (pool non alloué) est traité comme une ligne de devise normale.
       if (!code || byCurrency.has(code)) return;
       byCurrency.set(code, {
@@ -69,7 +64,7 @@ export function useWalletTokens({ displayTokens, currencyLines }) {
 
     // Injecter l'allocation RLUSD connue (utile pour affichage "≈ RLUSD" côté UI)
     const withAllocations = Array.from(byCurrency.values()).map((token) => {
-      const code = String(token?.currency || "").toUpperCase();
+      const code = normalizeCurrencyCode(token?.currency);
       if (!code) return token;
       const allocated = allocatedRlusdByCurrency.get(code);
       if (allocated == null) return token;
@@ -77,8 +72,8 @@ export function useWalletTokens({ displayTokens, currencyLines }) {
     });
 
     return withAllocations.sort((a, b) => {
-      const aCode = String(a?.currency || "").toUpperCase();
-      const bCode = String(b?.currency || "").toUpperCase();
+      const aCode = normalizeCurrencyCode(a?.currency);
+      const bCode = normalizeCurrencyCode(b?.currency);
       const aPriority = Object.prototype.hasOwnProperty.call(
         WALLET_TOKEN_PRIORITY,
         aCode,
@@ -108,9 +103,7 @@ export function useWalletTokens({ displayTokens, currencyLines }) {
     const seen = new Set();
     const list = [];
     (augmentedTokens || []).forEach((token) => {
-      const code = String(token?.currency || "")
-        .trim()
-        .toUpperCase();
+      const code = normalizeCurrencyCode(token?.currency);
       // XRP et RLUSD ne sont pas des devises sélectionnables par le client.
       // USD est une ligne de devise comme EUR, CHF, etc.
       if (code === "XRP" || code === "RLUSD") return;
@@ -125,15 +118,13 @@ export function useWalletTokens({ displayTokens, currencyLines }) {
     const candidates = new Set();
     // Inclure toutes les devises sélectionnables (dont USD).
     (walletCurrencyOptions || []).forEach((code) => {
-      const upper = String(code || "").toUpperCase();
+      const upper = normalizeCurrencyCode(code);
       if (upper) candidates.add(upper);
     });
     // Ajouter USD s'il n'est pas déjà présent.
     candidates.add("USD");
     (currencyLines || []).forEach((line) => {
-      const code = String(line?.currencyCode || "")
-        .trim()
-        .toUpperCase();
+      const code = normalizeCurrencyCode(line?.currencyCode);
       if (code && code !== "RLUSD" && code !== "XRP") candidates.add(code);
     });
     // RLUSD n'apparaît jamais dans les sélecteurs (seulement MoonPay).

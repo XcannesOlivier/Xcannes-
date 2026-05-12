@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSwapConversion } from "./useSwapConversion";
+import { normalizeCurrencyCode } from "../utils/normalizeCurrencyCode";
 
 /**
  * useWalletSwapOrchestrator — Groups all swap / convert / cash state,
@@ -53,36 +54,28 @@ export function useWalletSwapOrchestrator({
 
   // Guard: prevent XRP/RLUSD in convert selectors.
   useEffect(() => {
-    const baseUpper = String(convertBaseCurrency || "")
-      .trim()
-      .toUpperCase();
-    const quoteUpper = String(convertQuoteCurrency || "")
-      .trim()
-      .toUpperCase();
+    const baseUpper = normalizeCurrencyCode(convertBaseCurrency);
+    const quoteUpper = normalizeCurrencyCode(convertQuoteCurrency);
     if (baseUpper === "XRP" || baseUpper === "RLUSD") {
       setConvertBaseCurrency("USD");
     }
     if (quoteUpper === "XRP" || quoteUpper === "RLUSD") {
       setConvertQuoteCurrency("USD");
     }
-  }, [
-    convertBaseCurrency,
-    convertQuoteCurrency,
-    setConvertBaseCurrency,
-    setConvertQuoteCurrency,
-  ]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [convertBaseCurrency, convertQuoteCurrency]);
 
   // ── Swap currency options for modal ────────────────────────
   const swapCurrencyOptionsForModal = useMemo(() => {
     const candidates = new Set(
       (swapCurrencyOptions || [])
-        .map((c) => String(c || "").toUpperCase())
+        .map((c) => normalizeCurrencyCode(c))
         .filter(Boolean),
     );
     if (convertBaseCurrency)
-      candidates.add(String(convertBaseCurrency || "").toUpperCase());
+      candidates.add(normalizeCurrencyCode(convertBaseCurrency));
     if (convertQuoteCurrency)
-      candidates.add(String(convertQuoteCurrency || "").toUpperCase());
+      candidates.add(normalizeCurrencyCode(convertQuoteCurrency));
 
     const weight = (code) => {
       if (code === "USD") return 0;

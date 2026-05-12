@@ -1,5 +1,6 @@
 import { useEffect, useMemo } from "react";
 import { WALLET_CURRENCY_LINE_ORDER } from "../walletDashboardConfig";
+import { normalizeCurrencyCode } from "../utils/normalizeCurrencyCode";
 
 /**
  * useAugmentedCurrencyLines — Augments raw currency lines from the backend
@@ -18,7 +19,7 @@ export function useAugmentedCurrencyLines({
       : [];
     const index = new Map();
     entries.forEach((code, idx) => {
-      const upper = String(code || "").toUpperCase();
+      const upper = normalizeCurrencyCode(code);
       if (!upper) return;
       if (!index.has(upper)) index.set(upper, idx);
     });
@@ -29,7 +30,7 @@ export function useAugmentedCurrencyLines({
     const lines = Array.isArray(currencyLines) ? [...currencyLines] : [];
     const existing = new Set(
       lines
-        .map((l) => String(l?.currencyCode || "").toUpperCase())
+        .map((l) => normalizeCurrencyCode(l?.currencyCode))
         .filter(Boolean),
     );
 
@@ -75,8 +76,8 @@ export function useAugmentedCurrencyLines({
     });
 
     return lines.sort((a, b) => {
-      const aCode = String(a?.currencyCode || "").toUpperCase();
-      const bCode = String(b?.currencyCode || "").toUpperCase();
+      const aCode = normalizeCurrencyCode(a?.currencyCode);
+      const bCode = normalizeCurrencyCode(b?.currencyCode);
       const aOrder = currencyOrderIndex.get(aCode) ?? Number.POSITIVE_INFINITY;
       const bOrder = currencyOrderIndex.get(bCode) ?? Number.POSITIVE_INFINITY;
       if (aOrder !== bOrder) return aOrder - bOrder;
@@ -107,9 +108,7 @@ export function useAugmentedCurrencyLines({
     // USD, EUR, CHF, GBP, CAD, JPY, AED…) pour que useRlusdPerUnitRates
     // récupère les taux de TOUTES les devises affichées.
     (augmentedCurrencyLines || []).forEach((line) => {
-      const code = String(line?.currencyCode || "")
-        .trim()
-        .toUpperCase();
+      const code = normalizeCurrencyCode(line?.currencyCode);
       if (code) codes.add(code);
     });
     // Exclure les actifs XRPL (affichés on-chain), garder les devises "UX".

@@ -4,6 +4,7 @@ import { createPortal } from 'react-dom';
 import { useTranslation } from 'next-i18next';
 import { useModalTransition } from '@/hooks/useModalTransition';
 import { useEffect, useRef, useState } from 'react';
+import { useModalDragToClose } from '../hooks/useModalDragToClose';
 import useIsDesktop from '../hooks/useIsDesktop';
 
 export default function WalletDashboardCashChoiceModal({
@@ -128,179 +129,22 @@ export default function WalletDashboardCashChoiceModal({
   const cardClassName =
     'w-full text-left rounded-[20px] px-4 py-4 bg-white/[0.02] hover:bg-white/[0.05] active:bg-white/[0.03] ring-1 ring-white/10 ring-inset shadow-[0_8px_26px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-22px_34px_rgba(0,0,0,0.68)] transition-all duration-[140ms] ease-[cubic-bezier(0.4,0,0.2,1)] hover:ring-white/20 hover:-translate-y-px active:translate-y-0 active:scale-[0.99]';
 
-  const [overlayDragging, setOverlayDragging] = useState(false);
-  const [overlayTranslateY, setOverlayTranslateY] = useState(0);
-  const overlayRef = useRef(null);
   const overlayListRef = useRef(null);
-  const overlayDragMetaRef = useRef({
-    startY: 0,
-    startAt: 0,
-    pointerId: null,
-    lastDelta: 0,
-    pending: false,
-    source: null,
-    dragging: false,
-    scrollLocked: false,
-    lockedOverflowY: '',
+
+  const {
+    dragging: overlayDragging,
+    translateY: overlayTranslateY,
+    overlayRef,
+    closeRequestedRef,
+    maybeStartDrag: maybeStartOverlayDrag,
+    handlePointerMove: handleOverlayPointerMove,
+    handlePointerEnd: handleOverlayPointerEnd,
+  } = useModalDragToClose({
+    open,
+    inline,
+    onClose,
+    scrollContainerRef: overlayListRef,
   });
-  const closeRequestedRef = useRef(false);
-
-  useEffect(() => {
-    const resetMeta = {
-      startY: 0,
-      startAt: 0,
-      pointerId: null,
-      lastDelta: 0,
-      pending: false,
-      source: null,
-      dragging: false,
-      scrollLocked: false,
-      lockedOverflowY: '',
-    };
-
-    if (open) {
-      closeRequestedRef.current = false;
-      setOverlayDragging(false);
-      setOverlayTranslateY(0);
-      overlayDragMetaRef.current = resetMeta;
-      return;
-    }
-
-    try {
-      const listEl = overlayListRef.current;
-      const meta = overlayDragMetaRef.current;
-      if (listEl && meta?.scrollLocked) {
-        listEl.style.overflowY = meta.lockedOverflowY;
-      }
-    } catch {
-      // ignore
-    }
-    setOverlayDragging(false);
-    if (!closeRequestedRef.current) setOverlayTranslateY(0);
-    overlayDragMetaRef.current = resetMeta;
-  }, [open]);
-
-  const releaseOverlayScrollLock = () => {
-    const meta = overlayDragMetaRef.current;
-    if (meta?.source !== 'list') return;
-    if (!meta?.scrollLocked) return;
-    const listEl = overlayListRef.current;
-    if (!listEl) return;
-    try {
-      listEl.style.overflowY = meta.lockedOverflowY;
-    } catch {
-      // ignore
-    }
-    meta.scrollLocked = false;
-    meta.lockedOverflowY = '';
-  };
-
-  const maybeStartOverlayDrag = (event, source) => {
-    if (inline) return false;
-    if (!event?.isPrimary) return false;
-    if (event.pointerType === 'mouse') return false;
-    if (event.target?.closest?.('input,textarea,select')) return false;
-
-    if (source === 'list') {
-      const listEl = overlayListRef.current;
-      if (!listEl) return false;
-      if (listEl.scrollTop > 0) return false;
-    }
-
-    overlayDragMetaRef.current = {
-      startY: event.clientY,
-      startAt: Date.now(),
-      pointerId: event.pointerId,
-      lastDelta: 0,
-      pending: true,
-      source,
-      dragging: false,
-      scrollLocked: false,
-      lockedOverflowY: '',
-    };
-    return true;
-  };
-
-  const handleOverlayPointerMove = event => {
-    if (inline) return;
-    const meta = overlayDragMetaRef.current;
-    if (!meta?.pending && !meta?.dragging) return;
-    if (meta.pointerId !== event.pointerId) return;
-
-    const delta = event.clientY - meta.startY;
-    if (delta <= 0) return;
-
-    if (!meta.dragging) {
-      if (delta < 8) return;
-      try {
-        overlayRef.current?.setPointerCapture?.(event.pointerId);
-      } catch {
-        // ignore
-      }
-
-      if (meta.source === 'list') {
-        const listEl = overlayListRef.current;
-        if (listEl && listEl.scrollTop <= 0) {
-          try {
-            meta.lockedOverflowY = listEl.style.overflowY;
-            meta.scrollLocked = true;
-            listEl.style.overflowY = 'hidden';
-            listEl.scrollTop = 0;
-          } catch {
-            // ignore
-          }
-        }
-      }
-
-      meta.dragging = true;
-      setOverlayDragging(true);
-    }
-
-    meta.lastDelta = delta;
-    setOverlayTranslateY(delta);
-  };
-
-  const handleOverlayPointerEnd = event => {
-    if (inline) return;
-    const meta = overlayDragMetaRef.current;
-    if (meta.pointerId !== event.pointerId) return;
-
-    const delta = meta.lastDelta || 0;
-    const duration = Math.max(1, Date.now() - (meta.startAt || 0));
-    const velocity = delta / duration; // px/ms
-    const height = typeof window !== 'undefined' ? window.innerHeight : 800;
-    const closeDistance = Math.max(220, Math.min(320, height * 0.28));
-    const shouldClose = delta > closeDistance || (delta > closeDistance * 0.6 && velocity > 1.25);
-
-    overlayDragMetaRef.current.pending = false;
-    overlayDragMetaRef.current.dragging = false;
-    setOverlayDragging(false);
-    releaseOverlayScrollLock();
-
-    if (shouldClose) {
-      if (!closeRequestedRef.current) {
-        closeRequestedRef.current = true;
-        setOverlayTranslateY(Math.max(delta, height));
-        window.setTimeout(() => {
-          onClose?.();
-        }, 180);
-      }
-      return;
-    }
-
-    setOverlayTranslateY(0);
-    overlayDragMetaRef.current = {
-      startY: 0,
-      startAt: 0,
-      pointerId: null,
-      lastDelta: 0,
-      pending: false,
-      source: null,
-      dragging: false,
-      scrollLocked: false,
-      lockedOverflowY: '',
-    };
-  };
 
   if (!shouldRender) return null;
 

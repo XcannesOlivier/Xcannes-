@@ -12,6 +12,7 @@ import TopperSellModal from "./TopperSellModal";
 import { createPortal } from "react-dom";
 import { useTranslation } from "next-i18next";
 import { useModalTransition } from "@/hooks/useModalTransition";
+import { useModalDragToClose } from "../hooks/useModalDragToClose";
 import {
   MOONPAY_UI_ENABLED,
   RAMP_DEFAULT_PROVIDER,
@@ -48,16 +49,7 @@ export default function WalletDashboardCashModal({
   const moonpayEnabled = MOONPAY_UI_ENABLED;
   const topperEnabled = TOPPER_UI_ENABLED;
   // Overlay drag system (swipe-to-close)
-  const [overlayDragging, setOverlayDragging] = useState(false);
-  const [overlayTranslateY, setOverlayTranslateY] = useState(0);
-  const overlayRef = useRef(null);
   const overlayListRef = useRef(null); // alias de cashContentRootRef pour le lock scroll
-  const closeRequestedRef = useRef(false);
-  const overlayDragMetaRef = useRef({
-    startY: 0, startAt: 0, pointerId: null, lastDelta: 0,
-    pending: false, source: null, dragging: false,
-    scrollLocked: false, lockedOverflowY: '',
-  });
   const forceSimpleSwapBuy =
     String(buyPrefill?.partnerOverride || "").trim().toLowerCase() === "simpleswap";
   const forceSimpleSwapSell = String(sellDestinationMode || "").trim().toLowerCase() ===
@@ -154,91 +146,21 @@ export default function WalletDashboardCashModal({
     };
   }, [walletMenuOpen]);
 
-  // Reset drag state à l'ouverture/fermeture
-  const _dragResetMeta = { startY:0, startAt:0, pointerId:null, lastDelta:0, pending:false, source:null, dragging:false, scrollLocked:false, lockedOverflowY:'' };
-  useEffect(() => {
-    if (open) {
-      closeRequestedRef.current = false;
-      setOverlayDragging(false);
-      setOverlayTranslateY(0);
-      overlayDragMetaRef.current = { ..._dragResetMeta };
-    } else {
-      try {
-        const listEl = overlayListRef.current;
-        const meta = overlayDragMetaRef.current;
-        if (listEl && meta?.scrollLocked) listEl.style.overflowY = meta.lockedOverflowY;
-      } catch { /* ignore */ }
-      setOverlayDragging(false);
-      if (!closeRequestedRef.current) setOverlayTranslateY(0);
-      overlayDragMetaRef.current = { ..._dragResetMeta };
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]);
-
-  const maybeStartOverlayDrag = (event, source) => {
-    if (inline) return false;
-    if (!event?.isPrimary) return false;
-    if (event.pointerType === 'mouse') return false;
-    if (event.target?.closest?.('input,textarea,select,button')) return false;
-    if (source === 'list') {
-      const listEl = overlayListRef.current;
-      if (!listEl || listEl.scrollTop > 0) return false;
-    }
-    overlayDragMetaRef.current = { startY: event.clientY, startAt: Date.now(), pointerId: event.pointerId, lastDelta: 0, pending: true, source, dragging: false, scrollLocked: false, lockedOverflowY: '' };
-    return true;
-  };
-
-  const handleOverlayPointerMove = (event) => {
-    if (inline) return;
-    const meta = overlayDragMetaRef.current;
-    if (!meta?.pending && !meta?.dragging) return;
-    if (meta.pointerId !== event.pointerId) return;
-    const delta = event.clientY - meta.startY;
-    if (delta <= 0) return;
-    if (!meta.dragging) {
-      if (delta < 8) return;
-      try { overlayRef.current?.setPointerCapture?.(event.pointerId); } catch { /* ignore */ }
-      if (meta.source === 'list') {
-        const listEl = overlayListRef.current;
-        if (listEl && listEl.scrollTop <= 0) {
-          try { meta.lockedOverflowY = listEl.style.overflowY; meta.scrollLocked = true; listEl.style.overflowY = 'hidden'; listEl.scrollTop = 0; } catch { /* ignore */ }
-        }
-      }
-      meta.dragging = true;
-      setOverlayDragging(true);
-    }
-    meta.lastDelta = delta;
-    setOverlayTranslateY(delta);
-  };
-
-  const handleOverlayPointerEnd = (event) => {
-    if (inline) return;
-    const meta = overlayDragMetaRef.current;
-    if (meta.pointerId !== event.pointerId) return;
-    const delta = meta.lastDelta || 0;
-    const duration = Math.max(1, Date.now() - (meta.startAt || 0));
-    const velocity = delta / duration;
-    const height = typeof window !== 'undefined' ? window.innerHeight : 800;
-    const closeDistance = Math.max(180, Math.min(280, height * 0.25));
-    const shouldClose = delta > closeDistance || (delta > closeDistance * 0.5 && velocity > 1.2);
-    overlayDragMetaRef.current.pending = false;
-    overlayDragMetaRef.current.dragging = false;
-    setOverlayDragging(false);
-    // release scroll lock
-    if (meta.source === 'list' && meta.scrollLocked) {
-      try { if (overlayListRef.current) overlayListRef.current.style.overflowY = meta.lockedOverflowY; } catch { /* ignore */ }
-    }
-    if (shouldClose) {
-      if (!closeRequestedRef.current) {
-        closeRequestedRef.current = true;
-        setOverlayTranslateY(Math.max(delta, height));
-        window.setTimeout(() => { onClose?.(); }, 180);
-      }
-      return;
-    }
-    setOverlayTranslateY(0);
-    overlayDragMetaRef.current = { ..._dragResetMeta };
-  };
+  const {
+    dragging: overlayDragging,
+    translateY: overlayTranslateY,
+    overlayRef,
+    closeRequestedRef,
+    maybeStartDrag: maybeStartOverlayDrag,
+    handlePointerMove: handleOverlayPointerMove,
+    handlePointerEnd: handleOverlayPointerEnd,
+  } = useModalDragToClose({
+    open,
+    inline,
+    onClose,
+    scrollContainerRef: overlayListRef,
+    blockButtons: true,
+  });
 
   if (!shouldRender) return null;
 

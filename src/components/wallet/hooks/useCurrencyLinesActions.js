@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback } from "react";
+import { normalizeCurrencyCode } from "../utils/normalizeCurrencyCode";
 
 export function useCurrencyLinesActions({
   backendWalletAddress,
@@ -17,9 +18,7 @@ export function useCurrencyLinesActions({
       return;
     }
 
-    const code = String(currencyLineCode || "")
-      .trim()
-      .toUpperCase();
+    const code = normalizeCurrencyCode(currencyLineCode);
     if (!code || code.length < 2) {
       toast?.error("Select a valid currency.");
       return;
