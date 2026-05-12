@@ -50,15 +50,13 @@ function isAcceptedOnChainToken(currency) {
   return WALLET_ACCEPTED_TOKENS.has(code);
 }
 
-const MOONPAY_ORIGIN_SUFFIX = '.moonpay.com';
-const MOONPAY_ACTIVE_STORAGE_KEY = 'xcannes_moonpay_active';
-const MOONPAY_BUY_RESUME_KEY = 'xcannes_moonpay_resume_buy_v1';
-const MOONPAY_SELL_RESUME_KEY = 'xcannes_moonpay_resume_sell_v1';
-const MOONPAY_AUTOOPEN_TAB_KEY = 'xcannes_moonpay_autoopen_tab';
-const MOONPAY_SELL_FLOW_KEY = 'xcannes_moonpay_sell_flow_v1';
-const MOONPAY_SELL_SOURCE_KEY = 'xcannes_moonpay_sell_source_v1';
-const MOONPAY_WALLET_ADDRESS_KEY = 'xcannes_moonpay_wallet_address_v1';
-const MOONPAY_BUY_RESUME_MAX_AGE_MS = 5 * 60 * 1000;
+import {
+  MOONPAY_AUTOOPEN_TAB_KEY,
+  MOONPAY_BUY_RESUME_MAX_AGE_MS,
+  readMoonpayBuyResumeState,
+  saveMoonpayBuyResumeState,
+  returnToMoonpaySellWidget,
+} from './moonpayClientUtils';
 
 function normalizeMovementKind(value) {
   return String(value || '')
@@ -79,76 +77,6 @@ function resolveIncomingXrpAmount(movement) {
     return amountRlusd / fxRate;
   }
   return Number.NaN;
-}
-
-function readMoonpayBuyResumeState(walletAddress) {
-  if (typeof window === 'undefined') return null;
-  try {
-    const raw = window.sessionStorage?.getItem(MOONPAY_BUY_RESUME_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw);
-    if (!parsed || parsed.v !== 1 || parsed.kind !== 'buy') return null;
-    if (!parsed.awaitingXrpSwap) return null;
-    if (String(parsed.walletAddress || '') !== String(walletAddress || '')) return null;
-    const ageMs = Date.now() - Number(parsed.ts || 0);
-    if (!Number.isFinite(ageMs) || ageMs < 0 || ageMs > MOONPAY_BUY_RESUME_MAX_AGE_MS) {
-      return null;
-    }
-    return parsed;
-  } catch {
-    return null;
-  }
-}
-
-function saveMoonpayBuyResumeState(nextState) {
-  if (typeof window === 'undefined') return;
-  try {
-    window.sessionStorage?.setItem(
-      MOONPAY_BUY_RESUME_KEY,
-      JSON.stringify({ ...nextState, v: 1, kind: 'buy', ts: Date.now() }),
-    );
-  } catch {
-    // ignore
-  }
-}
-
-function isTrustedMoonpayUrl(value) {
-  try {
-    const url = new URL(value);
-    if (url.protocol !== 'https:') return false;
-    const host = String(url.hostname || '').toLowerCase();
-    return host === 'moonpay.com' || host.endsWith(MOONPAY_ORIGIN_SUFFIX);
-  } catch {
-    return false;
-  }
-}
-
-function clearMoonpaySellClientState() {
-  if (typeof window === 'undefined') return;
-  try {
-    window.sessionStorage?.removeItem(MOONPAY_ACTIVE_STORAGE_KEY);
-    window.sessionStorage?.removeItem(MOONPAY_AUTOOPEN_TAB_KEY);
-    window.sessionStorage?.removeItem(MOONPAY_SELL_RESUME_KEY);
-    window.sessionStorage?.removeItem(MOONPAY_SELL_FLOW_KEY);
-    window.localStorage?.removeItem(MOONPAY_SELL_SOURCE_KEY);
-    window.localStorage?.removeItem(MOONPAY_WALLET_ADDRESS_KEY);
-    window.__XCANNES_MOONPAY_ACTIVE__ = false;
-    window.dispatchEvent(new CustomEvent('xcannes:moonpay-active', { detail: { active: false } }));
-  } catch {
-    // ignore
-  }
-}
-
-function returnToMoonpaySellWidget(returnUrl) {
-  if (typeof window === 'undefined') return;
-  clearMoonpaySellClientState();
-  if (isTrustedMoonpayUrl(returnUrl)) {
-    window.location.href = returnUrl;
-    return;
-  }
-  if (window.history.length > 1) {
-    window.history.back();
-  }
 }
 
 function ActivityIconSvg({ icon, size }) {
@@ -183,7 +111,6 @@ export default function WalletDashboard({
 }) {
   const { t, i18n } = useTranslation('common');
   const locale = i18n?.language || 'en';
-  const statementVariant = WALLET_LAYOUT.statementVariant;
   const showDesktopStatementPanel = Boolean(showDesktopStatement);
 
   // ── Core wallet context ────────────────────────────────────
@@ -885,6 +812,15 @@ export default function WalletDashboard({
     return null;
   }, [recentActivityKind]);
 
+  const recentActivityLabel =
+    recentActivityIcon === "convert"
+      ? t("ui_recent_conversion_banner", "Conversion récente")
+      : recentActivityIcon === "receive"
+        ? t("ui_recent_receive_banner", "Réception récente")
+        : recentActivityIcon === "send"
+          ? t("ui_recent_send_banner", "Envoi récent")
+          : t("ui_recent_activity_banner", "Activité récente");
+
   // ── Reset previous action state on desktop inline switch ──
   const prevActionRef = useRef(null);
   const { resetSendForm, resetReceiveForm } = sendState;
@@ -1159,7 +1095,7 @@ export default function WalletDashboard({
     displayTokensWithCurrencyLines,
     backendWalletAddress,
     isFullPageView: true,
-    statementVariant,
+    statementVariant: WALLET_LAYOUT.statementVariant,
     usdRates,
     preferredCurrency,
     showGlobalStatement,
@@ -1338,13 +1274,7 @@ export default function WalletDashboard({
                                 <ActivityIconSvg icon={recentActivityIcon} size={18} />
                               </div>
                               <span className="text-[13px] text-white/55 truncate">
-                                {recentActivityIcon === "convert"
-                                  ? t("ui_recent_conversion_banner", "Conversion récente")
-                                  : recentActivityIcon === "receive"
-                                    ? t("ui_recent_receive_banner", "Réception récente")
-                                    : recentActivityIcon === "send"
-                                      ? t("ui_recent_send_banner", "Envoi récent")
-                                      : t("ui_recent_activity_banner", "Activité récente")}
+                                {recentActivityLabel}
                               </span>
                             </div>
                             {recentActivityWhen?.date ? (
@@ -1387,13 +1317,7 @@ export default function WalletDashboard({
                             <ActivityIconSvg icon={recentActivityIcon} size={16} />
                           </div>
                           <span className="shrink-0 text-[12px] text-white/40 whitespace-nowrap">
-                            {recentActivityIcon === "convert"
-                              ? t("ui_recent_conversion_banner", "Conversion récente")
-                              : recentActivityIcon === "receive"
-                                ? t("ui_recent_receive_banner", "Réception récente")
-                                : recentActivityIcon === "send"
-                                  ? t("ui_recent_send_banner", "Envoi récent")
-                                  : t("ui_recent_activity_banner", "Activité récente")}
+                            {recentActivityLabel}
                           </span>
                           <span className="flex-1 min-w-0 truncate text-[13px] text-white/70 font-medium">
                             {recentActivityMessageParts.isConversion ? (

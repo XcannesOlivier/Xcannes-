@@ -31,15 +31,15 @@
 - [x] **7. SVG d'icônes copié 2× (mobile 18px + desktop 16px)**
   Extrait en composant `ActivityIconSvg({ icon, size })` avant le composant principal. Les 2 blocs JSX remplacés par `<ActivityIconSvg icon={recentActivityIcon} size={18/16} />`.
 
-- [ ] **8. Label d'activité i18n dupliqué**
-  Le bloc ternaire à 4 branches (`convert` / `receive` / `send` / default) avec `t(...)` est répété **2 fois** dans le JSX. Extraire dans une variable `const recentActivityLabel`.
+- [x] **8. Label d'activité i18n dupliqué**
+  Extrait en variable `recentActivityLabel` après `recentActivityIcon`. Les 2 blocs ternaires JSX remplacés par `{recentActivityLabel}`.
 
 ---
 
 ## 🟢 Organisation (mineur)
 
-- [ ] **9. Constantes MoonPay en scope module**
-  `isTrustedMoonpayUrl`, `clearMoonpaySellClientState`, `returnToMoonpaySellWidget` + leurs 7 constantes `MOONPAY_*` sont uniquement liées au sell-flow. Un fichier `utils/moonpayClientUtils.js` allégerait le haut du composant.
+- [x] **9. Constantes MoonPay en scope module**
+  Extrait dans `moonpayClientUtils.js` : 8 constantes + 4 fonctions (`readMoonpayBuyResumeState`, `saveMoonpayBuyResumeState`, `isTrustedMoonpayUrl`, `clearMoonpaySellClientState`, `returnToMoonpaySellWidget`). `WalletDashboard.jsx` importe uniquement ce dont il a besoin.
 
-- [ ] **10. `statementVariant` inline**
-  `const statementVariant = WALLET_LAYOUT.statementVariant;` — une ligne intermédiaire qui peut s'inliner directement dans l'appel `useWalletModalProps`.
+- [x] **10. `statementVariant` inline**
+  `const statementVariant = WALLET_LAYOUT.statementVariant;` inliné directement dans l'appel `useWalletModalProps`.
