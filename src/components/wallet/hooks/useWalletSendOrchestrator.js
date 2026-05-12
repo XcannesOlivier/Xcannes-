@@ -200,39 +200,42 @@ export function useWalletSendOrchestrator({
     closeQrModal?.();
   }, [closeQrModal, isDesktopPanel, setQrScannerOpen]);
 
+  // ── Shared form-fill helper ────────────────────────────────
+  const applyPaymentToSendForm = useCallback(
+    ({ destination, label, assetKey, amount, paymentRequest }) => {
+      if (destination !== undefined) setSendDestination(destination);
+      if (label !== undefined) setSendDestinationLabel(label);
+      if (assetKey !== undefined) setSendAssetKey(assetKey);
+      if (amount !== undefined) setSendAmount(amount);
+      setSendPaymentRequest(paymentRequest ?? null);
+    },
+    [setSendDestination, setSendDestinationLabel, setSendAssetKey, setSendAmount, setSendPaymentRequest],
+  );
+
   // ── Resume a saved payment request ─────────────────────────
   const handleResumePayreq = useCallback(
     entry => {
       if (!entry?.payreq) return;
       const pr = entry.payreq;
       setMoonpaySellRequest(null);
-      if (pr.to) setSendDestination(pr.to);
-      setSendDestinationLabel('');
       const targetCurrency = String(pr.targetCurrencyCode || '').toUpperCase();
       const matchingToken = (augmentedTokens || []).find(
         tok => String(tok.currency || '').toUpperCase() === targetCurrency,
       );
+      let assetKey, amount;
       if (matchingToken) {
-        setSendAssetKey(matchingToken.key);
-        if (pr.displayAmount != null) setSendAmount(String(pr.displayAmount));
+        assetKey = matchingToken.key;
+        if (pr.displayAmount != null) amount = String(pr.displayAmount);
       } else if (pr.amountRlusd != null) {
         // Fallback: utiliser le montant RLUSD brut avec le premier token disponible.
         const fallbackToken = (augmentedTokens || [])[0];
-        if (fallbackToken) setSendAssetKey(fallbackToken.key);
-        setSendAmount(String(pr.amountRlusd));
+        if (fallbackToken) assetKey = fallbackToken.key;
+        amount = String(pr.amountRlusd);
       }
-      setSendPaymentRequest(pr);
+      applyPaymentToSendForm({ destination: pr.to || undefined, label: '', assetKey, amount, paymentRequest: pr });
       setActiveAction('send');
     },
-    [
-      augmentedTokens,
-      setSendDestination,
-      setSendDestinationLabel,
-      setSendAssetKey,
-      setSendAmount,
-      setSendPaymentRequest,
-      setActiveAction,
-    ],
+    [augmentedTokens, applyPaymentToSendForm, setActiveAction],
   );
 
   const startMoonpaySellRequest = useCallback(
@@ -264,21 +267,10 @@ export function useWalletSendOrchestrator({
         baseCurrencyCode: currency,
         beneficiaryLabel: 'MoonPay',
       });
-      setSendPaymentRequest(null);
-      setSendAssetKey(matchingToken.key);
-      setSendDestination(destination);
-      setSendDestinationLabel('MoonPay');
-      setSendAmount(amount);
+      applyPaymentToSendForm({ destination, label: 'MoonPay', assetKey: matchingToken.key, amount, paymentRequest: null });
       return true;
     },
-    [
-      augmentedTokens,
-      setSendAmount,
-      setSendAssetKey,
-      setSendDestination,
-      setSendDestinationLabel,
-      setSendPaymentRequest,
-    ],
+    [augmentedTokens, applyPaymentToSendForm],
   );
 
   const clearMoonpaySellRequest = useCallback(() => {

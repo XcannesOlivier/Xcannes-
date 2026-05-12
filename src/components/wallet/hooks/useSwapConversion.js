@@ -7,6 +7,9 @@ import {
   XCANNES_ACTIVATION_WALLET_ADDRESS,
 } from "@/utils/walletSpread";
 
+const RLUSD_USD_RATE = 1;
+const EPSILON = 1e-9;
+
 export function useSwapConversion({
   isPreviewMode,
   isConnected,
@@ -67,7 +70,7 @@ export function useSwapConversion({
     async (currencyCode) => {
       const code = String(currencyCode || "").toUpperCase();
       if (!code) return Number.NaN;
-      if (code === "RLUSD" || code === "USD") return 1;
+      if (code === "RLUSD" || code === "USD") return RLUSD_USD_RATE;
 
       const existing = demoLines?.[code];
       if (existing && Number(existing.units || 0) > 0) {
@@ -89,7 +92,7 @@ export function useSwapConversion({
         console.warn("getRlusdPerUnit FX error:", error);
       }
 
-      return 1;
+      return RLUSD_USD_RATE;
     },
     [demoLines],
   );
@@ -264,7 +267,7 @@ export function useSwapConversion({
     try {
       const rlusdPerBase = await getRlusdPerUnit(base);
       const rlusdPerQuote =
-        quote === "RLUSD" ? 1 : await getRlusdPerUnit(quote);
+        quote === "RLUSD" ? RLUSD_USD_RATE : await getRlusdPerUnit(quote);
 
       if (
         !Number.isFinite(rlusdPerBase) ||
@@ -285,13 +288,11 @@ export function useSwapConversion({
       const spreadFee = Number(spread?.spreadFeeRlusd || 0);
       const netRlusd = Math.max(0, grossRlusd - spreadFee);
       const amountQuote = netRlusd / rlusdPerQuote;
-      const epsilon = 1e-9;
-
       const unallocated = Number(currencyLinesSummary?.unallocatedRlusd);
       if (base === "RLUSD") {
         if (
           Number.isFinite(unallocated) &&
-          unallocated + epsilon < grossRlusd
+          unallocated + EPSILON < grossRlusd
         ) {
           toast?.error(
             `Insufficient unallocated RLUSD. Available: ${unallocated.toLocaleString("en-US", { maximumFractionDigits: 2 })} RLUSD.`,
@@ -302,7 +303,7 @@ export function useSwapConversion({
 
       if (base !== "RLUSD") {
         const availableAllocated = allocatedRlusdByCurrency?.get(base) || 0;
-        if (availableAllocated + epsilon < grossRlusd) {
+        if (availableAllocated + EPSILON < grossRlusd) {
           const maxUnits =
             availableAllocated > 0 ? availableAllocated / rlusdPerBase : 0;
           toast?.error(

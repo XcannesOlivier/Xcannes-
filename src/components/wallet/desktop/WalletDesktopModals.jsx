@@ -105,6 +105,18 @@ export default function WalletDesktopModals({
     [setActiveAction],
   );
 
+  const resetCashChoiceState = useCallback(() => {
+    setCashSellSelectTitleOverride?.("");
+    setCashSellDestinationMode?.("");
+    setCashBuyPrefill(null);
+  }, [setCashSellSelectTitleOverride, setCashSellDestinationMode, setCashBuyPrefill]);
+
+  const handleCashTab = useCallback((tab) => {
+    resetCashChoiceState();
+    cashModalProps?.setCashModalTab?.(tab);
+    setActiveAction("cash");
+  }, [resetCashChoiceState, cashModalProps, setActiveAction]);
+
   const closeSettingsPage = () => {
     setDesktopSettingsPage?.(null);
     try {
@@ -247,24 +259,10 @@ export default function WalletDesktopModals({
 	            setActiveAction(null);
 	            setCashBuyPrefill(null);
 	          }}
-		          onChooseBuy={() => {
-		            setCashSellSelectTitleOverride?.("");
-		            setCashSellDestinationMode?.("");
-		            setCashBuyPrefill(null);
-		            cashModalProps?.setCashModalTab?.("buy");
-		            setActiveAction("cash");
-		          }}
-		          onChooseSell={() => {
-		            setCashSellSelectTitleOverride?.("");
-		            setCashSellDestinationMode?.("");
-		            setCashBuyPrefill(null);
-		            cashModalProps?.setCashModalTab?.("sell");
-		            setActiveAction("cash");
-		          }}
+	          onChooseBuy={() => handleCashTab("buy")}
+	          onChooseSell={() => handleCashTab("sell")}
 		          onChooseUsdSwapOut={() => {
-		            setCashSellSelectTitleOverride?.("");
-		            setCashSellDestinationMode?.("");
-		            setCashBuyPrefill(null);
+		            resetCashChoiceState();
 		            openUsdSwapOut("", {
 		              direction: "stable_to_rlusd",
 		              accentVariant: "simpleSwapBlue",
@@ -276,9 +274,7 @@ export default function WalletDesktopModals({
 			            });
 			          }}
 		          onChooseUsdSwapIn={() => {
-		            setCashSellSelectTitleOverride?.("");
-		            setCashSellDestinationMode?.("");
-		            setCashBuyPrefill(null);
+		            resetCashChoiceState();
 		            openUsdSwapOut("", {
 		              direction: "rlusd_to_stable",
 		              accentVariant: "binanceYellow",

@@ -193,6 +193,75 @@ export function usePaymentRequestScanner({
         setSendPaymentRequest?.(null);
       };
 
+      // Centralise le traitement xcannes payreq (JSON et URI partagent la même logique)
+      const applyXcannesPayreq = (request) => {
+        const schema = String(request.schema || request.kind || "").toLowerCase();
+        const isXcannesPayReq =
+          schema.includes("xcannes") ||
+          schema.includes("payreq") ||
+          Boolean(request.targetCurrency);
+
+        const targetCurrency = String(
+          request.targetCurrency || request.targetCurrencyCode || request.currency || "",
+        ).trim().toUpperCase();
+
+        const displayAmount = request.displayAmount ?? request.amount ?? null;
+        let amountRlusd = request.amountRlusd ?? request.rlusd ?? null;
+        if ((amountRlusd == null || Number.isNaN(Number(amountRlusd))) && targetCurrency === "RLUSD") {
+          amountRlusd = displayAmount;
+        }
+        const fxRate = request.fxRate ?? null;
+        const fxSource = request.fxSource ?? null;
+        const memo = request.memo ?? null;
+        const beneficiaryLabel =
+          request.beneficiaryLabel ??
+          request.beneficiaryName ??
+          request.beneficiary ??
+          request.walletLabel ??
+          request.label ??
+          null;
+
+        if (!isXcannesPayReq || !targetCurrency) {
+          return { handled: false, beneficiaryLabel };
+        }
+
+        setSendDestinationLabel?.("");
+        const matchingToken = (augmentedTokens || []).find(
+          (t) => String(t.currency || "").toUpperCase() === targetCurrency,
+        );
+        const rlusdToken = (augmentedTokens || []).find(
+          (t) => String(t.currency || "").toUpperCase() === "RLUSD",
+        );
+
+        // Prefer paying from the requested currency allocation when available, otherwise pay directly in RLUSD.
+        if (matchingToken && displayAmount != null) {
+          setSendAssetKey?.(matchingToken.key);
+          setSendAmount?.(String(displayAmount));
+        } else if (rlusdToken && amountRlusd != null) {
+          setSendAssetKey?.(rlusdToken.key);
+          setSendAmount?.(String(amountRlusd));
+        } else {
+          // fallback to previous behavior
+          applyPrefill({ to: request.to, amount: request.amount, currency: request.currency });
+          return { handled: true };
+        }
+
+        setSendDestination?.(request.to);
+        setSendPaymentRequest?.({
+          schema: PAYREQ_SCHEMA,
+          to: request.to,
+          targetCurrencyCode: targetCurrency || null,
+          displayAmount: displayAmount != null ? Number(displayAmount) : null,
+          displayCurrency: targetCurrency || null,
+          amountRlusd: amountRlusd != null ? Number(amountRlusd) : null,
+          fxRate: fxRate != null ? Number(fxRate) : null,
+          fxSource: fxSource != null ? String(fxSource) : null,
+          memo: memo != null ? String(memo) : null,
+          beneficiaryLabel: beneficiaryLabel != null ? String(beneficiaryLabel) : null,
+        });
+        return { handled: true };
+      };
+
       try {
         // 1) JSON
         const requestRaw = JSON.parse(payload);
@@ -201,93 +270,10 @@ export function usePaymentRequestScanner({
         }
         const request = normalizePayreqPayload(requestRaw);
         if (request && request.to) {
-          const schema = String(
-            request.schema || request.kind || "",
-          ).toLowerCase();
-          const isXcannesPayReq =
-            schema.includes("xcannes") ||
-            schema.includes("payreq") ||
-            Boolean(request.targetCurrency);
-
-          const targetCurrency = String(
-            request.targetCurrency ||
-              request.targetCurrencyCode ||
-              request.currency ||
-              "",
-          )
-            .trim()
-            .toUpperCase();
-
-          const displayAmount = request.displayAmount ?? request.amount ?? null;
-          let amountRlusd = request.amountRlusd ?? request.rlusd ?? null;
-          if (
-            (amountRlusd == null || Number.isNaN(Number(amountRlusd))) &&
-            targetCurrency === "RLUSD"
-          ) {
-            amountRlusd = displayAmount;
-          }
-          const fxRate = request.fxRate ?? null;
-          const fxSource = request.fxSource ?? null;
-          const memo = request.memo ?? null;
-          const beneficiaryLabel =
-            request.beneficiaryLabel ??
-            request.beneficiaryName ??
-            request.beneficiary ??
-            request.walletLabel ??
-            request.label ??
-            null;
-
-          if (isXcannesPayReq && targetCurrency) {
-            setSendDestinationLabel?.("");
-            const matchingToken = (augmentedTokens || []).find(
-              (t) => String(t.currency || "").toUpperCase() === targetCurrency,
-            );
-            const rlusdToken = (augmentedTokens || []).find(
-              (t) => String(t.currency || "").toUpperCase() === "RLUSD",
-            );
-
-            // Prefer paying from the requested currency allocation when available, otherwise pay directly in RLUSD.
-            if (matchingToken && displayAmount != null) {
-              setSendAssetKey?.(matchingToken.key);
-              setSendAmount?.(String(displayAmount));
-            } else if (rlusdToken && amountRlusd != null) {
-              setSendAssetKey?.(rlusdToken.key);
-              setSendAmount?.(String(amountRlusd));
-            } else {
-              // fallback to previous behavior
-              applyPrefill({
-                to: request.to,
-                amount: request.amount,
-                currency: request.currency,
-              });
-              return;
-            }
-
-            setSendDestination?.(request.to);
-            setSendPaymentRequest?.({
-              schema: PAYREQ_SCHEMA,
-              to: request.to,
-              targetCurrencyCode: targetCurrency || null,
-              displayAmount:
-                displayAmount != null ? Number(displayAmount) : null,
-              displayCurrency: targetCurrency || null,
-              amountRlusd: amountRlusd != null ? Number(amountRlusd) : null,
-              fxRate: fxRate != null ? Number(fxRate) : null,
-              fxSource: fxSource != null ? String(fxSource) : null,
-              memo: memo != null ? String(memo) : null,
-              beneficiaryLabel:
-                beneficiaryLabel != null ? String(beneficiaryLabel) : null,
-            });
-            return;
-          }
-
+          const { handled, beneficiaryLabel } = applyXcannesPayreq(request);
+          if (handled) return;
           // Legacy JSON: { amount, currency, to }
-          applyPrefill({
-            to: request.to,
-            amount: request.amount,
-            currency: request.currency,
-            label: beneficiaryLabel,
-          });
+          applyPrefill({ to: request.to, amount: request.amount, currency: request.currency, label: beneficiaryLabel });
           return;
         }
       } catch (_) {
@@ -304,89 +290,9 @@ export function usePaymentRequestScanner({
       const parsed = tryParseUri(payload);
       if (parsed?.request?.to) {
         const request = normalizePayreqPayload(parsed.request);
-        const schema = String(
-          request.schema || request.kind || "",
-        ).toLowerCase();
-        const isXcannesPayReq =
-          schema.includes("xcannes") ||
-          schema.includes("payreq") ||
-          Boolean(request.targetCurrency);
-
-        const targetCurrency = String(
-          request.targetCurrency ||
-            request.targetCurrencyCode ||
-            request.currency ||
-            "",
-        )
-          .trim()
-          .toUpperCase();
-
-        const displayAmount = request.displayAmount ?? request.amount ?? null;
-        let amountRlusd = request.amountRlusd ?? request.rlusd ?? null;
-        if (
-          (amountRlusd == null || Number.isNaN(Number(amountRlusd))) &&
-          targetCurrency === "RLUSD"
-        ) {
-          amountRlusd = displayAmount;
-        }
-        const fxRate = request.fxRate ?? null;
-        const fxSource = request.fxSource ?? null;
-        const memo = request.memo ?? null;
-        const beneficiaryLabel =
-          request.beneficiaryLabel ??
-          request.beneficiaryName ??
-          request.beneficiary ??
-          request.walletLabel ??
-          request.label ??
-          null;
-
-        if (isXcannesPayReq && targetCurrency) {
-          setSendDestinationLabel?.("");
-          const matchingToken = (augmentedTokens || []).find(
-            (t) => String(t.currency || "").toUpperCase() === targetCurrency,
-          );
-          const rlusdToken = (augmentedTokens || []).find(
-            (t) => String(t.currency || "").toUpperCase() === "RLUSD",
-          );
-
-          if (matchingToken && displayAmount != null) {
-            setSendAssetKey?.(matchingToken.key);
-            setSendAmount?.(String(displayAmount));
-          } else if (rlusdToken && amountRlusd != null) {
-            setSendAssetKey?.(rlusdToken.key);
-            setSendAmount?.(String(amountRlusd));
-          } else {
-            applyPrefill({
-              to: request.to,
-              amount: request.amount,
-              currency: request.currency,
-            });
-            return;
-          }
-
-          setSendDestination?.(request.to);
-          setSendPaymentRequest?.({
-            schema: PAYREQ_SCHEMA,
-            to: request.to,
-            targetCurrencyCode: targetCurrency || null,
-            displayAmount: displayAmount != null ? Number(displayAmount) : null,
-            displayCurrency: targetCurrency || null,
-            amountRlusd: amountRlusd != null ? Number(amountRlusd) : null,
-            fxRate: fxRate != null ? Number(fxRate) : null,
-            fxSource: fxSource != null ? String(fxSource) : null,
-            memo: memo != null ? String(memo) : null,
-            beneficiaryLabel:
-              beneficiaryLabel != null ? String(beneficiaryLabel) : null,
-          });
-          return;
-        }
-
-        applyPrefill({
-          to: request.to,
-          amount: request.amount,
-          currency: request.currency,
-          label: beneficiaryLabel,
-        });
+        const { handled, beneficiaryLabel } = applyXcannesPayreq(request);
+        if (handled) return;
+        applyPrefill({ to: request.to, amount: request.amount, currency: request.currency, label: beneficiaryLabel });
         return;
       }
 
