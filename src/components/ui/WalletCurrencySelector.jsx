@@ -629,7 +629,7 @@ export default function WalletCurrencySelector({
                     </button>
                   </div>
 
-                  <div className="px-4 pb-4">
+                  <div className="px-4 pb-4 pt-3">
                     <div className="relative">
                       <div className="pointer-events-none absolute inset-y-0 left-4 flex items-center text-white/45">
                         <svg
