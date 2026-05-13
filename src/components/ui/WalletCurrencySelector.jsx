@@ -55,6 +55,7 @@ export default function WalletCurrencySelector({
   showQuickAdd = true,
   excludeCodes = [],
   buttonClassName = "",
+  buttonStyle = undefined,
   fullscreen = false,
   closeSignal = undefined,
   walletLabel = null,
@@ -453,6 +454,7 @@ export default function WalletCurrencySelector({
             ? "inline-flex items-center gap-2 text-base md:text-[15px] leading-snug text-xcannes-green/85 font-normal hover:text-xcannes-green transition-colors"
             : "w-full bg-black/20 border border-white/10 rounded-md px-2.5 py-1.5 text-[15px] text-white/70 flex items-center justify-between gap-2 hover:border-white/20 hover:text-white/85 transition-colors active:scale-98")
         }
+        style={buttonStyle}
       >
         <div className="flex items-center gap-2 min-w-0">
           <span className={triggerVariant === "text" ? "" : "truncate"}>
