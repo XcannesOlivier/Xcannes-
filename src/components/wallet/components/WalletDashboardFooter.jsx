@@ -20,7 +20,7 @@ function ScanIcon() {
       className="h-7 w-[80px]"
       fill="none"
       stroke="currentColor"
-      strokeWidth="2"
+      strokeWidth="1.5"
       aria-hidden
     >
       <path
@@ -36,7 +36,7 @@ function ScanIcon() {
         fill="currentColor"
         stroke="none"
         fontSize="19"
-        fontWeight="600"
+        fontWeight="400"
         fontFamily="system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif"
       >
         Scanner
