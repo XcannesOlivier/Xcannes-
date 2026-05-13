@@ -1527,7 +1527,7 @@ export default function GlobalStatement({
         </div>
 
         {/* Filtres */}
-        <div className="px-4 md:px-6 pt-[60px] pb-4 flex flex-row items-stretch md:items-center gap-2">
+        <div className="px-4 md:px-6 pt-[80px] pb-4 bg-[#111518] flex flex-row items-stretch md:items-center gap-2">
           <div className="flex flex-1 items-center rounded-[16px] p-1 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-[#101415] to-[#0d1214]">
             {[
               { key: "all", label: t("ui_all_0c90d41d71", "Tout") },
@@ -1542,13 +1542,19 @@ export default function GlobalStatement({
                 className={`px-3 py-3 flex-1 text-center rounded-[12px] text-sm font-medium transition-colors whitespace-nowrap ${
                   txFilter === item.key
                     ? item.key === "all"
-                      ? "bg-[#111518] text-white shadow-[inset_0_-14px_18px_rgba(0,0,0,0.8)]"
+                      ? "bg-[#080a0b] text-white shadow-[inset_0_-14px_18px_rgba(0,0,0,0.9)]"
                       : item.key === "credit"
                         ? "bg-green-500/15 text-green-300"
                         : item.key === "debit"
                           ? "bg-red-500/15 text-red-300"
                           : "bg-blue-500/15 text-blue-300"
-                    : "text-white/60 hover:text-white/80 bg-[#111518] hover:bg-[#111518]"
+                    : item.key === "all"
+                      ? "text-white/60 hover:text-white/80 bg-[#111518] hover:bg-[#080a0b]"
+                      : item.key === "credit"
+                        ? "text-white/60 hover:text-green-300 bg-[#111518] hover:bg-green-500/15"
+                        : item.key === "debit"
+                          ? "text-white/60 hover:text-red-300 bg-[#111518] hover:bg-red-500/15"
+                          : "text-white/60 hover:text-blue-300 bg-[#111518] hover:bg-blue-500/15"
                 }`}
               >
                 {item.label}
@@ -1640,7 +1646,7 @@ export default function GlobalStatement({
                         className={[
                           "w-full text-left rounded-[20px] px-3 transition-colors duration-150",
                           isLatest
-                            ? "py-3 ring-1 ring-inset bg-[#101415] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-14px_22px_rgba(0,0,0,0.5)] ring-white/20 transform-gpu scale-[1.03] origin-center drop-shadow-[0_10px_18px_rgba(0,0,0,0.55)] transition-transform duration-150"
+                            ? "py-3 ring-1 ring-inset bg-[#101415] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-14px_22px_rgba(0,0,0,0.5)] ring-white/10 transform-gpu scale-[1.04] origin-center drop-shadow-[0_10px_18px_rgba(0,0,0,0.55)] transition-transform duration-150"
                             : "py-2 ring-1 ring-inset ring-white/[0.06] bg-[#101415] shadow-[inset_0_-14px_18px_rgba(0,0,0,0.8)]",
                         ].join(" ")}
                     >
@@ -1739,7 +1745,7 @@ export default function GlobalStatement({
         </div>
 
         {/* Footer */}
-        <div className="shrink-0 px-4 md:px-6 py-3 pb-[max(12px,env(safe-area-inset-bottom))] border-t border-white/[0.06] bg-[#0e1214] flex items-center justify-between gap-3">
+        <div className="shrink-0 px-4 md:px-6 py-3 pb-[max(12px,env(safe-area-inset-bottom))] border-t border-white/[0.06] bg-[#111518] flex items-center justify-between gap-3">
           {/* Compte actuel */}
           <div className="flex items-center gap-3 min-w-0">
             <div className="relative w-auto min-w-[120px] max-w-[180px]" ref={accountDropdownRef}>
