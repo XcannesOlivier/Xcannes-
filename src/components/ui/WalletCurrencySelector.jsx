@@ -629,7 +629,7 @@ export default function WalletCurrencySelector({
                     </button>
                   </div>
 
-                  <div className="px-4 pb-4 pt-3">
+                  <div className="px-4 pb-4 pt-6">
                     <div className="relative">
                       <div className="pointer-events-none absolute inset-y-0 left-4 flex items-center text-white/45">
                         <svg
@@ -685,7 +685,7 @@ export default function WalletCurrencySelector({
                             handleSelect(c.code);
                           }}
                           className={[
-                            "w-full flex items-center gap-3 px-4 py-3 text-left border-b border-white/5 last:border-b-0",
+                            "w-full flex items-center gap-3 px-4 py-3 text-left border-b border-white/5 last:border-b-0 shadow-[inset_0_-6px_10px_rgba(0,0,0,0.25)]",
                             active
                               ? "bg-xcannes-green/10 text-white"
                               : "hover:bg-white/[0.04] text-white/80",
@@ -709,7 +709,7 @@ export default function WalletCurrencySelector({
                   )}
                 </div>
 
-                <div className="px-3 py-3 text-xs text-white/55 bg-white/[0.02] border-t border-white/5">
+                <div className="px-3 py-3 sm:py-3 pb-6 sm:pb-3 text-[15px] font-light text-white/55 bg-white/[0.02] border-t border-white/5">
                   {t("ui_search_results", "Sélectionnez une devise.")}
                 </div>
               </div>
