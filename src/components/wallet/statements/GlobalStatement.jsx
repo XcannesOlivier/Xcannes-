@@ -49,7 +49,7 @@ export default function GlobalStatement({
   const locale = i18n?.language || "en";
   const globalTitle = t(
     "ui_global_statement_13e29aa8aa",
-    "Vos dernières transactions",
+    "Activité récente",
   );
   const MAX_RECENT_TRANSACTIONS = 20;
 
@@ -1570,7 +1570,7 @@ export default function GlobalStatement({
               <p className="-mt-1 text-[16px] md:text-[17px] text-white/60 max-w-[52ch] leading-relaxed">
                 {t(
                   "ui_global_statement_subtitle_recent_20",
-                  "Activité récente",
+                  "Consultez vos transactions récentes et ouvrez-en une pour voir les détails.",
                 )}
               </p>
             </div>
