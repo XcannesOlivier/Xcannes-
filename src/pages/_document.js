@@ -45,6 +45,14 @@ export default function XcannesDocument(props) {
           name="viewport"
           content="width=device-width, initial-scale=1, viewport-fit=cover"
         />
+        {/* PWA manifest — verrouille l'orientation en portrait */}
+        <link rel="manifest" href="/manifest.json" />
+        {/* iOS PWA */}
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="Xcannes" />
+        <meta name="theme-color" content="#05090f" />
       </Head>
       <body>
         <Main />

@@ -23,6 +23,17 @@ function App({ Component, pageProps }) {
     wsClient.connect().catch(() => {});
   }, []);
 
+  // ── Screen Orientation: verrouillage portrait (PWA / fullscreen) ──
+  useEffect(() => {
+    try {
+      if (screen?.orientation?.lock) {
+        screen.orientation.lock("portrait").catch(() => {});
+      }
+    } catch {
+      // API non disponible (Safari, navigateur classique) — le CSS overlay prend le relai
+    }
+  }, []);
+
   useEffect(() => {
     if (!router?.events) return;
     const normalizePath = (value) => {
