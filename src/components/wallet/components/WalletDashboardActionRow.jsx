@@ -57,7 +57,7 @@ export default function WalletDashboardActionRow({ onAction, vertical = false })
 
   return (
     <div
-      className="relative px-3 pt-[10px] pb-1.5 md:py-2 space-y-2 md:space-y-3"
+      className="relative px-3 pt-[16px] pb-0 md:py-2 space-y-2 md:space-y-3"
     >
       <div className="grid grid-cols-4 gap-2 sm:gap-3 relative z-[1]">
         <div className="rounded-[16px] bg-gradient-to-b from-[#101415] to-[#0d1214] ring-1 ring-white/[0.04] ring-inset shadow-[-3px_3px_10px_2px_rgba(255,255,255,0.03),0_2px_8px_rgba(0,0,0,0.35),inset_0_-10px_14px_rgba(0,0,0,0.7)] md:shadow-[-3px_3px_10px_2px_rgba(255,255,255,0.06),0_2px_8px_rgba(0,0,0,0.35),inset_0_-10px_14px_rgba(0,0,0,0.7)]">
