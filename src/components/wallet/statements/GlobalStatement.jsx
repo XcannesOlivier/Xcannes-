@@ -1482,13 +1482,14 @@ export default function GlobalStatement({
         onPointerUp={handleOverlayPointerEnd}
         onPointerCancel={handleOverlayPointerEnd}
       >
-        {/* Header */}
+        {/* Header + Filtres — même conteneur pour éviter la jonction */}
         <div
-          className={`relative flex-shrink-0 bg-[#111518] shadow-[inset_0_16px_28px_rgba(255,255,255,0.03),inset_0_-46px_70px_rgba(0,0,0,0.55)] px-4 md:px-5 py-4`}
+          className="relative flex-shrink-0 bg-[#111518] shadow-[inset_0_16px_28px_rgba(255,255,255,0.03),inset_0_-46px_70px_rgba(0,0,0,0.55)]"
           onPointerDown={(event) => {
             maybeStartOverlayDrag(event, "fixed");
           }}
         >
+          <div className="px-4 md:px-5 py-4">
           {swipeEnabled ? (
             <div className="md:hidden flex justify-center -mt-1 pt-1 pb-2" aria-hidden>
               <span className="block w-12 h-1.5 rounded-full bg-white/20" />
@@ -1524,11 +1525,11 @@ export default function GlobalStatement({
             </div>
             {/* close via swipe/backdrop */}
           </div>
-        </div>
+          </div>
 
         {/* Filtres */}
-        <div className="px-4 md:px-6 pt-[80px] pb-4 bg-[#111518] shadow-[inset_0_80px_60px_-10px_rgba(0,0,0,0.65),inset_0_-46px_70px_rgba(0,0,0,0.55)] flex flex-row items-stretch md:items-center gap-2">
-          <div className="flex flex-1 items-center rounded-[16px] p-1 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-[#101415] to-[#0d1214]">
+        <div className="px-4 md:px-6 pt-6 pb-4 flex flex-row items-stretch md:items-center gap-2">
+          <div className="flex flex-1 items-center rounded-[16px] p-1 ring-1 ring-white/[0.05] ring-inset bg-gradient-to-b from-[#101415] to-[#0d1214]">
             {[
               { key: "all", label: t("ui_all_0c90d41d71", "Tout") },
               { key: "credit", label: t("ui_credits_b8166276a0", "Entrées") },
@@ -1544,10 +1545,10 @@ export default function GlobalStatement({
                     ? item.key === "all"
                       ? "bg-[#080a0b] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.18),inset_0_-14px_18px_rgba(0,0,0,0.9)]"
                       : item.key === "credit"
-                        ? "bg-green-500/15 text-green-300"
+                        ? "bg-green-500/15 text-green-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]"
                         : item.key === "debit"
-                          ? "bg-red-500/15 text-red-300"
-                          : "bg-blue-500/15 text-blue-300"
+                          ? "bg-red-500/15 text-red-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]"
+                          : "bg-blue-500/15 text-blue-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]"
                     : item.key === "all"
                       ? "text-white/60 hover:text-white/80 bg-[#111518] hover:bg-[#080a0b]"
                       : item.key === "credit"
@@ -1562,6 +1563,7 @@ export default function GlobalStatement({
             ))}
           </div>
         </div>
+        </div>{/* fin conteneur header+filtres */}
 
         {/* Content - Zone scrollable */}
         <div
