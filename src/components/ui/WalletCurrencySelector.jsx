@@ -717,14 +717,11 @@ export default function WalletCurrencySelector({
                   )}
                 </div>
 
-                <div className="px-3 py-3 sm:py-3 pb-6 sm:pb-3 bg-white/[0.02] border-t border-white/5 flex items-center gap-2">
+                <div className="px-3 py-3 sm:py-3 pb-6 sm:pb-3 bg-transparent border-t border-white/5 flex items-center gap-2">
                   {walletLabel ? (
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/[0.06] ring-1 ring-white/10 text-[13px] font-medium text-white/70 leading-none">
-                      <svg viewBox="0 0 16 16" fill="none" className="w-3.5 h-3.5 shrink-0 text-white/40" aria-hidden>
-                        <rect x="1" y="3" width="14" height="10" rx="2" stroke="currentColor" strokeWidth="1.3" />
-                        <circle cx="8" cy="8" r="2" fill="currentColor" />
-                      </svg>
-                      {walletLabel}
+                    <span className="text-[15px] text-white/55 flex items-center gap-1.5">
+                      <span className="h-2 w-2 rounded-full bg-xcannes-green shrink-0 animate-pulse" aria-hidden />
+                      <span className="text-white/90 font-semibold">{walletLabel}</span>
                     </span>
                   ) : (
                     <span className="text-[15px] font-light text-white/55">{t("ui_search_results", "Sélectionnez une devise.")}</span>

@@ -998,6 +998,7 @@ export default function WalletDashboard({
                       excludeCodes={['USD', 'RLUSD', 'XRP']}
                       showQuickAdd={false}
                       closeSignal={activeAction}
+                      walletLabel={walletLabel || null}
                       fullscreenPortalTarget={
                         typeof document !== 'undefined' && isDesktopPanel
                           ? document.getElementById('wallet-desktop-inline-panel')
@@ -1060,6 +1061,7 @@ export default function WalletDashboard({
                   excludeCodes={['USD', 'RLUSD', 'XRP']}
                   showQuickAdd={false}
                   closeSignal={activeAction}
+                  walletLabel={walletLabel || null}
                   fullscreenPortalTarget={
                     typeof document !== 'undefined' && isDesktopPanel
                       ? document.getElementById('wallet-desktop-inline-panel')
