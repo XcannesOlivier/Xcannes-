@@ -1477,7 +1477,7 @@ export default function CurrencyStatement({
           <div className={`space-y-3 ${periodDropdownOpen ? "relative z-[60]" : ""}`}>
             {/* Balance + USD estimé */}
             {!isXrpNetworkView ? (
-              <div className="flex flex-col items-center text-center gap-0.5 mb-4">
+              <div className="flex flex-col items-center text-center gap-0.5 mb-4 rounded-2xl border border-white/10 bg-white/[0.04] shadow-[inset_0_1px_0_rgba(255,255,255,0.07)] px-6 py-5">
                 <p className="text-[24px] md:text-[26px] text-white/60">
                   {t("ui_balance_445d830d72", "Solde disponible")}
                 </p>
