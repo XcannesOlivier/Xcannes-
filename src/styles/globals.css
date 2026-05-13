@@ -4,6 +4,26 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ===== Blocage orientation paysage sur mobile ===== */
+/* Cible uniquement les téléphones en landscape (hauteur < 600px) */
+@media screen and (orientation: landscape) and (max-height: 600px) {
+  body::after {
+    content: "↩  Veuillez orienter votre téléphone en portrait";
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    background: #05090f;
+    color: #f9fafb;
+    font-family: system-ui, sans-serif;
+    font-size: 1.1rem;
+    font-weight: 500;
+    text-align: center;
+    display: grid;
+    place-items: center;
+    padding: 2rem;
+  }
+}
+
 /* ===== Design tokens (dark, financière, calme) ===== */
 
 :root {
