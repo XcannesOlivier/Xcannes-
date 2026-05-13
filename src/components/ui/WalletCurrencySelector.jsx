@@ -57,6 +57,7 @@ export default function WalletCurrencySelector({
   buttonClassName = "",
   fullscreen = false,
   closeSignal = undefined,
+  walletLabel = null,
 }) {
   const { t } = useTranslation("common");
   const [currencies, setCurrencies] = useState([]);
@@ -716,8 +717,18 @@ export default function WalletCurrencySelector({
                   )}
                 </div>
 
-                <div className="px-3 py-3 sm:py-3 pb-6 sm:pb-3 text-[15px] font-light text-white/55 bg-white/[0.02] border-t border-white/5">
-                  {t("ui_search_results", "Sélectionnez une devise.")}
+                <div className="px-3 py-3 sm:py-3 pb-6 sm:pb-3 bg-white/[0.02] border-t border-white/5 flex items-center gap-2">
+                  {walletLabel ? (
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/[0.06] ring-1 ring-white/10 text-[13px] font-medium text-white/70 leading-none">
+                      <svg viewBox="0 0 16 16" fill="none" className="w-3.5 h-3.5 shrink-0 text-white/40" aria-hidden>
+                        <rect x="1" y="3" width="14" height="10" rx="2" stroke="currentColor" strokeWidth="1.3" />
+                        <circle cx="8" cy="8" r="2" fill="currentColor" />
+                      </svg>
+                      {walletLabel}
+                    </span>
+                  ) : (
+                    <span className="text-[15px] font-light text-white/55">{t("ui_search_results", "Sélectionnez une devise.")}</span>
+                  )}
                 </div>
               </div>
             </div>,

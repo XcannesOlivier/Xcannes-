@@ -1128,6 +1128,7 @@ export default function WalletDashboard({
                   excludeCodes={['USD', 'RLUSD', 'XRP']}
                   showQuickAdd={false}
                   fullscreen={true}
+                  walletLabel={walletLabel || null}
                 />
               ) : null
             }
