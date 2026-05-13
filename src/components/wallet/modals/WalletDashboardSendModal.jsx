@@ -56,6 +56,7 @@ export default function WalletDashboardSendModal({
   const [showSavedPicker, setShowSavedPicker] = useState(false);
   const [useLabelDisplay, setUseLabelDisplay] = useState(false);
   const [destinationFocused, setDestinationFocused] = useState(false);
+  const [amountFocused, setAmountFocused] = useState(false);
   const [autoShowLabelOnce, setAutoShowLabelOnce] = useState(false);
   const [showFullPayreqAddress, setShowFullPayreqAddress] = useState(false);
   const [scanUnavailable, setScanUnavailable] = useState(false);
@@ -675,7 +676,7 @@ export default function WalletDashboardSendModal({
     inline,
     onClose,
     scrollContainerRef: scrollContainerRef,
-    extraGuard: () => scanActive,
+    extraGuard: () => scanActive || (!hasPaymentRequest && (sendAssetDropdownOpen || amountFocused)),
   });
 
   if (!shouldRender) return null;
@@ -1068,7 +1069,11 @@ export default function WalletDashboardSendModal({
                 </span>
               ) : null}
             </div>
-            <div className="bg-[#111518] rounded-[18px]">
+            <div
+              className="bg-[#111518] rounded-[18px]"
+              onFocus={() => setAmountFocused(true)}
+              onBlur={() => setAmountFocused(false)}
+            >
             <TokenAmountInput
               value={sendAmount}
               onChange={setSendAmount}
@@ -1441,6 +1446,13 @@ export default function WalletDashboardSendModal({
             onClick={(e) => {
               if (!inline) e.stopPropagation();
             }}
+            onPointerDown={(event) => {
+              if (inline) return;
+              // Skip if the event originates from inside the scroll container
+              // (it has its own handler with scroll-aware source)
+              if (scrollContainerRef.current?.contains(event.target)) return;
+              maybeStartOverlayDrag(event, "fixed");
+            }}
           >
             {/* Ambient glow */}
             <div className="pointer-events-none absolute inset-0" aria-hidden>
@@ -1480,7 +1492,9 @@ export default function WalletDashboardSendModal({
               className="flex-1 overflow-y-auto -mx-4 px-4 md:-mx-5 md:px-5"
               style={{ touchAction: 'pan-y' }}
               onPointerDown={(event) => {
-                maybeStartOverlayDrag(event, "list");
+                // payreq: contenu court, pas de scroll → source fixe (pas de garde scrollTop)
+                // manual: source list → se déclenche uniquement en haut de liste
+                maybeStartOverlayDrag(event, hasPaymentRequest ? "fixed" : "list");
               }}
             >
               <div className="flex flex-col gap-3">
