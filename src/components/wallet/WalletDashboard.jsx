@@ -824,7 +824,7 @@ export default function WalletDashboard({
                       {/* Mini-card activité récente */}
                       <div
                         className="mx-0 mb-[18px] px-4 py-[9px] rounded-[16px] transition-colors"
-                        style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.02)' }}
+                        style={{ background: '#0d1214', border: '1px solid rgba(255,255,255,0.02)' }}
                       >
                         {/* Mobile : deux lignes */}
                         <div className="lg:hidden flex flex-col justify-center gap-[2px] min-h-[52px]">
