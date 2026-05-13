@@ -74,7 +74,7 @@ export default function WalletDashboardFooter({ onScan, addCurrencySlot, onHisto
           ) : null}
 
           {/* Droite : Historique */}
-          <div className="flex-1 flex items-center justify-center h-full min-w-0">
+          <div className="flex-1 flex items-center justify-center h-full min-w-0 px-[5%]">
             {onHistory ? (
               <button
                 type="button"

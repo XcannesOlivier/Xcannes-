@@ -1115,7 +1115,7 @@ export default function WalletDashboard({
             }
             addCurrencySlot={
               !isDesktopPanel ? (
-                <div className="w-full"><WalletCurrencySelector
+                <div className="w-full px-[5%]"><WalletCurrencySelector
                   value=""
                   onChange={handleAddDevise}
                   triggerVariant="text"
