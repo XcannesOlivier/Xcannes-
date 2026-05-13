@@ -56,6 +56,7 @@ export default function WalletCurrencySelector({
   excludeCodes = [],
   buttonClassName = "",
   fullscreen = false,
+  closeSignal = undefined,
 }) {
   const { t } = useTranslation("common");
   const [currencies, setCurrencies] = useState([]);
@@ -161,6 +162,12 @@ export default function WalletCurrencySelector({
     document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
   }, [fullscreen, open]);
+
+  // Ferme le modal quand closeSignal change (ex: ouverture d'un autre modal)
+  useEffect(() => {
+    if (closeSignal === undefined) return;
+    setOpen(false);
+  }, [closeSignal]);
 
   useEffect(() => {
     if (!open) return;

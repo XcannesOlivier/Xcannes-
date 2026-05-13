@@ -997,6 +997,7 @@ export default function WalletDashboard({
                       placeholder={t('ui_search_all_currencies_c5d6e7f8', 'Search currency...')}
                       excludeCodes={['USD', 'RLUSD', 'XRP']}
                       showQuickAdd={false}
+                      closeSignal={activeAction}
                       fullscreenPortalTarget={
                         typeof document !== 'undefined' && isDesktopPanel
                           ? document.getElementById('wallet-desktop-inline-panel')
@@ -1028,7 +1029,7 @@ export default function WalletDashboard({
                   </div>
                   {/* Header desktop : 3 colonnes */}
                   <div className="hidden lg:flex items-center justify-between gap-2 px-0.5 pb-1 border-b border-white/[0.06]">
-                    <span className="text-[12px] font-semibold text-white/40 tracking-widest uppercase">Mes devises</span>
+                    <span className="text-[12px] font-semibold text-white/40 tracking-widest">Mes devises</span>
                     <span className="text-[12px] text-white/25">
                       {(tokenListTokens || []).length > 0 ? `${(tokenListTokens || []).length} devise${(tokenListTokens || []).length > 1 ? 's' : ''}` : ''}
                     </span>
@@ -1058,6 +1059,7 @@ export default function WalletDashboard({
                   placeholder={t('ui_search_all_currencies_c5d6e7f8', 'Search currency...')}
                   excludeCodes={['USD', 'RLUSD', 'XRP']}
                   showQuickAdd={false}
+                  closeSignal={activeAction}
                   fullscreenPortalTarget={
                     typeof document !== 'undefined' && isDesktopPanel
                       ? document.getElementById('wallet-desktop-inline-panel')
