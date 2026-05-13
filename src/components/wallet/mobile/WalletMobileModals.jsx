@@ -121,17 +121,12 @@ export default function WalletMobileModals({
 
   const handleQrScanResult = useCallback((data, callbackRef) => {
     setQrScannerOpen(false);
-    // callbackRef === qrPayreqResultCallbackRef → payreq scan → parse + go direct to send
-    // callbackRef === qrScanResultCallbackRef   → address scan → go direct to send
-    if (callbackRef === qrPayreqResultCallbackRef) {
-      const result = handlePaymentRequestScan?.(data);
-      if (result?.relayChallenge || result?.navigate) return;
-      setActiveAction('send');
-    } else {
-      handleAddressScan?.(data);
-      setActiveAction('send');
-    }
-  }, [setQrScannerOpen, setActiveAction, handlePaymentRequestScan, handleAddressScan]);
+    // Pour les deux types de scan (adresse et payreq), handlePaymentRequestScan
+    // gère tous les formats et reset correctement sendPaymentRequest.
+    const result = handlePaymentRequestScan?.(data);
+    if (result?.relayChallenge || result?.navigate) return;
+    setActiveAction('send');
+  }, [setQrScannerOpen, setActiveAction, handlePaymentRequestScan]);
   const [scanDragging, setScanDragging] = useState(false);
   const [scanTranslateY, setScanTranslateY] = useState(0);
   const scanOverlayRef = useRef(null);
