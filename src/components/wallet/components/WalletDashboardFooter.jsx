@@ -52,7 +52,7 @@ export default function WalletDashboardFooter({ onScan, addCurrencySlot, onHisto
         <div className="pointer-events-none absolute inset-x-0 bottom-full h-[64px] bg-gradient-to-t from-[#0d1012]/90 to-transparent" />
 
         {/* Barre footer */}
-        <div className="relative z-10 h-[46px] flex items-center gap-2 px-3 bg-[#0e1214] border-t border-white/[0.06]">
+        <div className="relative z-10 h-[58px] flex items-center gap-2 px-3 bg-[#0e1214] border-t border-white/[0.06]">
 
           {/* Gauche : + Devise */}
           <div className="flex-1 flex items-center justify-center h-full min-w-0">
