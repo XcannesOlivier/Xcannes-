@@ -3,50 +3,14 @@
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { apiUrl } from "@/lib/runtimeConfig";
 import { USD_STABLECOINS } from "../walletDashboardConfig";
+import {
+  normalizeMovementKind as normalizeKind,
+  isVisibleMovement,
+  sortMovementsDesc,
+} from "../utils/movementUtils";
 
 function isXrplAddress(value) {
   return /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(String(value || "").trim());
-}
-
-function normalizeKind(value) {
-  return String(value || "").trim().toUpperCase();
-}
-
-function sortMovementsDesc(list) {
-  const sorted = Array.isArray(list) ? list.slice() : [];
-  sorted.sort((a, b) => {
-    const leftDate = a?.createdAt ? new Date(a.createdAt).getTime() : 0;
-    const rightDate = b?.createdAt ? new Date(b.createdAt).getTime() : 0;
-    if (leftDate !== rightDate) return rightDate - leftDate;
-
-    const left = Number.isFinite(Number(a?.ledgerIndex))
-      ? Number(a.ledgerIndex)
-      : -Infinity;
-    const right = Number.isFinite(Number(b?.ledgerIndex))
-      ? Number(b.ledgerIndex)
-      : -Infinity;
-    if (left !== right) return right - left;
-    return String(b?.txHash || "").localeCompare(String(a?.txHash || ""));
-  });
-  return sorted;
-}
-
-function isVisibleMovement(movement) {
-  const kind = normalizeKind(movement?.kind);
-  if (!kind) return false;
-  if (
-    kind === "ALLOCATE" ||
-    kind.startsWith("ALLOCATE_") ||
-    kind === "DEALLOCATE" ||
-    kind.startsWith("DEALLOCATE_")
-  ) {
-    return false;
-  }
-  if (kind === "XRPL_TRUSTLINE_ADD" || kind === "XRPL_TRUSTLINE_REMOVE") {
-    return false;
-  }
-  if (kind === "WALLET_LABEL") return false;
-  return true;
 }
 
 function rlusdToUnits(rlusdAmount, currencyCode, { rlusdPerUnitRates }) {

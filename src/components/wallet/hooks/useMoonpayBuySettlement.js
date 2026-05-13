@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { apiUrl } from '@/lib/runtimeConfig';
 import xcannesApi from '@/lib/xcannesApi';
 import { readMoonpayBuyResumeState, saveMoonpayBuyResumeState } from '../moonpayClientUtils';
-import { normalizeMovementKind, resolveIncomingXrpAmount } from '../utils/movementUtils';
+import { resolveIncomingXrpAmount, findIncomingXrpMovement } from '../utils/movementUtils';
 
 /**
  * Handles the two MoonPay Buy settlement effects:
@@ -84,23 +84,9 @@ export function useMoonpayBuySettlement({ wallet, isConnected, activeAction, set
         if (!response.ok) return;
 
         const movements = Array.isArray(data?.movements) ? data.movements : [];
-        const incomingXrp = movements.find(movement => {
-          const kind = normalizeMovementKind(movement?.kind);
-          if (kind !== 'PAYMENT_IN' && kind !== 'XRPL_PAYMENT_IN') return false;
-          const currencyCode = String(
-            movement?.toCurrencyCode || movement?.fromCurrencyCode || movement?.displayCurrency || '',
-          )
-            .trim()
-            .toUpperCase();
-          if (currencyCode !== 'XRP') return false;
-          const movementId = String(movement?.movementId || movement?._id || movement?.txHash || '').trim();
-          if (movementId && movementId === seenMovementIdRef.current) return false;
-          const createdAtMs = movement?.createdAt ? new Date(movement.createdAt).getTime() : Number.NaN;
-          const awaitingXrpSince = Number(freshResume.awaitingXrpSince);
-          if (Number.isFinite(awaitingXrpSince) && Number.isFinite(createdAtMs) && createdAtMs < awaitingXrpSince) {
-            return false;
-          }
-          return Number.isFinite(resolveIncomingXrpAmount(movement));
+        const incomingXrp = findIncomingXrpMovement(movements, {
+          awaitingXrpSince: Number(freshResume.awaitingXrpSince),
+          seenMovementId: seenMovementIdRef.current,
         });
 
         if (!incomingXrp) return;

@@ -22,6 +22,7 @@ import {
   getDisplayCurrencyCode,
   USD_STABLECOINS,
 } from "../walletDashboardConfig";
+import { truncateMiddle } from "../modals/walletModalShared";
 import {
   HIGHLIGHT_DURATION_MS,
   STATEMENT_LAYOUTS,
@@ -1011,13 +1012,6 @@ export default function CurrencyStatement({
       lockedOverflowY: "",
     };
   };
-
-  const truncateMiddle = useCallback((text, start = 6, end = 4) => {
-    const raw = String(text || "").trim();
-    if (!raw) return "";
-    if (raw.length <= start + end + 1) return raw;
-    return `${raw.slice(0, start)}…${raw.slice(-end)}`;
-  }, []);
 
   const copyToClipboard = useCallback(
     async (text, successMessage) => {

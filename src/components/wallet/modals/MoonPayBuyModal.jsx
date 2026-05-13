@@ -22,6 +22,7 @@ import {
   truncateMiddle,
 } from './walletModalShared';
 import { useMoonpayBase } from '../hooks/useMoonpayBase';
+import { resolveIncomingXrpAmount, findIncomingXrpMovement } from '../utils/movementUtils';
 
 // Buy-only constants
 const MOONPAY_BUY_RESUME_KEY = 'xcannes_moonpay_resume_buy_v1';
@@ -41,24 +42,6 @@ const MOONPAY_SUPPORTED_CURRENCIES = [
   { code: 'RLUSD', icon: CRYPTO_ICONS.RLUSD },
   { code: 'XRP', icon: CRYPTO_ICONS.XRP },
 ];
-
-const normalizeMovementKind = value =>
-  String(value || '').trim().toUpperCase();
-
-const resolveIncomingXrpAmount = movement => {
-  const displayAmount = Number(movement?.displayAmount);
-  if (Number.isFinite(displayAmount) && displayAmount > 0) return displayAmount;
-  const amountXrp = Number(movement?.amountXrp);
-  if (Number.isFinite(amountXrp) && amountXrp > 0) return amountXrp;
-  const amount = Number(movement?.amount);
-  if (Number.isFinite(amount) && amount > 0) return amount;
-  const amountRlusd = Number(movement?.amountRlusd);
-  const fxRate = Number(movement?.fxRate);
-  if (Number.isFinite(amountRlusd) && amountRlusd > 0 && Number.isFinite(fxRate) && fxRate > 0) {
-    return amountRlusd / fxRate;
-  }
-  return Number.NaN;
-};
 
 /**
  * MoonPayBuyModal - Modal pour acheter des cryptos avec MoonPay
@@ -1256,22 +1239,9 @@ const MoonPayBuyModal = ({
         if (!response.ok) return;
 
         const movements = Array.isArray(data?.movements) ? data.movements : [];
-        const incomingXrp = movements.find(movement => {
-          const kind = normalizeMovementKind(movement?.kind);
-          if (kind !== 'PAYMENT_IN' && kind !== 'XRPL_PAYMENT_IN') return false;
-          const currencyCode = String(
-            movement?.toCurrencyCode || movement?.fromCurrencyCode || movement?.displayCurrency || '',
-          )
-            .trim()
-            .toUpperCase();
-          if (currencyCode !== 'XRP') return false;
-          const movementId = String(movement?.movementId || movement?._id || movement?.txHash || '').trim();
-          if (movementId && movementId === pendingSwapPollSeenRef.current) return false;
-          const createdAtMs = movement?.createdAt ? new Date(movement.createdAt).getTime() : Number.NaN;
-          if (Number.isFinite(awaitingXrpSince) && Number.isFinite(createdAtMs) && createdAtMs < awaitingXrpSince) {
-            return false;
-          }
-          return Number.isFinite(resolveIncomingXrpAmount(movement));
+        const incomingXrp = findIncomingXrpMovement(movements, {
+          awaitingXrpSince,
+          seenMovementId: pendingSwapPollSeenRef.current,
         });
 
         if (!incomingXrp) return;

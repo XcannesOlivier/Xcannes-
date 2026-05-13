@@ -16,6 +16,12 @@ import useStatementDocHash from "./useStatementDocHash";
 import { useSavedAddresses } from "../hooks/useSavedAddresses";
 import { useFlashNotice } from "../hooks/useFlashNotice";
 import { isXrplAddress } from "../utils/xrplAddress";
+import { truncateMiddle } from "../modals/walletModalShared";
+import {
+  normalizeMovementKind as normalizeKind,
+  isVisibleMovement,
+  sortMovementsDesc,
+} from "../utils/movementUtils";
 
 /**
  * Composant de relevé bancaire global (toutes les devises consolidées).
@@ -198,51 +204,6 @@ export default function GlobalStatement({
     [locale],
   );
 
-  const normalizeKind = useCallback(
-    (value) => String(value || "").trim().toUpperCase(),
-    [],
-  );
-
-  const isVisibleMovement = useCallback(
-    (m) => {
-      const kind = normalizeKind(m?.kind);
-      if (!kind) return false;
-      if (
-        kind === "ALLOCATE" ||
-        kind.startsWith("ALLOCATE_") ||
-        kind === "DEALLOCATE" ||
-        kind.startsWith("DEALLOCATE_")
-      ) {
-        return false;
-      }
-      if (kind === "XRPL_TRUSTLINE_ADD" || kind === "XRPL_TRUSTLINE_REMOVE") {
-        return false;
-      }
-      if (kind === "WALLET_LABEL") return false;
-      return true;
-    },
-    [normalizeKind],
-  );
-
-  const sortMovementsDesc = useCallback((list) => {
-    const sorted = Array.isArray(list) ? list.slice() : [];
-    sorted.sort((a, b) => {
-      const leftDate = a?.createdAt ? new Date(a.createdAt).getTime() : 0;
-      const rightDate = b?.createdAt ? new Date(b.createdAt).getTime() : 0;
-      if (leftDate !== rightDate) return rightDate - leftDate;
-
-      const left = Number.isFinite(Number(a?.ledgerIndex))
-        ? Number(a.ledgerIndex)
-        : -Infinity;
-      const right = Number.isFinite(Number(b?.ledgerIndex))
-        ? Number(b.ledgerIndex)
-        : -Infinity;
-      if (left !== right) return right - left;
-      return String(b?.txHash || "").localeCompare(String(a?.txHash || ""));
-    });
-    return sorted;
-  }, []);
-
   const recentMovements = useMemo(() => {
     const visible = (movements || []).filter(isVisibleMovement);
     const sorted = sortMovementsDesc(visible);
@@ -355,13 +316,6 @@ export default function GlobalStatement({
     recentMovements,
     savedAddressLabelByAddress,
   ]);
-
-  const truncateMiddle = useCallback((value, left = 10, right = 8) => {
-    const s = String(value || "");
-    if (!s) return "";
-    if (s.length <= left + right + 1) return s;
-    return `${s.slice(0, left)}…${s.slice(-right)}`;
-  }, []);
 
   const getMovementUiType = useCallback(
     (m) => {
