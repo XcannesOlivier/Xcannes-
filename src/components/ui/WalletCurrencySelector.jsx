@@ -717,7 +717,7 @@ export default function WalletCurrencySelector({
                   )}
                 </div>
 
-                <div className="px-3 py-3 sm:py-3 pb-6 sm:pb-3 bg-transparent border-t border-white/5 flex items-center justify-end gap-2">
+                <div className="px-6 py-3 sm:py-3 pb-6 sm:pb-3 bg-transparent border-t border-white/5 flex items-center justify-end gap-2">
                   {walletLabel ? (
                     <span className="text-[17px] text-white/55 flex items-center gap-2">
                       <span className="h-2.5 w-2.5 rounded-full bg-xcannes-green shrink-0 animate-pulse" aria-hidden />
