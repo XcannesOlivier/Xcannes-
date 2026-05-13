@@ -8,7 +8,7 @@
 /* Cible uniquement les téléphones en landscape (hauteur < 600px) */
 @media screen and (orientation: landscape) and (max-height: 600px) {
   body::after {
-    content: "↩  Veuillez orienter votre téléphone en portrait";
+    content: "↺  Veuillez orienter votre téléphone en portrait";
     position: fixed;
     inset: 0;
     z-index: 99999;
