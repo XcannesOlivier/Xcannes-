@@ -1484,7 +1484,7 @@ export default function GlobalStatement({
       >
         {/* Header */}
         <div
-          className={`relative flex-shrink-0 bg-[#111518] shadow-[inset_0_16px_28px_rgba(255,255,255,0.03),inset_0_-46px_70px_rgba(0,0,0,0.55)] px-4 md:px-5 py-4 before:content-[''] before:absolute before:left-0 before:right-0 before:bottom-0 before:h-px before:bg-white/10`}
+          className={`relative flex-shrink-0 bg-[#111518] shadow-[inset_0_16px_28px_rgba(255,255,255,0.03),inset_0_-46px_70px_rgba(0,0,0,0.55)] px-4 md:px-5 py-4`}
           onPointerDown={(event) => {
             maybeStartOverlayDrag(event, "fixed");
           }}
@@ -1527,7 +1527,7 @@ export default function GlobalStatement({
         </div>
 
         {/* Filtres */}
-        <div className="px-4 md:px-6 pb-4 flex flex-row items-stretch md:items-center gap-2">
+        <div className="px-4 md:px-6 pt-[60px] pb-4 flex flex-row items-stretch md:items-center gap-2">
           <div className="flex flex-1 items-center rounded-[16px] p-1 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-[#101415] to-[#0d1214]">
             {[
               { key: "all", label: t("ui_all_0c90d41d71", "Tout") },
@@ -1742,14 +1742,11 @@ export default function GlobalStatement({
         <div className="shrink-0 px-4 md:px-6 py-3 pb-[max(12px,env(safe-area-inset-bottom))] border-t border-white/[0.06] bg-[#0e1214] flex items-center justify-between gap-3">
           {/* Compte actuel */}
           <div className="flex items-center gap-3 min-w-0">
-            <span className="text-[14px] text-white/50 font-medium shrink-0">
-              {t("ui_current_account_plain", "Compte actuel")}
-            </span>
             <div className="relative w-auto min-w-[120px] max-w-[180px]" ref={accountDropdownRef}>
               <button
                 type="button"
                 onClick={() => setAccountDropdownOpen((prev) => !prev)}
-                className={`w-full inline-flex items-center justify-center gap-2 px-3 py-2 bg-elevated ring-1 ring-inset transition-all ${accountDropdownOpen ? "rounded-t-[10px] rounded-b-none ring-white/20" : "rounded-[10px] ring-white/15"}`}
+                className={`w-full inline-flex items-center justify-center gap-2 px-3 py-2 bg-transparent transition-all rounded-[10px]`}
                 aria-haspopup="menu"
                 aria-expanded={accountDropdownOpen}
                 title={t("ui_current_account_plain", "Compte actuel")}
@@ -1758,6 +1755,20 @@ export default function GlobalStatement({
                 <span className="text-white/95 text-sm font-semibold truncate min-w-0 flex-1 text-center">
                   {walletLabel || t("nav_wallet", "Wallet")}
                 </span>
+                <svg
+                  className="w-4 h-4 text-white/45 shrink-0"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.7"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M2.5 12s3.5-7 9.5-7 9.5 7 9.5 7-3.5 7-9.5 7-9.5-7-9.5-7Z" />
+                  <circle cx="12" cy="12" r="2.6" />
+                  {accountDropdownOpen ? <path d="M4 20L20 4" /> : null}
+                </svg>
               </button>
               {accountDropdownOpen && walletAddress ? (
                 <div className="absolute bottom-full left-0 z-[200] w-full mb-1 rounded-[10px] ring-1 ring-white/20 ring-inset bg-elevated px-4 py-3 shadow-[0_-8px_18px_rgba(0,0,0,0.45)]">
@@ -1803,7 +1814,7 @@ export default function GlobalStatement({
           <button
             onClick={handleExportPdf}
             disabled={exportFormat === "pdf"}
-            className="shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-[10px] text-sm font-medium transition-colors disabled:opacity-50 text-white/70 hover:text-white bg-white/[0.04] hover:bg-white/[0.07]"
+            className="shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-[10px] text-sm font-medium transition-colors disabled:opacity-50 text-white/70 hover:text-white bg-transparent hover:bg-white/[0.04]"
             aria-label={t("ui_export_pdf_9c8d16b4fe", "Télécharger")}
           >
             <ShareIcon className={`w-4 h-4 ${exportFormat === "pdf" ? "opacity-40" : ""}`} />
