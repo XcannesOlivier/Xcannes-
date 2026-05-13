@@ -26,7 +26,7 @@ function ScanIcon() {
       <path
         strokeLinecap="butt"
         strokeLinejoin="miter"
-        d="M2.5 10.5V2.5H10.5M85.5 2.5H93.5V10.5M10.5 21.5H2.5V13.5M93.5 13.5V21.5H85.5"
+        d="M2.5 12.5V2.5H10.5M85.5 2.5H93.5V12.5M10.5 21.5H2.5V11.5M93.5 11.5V21.5H85.5"
       />
       <text
         x="48"
@@ -65,7 +65,7 @@ export default function WalletDashboardFooter({ onScan, addCurrencySlot, onHisto
         <div className="relative z-10 mx-4 mb-1 h-[46px] flex items-center rounded-[30px] bg-[#0e1214] ring-1 ring-white/[0.02] ring-inset shadow-[0_2px_16px_rgba(0,0,0,0.35),0_1px_3px_rgba(0,0,0,0.2)]">
 
           {/* Gauche : + Devise */}
-          <div className="flex-1 flex items-center justify-center h-full min-w-0">
+          <div className="flex-1 flex items-center justify-end h-full min-w-0">
             {addCurrencySlot ?? null}
           </div>
 
