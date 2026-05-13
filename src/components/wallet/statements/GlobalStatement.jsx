@@ -1675,7 +1675,7 @@ export default function GlobalStatement({
           </div>
         </div>
 
-        {/* Content - Zone scrollable */
+        {/* Content - Zone scrollable */}
         <div
           ref={overlayListRef}
           className="flex-1 min-h-0 overflow-y-auto px-4 md:px-5 py-6 flex flex-col gap-4 bg-gradient-to-b from-[#101415] to-[#0d1214]"
