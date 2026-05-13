@@ -119,9 +119,19 @@ export function useWalletIncomingToast({
 
     fetchLatestIncoming();
     const interval = window.setInterval(fetchLatestIncoming, 12000);
+
+    // Réagit immédiatement aux événements WebSocket (transaction on-chain détectée)
+    // sans attendre le prochain tick du polling.
+    const handleWalletRefresh = (event) => {
+      if (event?.detail?.address && event.detail.address !== backendWalletAddress) return;
+      fetchLatestIncoming();
+    };
+    window.addEventListener("xcannes:wallet:refresh", handleWalletRefresh);
+
     return () => {
       cancelled = true;
       window.clearInterval(interval);
+      window.removeEventListener("xcannes:wallet:refresh", handleWalletRefresh);
     };
-  }, [backendWalletAddress, flashWalletHeaderToast]);
+  }, [backendWalletAddress, flashWalletHeaderToast];
 }

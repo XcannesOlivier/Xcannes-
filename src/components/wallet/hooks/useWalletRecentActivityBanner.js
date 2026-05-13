@@ -214,9 +214,19 @@ export function useWalletRecentActivityBanner({
 
     fetchLatest();
     const interval = window.setInterval(fetchLatest, pollIntervalMs);
+
+    // Réagit immédiatement aux événements WebSocket (transaction on-chain détectée)
+    // sans attendre le prochain tick du polling.
+    const handleWalletRefresh = (event) => {
+      if (event?.detail?.address && event.detail.address !== backendWalletAddress) return;
+      fetchLatest();
+    };
+    window.addEventListener("xcannes:wallet:refresh", handleWalletRefresh);
+
     return () => {
       cancelled = true;
       window.clearInterval(interval);
+      window.removeEventListener("xcannes:wallet:refresh", handleWalletRefresh);
     };
   }, [
     backendWalletAddress,

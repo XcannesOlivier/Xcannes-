@@ -203,6 +203,45 @@ export const NativeWalletProvider = ({ children }) => {
         }
       };
 
+      // ── HTTP polling fallback ────────────────────────────────────────────
+      // Polls GET /wallet-relay/status/:id every 3s as a safety net when
+      // Redis pub/sub is unavailable and the WebSocket push never arrives.
+      // Stopped immediately when cleanupRelaySubscription() is called
+      // (which happens as soon as either WS or poll delivers an event).
+      const pollStatus = async () => {
+        try {
+          const res = await fetch(apiUrl(`/wallet-relay/status/${challengeId}`), {
+            signal: AbortSignal.timeout(5000),
+          });
+          if (!res.ok) return;
+          const { status, result } = await res.json();
+          if (status === "signed" || status === "submitted") {
+            handleRelayEvent({
+              challengeId,
+              event: mode === "connect" ? "connected" : "signed",
+              address: result?.address,
+              hash: result?.hash,
+              txResult: result?.txResult,
+              addresses: result?.addresses,
+            });
+          } else if (status === "rejected") {
+            handleRelayEvent({
+              challengeId,
+              event: "rejected",
+              engineResult: result?.engineResult || "",
+              engineMessage: result?.engineMessage || "Transaction rejetée par le XRPL",
+              hash: result?.hash || "",
+            });
+          } else if (status === "expired") {
+            handleRelayEvent({ challengeId, event: "expired" });
+          }
+          // "pending" → no action, next poll will retry
+        } catch {
+          // Network error or timeout — next poll will retry
+        }
+      };
+      const pollIntervalId = setInterval(pollStatus, 5000);
+
       try {
         await wsClient.connect();
         wsClient.subscribe("wallet-relay", challengeId);
@@ -210,12 +249,14 @@ export const NativeWalletProvider = ({ children }) => {
 
         relayCleanupRef.current = () => {
           clearTimeout(timeoutId);
+          clearInterval(pollIntervalId);
           wsClient.off("wallet-relay", handleRelayEvent);
           wsClient.unsubscribe("wallet-relay", challengeId);
         };
       } catch (error) {
         console.error("[NativeWallet] WebSocket subscription error:", error);
         clearTimeout(timeoutId);
+        clearInterval(pollIntervalId);
       }
     },
     [
