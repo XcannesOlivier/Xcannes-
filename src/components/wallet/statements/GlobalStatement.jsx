@@ -1547,7 +1547,7 @@ export default function GlobalStatement({
             </div>
           ) : null}
           <div className="flex justify-start">
-            <div className="min-w-0 flex flex-col items-start justify-center text-left">
+            <div className="min-w-0 flex flex-col items-start justify-center text-left gap-1">
               <div className="flex items-center justify-start gap-3">
                 <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-white/70" aria-hidden="true">
                   <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h8" />
