@@ -1484,7 +1484,7 @@ export default function GlobalStatement({
       >
         {/* Header + Filtres — même conteneur pour éviter la jonction */}
         <div
-          className="relative flex-shrink-0 bg-[#111518] shadow-[inset_0_46px_70px_rgba(0,0,0,0.55),inset_0_-16px_28px_rgba(255,255,255,0.03)]"
+          className="relative flex-shrink-0 bg-[#111518] shadow-[inset_0_70px_100px_rgba(0,0,0,0.75)]"
           onPointerDown={(event) => {
             maybeStartOverlayDrag(event, "fixed");
           }}
@@ -1528,7 +1528,7 @@ export default function GlobalStatement({
           </div>
 
         {/* Filtres */}
-        <div className="px-4 md:px-6 pt-[60px] pb-4 flex flex-row items-stretch md:items-center gap-2">
+        <div className="px-4 md:px-6 pt-[80px] pb-4 flex flex-row items-stretch md:items-center gap-2">
           <div className="flex flex-1 items-center rounded-[16px] p-1 ring-1 ring-white/[0.05] ring-inset bg-gradient-to-b from-[#101415] to-[#0d1214]">
             {[
               { key: "all", label: t("ui_all_0c90d41d71", "Tout") },
