@@ -1577,7 +1577,7 @@ export default function GlobalStatement({
             {/* close via swipe/backdrop */}
           </div>
 
-            <div className="mt-8 mb-8 flex justify-start items-center gap-3">
+            <div className="mt-8 mb-12 flex justify-start items-center gap-3">
             <span className="text-[16px] md:text-[17px] text-white/70 font-medium shrink-0">
               {t("ui_current_account_plain", "Compte actuel")}
             </span>
