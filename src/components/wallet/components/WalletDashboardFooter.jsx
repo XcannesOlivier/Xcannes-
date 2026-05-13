@@ -5,7 +5,7 @@ import { useTranslation } from "next-i18next";
 const scanButtonStyle = {
   background: "transparent",
   boxShadow:
-    "0 4px 14px rgba(0,0,0,0.32), inset 0 1px 0 rgba(255,255,255,0.06)",
+    "0 4px 14px rgba(0,0,0,0.32), inset 0 1px 0 rgba(255,255,255,0.06), 0 0 18px rgba(255,255,255,0.07)",
 };
 
 const SCAN_LABEL_KEY = "ui_scan_qr_code_12fa63d927";
