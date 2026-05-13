@@ -121,9 +121,17 @@ export default function WalletMobileModals({
 
   const handleQrScanResult = useCallback((data, callbackRef) => {
     setQrScannerOpen(false);
-    setActiveAction('sendChoice');
-    setTimeout(() => { callbackRef.__inject?.(data); }, 120);
-  }, [setQrScannerOpen, setActiveAction]);
+    // callbackRef === qrPayreqResultCallbackRef → payreq scan → parse + go direct to send
+    // callbackRef === qrScanResultCallbackRef   → address scan → go direct to send
+    if (callbackRef === qrPayreqResultCallbackRef) {
+      const result = handlePaymentRequestScan?.(data);
+      if (result?.relayChallenge || result?.navigate) return;
+      setActiveAction('send');
+    } else {
+      handleAddressScan?.(data);
+      setActiveAction('send');
+    }
+  }, [setQrScannerOpen, setActiveAction, handlePaymentRequestScan, handleAddressScan]);
   const [scanDragging, setScanDragging] = useState(false);
   const [scanTranslateY, setScanTranslateY] = useState(0);
   const scanOverlayRef = useRef(null);
