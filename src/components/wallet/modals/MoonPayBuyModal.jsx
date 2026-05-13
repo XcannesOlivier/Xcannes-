@@ -799,7 +799,7 @@ const MoonPayBuyModal = ({
       setWalletAddressCopied(false);
       onClose?.();
     };
-  }, [clearAutoOpen, clearFlowId, clearMoonpayWalletAddress, clearResumeState, deactivateMoonpayActive, onClose]);
+  }, [clearAutoOpen, clearFlowId, clearMoonpayWalletAddress, clearResumeState, deactivateMoonpayActive, onClose, setError, setIframeUrl, setStep]);
 
   useEffect(() => {
     return () => {
@@ -829,7 +829,7 @@ const MoonPayBuyModal = ({
       setWalletAddressExpanded(false);
       setWalletAddressCopied(false);
     };
-  }, [clearAutoOpen, clearFlowId, clearMoonpayWalletAddress, clearResumeState, deactivateMoonpayActive]);
+  }, [clearAutoOpen, clearFlowId, clearMoonpayWalletAddress, clearResumeState, deactivateMoonpayActive, setError, setIframeUrl, setStep]);
 
   const handleCopyWalletAddress = async event => {
     event?.stopPropagation?.();
@@ -861,6 +861,7 @@ const MoonPayBuyModal = ({
   // don't keep the resume cache around.
   useEffect(() => {
     return () => {
+      // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional: read latest ref value at cleanup time
       if (latestStepRef.current !== 'iframe' || !latestIframeUrlRef.current) return;
       clearResumeState();
       clearAutoOpen();
@@ -868,7 +869,7 @@ const MoonPayBuyModal = ({
       clearMoonpayWalletAddress();
       deactivateMoonpayActive();
     };
-  }, [clearAutoOpen, clearFlowId, clearMoonpayWalletAddress, clearResumeState, deactivateMoonpayActive]);
+  }, [clearAutoOpen, clearFlowId, clearMoonpayWalletAddress, clearResumeState, deactivateMoonpayActive, latestIframeUrlRef, latestStepRef]);
 
   const prefillSignature = useMemo(() => {
     if (!prefill) return '';
@@ -986,8 +987,8 @@ const MoonPayBuyModal = ({
     if (resume.fiatCurrency) setFiatCurrency(String(resume.fiatCurrency).toUpperCase());
 
     pendingAutoStartRef.current = true;
-  }, [demoMode, fiatCurrency, iframeUrl, isOpen, readResumeState, step, walletAddress]);
-
+  }, [demoMode, fiatCurrency, iframeUrl, isOpen, pendingAutoStartRef, readResumeState, setIframeUrl, setStep, step, walletAddress]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- generateBuyUrl n'est pas mémoïsé; pendingAutoStartRef/setIframeUrl/setStep sont stables
   useEffect(() => {
     if (!isOpen) return;
     if (!pendingAutoStartRef.current) return;
@@ -998,8 +999,8 @@ const MoonPayBuyModal = ({
       generateBuyUrl();
     }, 0);
     return () => window.clearTimeout(id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [demoMode, isOpen]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- generateBuyUrl n'est pas mémoïsé
+  }, [demoMode, isOpen, pendingAutoStartRef]);
 
   const minFiatAmount = useMemo(() => {
     if (resolvedMoonpayBaseFiatCurrencyCode === 'USD') {
@@ -1216,8 +1217,11 @@ const MoonPayBuyModal = ({
     isOpen,
     onClose,
     saveResumeState,
-    targetAssetAmount,
+    setError,
+    setIframeUrl,
+    setStep,
     t,
+    targetAssetAmount,
   ]);
 
   useEffect(() => {
@@ -1293,6 +1297,7 @@ const MoonPayBuyModal = ({
     step,
     targetAssetAmount,
     walletAddress,
+    setStep,
   ]);
 
   const handleConvertReceivedXrpToRlusd = async () => {
@@ -1358,7 +1363,7 @@ const MoonPayBuyModal = ({
   // Reset au changement de devise
   useEffect(() => {
     setError(null);
-  }, [currency, amount, fiatCurrency]);
+  }, [currency, amount, fiatCurrency, setError]);
 
   useEffect(() => {
     setTargetAssetAmount('');

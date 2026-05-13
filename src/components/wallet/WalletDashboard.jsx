@@ -527,12 +527,12 @@ export default function WalletDashboard({
   const handleOpenRecentSummary = useCallback(() => {
     setActivityTooltipOpen(false);
     setRecentSummaryOpen(true);
-  }, []);
+  }, [setActivityTooltipOpen, setRecentSummaryOpen]);
 
   const handleOpenGlobalStatementPlain = useCallback(() => {
     setHighlightTransactionId(null);
     handleOpenGlobalStatement?.();
-  }, [handleOpenGlobalStatement]);
+  }, [handleOpenGlobalStatement, setHighlightTransactionId]);
 
   const handleAddDevise = useCallback(
     async (code) => {

@@ -148,9 +148,13 @@ export function useWalletNavigation({
       backendWalletAddress,
       currencyLines,
       setActiveAction,
+      setConvertAmount,
+      setConvertBaseCurrency,
+      setConvertQuoteCurrency,
+      setSwapDefaultView,
+      setSwapLockedView,
       t,
       toast,
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     ],
   );
 
@@ -473,7 +477,13 @@ export function useWalletNavigation({
   }, [
     closeInlineQr,
     setActiveAction,
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    setConvertAmount,
+    setConvertBaseCurrency,
+    setConvertQuoteCurrency,
+    setDesktopSettingsPage,
+    setSwapDefaultView,
+    setSwapLockedView,
+    setWalletInfoOpen,
   ]);
 
   return {

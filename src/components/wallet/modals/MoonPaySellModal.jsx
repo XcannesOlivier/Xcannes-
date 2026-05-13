@@ -301,6 +301,9 @@ const MoonPaySellModal = ({
     clearSellSourceState,
     deactivateMoonpayActive,
     onClose,
+    setError,
+    setIframeUrl,
+    setStep,
   ]);
 
   useEffect(() => {
@@ -333,12 +336,16 @@ const MoonPaySellModal = ({
     clearResumeState,
     clearSellSourceState,
     deactivateMoonpayActive,
+    setError,
+    setIframeUrl,
+    setStep,
   ]);
 
   // If the user closes the Cash modal while the MoonPay widget is open,
   // don't keep the resume cache around.
   useEffect(() => {
     return () => {
+      // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional: read latest ref value at cleanup time
       if (latestStepRef.current !== "iframe" || !latestIframeUrlRef.current) return;
       clearResumeState();
       clearSellSourceState();
@@ -354,6 +361,8 @@ const MoonPaySellModal = ({
     clearResumeState,
     clearSellSourceState,
     deactivateMoonpayActive,
+    latestIframeUrlRef,
+    latestStepRef,
   ]);
 
   const supportedCurrencies = useMemo(() => {
@@ -577,12 +586,15 @@ const MoonPaySellModal = ({
     demoMode,
     iframeUrl,
     isOpen,
+    pendingAutoStartRef,
     quoteCurrency,
     readResumeState,
+    setIframeUrl,
+    setStep,
     step,
     walletAddress,
   ]);
-
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- generateSellUrl n'est pas mémoïsé; pendingAutoStartRef/setIframeUrl/setStep sont stables
   useEffect(() => {
     if (!isOpen) return;
     if (!pendingAutoStartRef.current) return;
@@ -592,8 +604,8 @@ const MoonPaySellModal = ({
       generateSellUrl();
     }, 0);
     return () => window.clearTimeout(id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [demoMode, isOpen]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- generateSellUrl n'est pas mémoïsé
+  }, [demoMode, isOpen, pendingAutoStartRef]);
 
   const selectedToken = useMemo(() => {
     const current = normalizeCurrencyCode(currency);
@@ -1111,13 +1123,15 @@ const MoonPaySellModal = ({
     handleWidgetClose,
     isOpen,
     onClose,
+    setError,
+    setStep,
     t,
   ]);
 
   // Reset au changement de devise
   useEffect(() => {
     setError(null);
-  }, [currency, amount, quoteCurrency]);
+  }, [currency, amount, quoteCurrency, setError]);
 
   const amountForCtaLabel = useMemo(() => {
     const raw = String(amount || "").trim();
