@@ -90,7 +90,7 @@ export default function WalletDashboardFooter({ onScan, addCurrencySlot, onHisto
               <button
                 type="button"
                 onClick={onHistory}
-                className="w-full h-[46px] flex flex-row items-center justify-center gap-1.5 transition-colors rounded-r-[30px] px-3 group"
+                className="w-full h-[46px] flex flex-row items-center justify-center gap-1.5 transition-colors rounded-r-[30px] px-3 group hover:bg-white/[0.04] active:bg-white/[0.06]"
                 aria-label={t("ui_open_statement", "Ouvrir le relevé des transactions")}
               >
                 <svg
