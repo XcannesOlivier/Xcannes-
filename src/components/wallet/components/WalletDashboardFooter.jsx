@@ -6,7 +6,7 @@ const scanButtonStyle = {
   background: "transparent",
   boxShadow:
     "0 4px 14px rgba(0,0,0,0.32), inset 0 1px 0 rgba(255,255,255,0.06)",
-  border: "1.5px solid rgba(34,197,94,0.55)",
+  border: "1px solid rgba(34,197,94,0.45)",
 };
 
 const SCAN_LABEL_KEY = "ui_scan_qr_code_12fa63d927";
@@ -35,7 +35,7 @@ function ScanIcon() {
         dominantBaseline="middle"
         fill="currentColor"
         stroke="none"
-        fontSize="15"
+        fontSize="17"
         fontWeight="600"
         fontFamily="system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif"
       >
