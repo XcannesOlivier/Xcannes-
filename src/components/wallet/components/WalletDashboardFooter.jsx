@@ -3,10 +3,10 @@
 import { useTranslation } from "next-i18next";
 
 const scanButtonStyle = {
-  background:
-    "linear-gradient(180deg, rgba(34,154,86,1) 0%, rgba(14,103,58,1) 100%)",
+  background: "transparent",
   boxShadow:
-    "0 4px 14px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -6px 10px rgba(0,0,0,0.28)",
+    "0 4px 14px rgba(0,0,0,0.32), inset 0 1px 0 rgba(255,255,255,0.06)",
+  border: "1.5px solid rgba(34,197,94,0.55)",
 };
 
 const SCAN_LABEL_KEY = "ui_scan_qr_code_12fa63d927";
@@ -75,7 +75,7 @@ export default function WalletDashboardFooter({ onScan, addCurrencySlot, onHisto
               <button
                 type="button"
                 onClick={onScan}
-                className="flex h-[44px] w-[110px] items-center justify-center rounded-[20px] text-white transition-transform duration-150 hover:scale-[1.02] active:scale-[0.97] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#39d57c]/20"
+                className="flex h-[44px] w-[110px] items-center justify-center rounded-[20px] text-xcannes-green transition-transform duration-150 hover:scale-[1.02] active:scale-[0.97] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#39d57c]/20"
                 style={scanButtonStyle}
                 aria-label={t(SCAN_LABEL_KEY, "Scan QR Code")}
               >
