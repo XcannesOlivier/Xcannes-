@@ -1115,7 +1115,7 @@ export default function WalletDashboard({
             }
             addCurrencySlot={
               !isDesktopPanel ? (
-                <WalletCurrencySelector
+                <div className="w-full"><WalletCurrencySelector
                   value=""
                   onChange={handleAddDevise}
                   triggerVariant="text"
@@ -1132,7 +1132,7 @@ export default function WalletDashboard({
                   showQuickAdd={false}
                   fullscreen={true}
                   walletLabel={walletLabel || null}
-                />
+                /></div>
               ) : null
             }
             onHistory={!isDesktopPanel ? handleOpenGlobalStatementPlain : null}
