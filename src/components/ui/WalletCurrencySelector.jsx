@@ -600,12 +600,19 @@ export default function WalletCurrencySelector({
                     </div>
                   </div>
 
-                  <div className="relative flex items-center justify-center gap-3 px-4 py-4">
-                    <div className="min-w-0 text-center">
-                      <div className="text-white/90 font-semibold text-lg leading-tight">
-                        {t("ui_select_currency_title", "Ajouter une devise")}
+                  <div className="relative flex items-center justify-between gap-3 px-4 py-4">
+                    <div className="min-w-0 text-left">
+                      <div className="flex items-center gap-3">
+                        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-white/70" aria-hidden="true">
+                          <circle cx="12" cy="12" r="10" />
+                          <line x1="12" y1="8" x2="12" y2="16" />
+                          <line x1="8" y1="12" x2="16" y2="12" />
+                        </svg>
+                        <div className="text-white/95 font-bold text-[30px] md:text-[34px] tracking-tight leading-tight">
+                          {t("ui_select_currency_title", "Ajouter une devise")}
+                        </div>
                       </div>
-                      <div className="mt-1 text-[12px] text-white/55 leading-snug max-w-[52ch] mx-auto">
+                      <div className="mt-1 text-[17px] md:text-[18px] text-white/60 leading-relaxed max-w-[52ch]">
                         {t(
                           "ui_select_currency_subtitle_add_currency",
                           "Une transaction validera l’ajout, aucun montant minimum requis.",
