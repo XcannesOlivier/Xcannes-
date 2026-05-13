@@ -823,7 +823,7 @@ export default function WalletDashboard({
                     >
                       {/* Mini-card activité récente */}
                       <div
-                        className="mx-0 mb-[18px] px-4 py-[9px] rounded-[16px] transition-colors"
+                        className="mx-0 mb-0 px-4 py-[9px] transition-colors"
                         style={{ background: '#0d1214', boxShadow: 'inset 0 -16px 20px rgba(0,0,0,0.88)' }}
                       >
                         {/* Mobile : deux lignes */}
