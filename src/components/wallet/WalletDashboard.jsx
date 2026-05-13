@@ -835,10 +835,10 @@ export default function WalletDashboard({
                                 className={[
                                   "shrink-0 flex items-center justify-center opacity-70",
                                   recentActivityIcon === "receive"
-                                    ? "text-emerald-400"
+                                    ? "text-xcannes-green"
                                     : recentActivityIcon === "send"
                                       ? "text-red-400"
-                                      : "text-emerald-400",
+                                      : "text-xcannes-green",
                                 ].join(" ")}
                                 aria-hidden
                               >
@@ -858,7 +858,7 @@ export default function WalletDashboard({
                               {recentActivityMessageParts.isConversion ? (
                                 <>{String(recentActivityMessageParts.left || "").replace(/^Vous avez converti\s+/i, "").trim()}{" "}{recentActivityMessageParts.arrow}{" "}{recentActivityMessageParts.right}</>
                               ) : recentActivityIcon === "receive" && recentActivityReceiveParts ? (
-                                <span className="text-emerald-400">+ {recentActivityReceiveParts.amount} {recentActivityReceiveParts.currency}</span>
+                                <span className="text-xcannes-green">+ {recentActivityReceiveParts.amount} {recentActivityReceiveParts.currency}</span>
                               ) : recentActivityIcon === "send" && recentActivitySendParts ? (
                                 <span className="text-red-400">- {recentActivitySendParts.amount} {recentActivitySendParts.currency}</span>
                               ) : recentActivityMessage}
@@ -879,9 +879,9 @@ export default function WalletDashboard({
                           <div
                             className={[
                               "shrink-0 flex items-center justify-center opacity-70",
-                              recentActivityIcon === "receive" ? "text-emerald-400"
+                              recentActivityIcon === "receive" ? "text-xcannes-green"
                                 : recentActivityIcon === "send" ? "text-red-400"
-                                : "text-emerald-400",
+                                : "text-xcannes-green",
                             ].join(" ")}
                             aria-hidden
                           >
@@ -894,7 +894,7 @@ export default function WalletDashboard({
                             {recentActivityMessageParts.isConversion ? (
                               <>{String(recentActivityMessageParts.left || "").replace(/^Vous avez converti\s+/i, "").trim()}{" "}{recentActivityMessageParts.arrow}{" "}{recentActivityMessageParts.right}</>
                             ) : recentActivityIcon === "receive" && recentActivityReceiveParts ? (
-                              <span className="text-emerald-400">+ {recentActivityReceiveParts.amount} {recentActivityReceiveParts.currency}</span>
+                              <span className="text-xcannes-green">+ {recentActivityReceiveParts.amount} {recentActivityReceiveParts.currency}</span>
                             ) : recentActivityIcon === "send" && recentActivitySendParts ? (
                               <span className="text-red-400">- {recentActivitySendParts.amount} {recentActivitySendParts.currency}</span>
                             ) : recentActivityMessage}
