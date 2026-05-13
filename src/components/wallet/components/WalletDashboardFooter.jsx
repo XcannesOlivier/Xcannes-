@@ -64,7 +64,7 @@ export default function WalletDashboardFooter({ onScan, addCurrencySlot, onHisto
         <div className="relative z-10 mx-4 mb-1 h-[46px] flex items-center rounded-[30px] overflow-hidden bg-[#0e1214] ring-1 ring-white/[0.02] ring-inset shadow-[0_2px_16px_rgba(0,0,0,0.35),0_1px_3px_rgba(0,0,0,0.2)]">
 
           {/* Gauche : + Devise */}
-          <div className="flex-1 flex items-center justify-end h-full min-w-0">
+          <div className="flex-1 flex items-center justify-end h-full min-w-0" style={{ boxShadow: '0 0 18px rgba(255,255,255,0.07)' }}>
             {addCurrencySlot ?? null}
           </div>
 
@@ -84,7 +84,7 @@ export default function WalletDashboardFooter({ onScan, addCurrencySlot, onHisto
           ) : null}
 
           {/* Droite : Historique */}
-          <div className="flex-1 flex items-center justify-center h-full min-w-0">
+          <div className="flex-1 flex items-center justify-center h-full min-w-0" style={{ boxShadow: '0 0 18px rgba(255,255,255,0.07)' }}>
             {onHistory ? (
               <button
                 type="button"

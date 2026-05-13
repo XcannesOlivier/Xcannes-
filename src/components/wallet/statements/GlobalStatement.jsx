@@ -1615,7 +1615,67 @@ export default function GlobalStatement({
           </div>
         </div>
 
-        {/* Content - Zone scrollable */}
+        {/* Filtres */}
+        <div className="px-4 md:px-6 pb-4 flex flex-row items-stretch md:items-center gap-2">
+          <div className="flex flex-1 items-center rounded-[16px] p-1 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-[#101415] to-[#0d1214]">
+            {[
+              { key: "all", label: t("ui_all_0c90d41d71", "Tout") },
+              { key: "credit", label: t("ui_credits_b8166276a0", "Entrées") },
+              { key: "debit", label: t("ui_debits_38c870b18f", "Sorties") },
+              { key: "conversion", label: t("ui_conversions_b604b5ef8b", "Conversions") },
+            ].map((item) => (
+              <button
+                key={item.key}
+                type="button"
+                onClick={() => setTxFilter(item.key)}
+                className={`px-3 py-3 flex-1 text-center rounded-[12px] text-sm font-medium transition-colors whitespace-nowrap ${
+                  txFilter === item.key
+                    ? item.key === "all"
+                      ? "bg-[#111518] text-white shadow-[inset_0_-14px_18px_rgba(0,0,0,0.8)]"
+                      : item.key === "credit"
+                        ? "bg-green-500/15 text-green-300"
+                        : item.key === "debit"
+                          ? "bg-red-500/15 text-red-300"
+                          : "bg-blue-500/15 text-blue-300"
+                    : "text-white/60 hover:text-white/80 bg-[#111518] hover:bg-[#111518]"
+                }`}
+              >
+                {item.label}
+              </button>
+            ))}
+            {/* Icône télécharger intégrée dans le bloc filtres — mobile uniquement */}
+            <button
+              onClick={handleExportPdf}
+              disabled={exportFormat === "pdf"}
+              className="md:hidden shrink-0 px-2 py-2 text-white/60 hover:text-white transition-colors disabled:opacity-40"
+              aria-label={t("ui_export_pdf_9c8d16b4fe", "Télécharger")}
+            >
+              <ShareIcon className={`w-5 h-5 ${exportFormat === "pdf" ? "opacity-40" : ""}`} />
+            </button>
+          </div>
+          {/* Export — droite, desktop uniquement */}
+          <div className="hidden md:flex justify-end gap-2 shrink-0">
+            <button
+              onClick={handleExportPdf}
+              disabled={exportFormat === "pdf"}
+              className="px-4 py-2.5 rounded-[14px] text-sm font-semibold transition-colors disabled:opacity-50 text-white/80 hover:text-white"
+            >
+              {exportFormat === "pdf" ? (
+                <span className="inline-flex items-center gap-2">
+                  <ShareIcon className="w-5 h-5 opacity-60" />
+                  <span>{t("ui_loading_1386baebe9", "Loading…")}</span>
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-2">
+                  <ShareIcon className="w-5 h-5" />
+                  <span>{t("ui_export_pdf_9c8d16b4fe", "Télécharger")}</span>
+                </span>
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* Content - Zone scrollable */
         <div
           ref={overlayListRef}
           className="flex-1 min-h-0 overflow-y-auto px-4 md:px-5 py-6 flex flex-col gap-4 bg-gradient-to-b from-[#101415] to-[#0d1214]"
@@ -1796,66 +1856,6 @@ export default function GlobalStatement({
           </div>
         </div>
 
-        {/* Footer Actions */}
-        <div className="relative px-4 md:px-6 py-3 md:py-4 pb-2 md:pb-4 flex flex-row md:flex-row items-stretch md:items-center gap-2 bg-[#111518] shadow-[inset_0_-16px_28px_rgba(255,255,255,0.03),inset_0_46px_70px_rgba(0,0,0,0.55)] before:content-[''] before:absolute before:left-0 before:right-0 before:top-0 before:h-px before:bg-white/10">
-          {/* Filtres */}
-          <div className="flex flex-1 md:flex-1 items-center rounded-[16px] p-1 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-[#101415] to-[#0d1214]">
-            {[
-              { key: "all", label: t("ui_all_0c90d41d71", "Tout") },
-              { key: "credit", label: t("ui_credits_b8166276a0", "Entrées") },
-              { key: "debit", label: t("ui_debits_38c870b18f", "Sorties") },
-              { key: "conversion", label: t("ui_conversions_b604b5ef8b", "Conversions") },
-            ].map((item) => (
-              <button
-                key={item.key}
-                type="button"
-                onClick={() => setTxFilter(item.key)}
-                className={`px-3 py-3 flex-1 text-center rounded-[12px] text-sm font-medium transition-colors whitespace-nowrap ${
-                  txFilter === item.key
-                    ? item.key === "all"
-                      ? "bg-[#111518] text-white shadow-[inset_0_-14px_18px_rgba(0,0,0,0.8)]"
-                      : item.key === "credit"
-                        ? "bg-green-500/15 text-green-300"
-                        : item.key === "debit"
-                          ? "bg-red-500/15 text-red-300"
-                          : "bg-blue-500/15 text-blue-300"
-                    : "text-white/60 hover:text-white/80 bg-[#111518] hover:bg-[#111518]"
-                }`}
-              >
-                {item.label}
-              </button>
-            ))}
-            {/* Icône télécharger intégrée dans le bloc filtres — mobile uniquement */}
-            <button
-              onClick={handleExportPdf}
-              disabled={exportFormat === "pdf"}
-              className="md:hidden shrink-0 px-2 py-2 text-white/60 hover:text-white transition-colors disabled:opacity-40"
-              aria-label={t("ui_export_pdf_9c8d16b4fe", "Télécharger")}
-            >
-              <ShareIcon className={`w-5 h-5 ${exportFormat === "pdf" ? "opacity-40" : ""}`} />
-            </button>
-          </div>
-          {/* Export — droite, desktop uniquement */}
-          <div className="hidden md:flex justify-end gap-2 shrink-0">
-            <button
-              onClick={handleExportPdf}
-              disabled={exportFormat === "pdf"}
-              className="px-4 py-2.5 rounded-[14px] text-sm font-semibold transition-colors disabled:opacity-50 text-white/80 hover:text-white"
-            >
-              {exportFormat === "pdf" ? (
-                <span className="inline-flex items-center gap-2">
-                  <ShareIcon className="w-5 h-5 opacity-60" />
-                  <span>{t("ui_loading_1386baebe9", "Loading…")}</span>
-                </span>
-              ) : (
-                <span className="inline-flex items-center gap-2">
-                  <ShareIcon className="w-5 h-5" />
-                  <span>{t("ui_export_pdf_9c8d16b4fe", "Télécharger")}</span>
-                </span>
-              )}
-            </button>
-          </div>
-        </div>
       </div>
     </div>
   );
