@@ -26,7 +26,7 @@ function ScanIcon() {
       <path
         strokeLinecap="butt"
         strokeLinejoin="miter"
-        d="M2.5 14.5V2.5H10.5M85.5 2.5H93.5V14.5M10.5 21.5H2.5V9.5M93.5 9.5V21.5H85.5"
+        d="M2.5 20.5V2.5H10.5M85.5 2.5H93.5V20.5M10.5 21.5H2.5V3.5M93.5 3.5V21.5H85.5"
       />
       <text
         x="48"
