@@ -1477,7 +1477,7 @@ export default function CurrencyStatement({
           <div className={`space-y-3 ${periodDropdownOpen ? "relative z-[60]" : ""}`}>
             {/* Balance + USD estimé */}
             {!isXrpNetworkView ? (
-              <div className="flex flex-col items-center text-center gap-0.5 mt-6 mb-4 w-fit mx-auto rounded-2xl ring-1 ring-white/10 ring-inset bg-[#111518] shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30)] px-8 py-4">
+              <div className="flex flex-col items-center text-center gap-0.5 mt-10 mb-10 w-fit mx-auto rounded-2xl ring-1 ring-white/10 ring-inset bg-[#111518] shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30)] px-8 py-4">
                 <p className="text-[24px] md:text-[26px] text-white/60">
                   {t("ui_balance_445d830d72", "Solde disponible")}
                 </p>
