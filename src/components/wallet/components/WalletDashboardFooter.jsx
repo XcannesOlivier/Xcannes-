@@ -49,22 +49,19 @@ export default function WalletDashboardFooter({ onScan, addCurrencySlot, onHisto
 
   return (
     <div className="mt-[2px] shrink-0 z-20 bg-transparent md:bg-elevated md:[--bg-elevated:#090c0d] border-t-0 md:mt-auto md:border-t md:border-white/10 lg:border-t lg:border-white/[0.04] lg:border-r lg:border-r-white/5">
-      {/* Mobile footer — barre unique 3 colonnes */}
+      {/* Mobile footer — barre flat 3 boutons */}
       <div
         className="relative md:hidden shrink-0"
         style={{ paddingBottom: 'max(4px, env(safe-area-inset-bottom))' }}
       >
-        {/* Gradient de fondu sous la barre */}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[120px] bg-gradient-to-t from-[#0d1012] via-[#0d1012]/70 to-transparent" />
-
         {/* Gradient au-dessus du footer — sépare du contenu */}
         <div className="pointer-events-none absolute inset-x-0 bottom-full h-[64px] bg-gradient-to-t from-[#0d1012]/90 to-transparent" />
 
-        {/* Barre flottante */}
-        <div className="relative z-10 mx-4 mb-1 h-[46px] flex items-center rounded-[30px] overflow-hidden bg-[#0e1214] ring-1 ring-white/[0.02] ring-inset shadow-[0_2px_16px_rgba(0,0,0,0.35),0_1px_3px_rgba(0,0,0,0.2)]">
+        {/* Barre footer */}
+        <div className="relative z-10 h-[46px] flex items-center bg-[#0e1214] border-t border-white/[0.06]">
 
           {/* Gauche : + Devise */}
-          <div className="flex-1 flex items-center justify-end h-full min-w-0" style={{ boxShadow: '0 0 18px rgba(255,255,255,0.07)' }}>
+          <div className="flex-1 flex items-center justify-center h-full min-w-0">
             {addCurrencySlot ?? null}
           </div>
 
@@ -74,7 +71,7 @@ export default function WalletDashboardFooter({ onScan, addCurrencySlot, onHisto
               <button
                 type="button"
                 onClick={onScan}
-                className="flex h-[44px] w-[110px] items-center justify-center rounded-[14px] text-xcannes-green transition-transform duration-150 hover:scale-[1.02] active:scale-[0.97] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#39d57c]/20"
+                className="flex h-[40px] w-[110px] items-center justify-center rounded-[12px] text-xcannes-green transition-transform duration-150 hover:scale-[1.02] active:scale-[0.97] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#39d57c]/20"
                 style={scanButtonStyle}
                 aria-label={t(SCAN_LABEL_KEY, "Scan QR Code")}
               >
@@ -84,13 +81,12 @@ export default function WalletDashboardFooter({ onScan, addCurrencySlot, onHisto
           ) : null}
 
           {/* Droite : Historique */}
-          <div className="flex-1 flex items-center justify-center h-full min-w-0" style={{ boxShadow: '0 0 18px rgba(255,255,255,0.07)' }}>
+          <div className="flex-1 flex items-center justify-center h-full min-w-0">
             {onHistory ? (
               <button
                 type="button"
                 onClick={onHistory}
-                className="w-full h-[46px] flex flex-row items-center justify-center gap-1.5 transition-colors rounded-[30px] px-3 group"
-                style={scanButtonStyle}
+                className="w-full h-[46px] flex flex-row items-center justify-center gap-1.5 transition-colors px-3 group"
                 aria-label={t("ui_open_statement", "Ouvrir le relevé des transactions")}
               >
                 <svg
