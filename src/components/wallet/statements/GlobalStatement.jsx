@@ -1567,7 +1567,7 @@ export default function GlobalStatement({
                   </span>
                 ) : null}
               </div>
-              <p className="-mt-1 text-[16px] md:text-[17px] text-white/60 max-w-[52ch] leading-relaxed">
+              <p className="-mt-1 text-[17px] md:text-[18px] text-white/60 max-w-[52ch] leading-relaxed">
                 {t(
                   "ui_global_statement_subtitle_recent_20",
                   "Consultez vos transactions récentes et ouvrez-en une pour voir les détails.",
@@ -1577,8 +1577,8 @@ export default function GlobalStatement({
             {/* close via swipe/backdrop */}
           </div>
 
-            <div className="mt-6 mb-4 flex justify-start items-center gap-3">
-            <span className="text-[17px] md:text-[18px] text-white/70 font-medium shrink-0">
+            <div className="mt-8 mb-8 flex justify-start items-center gap-3">
+            <span className="text-[16px] md:text-[17px] text-white/70 font-medium shrink-0">
               {t("ui_current_account_plain", "Compte actuel")}
             </span>
             <div className="relative w-auto min-w-[160px] max-w-[220px]" ref={accountDropdownRef}>
