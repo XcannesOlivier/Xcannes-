@@ -1418,9 +1418,9 @@ export default function CurrencyStatement({
 	                <ChevronLeftIcon className="w-6 h-6" aria-hidden="true" />
 	              </button>
 	            ) : null}
-              <div className="flex flex-col items-center text-center gap-1 min-w-0 flex-1">
+              <div className="flex flex-col items-start text-left gap-1 min-w-0 flex-1">
                 {/* Drapeau + nom sur une seule ligne */}
-                <div className="flex items-center justify-center gap-2 flex-wrap min-w-0">
+                <div className="flex items-center justify-start gap-2 flex-wrap min-w-0">
 	              {CRYPTO_ICONS?.[displayCurrency] ? (
 	                isSvgIcon(CRYPTO_ICONS[displayCurrency]) ? (
 	                  // eslint-disable-next-line @next/next/no-img-element
@@ -1454,7 +1454,7 @@ export default function CurrencyStatement({
                 </span>
               ) : null}
                 </div>
-              <p className="mt-1 text-[13px] md:text-[14px] text-white/55 leading-relaxed">
+              <p className="mt-1 text-[15px] md:text-[16px] text-white/55 leading-relaxed">
                 {t(
                   "ui_currency_statement_subtitle_periods",
                   "Suivez le solde et les mouvements de cette devise.",
