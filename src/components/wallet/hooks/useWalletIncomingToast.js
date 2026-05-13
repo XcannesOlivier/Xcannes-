@@ -133,5 +133,5 @@ export function useWalletIncomingToast({
       window.clearInterval(interval);
       window.removeEventListener("xcannes:wallet:refresh", handleWalletRefresh);
     };
-  }, [backendWalletAddress, flashWalletHeaderToast];
+  }, [backendWalletAddress, flashWalletHeaderToast]);
 }

@@ -210,9 +210,7 @@ export default function GlobalStatement({
     return sorted.slice(0, MAX_RECENT_TRANSACTIONS);
   }, [
     MAX_RECENT_TRANSACTIONS,
-    isVisibleMovement,
     movements,
-    sortMovementsDesc,
   ]);
 
   const getOnChainLabelForAddress = useCallback(
@@ -342,7 +340,7 @@ export default function GlobalStatement({
       }
       return "neutral";
     },
-    [normalizeKind],
+    [],
   );
 
   const getMovementDisplayAmount = useCallback(
@@ -403,7 +401,7 @@ export default function GlobalStatement({
 
       return { amount: amountRlusd, currency: "RLUSD" };
     },
-    [normalizeKind, usdRates],
+    [usdRates],
   );
 
   const getMovementTitle = useCallback(
@@ -452,7 +450,7 @@ export default function GlobalStatement({
       }
       return String(m?.kind || "").trim() || t("ui_transaction", "Transaction");
     },
-    [formatConversionUnits, normalizeKind, rlusdToLocal, t],
+    [formatConversionUnits, rlusdToLocal, t],
   );
 
   const formatMovementDateTime = useCallback(
@@ -906,11 +904,9 @@ export default function GlobalStatement({
     getOnChainLabelForAddress,
     globalTitle,
     isPreviewMode,
-    normalizeKind,
     rlusdToLocal,
     t,
     toast,
-    truncateMiddle,
     walletLabel,
   ]);
 
@@ -1297,21 +1293,21 @@ export default function GlobalStatement({
     if (kind === "XRPL_FEES_TOTAL") return t("ui_fee", "Frais");
     if (kind === "RECONCILE") return t("ui_adjustment", "Ajustement");
     return t("ui_transaction", "Transaction");
-  }, [detailMovement, normalizeKind, t]);
+  }, [detailMovement, t]);
 
   const detailIsConversion = useMemo(() => {
     return normalizeKind(detailMovement?.kind) === "CONVERSION";
-  }, [detailMovement, normalizeKind]);
+  }, [detailMovement]);
 
   const detailIsPaymentSent = useMemo(() => {
     const kind = normalizeKind(detailMovement?.kind);
     return kind === "PAYMENT_OUT" || kind === "XRPL_PAYMENT_OUT";
-  }, [detailMovement, normalizeKind]);
+  }, [detailMovement]);
 
   const detailIsPaymentReceive = useMemo(() => {
     const kind = normalizeKind(detailMovement?.kind);
     return kind === "PAYMENT_IN" || kind === "XRPL_PAYMENT_IN";
-  }, [detailMovement, normalizeKind]);
+  }, [detailMovement]);
 
   const detailRecipientLabel = useMemo(() => {
     if (!detailMovement) return "—";
@@ -1331,7 +1327,6 @@ export default function GlobalStatement({
   }, [
     detailMovement,
     getOnChainLabelForAddress,
-    truncateMiddle,
   ]);
 
   const detailSenderLabel = useMemo(() => {
@@ -1351,7 +1346,6 @@ export default function GlobalStatement({
   }, [
     detailMovement,
     getOnChainLabelForAddress,
-    truncateMiddle,
   ]);
 
   const detailConversionHeader = useMemo(() => {
