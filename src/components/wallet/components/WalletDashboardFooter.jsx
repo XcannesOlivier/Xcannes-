@@ -20,13 +20,13 @@ function ScanIcon() {
       className="h-6 w-[68px]"
       fill="none"
       stroke="currentColor"
-      strokeWidth="1.5"
+      strokeWidth="2"
       aria-hidden
     >
       <path
         strokeLinecap="butt"
         strokeLinejoin="miter"
-        d="M2.5 9V2.5H9M71 2.5H77.5V9M9 21.5H2.5V15M77.5 15V21.5H71"
+        d="M2.5 10.5V2.5H10.5M69.5 2.5H77.5V10.5M10.5 21.5H2.5V13.5M77.5 13.5V21.5H69.5"
       />
       <text
         x="40"
