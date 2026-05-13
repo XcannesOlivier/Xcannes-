@@ -1577,11 +1577,11 @@ export default function GlobalStatement({
             {/* close via swipe/backdrop */}
           </div>
 
-            <div className="mt-6 mb-4 flex justify-center">
-            <div className="relative w-auto min-w-[200px] max-w-[260px]" ref={accountDropdownRef}>
-              <p className="text-[22px] md:text-[21px] text-white/85 font-medium mb-1 text-center">
-                {t("ui_current_account_plain", "Compte actuel")}
-              </p>
+            <div className="mt-6 mb-4 flex justify-start items-center gap-3">
+            <span className="text-[17px] md:text-[18px] text-white/70 font-medium shrink-0">
+              {t("ui_current_account_plain", "Compte actuel")}
+            </span>
+            <div className="relative w-auto min-w-[160px] max-w-[220px]" ref={accountDropdownRef}>
               <button
                 type="button"
                 onClick={() => setAccountDropdownOpen((prev) => !prev)}
@@ -1670,7 +1670,7 @@ export default function GlobalStatement({
         {/* Content - Zone scrollable */}
         <div
           ref={overlayListRef}
-          className="flex-1 min-h-0 overflow-y-auto px-4 md:px-5 py-4 flex flex-col gap-4 bg-gradient-to-b from-[#101415] to-[#0d1214]"
+          className="flex-1 min-h-0 overflow-y-auto px-4 md:px-5 py-6 flex flex-col gap-4 bg-gradient-to-b from-[#101415] to-[#0d1214]"
           onPointerDown={(event) => {
             maybeStartOverlayDrag(event, "list");
           }}
