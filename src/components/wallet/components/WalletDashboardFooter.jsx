@@ -6,7 +6,6 @@ const scanButtonStyle = {
   background: "transparent",
   boxShadow:
     "0 4px 14px rgba(0,0,0,0.32), inset 0 1px 0 rgba(255,255,255,0.06)",
-  border: "0.5px solid rgba(34,197,94,0.4)",
 };
 
 const SCAN_LABEL_KEY = "ui_scan_qr_code_12fa63d927";
@@ -62,7 +61,7 @@ export default function WalletDashboardFooter({ onScan, addCurrencySlot, onHisto
         <div className="pointer-events-none absolute inset-x-0 bottom-full h-[64px] bg-gradient-to-t from-[#0d1012]/90 to-transparent" />
 
         {/* Barre flottante */}
-        <div className="relative z-10 mx-4 mb-1 h-[46px] flex items-center rounded-[30px] bg-[#0e1214] ring-1 ring-white/[0.02] ring-inset shadow-[0_2px_16px_rgba(0,0,0,0.35),0_1px_3px_rgba(0,0,0,0.2)]">
+        <div className="relative z-10 mx-4 mb-1 h-[46px] flex items-center rounded-[30px] overflow-hidden bg-[#0e1214] ring-1 ring-white/[0.02] ring-inset shadow-[0_2px_16px_rgba(0,0,0,0.35),0_1px_3px_rgba(0,0,0,0.2)]">
 
           {/* Gauche : + Devise */}
           <div className="flex-1 flex items-center justify-end h-full min-w-0">
@@ -90,7 +89,7 @@ export default function WalletDashboardFooter({ onScan, addCurrencySlot, onHisto
               <button
                 type="button"
                 onClick={onHistory}
-                className="w-full h-[46px] flex flex-row items-center justify-center gap-1.5 transition-colors rounded-r-[30px] px-3 group hover:bg-white/[0.04] active:bg-white/[0.06]"
+                className="w-full h-[46px] flex flex-row items-center justify-center gap-1.5 transition-colors rounded-[30px] px-3 group hover:bg-white/[0.04] active:bg-white/[0.06]"
                 aria-label={t("ui_open_statement", "Ouvrir le relevé des transactions")}
               >
                 <svg
