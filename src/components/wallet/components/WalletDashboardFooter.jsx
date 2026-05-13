@@ -16,8 +16,8 @@ const TAGLINE_KEY = "ui_global_usd_wallet_202f7e48be";
 function ScanIcon() {
   return (
     <svg
-      viewBox="0 0 96 24"
-      className="h-6 w-[80px]"
+      viewBox="0 0 96 32"
+      className="h-7 w-[80px]"
       fill="none"
       stroke="currentColor"
       strokeWidth="2"
@@ -26,11 +26,11 @@ function ScanIcon() {
       <path
         strokeLinecap="butt"
         strokeLinejoin="miter"
-        d="M2.5 20.5V2.5H10.5M85.5 2.5H93.5V20.5M10.5 21.5H2.5V3.5M93.5 3.5V21.5H85.5"
+        d="M2.5 11.5V2.5H10.5M85.5 2.5H93.5V11.5M10.5 29.5H2.5V20.5M93.5 20.5V29.5H85.5"
       />
       <text
         x="48"
-        y="13"
+        y="16"
         textAnchor="middle"
         dominantBaseline="middle"
         fill="currentColor"
