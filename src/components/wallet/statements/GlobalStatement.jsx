@@ -1527,7 +1527,7 @@ export default function GlobalStatement({
         </div>
 
         {/* Filtres */}
-        <div className="px-4 md:px-6 pt-[80px] pb-4 bg-[#111518] shadow-[inset_0_-46px_70px_rgba(0,0,0,0.55)] flex flex-row items-stretch md:items-center gap-2">
+        <div className="px-4 md:px-6 pt-[80px] pb-4 bg-[#111518] shadow-[inset_0_80px_60px_-10px_rgba(0,0,0,0.65),inset_0_-46px_70px_rgba(0,0,0,0.55)] flex flex-row items-stretch md:items-center gap-2">
           <div className="flex flex-1 items-center rounded-[16px] p-1 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-[#101415] to-[#0d1214]">
             {[
               { key: "all", label: t("ui_all_0c90d41d71", "Tout") },
@@ -1542,7 +1542,7 @@ export default function GlobalStatement({
                 className={`px-3 py-3 flex-1 text-center rounded-[12px] text-sm font-medium transition-colors whitespace-nowrap ${
                   txFilter === item.key
                     ? item.key === "all"
-                      ? "bg-[#080a0b] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.07),inset_0_-14px_18px_rgba(0,0,0,0.9)]"
+                      ? "bg-[#080a0b] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.18),inset_0_-14px_18px_rgba(0,0,0,0.9)]"
                       : item.key === "credit"
                         ? "bg-green-500/15 text-green-300"
                         : item.key === "debit"
@@ -1745,7 +1745,7 @@ export default function GlobalStatement({
         </div>
 
         {/* Footer */}
-        <div className="shrink-0 px-4 md:px-6 py-3 pb-[max(12px,env(safe-area-inset-bottom))] border-t border-white/[0.06] bg-[#111518] shadow-[inset_0_46px_70px_rgba(0,0,0,0.55)] flex items-center justify-between gap-3">
+        <div className="shrink-0 px-4 md:px-6 py-3 pb-[max(12px,env(safe-area-inset-bottom))] border-t border-white/[0.06] bg-[#111518] shadow-[inset_0_-46px_70px_rgba(0,0,0,0.55)] flex items-center justify-between gap-3">
           {/* Compte actuel */}
           <div className="flex items-center gap-3 min-w-0">
             <div className="relative w-auto min-w-[120px] max-w-[180px]" ref={accountDropdownRef}>
