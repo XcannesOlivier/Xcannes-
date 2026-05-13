@@ -1548,7 +1548,16 @@ export default function GlobalStatement({
           ) : null}
           <div className="flex justify-start">
             <div className="min-w-0 flex flex-col items-start justify-center text-left">
-              <div className="flex items-center justify-start">
+              <div className="flex items-center justify-start gap-3">
+                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-white/70" aria-hidden="true">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h8" />
+                  <polyline points="14 2 14 8 20 8" />
+                  <circle cx="18" cy="17" r="4" />
+                  <polyline points="18 15 18 17 19.5 18.5" />
+                  <line x1="8" y1="13" x2="12" y2="13" />
+                  <line x1="8" y1="9" x2="10" y2="9" />
+                  <line x1="8" y1="17" x2="11" y2="17" />
+                </svg>
                 <h2 className="text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight leading-tight text-left">
                   {globalTitle}
                 </h2>
@@ -1558,19 +1567,10 @@ export default function GlobalStatement({
                   </span>
                 ) : null}
               </div>
-              <p className="-mt-1 text-[16px] md:text-[17px] text-white/60 max-w-[52ch] leading-relaxed flex items-center gap-2">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 opacity-70" aria-hidden="true">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h8" />
-                  <polyline points="14 2 14 8 20 8" />
-                  <circle cx="18" cy="17" r="4" />
-                  <polyline points="18 15 18 17 19.5 18.5" />
-                  <line x1="8" y1="13" x2="12" y2="13" />
-                  <line x1="8" y1="9" x2="10" y2="9" />
-                  <line x1="8" y1="17" x2="11" y2="17" />
-                </svg>
+              <p className="-mt-1 text-[16px] md:text-[17px] text-white/60 max-w-[52ch] leading-relaxed">
                 {t(
                   "ui_global_statement_subtitle_recent_20",
-                  "Consultez vos transactions récentes et ouvrez-en une pour voir les détails.",
+                  "Activité récente",
                 )}
               </p>
             </div>
