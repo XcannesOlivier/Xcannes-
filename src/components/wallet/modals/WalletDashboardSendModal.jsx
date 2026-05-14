@@ -1373,7 +1373,7 @@ export default function WalletDashboardSendModal({
             {/* Titre */}
             <p className="w-full text-center text-sm text-white/45 px-6 pt-4 pb-0">
               Scannez une adresse, une demande de paiement ou un QR de connexion.
-            </p>}
+            </p>
             <div className="flex-1 w-full">
               <QRScanner
                 key={scanKey}

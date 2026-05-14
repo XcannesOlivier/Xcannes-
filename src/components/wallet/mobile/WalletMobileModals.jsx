@@ -465,7 +465,6 @@ export default function WalletMobileModals({
                     hideWhenUnavailable
                 className="bg-elevated w-full h-full flex flex-col justify-center [&_video]:w-full [&_video]:h-full [&_video]:object-cover"
                   />
-                </div>
               </div>
             </div>,
             document.body,
