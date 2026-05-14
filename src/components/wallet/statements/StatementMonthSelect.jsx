@@ -46,7 +46,7 @@ export default function StatementMonthSelect({
   };
 
   return (
-    <div className={`relative ${open ? "z-50" : ""}`}>
+    <div className={`relative w-full ${open ? "z-50" : ""}`}>
       {label ? (
         <p className={labelClassName}>{label}</p>
       ) : null}
