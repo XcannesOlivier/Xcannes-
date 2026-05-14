@@ -128,15 +128,6 @@ export default function WalletDashboard({
   const [selectedStatementToken, setSelectedStatementToken] = useState(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [activitySkeletonExpired, setActivitySkeletonExpired] = useState(false);
-  useEffect(() => {
-    if (recentActivityMessage) {
-      setActivitySkeletonExpired(false);
-      return;
-    }
-    setActivitySkeletonExpired(false);
-    const timer = setTimeout(() => setActivitySkeletonExpired(true), 5000);
-    return () => clearTimeout(timer);
-  }, [recentActivityMessage]);
   const desktopDefaultActionSetRef = useRef(false);
 
   // ── Desktop panel media query ──────────────────────────────
@@ -403,6 +394,17 @@ export default function WalletDashboard({
     locale,
     t,
   });
+
+  // ── Skeleton expiration après 5s sans activité récente ──────
+  useEffect(() => {
+    if (recentActivityMessage) {
+      setActivitySkeletonExpired(false);
+      return;
+    }
+    setActivitySkeletonExpired(false);
+    const timer = setTimeout(() => setActivitySkeletonExpired(true), 5000);
+    return () => clearTimeout(timer);
+  }, [recentActivityMessage]);
 
   // ── Reset previous action state on desktop inline switch ──
   const prevActionRef = useRef(null);
