@@ -412,7 +412,8 @@ export default function WalletMobileModals({
                 className="relative flex-1 flex flex-col items-center justify-center"
                 style={{
                   transform: `translateY(${Math.max(0, scanTranslateY)}px)`,
-                  transition: scanDragging ? "none" : "transform 220ms cubic-bezier(0.2,0,0,1)",
+                  opacity: scanTranslateY > 0 ? Math.max(0, Math.min(1, 1 - scanTranslateY / 420)) : undefined,
+                  transition: scanDragging ? "none" : "transform 220ms cubic-bezier(0.2,0,0,1), opacity 220ms cubic-bezier(0.2,0,0,1)",
                   willChange: scanTranslateY ? "transform" : undefined,
                   touchAction: "none",
                 }}
@@ -459,7 +460,7 @@ export default function WalletMobileModals({
                     hideTitle={true}
                     enableCamera={true}
                     hideWhenUnavailable
-                    className="bg-[#101415] w-full h-full flex flex-col justify-center [&_video]:w-full [&_video]:h-full [&_video]:object-cover"
+                className="bg-elevated w-full h-full flex flex-col justify-center [&_video]:w-full [&_video]:h-full [&_video]:object-cover"
                   />
                 </div>
               </div>

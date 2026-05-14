@@ -401,7 +401,7 @@ export default function QRScanner({
         .join(" ")}
     >
       {/* Ambient glow vert */}
-      <div className="pointer-events-none absolute inset-0 rounded-2xl overflow-hidden" aria-hidden>
+      <div className="pointer-events-none absolute inset-0" aria-hidden>
         <div className="absolute inset-0 bg-[radial-gradient(700px_circle_at_100%_50%,rgba(0,255,150,0.07),transparent_60%)]" />
       </div>
       {showEmbeddedFauxQr ? (

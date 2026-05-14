@@ -1382,7 +1382,7 @@ export default function WalletDashboardSendModal({
                 enableCamera={true}
                 hideWhenUnavailable
                 onCameraUnavailableChange={setScanUnavailable}
-                className="bg-[#101415] w-full h-full flex flex-col justify-center [&_video]:w-full [&_video]:h-full [&_video]:object-cover"
+                className="bg-elevated w-full h-full flex flex-col justify-center [&_video]:w-full [&_video]:h-full [&_video]:object-cover"
               />
             </div>
             {inline && scanUnavailable ? (
