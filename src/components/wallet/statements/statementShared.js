@@ -92,10 +92,11 @@ export const formatMonthLabel = (
     .map((value) => Number.parseInt(value, 10));
   if (!Number.isFinite(year) || !Number.isFinite(month)) return monthKey;
   const date = new Date(year, month - 1, 1);
-  return date.toLocaleDateString(
+  const result = date.toLocaleDateString(
     locale || "en",
     monthOnly ? { month: "long" } : { month: "long", year: "numeric" },
   );
+  return result.charAt(0).toUpperCase() + result.slice(1);
 };
 
 /* ─── STATEMENT_LAYOUTS ───────────────────────────────────── */
