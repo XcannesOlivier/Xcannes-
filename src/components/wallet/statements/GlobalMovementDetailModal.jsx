@@ -34,6 +34,7 @@ export default function GlobalMovementDetailModal({
   shareNoticeTone,
   isXrplAddress,
   truncateMiddle,
+  walletLabel,
   t,
   locale,
 }) {
@@ -295,21 +296,16 @@ export default function GlobalMovementDetailModal({
 
         <div className="h-px bg-white/[0.04] my-3" />
 
-        {/* Technical */}
+        {/* Wallet + partage */}
         {detailMovement?.txHash ? (
           <div className="space-y-2">
-            <div className="text-[11px] tracking-[0.08em] text-[#8B98A5]">
-              {t("ui_transaction", "Transaction")}
-            </div>
             <div className="rounded-[20px] border border-white/[0.06] bg-white/[0.03] px-3 py-3">
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <div className="text-xs text-white/60">
-                    {t("ui_tx_hash_label_2b7c1a9d5e", "Hash")}
-                  </div>
-                  <div className="mt-0.5 text-sm text-white/90 font-mono whitespace-nowrap overflow-hidden text-ellipsis">
-                    {truncateMiddle(detailMovement.txHash, 10, 8)}
-                  </div>
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="h-2.5 w-2.5 rounded-full bg-xcannes-green ring-4 ring-xcannes-green/20 shrink-0 animate-pulse" aria-hidden />
+                  <span className="text-sm text-white/90 font-semibold truncate">
+                    {walletLabel || t("nav_wallet", "Wallet")}
+                  </span>
                 </div>
                 <div className="flex items-center gap-2 flex-none">
                   <button
@@ -343,7 +339,11 @@ export default function GlobalMovementDetailModal({
                     aria-label={t("ui_share", "Partager")}
                     title={t("ui_share", "Partager")}
                   >
-                    ↗
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4" aria-hidden="true">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                      <polyline points="17 8 12 3 7 8" />
+                      <line x1="12" y1="3" x2="12" y2="15" />
+                    </svg>
                   </button>
                 </div>
               </div>

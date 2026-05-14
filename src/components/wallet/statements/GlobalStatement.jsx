@@ -1423,6 +1423,7 @@ export default function GlobalStatement({
       shareNoticeTone={shareNoticeTone}
       isXrplAddress={isXrplAddress}
       truncateMiddle={truncateMiddle}
+      walletLabel={walletLabel}
       t={t}
       locale={locale}
     />

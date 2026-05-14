@@ -1693,7 +1693,7 @@ export default function CurrencyStatement({
               <button
                 type="button"
                 onClick={() => setFooterDropdownOpen((prev) => !prev)}
-                className="w-full inline-flex items-center justify-center gap-1 md:gap-2 px-3 py-2 bg-transparent transition-all rounded-[10px]"
+                className="w-full inline-flex items-center justify-center gap-0.5 md:gap-2 px-1 md:px-3 py-2 bg-transparent transition-all rounded-[10px]"
                 aria-haspopup="menu"
                 aria-expanded={footerDropdownOpen}
                 title={t("ui_current_account_plain", "Compte actuel")}
