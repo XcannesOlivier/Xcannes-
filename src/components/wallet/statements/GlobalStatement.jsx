@@ -1523,8 +1523,7 @@ export default function GlobalStatement({
                   "Consultez vos transactions récentes et ouvrez-en une pour voir les détails.",
                 )}
               </p>
-            </div>
-     {/* close via swipe/backdrop */}
+            </div>  {/* close via swipe/backdrop */}
           </div>
           </div>
 
