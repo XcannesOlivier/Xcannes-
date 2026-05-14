@@ -1494,6 +1494,27 @@ export default function CurrencyStatement({
               {/* close via swipe/backdrop */}
 	          </div>
 
+          {/* Sélecteur de période */}
+          {!isXrpNetworkView ? (
+            <div className="flex justify-center px-4 md:px-6 mt-6 mb-2">
+              <StatementMonthSelect
+                value={selectedMonth}
+                onOpenChange={setPeriodDropdownOpen}
+                onChange={(nextValue) => {
+                  if (nextValue === "archives") {
+                    setSelectedMonth("archives");
+                    return;
+                  }
+                  const parsed = Number.parseInt(nextValue, 10);
+                  setSelectedMonth(Number.isFinite(parsed) ? parsed : 0);
+                }}
+                options={availableMonths}
+                menuClassName={modalBgClass}
+                menuPosition="bottom"
+              />
+            </div>
+          ) : null}
+
           {/* Account Info dans le header */}
           <div className="space-y-3">
             {/* Balance + USD estimé */}
@@ -1686,7 +1707,7 @@ export default function CurrencyStatement({
         </div>
 
         {/* Footer */}
-        <div className={`shrink-0 px-4 md:px-6 py-1.5 md:py-3 pb-[max(6px,env(safe-area-inset-bottom))] md:pb-[max(12px,env(safe-area-inset-bottom))] border-t border-white/[0.06] bg-[#111518] shadow-[inset_0_-46px_70px_rgba(0,0,0,0.55)] flex items-center justify-between gap-1 md:gap-2 ${periodDropdownOpen ? "relative z-[70]" : ""}`}>
+        <div className="shrink-0 px-4 md:px-6 py-1.5 md:py-3 pb-[max(6px,env(safe-area-inset-bottom))] md:pb-[max(12px,env(safe-area-inset-bottom))] border-t border-white/[0.06] bg-[#111518] shadow-[inset_0_-46px_70px_rgba(0,0,0,0.55)] flex items-center justify-between gap-1 md:gap-2">
           {/* Compte actuel */}
           <div className="flex items-center gap-3 min-w-0">
             <div className="relative w-auto min-w-[120px] max-w-[180px]" ref={footerDropdownRef}>
@@ -1761,26 +1782,6 @@ export default function CurrencyStatement({
               ) : null}
             </div>
           </div>
-          {/* Période du relevé — centre */}
-          {!isXrpNetworkView ? (
-            <div className="flex-[3] md:flex-[5] min-w-0 flex flex-col items-stretch px-2 md:px-6">
-              <StatementMonthSelect
-                value={selectedMonth}
-                onOpenChange={setPeriodDropdownOpen}
-                onChange={(nextValue) => {
-                  if (nextValue === "archives") {
-                    setSelectedMonth("archives");
-                    return;
-                  }
-                  const parsed = Number.parseInt(nextValue, 10);
-                  setSelectedMonth(Number.isFinite(parsed) ? parsed : 0);
-                }}
-                options={availableMonths}
-                menuClassName={modalBgClass}
-                menuPosition="top"
-              />
-            </div>
-          ) : null}
           {/* Bouton télécharger */}
           <button
             onClick={handleExportPdf}
