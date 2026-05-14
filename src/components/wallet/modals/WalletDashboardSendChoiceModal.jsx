@@ -745,14 +745,14 @@ export default function WalletDashboardSendChoiceModal({
                         <svg className="w-[36px] h-[36px] text-white/90" fill="none" viewBox="0 0 24 24" strokeWidth={0.8} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0" /></svg>
                       </div>
                       <div className="min-w-0 flex-1">
-                        <div className={`flex items-center justify-between ring-1 ring-inset rounded-xl pl-3 pr-2.5 py-2 transition-colors duration-150 ${selectedContactDisplay ? 'bg-transparent ring-white/10' : 'bg-transparent ring-white/15'}`}>
+                        <div className={`flex items-center justify-between ring-1 ring-inset rounded-xl pl-3 pr-2.5 py-2 transition-colors duration-150 ${selectedContactDisplay ? 'bg-white/5 ring-white/10 shadow-[inset_0_-34px_34px_-20px_rgba(0,0,0,0.95),inset_0_-18px_70px_-45px_rgba(0,0,0,0.9)]' : 'bg-white/5 ring-white/10 shadow-[inset_0_-34px_34px_-20px_rgba(0,0,0,0.95),inset_0_-18px_70px_-45px_rgba(0,0,0,0.9)]'}`}>
                           <span className={`text-[13px] truncate ${selectedContactDisplay ? 'text-white/85' : 'text-white/55'}`}>{selectedContactDisplay || t('ui_contacts_card_hint', 'Sélectionnez un destinataire enregistré')}</span>
                           <svg className={`w-4 h-4 text-white/30 flex-shrink-0 ml-2 transition-transform duration-200 ${showQuickscanSavedPicker ? 'rotate-180' : ''}`} viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                         </div>
                       </div>
                     </button>
                     <div
-                      className={`absolute left-0 right-0 top-full mt-1.5 z-[100] rounded-[20px] ring-1 ring-white/15 ring-inset overflow-hidden bg-black/80 transition-all duration-200 origin-top ${showQuickscanSavedPicker ? 'opacity-100 scale-y-100 shadow-[0_4px_8px_2px_rgba(13,18,20,0.75),0_8px_18px_6px_rgba(13,18,20,0.5),0_24px_40px_20px_rgba(13,18,20,0.95),inset_0_1px_0_rgba(255,255,255,0.06),inset_1px_0_0_rgba(255,255,255,0.04),inset_-1px_0_0_rgba(255,255,255,0.04)]' : 'opacity-0 scale-y-95 pointer-events-none shadow-[0_12px_36px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.06),inset_1px_0_0_rgba(255,255,255,0.04),inset_-1px_0_0_rgba(255,255,255,0.04)]'}`}
+                      className={`absolute left-0 right-0 top-full mt-1.5 z-[100] rounded-[20px] ring-1 ring-white/10 ring-inset overflow-hidden bg-white/5 shadow-[inset_0_-34px_34px_-20px_rgba(0,0,0,0.95),inset_0_-18px_70px_-45px_rgba(0,0,0,0.9)] transition-all duration-200 origin-top ${showQuickscanSavedPicker ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-95 pointer-events-none'}`}
                     >
                       <div className="px-4 py-2.5 border-b border-white/[0.04]">
                         <div className="flex items-center justify-between gap-2">
