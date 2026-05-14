@@ -386,8 +386,8 @@ export default function QRScanner({
     <div
       className={[
         embedded
-          ? "relative rounded-xl border border-white/10 bg-black/20 p-4"
-          : "relative w-full max-w-md bg-xcannes-surface-demo border border-white/10 rounded-2xl p-6 shadow-2xl",
+          ? "relative rounded-xl bg-black/20 p-4"
+          : "relative w-full max-w-md bg-xcannes-surface-demo rounded-2xl p-6 shadow-2xl",
         showEmbeddedFauxQr ? "overflow-hidden" : "",
         embedded ? "wallet-inline-zoom-in" : "",
         !embedded
@@ -454,7 +454,7 @@ export default function QRScanner({
         {/* Scanner / Static Demo */}
         {showStaticQr ? (
           <div className="mb-4 space-y-3">
-            <div className="relative rounded-lg overflow-hidden border border-white/10 bg-black/40">
+            <div className="relative rounded-lg overflow-hidden bg-black/40">
               {staticContent ? (
                 <div
                   className={[
