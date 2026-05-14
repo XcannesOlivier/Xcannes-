@@ -409,7 +409,7 @@ export default function WalletMobileModals({
               {/* Swipeable scanner wrapper */}
               <div
                 ref={scanOverlayRef}
-                className="relative flex-1 flex flex-col items-center justify-center"
+                className="relative flex-1 flex flex-col items-center justify-center bg-elevated"
                 style={{
                   transform: `translateY(${Math.max(0, scanTranslateY)}px)`,
                   opacity: scanTranslateY > 0 ? Math.max(0, Math.min(1, 1 - scanTranslateY / 420)) : undefined,
