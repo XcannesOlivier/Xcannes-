@@ -35,7 +35,7 @@ export function useAugmentedCurrencyLines({
     );
 
     // Lignes par défaut affichées dans tout wallet (même nouveau).
-    const DEFAULT_LINES = ["USD", "EUR", "CHF", "GBP", "CAD", "JPY", "AED"];
+    const DEFAULT_LINES = ["USD", "EUR", "CHF", "GBP", "CAD", "JPY", "AED", "AUD", "SGD"];
 
     // Injecter la ligne USD synthétique avec le montant non alloué.
     const unallocatedRaw = currencyLinesSummary?.unallocatedRlusd;

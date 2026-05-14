@@ -39,26 +39,45 @@
   z-index: 1;
 }
 
-/* Subtle radial glow on hover */
-.wallet-action-btn::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.04), transparent);
-  opacity: 0;
-  transition: opacity 120ms;
-  pointer-events: none;
-  border-radius: inherit;
+/* ── Mouse hover (vrais pointeurs uniquement) ── */
+@media (hover: hover) {
+  .wallet-action-btn:hover::before {
+    opacity: 1;
+  }
+
+  .wallet-action-btn:hover {
+    background: rgba(255, 255, 255, 0.05);
+    transform: translateY(-1px);
+  }
+
+  .wallet-action-btn:hover .wallet-action-icon {
+    transform: none;
+  }
+
+  .wallet-action-btn:hover .wallet-action-label {
+    color: rgba(255, 255, 255, 0.95);
+  }
+
+  .wallet-action-receive:hover .wallet-action-icon { background: transparent; }
+  .wallet-action-swap:hover .wallet-action-icon { background: transparent; }
+  .wallet-action-send:hover .wallet-action-icon { background: transparent; }
+  .wallet-action-send:hover .wallet-action-icon svg { color: #ffffff; opacity: 1; }
+  .wallet-action-buysell:hover .wallet-action-icon { background: transparent; }
 }
 
-.wallet-action-btn:hover::before {
+/* ── Touch hover avec retour timer (classe JS) ── */
+.wallet-action-btn.is-touched::before {
   opacity: 1;
 }
-
-/* Improvement 3: Enhanced hover state - faster, more visible */
-.wallet-action-btn:hover {
+.wallet-action-btn.is-touched {
   background: rgba(255, 255, 255, 0.05);
-  transform: translateY(-1px); /* Subtle lift on hover */
+  transform: translateY(-1px);
+}
+.wallet-action-btn.is-touched .wallet-action-icon {
+  transform: none;
+}
+.wallet-action-btn.is-touched .wallet-action-label {
+  color: rgba(255, 255, 255, 0.95);
 }
 
 /* Improvement 3: Active state - clear press feedback */
@@ -83,10 +102,7 @@
 }
 
 /* Improvement 3: Enhanced icon hover feedback */
-.wallet-action-btn:hover .wallet-action-icon {
-  transform: none;
-}
-
+.wallet-action-btn.is-touched .wallet-action-icon,
 .wallet-action-btn:active .wallet-action-icon {
   transform: none;
 }
@@ -101,8 +117,14 @@
   pointer-events: none; /* Label shouldn't block clicks */
 }
 
-.wallet-action-btn:hover .wallet-action-label {
-  color: rgba(255, 255, 255, 0.95); /* Stronger contrast on hover */
+.wallet-action-btn.is-touched .wallet-action-label {
+  color: rgba(255, 255, 255, 0.95);
+}
+
+@media (hover: hover) {
+  .wallet-action-btn:hover .wallet-action-label {
+    color: rgba(255, 255, 255, 0.95);
+  }
 }
 
 /* ============================================
@@ -115,10 +137,6 @@
   color: #16A34A;
 }
 
-.wallet-action-receive:hover .wallet-action-icon {
-  background: transparent;
-}
-
 .wallet-action-receive:active .wallet-action-icon {
   background: transparent;
 }
@@ -127,10 +145,6 @@
 .wallet-action-swap .wallet-action-icon {
   background: transparent;
   color: #16A34A;
-}
-
-.wallet-action-swap:hover .wallet-action-icon {
-  background: transparent;
 }
 
 .wallet-action-swap:active .wallet-action-icon {
@@ -158,15 +172,6 @@
   opacity: 1;
 }
 
-.wallet-action-send:hover .wallet-action-icon {
-  background: transparent;
-}
-
-.wallet-action-send:hover .wallet-action-icon svg {
-  color: #ffffff;
-  opacity: 1;
-}
-
 .wallet-action-send:active .wallet-action-icon {
   background: transparent;
 }
@@ -175,10 +180,6 @@
 .wallet-action-buysell .wallet-action-icon {
   background: transparent;
   color: #16A34A;
-}
-
-.wallet-action-buysell:hover .wallet-action-icon {
-  background: transparent;
 }
 
 .wallet-action-buysell:active .wallet-action-icon {

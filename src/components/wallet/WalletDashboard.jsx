@@ -127,6 +127,16 @@ export default function WalletDashboard({
   const [desktopSettingsPage, setDesktopSettingsPage] = useState(null);
   const [selectedStatementToken, setSelectedStatementToken] = useState(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [activitySkeletonExpired, setActivitySkeletonExpired] = useState(false);
+  useEffect(() => {
+    if (recentActivityMessage) {
+      setActivitySkeletonExpired(false);
+      return;
+    }
+    setActivitySkeletonExpired(false);
+    const timer = setTimeout(() => setActivitySkeletonExpired(true), 5000);
+    return () => clearTimeout(timer);
+  }, [recentActivityMessage]);
   const desktopDefaultActionSetRef = useRef(false);
 
   // ── Desktop panel media query ──────────────────────────────
@@ -805,6 +815,23 @@ export default function WalletDashboard({
                     aria-live="polite"
                   >
                     {!recentActivityMessage ? (
+                      activitySkeletonExpired ? (
+                      /* ── Message vide après 5s ── */
+                      <div
+                        className="mx-0 mb-0 px-4 py-[9px] animate-fade-in"
+                        style={{ background: '#0d1214', boxShadow: 'inset 0 -16px 20px rgba(0,0,0,0.88)' }}
+                      >
+                        <div className="flex items-center gap-2 min-h-[52px] lg:min-h-[38px]">
+                          <svg className="w-4 h-4 shrink-0 text-white/20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                            <circle cx="12" cy="12" r="9" />
+                            <polyline points="12 7 12 12 15.5 14.5" />
+                          </svg>
+                          <span className="text-[13px] text-white/30">
+                            {t('ui_no_recent_activity', 'Aucune transaction détectée pour le moment')}
+                          </span>
+                        </div>
+                      </div>
+                      ) : (
                       /* ── Skeleton pendant le chargement ── */
                       <div
                         className="mx-0 mb-0 px-4 py-[9px]"
@@ -834,6 +861,7 @@ export default function WalletDashboard({
                           <div className="h-2.5 w-20 rounded bg-white/[0.07] animate-pulse shrink-0" />
                         </div>
                       </div>
+                      )
                     ) : (
                     <button
                       type="button"

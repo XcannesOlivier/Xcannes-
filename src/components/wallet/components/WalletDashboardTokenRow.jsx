@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef, useState } from "react";
 import Image from "next/image";
 import { CRYPTO_ICONS } from "@/utils/marketConstants";
 import { getCurrencyDescription } from "@/utils/currencyDescriptions";
@@ -45,6 +46,17 @@ export default function WalletDashboardTokenRow({
 }) {
   const { i18n } = useTranslation("common");
   const locale = i18n?.language || "en";
+
+  // ── Hover tactile avec retour automatique ──────────────────────
+  const [touched, setTouched] = useState(false);
+  const touchTimerRef = useRef(null);
+  const handleTouchStart = () => {
+    if (touchTimerRef.current) clearTimeout(touchTimerRef.current);
+    setTouched(true);
+  };
+  const handleTouchEnd = () => {
+    touchTimerRef.current = setTimeout(() => setTouched(false), 300);
+  };
   const currencyCode = String(token?.currency || "").toUpperCase();
   const displayCode = getDisplayCurrencyCode(currencyCode);
   const isDisplayOverride = displayCode !== currencyCode;
@@ -82,7 +94,8 @@ export default function WalletDashboardTokenRow({
     "border border-white/[0.03]",
     "bg-white/[0.035]",
     "bg-[linear-gradient(to_bottom,rgba(255,255,255,0.04),rgba(255,255,255,0)_85%)]",
-    "hover:bg-none hover:border-white/[0.05]",
+    "[@media(hover:hover)]:hover:bg-none [@media(hover:hover)]:hover:border-white/[0.05]",
+    touched ? "!bg-none !border-white/[0.05]" : "",
     "transition-colors duration-150",
   ].join(" ");
 
@@ -102,6 +115,8 @@ export default function WalletDashboardTokenRow({
         tabIndex={0}
         onClick={onClick}
         onKeyDown={handleRowKeyDown}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
         className="w-full text-left"
       >
         <div

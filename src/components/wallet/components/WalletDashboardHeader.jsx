@@ -92,6 +92,21 @@ export default function WalletDashboardHeader({
   const didSwitchRef = useRef(false);
   const switcherRef = useRef(null);
   const selectorContainerRef = useRef(null);
+
+  // ── Soft crossfade on balance change ──────────────────────
+  const [shownLabel, setShownLabel] = useState(totalLabel);
+  const [balanceFading, setBalanceFading] = useState(false);
+  const prevLabelRef = useRef(totalLabel);
+  useEffect(() => {
+    if (totalLabel === prevLabelRef.current) return;
+    prevLabelRef.current = totalLabel;
+    setBalanceFading(true);
+    const timer = setTimeout(() => {
+      setShownLabel(totalLabel);
+      setBalanceFading(false);
+    }, 180);
+    return () => clearTimeout(timer);
+  }, [totalLabel]);
   const hasMultipleWallets = useMemo(() => {
     const set = new Set();
     for (const w of walletAddresses || []) {
@@ -694,26 +709,23 @@ export default function WalletDashboardHeader({
         <div className="text-[21px] md:text-[27px] text-white/55 mb-0.5 md:mb-0">
           {t("ui_total_balance_label_a91b6b8c1e", "Solde total")}
         </div>
-        <p className="text-6xl md:text-6xl lg:text-7xl font-sans font-bold text-white tabular-nums tracking-tight leading-none">
-          {totalLabel}
+        <p
+          className="text-6xl md:text-6xl lg:text-7xl font-sans font-bold text-white tabular-nums tracking-tight leading-none transition-opacity duration-[180ms]"
+          style={{ opacity: balanceFading ? 0 : 1 }}
+        >
+          {shownLabel}
         </p>
         {Number.isFinite(totalInUsd) &&
           totalInUsd > 0 &&
           preferredCurrency &&
-          preferredCurrency !== "USD" &&
           preferredCurrency !== "RLUSD" && (
-            <div className="text-[11px] md:text-sm text-white/50 mt-0.5 mb-1 md:mb-0 inline-flex items-center gap-2">
-              <span>Devises numériques</span>
-                <button
-                  type="button"
-                  onClick={onOpenInfo}
-                  className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-white/3 hover:bg-white/5 ring-1 ring-white/10 hover:ring-white/15 text-white/55 hover:text-white/75 transition-colors"
-                  aria-label={t("ui_info", "Informations")}
-                  title={t("ui_info", "Informations")}
-                >
-                <span className="text-[12px] leading-none font-semibold">i</span>
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={onOpenInfo}
+              className="text-[11px] md:text-sm text-white/50 hover:text-white/70 transition-colors duration-150 mt-0.5 mb-1 md:mb-0 cursor-pointer"
+            >
+              Devises numériques
+            </button>
           )}
 
         {/* ── Wallet setup dropdown (centralised activation steps) ── */}
