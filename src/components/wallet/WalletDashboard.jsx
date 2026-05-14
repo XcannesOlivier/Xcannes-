@@ -801,12 +801,40 @@ export default function WalletDashboard({
               headerTitle={
                 <div className="w-full flex flex-col gap-y-0">
                   <div
-                    className={[
-                      "w-full min-w-0 overflow-visible relative transition-all duration-500",
-                      recentActivityMessage ? "opacity-100 max-h-20" : "opacity-0 max-h-0 pointer-events-none",
-                    ].join(" ")}
+                    className="w-full min-w-0 overflow-visible relative"
                     aria-live="polite"
                   >
+                    {!recentActivityMessage ? (
+                      /* ── Skeleton pendant le chargement ── */
+                      <div
+                        className="mx-0 mb-0 px-4 py-[9px]"
+                        style={{ background: '#0d1214', boxShadow: 'inset 0 -16px 20px rgba(0,0,0,0.88)' }}
+                      >
+                        {/* Mobile : deux lignes skeleton */}
+                        <div className="lg:hidden flex flex-col justify-center gap-[5px] min-h-[52px]">
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="flex items-center gap-1.5">
+                              <div className="h-4 w-4 rounded-full bg-white/[0.07] animate-pulse shrink-0" />
+                              <div className="h-2.5 w-20 rounded bg-white/[0.07] animate-pulse" />
+                            </div>
+                            <div className="h-2.5 w-12 rounded bg-white/[0.07] animate-pulse" />
+                          </div>
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="h-3 w-36 rounded bg-white/[0.07] animate-pulse" />
+                            <div className="flex items-center gap-1">
+                              <div className="h-2.5 w-10 rounded bg-white/[0.07] animate-pulse" />
+                            </div>
+                          </div>
+                        </div>
+                        {/* Desktop : une ligne skeleton */}
+                        <div className="hidden lg:flex items-center gap-3 min-h-[38px]">
+                          <div className="h-4 w-4 rounded-full bg-white/[0.07] animate-pulse shrink-0" />
+                          <div className="h-2.5 w-16 rounded bg-white/[0.07] animate-pulse shrink-0" />
+                          <div className="h-3 w-40 rounded bg-white/[0.07] animate-pulse flex-1 max-w-[200px]" />
+                          <div className="h-2.5 w-20 rounded bg-white/[0.07] animate-pulse shrink-0" />
+                        </div>
+                      </div>
+                    ) : (
                     <button
                       type="button"
                       ref={activityTooltipTriggerRef}
@@ -819,7 +847,7 @@ export default function WalletDashboard({
                       onMouseEnter={() => setActivityTooltipOpen(true)}
                       onMouseLeave={() => setActivityTooltipOpen(false)}
                       onBlur={() => setActivityTooltipOpen(false)}
-                      className="w-full text-left focus:outline-none"
+                      className="w-full text-left focus:outline-none animate-fade-in"
                     >
                       {/* Mini-card activité récente */}
                       <div
@@ -913,6 +941,7 @@ export default function WalletDashboard({
                         </div>
                       </div>
                     </button>
+                    )}
                     {activityTooltipOpen && recentActivityMessage ? (
                       <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50 w-max max-w-[260px] bg-[#1e2628] text-white/85 text-[11px] leading-snug rounded-lg px-3 py-2 shadow-xl ring-1 ring-white/10 pointer-events-none">
                         {recentActivityWhen?.label ? (
