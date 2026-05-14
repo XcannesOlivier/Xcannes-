@@ -603,13 +603,19 @@ export default function QRScanner({
 
         {/* Instructions */}
         {(isScanning || isStarting) && !error && !showStaticQr && (
-          <div className="bg-xcannes-green/10 border border-xcannes-green/30 rounded-lg p-3">
-            <p className="text-sm text-white/80 text-center">
-              {isStarting
-                ? "Starting camera..."
-                : "Point your camera at a QR code"}
-            </p>
-          </div>
+          <>
+            <div className="bg-xcannes-green/10 border border-xcannes-green/30 rounded-lg p-3">
+              <p className="text-sm text-white/80 text-center">
+                {isStarting
+                  ? "Démarrage de la caméra…"
+                  : "Recherche d'un QR code…"}
+              </p>
+            </div>
+            <div className="text-center mt-2">
+              <p className="text-xs text-white/50">Détection automatique activée</p>
+              <p className="text-xs text-white/30 mt-0.5">Adresse de compte · Paiement · Connexion</p>
+            </div>
+          </>
         )}
       </div>
     </div>

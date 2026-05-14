@@ -426,7 +426,10 @@ export default function WalletMobileModals({
                 <div className="md:hidden flex justify-center pt-3 pb-2" aria-hidden>
                   <span className="block w-12 h-1.5 rounded-full bg-white/20" />
                 </div>
-                <div className="flex-1 w-full">
+                {/* Titre */}
+                <p className="w-full text-center text-sm text-white/45 px-6 pt-4 pb-0">
+                  Scannez une adresse, une demande de paiement ou un QR de connexion.
+                </p>
                   <QRScanner
                     isOpen={true}
                     onScan={(data) => {
