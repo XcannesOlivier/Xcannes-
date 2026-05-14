@@ -1524,7 +1524,7 @@ export default function GlobalStatement({
                 )}
               </p>
             </div>
-            {/* close via swipe/backdrop */}
+     {/* close via swipe/backdrop */}
           </div>
           </div>
 
