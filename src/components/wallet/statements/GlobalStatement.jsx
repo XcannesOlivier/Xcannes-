@@ -1544,14 +1544,14 @@ export default function GlobalStatement({
                 className={`px-3 py-3 flex-1 text-center rounded-[12px] text-sm font-medium transition-colors whitespace-nowrap ${
                   txFilter === item.key
                     ? item.key === "all"
-                      ? "bg-[#080a0b] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.18),inset_0_-14px_18px_rgba(0,0,0,0.9)]"
+                      ? "bg-[#0d1114] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.12),inset_0_-14px_18px_rgba(0,0,0,0.6)]"
                       : item.key === "credit"
                         ? "bg-green-500/15 text-green-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]"
                         : item.key === "debit"
                           ? "bg-red-500/15 text-red-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]"
                           : "bg-blue-500/15 text-blue-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]"
                     : item.key === "all"
-                      ? "text-white/60 hover:text-white/80 bg-[#111518] hover:bg-[#080a0b]"
+                      ? "text-white/60 hover:text-white/80 bg-[#111518] hover:bg-[#0d1114]"
                       : item.key === "credit"
                         ? "text-white/60 hover:text-green-300 bg-[#111518] hover:bg-green-500/15"
                         : item.key === "debit"
