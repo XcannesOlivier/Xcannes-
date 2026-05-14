@@ -386,8 +386,8 @@ export default function QRScanner({
     <div
       className={[
         embedded
-          ? "relative rounded-xl bg-black/20 p-4"
-          : "relative w-full max-w-md bg-xcannes-surface-demo rounded-2xl p-6 shadow-2xl",
+          ? "relative rounded-xl bg-elevated p-4"
+          : "relative w-full max-w-md bg-elevated rounded-2xl p-6 shadow-2xl",
         showEmbeddedFauxQr ? "overflow-hidden" : "",
         embedded ? "wallet-inline-zoom-in" : "",
         !embedded
@@ -400,6 +400,10 @@ export default function QRScanner({
         .filter(Boolean)
         .join(" ")}
     >
+      {/* Ambient glow vert */}
+      <div className="pointer-events-none absolute inset-0 rounded-2xl overflow-hidden" aria-hidden>
+        <div className="absolute inset-0 bg-[radial-gradient(700px_circle_at_100%_50%,rgba(0,255,150,0.07),transparent_60%)]" />
+      </div>
       {showEmbeddedFauxQr ? (
         <div
           aria-hidden="true"
