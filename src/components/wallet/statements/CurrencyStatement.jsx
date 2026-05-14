@@ -140,6 +140,10 @@ export default function CurrencyStatement({
   const [accountAddressExpanded, setAccountAddressExpanded] = useState(false);
   const [accountCopyNotice, setAccountCopyNotice] = useState("");
   const accountCopyNoticeTimerRef = useRef(null);
+  const [footerDropdownOpen, setFooterDropdownOpen] = useState(false);
+  const [footerAddressExpanded, setFooterAddressExpanded] = useState(false);
+  const [footerCopyNotice, setFooterCopyNotice] = useState("");
+  const footerCopyNoticeTimerRef = useRef(null);
   const [periodDropdownOpen, setPeriodDropdownOpen] = useState(false);
   const [isMobileDate, setIsMobileDate] = useState(false);
   const [highlightedTransactionId, setHighlightedTransactionId] =
@@ -161,6 +165,7 @@ export default function CurrencyStatement({
   const [overlayTranslateY, setOverlayTranslateY] = useState(0);
   const overlayRef = useRef(null);
   const accountDropdownRef = useRef(null);
+  const footerDropdownRef = useRef(null);
   const overlayListRef = useRef(null);
   const overlayDragMetaRef = useRef({
     startY: 0,
@@ -526,6 +531,37 @@ export default function CurrencyStatement({
       document.removeEventListener("touchstart", handlePointerDown);
     };
   }, [accountDropdownOpen]);
+
+  /* ── footer dropdown ──────────────────────────────────── */
+  useEffect(() => {
+    if (!footerDropdownOpen) {
+      setFooterAddressExpanded(false);
+      setFooterCopyNotice("");
+      if (footerCopyNoticeTimerRef.current) clearTimeout(footerCopyNoticeTimerRef.current);
+    }
+  }, [footerDropdownOpen]);
+
+  useEffect(() => {
+    return () => {
+      if (footerCopyNoticeTimerRef.current) clearTimeout(footerCopyNoticeTimerRef.current);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!footerDropdownOpen) return;
+    const handlePointerDown = (event) => {
+      const target = event?.target;
+      if (!target) return;
+      if (footerDropdownRef.current && footerDropdownRef.current.contains(target)) return;
+      setFooterDropdownOpen(false);
+    };
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("touchstart", handlePointerDown, { passive: true });
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("touchstart", handlePointerDown);
+    };
+  }, [footerDropdownOpen]);
 
   /* ── highlight timer ───────────────────────────────────── */
   useEffect(() => {
@@ -1795,6 +1831,94 @@ export default function CurrencyStatement({
 
             </>
           )}
+        </div>
+
+        {/* Footer */}
+        <div className="shrink-0 px-4 md:px-6 py-1.5 md:py-3 pb-[max(6px,env(safe-area-inset-bottom))] md:pb-[max(12px,env(safe-area-inset-bottom))] border-t border-white/[0.06] bg-[#111518] shadow-[inset_0_-46px_70px_rgba(0,0,0,0.55)] flex items-center justify-between gap-3">
+          {/* Compte actuel */}
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="relative w-auto min-w-[120px] max-w-[180px]" ref={footerDropdownRef}>
+              <button
+                type="button"
+                onClick={() => setFooterDropdownOpen((prev) => !prev)}
+                className="w-full inline-flex items-center justify-center gap-2 px-3 py-2 bg-transparent transition-all rounded-[10px]"
+                aria-haspopup="menu"
+                aria-expanded={footerDropdownOpen}
+                title={t("ui_current_account_plain", "Compte actuel")}
+              >
+                <span className="h-2.5 w-2.5 rounded-full bg-xcannes-green ring-4 ring-xcannes-green/20 shrink-0 animate-pulse" aria-hidden />
+                <span className="text-white/95 text-sm font-semibold truncate min-w-0 flex-1 text-center">
+                  {walletLabel || t("nav_wallet", "Wallet")}
+                </span>
+                <svg
+                  className="w-4 h-4 text-white/45 shrink-0"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.7"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M2.5 12s3.5-7 9.5-7 9.5 7 9.5 7-3.5 7-9.5 7-9.5-7-9.5-7Z" />
+                  <circle cx="12" cy="12" r="2.6" />
+                  {footerDropdownOpen ? <path d="M4 20L20 4" /> : null}
+                </svg>
+              </button>
+              {footerDropdownOpen && walletAddress ? (
+                <div className="absolute bottom-full left-0 z-[200] w-full mb-1 rounded-[10px] ring-1 ring-white/20 ring-inset bg-elevated px-4 py-3 shadow-[0_-8px_18px_rgba(0,0,0,0.45)]">
+                  <p className="text-[13px] text-white/60 mb-2">{t("ui_account_address", "Adresse du compte")}</p>
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <button
+                      type="button"
+                      className={`min-w-0 flex-1 text-left text-xs text-white/55 font-mono font-light ${footerAddressExpanded ? "break-all whitespace-normal" : "truncate"}`}
+                      title={walletAddress}
+                      onClick={() => setFooterAddressExpanded((prev) => !prev)}
+                      aria-label={t("ui_toggle_wallet_address_truncation", "Afficher l'adresse complète")}
+                    >
+                      {footerAddressExpanded ? walletAddress : `${walletAddress.slice(0, 8)}…${walletAddress.slice(-6)}`}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        try {
+                          await navigator.clipboard?.writeText?.(walletAddress);
+                          setFooterCopyNotice(t("ui_copied_address", "Adresse copiée"));
+                          if (footerCopyNoticeTimerRef.current) clearTimeout(footerCopyNoticeTimerRef.current);
+                          footerCopyNoticeTimerRef.current = window.setTimeout(() => setFooterCopyNotice(""), 3000);
+                        } catch { /* ignore */ }
+                      }}
+                      className="shrink-0 text-white/40 hover:text-white/70 transition-colors p-0.5"
+                      title={t("ui_copy_address", "Copier l'adresse")}
+                      aria-label={t("ui_copy_address", "Copier l'adresse")}
+                    >
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                        <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
+                      </svg>
+                    </button>
+                  </div>
+                  <div
+                    className={`mt-1.5 text-[11px] text-xcannes-green/85 transition-opacity duration-200 ${footerCopyNotice ? "opacity-100" : "opacity-0"}`}
+                    role="status"
+                    aria-live="polite"
+                  >
+                    {footerCopyNotice || " "}
+                  </div>
+                </div>
+              ) : null}
+            </div>
+          </div>
+          {/* Bouton télécharger */}
+          <button
+            onClick={handleExportPdf}
+            disabled={exportFormat === "pdf"}
+            className="shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-[10px] text-sm font-medium transition-colors disabled:opacity-50 text-white/70 hover:text-white bg-transparent hover:bg-white/[0.04]"
+            aria-label={t("ui_export_pdf_9c8d16b4fe", "Télécharger")}
+          >
+            <ShareIcon className={`w-4 h-4 ${exportFormat === "pdf" ? "opacity-40" : ""}`} />
+            <span>{exportFormat === "pdf" ? t("ui_loading_1386baebe9", "Loading…") : t("ui_export_pdf_9c8d16b4fe", "Télécharger")}</span>
+          </button>
         </div>
 
       </div>
