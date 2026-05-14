@@ -386,7 +386,7 @@ export default function QRScanner({
     <div
       className={[
         embedded
-          ? "relative rounded-xl bg-elevated p-4"
+          ? "relative rounded-xl p-4"
           : "relative w-full max-w-md bg-elevated rounded-2xl p-6 shadow-2xl",
         showEmbeddedFauxQr ? "overflow-hidden" : "",
         embedded ? "wallet-inline-zoom-in" : "",
