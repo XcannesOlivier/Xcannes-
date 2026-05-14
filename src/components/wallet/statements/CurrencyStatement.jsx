@@ -1424,7 +1424,7 @@ export default function CurrencyStatement({
       >
 	        {/* Header avec Account Info intégré */}
 	        <div
-	          className={`relative flex-shrink-0 bg-[#111518] shadow-[inset_0_16px_28px_rgba(255,255,255,0.03),inset_0_-46px_70px_rgba(0,0,0,0.55)] px-4 md:px-6 py-3 md:py-4 before:content-[''] before:absolute before:left-0 before:right-0 before:bottom-0 before:h-px before:bg-white/10`}
+	          className={`relative flex-shrink-0 bg-[#111518] shadow-[inset_0_16px_28px_rgba(255,255,255,0.03),inset_0_-46px_70px_rgba(0,0,0,0.55)] px-4 md:px-6 py-3 md:py-4`}
             onPointerDown={(event) => {
               maybeStartOverlayDrag(event, "fixed");
             }}
@@ -1525,129 +1525,36 @@ export default function CurrencyStatement({
                 ) : null}
               </div>
             ) : null}
-            {/* Ligne wallet (gauche) + Statement Period (droite) */}
-            <div className={`flex items-end gap-3 ${periodDropdownOpen ? "relative z-[60]" : ""}`}>
-              {/* Wallet selector — gauche */}
-              <div className="flex-1 min-w-0">
-                <p className="text-[13px] md:text-[13px] text-white/85 font-medium mb-1 text-center">
-                  {t("ui_current_account_prefix", "Compte actuel")}
-                </p>
-                <div className="relative w-full" ref={accountDropdownRef}>
-                    <button
-                      type="button"
-                      onClick={() => setAccountDropdownOpen((prev) => !prev)}
-                      className={`w-full inline-flex items-center justify-center gap-2 px-3 py-2.5 bg-elevated rounded-[10px] ${accountDropdownOpen ? "border border-white/20" : "border border-white/10"} transition-all`}
-                      aria-haspopup="menu"
-                      aria-expanded={accountDropdownOpen}
-                      title={t("ui_current_account_prefix", "Compte actuel")}
-                    >
-                        <span className="h-3 w-3 rounded-full bg-xcannes-green ring-4 ring-xcannes-green/20 shrink-0 animate-pulse" aria-hidden />
-                        <span className="text-white/95 text-sm font-semibold truncate min-w-0 flex-1 text-center">
-                          {walletLabel || t("nav_wallet", "Wallet")}
-                        </span>
-                        <svg
-                          className="w-4 h-4 text-white/45 transition-colors"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="1.7"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          aria-hidden="true"
-                        >
-                          <path d="M2.5 12s3.5-7 9.5-7 9.5 7 9.5 7-3.5 7-9.5 7-9.5-7-9.5-7Z" />
-                          <circle cx="12" cy="12" r="2.6" />
-                          {accountDropdownOpen ? <path d="M4 20L20 4" /> : null}
-                        </svg>
-                    </button>
-                    {accountDropdownOpen && walletAddress ? (
-                      <div className="absolute top-full left-0 z-[200] w-full mt-1 rounded-[10px] ring-1 ring-white/20 ring-inset bg-elevated px-4 py-3 shadow-[0_8px_18px_rgba(0,0,0,0.45)]">
-                        <p className="text-[13px] md:text-[14px] text-white/60 mb-2">
-                          {t("ui_account_address", "Adresse du compte")}
-                        </p>
-                        <div className="flex items-center gap-1.5 min-w-0">
-                          <button
-                            type="button"
-                            className={`min-w-0 flex-1 text-left text-xs md:text-sm text-white/55 font-mono font-light ${
-                              accountAddressExpanded ? "break-all whitespace-normal" : "truncate"
-                            }`}
-                            title={walletAddress}
-                            onClick={() => setAccountAddressExpanded((prev) => !prev)}
-                            aria-label={t("ui_toggle_wallet_address_truncation", "Afficher l'adresse complète")}
-                          >
-                            {accountAddressExpanded
-                              ? walletAddress
-                              : `${walletAddress.slice(0, 8)}…${walletAddress.slice(-6)}`}
-                          </button>
-                          <button
-                            type="button"
-                            onClick={async () => {
-                              try {
-                                await navigator.clipboard?.writeText?.(walletAddress);
-                                setAccountCopyNotice(t("ui_copied_address", "Adresse copiée"));
-                                if (accountCopyNoticeTimerRef.current) clearTimeout(accountCopyNoticeTimerRef.current);
-                                accountCopyNoticeTimerRef.current = window.setTimeout(() => {
-                                  setAccountCopyNotice("");
-                                }, 3000);
-                              } catch {
-                                /* ignore */
-                              }
-                            }}
-                            className="shrink-0 text-white/40 hover:text-white/70 transition-colors p-0.5"
-                            title={t("ui_copy_address", "Copier l'adresse")}
-                            aria-label={t("ui_copy_address", "Copier l'adresse")}
-                          >
-                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                              <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-                              <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
-                            </svg>
-                          </button>
-                        </div>
-                        <div
-                          className={`mt-1.5 text-[11px] text-xcannes-green/85 transition-opacity duration-200 ${
-                            accountCopyNotice ? "opacity-100" : "opacity-0"
-                          }`}
-                          role="status"
-                          aria-live="polite"
-                        >
-                          {accountCopyNotice || " "}
-                        </div>
-                      </div>
-                    ) : null}
-                </div>
+            {/* Statement Period */}
+            {!isXrpNetworkView ? (
+              <div className={`${periodDropdownOpen ? "relative z-[60]" : ""}`}>
+                <StatementMonthSelect
+                  label={t("ui_statement_period_6dedec11d9", "Période du relevé")}
+                  labelClassName="text-[13px] md:text-[13px] text-white/85 font-medium mb-1 text-center"
+                  value={selectedMonth}
+                  onOpenChange={(open) => {
+                    setPeriodDropdownOpen(open);
+                  }}
+                  onChange={(nextValue) => {
+                    if (nextValue === "archives") {
+                      setSelectedMonth("archives");
+                      return;
+                    }
+                    const parsed = Number.parseInt(nextValue, 10);
+                    setSelectedMonth(Number.isFinite(parsed) ? parsed : 0);
+                  }}
+                  options={availableMonths}
+                  menuClassName={modalBgClass}
+                />
               </div>
-              {/* Statement Period — droite */}
-              {!isXrpNetworkView ? (
-                <div className="flex-1 min-w-0">
-                  <StatementMonthSelect
-                    label={t("ui_statement_period_6dedec11d9", "Période du relevé")}
-                    labelClassName="text-[13px] md:text-[13px] text-white/85 font-medium mb-1 text-center"
-                    value={selectedMonth}
-                    onOpenChange={(open) => {
-                      setPeriodDropdownOpen(open);
-                      if (open) setAccountDropdownOpen(false);
-                    }}
-                    onChange={(nextValue) => {
-                      if (nextValue === "archives") {
-                        setSelectedMonth("archives");
-                        return;
-                      }
-                      const parsed = Number.parseInt(nextValue, 10);
-                      setSelectedMonth(Number.isFinite(parsed) ? parsed : 0);
-                    }}
-                    options={availableMonths}
-                    menuClassName={modalBgClass}
-                  />
-                </div>
-              ) : null}
-            </div>
+            ) : null}
           </div>
         </div>
 
         {/* Filtres */}
         {!isXrpNetworkView ? (
           <div className="px-4 md:px-6 pb-4 flex flex-row items-stretch md:items-center gap-2">
-            <div className="flex flex-1 items-center rounded-[16px] p-1 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-[#101415] to-[#0d1214]">
+            <div className="flex flex-1 items-center rounded-[16px] p-1 ring-1 ring-white/[0.05] ring-inset bg-gradient-to-b from-[#101415] to-[#0d1214]">
               {[
                 { key: "all", label: stripCountSuffix(t("ui_all_0c90d41d71", "Tout")) },
                 { key: "credit", label: stripCountSuffix(t("ui_credits_b8166276a0", "Entrées")) },
@@ -1661,47 +1568,24 @@ export default function CurrencyStatement({
                   className={`px-3 py-3 flex-1 text-center rounded-[12px] text-sm font-medium transition-colors whitespace-nowrap ${
                     filter === item.key
                       ? item.key === "all"
-                        ? "bg-[#111518] text-white shadow-[inset_0_-14px_18px_rgba(0,0,0,0.8)]"
+                        ? "bg-[#080a0b] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.18),inset_0_-14px_18px_rgba(0,0,0,0.9)]"
                         : item.key === "credit"
-                          ? "bg-green-500/15 text-green-300"
+                          ? "bg-green-500/15 text-green-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]"
                           : item.key === "debit"
-                            ? "bg-red-500/15 text-red-300"
-                            : "bg-blue-500/15 text-blue-300"
-                      : "text-white/60 hover:text-white/80 bg-[#111518] hover:bg-[#111518]"
+                            ? "bg-red-500/15 text-red-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]"
+                            : "bg-blue-500/15 text-blue-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]"
+                      : item.key === "all"
+                        ? "text-white/60 hover:text-white/80 bg-[#111518] hover:bg-[#080a0b]"
+                        : item.key === "credit"
+                          ? "text-white/60 hover:text-green-300 bg-[#111518] hover:bg-green-500/15"
+                          : item.key === "debit"
+                            ? "text-white/60 hover:text-red-300 bg-[#111518] hover:bg-red-500/15"
+                            : "text-white/60 hover:text-blue-300 bg-[#111518] hover:bg-blue-500/15"
                   }`}
                 >
                   {item.label}
                 </button>
               ))}
-              {/* Icône télécharger intégrée dans le bloc filtres — mobile uniquement */}
-              <button
-                onClick={handleExportPdf}
-                disabled={exportFormat === "pdf"}
-                className="md:hidden shrink-0 px-2 py-2 text-white/60 hover:text-white transition-colors disabled:opacity-40"
-                aria-label={t("ui_export_pdf_9c8d16b4fe", "Télécharger")}
-              >
-                <ShareIcon className={`w-5 h-5 ${exportFormat === "pdf" ? "opacity-40" : ""}`} />
-              </button>
-            </div>
-            {/* Export — droite, desktop uniquement */}
-            <div className="hidden md:flex justify-end gap-2 shrink-0">
-              <button
-                onClick={handleExportPdf}
-                disabled={exportFormat === "pdf"}
-                className="px-4 py-2.5 rounded-[14px] text-sm font-semibold transition-colors disabled:opacity-50 text-white/80 hover:text-white"
-              >
-                {exportFormat === "pdf" ? (
-                  <span className="inline-flex items-center gap-2">
-                    <ShareIcon className="w-5 h-5 opacity-60" />
-                    <span>{t("ui_loading_1386baebe9", "Loading…")}</span>
-                  </span>
-                ) : (
-                  <span className="inline-flex items-center gap-2">
-                    <ShareIcon className="w-5 h-5" />
-                    <span>{t("ui_export_pdf_9c8d16b4fe", "Télécharger")}</span>
-                  </span>
-                )}
-              </button>
             </div>
           </div>
         ) : null}
