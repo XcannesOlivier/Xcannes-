@@ -1495,16 +1495,7 @@ export default function CurrencyStatement({
 	          </div>
 
           {/* Account Info dans le header */}
-          {periodDropdownOpen && (
-            <div
-              className="fixed inset-0 z-[55]"
-              aria-hidden="true"
-              onClick={() => {
-                setPeriodDropdownOpen(false);
-              }}
-            />
-          )}
-          <div className={`space-y-3 ${periodDropdownOpen ? "relative z-[60]" : ""}`}>
+          <div className="space-y-3">
             {/* Balance + USD estimé */}
             {!isXrpNetworkView ? (
               <div className="flex flex-col items-center text-center gap-0.5 mt-10 mb-10 w-fit mx-auto rounded-2xl ring-1 ring-white/10 ring-inset bg-[#0c0f11] shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30)] px-8 py-4">
@@ -1523,29 +1514,6 @@ export default function CurrencyStatement({
                     })}
                   </p>
                 ) : null}
-              </div>
-            ) : null}
-            {/* Statement Period */}
-            {!isXrpNetworkView ? (
-              <div className={`${periodDropdownOpen ? "relative z-[60]" : ""}`}>
-                <StatementMonthSelect
-                  label={t("ui_statement_period_6dedec11d9", "Période du relevé")}
-                  labelClassName="text-[13px] md:text-[13px] text-white/85 font-medium mb-1 text-center"
-                  value={selectedMonth}
-                  onOpenChange={(open) => {
-                    setPeriodDropdownOpen(open);
-                  }}
-                  onChange={(nextValue) => {
-                    if (nextValue === "archives") {
-                      setSelectedMonth("archives");
-                      return;
-                    }
-                    const parsed = Number.parseInt(nextValue, 10);
-                    setSelectedMonth(Number.isFinite(parsed) ? parsed : 0);
-                  }}
-                  options={availableMonths}
-                  menuClassName={modalBgClass}
-                />
               </div>
             ) : null}
           </div>
@@ -1718,14 +1686,14 @@ export default function CurrencyStatement({
         </div>
 
         {/* Footer */}
-        <div className="shrink-0 px-4 md:px-6 py-1.5 md:py-3 pb-[max(6px,env(safe-area-inset-bottom))] md:pb-[max(12px,env(safe-area-inset-bottom))] border-t border-white/[0.06] bg-[#111518] shadow-[inset_0_-46px_70px_rgba(0,0,0,0.55)] flex items-center justify-between gap-3">
+        <div className={`shrink-0 px-4 md:px-6 py-1.5 md:py-3 pb-[max(6px,env(safe-area-inset-bottom))] md:pb-[max(12px,env(safe-area-inset-bottom))] border-t border-white/[0.06] bg-[#111518] shadow-[inset_0_-46px_70px_rgba(0,0,0,0.55)] flex items-center justify-between gap-2 ${periodDropdownOpen ? "relative z-[70]" : ""}`}>
           {/* Compte actuel */}
           <div className="flex items-center gap-3 min-w-0">
             <div className="relative w-auto min-w-[120px] max-w-[180px]" ref={footerDropdownRef}>
               <button
                 type="button"
                 onClick={() => setFooterDropdownOpen((prev) => !prev)}
-                className="w-full inline-flex items-center justify-center gap-2 px-3 py-2 bg-transparent transition-all rounded-[10px]"
+                className="w-full inline-flex items-center justify-center gap-1 md:gap-2 px-3 py-2 bg-transparent transition-all rounded-[10px]"
                 aria-haspopup="menu"
                 aria-expanded={footerDropdownOpen}
                 title={t("ui_current_account_plain", "Compte actuel")}
@@ -1793,15 +1761,39 @@ export default function CurrencyStatement({
               ) : null}
             </div>
           </div>
+          {/* Période du relevé — centre */}
+          {!isXrpNetworkView ? (
+            <div className="flex-1 min-w-0 flex flex-col items-center">
+              <p className="text-[10px] text-white/45 font-medium mb-0.5 text-center whitespace-nowrap">
+                {t("ui_statement_period_6dedec11d9", "Période du relevé")}
+              </p>
+              <StatementMonthSelect
+                value={selectedMonth}
+                onOpenChange={setPeriodDropdownOpen}
+                onChange={(nextValue) => {
+                  if (nextValue === "archives") {
+                    setSelectedMonth("archives");
+                    return;
+                  }
+                  const parsed = Number.parseInt(nextValue, 10);
+                  setSelectedMonth(Number.isFinite(parsed) ? parsed : 0);
+                }}
+                options={availableMonths}
+                menuClassName={modalBgClass}
+                menuPosition="top"
+              />
+            </div>
+          ) : null}
           {/* Bouton télécharger */}
           <button
             onClick={handleExportPdf}
             disabled={exportFormat === "pdf"}
             className="shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-[10px] text-sm font-medium transition-colors disabled:opacity-50 text-white/70 hover:text-white bg-transparent hover:bg-white/[0.04]"
             aria-label={t("ui_export_pdf_9c8d16b4fe", "Télécharger")}
+            title={t("ui_export_pdf_9c8d16b4fe", "Télécharger")}
           >
             <ShareIcon className={`w-4 h-4 ${exportFormat === "pdf" ? "opacity-40" : ""}`} />
-            <span>{exportFormat === "pdf" ? t("ui_loading_1386baebe9", "Loading…") : t("ui_export_pdf_9c8d16b4fe", "Télécharger")}</span>
+            <span className="hidden md:inline">{exportFormat === "pdf" ? t("ui_loading_1386baebe9", "Loading…") : t("ui_export_pdf_9c8d16b4fe", "Télécharger")}</span>
           </button>
         </div>
 

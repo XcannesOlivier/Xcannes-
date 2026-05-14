@@ -10,6 +10,7 @@ export default function StatementMonthSelect({
   label = "",
   labelClassName = "text-xs text-white/60 mb-1",
   onOpenChange,
+  menuPosition = "bottom",
 }) {
   const [open, setOpen] = useState(false);
   const triggerRef = useRef(null);
@@ -61,7 +62,11 @@ export default function StatementMonthSelect({
         }}
         aria-haspopup="listbox"
         aria-expanded={open}
-        className={`statement-select w-full ${menuClassName} ring-1 ring-inset px-3 py-2.5 text-sm text-white cursor-pointer transition-colors duration-150 flex items-center justify-between gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-xcannes-green/20 ${open ? "rounded-t-[10px] rounded-b-none ring-white/20" : "rounded-[10px] ring-white/15"}`}
+        className={`statement-select w-full ${menuClassName} ring-1 ring-inset px-3 py-2.5 text-sm text-white cursor-pointer transition-colors duration-150 flex items-center justify-between gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-xcannes-green/20 ${open
+          ? menuPosition === "top"
+            ? "rounded-b-[10px] rounded-t-none ring-white/20"
+            : "rounded-t-[10px] rounded-b-none ring-white/20"
+          : "rounded-[10px] ring-white/15"}`}
       >
         <span className="truncate min-w-0 flex-1">
           {selectedOption?.label || ""}
@@ -85,7 +90,11 @@ export default function StatementMonthSelect({
         <div
           ref={menuRef}
           role="listbox"
-          className={`absolute z-50 mt-0 w-full max-h-[480px] overflow-y-auto rounded-b-[10px] rounded-t-none border border-white/10 border-t-0 shadow-[0_8px_32px_rgba(0,0,0,0.6),0_0_0_1px_rgba(255,255,255,0.06)] ${menuClassName}`}
+          className={`absolute z-50 w-full max-h-[480px] overflow-y-auto shadow-[0_8px_32px_rgba(0,0,0,0.6),0_0_0_1px_rgba(255,255,255,0.06)] ${menuClassName} ${
+            menuPosition === "top"
+              ? "bottom-full mb-0 rounded-t-[10px] rounded-b-none border border-white/10 border-b-0"
+              : "mt-0 rounded-b-[10px] rounded-t-none border border-white/10 border-t-0"
+          }`}
           onClick={(e) => e.stopPropagation()}
         >
           {options.map((option) => {
