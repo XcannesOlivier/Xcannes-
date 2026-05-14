@@ -1763,10 +1763,7 @@ export default function CurrencyStatement({
           </div>
           {/* Période du relevé — centre */}
           {!isXrpNetworkView ? (
-            <div className="flex-1 min-w-0 flex flex-col items-center">
-              <p className="text-[10px] text-white/45 font-medium mb-0.5 text-center whitespace-nowrap">
-                {t("ui_statement_period_6dedec11d9", "Période du relevé")}
-              </p>
+            <div className="flex-[2] md:flex-[3] min-w-0 flex flex-col items-center">
               <StatementMonthSelect
                 value={selectedMonth}
                 onOpenChange={setPeriodDropdownOpen}
