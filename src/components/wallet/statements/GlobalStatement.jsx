@@ -1724,7 +1724,7 @@ export default function GlobalStatement({
                           ) : null}
 
                           <svg
-                            className="w-5 h-5 text-white/35"
+                            className="w-4 h-4 text-white/35"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
