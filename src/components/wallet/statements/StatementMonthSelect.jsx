@@ -64,9 +64,9 @@ export default function StatementMonthSelect({
         aria-expanded={open}
         className={`statement-select w-full ${menuClassName} ring-1 ring-inset px-3 py-1.5 text-sm text-white cursor-pointer transition-colors duration-150 flex items-center justify-between gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-xcannes-green/20 ${open
           ? menuPosition === "top"
-            ? "rounded-b-[10px] rounded-t-none ring-white/12"
-            : "rounded-t-[10px] rounded-b-none ring-white/12"
-          : "rounded-[10px] ring-white/8"}`}
+            ? "rounded-b-[10px] rounded-t-none ring-white/10"
+            : "rounded-t-[10px] rounded-b-none ring-white/10"
+          : "rounded-[10px] ring-white/[0.06]"}`}
       >
         <span className="truncate min-w-0 flex-1">
           {selectedOption?.label || ""}
