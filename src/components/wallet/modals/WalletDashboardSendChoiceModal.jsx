@@ -719,7 +719,18 @@ export default function WalletDashboardSendChoiceModal({
                     {t('ui_send_choose_recipient_title', 'Envoyer à un destinataire')}
                   </h3>
                   <p className="mt-2 text-[14px] md:text-[15px] text-white/60 max-w-[56ch] leading-relaxed">
-                    {t('ui_send_choose_recipient_hint', 'Choisissez une adresse enregistrée, scannez un QR code ou saisissez-la manuellement.')}
+                    <span className="block">
+                      {t(
+                        "ui_send_choose_recipient_hint_line_1",
+                        "Choisissez une adresse enregistrée,",
+                      )}
+                    </span>
+                    <span className="block">
+                      {t(
+                        "ui_send_choose_recipient_hint_line_2",
+                        "scannez un QR code ou saisissez-la manuellement.",
+                      )}
+                    </span>
                   </p>
                   {/* Wallet meta pill */}
                   <div className="mt-6 flex justify-center px-4 w-full">
@@ -883,7 +894,7 @@ export default function WalletDashboardSendChoiceModal({
                   <button
                     type="button"
                     onClick={onChooseQuickScan}
-                    className="xcannes-fade-border-y w-full grid grid-cols-[56px_1fr_24px] items-center gap-3 pl-2 pr-3 md:px-6 py-4 md:py-5 hover:bg-white/[0.02] transition-colors duration-150 text-left rounded-[20px] shadow-[inset_0_-14px_18px_rgba(0,0,0,0.55)]"
+                    className="xcannes-fade-border-y w-full grid grid-cols-[56px_1fr_24px] items-center gap-2 md:gap-3 pl-2 pr-3 md:px-6 py-4 md:py-5 hover:bg-white/[0.02] transition-colors duration-150 text-left rounded-[20px] shadow-[inset_0_-14px_18px_rgba(0,0,0,0.55)]"
                   >
                     <div className="w-14 flex items-center justify-center flex-shrink-0">
                       <div className="xcannes-fade-ring-y w-[52px] h-[52px] rounded-full bg-black/20 bg-[linear-gradient(180deg,rgba(255,255,255,0.06)_0%,rgba(255,255,255,0.02)_50%,rgba(255,255,255,0)_100%)] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] flex items-center justify-center">
@@ -917,7 +928,7 @@ export default function WalletDashboardSendChoiceModal({
                         setSimpleSendSelfError(false);
                         setManualEntryOpen((prev) => !prev);
                       }}
-                      className="w-full grid grid-cols-[56px_1fr_24px] items-center gap-3 pl-2 pr-3 md:px-6 py-4 md:py-5 hover:bg-white/[0.02] transition-colors duration-150 text-left"
+                      className="w-full grid grid-cols-[56px_1fr_24px] items-center gap-2 md:gap-3 pl-2 pr-3 md:px-6 py-4 md:py-5 hover:bg-white/[0.02] transition-colors duration-150 text-left"
                     >
                       <div className="w-14 flex items-center justify-center flex-shrink-0">
                         <div className="xcannes-fade-ring-y w-[52px] h-[52px] rounded-full bg-black/20 bg-[linear-gradient(180deg,rgba(255,255,255,0.06)_0%,rgba(255,255,255,0.02)_50%,rgba(255,255,255,0)_100%)] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] flex items-center justify-center">
@@ -993,7 +1004,7 @@ export default function WalletDashboardSendChoiceModal({
                   <button
                     type="button"
                     onClick={() => handleFileUpload(quickscanFileInputId, false)}
-                    className="xcannes-fade-border-y w-full grid grid-cols-[56px_1fr_24px] items-center gap-3 pl-2 pr-3 md:px-6 py-4 md:py-5 hover:bg-white/[0.02] transition-colors duration-150 text-left rounded-[20px] shadow-[inset_0_-14px_18px_rgba(0,0,0,0.55)]"
+                    className="xcannes-fade-border-y w-full grid grid-cols-[56px_1fr_24px] items-center gap-2 md:gap-3 pl-2 pr-3 md:px-6 py-4 md:py-5 hover:bg-white/[0.02] transition-colors duration-150 text-left rounded-[20px] shadow-[inset_0_-14px_18px_rgba(0,0,0,0.55)]"
                   >
                     <div className="w-14 flex items-center justify-center flex-shrink-0">
                       <div className="xcannes-fade-ring-y w-[52px] h-[52px] rounded-full bg-black/20 bg-[linear-gradient(180deg,rgba(255,255,255,0.06)_0%,rgba(255,255,255,0.02)_50%,rgba(255,255,255,0)_100%)] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] flex items-center justify-center">
@@ -1029,10 +1040,15 @@ export default function WalletDashboardSendChoiceModal({
                     className={`w-full py-3.5 rounded-[14px] text-[16px] font-semibold transition-all duration-200 ${
                       pendingDestination.address
                         ? 'text-white hover:scale-[1.01] active:scale-[0.98]'
-                        : 'bg-xcannes-green/[0.07] text-xcannes-green/60 cursor-not-allowed ring-[0.5px] ring-xcannes-green/40 ring-inset'
+                        : 'bg-xcannes-green/[0.10] text-xcannes-green/60 cursor-not-allowed ring-[0.5px] ring-xcannes-green/40 ring-inset'
                     }`}
                     style={pendingDestination.address
-                      ? { background: 'linear-gradient(180deg, rgba(34,154,86,1) 0%, rgba(14,103,58,1) 100%)', boxShadow: '0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)' }
+                      ? {
+                          background:
+                            'linear-gradient(180deg, rgba(44, 185, 103, 1) 0%, rgba(14, 103, 58, 1) 100%)',
+                          boxShadow:
+                            '0 14px 28px rgba(0,0,0,0.52), 0 6px 14px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.30), inset 0 10px 18px rgba(0,0,0,0.10)',
+                        }
                       : undefined}
                   >
                     {pendingDestination.address

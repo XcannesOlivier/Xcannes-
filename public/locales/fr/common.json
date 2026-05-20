@@ -1035,6 +1035,8 @@
   "ui_send_tab_payreq_tip": "Payer via un code de demande.",
   "ui_send_choose_recipient_title": "Envoyer à un destinataire",
   "ui_send_choose_recipient_hint": "Choisissez une adresse enregistrée, scannez un QR code ou saisissez-la manuellement.",
+  "ui_send_choose_recipient_hint_line_1": "Choisissez une adresse enregistrée,",
+  "ui_send_choose_recipient_hint_line_2": "scannez un QR code ou saisissez-la manuellement.",
   "ui_saved_recipient_title": "Destinataire enregistré",
   "ui_saved_recipient_hint": "Sélectionnez un destinataire",
   "ui_manual_entry_title": "Entrer une adresse manuellement",

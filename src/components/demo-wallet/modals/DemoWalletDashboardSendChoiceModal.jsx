@@ -820,10 +820,18 @@ export default function DemoWalletDashboardSendChoiceModal({
                       )}
                     </h3>
                     <p className="mt-2 text-[14px] text-white/60 max-w-[40ch] leading-relaxed">
-                      {t(
-                        "ui_send_choose_recipient_hint",
-                        "Choisissez une adresse enregistrée, scannez un QR code ou saisissez-la manuellement.",
-                      )}
+                      <span className="block">
+                        {t(
+                          "ui_send_choose_recipient_hint_line_1",
+                          "Choisissez une adresse enregistrée,",
+                        )}
+                      </span>
+                      <span className="block">
+                        {t(
+                          "ui_send_choose_recipient_hint_line_2",
+                          "scannez un QR code ou saisissez-la manuellement.",
+                        )}
+                      </span>
                     </p>
 
                     <div className="mt-6 flex justify-center px-4 w-full">

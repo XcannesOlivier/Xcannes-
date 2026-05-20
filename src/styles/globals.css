@@ -824,6 +824,12 @@ body.header-hero-mode .home-content-wrapper {
   );
 }
 
+@media (min-width: 768px) {
+  .xcannes-fade-ring-y::after {
+    border-width: 0.1px;
+  }
+}
+
 .xcannes-scan-ping {
   animation: xcannesScanPing 6s ease-out infinite;
 }
