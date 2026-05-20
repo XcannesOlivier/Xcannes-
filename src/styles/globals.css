@@ -95,6 +95,14 @@
   background-color: rgba(11, 16, 23, 0.2);
 }
 
+.bg-elevated-40 {
+  background-color: rgba(10, 15, 13, 0.4);
+}
+
+.dark .bg-elevated-40 {
+  background-color: rgba(11, 16, 23, 0.4);
+}
+
 .border-subtle {
   border-color: var(--border-subtle);
 }

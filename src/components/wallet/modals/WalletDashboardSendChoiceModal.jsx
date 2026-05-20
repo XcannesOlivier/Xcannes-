@@ -561,7 +561,7 @@ export default function WalletDashboardSendChoiceModal({
 	                      className: "flex justify-center",
 	                      prefix: t("moonpay_from_account", "Compte source"),
 	                      pillClassName:
-	                        "bg-elevated-20 xcannes-fade-border-y shadow-none rounded-[20px]",
+	                        "bg-elevated-40 xcannes-fade-border-y shadow-none rounded-[20px]",
 	                    })}
 	                  </div>
                 </div>
@@ -756,7 +756,7 @@ export default function WalletDashboardSendChoiceModal({
 	                      variant: 'pill-column',
 	                      className: 'flex justify-center',
 	                      prefix: t('moonpay_from_account', 'Compte source'),
-	                      pillClassName: 'bg-elevated-20 xcannes-fade-border-y shadow-none rounded-[20px]',
+	                      pillClassName: 'bg-elevated-40 xcannes-fade-border-y shadow-none rounded-[20px]',
 	                    })}
 	                  </div>
                 </div>
@@ -1187,7 +1187,7 @@ export default function WalletDashboardSendChoiceModal({
 	                      variant: 'pill-column',
 	                      className: 'flex justify-center',
 	                      prefix: t('moonpay_from_account', 'Compte source'),
-	                      pillClassName: 'bg-elevated-20 xcannes-fade-border-y shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)] rounded-[20px]',
+	                      pillClassName: 'bg-elevated-40 xcannes-fade-border-y shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)] rounded-[20px]',
 	                      dotClassName: '!bg-[#f5a623] ring-[#f5a623]/20',
 	                    })}
 	                  </div>
