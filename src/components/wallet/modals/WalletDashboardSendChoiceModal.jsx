@@ -752,7 +752,7 @@ export default function WalletDashboardSendChoiceModal({
                   </div>
                 </div>
 
-                <div className="rounded-[26px] bg-[#0b0f10]/80 ring-1 ring-white/10 ring-inset shadow-[inset_0_1px_0_rgba(255,255,255,0.05),inset_0_-26px_46px_rgba(0,0,0,0.55)] p-3 md:p-4">
+                <div className="rounded-[26px] bg-[#0b0f10]/40 ring-1 ring-white/10 ring-inset shadow-[inset_0_1px_0_rgba(255,255,255,0.05),inset_0_-26px_46px_rgba(0,0,0,0.55)] p-3 md:p-4">
                   <div className="flex flex-col gap-3">
 
                   {/* 4. Choisir un contact */}
@@ -1052,11 +1052,12 @@ export default function WalletDashboardSendChoiceModal({
                         : 'text-white/75 cursor-not-allowed ring-[0.5px] ring-xcannes-green/30 ring-inset'
                     }`}
                     style={{
-                      background:
-                        'linear-gradient(180deg, rgba(44, 185, 103, 1) 0%, rgba(14, 103, 58, 1) 100%)',
-                      boxShadow:
-                        '0 14px 28px rgba(0,0,0,0.52), 0 6px 14px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.30), inset 0 10px 18px rgba(0,0,0,0.10)',
-                      opacity: pendingDestination.address ? 1 : 0.28,
+                      background: pendingDestination.address
+                        ? 'linear-gradient(180deg, rgba(44, 185, 103, 1) 0%, rgba(14, 103, 58, 1) 100%)'
+                        : 'linear-gradient(180deg, rgba(44, 185, 103, 0.34) 0%, rgba(14, 103, 58, 0.34) 100%)',
+                      boxShadow: pendingDestination.address
+                        ? '0 14px 28px rgba(0,0,0,0.52), 0 6px 14px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.30), inset 0 10px 18px rgba(0,0,0,0.10)'
+                        : '0 12px 24px rgba(0,0,0,0.44), 0 5px 12px rgba(0,0,0,0.24), inset 0 1px 0 rgba(255,255,255,0.12), inset 0 -10px 16px rgba(0,0,0,0.24)',
                     }}
                   >
                     {pendingDestination.address
@@ -1070,16 +1071,20 @@ export default function WalletDashboardSendChoiceModal({
                               ? `${addr.slice(0, 6)}…${addr.slice(-4)}`
                               : addr;
                           return (
-                            <span className="inline-flex flex-col items-center leading-tight">
-                              <span className="text-[12px] md:text-[13px] text-white/85">
-                                {showLabel ? `${label} — ` : ""}
-                                <span className="font-mono">{addrShort}</span>
-                              </span>
-                              <span className="mt-1">
+                            <span className="inline-flex items-center gap-2 whitespace-nowrap overflow-hidden text-ellipsis max-w-full">
+                              <span className="shrink-0">
                                 {t(
                                   "ui_validate_recipient_address",
                                   "Valider l'adresse du destinataire",
                                 )}
+                              </span>
+                              <span className="text-white/35">:</span>
+                              <span className="min-w-0 overflow-hidden text-ellipsis">
+                                {showLabel ? (
+                                  <span className="text-white/90">{label}</span>
+                                ) : null}
+                                {showLabel ? <span className="text-white/35"> · </span> : null}
+                                <span className="font-mono text-white/85">{addrShort}</span>
                               </span>
                             </span>
                           );
