@@ -739,6 +739,31 @@ body.header-hero-mode .home-content-wrapper {
   }
 }
 
+/* ── Fade-out border (vertical) for cards ── */
+.xcannes-fade-border-y {
+  position: relative;
+}
+.xcannes-fade-border-y::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 1) 68%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 1) 68%,
+    rgba(0, 0, 0, 0) 100%
+  );
+}
+
 .xcannes-scan-ping {
   animation: xcannesScanPing 6s ease-out infinite;
 }

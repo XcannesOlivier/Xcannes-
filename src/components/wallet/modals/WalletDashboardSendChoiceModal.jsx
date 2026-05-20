@@ -732,7 +732,7 @@ export default function WalletDashboardSendChoiceModal({
                   </div>
                 </div>
 
-                <div className="rounded-[26px] bg-[linear-gradient(180deg,rgba(16,20,21,0.92)_0%,rgba(9,12,13,0.72)_100%)] ring-1 ring-white/10 ring-inset shadow-[inset_0_1px_0_rgba(255,255,255,0.05),inset_0_-26px_46px_rgba(0,0,0,0.55)]">
+                <div className="xcannes-fade-border-y rounded-[26px] bg-[linear-gradient(180deg,rgba(16,20,21,0.92)_0%,rgba(9,12,13,0.72)_100%)] shadow-[inset_0_1px_0_rgba(255,255,255,0.05),inset_0_-26px_46px_rgba(0,0,0,0.55)]">
                   <div>
 
                   {/* 4. Choisir un contact */}
