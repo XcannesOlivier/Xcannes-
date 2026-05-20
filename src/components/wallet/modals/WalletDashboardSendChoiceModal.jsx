@@ -749,7 +749,7 @@ export default function WalletDashboardSendChoiceModal({
                           return next;
                         });
                       }}
-                      className="xcannes-fade-border-y w-full grid grid-cols-[56px_1fr] gap-3 px-5 md:px-6 py-4 md:py-5 hover:bg-white/[0.02] transition-colors duration-150 text-left rounded-[20px]"
+                      className="w-full grid grid-cols-[56px_1fr] gap-3 px-5 md:px-6 py-4 md:py-5 hover:bg-white/[0.02] transition-colors duration-150 text-left"
                     >
                       <div className="w-14 flex items-start justify-center pt-0.5 flex-shrink-0">
                         <svg className="w-[36px] h-[36px] text-xcannes-green" fill="none" viewBox="0 0 24 24" strokeWidth={0.8} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0" /></svg>
