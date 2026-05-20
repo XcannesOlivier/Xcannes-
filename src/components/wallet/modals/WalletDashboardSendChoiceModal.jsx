@@ -78,6 +78,7 @@ export default function WalletDashboardSendChoiceModal({
   const [payreqSelfSendError, setPayreqSelfSendError] = useState(false);
   const [simpleSendSelfError, setSimpleSendSelfError] = useState(false);
   const [quickscanPasteValue, setQuickscanPasteValue] = useState('');
+  const [manualEntryOpen, setManualEntryOpen] = useState(false);
   const [showQuickscanSavedPicker, setShowQuickscanSavedPicker] = useState(false);
   const [selectedContactDisplay, setSelectedContactDisplay] = useState('');
   const [scannedDisplay, setScannedDisplay] = useState('');
@@ -89,6 +90,7 @@ export default function WalletDashboardSendChoiceModal({
   const [savedAddressesVisible, setSavedAddressesVisible] = useState(false);
   const [savedAddressModes, setSavedAddressModes] = useState({});
   const quickscanSavedPickerRef = useRef(null);
+  const manualEntryInputRef = useRef(null);
   const normalizedCurrentWallet = String(currentWalletAddress || '').trim();
   const quickscanFileInputId = 'quickscan-choice-qr-file';
   const payreqFileInputId = 'payreq-choice-qr-file';
@@ -123,11 +125,18 @@ export default function WalletDashboardSendChoiceModal({
       setPayreqScannedDisplay('');
       setPayreqImportedDisplay('');
       setQuickscanPasteValue('');
+      setManualEntryOpen(false);
       setShowQuickscanSavedPicker(false);
       setSavedAddressesVisible(false);
       setSavedAddressModes({});
     }
   }, [open]);
+
+  useEffect(() => {
+    if (!manualEntryOpen) return;
+    const id = setTimeout(() => manualEntryInputRef.current?.focus?.(), 0);
+    return () => clearTimeout(id);
+  }, [manualEntryOpen]);
 
   useEffect(() => {
     if (!showQuickscanSavedPicker) return;
@@ -707,7 +716,7 @@ export default function WalletDashboardSendChoiceModal({
                 {/* Title + subtitle (centered) */}
                 <div className="flex flex-col items-center text-center mb-[40px]">
                   <h3 className="mt-1 text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight">
-                    {t('ui_send_choose_recipient_title', 'Renseigner le destinataire')}
+                    {t('ui_send_choose_recipient_title', 'Envoyer à un destinataire')}
                   </h3>
                   <p className="mt-2 text-[14px] md:text-[15px] text-white/60 max-w-[40ch] leading-relaxed">
                     {t('ui_send_choose_recipient_hint', 'Choisissez comment renseigner l’adresse du destinataire.')}
@@ -745,8 +754,13 @@ export default function WalletDashboardSendChoiceModal({
                         <svg className="w-[36px] h-[36px] text-white/90" fill="none" viewBox="0 0 24 24" strokeWidth={0.8} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0" /></svg>
                       </div>
                       <div className="min-w-0 flex-1">
-                        <div className={`flex items-center justify-between ring-1 ring-inset rounded-xl pl-3 pr-2.5 py-2 transition-colors duration-150 ${selectedContactDisplay ? 'bg-white/5 ring-white/10 shadow-[inset_0_-34px_34px_-20px_rgba(0,0,0,0.95),inset_0_-18px_70px_-45px_rgba(0,0,0,0.9)]' : 'bg-white/5 ring-white/10 shadow-[inset_0_-34px_34px_-20px_rgba(0,0,0,0.95),inset_0_-18px_70px_-45px_rgba(0,0,0,0.9)]'}`}>
-                          <span className={`text-[13px] truncate ${selectedContactDisplay ? 'text-white/85' : 'text-white/55'}`}>{selectedContactDisplay || t('ui_contacts_card_hint', 'Sélectionnez un destinataire enregistré')}</span>
+                        <p className="text-[15px] font-semibold text-white/90">
+                          {t('ui_saved_recipient_title', 'Destinataire enregistré')}
+                        </p>
+                        <div className="mt-2 flex items-center justify-between ring-1 ring-inset rounded-xl pl-3 pr-2.5 py-2 bg-white/5 ring-white/10 shadow-[inset_0_-34px_34px_-20px_rgba(0,0,0,0.95),inset_0_-18px_70px_-45px_rgba(0,0,0,0.9)]">
+                          <span className={`text-[13px] truncate ${selectedContactDisplay ? 'text-white/85' : 'text-white/55'}`}>
+                            {selectedContactDisplay || t('ui_saved_recipient_hint', 'Sélectionnez un destinataire')}
+                          </span>
                           <svg className={`w-4 h-4 text-white/30 flex-shrink-0 ml-2 transition-transform duration-200 ${showQuickscanSavedPicker ? 'rotate-180' : ''}`} viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                         </div>
                       </div>
@@ -885,27 +899,80 @@ export default function WalletDashboardSendChoiceModal({
                   </button>
                   </div>
 
-                  {/* 3. Saisir une adresse */}
-                  <div className="rounded-[20px]">
-                  <div className="bg-transparent overflow-hidden">
-                    <div className="flex items-center gap-4 px-4 py-3">
+                  {/* 3. Entrer une adresse manuellement */}
+                  <div className="rounded-[20px] bg-elevated">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowQuickscanSavedPicker(false);
+                        setSimpleSendSelfError(false);
+                        setManualEntryOpen((prev) => !prev);
+                      }}
+                      className="w-full flex items-center gap-4 bg-white/5 ring-1 ring-inset ring-white/10 rounded-[20px] shadow-[inset_0_-34px_34px_-20px_rgba(0,0,0,0.95),inset_0_-18px_70px_-45px_rgba(0,0,0,0.9)] px-4 py-4 hover:bg-transparent hover:ring-white/15 transition-colors duration-150 text-left"
+                    >
                       <div className="w-11 h-11 flex items-center justify-center flex-shrink-0">
                         <svg className="w-[36px] h-[36px] text-white/90" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={0.8}><path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                       </div>
                       <div className="min-w-0 flex-1">
+                        <p className="text-[15px] font-medium text-white/85">
+                          {t('ui_manual_entry_title', 'Entrer une adresse manuellement')}
+                        </p>
+                        <p className="text-[13px] text-white/40 mt-0.5">
+                          {t('ui_manual_entry_hint', 'Coller ou saisir une adresse de wallet')}
+                        </p>
+                      </div>
+                      <svg className={`w-5 h-5 text-white/45 flex-shrink-0 transition-transform duration-200 ${manualEntryOpen ? 'rotate-90' : 'rotate-0'}`} viewBox="0 0 24 24" fill="none"><path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    </button>
+
+                    {manualEntryOpen ? (
+                      <div className="px-4 pb-4">
                         <div className="relative">
-                          <input id="quickscan-paste-input" type="text" value={quickscanPasteValue} onChange={(e) => { setQuickscanPasteValue(e.target.value); setShowQuickscanSavedPicker(false); setSimpleSendSelfError(false); }} onKeyDown={(e) => { if (e.key === 'Enter') handleQuickscanPasteSubmit(); }} onPaste={(e) => { const text = (e.clipboardData?.getData('text') || '').trim(); if (text) { e.preventDefault(); setQuickscanPasteValue(text); setShowQuickscanSavedPicker(false); if (normalizedCurrentWallet && text === normalizedCurrentWallet) { setSimpleSendSelfError(true); return; } setSimpleSendSelfError(false); setPendingDestination({ address: text, label: '' }); } }} placeholder={t('ui_paste_address_placeholder', 'Entrez manuellement une adresse')} className="w-full bg-black ring-1 ring-white/10 ring-inset rounded-xl pl-3 pr-10 py-2 text-[13px] text-white placeholder:text-white/55 outline-none focus:ring-white/25 transition-all duration-200" />
-                          {quickscanPasteValue.trim() ? (<button type="button" onClick={handleQuickscanPasteSubmit} className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-lg text-white/30 hover:text-white/60 transition-colors" title={t('ui_go_label', 'Valider')}><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M12 5l7 7-7 7" /></svg></button>) : null}
+                          <input
+                            ref={manualEntryInputRef}
+                            id="quickscan-paste-input"
+                            type="text"
+                            value={quickscanPasteValue}
+                            onChange={(e) => {
+                              setQuickscanPasteValue(e.target.value);
+                              setSimpleSendSelfError(false);
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') handleQuickscanPasteSubmit();
+                            }}
+                            onPaste={(e) => {
+                              const text = (e.clipboardData?.getData('text') || '').trim();
+                              if (!text) return;
+                              e.preventDefault();
+                              setQuickscanPasteValue(text);
+                              if (normalizedCurrentWallet && text === normalizedCurrentWallet) {
+                                setSimpleSendSelfError(true);
+                                return;
+                              }
+                              setSimpleSendSelfError(false);
+                              setPendingDestination({ address: text, label: '' });
+                            }}
+                            placeholder={t('ui_paste_address_placeholder', 'Entrez manuellement une adresse')}
+                            className="w-full bg-black ring-1 ring-white/10 ring-inset rounded-xl pl-3 pr-10 py-2 text-[13px] text-white placeholder:text-white/55 outline-none focus:ring-white/25 transition-all duration-200"
+                          />
+                          {quickscanPasteValue.trim() ? (
+                            <button
+                              type="button"
+                              onClick={handleQuickscanPasteSubmit}
+                              className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-lg text-white/30 hover:text-white/60 transition-colors"
+                              title={t('ui_go_label', 'Valider')}
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M12 5l7 7-7 7" /></svg>
+                            </button>
+                          ) : null}
                         </div>
-                        {simpleSendSelfError && (
+                        {simpleSendSelfError ? (
                           <div className="rounded-lg ring-1 ring-orange-400/30 ring-inset bg-orange-400/10 px-3 py-2.5 text-xs text-orange-200/90 mt-2">
                             <div className="font-semibold">{t('ui_invalid_recipient_title', 'Destinataire invalide')}</div>
                             <div className="mt-0.5 text-orange-200/70">{t('ui_cannot_send_to_self', 'Vous ne pouvez pas envoyer à votre propre compte.')}</div>
                           </div>
-                        )}
+                        ) : null}
                       </div>
-                    </div>
-                  </div>
+                    ) : null}
                   </div>
 
                   {/* 4. Importer un QR code */}

@@ -816,7 +816,7 @@ export default function DemoWalletDashboardSendChoiceModal({
                     <h3 className="mt-1 text-[30px] font-bold text-white/95 tracking-tight">
                       {t(
                         "ui_send_choose_recipient_title",
-                        "Renseigner le destinataire",
+                        "Envoyer à un destinataire",
                       )}
                     </h3>
                     <p className="mt-2 text-[14px] text-white/60 max-w-[40ch] leading-relaxed">
