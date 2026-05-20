@@ -438,7 +438,6 @@ export default function DemoWalletDashboardSendModal({
       setShowSavedPicker(false);
       setSelectedSavedLabel("");
       setSendAssetDropdownOpen(false);
-      setShowFullRecipientAccount(false);
       setSubmitStatus("idle");
       setSubmitError("");
     }
@@ -463,14 +462,6 @@ export default function DemoWalletDashboardSendModal({
     }
     setCameraUnavailable(false);
   }, [open]);
-
-  useEffect(() => {
-    setShowFullRecipientAccount(false);
-  }, [normalizedDestination]);
-
-  useEffect(() => {
-    setShowFullRecipientAccount(false);
-  }, [normalizedDestination]);
 
   useEffect(() => {
     if (scanActive) {
