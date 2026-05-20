@@ -733,7 +733,7 @@ export default function WalletDashboardSendChoiceModal({
                 </div>
 
                 <div className="rounded-[26px] bg-[linear-gradient(180deg,rgba(16,20,21,0.92)_0%,rgba(9,12,13,0.72)_100%)] ring-1 ring-white/10 ring-inset shadow-[inset_0_1px_0_rgba(255,255,255,0.05),inset_0_-26px_46px_rgba(0,0,0,0.55)]">
-                  <div className="divide-y divide-white/[0.08]">
+                  <div>
 
                   {/* 4. Choisir un contact */}
                   <div className="relative" ref={quickscanSavedPickerRef}>
@@ -755,7 +755,7 @@ export default function WalletDashboardSendChoiceModal({
                         <svg className="w-[36px] h-[36px] text-xcannes-green" fill="none" viewBox="0 0 24 24" strokeWidth={0.8} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0" /></svg>
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="text-[15px] font-semibold text-white/90">
+                        <p className="text-[13px] font-semibold text-white/90">
                           {t('ui_saved_recipient_title', 'Destinataire enregistré')}
                         </p>
                         <div className="mt-2 flex items-center justify-between ring-1 ring-inset rounded-xl pl-3 pr-2.5 py-2 bg-black/60 ring-white/10 shadow-[inset_0_-30px_30px_-20px_rgba(0,0,0,0.92)]">
@@ -877,6 +877,8 @@ export default function WalletDashboardSendChoiceModal({
                     </div>
                   </div>
 
+                  <div className="h-px bg-white/[0.12] md:bg-white/[0.08] ml-[72px] mr-5 md:mr-6" />
+
                   {/* 1. Scanner un QR code */}
                   <button
                     type="button"
@@ -887,7 +889,7 @@ export default function WalletDashboardSendChoiceModal({
                       <svg className="w-[36px] h-[36px] text-xcannes-green" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={0.8}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" /></svg>
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="text-[15px] font-medium text-white/85">{t('ui_scan_card_title', 'Scanner un QR code')}</p>
+                      <p className="text-[13px] font-medium text-white/85">{t('ui_scan_card_title', 'Scanner un QR code')}</p>
                       {scannedDisplay ? (
                         <div className="flex items-center mt-1.5 bg-black/80 ring-1 ring-white/10 ring-inset rounded-xl pl-3 pr-3 py-2">
                           <span className="text-[13px] truncate text-white/85">{scannedDisplay}</span>
@@ -900,6 +902,8 @@ export default function WalletDashboardSendChoiceModal({
                       <svg className="w-5 h-5 text-xcannes-green" viewBox="0 0 24 24" fill="none" aria-hidden><path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                     </div>
                   </button>
+
+                  <div className="h-px bg-white/[0.12] md:bg-white/[0.08] ml-[72px] mr-5 md:mr-6" />
 
                   {/* 3. Entrer une adresse manuellement */}
                   <div>
@@ -916,7 +920,7 @@ export default function WalletDashboardSendChoiceModal({
                         <svg className="w-[36px] h-[36px] text-xcannes-green" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={0.8}><path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="text-[15px] font-medium text-white/85">
+                        <p className="text-[13px] font-medium text-white/85">
                           {t('ui_manual_entry_title', 'Entrer une adresse manuellement')}
                         </p>
                         <p className="text-[13px] text-white/40 mt-0.5">
@@ -976,6 +980,8 @@ export default function WalletDashboardSendChoiceModal({
                       </div>
                     ) : null}
                   </div>
+
+                  <div className="h-px bg-white/[0.12] md:bg-white/[0.08] ml-[72px] mr-5 md:mr-6" />
 
                   {/* 4. Importer un QR code */}
                   <button
