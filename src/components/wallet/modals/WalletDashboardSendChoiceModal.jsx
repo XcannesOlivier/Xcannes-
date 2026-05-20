@@ -1040,7 +1040,7 @@ export default function WalletDashboardSendChoiceModal({
                     className={`w-full py-3.5 rounded-[14px] text-[16px] font-semibold transition-all duration-200 ${
                       pendingDestination.address
                         ? 'text-white hover:scale-[1.01] active:scale-[0.98]'
-                        : 'bg-xcannes-green/[0.10] text-xcannes-green/60 cursor-not-allowed ring-[0.5px] ring-xcannes-green/40 ring-inset'
+                        : 'text-white/30 cursor-not-allowed ring-[0.5px] ring-xcannes-green/30 ring-inset'
                     }`}
                     style={pendingDestination.address
                       ? {
@@ -1049,7 +1049,12 @@ export default function WalletDashboardSendChoiceModal({
                           boxShadow:
                             '0 14px 28px rgba(0,0,0,0.52), 0 6px 14px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.30), inset 0 10px 18px rgba(0,0,0,0.10)',
                         }
-                      : undefined}
+                      : {
+                          background:
+                            'linear-gradient(180deg, rgba(44, 185, 103, 0.18) 0%, rgba(14, 103, 58, 0.18) 100%)',
+                          boxShadow:
+                            '0 10px 22px rgba(0,0,0,0.42), 0 4px 10px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.10), inset 0 -10px 16px rgba(0,0,0,0.22)',
+                        }}
                   >
                     {pendingDestination.address
                       ? t('ui_validate_recipient_address', "Valider l'adresse du destinataire")
