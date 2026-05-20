@@ -883,7 +883,7 @@ export default function WalletDashboardSendChoiceModal({
                   <button
                     type="button"
                     onClick={onChooseQuickScan}
-                    className="xcannes-fade-border-y w-full grid grid-cols-[56px_1fr_24px] items-center gap-3 pl-2 pr-3 md:px-6 py-4 md:py-5 hover:bg-white/[0.02] transition-colors duration-150 text-left rounded-[20px]"
+                    className="xcannes-fade-border-y w-full grid grid-cols-[56px_1fr_24px] items-center gap-3 pl-2 pr-3 md:px-6 py-4 md:py-5 hover:bg-white/[0.02] transition-colors duration-150 text-left rounded-[20px] shadow-[inset_0_-14px_18px_rgba(0,0,0,0.55)]"
                   >
                     <div className="w-14 flex items-center justify-center flex-shrink-0">
                       <div className="xcannes-fade-ring-y w-[52px] h-[52px] rounded-full bg-black/20 bg-[linear-gradient(180deg,rgba(255,255,255,0.06)_0%,rgba(255,255,255,0.02)_50%,rgba(255,255,255,0)_100%)] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] flex items-center justify-center">
@@ -909,7 +909,7 @@ export default function WalletDashboardSendChoiceModal({
                   </button>
 
                   {/* 3. Entrer une adresse manuellement */}
-                  <div className="xcannes-fade-border-y rounded-[20px]">
+                  <div className="xcannes-fade-border-y rounded-[20px] shadow-[inset_0_-14px_18px_rgba(0,0,0,0.55)]">
                     <button
                       type="button"
                       onClick={() => {
@@ -929,7 +929,7 @@ export default function WalletDashboardSendChoiceModal({
                           {t('ui_manual_entry_title', 'Entrer une adresse manuellement')}
                         </p>
                         <p className="text-[11px] md:text-[13px] text-white/40 mt-0.5">
-                          {t('ui_manual_entry_hint', 'Coller ou saisir une adresse de wallet')}
+                          {t('ui_manual_entry_hint', 'Coller ou saisir une adresse de compte')}
                         </p>
                       </div>
                       <svg className={`w-5 h-5 text-xcannes-green flex-shrink-0 transition-transform duration-200 ${manualEntryOpen ? 'rotate-90' : 'rotate-0'}`} viewBox="0 0 24 24" fill="none">
@@ -993,7 +993,7 @@ export default function WalletDashboardSendChoiceModal({
                   <button
                     type="button"
                     onClick={() => handleFileUpload(quickscanFileInputId, false)}
-                    className="xcannes-fade-border-y w-full grid grid-cols-[56px_1fr_24px] items-center gap-3 pl-2 pr-3 md:px-6 py-4 md:py-5 hover:bg-white/[0.02] transition-colors duration-150 text-left rounded-[20px]"
+                    className="xcannes-fade-border-y w-full grid grid-cols-[56px_1fr_24px] items-center gap-3 pl-2 pr-3 md:px-6 py-4 md:py-5 hover:bg-white/[0.02] transition-colors duration-150 text-left rounded-[20px] shadow-[inset_0_-14px_18px_rgba(0,0,0,0.55)]"
                   >
                     <div className="w-14 flex items-center justify-center flex-shrink-0">
                       <div className="xcannes-fade-ring-y w-[52px] h-[52px] rounded-full bg-black/20 bg-[linear-gradient(180deg,rgba(255,255,255,0.06)_0%,rgba(255,255,255,0.02)_50%,rgba(255,255,255,0)_100%)] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] flex items-center justify-center">

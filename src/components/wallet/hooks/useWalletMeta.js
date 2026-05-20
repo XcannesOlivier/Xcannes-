@@ -68,7 +68,7 @@ export function useWalletMeta({
                 .filter(Boolean)
                 .join(" ")}
             >
-              <span className={["text-white/70 text-[14px] font-medium tracking-wide", options?.prefixClassName || ""].filter(Boolean).join(" ")}>
+              <span className={["text-white/70 text-[11px] md:text-[12px] font-medium tracking-wide", options?.prefixClassName || ""].filter(Boolean).join(" ")}>
                 {effectivePrefix}
               </span>
               <div className="flex items-center gap-2">

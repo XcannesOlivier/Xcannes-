@@ -1038,7 +1038,7 @@
   "ui_saved_recipient_title": "Destinataire enregistré",
   "ui_saved_recipient_hint": "Sélectionnez un destinataire",
   "ui_manual_entry_title": "Entrer une adresse manuellement",
-  "ui_manual_entry_hint": "Coller ou saisir une adresse de wallet",
+  "ui_manual_entry_hint": "Coller ou saisir une adresse de compte",
   "ui_import_card_hint": "Depuis une image ou un fichier",
   "ui_send_asset_tip": "Sélectionnez la devise à envoyer.",
   "ui_send_amount_tip": "Saisissez le montant à envoyer.",
