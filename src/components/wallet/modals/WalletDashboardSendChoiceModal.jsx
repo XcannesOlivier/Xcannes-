@@ -715,11 +715,11 @@ export default function WalletDashboardSendChoiceModal({
                 <div className="px-5 pt-[30px] md:pt-[60px] pb-5 flex flex-col flex-1 min-h-0 overflow-y-auto overscroll-contain">
                 {/* Title + subtitle (centered) */}
                 <div className="flex flex-col items-center text-center mb-[40px]">
-                  <h3 className="mt-1 text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight">
+                  <h3 className="mt-1 text-[28px] md:text-[32px] font-bold text-white/95 tracking-tight">
                     {t('ui_send_choose_recipient_title', 'Envoyer à un destinataire')}
                   </h3>
-                  <p className="mt-2 text-[14px] md:text-[15px] text-white/60 max-w-[40ch] leading-relaxed">
-                    {t('ui_send_choose_recipient_hint', 'Choisissez comment renseigner l’adresse du destinataire.')}
+                  <p className="mt-2 text-[14px] md:text-[15px] text-white/60 max-w-[56ch] leading-relaxed">
+                    {t('ui_send_choose_recipient_hint', 'Choisissez une adresse enregistrée, scannez un QR code ou saisissez-la manuellement.')}
                   </p>
                   {/* Wallet meta pill */}
                   <div className="mt-6 flex justify-center px-4 w-full">
