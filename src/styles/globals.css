@@ -766,7 +766,7 @@ body.header-hero-mode .home-content-wrapper {
 
 /* ── Thin irregular green border (for select-like inputs) ── */
 .xcannes-irregular-green-border {
-  position: relative;
+  /* Do not set `position` here, to avoid overriding Tailwind `absolute`/`relative`. */
 }
 .xcannes-irregular-green-border::before {
   content: "";
