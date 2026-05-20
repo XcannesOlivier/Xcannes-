@@ -1049,7 +1049,7 @@ export default function WalletDashboardSendChoiceModal({
                     className={`w-full py-3.5 rounded-[14px] text-[16px] font-semibold transition-all duration-200 ${
                       pendingDestination.address
                         ? 'text-white hover:scale-[1.01] active:scale-[0.98]'
-                        : 'text-white/30 cursor-not-allowed ring-[0.5px] ring-xcannes-green/30 ring-inset'
+                        : 'text-white/75 cursor-not-allowed ring-[0.5px] ring-xcannes-green/30 ring-inset'
                     }`}
                     style={{
                       background:
@@ -1060,7 +1060,30 @@ export default function WalletDashboardSendChoiceModal({
                     }}
                   >
                     {pendingDestination.address
-                      ? t('ui_validate_recipient_address', "Valider l'adresse du destinataire")
+                      ? (() => {
+                          const addr = String(pendingDestination.address || "").trim();
+                          const label = String(pendingDestination.label || "").trim();
+                          const showLabel =
+                            label && label !== addr && label !== t("ui_wallet_unknown", "Unknown wallet");
+                          const addrShort =
+                            addr.length > 18
+                              ? `${addr.slice(0, 6)}…${addr.slice(-4)}`
+                              : addr;
+                          return (
+                            <span className="inline-flex flex-col items-center leading-tight">
+                              <span className="text-[12px] md:text-[13px] text-white/85">
+                                {showLabel ? `${label} — ` : ""}
+                                <span className="font-mono">{addrShort}</span>
+                              </span>
+                              <span className="mt-1">
+                                {t(
+                                  "ui_validate_recipient_address",
+                                  "Valider l'adresse du destinataire",
+                                )}
+                              </span>
+                            </span>
+                          );
+                        })()
                       : <span className="inline-flex items-center gap-1.5 text-white/20">
                           <span className="text-xs">{t('ui_fill_recipient_address', "Renseigner l'adresse du destinataire")}</span>
                           <span className="inline-flex items-end gap-[3px] mb-[-1px]">
