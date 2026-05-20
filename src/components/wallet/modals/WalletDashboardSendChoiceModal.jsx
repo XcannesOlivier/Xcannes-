@@ -877,11 +877,6 @@ export default function WalletDashboardSendChoiceModal({
                     </div>
                   </div>
 
-                  <div className="ml-[72px] mr-5 md:mr-6">
-                    <div className="h-px bg-gradient-to-r from-transparent via-white/[0.14] to-transparent" />
-                    <div className="-mt-px h-px bg-gradient-to-r from-transparent via-black/[0.55] to-transparent opacity-70" />
-                  </div>
-
                   {/* 1. Scanner un QR code */}
                   <button
                     type="button"
@@ -908,11 +903,6 @@ export default function WalletDashboardSendChoiceModal({
                       </svg>
                     </div>
                   </button>
-
-                  <div className="ml-[72px] mr-5 md:mr-6">
-                    <div className="h-px bg-gradient-to-r from-transparent via-white/[0.14] to-transparent" />
-                    <div className="-mt-px h-px bg-gradient-to-r from-transparent via-black/[0.55] to-transparent opacity-70" />
-                  </div>
 
                   {/* 3. Entrer une adresse manuellement */}
                   <div>
@@ -991,11 +981,6 @@ export default function WalletDashboardSendChoiceModal({
                         ) : null}
                       </div>
                     ) : null}
-                  </div>
-
-                  <div className="ml-[72px] mr-5 md:mr-6">
-                    <div className="h-px bg-gradient-to-r from-transparent via-white/[0.14] to-transparent" />
-                    <div className="-mt-px h-px bg-gradient-to-r from-transparent via-black/[0.55] to-transparent opacity-70" />
                   </div>
 
                   {/* 4. Importer un QR code */}
