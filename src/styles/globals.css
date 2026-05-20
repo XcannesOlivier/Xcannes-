@@ -792,6 +792,30 @@ body.header-hero-mode .home-content-wrapper {
   opacity: 0.9;
 }
 
+.xcannes-fade-ring-y {
+  position: relative;
+}
+.xcannes-fade-ring-y::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 1) 40%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 1) 40%,
+    rgba(0, 0, 0, 0) 100%
+  );
+}
+
 .xcannes-scan-ping {
   animation: xcannesScanPing 6s ease-out infinite;
 }
