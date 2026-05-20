@@ -758,7 +758,7 @@ export default function WalletDashboardSendChoiceModal({
                         <p className="text-[13px] font-semibold text-white/90">
                           {t('ui_saved_recipient_title', 'Destinataire enregistré')}
                         </p>
-                        <div className="mt-2 flex items-center justify-between ring-1 ring-inset rounded-xl pl-3 pr-2.5 py-2 bg-black/60 ring-white/10 shadow-[inset_0_-30px_30px_-20px_rgba(0,0,0,0.92)]">
+                        <div className="xcannes-irregular-green-border mt-2 flex items-center justify-between rounded-xl pl-3 pr-2.5 py-2 bg-black/60 shadow-[inset_0_-30px_30px_-20px_rgba(0,0,0,0.92)]">
                           <span className={`text-[13px] truncate ${selectedContactDisplay ? 'text-white/85' : 'text-white/55'}`}>
                             {selectedContactDisplay || t('ui_saved_recipient_hint', 'Sélectionnez un destinataire')}
                           </span>
