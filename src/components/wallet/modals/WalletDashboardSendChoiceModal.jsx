@@ -769,7 +769,7 @@ export default function WalletDashboardSendChoiceModal({
                           return next;
                         });
                       }}
-                      className="w-full grid grid-cols-[56px_1fr] gap-3 pl-2 pr-3 md:px-6 py-4 md:py-5 hover:bg-white/[0.02] transition-colors duration-150 text-left"
+                      className="w-full grid grid-cols-[56px_1fr] gap-3 pl-2 pr-3 md:px-6 py-4 md:py-5 text-left"
                     >
                       <div className="w-14 flex items-center justify-center flex-shrink-0">
                         <div className="xcannes-fade-ring-y w-[52px] h-[52px] rounded-full bg-black/20 bg-[linear-gradient(180deg,rgba(255,255,255,0.06)_0%,rgba(255,255,255,0.02)_50%,rgba(255,255,255,0)_100%)] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] flex items-center justify-center">
