@@ -1071,7 +1071,7 @@ export default function WalletDashboardSendChoiceModal({
                             if (showLabel) {
                               // When label is shown, keep the address very short.
                               return addr.length > 10
-                                ? `${addr.slice(0, 4)}…${addr.slice(-2)}`
+                                ? `${addr.slice(0, 3)}…${addr.slice(-2)}`
                                 : addr;
                             }
                             // Without label, keep more than half of the address visible.
@@ -1099,7 +1099,7 @@ export default function WalletDashboardSendChoiceModal({
                           );
                         })()
                       : <span className="inline-flex items-center gap-1.5 text-white/85">
-                          <span className="text-xs">{t('ui_fill_recipient_address', "Renseigner l'adresse du destinataire")}</span>
+                          <span className="text-[12px] md:text-[14px]">{t('ui_fill_recipient_address', "Renseigner l'adresse du destinataire")}</span>
                           <span className="inline-flex items-end gap-[3px] mb-[-1px]">
                             <span className="send-dot" style={{ animationDelay: '0s' }}>·</span>
                             <span className="send-dot" style={{ animationDelay: '0.6s' }}>·</span>
@@ -1270,7 +1270,7 @@ export default function WalletDashboardSendChoiceModal({
                     {pendingPayreq
                       ? t('ui_validate_payreq', 'Vérifier la demande de paiement')
                       : <span className="inline-flex items-center gap-1.5">
-                          <span className="text-xs">{t('ui_fill_payreq', 'Renseignez la demande de paiement')}</span>
+                          <span className="text-[12px] md:text-[14px]">{t('ui_fill_payreq', 'Renseignez la demande de paiement')}</span>
                           <span className="inline-flex items-end gap-[3px] mb-[-1px]">
                             <span className="payreq-cta-dot" style={{ animationDelay: '0s' }}>·</span>
                             <span className="payreq-cta-dot" style={{ animationDelay: '0.6s' }}>·</span>

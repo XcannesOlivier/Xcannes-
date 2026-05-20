@@ -61,7 +61,6 @@ export default function DemoWalletDashboardSendModal({
   const locale = i18n?.language || "en";
   const [saveNewAddress, setSaveNewAddress] = useState(false);
   const [saveNewAddressLabel, setSaveNewAddressLabel] = useState("");
-  const [showFullRecipientAccount, setShowFullRecipientAccount] = useState(false);
   const [submitStatus, setSubmitStatus] = useState("idle"); // idle | processing | success | error
   const [submitError, setSubmitError] = useState("");
   const [scanActive, setScanActive] = useState(false);
@@ -98,6 +97,15 @@ export default function DemoWalletDashboardSendModal({
     () => String(sendDestination || "").trim(),
     [sendDestination],
   );
+  const copyRecipientAddress = async () => {
+    const value = String(normalizedDestination || "").trim();
+    if (!value || typeof navigator === "undefined") return;
+    try {
+      await navigator.clipboard.writeText(value);
+    } catch {
+      // ignore
+    }
+  };
   const compactDestinationLabel = normalizedDestination
     ? normalizedDestination.length > 14
       ? `${normalizedDestination.slice(0, 6)}…${normalizedDestination.slice(-4)}`
@@ -890,16 +898,11 @@ export default function DemoWalletDashboardSendModal({
               {t("ui_account_number_label", "N° de compte")} —{" "}
               <button
                 type="button"
-                onClick={() => setShowFullRecipientAccount((prev) => !prev)}
+                onClick={copyRecipientAddress}
                 className="font-mono text-xcannes-green/80 hover:text-xcannes-green/95 transition-colors underline decoration-white/25 underline-offset-2 hover:decoration-white/60"
-                title={t(
-                  "ui_toggle_full_account_number",
-                  "Afficher/masquer l'adresse complète",
-                )}
+                title={t("ui_copy_address", "Copier l’adresse")}
               >
-                {showFullRecipientAccount
-                  ? normalizedDestination
-                  : compactDestinationLabel}
+                {compactDestinationLabel}
               </button>
             </span>
           ) : null}
@@ -1250,7 +1253,7 @@ export default function DemoWalletDashboardSendModal({
           </span>
         ) : sendButtonDisabled && !sendProcessing ? (
           <span className="inline-flex items-center gap-1.5 text-white/20">
-            <span className="text-xs">
+            <span className="text-[12px] md:text-[14px]">
               {t("ui_send_fill_cta", "Choisissez la devise et le montant")}
             </span>
             <span className="inline-flex items-end gap-[3px] mb-[-1px]">

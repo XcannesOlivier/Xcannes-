@@ -61,8 +61,6 @@ export default function WalletDashboardSendModal({
   const [showFullPayreqAddress, setShowFullPayreqAddress] = useState(false);
   const [scanUnavailable, setScanUnavailable] = useState(false);
   /* ── Scanner swipe-to-close (mobile) ── */
-  const [showFullRecipientAccount, setShowFullRecipientAccount] =
-    useState(false);
   const [sendAssetDropdownOpen, setSendAssetDropdownOpen] = useState(false);
   const savedPickerRef = useRef(null);
   const savedMenuRef = useRef(null);
@@ -249,6 +247,17 @@ export default function WalletDashboardSendModal({
   };
   const looksLikeXrplAddress = (value) =>
     /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(value);
+
+  const copyRecipientAddress = async () => {
+    const value = String(normalizedDestination || "").trim();
+    if (!value || typeof navigator === "undefined") return;
+    try {
+      await navigator.clipboard.writeText(value);
+      toast?.success?.(t("ui_address_copied", "Adresse copiée"));
+    } catch {
+      // ignore
+    }
+  };
   const looksLikeQrPayload = (value) => {
     const raw = String(value || "").trim();
     if (!raw) return false;
@@ -518,10 +527,6 @@ export default function WalletDashboardSendModal({
       ? `${normalizedDestination.slice(0, 6)}…${normalizedDestination.slice(-4)}`
       : normalizedDestination
     : "";
-
-  useEffect(() => {
-    setShowFullRecipientAccount(false);
-  }, [normalizedDestination]);
 
   const savedPickerMenu = showSavedPicker ? (
     (() => {
@@ -893,18 +898,14 @@ export default function WalletDashboardSendModal({
             </div>
             <button
               type="button"
-              onClick={() => setShowFullRecipientAccount((prev) => !prev)}
+              onClick={copyRecipientAddress}
               className={[
                 "font-mono text-xs text-white/80 text-left transition-colors",
                 "underline decoration-white/25 underline-offset-2 hover:decoration-white/60",
-                showFullRecipientAccount ? "break-all" : "",
               ].join(" ")}
-              title={t(
-                "ui_toggle_full_account_number",
-                "Afficher/masquer l’adresse complète",
-              )}
+              title={t("ui_copy_address", "Copier l’adresse")}
             >
-              {showFullRecipientAccount ? normalizedDestination : compactDestinationLabel}
+              {compactDestinationLabel}
             </button>
           </div>
           <div className="flex items-start justify-between gap-4">
@@ -1135,11 +1136,11 @@ export default function WalletDashboardSendModal({
               {t("ui_account_number_label", "N° de compte")} —{" "}
               <button
                 type="button"
-                onClick={() => setShowFullRecipientAccount((prev) => !prev)}
+                onClick={copyRecipientAddress}
                 className="font-mono text-xcannes-green/80 hover:text-xcannes-green/95 transition-colors underline decoration-white/25 underline-offset-2 hover:decoration-white/60"
-                title={t("ui_toggle_full_account_number", "Afficher/masquer l'adresse complète")}
+                title={t("ui_copy_address", "Copier l’adresse")}
               >
-                {showFullRecipientAccount ? normalizedDestination : compactDestinationLabel}
+                {compactDestinationLabel}
               </button>
             </span>
           ) : null}
@@ -1285,7 +1286,7 @@ export default function WalletDashboardSendModal({
       >
         {sendButtonDisabled && !sendProcessing
           ? <span className="inline-flex items-center gap-1.5 text-white/20">
-              <span className="text-xs">{t('ui_send_fill_cta', 'Choisissez la devise et le montant')}</span>
+              <span className="text-[12px]">{t('ui_send_fill_cta', 'Choisissez la devise et le montant')}</span>
               <span className="inline-flex items-end gap-[3px] mb-[-1px]">
                 <span className="send-modal-dot" style={{ animationDelay: '0s' }}>·</span>
                 <span className="send-modal-dot" style={{ animationDelay: '0.6s' }}>·</span>
@@ -1314,7 +1315,7 @@ export default function WalletDashboardSendModal({
       >
         {sendButtonDisabled && !sendProcessing
           ? <span className="inline-flex items-center gap-1.5 text-white/20">
-              <span className="text-xs">{t('ui_send_fill_cta', 'Choisissez la devise et le montant')}</span>
+              <span className="text-[14px]">{t('ui_send_fill_cta', 'Choisissez la devise et le montant')}</span>
               <span className="inline-flex items-end gap-[3px] mb-[-1px]">
                 <span className="send-modal-dot" style={{ animationDelay: '0s' }}>·</span>
                 <span className="send-modal-dot" style={{ animationDelay: '0.6s' }}>·</span>
