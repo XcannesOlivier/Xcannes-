@@ -877,7 +877,10 @@ export default function WalletDashboardSendChoiceModal({
                     </div>
                   </div>
 
-                  <div className="h-px bg-white/[0.12] md:bg-white/[0.08] ml-[72px] mr-5 md:mr-6" />
+                  <div className="ml-[72px] mr-5 md:mr-6">
+                    <div className="h-px bg-gradient-to-r from-transparent via-white/[0.14] to-transparent" />
+                    <div className="-mt-px h-px bg-gradient-to-r from-transparent via-black/[0.55] to-transparent opacity-70" />
+                  </div>
 
                   {/* 1. Scanner un QR code */}
                   <button
@@ -899,11 +902,17 @@ export default function WalletDashboardSendChoiceModal({
                       )}
                     </div>
                     <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">
-                      <svg className="w-5 h-5 text-xcannes-green" viewBox="0 0 24 24" fill="none" aria-hidden><path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                      <svg className="w-5 h-5 text-xcannes-green" viewBox="0 0 24 24" fill="none" aria-hidden>
+                        <path d="M8 18L14 12L8 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        <path d="M12 18L18 12L12 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
                     </div>
                   </button>
 
-                  <div className="h-px bg-white/[0.12] md:bg-white/[0.08] ml-[72px] mr-5 md:mr-6" />
+                  <div className="ml-[72px] mr-5 md:mr-6">
+                    <div className="h-px bg-gradient-to-r from-transparent via-white/[0.14] to-transparent" />
+                    <div className="-mt-px h-px bg-gradient-to-r from-transparent via-black/[0.55] to-transparent opacity-70" />
+                  </div>
 
                   {/* 3. Entrer une adresse manuellement */}
                   <div>
@@ -927,7 +936,10 @@ export default function WalletDashboardSendChoiceModal({
                           {t('ui_manual_entry_hint', 'Coller ou saisir une adresse de wallet')}
                         </p>
                       </div>
-                      <svg className={`w-5 h-5 text-xcannes-green flex-shrink-0 transition-transform duration-200 ${manualEntryOpen ? 'rotate-90' : 'rotate-0'}`} viewBox="0 0 24 24" fill="none"><path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                      <svg className={`w-5 h-5 text-xcannes-green flex-shrink-0 transition-transform duration-200 ${manualEntryOpen ? 'rotate-90' : 'rotate-0'}`} viewBox="0 0 24 24" fill="none">
+                        <path d="M8 18L14 12L8 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        <path d="M12 18L18 12L12 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
                     </button>
 
                     {manualEntryOpen ? (
@@ -981,7 +993,10 @@ export default function WalletDashboardSendChoiceModal({
                     ) : null}
                   </div>
 
-                  <div className="h-px bg-white/[0.12] md:bg-white/[0.08] ml-[72px] mr-5 md:mr-6" />
+                  <div className="ml-[72px] mr-5 md:mr-6">
+                    <div className="h-px bg-gradient-to-r from-transparent via-white/[0.14] to-transparent" />
+                    <div className="-mt-px h-px bg-gradient-to-r from-transparent via-black/[0.55] to-transparent opacity-70" />
+                  </div>
 
                   {/* 4. Importer un QR code */}
                   <button
@@ -1003,7 +1018,10 @@ export default function WalletDashboardSendChoiceModal({
                       )}
                     </div>
                     <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">
-                      <svg className="w-5 h-5 text-xcannes-green" viewBox="0 0 24 24" fill="none" aria-hidden><path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                      <svg className="w-5 h-5 text-xcannes-green" viewBox="0 0 24 24" fill="none" aria-hidden>
+                        <path d="M8 18L14 12L8 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        <path d="M12 18L18 12L12 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
                     </div>
                   </button>
 
