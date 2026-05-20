@@ -732,7 +732,7 @@ export default function WalletDashboardSendChoiceModal({
                   </div>
                 </div>
 
-                <div className="rounded-[26px] bg-[linear-gradient(180deg,rgba(16,20,21,0.92)_0%,rgba(9,12,13,0.72)_100%)] shadow-[inset_0_1px_0_rgba(255,255,255,0.05),inset_0_-26px_46px_rgba(0,0,0,0.55)] p-3 md:p-4">
+                <div className="rounded-[26px] bg-[linear-gradient(180deg,rgba(16,20,21,0.92)_0%,rgba(9,12,13,0.72)_100%)] ring-1 ring-white/10 ring-inset shadow-[inset_0_1px_0_rgba(255,255,255,0.05),inset_0_-26px_46px_rgba(0,0,0,0.55)] p-3 md:p-4">
                   <div className="flex flex-col gap-3">
 
                   {/* 4. Choisir un contact */}
@@ -899,7 +899,7 @@ export default function WalletDashboardSendChoiceModal({
                     <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">
                       <svg className="w-5 h-5 text-xcannes-green" viewBox="0 0 24 24" fill="none" aria-hidden>
                         <path d="M8 18L14 12L8 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                        <path d="M12 18L18 12L12 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        <path d="M13.5 18L19.5 12L13.5 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                     </div>
                   </button>
@@ -928,7 +928,7 @@ export default function WalletDashboardSendChoiceModal({
                       </div>
                       <svg className={`w-5 h-5 text-xcannes-green flex-shrink-0 transition-transform duration-200 ${manualEntryOpen ? 'rotate-90' : 'rotate-0'}`} viewBox="0 0 24 24" fill="none">
                         <path d="M8 18L14 12L8 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                        <path d="M12 18L18 12L12 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        <path d="M13.5 18L19.5 12L13.5 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                     </button>
 
@@ -1005,7 +1005,7 @@ export default function WalletDashboardSendChoiceModal({
                     <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">
                       <svg className="w-5 h-5 text-xcannes-green" viewBox="0 0 24 24" fill="none" aria-hidden>
                         <path d="M8 18L14 12L8 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                        <path d="M12 18L18 12L12 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        <path d="M13.5 18L19.5 12L13.5 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                     </div>
                   </button>
