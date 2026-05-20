@@ -561,7 +561,7 @@ export default function WalletDashboardSendChoiceModal({
 	                      className: "flex justify-center",
 	                      prefix: t("moonpay_from_account", "Compte source"),
 	                      pillClassName:
-	                        "bg-elevated ring-1 ring-white/10 shadow-none rounded-[20px]",
+	                        "bg-elevated xcannes-fade-border-y shadow-none rounded-[20px]",
 	                    })}
 	                  </div>
                 </div>
@@ -747,7 +747,7 @@ export default function WalletDashboardSendChoiceModal({
 	                      variant: 'pill-column',
 	                      className: 'flex justify-center',
 	                      prefix: t('moonpay_from_account', 'Compte source'),
-	                      pillClassName: 'bg-elevated ring-1 ring-white/10 shadow-none rounded-[20px]',
+	                      pillClassName: 'bg-elevated xcannes-fade-border-y shadow-none rounded-[20px]',
 	                    })}
 	                  </div>
                 </div>
@@ -789,7 +789,7 @@ export default function WalletDashboardSendChoiceModal({
                       </div>
                     </button>
                     <div
-                      className={`absolute left-0 right-0 top-full mt-1.5 z-[100] xcannes-irregular-green-border rounded-xl overflow-hidden bg-black/60 shadow-[inset_0_-30px_30px_-20px_rgba(0,0,0,0.92)] transition-all duration-200 origin-top ${showQuickscanSavedPicker ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-95 pointer-events-none'}`}
+                      className={`absolute left-0 right-0 top-full mt-1.5 z-[100] xcannes-irregular-green-border rounded-xl overflow-hidden bg-black shadow-[inset_0_-30px_30px_-20px_rgba(0,0,0,0.92)] transition-all duration-200 origin-top ${showQuickscanSavedPicker ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-95 pointer-events-none'}`}
                     >
                       <div className="px-4 py-2.5 border-b border-white/[0.04]">
                         <div className="flex items-center justify-between gap-2">
@@ -1178,7 +1178,7 @@ export default function WalletDashboardSendChoiceModal({
 	                      variant: 'pill-column',
 	                      className: 'flex justify-center',
 	                      prefix: t('moonpay_from_account', 'Compte source'),
-	                      pillClassName: 'bg-elevated shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)] rounded-[20px]',
+	                      pillClassName: 'bg-elevated xcannes-fade-border-y shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)] rounded-[20px]',
 	                      dotClassName: '!bg-[#f5a623] ring-[#f5a623]/20',
 	                    })}
 	                  </div>
