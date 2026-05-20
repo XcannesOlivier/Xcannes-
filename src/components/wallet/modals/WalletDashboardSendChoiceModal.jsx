@@ -79,6 +79,7 @@ export default function WalletDashboardSendChoiceModal({
   const [simpleSendSelfError, setSimpleSendSelfError] = useState(false);
   const [quickscanPasteValue, setQuickscanPasteValue] = useState('');
   const [manualEntryOpen, setManualEntryOpen] = useState(false);
+  const [payreqManualEntryOpen, setPayreqManualEntryOpen] = useState(false);
   const [showQuickscanSavedPicker, setShowQuickscanSavedPicker] = useState(false);
   const [selectedContactDisplay, setSelectedContactDisplay] = useState('');
   const [scannedDisplay, setScannedDisplay] = useState('');
@@ -126,6 +127,7 @@ export default function WalletDashboardSendChoiceModal({
       setPayreqImportedDisplay('');
       setQuickscanPasteValue('');
       setManualEntryOpen(false);
+      setPayreqManualEntryOpen(false);
       setShowQuickscanSavedPicker(false);
       setSavedAddressesVisible(false);
       setSavedAddressModes({});
@@ -1196,73 +1198,141 @@ export default function WalletDashboardSendChoiceModal({
                 <div className="flex flex-col gap-4 md:gap-7">
 
                   {/* 1. Scanner un QR code */}
-                  <div className="rounded-[20px] bg-elevated">
                   <button
                     type="button"
                     onClick={onChoosePayreqScan || onChooseQuickScan}
-                    className="w-full flex items-center gap-4 bg-white/5 ring-1 ring-inset ring-white/10 rounded-[20px] shadow-[inset_0_-34px_34px_-20px_rgba(0,0,0,0.95),inset_0_-18px_70px_-45px_rgba(0,0,0,0.9)] px-4 py-4 hover:bg-transparent hover:ring-white/15 transition-colors duration-150 text-left"
+                    className="xcannes-fade-border-y w-full grid grid-cols-[56px_1fr_24px] items-center gap-2 md:gap-3 pl-2 pr-3 md:px-6 py-4 md:py-5 hover:bg-white/[0.02] transition-colors duration-150 text-left rounded-[20px] shadow-[inset_0_-14px_18px_rgba(0,0,0,0.55)]"
                   >
-                    <div className="w-11 h-11 flex items-center justify-center flex-shrink-0">
-                      <svg className="w-[36px] h-[36px] text-white/90" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" /></svg>
+                    <div className="w-14 flex items-center justify-center flex-shrink-0">
+                      <div className="xcannes-fade-ring-y w-[52px] h-[52px] rounded-full bg-black/20 bg-[linear-gradient(180deg,rgba(255,255,255,0.06)_0%,rgba(255,255,255,0.02)_50%,rgba(255,255,255,0)_100%)] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] flex items-center justify-center">
+                        <svg className="w-[26px] h-[26px] text-xcannes-green" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" /></svg>
+                      </div>
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="text-[15px] font-medium text-white/85">{t('ui_scan_card_title', 'Scanner un QR code')}</p>
+                      <p className="text-[13px] font-medium text-white/85 whitespace-nowrap overflow-hidden text-ellipsis">{t('ui_scan_card_title', 'Scanner un QR code')}</p>
                       {payreqScannedDisplay ? (
                         <div className="flex items-center mt-1.5 bg-black/80 ring-1 ring-white/10 ring-inset rounded-xl pl-3 pr-3 py-2">
                           <span className="text-[13px] truncate text-white/85">{payreqScannedDisplay}</span>
                         </div>
                       ) : (
-                        <p className="text-[13px] text-white/40 mt-0.5">{t('ui_scan_payreq_hint', 'Utilisez la caméra pour scanner une demande de paiement')}</p>
+                        <p className="text-[11px] md:text-[13px] text-white/40 mt-0.5">{t('ui_scan_payreq_hint', 'Utilisez la caméra pour scanner une demande de paiement')}</p>
                       )}
                     </div>
+                    <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">
+                      <svg className="w-5 h-5 text-xcannes-green" viewBox="0 0 24 24" fill="none" aria-hidden>
+                        <path d="M8 18L14 12L8 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        <path d="M13.5 18L19.5 12L13.5 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </div>
                   </button>
-                  </div>
 
                   {/* 3. Saisir une demande */}
-                  <div className="rounded-[20px]">
-                  <div className="bg-transparent overflow-hidden">
-                    <div className="flex items-center gap-4 px-4 py-3">
-                      <div className="w-11 h-11 flex items-center justify-center flex-shrink-0">
-                        <svg className="w-[36px] h-[36px] text-white/90" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                  <div className="xcannes-fade-border-y rounded-[20px] shadow-[inset_0_-14px_18px_rgba(0,0,0,0.55)]">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPayreqSelfSendError(false);
+                        setPayreqManualEntryOpen((prev) => !prev);
+                      }}
+                      className="w-full grid grid-cols-[56px_1fr_24px] items-center gap-2 md:gap-3 pl-2 pr-3 md:px-6 py-4 md:py-5 hover:bg-white/[0.02] transition-colors duration-150 text-left"
+                    >
+                      <div className="w-14 flex items-center justify-center flex-shrink-0">
+                        <div className="xcannes-fade-ring-y w-[52px] h-[52px] rounded-full bg-black/20 bg-[linear-gradient(180deg,rgba(255,255,255,0.06)_0%,rgba(255,255,255,0.02)_50%,rgba(255,255,255,0)_100%)] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] flex items-center justify-center">
+                          <svg className="w-[26px] h-[26px] text-xcannes-green" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                        </div>
                       </div>
                       <div className="min-w-0 flex-1">
+                        <p className="text-[13px] font-medium text-white/85 whitespace-nowrap overflow-hidden text-ellipsis">
+                          {t('ui_paste_payreq_title', 'Saisir une demande de paiement')}
+                        </p>
+                        <p className="text-[11px] md:text-[13px] text-white/40 mt-0.5">
+                          {t('ui_paste_payreq_hint', 'Coller ou saisir une demande de paiement')}
+                        </p>
+                      </div>
+                      <svg className={`w-5 h-5 text-xcannes-green flex-shrink-0 transition-transform duration-200 ${payreqManualEntryOpen ? 'rotate-90' : 'rotate-0'}`} viewBox="0 0 24 24" fill="none">
+                        <path d="M8 18L14 12L8 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        <path d="M13.5 18L19.5 12L13.5 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </button>
+
+                    {payreqManualEntryOpen ? (
+                      <div className="pl-2 pr-3 md:px-6 pb-4 -mt-2">
                         <div className="relative">
-                          <input type="text" value={payreqPasteValue} onChange={(e) => { setPayreqPasteValue(e.target.value); setPayreqSelfSendError(false); }} onKeyDown={(e) => { if (e.key === 'Enter') handlePayreqPasteSubmit(); }} onPaste={(e) => { const text = (e.clipboardData?.getData('text') || '').trim(); if (text) { e.preventDefault(); setPayreqPasteValue(text); if (isPayreqSelfSend(text)) { setPayreqSelfSendError(true); return; } setPayreqSelfSendError(false); setPendingPayreq(text); } }} placeholder={t('ui_paste_payreq_placeholder', 'Saisir une demande de paiement')} className="w-full bg-black/80 ring-1 ring-white/10 ring-inset rounded-xl shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30)] pl-3 pr-10 py-2 text-[13px] text-white placeholder:text-white/55 outline-none focus:ring-white/25 focus:shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30),0_0_0_1px_rgba(255,255,255,0.10),0_0_24px_rgba(255,255,255,0.06)] transition-all duration-200" />
-                          {payreqPasteValue.trim() ? (<button type="button" onClick={handlePayreqPasteSubmit} className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-lg text-white/30 hover:text-white/60 transition-colors" title={t('ui_go_label', 'Valider')}><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M12 5l7 7-7 7" /></svg></button>) : null}
+                          <input
+                            type="text"
+                            value={payreqPasteValue}
+                            onChange={(e) => {
+                              setPayreqPasteValue(e.target.value);
+                              setPayreqSelfSendError(false);
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') handlePayreqPasteSubmit();
+                            }}
+                            onPaste={(e) => {
+                              const text = (e.clipboardData?.getData('text') || '').trim();
+                              if (text) {
+                                e.preventDefault();
+                                setPayreqPasteValue(text);
+                                if (isPayreqSelfSend(text)) {
+                                  setPayreqSelfSendError(true);
+                                  return;
+                                }
+                                setPayreqSelfSendError(false);
+                                setPendingPayreq(text);
+                              }
+                            }}
+                            placeholder={t('ui_paste_payreq_placeholder', 'Saisir une demande de paiement')}
+                            className="w-full bg-black ring-1 ring-white/10 ring-inset rounded-xl pl-3 pr-10 py-2 text-[13px] text-white placeholder:text-white/55 outline-none focus:ring-white/25 transition-all duration-200"
+                          />
+                          {payreqPasteValue.trim() ? (
+                            <button
+                              type="button"
+                              onClick={handlePayreqPasteSubmit}
+                              className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-lg text-white/30 hover:text-white/60 transition-colors"
+                              title={t('ui_go_label', 'Valider')}
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M12 5l7 7-7 7" /></svg>
+                            </button>
+                          ) : null}
                         </div>
-                        {payreqSelfSendError && (
+                        {payreqSelfSendError ? (
                           <div className="rounded-lg ring-1 ring-orange-400/30 ring-inset bg-orange-400/10 px-3 py-2.5 text-xs text-orange-200/90 mt-2">
                             <div className="font-semibold">{t('ui_invalid_recipient_title', 'Destinataire invalide')}</div>
                             <div className="mt-0.5 text-orange-200/70">{t('ui_cannot_send_to_self', 'Vous ne pouvez pas envoyer à votre propre compte.')}</div>
                           </div>
-                        )}
+                        ) : null}
                       </div>
-                    </div>
-                  </div>
+                    ) : null}
                   </div>
 
                   {/* 4. Importer un QR code */}
-                  <div className="rounded-[20px] bg-elevated">
                   <button
                     type="button"
                     onClick={() => handleFileUpload(payreqFileInputId, true)}
-                    className="w-full flex items-center gap-4 bg-white/5 ring-1 ring-inset ring-white/10 rounded-[20px] shadow-[inset_0_-34px_34px_-20px_rgba(0,0,0,0.95),inset_0_-18px_70px_-45px_rgba(0,0,0,0.9)] px-4 py-4 hover:bg-transparent hover:ring-white/15 transition-colors duration-150 text-left"
+                    className="xcannes-fade-border-y w-full grid grid-cols-[56px_1fr_24px] items-center gap-2 md:gap-3 pl-2 pr-3 md:px-6 py-4 md:py-5 hover:bg-white/[0.02] transition-colors duration-150 text-left rounded-[20px] shadow-[inset_0_-14px_18px_rgba(0,0,0,0.55)]"
                   >
-                    <div className="w-11 h-11 flex items-center justify-center flex-shrink-0">
-                      <svg className="w-[36px] h-[36px] text-white/90" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M12 4v12m0 0l-3-3m3 3l3-3" /></svg>
+                    <div className="w-14 flex items-center justify-center flex-shrink-0">
+                      <div className="xcannes-fade-ring-y w-[52px] h-[52px] rounded-full bg-black/20 bg-[linear-gradient(180deg,rgba(255,255,255,0.06)_0%,rgba(255,255,255,0.02)_50%,rgba(255,255,255,0)_100%)] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] flex items-center justify-center">
+                        <svg className="w-[26px] h-[26px] text-xcannes-green" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M12 4v12m0 0l-3-3m3 3l3-3" /></svg>
+                      </div>
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="text-[13px] font-medium text-white/85">{t('ui_import_card_title', 'Importer un QR code')}</p>
+                      <p className="text-[13px] font-medium text-white/85 whitespace-nowrap overflow-hidden text-ellipsis">{t('ui_import_card_title', 'Importer un QR code')}</p>
                       {payreqImportedDisplay ? (
                         <div className="flex items-center mt-1.5 bg-black/80 ring-1 ring-white/10 ring-inset rounded-xl pl-3 pr-3 py-2">
-                          <span className="text-[11px] truncate text-white/85">{payreqImportedDisplay}</span>
+                          <span className="text-[13px] truncate text-white/85">{payreqImportedDisplay}</span>
                         </div>
                       ) : (
-                        <p className="text-[11px] text-white/40 mt-0.5">{t('ui_import_payreq_hint', 'Importez une image ou un fichier contenant un QR code')}</p>
+                        <p className="text-[11px] md:text-[13px] text-white/40 mt-0.5">{t('ui_import_payreq_hint', 'Importez une image ou un fichier contenant un QR code')}</p>
                       )}
                     </div>
+                    <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">
+                      <svg className="w-5 h-5 text-xcannes-green" viewBox="0 0 24 24" fill="none" aria-hidden>
+                        <path d="M8 18L14 12L8 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        <path d="M13.5 18L19.5 12L13.5 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </div>
                   </button>
-                  </div>
 
                 </div>
 
