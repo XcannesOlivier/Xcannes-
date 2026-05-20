@@ -732,8 +732,8 @@ export default function WalletDashboardSendChoiceModal({
                   </div>
                 </div>
 
-                <div className="rounded-[24px] bg-white/5 ring-1 ring-white/10 ring-inset shadow-[inset_0_-34px_34px_-20px_rgba(0,0,0,0.95),inset_0_-18px_70px_-45px_rgba(0,0,0,0.9)]">
-                  <div className="divide-y divide-white/[0.06]">
+                <div className="rounded-[26px] bg-[linear-gradient(180deg,rgba(16,20,21,0.92)_0%,rgba(9,12,13,0.72)_100%)] ring-1 ring-white/10 ring-inset shadow-[inset_0_1px_0_rgba(255,255,255,0.05),inset_0_-26px_46px_rgba(0,0,0,0.55)]">
+                  <div className="divide-y divide-white/[0.08]">
 
                   {/* 4. Choisir un contact */}
                   <div className="relative" ref={quickscanSavedPickerRef}>
@@ -749,16 +749,16 @@ export default function WalletDashboardSendChoiceModal({
                           return next;
                         });
                       }}
-                      className="w-full flex items-center gap-4 px-4 py-4 hover:bg-white/[0.03] transition-colors duration-150 text-left"
+                      className="w-full grid grid-cols-[56px_1fr] gap-3 px-5 md:px-6 py-4 md:py-5 hover:bg-white/[0.03] transition-colors duration-150 text-left"
                     >
-                      <div className="w-11 h-11 flex items-center justify-center flex-shrink-0">
+                      <div className="w-14 flex items-start justify-center pt-0.5 flex-shrink-0">
                         <svg className="w-[36px] h-[36px] text-xcannes-green" fill="none" viewBox="0 0 24 24" strokeWidth={0.8} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0" /></svg>
                       </div>
                       <div className="min-w-0 flex-1">
                         <p className="text-[15px] font-semibold text-white/90">
                           {t('ui_saved_recipient_title', 'Destinataire enregistré')}
                         </p>
-                        <div className="mt-2 flex items-center justify-between ring-1 ring-inset rounded-xl pl-3 pr-2.5 py-2 bg-black/70 ring-white/10 shadow-[inset_0_-34px_34px_-20px_rgba(0,0,0,0.95),inset_0_-18px_70px_-45px_rgba(0,0,0,0.9)]">
+                        <div className="mt-2 flex items-center justify-between ring-1 ring-inset rounded-xl pl-3 pr-2.5 py-2 bg-black/60 ring-white/10 shadow-[inset_0_-30px_30px_-20px_rgba(0,0,0,0.92)]">
                           <span className={`text-[13px] truncate ${selectedContactDisplay ? 'text-white/85' : 'text-white/55'}`}>
                             {selectedContactDisplay || t('ui_saved_recipient_hint', 'Sélectionnez un destinataire')}
                           </span>
@@ -881,9 +881,9 @@ export default function WalletDashboardSendChoiceModal({
                   <button
                     type="button"
                     onClick={onChooseQuickScan}
-                    className="w-full flex items-center gap-4 px-4 py-4 hover:bg-white/[0.03] transition-colors duration-150 text-left"
+                    className="w-full grid grid-cols-[56px_1fr_24px] items-center gap-3 px-5 md:px-6 py-4 md:py-5 hover:bg-white/[0.03] transition-colors duration-150 text-left"
                   >
-                    <div className="w-11 h-11 flex items-center justify-center flex-shrink-0">
+                    <div className="w-14 flex items-center justify-center flex-shrink-0">
                       <svg className="w-[36px] h-[36px] text-xcannes-green" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={0.8}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" /></svg>
                     </div>
                     <div className="min-w-0 flex-1">
@@ -910,9 +910,9 @@ export default function WalletDashboardSendChoiceModal({
                         setSimpleSendSelfError(false);
                         setManualEntryOpen((prev) => !prev);
                       }}
-                      className="w-full flex items-center gap-4 px-4 py-4 hover:bg-white/[0.03] transition-colors duration-150 text-left"
+                      className="w-full grid grid-cols-[56px_1fr_24px] items-center gap-3 px-5 md:px-6 py-4 md:py-5 hover:bg-white/[0.03] transition-colors duration-150 text-left"
                     >
-                      <div className="w-11 h-11 flex items-center justify-center flex-shrink-0">
+                      <div className="w-14 flex items-center justify-center flex-shrink-0">
                         <svg className="w-[36px] h-[36px] text-xcannes-green" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={0.8}><path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                       </div>
                       <div className="min-w-0 flex-1">
@@ -927,7 +927,7 @@ export default function WalletDashboardSendChoiceModal({
                     </button>
 
                     {manualEntryOpen ? (
-                      <div className="px-4 pb-4 -mt-1">
+                      <div className="px-5 md:px-6 pb-4 -mt-2">
                         <div className="relative">
                           <input
                             ref={manualEntryInputRef}
@@ -981,9 +981,9 @@ export default function WalletDashboardSendChoiceModal({
                   <button
                     type="button"
                     onClick={() => handleFileUpload(quickscanFileInputId, false)}
-                    className="w-full flex items-center gap-4 px-4 py-4 hover:bg-white/[0.03] transition-colors duration-150 text-left"
+                    className="w-full grid grid-cols-[56px_1fr_24px] items-center gap-3 px-5 md:px-6 py-4 md:py-5 hover:bg-white/[0.03] transition-colors duration-150 text-left"
                   >
-                    <div className="w-11 h-11 flex items-center justify-center flex-shrink-0">
+                    <div className="w-14 flex items-center justify-center flex-shrink-0">
                       <svg className="w-[36px] h-[36px] text-xcannes-green" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={0.8}><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M12 4v12m0 0l-3-3m3 3l3-3" /></svg>
                     </div>
                     <div className="min-w-0 flex-1">
@@ -993,7 +993,7 @@ export default function WalletDashboardSendChoiceModal({
                           <span className="text-[13px] truncate text-white/85">{importedDisplay}</span>
                         </div>
                       ) : (
-                        <p className="text-[11px] text-white/40 mt-0.5">{t('ui_import_card_hint', 'Importez une image ou un fichier contenant un QR code')}</p>
+                        <p className="text-[11px] text-white/40 mt-0.5">{t('ui_import_card_hint', 'Depuis une image ou un fichier')}</p>
                       )}
                     </div>
                     <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">
