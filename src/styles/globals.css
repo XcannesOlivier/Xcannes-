@@ -753,13 +753,13 @@ body.header-hero-mode .home-content-wrapper {
   -webkit-mask-image: linear-gradient(
     to bottom,
     rgba(0, 0, 0, 1) 0%,
-    rgba(0, 0, 0, 1) 42%,
+    rgba(0, 0, 0, 1) 22%,
     rgba(0, 0, 0, 0) 100%
   );
   mask-image: linear-gradient(
     to bottom,
     rgba(0, 0, 0, 1) 0%,
-    rgba(0, 0, 0, 1) 42%,
+    rgba(0, 0, 0, 1) 22%,
     rgba(0, 0, 0, 0) 100%
   );
 }
@@ -767,6 +767,14 @@ body.header-hero-mode .home-content-wrapper {
 /* ── Thin irregular green border (for select-like inputs) ── */
 .xcannes-irregular-green-border {
   position: relative;
+}
+.xcannes-irregular-green-border::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 .xcannes-irregular-green-border::after {
   content: "";
@@ -801,7 +809,7 @@ body.header-hero-mode .home-content-wrapper {
   inset: 0;
   pointer-events: none;
   border-radius: inherit;
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  border: 0.25px solid rgba(255, 255, 255, 0.14);
   -webkit-mask-image: linear-gradient(
     to bottom,
     rgba(0, 0, 0, 1) 0%,

@@ -813,7 +813,7 @@ export default function DemoWalletDashboardSendChoiceModal({
 
                 <div className="px-5 pt-[30px] pb-5 flex flex-col flex-1 min-h-0 overflow-y-auto overscroll-contain">
                   <div className="flex flex-col items-center text-center mb-[40px]">
-                    <h3 className="mt-1 text-[28px] font-bold text-white/95 tracking-tight">
+                    <h3 className="mt-1 text-[28px] font-semibold text-white/95 tracking-tight">
                       {t(
                         "ui_send_choose_recipient_title",
                         "Envoyer à un destinataire",

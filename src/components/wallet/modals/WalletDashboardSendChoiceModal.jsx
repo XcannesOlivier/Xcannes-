@@ -715,7 +715,7 @@ export default function WalletDashboardSendChoiceModal({
                 <div className="px-5 pt-[30px] md:pt-[60px] pb-5 flex flex-col flex-1 min-h-0 overflow-y-auto overscroll-contain">
                 {/* Title + subtitle (centered) */}
                 <div className="flex flex-col items-center text-center mb-[40px]">
-                  <h3 className="mt-1 text-[28px] md:text-[32px] font-bold text-white/95 tracking-tight">
+                  <h3 className="mt-1 text-[28px] md:text-[32px] font-semibold text-white/95 tracking-tight">
                     {t('ui_send_choose_recipient_title', 'Envoyer à un destinataire')}
                   </h3>
                   <p className="mt-2 text-[14px] md:text-[15px] text-white/60 max-w-[56ch] leading-relaxed">
@@ -752,16 +752,16 @@ export default function WalletDashboardSendChoiceModal({
                       className="w-full grid grid-cols-[56px_1fr] gap-3 pl-2 pr-3 md:px-6 py-4 md:py-5 hover:bg-white/[0.02] transition-colors duration-150 text-left"
                     >
                       <div className="w-14 flex items-center justify-center flex-shrink-0">
-                        <div className="xcannes-fade-ring-y w-[52px] h-[52px] rounded-full bg-black/40 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] flex items-center justify-center">
+                        <div className="xcannes-fade-ring-y w-[52px] h-[52px] rounded-full bg-black/20 bg-[linear-gradient(180deg,rgba(255,255,255,0.06)_0%,rgba(255,255,255,0.02)_50%,rgba(255,255,255,0)_100%)] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] flex items-center justify-center">
                           <svg className="w-[26px] h-[26px] text-xcannes-green" fill="none" viewBox="0 0 24 24" strokeWidth={0.8} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0" /></svg>
                         </div>
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="text-[13px] font-semibold text-white/90">
+                        <p className="text-[13px] font-semibold text-white/90 whitespace-nowrap overflow-hidden text-ellipsis">
                           {t('ui_saved_recipient_title', 'Destinataire enregistré')}
                         </p>
                         <div className="xcannes-irregular-green-border mt-2 flex items-center justify-between rounded-xl pl-3 pr-2.5 py-2 bg-black/60 shadow-[inset_0_-30px_30px_-20px_rgba(0,0,0,0.92)]">
-                          <span className={`text-[13px] truncate ${selectedContactDisplay ? 'text-white/85' : 'text-white/55'}`}>
+                          <span className={`text-[11px] md:text-[13px] truncate ${selectedContactDisplay ? 'text-white/85' : 'text-white/55'}`}>
                             {selectedContactDisplay || t('ui_saved_recipient_hint', 'Sélectionnez un destinataire')}
                           </span>
                           <svg className={`w-4 h-4 text-xcannes-green flex-shrink-0 ml-2 transition-transform duration-200 ${showQuickscanSavedPicker ? 'rotate-180' : ''}`} viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
@@ -886,18 +886,18 @@ export default function WalletDashboardSendChoiceModal({
                     className="xcannes-fade-border-y w-full grid grid-cols-[56px_1fr_24px] items-center gap-3 pl-2 pr-3 md:px-6 py-4 md:py-5 hover:bg-white/[0.02] transition-colors duration-150 text-left rounded-[20px]"
                   >
                     <div className="w-14 flex items-center justify-center flex-shrink-0">
-                      <div className="xcannes-fade-ring-y w-[52px] h-[52px] rounded-full bg-black/40 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] flex items-center justify-center">
+                      <div className="xcannes-fade-ring-y w-[52px] h-[52px] rounded-full bg-black/20 bg-[linear-gradient(180deg,rgba(255,255,255,0.06)_0%,rgba(255,255,255,0.02)_50%,rgba(255,255,255,0)_100%)] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] flex items-center justify-center">
                         <svg className="w-[26px] h-[26px] text-xcannes-green" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={0.8}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" /></svg>
                       </div>
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="text-[13px] font-medium text-white/85">{t('ui_scan_card_title', 'Scanner un QR code')}</p>
+                      <p className="text-[13px] font-medium text-white/85 whitespace-nowrap overflow-hidden text-ellipsis">{t('ui_scan_card_title', 'Scanner un QR code')}</p>
                       {scannedDisplay ? (
                         <div className="flex items-center mt-1.5 bg-black/80 ring-1 ring-white/10 ring-inset rounded-xl pl-3 pr-3 py-2">
                           <span className="text-[13px] truncate text-white/85">{scannedDisplay}</span>
                         </div>
                       ) : (
-                        <p className="text-[13px] text-white/40 mt-0.5">{t('ui_scan_card_hint', 'Utilisez la caméra pour scanner une adresse')}</p>
+                        <p className="text-[11px] md:text-[13px] text-white/40 mt-0.5">{t('ui_scan_card_hint', 'Utilisez la caméra pour scanner une adresse')}</p>
                       )}
                     </div>
                     <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">
@@ -920,15 +920,15 @@ export default function WalletDashboardSendChoiceModal({
                       className="w-full grid grid-cols-[56px_1fr_24px] items-center gap-3 pl-2 pr-3 md:px-6 py-4 md:py-5 hover:bg-white/[0.02] transition-colors duration-150 text-left"
                     >
                       <div className="w-14 flex items-center justify-center flex-shrink-0">
-                        <div className="xcannes-fade-ring-y w-[52px] h-[52px] rounded-full bg-black/40 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] flex items-center justify-center">
+                        <div className="xcannes-fade-ring-y w-[52px] h-[52px] rounded-full bg-black/20 bg-[linear-gradient(180deg,rgba(255,255,255,0.06)_0%,rgba(255,255,255,0.02)_50%,rgba(255,255,255,0)_100%)] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] flex items-center justify-center">
                           <svg className="w-[26px] h-[26px] text-xcannes-green" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={0.8}><path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                         </div>
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="text-[13px] font-medium text-white/85">
+                        <p className="text-[13px] font-medium text-white/85 whitespace-nowrap overflow-hidden text-ellipsis">
                           {t('ui_manual_entry_title', 'Entrer une adresse manuellement')}
                         </p>
-                        <p className="text-[13px] text-white/40 mt-0.5">
+                        <p className="text-[11px] md:text-[13px] text-white/40 mt-0.5">
                           {t('ui_manual_entry_hint', 'Coller ou saisir une adresse de wallet')}
                         </p>
                       </div>
@@ -996,18 +996,18 @@ export default function WalletDashboardSendChoiceModal({
                     className="xcannes-fade-border-y w-full grid grid-cols-[56px_1fr_24px] items-center gap-3 pl-2 pr-3 md:px-6 py-4 md:py-5 hover:bg-white/[0.02] transition-colors duration-150 text-left rounded-[20px]"
                   >
                     <div className="w-14 flex items-center justify-center flex-shrink-0">
-                      <div className="xcannes-fade-ring-y w-[52px] h-[52px] rounded-full bg-black/40 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] flex items-center justify-center">
+                      <div className="xcannes-fade-ring-y w-[52px] h-[52px] rounded-full bg-black/20 bg-[linear-gradient(180deg,rgba(255,255,255,0.06)_0%,rgba(255,255,255,0.02)_50%,rgba(255,255,255,0)_100%)] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] flex items-center justify-center">
                         <svg className="w-[26px] h-[26px] text-xcannes-green" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={0.8}><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M12 4v12m0 0l-3-3m3 3l3-3" /></svg>
                       </div>
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="text-[13px] font-medium text-white/85">{t('ui_import_card_title', 'Importer un QR code')}</p>
+                      <p className="text-[13px] font-medium text-white/85 whitespace-nowrap overflow-hidden text-ellipsis">{t('ui_import_card_title', 'Importer un QR code')}</p>
                       {importedDisplay ? (
                         <div className="flex items-center mt-1.5 bg-black/80 ring-1 ring-white/10 ring-inset rounded-xl pl-3 pr-3 py-2">
                           <span className="text-[13px] truncate text-white/85">{importedDisplay}</span>
                         </div>
                       ) : (
-                        <p className="text-[11px] text-white/40 mt-0.5">{t('ui_import_card_hint', 'Depuis une image ou un fichier')}</p>
+                        <p className="text-[11px] md:text-[13px] text-white/40 mt-0.5">{t('ui_import_card_hint', 'Depuis une image ou un fichier')}</p>
                       )}
                     </div>
                     <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">
