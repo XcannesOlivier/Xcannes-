@@ -561,7 +561,7 @@ export default function WalletDashboardSendChoiceModal({
 	                      className: "flex justify-center",
 	                      prefix: t("moonpay_from_account", "Compte source"),
 	                      pillClassName:
-	                        "bg-elevated xcannes-fade-border-y shadow-none rounded-[20px]",
+	                        "bg-elevated-20 xcannes-fade-border-y shadow-none rounded-[20px]",
 	                    })}
 	                  </div>
                 </div>
@@ -721,6 +721,15 @@ export default function WalletDashboardSendChoiceModal({
                     <span className="block w-36 h-1.5 rounded-full bg-white/80" />
                   </div>
                 ) : null}
+                {/* Bottom bar – desktop only (visual balance) */}
+                {!inline ? (
+                  <div
+                    className="hidden md:flex pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-4 z-20"
+                    aria-hidden
+                  >
+                    <span className="block w-30 h-1 rounded-full bg-white/10" />
+                  </div>
+                ) : null}
                 <div className="px-5 pt-[30px] md:pt-[60px] pb-5 flex flex-col flex-1 min-h-0 overflow-y-auto overscroll-contain">
                 {/* Title + subtitle (centered) */}
                 <div className="flex flex-col items-center text-center mb-[40px]">
@@ -747,7 +756,7 @@ export default function WalletDashboardSendChoiceModal({
 	                      variant: 'pill-column',
 	                      className: 'flex justify-center',
 	                      prefix: t('moonpay_from_account', 'Compte source'),
-	                      pillClassName: 'bg-elevated xcannes-fade-border-y shadow-none rounded-[20px]',
+	                      pillClassName: 'bg-elevated-20 xcannes-fade-border-y shadow-none rounded-[20px]',
 	                    })}
 	                  </div>
                 </div>
@@ -1178,7 +1187,7 @@ export default function WalletDashboardSendChoiceModal({
 	                      variant: 'pill-column',
 	                      className: 'flex justify-center',
 	                      prefix: t('moonpay_from_account', 'Compte source'),
-	                      pillClassName: 'bg-elevated xcannes-fade-border-y shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)] rounded-[20px]',
+	                      pillClassName: 'bg-elevated-20 xcannes-fade-border-y shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)] rounded-[20px]',
 	                      dotClassName: '!bg-[#f5a623] ring-[#f5a623]/20',
 	                    })}
 	                  </div>

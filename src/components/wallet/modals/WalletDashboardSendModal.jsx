@@ -973,7 +973,7 @@ export default function WalletDashboardSendModal({
               variant: "pill-column",
               className: "flex justify-center relative z-[85]",
 	            prefix: t("moonpay_from_account", "Compte source"),
-              pillClassName: `bg-elevated ${sendAssetDropdownOpen
+              pillClassName: `bg-elevated-20 ${sendAssetDropdownOpen
                 ? "shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_10px_rgba(255,255,255,0.16)]"
                 : "shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]"} xcannes-fade-border-y rounded-[20px]`,
             })}
@@ -1176,7 +1176,7 @@ export default function WalletDashboardSendModal({
             variant: "pill-column",
             className: "flex justify-center",
             prefix: t("moonpay_from_account", "Compte source"),
-            pillClassName: "bg-elevated xcannes-fade-border-y shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)] rounded-[20px]",
+            pillClassName: "bg-elevated-20 xcannes-fade-border-y shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)] rounded-[20px]",
           })}
         </div>
       </div>
