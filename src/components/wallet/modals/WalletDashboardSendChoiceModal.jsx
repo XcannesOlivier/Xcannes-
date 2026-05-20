@@ -749,7 +749,7 @@ export default function WalletDashboardSendChoiceModal({
                           return next;
                         });
                       }}
-                      className="xcannes-fade-border-y w-full grid grid-cols-[56px_1fr] gap-3 px-5 md:px-6 py-4 md:py-5 hover:bg-white/[0.02] transition-colors duration-150 text-left rounded-[20px] bg-white/[0.04]"
+                      className="xcannes-fade-border-y w-full grid grid-cols-[56px_1fr] gap-3 px-5 md:px-6 py-4 md:py-5 hover:bg-white/[0.02] transition-colors duration-150 text-left rounded-[20px]"
                     >
                       <div className="w-14 flex items-start justify-center pt-0.5 flex-shrink-0">
                         <svg className="w-[36px] h-[36px] text-xcannes-green" fill="none" viewBox="0 0 24 24" strokeWidth={0.8} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0" /></svg>
@@ -881,7 +881,7 @@ export default function WalletDashboardSendChoiceModal({
                   <button
                     type="button"
                     onClick={onChooseQuickScan}
-                    className="xcannes-fade-border-y w-full grid grid-cols-[56px_1fr_24px] items-center gap-3 px-5 md:px-6 py-4 md:py-5 hover:bg-white/[0.02] transition-colors duration-150 text-left rounded-[20px] bg-white/[0.04]"
+                    className="xcannes-fade-border-y w-full grid grid-cols-[56px_1fr_24px] items-center gap-3 px-5 md:px-6 py-4 md:py-5 hover:bg-white/[0.02] transition-colors duration-150 text-left rounded-[20px]"
                   >
                     <div className="w-14 flex items-center justify-center flex-shrink-0">
                       <svg className="w-[36px] h-[36px] text-xcannes-green" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={0.8}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" /></svg>
@@ -905,7 +905,7 @@ export default function WalletDashboardSendChoiceModal({
                   </button>
 
                   {/* 3. Entrer une adresse manuellement */}
-                  <div className="xcannes-fade-border-y rounded-[20px] bg-white/[0.04]">
+                  <div className="xcannes-fade-border-y rounded-[20px]">
                     <button
                       type="button"
                       onClick={() => {
@@ -987,7 +987,7 @@ export default function WalletDashboardSendChoiceModal({
                   <button
                     type="button"
                     onClick={() => handleFileUpload(quickscanFileInputId, false)}
-                    className="xcannes-fade-border-y w-full grid grid-cols-[56px_1fr_24px] items-center gap-3 px-5 md:px-6 py-4 md:py-5 hover:bg-white/[0.02] transition-colors duration-150 text-left rounded-[20px] bg-white/[0.04]"
+                    className="xcannes-fade-border-y w-full grid grid-cols-[56px_1fr_24px] items-center gap-3 px-5 md:px-6 py-4 md:py-5 hover:bg-white/[0.02] transition-colors duration-150 text-left rounded-[20px]"
                   >
                     <div className="w-14 flex items-center justify-center flex-shrink-0">
                       <svg className="w-[36px] h-[36px] text-xcannes-green" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={0.8}><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M12 4v12m0 0l-3-3m3 3l3-3" /></svg>
