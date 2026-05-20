@@ -789,7 +789,7 @@ export default function WalletDashboardSendChoiceModal({
                       </div>
                     </button>
                     <div
-                      className={`absolute left-0 right-0 top-full mt-1.5 z-[100] rounded-[20px] ring-1 ring-white/10 ring-inset overflow-hidden bg-white/5 shadow-[inset_0_-34px_34px_-20px_rgba(0,0,0,0.95),inset_0_-18px_70px_-45px_rgba(0,0,0,0.9)] transition-all duration-200 origin-top ${showQuickscanSavedPicker ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-95 pointer-events-none'}`}
+                      className={`absolute left-0 right-0 top-full mt-1.5 z-[100] rounded-[20px] ring-1 ring-white/10 ring-inset overflow-hidden bg-black shadow-[inset_0_-34px_34px_-20px_rgba(0,0,0,0.95),inset_0_-18px_70px_-45px_rgba(0,0,0,0.9)] transition-all duration-200 origin-top ${showQuickscanSavedPicker ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-95 pointer-events-none'}`}
                     >
                       <div className="px-4 py-2.5 border-b border-white/[0.04]">
                         <div className="flex items-center justify-between gap-2">
@@ -1046,10 +1046,10 @@ export default function WalletDashboardSendChoiceModal({
                     type="button"
                     disabled={!pendingDestination.address}
                     onClick={() => { if (pendingDestination.address) { setSendDestination?.(pendingDestination.address); setSendDestinationLabel?.(pendingDestination.label); onChooseSimpleSend?.(); } }}
-                    className={`w-full py-3.5 rounded-[14px] text-[16px] font-semibold transition-all duration-200 ${
+                    className={`w-full py-3.5 rounded-[14px] text-[17px] md:text-[16px] font-semibold transition-all duration-200 ${
                       pendingDestination.address
                         ? 'text-white hover:scale-[1.01] active:scale-[0.98]'
-                        : 'text-white/75 cursor-not-allowed ring-[0.5px] ring-xcannes-green/30 ring-inset'
+                        : 'text-white/90 cursor-not-allowed ring-[0.5px] ring-xcannes-green/30 ring-inset'
                     }`}
                     style={{
                       background: pendingDestination.address
@@ -1075,7 +1075,7 @@ export default function WalletDashboardSendChoiceModal({
                               <span className="shrink-0">
                                 {t(
                                   "ui_validate_recipient_address",
-                                  "Valider l'adresse du destinataire",
+                                  "Valider l'adresse",
                                 )}
                               </span>
                               <span className="text-white/35">:</span>
