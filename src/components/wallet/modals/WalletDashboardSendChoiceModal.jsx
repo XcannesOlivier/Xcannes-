@@ -1088,13 +1088,24 @@ export default function WalletDashboardSendChoiceModal({
                                 )}
                               </span>
                               <span className="text-white/35">:</span>
-                              <span className="min-w-0 overflow-hidden text-ellipsis">
-                                {showLabel ? (
-                                  <span className="text-white/90">{label}</span>
-                                ) : null}
-                                {showLabel ? <span className="text-white/35"> · </span> : null}
-                                <span className="font-mono text-white/85">{addrShort}</span>
-                              </span>
+                              {showLabel ? (
+                                <span className="min-w-0 flex items-center gap-1">
+                                  <span className="min-w-0 truncate text-white/90">
+                                    {label}
+                                  </span>
+                                  <span className="shrink-0 text-white/35">
+                                    {" "}
+                                    ·{" "}
+                                  </span>
+                                  <span className="shrink-0 font-mono text-white/85">
+                                    {addrShort}
+                                  </span>
+                                </span>
+                              ) : (
+                                <span className="min-w-0 overflow-hidden text-ellipsis font-mono text-white/85">
+                                  {addrShort}
+                                </span>
+                              )}
                             </span>
                           );
                         })()
