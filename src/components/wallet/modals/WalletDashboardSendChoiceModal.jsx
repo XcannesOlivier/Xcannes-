@@ -918,7 +918,7 @@ export default function WalletDashboardSendChoiceModal({
                   >
                     <div className="w-14 flex items-center justify-center flex-shrink-0">
                       <div className="xcannes-fade-ring-y w-[52px] h-[52px] rounded-full bg-black/20 bg-[linear-gradient(180deg,rgba(255,255,255,0.06)_0%,rgba(255,255,255,0.02)_50%,rgba(255,255,255,0)_100%)] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] flex items-center justify-center">
-                        <svg className="w-[26px] h-[26px] text-xcannes-green" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" /></svg>
+                        <svg className="w-[26px] h-[26px] text-[#f5a623]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" /></svg>
                       </div>
                     </div>
                     <div className="min-w-0 flex-1">
@@ -932,7 +932,7 @@ export default function WalletDashboardSendChoiceModal({
                       )}
                     </div>
                     <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">
-                      <svg className="w-5 h-5 text-xcannes-green" viewBox="0 0 24 24" fill="none" aria-hidden>
+                      <svg className="w-5 h-5 text-[#f5a623]" viewBox="0 0 24 24" fill="none" aria-hidden>
                         <path d="M8 18L14 12L8 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                         <path d="M13.5 18L19.5 12L13.5 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
@@ -952,7 +952,7 @@ export default function WalletDashboardSendChoiceModal({
                     >
                       <div className="w-14 flex items-center justify-center flex-shrink-0">
                         <div className="xcannes-fade-ring-y w-[52px] h-[52px] rounded-full bg-black/20 bg-[linear-gradient(180deg,rgba(255,255,255,0.06)_0%,rgba(255,255,255,0.02)_50%,rgba(255,255,255,0)_100%)] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] flex items-center justify-center">
-                          <svg className="w-[26px] h-[26px] text-xcannes-green" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                          <svg className="w-[26px] h-[26px] text-[#f5a623]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                         </div>
                       </div>
                       <div className="min-w-0 flex-1">
@@ -1177,7 +1177,7 @@ export default function WalletDashboardSendChoiceModal({
                 <div className="px-5 pt-[70px] md:pt-[90px] pb-5 flex flex-col flex-1 min-h-0 overflow-y-auto overscroll-contain">
                 {/* Title + subtitle (centered) */}
                 <div className="flex flex-col items-center text-center mb-[40px]">
-                  <h3 className="mt-1 text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight">
+                  <h3 className="mt-1 text-[30px] md:text-[34px] font-semibold text-white/95 tracking-tight">
 	                    {t('ui_send_pay_request_title', 'Renseigner une demande ')}
                   </h3>
                   <p className="mt-2 text-[14px] md:text-[15px] text-white/60 max-w-[34ch] leading-relaxed">
@@ -1195,7 +1195,8 @@ export default function WalletDashboardSendChoiceModal({
 	                  </div>
                 </div>
 
-                <div className="flex flex-col gap-4 md:gap-7">
+	                <div className="rounded-[26px] bg-[#0b0f10]/40 ring-1 ring-white/10 ring-inset shadow-[inset_0_1px_0_rgba(255,255,255,0.05),inset_0_-26px_46px_rgba(0,0,0,0.55)] p-3 md:p-4">
+	                  <div className="flex flex-col gap-3">
 
                   {/* 1. Scanner un QR code */}
                   <button
@@ -1249,7 +1250,7 @@ export default function WalletDashboardSendChoiceModal({
                           {t('ui_paste_payreq_hint', 'Coller ou saisir une demande de paiement')}
                         </p>
                       </div>
-                      <svg className={`w-5 h-5 text-xcannes-green flex-shrink-0 transition-transform duration-200 ${payreqManualEntryOpen ? 'rotate-90' : 'rotate-0'}`} viewBox="0 0 24 24" fill="none">
+                      <svg className={`w-5 h-5 text-[#f5a623] flex-shrink-0 transition-transform duration-200 ${payreqManualEntryOpen ? 'rotate-90' : 'rotate-0'}`} viewBox="0 0 24 24" fill="none">
                         <path d="M8 18L14 12L8 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                         <path d="M13.5 18L19.5 12L13.5 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
@@ -1313,7 +1314,7 @@ export default function WalletDashboardSendChoiceModal({
                   >
                     <div className="w-14 flex items-center justify-center flex-shrink-0">
                       <div className="xcannes-fade-ring-y w-[52px] h-[52px] rounded-full bg-black/20 bg-[linear-gradient(180deg,rgba(255,255,255,0.06)_0%,rgba(255,255,255,0.02)_50%,rgba(255,255,255,0)_100%)] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] flex items-center justify-center">
-                        <svg className="w-[26px] h-[26px] text-xcannes-green" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M12 4v12m0 0l-3-3m3 3l3-3" /></svg>
+                        <svg className="w-[26px] h-[26px] text-[#f5a623]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M12 4v12m0 0l-3-3m3 3l3-3" /></svg>
                       </div>
                     </div>
                     <div className="min-w-0 flex-1">
@@ -1327,43 +1328,49 @@ export default function WalletDashboardSendChoiceModal({
                       )}
                     </div>
                     <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">
-                      <svg className="w-5 h-5 text-xcannes-green" viewBox="0 0 24 24" fill="none" aria-hidden>
+                      <svg className="w-5 h-5 text-[#f5a623]" viewBox="0 0 24 24" fill="none" aria-hidden>
                         <path d="M8 18L14 12L8 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                         <path d="M13.5 18L19.5 12L13.5 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                     </div>
                   </button>
 
+                  </div>
                 </div>
 
                 {/* CTA — Valider la demande de paiement */}
                 <div className="pt-[34px] md:pt-12">
-                  <button
-                    type="button"
-                    disabled={!pendingPayreq}
-                    onClick={() => {
-                      if (pendingPayreq) {
-                        setPayreqSelfSendError(false);
-                        handlePaymentRequestScan?.(pendingPayreq);
-                        onChoosePayRequest?.();
-                      }
-                    }}
-                    className={`w-full py-3.5 rounded-[14px] text-[16px] font-semibold transition-all duration-200 ${
-                      pendingPayreq
-                        ? 'text-white hover:scale-[1.01] active:scale-[0.98]'
-                        : 'cursor-not-allowed ring-[0.5px] ring-[#f5a623]/40 ring-inset'
-                    }`}
-                    style={pendingPayreq
-                      ? { background: 'linear-gradient(180deg, #f5a623 0%, #d98c0f 100%)', boxShadow: '0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)' }
-                      : { background: 'rgba(245,166,35,0.07)', color: 'rgba(255,255,255,0.2)' }}
-                  >
-                    {pendingPayreq
-                      ? t('ui_validate_payreq', 'Vérifier la demande de paiement')
-                      : <span className="inline-flex items-center gap-1.5">
-                          <span className="text-[14px] md:text-[16px]">{t('ui_fill_payreq', 'Renseignez la demande de paiement')}</span>
-                          <span className="inline-flex items-end gap-[3px] mb-[-1px]">
-                            <span className="payreq-cta-dot" style={{ animationDelay: '0s' }}>·</span>
-                            <span className="payreq-cta-dot" style={{ animationDelay: '0.6s' }}>·</span>
+	                  <button
+	                    type="button"
+	                    disabled={!pendingPayreq}
+	                    onClick={() => {
+	                      if (pendingPayreq) {
+	                        setPayreqSelfSendError(false);
+	                        handlePaymentRequestScan?.(pendingPayreq);
+	                        onChoosePayRequest?.();
+	                      }
+	                    }}
+	                    className={`w-full py-3.5 rounded-[14px] text-[17px] md:text-[16px] font-semibold transition-all duration-200 ${
+	                      pendingPayreq
+	                        ? 'text-white hover:scale-[1.01] active:scale-[0.98]'
+	                        : 'text-white/90 cursor-not-allowed ring-[0.5px] ring-[#f5a623]/30 ring-inset'
+	                    }`}
+	                    style={{
+	                      background: pendingPayreq
+	                        ? 'linear-gradient(180deg, rgba(245, 166, 35, 1) 0%, rgba(217, 140, 15, 1) 100%)'
+	                        : 'linear-gradient(180deg, rgba(245, 166, 35, 0.34) 0%, rgba(217, 140, 15, 0.34) 100%)',
+	                      boxShadow: pendingPayreq
+	                        ? '0 14px 28px rgba(0,0,0,0.52), 0 6px 14px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.30), inset 0 10px 18px rgba(0,0,0,0.10)'
+	                        : '0 12px 24px rgba(0,0,0,0.44), 0 5px 12px rgba(0,0,0,0.24), inset 0 1px 0 rgba(255,255,255,0.12), inset 0 -10px 16px rgba(0,0,0,0.24)',
+	                    }}
+	                  >
+	                    {pendingPayreq
+	                      ? t('ui_validate_payreq', 'Vérifier la demande de paiement')
+	                      : <span className="inline-flex items-center gap-1.5 text-white/85">
+	                          <span className="text-[14px] md:text-[16px]">{t('ui_fill_payreq', 'Renseignez la demande de paiement')}</span>
+	                          <span className="inline-flex items-end gap-[3px] mb-[-1px]">
+	                            <span className="payreq-cta-dot" style={{ animationDelay: '0s' }}>·</span>
+	                            <span className="payreq-cta-dot" style={{ animationDelay: '0.6s' }}>·</span>
                             <span className="payreq-cta-dot" style={{ animationDelay: '1.2s' }}>·</span>
                           </span>
                         </span>
