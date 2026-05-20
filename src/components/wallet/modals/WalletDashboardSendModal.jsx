@@ -968,16 +968,14 @@ export default function WalletDashboardSendModal({
           <p className="relative z-[50] text-[14px] md:text-[15px] text-white/55 text-center leading-relaxed -mt-2">
             {t("ui_send_devise_hint", "Choisissez la devise, saisissez le montant, puis vérifiez avant l’envoi.")}
           </p>
-          <div className="flex justify-center relative z-[65]">
-            {renderWalletMeta?.({
-              variant: "pill-column",
-              className: "flex justify-center relative z-[85]",
-	            prefix: t("moonpay_from_account", "Compte source"),
-              pillClassName: `bg-elevated-40 ${sendAssetDropdownOpen
-                ? "shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_10px_rgba(255,255,255,0.16)]"
-                : "shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]"} xcannes-fade-border-y rounded-[20px]`,
-            })}
-          </div>
+	          <div className="flex justify-center relative z-[65]">
+	            {renderWalletMeta?.({
+	              variant: "pill-column",
+	              className: "flex justify-center relative z-[85]",
+		            prefix: t("moonpay_from_account", "Compte source"),
+	              pillClassName: "bg-elevated-40 xcannes-fade-border-y shadow-none rounded-[20px]",
+	            })}
+	          </div>
           <div>
             <div className="flex items-baseline justify-between mb-1.5 relative z-[65]">
               <label
@@ -1264,29 +1262,49 @@ export default function WalletDashboardSendModal({
 	        ? t("ui_confirm_payment_button", "Confirmer le paiement")
 	        : t("ui_send_504b64a87b", "Envoyer");
 
-  const sendActions = (
-    <div className="sticky bottom-0 pt-8 pb-3 mt-auto space-y-2 bg-inherit z-10 relative">
-      <button
-        type="button"
+	  const ctaEnabledBg = hasPaymentRequest
+	    ? "linear-gradient(180deg, rgba(245, 166, 35, 1) 0%, rgba(217, 140, 15, 1) 100%)"
+	    : "linear-gradient(180deg, rgba(44, 185, 103, 1) 0%, rgba(14, 103, 58, 1) 100%)";
+	  const ctaDisabledBg = hasPaymentRequest
+	    ? "linear-gradient(180deg, rgba(245, 166, 35, 0.34) 0%, rgba(217, 140, 15, 0.34) 100%)"
+	    : "linear-gradient(180deg, rgba(44, 185, 103, 0.34) 0%, rgba(14, 103, 58, 0.34) 100%)";
+	  const ctaRingClass = hasPaymentRequest ? "ring-[#f5a623]/30" : "ring-xcannes-green/30";
+	
+	  const sendActions = (
+	    <div className="sticky bottom-0 pt-8 pb-3 mt-auto space-y-2 bg-inherit z-10 relative">
+	      <button
+	        type="button"
         onClick={(e) => {
           e.stopPropagation();
           handleManualSend();
-        }}
-        disabled={sendButtonDisabled}
-        className={[
-          "md:hidden w-full h-14 rounded-[20px] text-lg font-semibold transition-all duration-200 tracking-[-0.01em]",
-          sendButtonDisabled
-            ? sendProcessing ? "opacity-45 cursor-not-allowed" : "bg-xcannes-green/[0.07] text-xcannes-green/60 cursor-not-allowed ring-[0.5px] ring-xcannes-green/40 ring-inset"
-            : "text-white hover:scale-[1.01] active:scale-[0.98]",
-        ].join(" ")}
-        style={sendButtonDisabled
-          ? sendProcessing ? { background: 'linear-gradient(180deg, rgba(34,154,86,0.65) 0%, rgba(14,103,58,0.65) 100%)', color: 'rgba(255,255,255,0.4)' } : undefined
-          : { background: 'linear-gradient(180deg, rgba(34,154,86,1) 0%, rgba(14,103,58,1) 100%)', boxShadow: '0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)' }
-        }
-      >
-        {sendButtonDisabled && !sendProcessing
-          ? <span className="inline-flex items-center gap-1.5 text-white/20">
-              <span className="text-[14px]">{t('ui_send_fill_cta', 'Choisissez la devise et le montant')}</span>
+	        }}
+	        disabled={sendButtonDisabled}
+	        className={[
+	          "md:hidden w-full py-3.5 rounded-[14px] text-[17px] font-semibold transition-all duration-200 tracking-[-0.01em]",
+	          sendButtonDisabled
+	            ? sendProcessing
+	              ? "opacity-45 cursor-not-allowed"
+	              : `text-white/90 cursor-not-allowed ring-[0.5px] ${ctaRingClass} ring-inset`
+	            : "text-white hover:scale-[1.01] active:scale-[0.98]",
+	        ].join(" ")}
+	        style={{
+	          background: sendButtonDisabled
+	            ? ctaDisabledBg
+	            : ctaEnabledBg,
+	          boxShadow: sendButtonDisabled
+	            ? "0 12px 24px rgba(0,0,0,0.44), 0 5px 12px rgba(0,0,0,0.24), inset 0 1px 0 rgba(255,255,255,0.12), inset 0 -10px 16px rgba(0,0,0,0.24)"
+	            : "0 14px 28px rgba(0,0,0,0.52), 0 6px 14px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.30), inset 0 10px 18px rgba(0,0,0,0.10)",
+	          ...(sendProcessing
+	            ? {
+	                background: ctaDisabledBg,
+	                color: "rgba(255,255,255,0.4)",
+	              }
+	            : null),
+	        }}
+	      >
+	        {sendButtonDisabled && !sendProcessing
+	          ? <span className="inline-flex items-center gap-1.5 text-white/20">
+	              <span className="text-[14px]">{t('ui_send_fill_cta', 'Choisissez la devise et le montant')}</span>
               <span className="inline-flex items-end gap-[3px] mb-[-1px]">
                 <span className="send-modal-dot" style={{ animationDelay: '0s' }}>·</span>
                 <span className="send-modal-dot" style={{ animationDelay: '0.6s' }}>·</span>
@@ -1295,27 +1313,39 @@ export default function WalletDashboardSendModal({
             </span>
           : sendButtonLabel}
       </button>
-      <button
-        type="button"
+	      <button
+	        type="button"
         onClick={(e) => {
           e.stopPropagation();
           handleManualSend();
-        }}
-        disabled={sendButtonDisabled}
-        className={[
-          "hidden md:flex items-center justify-center w-full h-14 rounded-[20px] text-lg font-semibold transition-all duration-200 tracking-[-0.01em]",
-          sendButtonDisabled
-            ? sendProcessing ? "opacity-45 cursor-not-allowed" : "bg-xcannes-green/[0.07] text-xcannes-green/60 cursor-not-allowed ring-[0.5px] ring-xcannes-green/40 ring-inset"
-            : "text-white hover:scale-[1.01] active:scale-[0.98]",
-        ].join(" ")}
-        style={sendButtonDisabled
-          ? sendProcessing ? { background: 'linear-gradient(180deg, rgba(34,154,86,0.65) 0%, rgba(14,103,58,0.65) 100%)', color: 'rgba(255,255,255,0.4)' } : undefined
-          : { background: 'linear-gradient(180deg, rgba(34,154,86,1) 0%, rgba(14,103,58,1) 100%)', boxShadow: '0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)' }
-        }
-      >
-        {sendButtonDisabled && !sendProcessing
-          ? <span className="inline-flex items-center gap-1.5 text-white/20">
-              <span className="text-[16px]">{t('ui_send_fill_cta', 'Choisissez la devise et le montant')}</span>
+	        }}
+	        disabled={sendButtonDisabled}
+	        className={[
+	          "hidden md:flex items-center justify-center w-full py-3.5 rounded-[14px] text-[16px] font-semibold transition-all duration-200 tracking-[-0.01em]",
+	          sendButtonDisabled
+	            ? sendProcessing
+	              ? "opacity-45 cursor-not-allowed"
+	              : `text-white/90 cursor-not-allowed ring-[0.5px] ${ctaRingClass} ring-inset`
+	            : "text-white hover:scale-[1.01] active:scale-[0.98]",
+	        ].join(" ")}
+	        style={{
+	          background: sendButtonDisabled
+	            ? ctaDisabledBg
+	            : ctaEnabledBg,
+	          boxShadow: sendButtonDisabled
+	            ? "0 12px 24px rgba(0,0,0,0.44), 0 5px 12px rgba(0,0,0,0.24), inset 0 1px 0 rgba(255,255,255,0.12), inset 0 -10px 16px rgba(0,0,0,0.24)"
+	            : "0 14px 28px rgba(0,0,0,0.52), 0 6px 14px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.30), inset 0 10px 18px rgba(0,0,0,0.10)",
+	          ...(sendProcessing
+	            ? {
+	                background: ctaDisabledBg,
+	                color: "rgba(255,255,255,0.4)",
+	              }
+	            : null),
+	        }}
+	      >
+	        {sendButtonDisabled && !sendProcessing
+	          ? <span className="inline-flex items-center gap-1.5 text-white/20">
+	              <span className="text-[16px]">{t('ui_send_fill_cta', 'Choisissez la devise et le montant')}</span>
               <span className="inline-flex items-end gap-[3px] mb-[-1px]">
                 <span className="send-modal-dot" style={{ animationDelay: '0s' }}>·</span>
                 <span className="send-modal-dot" style={{ animationDelay: '0.6s' }}>·</span>
@@ -1463,10 +1493,10 @@ export default function WalletDashboardSendModal({
             <div className="pointer-events-none absolute inset-0" aria-hidden>
               <div className={`absolute inset-0 md:hidden ${hasPaymentRequest ? 'bg-[radial-gradient(700px_circle_at_100%_50%,rgba(245,166,35,0.07),transparent_60%)]' : 'bg-[radial-gradient(700px_circle_at_100%_50%,rgba(0,255,150,0.07),transparent_60%)]'}`} />
               <div className={`absolute inset-0 hidden md:block ${hasPaymentRequest ? 'bg-[radial-gradient(1000px_circle_at_100%_50%,rgba(245,166,35,0.07),transparent_60%)]' : 'bg-[radial-gradient(1000px_circle_at_100%_50%,rgba(0,255,150,0.07),transparent_60%)]'}`} />
-            </div>
-            <div className="relative z-10 flex flex-col flex-1 min-h-0">
-            {!inline ? (
-              <div
+	            </div>
+	            <div className="relative z-10 flex flex-col flex-1 min-h-0">
+	            {!inline ? (
+	              <div
                 className="md:hidden flex justify-center pt-0 pb-0 touch-none"
                 aria-hidden
                 onPointerDown={(event) => {
@@ -1474,13 +1504,20 @@ export default function WalletDashboardSendModal({
                 }}
               >
                 <span className="block w-12 h-1.5 rounded-full bg-white/20" />
-              </div>
-            ) : null}
-            <div
-              className={`flex items-start justify-between gap-3 relative z-[65] touch-none ${hasPaymentRequest ? 'mb-[110px] md:mb-[140px]' : 'mb-[54px] md:mb-[60px]'}`}
-              onPointerDown={(event) => {
-                maybeStartOverlayDrag(event, "fixed");
-              }}
+	              </div>
+	            ) : null}
+	            {/* Bottom bar – mobile only */}
+	            <div
+	              className="md:hidden pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-[max(env(safe-area-inset-bottom),10px)] z-20"
+	              aria-hidden
+	            >
+	              <span className="block w-36 h-1.5 rounded-full bg-white/80" />
+	            </div>
+	            <div
+	              className={`flex items-start justify-between gap-3 relative z-[65] touch-none ${hasPaymentRequest ? 'mb-[110px] md:mb-[140px]' : 'mb-[54px] md:mb-[60px]'}`}
+	              onPointerDown={(event) => {
+	                maybeStartOverlayDrag(event, "fixed");
+	              }}
             >
               <div className="flex min-w-0 flex-col gap-1.5 w-full">
                 <div className="flex flex-wrap items-center gap-2">
@@ -1501,15 +1538,19 @@ export default function WalletDashboardSendModal({
                 // manual: source list → se déclenche uniquement en haut de liste
                 maybeStartOverlayDrag(event, hasPaymentRequest ? "fixed" : "list");
               }}
-            >
-              <div className="flex flex-col gap-3">
-                {hasPaymentRequest ? payreqFinalStep : manualForm}
-                {!hasPaymentRequest && !hasMoonpaySellRequest ? inlineSummary : null}
-                {scannerModal}
-                {sendActions}
-              </div>
-            </div>
-            </div>
+	            >
+	              <div className="flex flex-col gap-3">
+	                {hasPaymentRequest ? payreqFinalStep : manualForm}
+	                {!hasPaymentRequest && !hasMoonpaySellRequest ? inlineSummary : null}
+	                {scannerModal}
+	                {sendActions}
+	              </div>
+	            </div>
+	            {/* Bottom bar – desktop only (inline) */}
+	            <div className="hidden md:flex pointer-events-none justify-center pt-2 pb-4" aria-hidden>
+	              <span className="block w-[120px] h-[4px] rounded-full bg-white/10" />
+	            </div>
+	            </div>
           {inline &&
           savedPickerMenu &&
           savedMenuStyle &&
