@@ -751,7 +751,7 @@ export default function WalletDashboardSendChoiceModal({
                       className="w-full flex items-center gap-4 bg-black/80 ring-1 ring-inset ring-white/10 rounded-[20px] px-4 py-4 hover:ring-white/15 transition-colors duration-150 text-left"
                     >
                       <div className="w-11 h-11 flex items-center justify-center flex-shrink-0">
-                        <svg className="w-[36px] h-[36px] text-white/90" fill="none" viewBox="0 0 24 24" strokeWidth={0.8} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0" /></svg>
+                        <svg className="w-[36px] h-[36px] text-xcannes-green" fill="none" viewBox="0 0 24 24" strokeWidth={0.8} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0" /></svg>
                       </div>
                       <div className="min-w-0 flex-1">
                         <p className="text-[15px] font-semibold text-white/90">
@@ -761,7 +761,7 @@ export default function WalletDashboardSendChoiceModal({
                           <span className={`text-[13px] truncate ${selectedContactDisplay ? 'text-white/85' : 'text-white/55'}`}>
                             {selectedContactDisplay || t('ui_saved_recipient_hint', 'Sélectionnez un destinataire')}
                           </span>
-                          <svg className={`w-4 h-4 text-white/30 flex-shrink-0 ml-2 transition-transform duration-200 ${showQuickscanSavedPicker ? 'rotate-180' : ''}`} viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                          <svg className={`w-4 h-4 text-xcannes-green flex-shrink-0 ml-2 transition-transform duration-200 ${showQuickscanSavedPicker ? 'rotate-180' : ''}`} viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                         </div>
                       </div>
                     </button>
@@ -884,7 +884,7 @@ export default function WalletDashboardSendChoiceModal({
                     className="w-full flex items-center gap-4 bg-white/5 ring-1 ring-inset ring-white/10 rounded-[20px] shadow-[inset_0_-34px_34px_-20px_rgba(0,0,0,0.95),inset_0_-18px_70px_-45px_rgba(0,0,0,0.9)] px-4 py-4 hover:bg-transparent hover:ring-white/15 transition-colors duration-150 text-left"
                   >
                     <div className="w-11 h-11 flex items-center justify-center flex-shrink-0">
-                      <svg className="w-[36px] h-[36px] text-white/90" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={0.8}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" /></svg>
+                      <svg className="w-[36px] h-[36px] text-xcannes-green" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={0.8}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" /></svg>
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="text-[15px] font-medium text-white/85">{t('ui_scan_card_title', 'Scanner un QR code')}</p>
@@ -895,6 +895,9 @@ export default function WalletDashboardSendChoiceModal({
                       ) : (
                         <p className="text-[13px] text-white/40 mt-0.5">{t('ui_scan_card_hint', 'Utilisez la caméra pour scanner une adresse')}</p>
                       )}
+                    </div>
+                    <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">
+                      <svg className="w-5 h-5 text-xcannes-green" viewBox="0 0 24 24" fill="none" aria-hidden><path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                     </div>
                   </button>
                   </div>
@@ -911,7 +914,7 @@ export default function WalletDashboardSendChoiceModal({
                       className="w-full flex items-center gap-4 bg-white/5 ring-1 ring-inset ring-white/10 rounded-[20px] shadow-[inset_0_-34px_34px_-20px_rgba(0,0,0,0.95),inset_0_-18px_70px_-45px_rgba(0,0,0,0.9)] px-4 py-4 hover:bg-transparent hover:ring-white/15 transition-colors duration-150 text-left"
                     >
                       <div className="w-11 h-11 flex items-center justify-center flex-shrink-0">
-                        <svg className="w-[36px] h-[36px] text-white/90" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={0.8}><path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                        <svg className="w-[36px] h-[36px] text-xcannes-green" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={0.8}><path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                       </div>
                       <div className="min-w-0 flex-1">
                         <p className="text-[15px] font-medium text-white/85">
@@ -921,7 +924,7 @@ export default function WalletDashboardSendChoiceModal({
                           {t('ui_manual_entry_hint', 'Coller ou saisir une adresse de wallet')}
                         </p>
                       </div>
-                      <svg className={`w-5 h-5 text-white/45 flex-shrink-0 transition-transform duration-200 ${manualEntryOpen ? 'rotate-90' : 'rotate-0'}`} viewBox="0 0 24 24" fill="none"><path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                      <svg className={`w-5 h-5 text-xcannes-green flex-shrink-0 transition-transform duration-200 ${manualEntryOpen ? 'rotate-90' : 'rotate-0'}`} viewBox="0 0 24 24" fill="none"><path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                     </button>
 
                     {manualEntryOpen ? (
@@ -983,7 +986,7 @@ export default function WalletDashboardSendChoiceModal({
                     className="w-full flex items-center gap-4 bg-white/5 ring-1 ring-inset ring-white/10 rounded-[20px] shadow-[inset_0_-34px_34px_-20px_rgba(0,0,0,0.95),inset_0_-18px_70px_-45px_rgba(0,0,0,0.9)] px-4 py-4 hover:bg-transparent hover:ring-white/15 transition-colors duration-150 text-left"
                   >
                     <div className="w-11 h-11 flex items-center justify-center flex-shrink-0">
-                      <svg className="w-[36px] h-[36px] text-white/90" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={0.8}><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M12 4v12m0 0l-3-3m3 3l3-3" /></svg>
+                      <svg className="w-[36px] h-[36px] text-xcannes-green" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={0.8}><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M12 4v12m0 0l-3-3m3 3l3-3" /></svg>
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="text-[13px] font-medium text-white/85">{t('ui_import_card_title', 'Importer un QR code')}</p>
@@ -994,6 +997,9 @@ export default function WalletDashboardSendChoiceModal({
                       ) : (
                         <p className="text-[11px] text-white/40 mt-0.5">{t('ui_import_card_hint', 'Importez une image ou un fichier contenant un QR code')}</p>
                       )}
+                    </div>
+                    <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">
+                      <svg className="w-5 h-5 text-xcannes-green" viewBox="0 0 24 24" fill="none" aria-hidden><path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                     </div>
                   </button>
                   </div>
