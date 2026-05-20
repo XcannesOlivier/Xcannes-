@@ -723,15 +723,6 @@ export default function WalletDashboardSendChoiceModal({
                     <span className="block w-36 h-1.5 rounded-full bg-white/80" />
                   </div>
                 ) : null}
-                {/* Bottom bar – desktop only (visual balance) */}
-                {!inline ? (
-                  <div
-                    className="hidden md:flex pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-4 z-20"
-                    aria-hidden
-                  >
-                    <span className="block w-30 h-1 rounded-full bg-white/10" />
-                  </div>
-                ) : null}
                 <div className="px-5 pt-[30px] md:pt-[60px] pb-5 flex flex-col flex-1 min-h-0 overflow-y-auto overscroll-contain">
                 {/* Title + subtitle (centered) */}
                 <div className="flex flex-col items-center text-center mb-[40px]">
@@ -1141,10 +1132,16 @@ export default function WalletDashboardSendChoiceModal({
                       animation: sendDotBlink 2.4s ease-in-out infinite;
                       color: inherit;
                     }
-                  `}</style>
+	                  `}</style>
                 </div>
 
                 </div>
+                {/* Bottom bar – desktop only (visual balance) */}
+                {!inline ? (
+                  <div className="hidden md:flex pointer-events-none justify-center pt-2 pb-4" aria-hidden>
+                    <span className="block w-[120px] h-[4px] rounded-full bg-white/10" />
+                  </div>
+                ) : null}
               </div>
             </div>
           </div>
@@ -1175,42 +1172,33 @@ export default function WalletDashboardSendChoiceModal({
 	                  </div>
 	                ) : null}
 	                {/* Bottom bar – mobile only */}
-	                {!inline ? (
-	                  <div
-	                    className="md:hidden pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-[max(env(safe-area-inset-bottom),10px)] z-20"
-	                    aria-hidden
-	                  >
-	                    <span className="block w-36 h-1.5 rounded-full bg-white/80" />
-	                  </div>
-	                ) : null}
-	                {/* Bottom bar – desktop only (visual balance) */}
-	                {!inline ? (
-	                  <div
-	                    className="hidden md:flex pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-4 z-20"
-	                    aria-hidden
-	                  >
-	                    <span className="block w-30 h-1 rounded-full bg-white/10" />
-	                  </div>
-	                ) : null}
-	                <div className="px-5 pt-[70px] md:pt-[90px] pb-5 flex flex-col flex-1 min-h-0 overflow-y-auto overscroll-contain">
-	                {/* Title + subtitle (centered) */}
-	                <div className="flex flex-col items-center text-center mb-[40px]">
+		                {!inline ? (
+		                  <div
+		                    className="md:hidden pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-[max(env(safe-area-inset-bottom),10px)] z-20"
+		                    aria-hidden
+		                  >
+		                    <span className="block w-36 h-1.5 rounded-full bg-white/80" />
+		                  </div>
+		                ) : null}
+		                <div className="px-5 pt-[70px] md:pt-[90px] pb-5 flex flex-col flex-1 min-h-0 overflow-y-auto overscroll-contain">
+		                {/* Title + subtitle (centered) */}
+		                <div className="flex flex-col items-center text-center mb-[40px]">
                   <h3 className="mt-1 text-[28px] md:text-[32px] font-semibold text-white/95 tracking-tight">
-	                    {t('ui_send_pay_request_title', 'Renseigner une demande ')}
+		                    {t('ui_send_pay_request_title', 'Renseigner une demande ')}
                   </h3>
                   <p className="mt-2 text-[14px] md:text-[15px] text-white/60 max-w-[34ch] leading-relaxed">
                     {t('ui_send_pay_request_hint', 'Scannez, importez un QR code ou saisissez une demande de paiement.')}
                   </p>
                   {/* Wallet meta pill */}
                   <div className="mt-[40px] flex justify-center px-4 w-full">
-	                    {renderWalletMeta?.({
-	                      variant: 'pill-column',
-	                      className: 'flex justify-center',
-	                      prefix: t('moonpay_from_account', 'Compte source'),
-	                      pillClassName: 'bg-elevated-40 xcannes-fade-border-y shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)] rounded-[20px]',
-	                      dotClassName: '!bg-[#f5a623] ring-[#f5a623]/20',
-	                    })}
-	                  </div>
+		                    {renderWalletMeta?.({
+		                      variant: 'pill-column',
+		                      className: 'flex justify-center',
+		                      prefix: t('moonpay_from_account', 'Compte source'),
+		                      pillClassName: 'bg-elevated-40 xcannes-fade-border-y shadow-none rounded-[20px]',
+		                      dotClassName: '!bg-[#f5a623] ring-[#f5a623]/20',
+		                    })}
+		                  </div>
                 </div>
 
 	                <div className="rounded-[26px] bg-[#0b0f10]/40 ring-1 ring-white/10 ring-inset shadow-[inset_0_1px_0_rgba(255,255,255,0.05),inset_0_-26px_46px_rgba(0,0,0,0.55)] p-3 md:p-4">
@@ -1397,9 +1385,15 @@ export default function WalletDashboardSendChoiceModal({
                   <style>{`
                     @keyframes payreqCtaDotBlink { 0%, 70%, 100% { opacity: 0.1; } 35% { opacity: 0.9; } }
                     .payreq-cta-dot { font-size: 20px; line-height: 1; animation: payreqCtaDotBlink 2.4s ease-in-out infinite; color: inherit; }
-                  `}</style>
+	                  `}</style>
                 </div>
                 </div>
+                {/* Bottom bar – desktop only (visual balance) */}
+                {!inline ? (
+                  <div className="hidden md:flex pointer-events-none justify-center pt-2 pb-4" aria-hidden>
+                    <span className="block w-[120px] h-[4px] rounded-full bg-white/10" />
+                  </div>
+                ) : null}
               </div>
             </div>
           </div>
