@@ -975,7 +975,7 @@ export default function WalletDashboardSendModal({
 	            prefix: t("moonpay_from_account", "Compte source"),
               pillClassName: `bg-elevated ${sendAssetDropdownOpen
                 ? "ring-1 ring-white/15 ring-inset shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_10px_rgba(255,255,255,0.16)]"
-                : "shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]"}`,
+                : "shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]"} rounded-[20px]`,
             })}
           </div>
           <div>
@@ -1176,7 +1176,7 @@ export default function WalletDashboardSendModal({
             variant: "pill-column",
             className: "flex justify-center",
             prefix: t("moonpay_from_account", "Compte source"),
-            pillClassName: "bg-elevated shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]",
+            pillClassName: "bg-elevated shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)] rounded-[20px]",
           })}
         </div>
       </div>
@@ -1286,7 +1286,7 @@ export default function WalletDashboardSendModal({
       >
         {sendButtonDisabled && !sendProcessing
           ? <span className="inline-flex items-center gap-1.5 text-white/20">
-              <span className="text-[12px]">{t('ui_send_fill_cta', 'Choisissez la devise et le montant')}</span>
+              <span className="text-[14px]">{t('ui_send_fill_cta', 'Choisissez la devise et le montant')}</span>
               <span className="inline-flex items-end gap-[3px] mb-[-1px]">
                 <span className="send-modal-dot" style={{ animationDelay: '0s' }}>·</span>
                 <span className="send-modal-dot" style={{ animationDelay: '0.6s' }}>·</span>
@@ -1315,7 +1315,7 @@ export default function WalletDashboardSendModal({
       >
         {sendButtonDisabled && !sendProcessing
           ? <span className="inline-flex items-center gap-1.5 text-white/20">
-              <span className="text-[14px]">{t('ui_send_fill_cta', 'Choisissez la devise et le montant')}</span>
+              <span className="text-[16px]">{t('ui_send_fill_cta', 'Choisissez la devise et le montant')}</span>
               <span className="inline-flex items-end gap-[3px] mb-[-1px]">
                 <span className="send-modal-dot" style={{ animationDelay: '0s' }}>·</span>
                 <span className="send-modal-dot" style={{ animationDelay: '0.6s' }}>·</span>

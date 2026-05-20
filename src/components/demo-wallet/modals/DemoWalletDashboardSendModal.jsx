@@ -1244,7 +1244,7 @@ export default function DemoWalletDashboardSendModal({
           </span>
         ) : sendButtonDisabled && !sendProcessing ? (
           <span className="inline-flex items-center gap-1.5 text-white/20">
-            <span className="text-[12px] md:text-[14px]">
+            <span className="text-[14px] md:text-[16px]">
               {t("ui_send_fill_cta", "Choisissez la devise et le montant")}
             </span>
             <span className="inline-flex items-end gap-[3px] mb-[-1px]">

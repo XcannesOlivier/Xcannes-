@@ -556,14 +556,14 @@ export default function WalletDashboardSendChoiceModal({
                   </p>
                   {/* Wallet meta pill */}
                   <div className="mt-[40px] flex justify-center px-4 w-full">
-                    {renderWalletMeta?.({
-                      variant: "pill-column",
-                      className: "flex justify-center",
-                      prefix: t("moonpay_from_account", "Compte source"),
-                      pillClassName:
-                        "bg-elevated ring-1 ring-white/10 shadow-none",
-                    })}
-                  </div>
+	                    {renderWalletMeta?.({
+	                      variant: "pill-column",
+	                      className: "flex justify-center",
+	                      prefix: t("moonpay_from_account", "Compte source"),
+	                      pillClassName:
+	                        "bg-elevated ring-1 ring-white/10 shadow-none rounded-[20px]",
+	                    })}
+	                  </div>
                 </div>
 
                 {/* Cards — vertically centred in remaining space */}
@@ -743,13 +743,13 @@ export default function WalletDashboardSendChoiceModal({
                   </p>
                   {/* Wallet meta pill */}
                   <div className="mt-6 flex justify-center px-4 w-full">
-                    {renderWalletMeta?.({
-                      variant: 'pill-column',
-                      className: 'flex justify-center',
-                      prefix: t('moonpay_from_account', 'Compte source'),
-                      pillClassName: 'bg-elevated ring-1 ring-white/10 shadow-none',
-                    })}
-                  </div>
+	                    {renderWalletMeta?.({
+	                      variant: 'pill-column',
+	                      className: 'flex justify-center',
+	                      prefix: t('moonpay_from_account', 'Compte source'),
+	                      pillClassName: 'bg-elevated ring-1 ring-white/10 shadow-none rounded-[20px]',
+	                    })}
+	                  </div>
                 </div>
 
                 <div className="rounded-[26px] bg-[#0b0f10]/40 ring-1 ring-white/10 ring-inset shadow-[inset_0_1px_0_rgba(255,255,255,0.05),inset_0_-26px_46px_rgba(0,0,0,0.55)] p-3 md:p-4">
@@ -1110,7 +1110,7 @@ export default function WalletDashboardSendChoiceModal({
                           );
                         })()
                       : <span className="inline-flex items-center gap-1.5 text-white/85">
-                          <span className="text-[12px] md:text-[14px]">{t('ui_fill_recipient_address', "Renseigner l'adresse du destinataire")}</span>
+                          <span className="text-[14px] md:text-[16px]">{t('ui_fill_recipient_address', "Renseigner l'adresse du destinataire")}</span>
                           <span className="inline-flex items-end gap-[3px] mb-[-1px]">
                             <span className="send-dot" style={{ animationDelay: '0s' }}>·</span>
                             <span className="send-dot" style={{ animationDelay: '0.6s' }}>·</span>
@@ -1174,14 +1174,14 @@ export default function WalletDashboardSendChoiceModal({
                   </p>
                   {/* Wallet meta pill */}
                   <div className="mt-[40px] flex justify-center px-4 w-full">
-                    {renderWalletMeta?.({
-                      variant: 'pill-column',
-                      className: 'flex justify-center',
-                      prefix: t('moonpay_from_account', 'Compte source'),
-                      pillClassName: 'bg-elevated shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]',
-                      dotClassName: '!bg-[#f5a623] ring-[#f5a623]/20',
-                    })}
-                  </div>
+	                    {renderWalletMeta?.({
+	                      variant: 'pill-column',
+	                      className: 'flex justify-center',
+	                      prefix: t('moonpay_from_account', 'Compte source'),
+	                      pillClassName: 'bg-elevated shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)] rounded-[20px]',
+	                      dotClassName: '!bg-[#f5a623] ring-[#f5a623]/20',
+	                    })}
+	                  </div>
                 </div>
 
                 <div className="flex flex-col gap-4 md:gap-7">
@@ -1281,7 +1281,7 @@ export default function WalletDashboardSendChoiceModal({
                     {pendingPayreq
                       ? t('ui_validate_payreq', 'Vérifier la demande de paiement')
                       : <span className="inline-flex items-center gap-1.5">
-                          <span className="text-[12px] md:text-[14px]">{t('ui_fill_payreq', 'Renseignez la demande de paiement')}</span>
+                          <span className="text-[14px] md:text-[16px]">{t('ui_fill_payreq', 'Renseignez la demande de paiement')}</span>
                           <span className="inline-flex items-end gap-[3px] mb-[-1px]">
                             <span className="payreq-cta-dot" style={{ animationDelay: '0s' }}>·</span>
                             <span className="payreq-cta-dot" style={{ animationDelay: '0.6s' }}>·</span>
