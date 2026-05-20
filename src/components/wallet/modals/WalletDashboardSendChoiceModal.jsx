@@ -701,8 +701,8 @@ export default function WalletDashboardSendChoiceModal({
             >
               {/* Glow */}
               <div className="pointer-events-none absolute inset-0" aria-hidden>
-                <div className="absolute inset-0 md:hidden bg-[radial-gradient(700px_circle_at_100%_50%,rgba(0,255,150,0.08),transparent_60%)]" />
-                <div className="absolute inset-0 hidden md:block bg-[radial-gradient(1000px_circle_at_100%_50%,rgba(0,255,150,0.08),transparent_60%)]" />
+                <div className="absolute inset-0 md:hidden bg-[radial-gradient(260px_circle_at_70%_25%,rgba(0,255,150,0.16),transparent_70%)]" />
+                <div className="absolute inset-0 hidden md:block bg-[radial-gradient(320px_circle_at_70%_25%,rgba(0,255,150,0.14),transparent_72%)]" />
                 <div className="absolute inset-0 bg-[radial-gradient(400px_circle_at_0%_100%,rgba(255,255,255,0.03),transparent_55%)]" />
               </div>
               <div className="relative z-10 flex flex-col flex-1 min-h-0">
@@ -710,6 +710,15 @@ export default function WalletDashboardSendChoiceModal({
                 {!inline ? (
                   <div className="md:hidden flex justify-center pt-3 pb-0" aria-hidden>
                     <span className="block w-12 h-1.5 rounded-full bg-white/20" />
+                  </div>
+                ) : null}
+                {/* Bottom bar – mobile only */}
+                {!inline ? (
+                  <div
+                    className="md:hidden pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-[max(env(safe-area-inset-bottom),10px)] z-20"
+                    aria-hidden
+                  >
+                    <span className="block w-36 h-1.5 rounded-full bg-white/80" />
                   </div>
                 ) : null}
                 <div className="px-5 pt-[30px] md:pt-[60px] pb-5 flex flex-col flex-1 min-h-0 overflow-y-auto overscroll-contain">
@@ -1042,19 +1051,13 @@ export default function WalletDashboardSendChoiceModal({
                         ? 'text-white hover:scale-[1.01] active:scale-[0.98]'
                         : 'text-white/30 cursor-not-allowed ring-[0.5px] ring-xcannes-green/30 ring-inset'
                     }`}
-                    style={pendingDestination.address
-                      ? {
-                          background:
-                            'linear-gradient(180deg, rgba(44, 185, 103, 1) 0%, rgba(14, 103, 58, 1) 100%)',
-                          boxShadow:
-                            '0 14px 28px rgba(0,0,0,0.52), 0 6px 14px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.30), inset 0 10px 18px rgba(0,0,0,0.10)',
-                        }
-                      : {
-                          background:
-                            'linear-gradient(180deg, rgba(44, 185, 103, 0.18) 0%, rgba(14, 103, 58, 0.18) 100%)',
-                          boxShadow:
-                            '0 10px 22px rgba(0,0,0,0.42), 0 4px 10px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.10), inset 0 -10px 16px rgba(0,0,0,0.22)',
-                        }}
+                    style={{
+                      background:
+                        'linear-gradient(180deg, rgba(44, 185, 103, 1) 0%, rgba(14, 103, 58, 1) 100%)',
+                      boxShadow:
+                        '0 14px 28px rgba(0,0,0,0.52), 0 6px 14px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.30), inset 0 10px 18px rgba(0,0,0,0.10)',
+                      opacity: pendingDestination.address ? 1 : 0.28,
+                    }}
                   >
                     {pendingDestination.address
                       ? t('ui_validate_recipient_address', "Valider l'adresse du destinataire")
