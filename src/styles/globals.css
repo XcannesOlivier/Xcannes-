@@ -774,22 +774,22 @@ body.header-hero-mode .home-content-wrapper {
   inset: 0;
   pointer-events: none;
   border-radius: inherit;
-  padding: 0.75px;
+  padding: 1px;
   background:
-    radial-gradient(140px 60px at 12% 0%, rgba(0, 255, 150, 0.14), rgba(0, 255, 150, 0) 72%),
-    radial-gradient(160px 70px at 88% 20%, rgba(0, 255, 150, 0.10), rgba(0, 255, 150, 0) 74%),
+    radial-gradient(120px 52px at 14% 10%, rgba(0, 255, 150, 0.08), rgba(0, 255, 150, 0) 74%),
+    radial-gradient(120px 52px at 86% 10%, rgba(0, 255, 150, 0.08), rgba(0, 255, 150, 0) 74%),
     linear-gradient(90deg,
       rgba(0, 255, 150, 0) 0%,
-      rgba(0, 255, 150, 0.14) 22%,
-      rgba(0, 255, 150, 0.08) 50%,
-      rgba(0, 255, 150, 0.14) 78%,
+      rgba(0, 255, 150, 0.14) 20%,
+      rgba(0, 255, 150, 0.14) 50%,
+      rgba(0, 255, 150, 0.14) 80%,
       rgba(0, 255, 150, 0) 100%);
   -webkit-mask:
     linear-gradient(#000 0 0) content-box,
     linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
-  opacity: 0.75;
+  opacity: 0.9;
 }
 
 .xcannes-scan-ping {
