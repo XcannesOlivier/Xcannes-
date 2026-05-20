@@ -1137,11 +1137,9 @@ export default function WalletDashboardSendChoiceModal({
 
                 </div>
                 {/* Bottom bar – desktop only (visual balance) */}
-                {!inline ? (
-                  <div className="hidden md:flex pointer-events-none justify-center pt-2 pb-4" aria-hidden>
-                    <span className="block w-[120px] h-[4px] rounded-full bg-white/10" />
-                  </div>
-                ) : null}
+                <div className="hidden md:flex pointer-events-none justify-center pt-2 pb-4" aria-hidden>
+                  <span className="block w-[120px] h-[4px] rounded-full bg-white/10" />
+                </div>
               </div>
             </div>
           </div>
@@ -1158,12 +1156,12 @@ export default function WalletDashboardSendChoiceModal({
               style={!inline && overlayTranslateY ? { transform: `translateY(${Math.max(0, overlayTranslateY)}px)`, transition: overlayDragging ? 'none' : 'transform 220ms cubic-bezier(0.2,0,0,1)', opacity: Math.max(0, Math.min(1, 1 - overlayTranslateY / 420)) } : undefined}
               onPointerDown={handleSubModalPillDown}
             >
-              {/* Glow */}
-              <div className="pointer-events-none absolute inset-0" aria-hidden>
-                <div className="absolute inset-0 md:hidden bg-[radial-gradient(700px_circle_at_100%_50%,rgba(245,166,35,0.12),transparent_60%)]" />
-                <div className="absolute inset-0 hidden md:block bg-[radial-gradient(1000px_circle_at_100%_50%,rgba(245,166,35,0.12),transparent_60%)]" />
-                <div className="absolute inset-0 bg-[radial-gradient(400px_circle_at_0%_100%,rgba(255,255,255,0.03),transparent_55%)]" />
-              </div>
+	              {/* Glow */}
+	              <div className="pointer-events-none absolute inset-0" aria-hidden>
+	                <div className="absolute inset-0 md:hidden bg-[radial-gradient(260px_circle_at_30%_25%,rgba(245,166,35,0.16),transparent_70%)]" />
+	                <div className="absolute inset-0 hidden md:block bg-[radial-gradient(320px_circle_at_30%_25%,rgba(245,166,35,0.14),transparent_72%)]" />
+	                <div className="absolute inset-0 bg-[radial-gradient(400px_circle_at_0%_100%,rgba(255,255,255,0.03),transparent_55%)]" />
+	              </div>
               <div className="relative z-10 flex flex-col flex-1 min-h-0">
                 {/* Swipe bar – mobile only */}
 	                {!inline ? (
@@ -1389,11 +1387,9 @@ export default function WalletDashboardSendChoiceModal({
                 </div>
                 </div>
                 {/* Bottom bar – desktop only (visual balance) */}
-                {!inline ? (
-                  <div className="hidden md:flex pointer-events-none justify-center pt-2 pb-4" aria-hidden>
-                    <span className="block w-[120px] h-[4px] rounded-full bg-white/10" />
-                  </div>
-                ) : null}
+                <div className="hidden md:flex pointer-events-none justify-center pt-2 pb-4" aria-hidden>
+                  <span className="block w-[120px] h-[4px] rounded-full bg-white/10" />
+                </div>
               </div>
             </div>
           </div>
