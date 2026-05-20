@@ -1066,10 +1066,19 @@ export default function WalletDashboardSendChoiceModal({
                           const label = String(pendingDestination.label || "").trim();
                           const showLabel =
                             label && label !== addr && label !== t("ui_wallet_unknown", "Unknown wallet");
-                          const addrShort =
-                            addr.length > 18
-                              ? `${addr.slice(0, 6)}…${addr.slice(-4)}`
-                              : addr;
+                          const addrShort = (() => {
+                            if (!addr) return "";
+                            if (showLabel) {
+                              // When label is shown, keep the address very short.
+                              return addr.length > 10
+                                ? `${addr.slice(0, 4)}…${addr.slice(-2)}`
+                                : addr;
+                            }
+                            // Without label, keep more than half of the address visible.
+                            if (addr.length > 26) return `${addr.slice(0, 14)}…${addr.slice(-10)}`;
+                            if (addr.length > 18) return `${addr.slice(0, 10)}…${addr.slice(-6)}`;
+                            return addr;
+                          })();
                           return (
                             <span className="inline-flex items-center gap-2 whitespace-nowrap overflow-hidden text-ellipsis max-w-full">
                               <span className="shrink-0">
@@ -1089,7 +1098,7 @@ export default function WalletDashboardSendChoiceModal({
                             </span>
                           );
                         })()
-                      : <span className="inline-flex items-center gap-1.5 text-white/20">
+                      : <span className="inline-flex items-center gap-1.5 text-white/85">
                           <span className="text-xs">{t('ui_fill_recipient_address', "Renseigner l'adresse du destinataire")}</span>
                           <span className="inline-flex items-end gap-[3px] mb-[-1px]">
                             <span className="send-dot" style={{ animationDelay: '0s' }}>·</span>
