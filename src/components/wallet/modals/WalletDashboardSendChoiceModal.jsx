@@ -786,37 +786,7 @@ export default function WalletDashboardSendChoiceModal({
 	                    </button>
 	                  </div>
 
-                  {/* ── Inline flow: Envoi simple (desktop only) ── */}
-                  {flowSheet === 'simple' && (
-                    <div className="hidden md:block rounded-[18px] bg-[#070a0b]/95 ring-1 ring-white/10 ring-inset px-5 py-4">
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="text-[15px] font-bold text-white/90">{t('ui_send_simple_title', 'Envoi simple')}</div>
-                        <button type="button" onClick={closeFlowSheet} className="h-8 w-8 rounded-full bg-white/[0.06] hover:bg-white/[0.09] flex items-center justify-center" aria-label={t('ui_close', 'Fermer')}>
-                          <svg viewBox="0 0 24 24" className="w-4 h-4 text-white/70" fill="none" aria-hidden><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
-                        </button>
-                      </div>
-                      <div className="flex flex-col gap-3">
-                        {[
-                          { title: t('home_v2_essentials_2_modal_flow_2_step_1_title', 'Choisir le destinataire'), desc: t('ui_send_choice_simple_flow_step1_desc_v2', 'Ajoutez le wallet du destinataire en scannant un QR code, en collant une adresse reçue, ou en sélectionnant un wallet enregistré.') },
-                          { title: t('home_v2_essentials_2_modal_flow_2_step_2_title', 'Indiquer le paiement'), desc: t('ui_send_choice_simple_flow_step2_desc_v2', 'Choisissez la devise, puis saisissez le montant à envoyer.') },
-                          { title: t('ui_send_choice_simple_flow_step3_title_v2', 'Vérifier l’envoi'), desc: t('ui_send_choice_simple_flow_step3_desc_v2', 'Contrôlez les informations affichées avant de continuer.') },
-                          { title: t('home_v2_essentials_2_modal_flow_2_step_4_title', 'Confirmer la transaction'), desc: t('ui_send_choice_simple_flow_step4_desc_v2', 'Validez explicitement la transaction pour finaliser l’envoi en toute sécurité.') },
-                        ].map((step, idx) => (
-                          <div key={idx} className="rounded-[14px] bg-white/[0.05] px-4 py-4">
-                            <div className="flex items-start gap-3.5">
-                              <div className="mt-[1px] w-9 h-9 flex-none shrink-0 rounded-full ring-inset flex items-center justify-center text-[14px] font-bold leading-none bg-white/[0.10] text-xcannes-green/90 ring-1 ring-xcannes-green/30">{idx + 1}</div>
-                              <div className="min-w-0">
-                                <div className="text-[13px] md:text-[14px] leading-snug text-white/90 font-semibold">{step.title}</div>
-                                <div className="mt-1 text-[12px] md:text-[13px] leading-relaxed text-white/60">{step.desc}</div>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* ── 2. Payer une demande ── */}
+                  {/* ── 2. Payer une demande ── */}}
                   <div className={`${cardClassName} xcannes-irregular-amber-border xcannes-sendchoice-accent-amber`}>
                     <div className="pointer-events-none absolute inset-0" aria-hidden>
                       <div className="xcannes-sendchoice-border-fade-amber z-10" />
@@ -881,37 +851,6 @@ export default function WalletDashboardSendChoiceModal({
 	                      </svg>
 	                    </button>
 	                  </div>
-
-                  {/* ── Inline flow: Payer une demande (desktop only) ── */}
-                  {flowSheet === 'payreq' && (
-                    <div className="hidden md:block rounded-[18px] bg-[#070a0b]/95 ring-1 ring-white/10 ring-inset px-5 py-4">
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="text-[15px] font-bold text-white/90">{t('ui_send_choice_pay_request_title', 'Payer une demande')}</div>
-                        <button type="button" onClick={closeFlowSheet} className="h-8 w-8 rounded-full bg-white/[0.06] hover:bg-white/[0.09] flex items-center justify-center" aria-label={t('ui_close', 'Fermer')}>
-                          <svg viewBox="0 0 24 24" className="w-4 h-4 text-white/70" fill="none" aria-hidden><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
-                        </button>
-                      </div>
-                      <div className="flex flex-col gap-3">
-                        {[
-                          { title: t('home_v2_essentials_2_modal_flow_1_step_1_title', 'Recevoir la demande'), desc: t('home_v2_essentials_2_modal_flow_1_step_1_desc', 'Le destinataire vous envoie une demande contenant le montant, la devise, son wallet.'), note: t('home_v2_essentials_2_modal_flow_1_step_1_note', 'Elle peut être reçue par message, e-mail, SMS, ou présentée en face à face via un QR code.') },
-                          { title: t('home_v2_essentials_2_modal_flow_1_step_2_title', 'Charger la demande'), desc: t('home_v2_essentials_2_modal_flow_1_step_2_desc', 'Depuis votre wallet, importez la demande en :'), details: [t('home_v2_essentials_2_modal_flow_1_step_2_detail_1', 'Scannant le QR code'), t('home_v2_essentials_2_modal_flow_1_step_2_detail_2', 'Chargeant une image du QR'), t('home_v2_essentials_2_modal_flow_1_step_2_detail_3', 'Ou collant le code reçu')] },
-                          { title: t('home_v2_essentials_2_modal_flow_1_step_3_title', 'Vérifier et confirmer'), desc: t('home_v2_essentials_2_modal_flow_1_step_3_desc', 'Les informations s’affichent automatiquement. Vérifiez-les, puis confirmez la transaction.'), note: t('home_v2_essentials_2_modal_flow_1_step_3_note', 'Chaque paiement nécessite une validation explicite pour garantir sécurité et contrôle.') },
-                        ].map((step, idx) => (
-                          <div key={idx} className="rounded-[14px] bg-white/[0.05] px-4 py-4">
-                            <div className="flex items-start gap-3.5">
-                              <div className="mt-[1px] w-9 h-9 flex-none shrink-0 rounded-full ring-inset flex items-center justify-center text-[14px] font-bold leading-none bg-white/[0.10] text-[#f5a623]/90 ring-1 ring-[#f5a623]/25">{idx + 1}</div>
-                              <div className="min-w-0">
-                                <div className="text-[13px] md:text-[14px] leading-snug text-white/90 font-semibold">{step.title}</div>
-                                <div className="mt-1 text-[12px] md:text-[13px] leading-relaxed text-white/60">{step.desc}</div>
-                                {step.details?.length ? (<ul className="mt-2.5 space-y-1.5 list-disc pl-4 text-[12px] md:text-[13px] text-white/50">{step.details.map((d, j) => <li key={j}>{d}</li>)}</ul>) : null}
-                                {step.note ? (<div className="mt-2.5 text-[12px] md:text-[13px] leading-relaxed text-white/45">{step.note}</div>) : null}
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
 
                   {/* Hidden div for html5-qrcode reader */}
                   <div id={manualQrReaderIdRef.current} className="hidden" />
@@ -1634,7 +1573,7 @@ export default function WalletDashboardSendChoiceModal({
 
         {/* Flow dropdown (bottom sheet) */}
         {flowSheet ? (
-          <div className="fixed inset-0 z-[10006] pointer-events-none md:hidden">
+          <div className="fixed inset-0 z-[10006] pointer-events-none">
             <div
               className="absolute inset-0 bg-black/35 md:bg-black/20 pointer-events-auto"
               style={flowSheetTranslateY > 0 ? { opacity: Math.max(0, Math.min(1, 1 - flowSheetTranslateY / 320)) } : undefined}
