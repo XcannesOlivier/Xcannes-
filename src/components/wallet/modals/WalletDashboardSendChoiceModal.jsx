@@ -621,9 +621,10 @@ export default function WalletDashboardSendChoiceModal({
                   {/* ── 1. Envoi simple ── */}
                   <div className={`${cardClassName} xcannes-irregular-green-border xcannes-sendchoice-accent-green`}>
                     <div className="pointer-events-none absolute inset-0" aria-hidden>
+                      <div className="absolute inset-0 rounded-[inherit] p-px opacity-90 [background:linear-gradient(90deg,rgba(0,255,150,0.85)_0%,rgba(0,255,150,0.35)_22%,rgba(255,255,255,0.16)_55%,rgba(255,255,255,0.12)_100%)] [mask:linear-gradient(#000_0_0)_content-box,linear-gradient(#000_0_0)] [mask-composite:exclude] [webkit-mask:linear-gradient(#000_0_0)_content-box,linear-gradient(#000_0_0)] [webkit-mask-composite:xor]" />
                       <div className="absolute left-0 top-0 bottom-0 w-px opacity-80 bg-[linear-gradient(to_bottom,transparent_0%,rgba(0,255,150,0.75)_22%,rgba(0,255,150,0.20)_60%,transparent_100%)]" />
                       <div className="absolute -left-[1px] top-0 bottom-0 w-[3px] blur-[1px] opacity-90 bg-[linear-gradient(to_bottom,transparent_0%,rgba(0,255,150,0.55)_24%,rgba(0,255,150,0.95)_48%,rgba(0,255,150,0.35)_62%,transparent_100%)]" />
-                      <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[14px] h-[80px] blur-[2px] opacity-95 bg-[radial-gradient(16px_42px_at_0%_50%,rgba(0,255,150,0.95)_0%,rgba(0,255,150,0.35)_45%,transparent_75%)]" />
+                      <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[10px] h-[80px] blur-[2px] opacity-95 bg-[radial-gradient(12px_42px_at_0%_50%,rgba(0,255,150,0.95)_0%,rgba(0,255,150,0.35)_45%,transparent_75%)]" />
                       <div className="absolute inset-0 bg-[radial-gradient(190px_190px_at_-8%_45%,rgba(0,255,150,0.55)_0%,rgba(0,255,150,0.22)_22%,rgba(0,255,150,0.08)_38%,transparent_62%)]" />
                       <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] via-transparent to-black/40" />
                     </div>
@@ -676,9 +677,10 @@ export default function WalletDashboardSendChoiceModal({
                   {/* ── 2. Payer une demande ── */}
                   <div className={`${cardClassName} xcannes-irregular-amber-border xcannes-sendchoice-accent-amber`}>
                     <div className="pointer-events-none absolute inset-0" aria-hidden>
+                      <div className="absolute inset-0 rounded-[inherit] p-px opacity-90 [background:linear-gradient(90deg,rgba(245,166,35,0.78)_0%,rgba(245,166,35,0.32)_22%,rgba(255,255,255,0.16)_55%,rgba(255,255,255,0.12)_100%)] [mask:linear-gradient(#000_0_0)_content-box,linear-gradient(#000_0_0)] [mask-composite:exclude] [webkit-mask:linear-gradient(#000_0_0)_content-box,linear-gradient(#000_0_0)] [webkit-mask-composite:xor]" />
                       <div className="absolute left-0 top-0 bottom-0 w-px opacity-80 bg-[linear-gradient(to_bottom,transparent_0%,rgba(245,166,35,0.70)_22%,rgba(245,166,35,0.18)_60%,transparent_100%)]" />
                       <div className="absolute -left-[1px] top-0 bottom-0 w-[3px] blur-[1px] opacity-90 bg-[linear-gradient(to_bottom,transparent_0%,rgba(245,166,35,0.45)_24%,rgba(245,166,35,0.90)_48%,rgba(245,166,35,0.32)_62%,transparent_100%)]" />
-                      <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[14px] h-[80px] blur-[2px] opacity-95 bg-[radial-gradient(16px_42px_at_0%_50%,rgba(245,166,35,0.92)_0%,rgba(245,166,35,0.32)_45%,transparent_75%)]" />
+                      <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[10px] h-[80px] blur-[2px] opacity-95 bg-[radial-gradient(12px_42px_at_0%_50%,rgba(245,166,35,0.92)_0%,rgba(245,166,35,0.32)_45%,transparent_75%)]" />
                       <div className="absolute inset-0 bg-[radial-gradient(190px_190px_at_-8%_45%,rgba(245,166,35,0.46)_0%,rgba(245,166,35,0.20)_22%,rgba(245,166,35,0.08)_38%,transparent_62%)]" />
                       <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] via-transparent to-black/40" />
                     </div>
@@ -704,7 +706,7 @@ export default function WalletDashboardSendChoiceModal({
                             {t('ui_send_pay_request_hint', 'Scannez, importez un QR code ou saisissez une demande de paiement.')}
                           </p>
                           <div className="mt-3 pt-3 border-t border-white/10 flex flex-wrap items-center gap-2">
-                            <Badge className="ring-[0.6px] ring-[#f5a623]/70">{t('ui_send_choice_payreq_badge_modes', 'QR, import, saisie')}</Badge>
+                            <Badge className="ring-[0.6px] ring-[#f5a623]/90">{t('ui_send_choice_payreq_badge_modes', 'QR, import, saisie')}</Badge>
                             <span className="w-1 h-1 rounded-full bg-[#f5a623]/80" aria-hidden />
                             <Badge className="bg-transparent ring-0 px-0 text-[8px] md:text-[11px] text-white/65">{t('ui_send_choice_payreq_badge_flexible', 'Flexible & pratique')}</Badge>
                           </div>
