@@ -1585,7 +1585,7 @@ export default function WalletDashboardSendChoiceModal({
 	                    <div className="flex justify-center" aria-hidden>
 	                      <span className="block w-12 h-1.5 rounded-full bg-white/15" />
 	                    </div>
-	                    <div className="mt-3 text-[15px] md:text-[16px] leading-tight text-white/90 font-semibold text-center tracking-tight">
+	                    <div className="mt-3 text-[19px] md:text-[21px] leading-tight text-white/95 font-bold text-center tracking-tight">
 	                      {flowSheet === 'simple'
 	                        ? t('ui_send_simple_title', 'Envoi simple')
 	                        : t('ui_send_choice_pay_request_title', 'Payer une demande')}
@@ -1605,7 +1605,8 @@ export default function WalletDashboardSendChoiceModal({
 	                    </button>
 	                  </div>
 
-	                  <div className="mt-4 max-h-[62vh] md:max-h-[60vh] overflow-y-auto overscroll-contain pr-1">
+	                  <div className="mt-5 max-h-[62vh] md:max-h-[60vh] overflow-y-auto overscroll-contain pr-1">
+	                    <div className="flex flex-col gap-3">
 	                    {(flowSheet === 'simple'
 	                ? [
 	                    {
@@ -1661,12 +1662,12 @@ export default function WalletDashboardSendChoiceModal({
 	              ).map((step, idx) => {
                 const isSimple = flowSheet === 'simple';
                 const numberClass = isSimple
-                  ? 'bg-white/[0.04] text-xcannes-green/80 ring-1 ring-xcannes-green/25'
-                  : 'bg-white/[0.04] text-[#f5a623]/80 ring-1 ring-[#f5a623]/20';
+                  ? 'bg-white/[0.06] text-xcannes-green/90 ring-1 ring-xcannes-green/30'
+                  : 'bg-white/[0.06] text-[#f5a623]/90 ring-1 ring-[#f5a623]/25';
 	                return (
-	                  <div key={idx} className={idx ? 'mt-4 pt-4 border-t border-white/7' : ''}>
+	                  <div key={idx} className="rounded-[14px] bg-white/[0.055] px-4 py-4">
 	                    <div className="flex items-start gap-3.5">
-	                      <div className={`mt-[2px] w-6 h-6 flex-none shrink-0 rounded-full ring-inset flex items-center justify-center text-[11px] font-semibold leading-none ${numberClass}`}>
+	                      <div className={`mt-[1px] w-9 h-9 flex-none shrink-0 rounded-full ring-inset flex items-center justify-center text-[14px] font-bold leading-none ${numberClass}`}>
 	                        {idx + 1}
 	                      </div>
 	                      <div className="min-w-0">
@@ -1693,7 +1694,8 @@ export default function WalletDashboardSendChoiceModal({
 	                  </div>
 	                );
 	              })}
-                  </div>
+	                    </div>
+	                  </div>
                 </div>
               </div>
             </div>
