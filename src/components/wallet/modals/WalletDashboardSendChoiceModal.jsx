@@ -627,7 +627,8 @@ export default function WalletDashboardSendChoiceModal({
                   {/* ── 1. Envoi simple ── */}
                   <div className={`${cardClassName} xcannes-irregular-green-border`}>
                     <div className="pointer-events-none absolute inset-0" aria-hidden>
-                      <div className="absolute -inset-8 bg-[radial-gradient(220px_220px_at_0%_45%,rgba(0,255,150,0.34),rgba(0,255,150,0.16)_36%,transparent_70%),linear-gradient(90deg,rgba(0,255,150,0.10),transparent_55%)]" />
+                      <div className="absolute -left-[1px] top-0 bottom-0 w-[3px] blur-[1px] opacity-90 bg-[linear-gradient(to_bottom,transparent_0%,rgba(0,255,150,0.70)_18%,rgba(0,255,150,0.30)_55%,transparent_100%)]" />
+                      <div className="absolute inset-0 bg-[radial-gradient(190px_190px_at_-8%_45%,rgba(0,255,150,0.55)_0%,rgba(0,255,150,0.22)_22%,rgba(0,255,150,0.08)_38%,transparent_62%)]" />
                       <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] via-transparent to-black/40" />
                     </div>
                     <button
@@ -678,7 +679,8 @@ export default function WalletDashboardSendChoiceModal({
                   {/* ── 2. Payer une demande ── */}
                   <div className={`${cardClassName} xcannes-irregular-amber-border`}>
                     <div className="pointer-events-none absolute inset-0" aria-hidden>
-                      <div className="absolute -inset-8 bg-[radial-gradient(220px_220px_at_0%_45%,rgba(245,166,35,0.30),rgba(245,166,35,0.14)_36%,transparent_70%),linear-gradient(90deg,rgba(245,166,35,0.09),transparent_55%)]" />
+                      <div className="absolute -left-[1px] top-0 bottom-0 w-[3px] blur-[1px] opacity-90 bg-[linear-gradient(to_bottom,transparent_0%,rgba(245,166,35,0.62)_18%,rgba(245,166,35,0.28)_55%,transparent_100%)]" />
+                      <div className="absolute inset-0 bg-[radial-gradient(190px_190px_at_-8%_45%,rgba(245,166,35,0.46)_0%,rgba(245,166,35,0.20)_22%,rgba(245,166,35,0.08)_38%,transparent_62%)]" />
                       <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] via-transparent to-black/40" />
                     </div>
                     <button
