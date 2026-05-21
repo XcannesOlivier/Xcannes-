@@ -360,9 +360,7 @@ body.wallet-page {
   border-width: 0 !important;
 }
 
-.wallet-cash-modal .send-choice-card-btn {
-  border-width: unset !important;
-}
+/* Note: keep wallet modal zero-border reset so buttons don't regain UA borders. */
 
 .wallet-meta--plus-4 {
   font-size: 14px;
@@ -907,33 +905,37 @@ body.header-hero-mode .home-content-wrapper {
   inset: 0;
   border-radius: inherit;
   opacity: 0.95;
-  border: 1px solid transparent;
-  background-clip: padding-box, border-box;
-  background-origin: border-box;
+  padding: 1px;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
 }
 
 .xcannes-sendchoice-border-fade-green {
-  background-image:
-    linear-gradient(transparent, transparent),
-    linear-gradient(
-      90deg,
-      rgba(0, 255, 150, 0.70) 0%,
-      rgba(0, 255, 150, 0.24) 14%,
-      rgba(255, 255, 255, 0.14) 46%,
-      rgba(255, 255, 255, 0.12) 100%
-    );
+  background: linear-gradient(
+    90deg,
+    rgba(0, 255, 150, 0.70) 0%,
+    rgba(0, 255, 150, 0.24) 14%,
+    rgba(255, 255, 255, 0.14) 46%,
+    rgba(255, 255, 255, 0.12) 100%
+  );
+}
+
+@supports not ((-webkit-mask-composite: xor) or (mask-composite: exclude)) {
+  .xcannes-sendchoice-border-fade-green,
+  .xcannes-sendchoice-border-fade-amber {
+    display: none;
+  }
 }
 
 .xcannes-sendchoice-border-fade-amber {
-  background-image:
-    linear-gradient(transparent, transparent),
-    linear-gradient(
-      90deg,
-      rgba(245, 166, 35, 0.62) 0%,
-      rgba(245, 166, 35, 0.21) 14%,
-      rgba(255, 255, 255, 0.14) 46%,
-      rgba(255, 255, 255, 0.12) 100%
-    );
+  background: linear-gradient(
+    90deg,
+    rgba(245, 166, 35, 0.62) 0%,
+    rgba(245, 166, 35, 0.21) 14%,
+    rgba(255, 255, 255, 0.14) 46%,
+    rgba(255, 255, 255, 0.12) 100%
+  );
 }
 
 .xcannes-fade-ring-y {

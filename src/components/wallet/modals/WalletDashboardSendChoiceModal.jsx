@@ -631,7 +631,7 @@ export default function WalletDashboardSendChoiceModal({
 	                    <button
 	                      type="button"
 	                      onClick={() => openSubModal('quickscan')}
-	                      className="relative w-full text-left send-choice-card-btn"
+	                      className="relative w-full text-left"
 	                    >
                       <div className="grid grid-cols-[48px_1px_1fr_28px] md:grid-cols-[56px_1px_1fr_32px] gap-3 md:gap-4 items-start">
                         <div className="relative">
@@ -688,7 +688,7 @@ export default function WalletDashboardSendChoiceModal({
 	                    <button
 	                      type="button"
 	                      onClick={() => openSubModal('payreq')}
-	                      className="relative w-full text-left send-choice-card-btn"
+	                      className="relative w-full text-left"
 	                    >
                       <div className="grid grid-cols-[48px_1px_1fr_28px] md:grid-cols-[56px_1px_1fr_32px] gap-3 md:gap-4 items-start">
                         <div className="relative">
