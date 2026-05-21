@@ -792,6 +792,7 @@ body.header-hero-mode .home-content-wrapper {
   inset: 0;
   pointer-events: none;
   border-radius: inherit;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
 }
 .xcannes-irregular-green-border::after {
   content: "";
@@ -859,6 +860,7 @@ body.header-hero-mode .home-content-wrapper {
   inset: 0;
   pointer-events: none;
   border-radius: inherit;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
 }
 .xcannes-irregular-amber-border::after {
   content: "";
