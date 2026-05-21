@@ -405,16 +405,22 @@ export default function WalletDashboardSendChoiceModal({
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="2"
+      strokeWidth="1.8"
       strokeLinecap="round"
       strokeLinejoin="round"
       className={className}
       aria-hidden="true"
     >
-      <circle cx="5" cy="5" r="2" />
-      <circle cx="19" cy="12" r="1.8" fill="currentColor" strokeWidth="0" />
-      <circle cx="5" cy="19" r="2" fill="currentColor" />
-      <path d="M5 7c0 5 14 0 14 5s-14 0-14 5" />
+      {/* Chemin sinueux du parcours */}
+      <path
+        d="M4 19c2.5 0 3-3 1.5-4.5S3 12 4 10s3.5-1 5 0 3 2.5 5 1.5 2-3 1-4.5"
+        strokeDasharray="0.1 2.6"
+      />
+      {/* Point de départ */}
+      <circle cx="4" cy="19" r="1.8" fill="currentColor" strokeWidth="0" />
+      {/* Drapeau d'arrivée */}
+      <path d="M15 5v8" />
+      <path d="M15 5h5l-1.2 2L20 9h-5" fill="currentColor" strokeWidth="0" />
     </svg>
   );
 
