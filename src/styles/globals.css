@@ -947,7 +947,7 @@ body.header-hero-mode .home-content-wrapper {
   inset: 0;
   pointer-events: none;
   border-radius: inherit;
-  padding: 1px;
+  padding: 4px;
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
@@ -976,7 +976,7 @@ body.header-hero-mode .home-content-wrapper {
   inset: 0;
   border-radius: inherit;
   opacity: 0.95;
-  padding: 1px;
+  padding: 4px;
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
