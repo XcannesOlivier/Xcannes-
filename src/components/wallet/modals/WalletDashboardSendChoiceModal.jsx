@@ -411,12 +411,10 @@ export default function WalletDashboardSendChoiceModal({
       className={className}
       aria-hidden="true"
     >
-      <circle cx="6" cy="6" r="1.6" />
-      <circle cx="6" cy="18" r="1.6" />
-      <circle cx="18" cy="12" r="1.6" />
-      <path d="M7.9 6h4.6a3.6 3.6 0 0 1 0 7.2H11a3.6 3.6 0 0 0 0 7.2h4.6" />
-      <path d="M16 12h3.2" />
-      <path d="M18.2 10.4 20 12l-1.8 1.6" />
+      <circle cx="5" cy="5" r="2" />
+      <circle cx="19" cy="12" r="1.8" fill="currentColor" strokeWidth="0" />
+      <circle cx="5" cy="19" r="2" fill="currentColor" />
+      <path d="M5 7c0 5 14 0 14 5s-14 0-14 5" />
     </svg>
   );
 
@@ -760,8 +758,8 @@ export default function WalletDashboardSendChoiceModal({
                         </div>
                         <div className="self-center flex justify-end mr-2 md:mr-0">
                           <svg className="w-7 h-7 md:w-8 md:h-8 text-xcannes-green/90 flex-shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden>
-                            <path d="M7 18L13 12L7 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                            <path d="M13 18L19 12L13 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            <path d="M7 18L13 12L7 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                            <path d="M13 18L19 12L13 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                           </svg>
                         </div>
                       </div>
@@ -779,14 +777,44 @@ export default function WalletDashboardSendChoiceModal({
 	                    >
                       <div className="absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-xcannes-green/45 to-transparent" aria-hidden />
                       <span className="inline-flex items-center gap-2">
-                        <OpenFlowIcon className="w-[12px] h-[12px] text-xcannes-green/85" />
+                        <OpenFlowIcon className="w-[20px] h-[20px] text-xcannes-green/85" />
                         <span className="text-white">{t('ui_open_flow', 'Ouvrir le parcours')}</span>
                       </span>
-	                      <svg className={`w-5 h-5 text-xcannes-green/85 transition-transform duration-200 ${flowSheet === 'simple' ? 'rotate-90' : 'rotate-0'}`} viewBox="0 0 24 24" fill="none" aria-hidden>
+	                      <svg className={`w-4 h-4 text-xcannes-green/85 transition-transform duration-200 ${flowSheet === 'simple' ? 'rotate-90' : 'rotate-0'}`} viewBox="0 0 24 24" fill="none" aria-hidden>
 	                        <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
 	                      </svg>
 	                    </button>
 	                  </div>
+
+                  {/* ── Inline flow: Envoi simple (desktop only) ── */}
+                  {flowSheet === 'simple' && (
+                    <div className="hidden md:block rounded-[18px] bg-[#070a0b]/95 ring-1 ring-white/10 ring-inset px-5 py-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="text-[15px] font-bold text-white/90">{t('ui_send_simple_title', 'Envoi simple')}</div>
+                        <button type="button" onClick={closeFlowSheet} className="h-8 w-8 rounded-full bg-white/[0.06] hover:bg-white/[0.09] flex items-center justify-center" aria-label={t('ui_close', 'Fermer')}>
+                          <svg viewBox="0 0 24 24" className="w-4 h-4 text-white/70" fill="none" aria-hidden><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
+                        </button>
+                      </div>
+                      <div className="flex flex-col gap-3">
+                        {[
+                          { title: t('home_v2_essentials_2_modal_flow_2_step_1_title', 'Choisir le destinataire'), desc: t('ui_send_choice_simple_flow_step1_desc_v2', 'Ajoutez le wallet du destinataire en scannant un QR code, en collant une adresse reçue, ou en sélectionnant un wallet enregistré.') },
+                          { title: t('home_v2_essentials_2_modal_flow_2_step_2_title', 'Indiquer le paiement'), desc: t('ui_send_choice_simple_flow_step2_desc_v2', 'Choisissez la devise, puis saisissez le montant à envoyer.') },
+                          { title: t('ui_send_choice_simple_flow_step3_title_v2', 'Vérifier l’envoi'), desc: t('ui_send_choice_simple_flow_step3_desc_v2', 'Contrôlez les informations affichées avant de continuer.') },
+                          { title: t('home_v2_essentials_2_modal_flow_2_step_4_title', 'Confirmer la transaction'), desc: t('ui_send_choice_simple_flow_step4_desc_v2', 'Validez explicitement la transaction pour finaliser l’envoi en toute sécurité.') },
+                        ].map((step, idx) => (
+                          <div key={idx} className="rounded-[14px] bg-white/[0.05] px-4 py-4">
+                            <div className="flex items-start gap-3.5">
+                              <div className="mt-[1px] w-9 h-9 flex-none shrink-0 rounded-full ring-inset flex items-center justify-center text-[14px] font-bold leading-none bg-white/[0.10] text-xcannes-green/90 ring-1 ring-xcannes-green/30">{idx + 1}</div>
+                              <div className="min-w-0">
+                                <div className="text-[13px] md:text-[14px] leading-snug text-white/90 font-semibold">{step.title}</div>
+                                <div className="mt-1 text-[12px] md:text-[13px] leading-relaxed text-white/60">{step.desc}</div>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
                   {/* ── 2. Payer une demande ── */}
                   <div className={`${cardClassName} xcannes-irregular-amber-border xcannes-sendchoice-accent-amber`}>
@@ -826,8 +854,8 @@ export default function WalletDashboardSendChoiceModal({
                         </div>
                         <div className="self-center flex justify-end mr-2 md:mr-0">
                           <svg className="w-7 h-7 md:w-8 md:h-8 text-[#f5a623]/90 flex-shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden>
-                            <path d="M7 18L13 12L7 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                            <path d="M13 18L19 12L13 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            <path d="M7 18L13 12L7 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                            <path d="M13 18L19 12L13 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                           </svg>
                         </div>
                       </div>
@@ -845,14 +873,45 @@ export default function WalletDashboardSendChoiceModal({
 	                    >
                       <div className="absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-[#f5a623]/40 to-transparent" aria-hidden />
                       <span className="inline-flex items-center gap-2">
-                        <OpenFlowIcon className="w-[12px] h-[12px] text-[#f5a623]/85" />
+                        <OpenFlowIcon className="w-[20px] h-[20px] text-[#f5a623]/85" />
                         <span className="text-white">{t('ui_open_flow', 'Ouvrir le parcours')}</span>
                       </span>
-	                      <svg className={`w-5 h-5 text-[#f5a623]/85 transition-transform duration-200 ${flowSheet === 'payreq' ? 'rotate-90' : 'rotate-0'}`} viewBox="0 0 24 24" fill="none" aria-hidden>
+	                      <svg className={`w-4 h-4 text-[#f5a623]/85 transition-transform duration-200 ${flowSheet === 'payreq' ? 'rotate-90' : 'rotate-0'}`} viewBox="0 0 24 24" fill="none" aria-hidden>
 	                        <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
 	                      </svg>
 	                    </button>
 	                  </div>
+
+                  {/* ── Inline flow: Payer une demande (desktop only) ── */}
+                  {flowSheet === 'payreq' && (
+                    <div className="hidden md:block rounded-[18px] bg-[#070a0b]/95 ring-1 ring-white/10 ring-inset px-5 py-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="text-[15px] font-bold text-white/90">{t('ui_send_choice_pay_request_title', 'Payer une demande')}</div>
+                        <button type="button" onClick={closeFlowSheet} className="h-8 w-8 rounded-full bg-white/[0.06] hover:bg-white/[0.09] flex items-center justify-center" aria-label={t('ui_close', 'Fermer')}>
+                          <svg viewBox="0 0 24 24" className="w-4 h-4 text-white/70" fill="none" aria-hidden><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
+                        </button>
+                      </div>
+                      <div className="flex flex-col gap-3">
+                        {[
+                          { title: t('home_v2_essentials_2_modal_flow_1_step_1_title', 'Recevoir la demande'), desc: t('home_v2_essentials_2_modal_flow_1_step_1_desc', 'Le destinataire vous envoie une demande contenant le montant, la devise, son wallet.'), note: t('home_v2_essentials_2_modal_flow_1_step_1_note', 'Elle peut être reçue par message, e-mail, SMS, ou présentée en face à face via un QR code.') },
+                          { title: t('home_v2_essentials_2_modal_flow_1_step_2_title', 'Charger la demande'), desc: t('home_v2_essentials_2_modal_flow_1_step_2_desc', 'Depuis votre wallet, importez la demande en :'), details: [t('home_v2_essentials_2_modal_flow_1_step_2_detail_1', 'Scannant le QR code'), t('home_v2_essentials_2_modal_flow_1_step_2_detail_2', 'Chargeant une image du QR'), t('home_v2_essentials_2_modal_flow_1_step_2_detail_3', 'Ou collant le code reçu')] },
+                          { title: t('home_v2_essentials_2_modal_flow_1_step_3_title', 'Vérifier et confirmer'), desc: t('home_v2_essentials_2_modal_flow_1_step_3_desc', 'Les informations s’affichent automatiquement. Vérifiez-les, puis confirmez la transaction.'), note: t('home_v2_essentials_2_modal_flow_1_step_3_note', 'Chaque paiement nécessite une validation explicite pour garantir sécurité et contrôle.') },
+                        ].map((step, idx) => (
+                          <div key={idx} className="rounded-[14px] bg-white/[0.05] px-4 py-4">
+                            <div className="flex items-start gap-3.5">
+                              <div className="mt-[1px] w-9 h-9 flex-none shrink-0 rounded-full ring-inset flex items-center justify-center text-[14px] font-bold leading-none bg-white/[0.10] text-[#f5a623]/90 ring-1 ring-[#f5a623]/25">{idx + 1}</div>
+                              <div className="min-w-0">
+                                <div className="text-[13px] md:text-[14px] leading-snug text-white/90 font-semibold">{step.title}</div>
+                                <div className="mt-1 text-[12px] md:text-[13px] leading-relaxed text-white/60">{step.desc}</div>
+                                {step.details?.length ? (<ul className="mt-2.5 space-y-1.5 list-disc pl-4 text-[12px] md:text-[13px] text-white/50">{step.details.map((d, j) => <li key={j}>{d}</li>)}</ul>) : null}
+                                {step.note ? (<div className="mt-2.5 text-[12px] md:text-[13px] leading-relaxed text-white/45">{step.note}</div>) : null}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
                   {/* Hidden div for html5-qrcode reader */}
                   <div id={manualQrReaderIdRef.current} className="hidden" />
@@ -1575,7 +1634,7 @@ export default function WalletDashboardSendChoiceModal({
 
         {/* Flow dropdown (bottom sheet) */}
         {flowSheet ? (
-          <div className="fixed inset-0 z-[10006] pointer-events-none">
+          <div className="fixed inset-0 z-[10006] pointer-events-none md:hidden">
             <div
               className="absolute inset-0 bg-black/35 md:bg-black/20 pointer-events-auto"
               style={flowSheetTranslateY > 0 ? { opacity: Math.max(0, Math.min(1, 1 - flowSheetTranslateY / 320)) } : undefined}
@@ -1603,7 +1662,7 @@ export default function WalletDashboardSendChoiceModal({
 	                    </div>
 	                  </div>
 	                  <div className="h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent" aria-hidden />
-	                  <div className="hidden md:flex items-center justify-end -mt-10 pb-2">
+	                  <div className="hidden md:flex items-center justify-end -mt-14 pb-2">
 	                    <button
 	                      type="button"
                       onClick={closeFlowSheet}
@@ -1673,10 +1732,10 @@ export default function WalletDashboardSendChoiceModal({
 	              ).map((step, idx) => {
                 const isSimple = flowSheet === 'simple';
                 const numberClass = isSimple
-                  ? 'bg-white/[0.06] text-xcannes-green/90 ring-1 ring-xcannes-green/30'
-                  : 'bg-white/[0.06] text-[#f5a623]/90 ring-1 ring-[#f5a623]/25';
+                  ? 'bg-white/[0.10] text-xcannes-green/90 ring-1 ring-xcannes-green/30'
+                  : 'bg-white/[0.10] text-[#f5a623]/90 ring-1 ring-[#f5a623]/25';
 	                return (
-	                  <div key={idx} className="rounded-[14px] bg-black/40 px-4 py-4">
+	                  <div key={idx} className="rounded-[14px] bg-white/[0.05] px-4 py-4">
 	                    <div className="flex items-start gap-3.5">
 	                      <div className={`mt-[1px] w-9 h-9 flex-none shrink-0 rounded-full ring-inset flex items-center justify-center text-[14px] font-bold leading-none ${numberClass}`}>
 	                        {idx + 1}
