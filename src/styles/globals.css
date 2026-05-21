@@ -360,6 +360,10 @@ body.wallet-page {
   border-width: 0 !important;
 }
 
+.wallet-cash-modal .send-choice-card-btn {
+  border-width: unset !important;
+}
+
 .wallet-meta--plus-4 {
   font-size: 14px;
 }
@@ -902,31 +906,34 @@ body.header-hero-mode .home-content-wrapper {
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  padding: 1px;
   opacity: 0.95;
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
+  border: 1px solid transparent;
+  background-clip: padding-box, border-box;
+  background-origin: border-box;
 }
 
 .xcannes-sendchoice-border-fade-green {
-  background: linear-gradient(
-    90deg,
-    rgba(0, 255, 150, 0.70) 0%,
-    rgba(0, 255, 150, 0.26) 18%,
-    rgba(255, 255, 255, 0.14) 55%,
-    rgba(255, 255, 255, 0.12) 100%
-  );
+  background-image:
+    linear-gradient(transparent, transparent),
+    linear-gradient(
+      90deg,
+      rgba(0, 255, 150, 0.70) 0%,
+      rgba(0, 255, 150, 0.24) 14%,
+      rgba(255, 255, 255, 0.14) 46%,
+      rgba(255, 255, 255, 0.12) 100%
+    );
 }
 
 .xcannes-sendchoice-border-fade-amber {
-  background: linear-gradient(
-    90deg,
-    rgba(245, 166, 35, 0.62) 0%,
-    rgba(245, 166, 35, 0.22) 18%,
-    rgba(255, 255, 255, 0.14) 55%,
-    rgba(255, 255, 255, 0.12) 100%
-  );
+  background-image:
+    linear-gradient(transparent, transparent),
+    linear-gradient(
+      90deg,
+      rgba(245, 166, 35, 0.62) 0%,
+      rgba(245, 166, 35, 0.21) 14%,
+      rgba(255, 255, 255, 0.14) 46%,
+      rgba(255, 255, 255, 0.12) 100%
+    );
 }
 
 .xcannes-fade-ring-y {

@@ -379,7 +379,7 @@ export default function DemoWalletDashboardSendChoiceModal({
   ].join(" ");
 
   const cardClassName =
-    "relative overflow-hidden w-full text-left rounded-[22px] px-4 py-4 bg-white/[0.02] hover:bg-white/[0.035] active:bg-white/[0.03] shadow-[0_10px_30px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-22px_34px_rgba(0,0,0,0.68)] transition-all duration-[140ms] ease-[cubic-bezier(0.4,0,0.2,1)] hover:-translate-y-px active:translate-y-0 active:scale-[0.99]";
+    "relative overflow-hidden w-full text-left rounded-[22px] px-4 py-4 bg-white/[0.02] hover:bg-white/[0.035] active:bg-white/[0.03] transition-all duration-[140ms] ease-[cubic-bezier(0.4,0,0.2,1)] hover:-translate-y-px active:translate-y-0 active:scale-[0.99]";
 
   const Badge = ({ children, className = "" }) => (
     <span
@@ -554,7 +554,7 @@ export default function DemoWalletDashboardSendChoiceModal({
                   <button
                     type="button"
                     onClick={() => setSubModal("quickscan")}
-                    className="relative w-full text-left"
+                    className="relative w-full text-left send-choice-card-btn"
                   >
                     <div className="grid grid-cols-[48px_1px_1fr_28px] gap-3 items-start">
                       <div className="relative">
@@ -573,20 +573,21 @@ export default function DemoWalletDashboardSendChoiceModal({
                             "Saisissez une adresse, choisissez la devise et indiquez le montant.",
                           )}
                         </p>
-                        <div className="mt-3 pt-3 border-t border-white/10 flex flex-wrap items-center gap-2">
+                        <div className="mt-3 flex flex-wrap items-center gap-2">
                           <Badge className="ring-[0.6px] ring-xcannes-green/70">{t("ui_send_choice_simple_badge_steps", "3 étapes")}</Badge>
                           <span className="w-1 h-1 rounded-full bg-xcannes-green/80" aria-hidden />
                           <Badge className="bg-transparent ring-0 px-0 text-[8px] md:text-[11px] text-white/65">{t("ui_send_choice_simple_badge_secure", "Rapide & sécurisé")}</Badge>
                         </div>
                       </div>
-                      <div className="self-center flex justify-end">
+                      <div className="self-center flex justify-end -mr-[15.5px] md:mr-0">
                         <svg className="w-7 h-7 md:w-8 md:h-8 text-xcannes-green/90 flex-shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden>
                           <path d="M7 18L13 12L7 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                           <path d="M13 18L19 12L13 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                       </div>
                     </div>
-                    <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-[13px] text-white/75 hover:text-white transition-colors duration-150">
+                    <div className="relative mt-4 pt-3 flex items-center justify-between text-[13px] text-white/75 hover:text-white transition-colors duration-150">
+                      <div className="absolute left-0 right-0 top-0 h-px bg-gradient-to-l from-xcannes-green/45 via-white/10 to-transparent" aria-hidden />
                       <span className="inline-flex items-center gap-2">
                         <OpenFlowIcon className="w-[18px] h-[18px] text-xcannes-green/85" />
                         <span className="text-white">{t("ui_open_flow", "Ouvrir le parcours")}</span>
@@ -610,7 +611,7 @@ export default function DemoWalletDashboardSendChoiceModal({
                   <button
                     type="button"
                     onClick={() => setSubModal("payreq")}
-                    className="relative w-full text-left"
+                    className="relative w-full text-left send-choice-card-btn"
                   >
                     <div className="grid grid-cols-[48px_1px_1fr_28px] gap-3 items-start">
                       <div className="relative">
@@ -629,20 +630,21 @@ export default function DemoWalletDashboardSendChoiceModal({
                             "Payez une demande en scannant ou saisissant un code (payreq).",
                           )}
                         </p>
-                        <div className="mt-3 pt-3 border-t border-white/10 flex flex-wrap items-center gap-2">
+                        <div className="mt-3 flex flex-wrap items-center gap-2">
                           <Badge className="ring-[0.6px] ring-[#f5a623]/90">{t("ui_send_choice_payreq_badge_modes", "QR, import, saisie")}</Badge>
                           <span className="w-1 h-1 rounded-full bg-[#f5a623]/80" aria-hidden />
                           <Badge className="bg-transparent ring-0 px-0 text-[8px] md:text-[11px] text-white/65">{t("ui_send_choice_payreq_badge_flexible", "Flexible & pratique")}</Badge>
                         </div>
                       </div>
-                      <div className="self-center flex justify-end">
+                      <div className="self-center flex justify-end -mr-[15.5px] md:mr-0">
                         <svg className="w-7 h-7 md:w-8 md:h-8 text-[#f5a623]/90 flex-shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden>
                           <path d="M7 18L13 12L7 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                           <path d="M13 18L19 12L13 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                       </div>
                     </div>
-                    <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-[13px] text-white/75 hover:text-white transition-colors duration-150">
+                    <div className="relative mt-4 pt-3 flex items-center justify-between text-[13px] text-white/75 hover:text-white transition-colors duration-150">
+                      <div className="absolute left-0 right-0 top-0 h-px bg-gradient-to-l from-[#f5a623]/42 via-white/10 to-transparent" aria-hidden />
                       <span className="inline-flex items-center gap-2">
                         <OpenFlowIcon className="w-[18px] h-[18px] text-[#f5a623]/85" />
                         <span className="text-white">{t("ui_open_flow", "Ouvrir le parcours")}</span>
