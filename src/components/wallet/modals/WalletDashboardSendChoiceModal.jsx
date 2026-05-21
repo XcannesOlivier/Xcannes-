@@ -71,6 +71,12 @@ export default function WalletDashboardSendChoiceModal({
   const [flowSheetTranslateY, setFlowSheetTranslateY] = useState(0);
   const [flowSheetDragging, setFlowSheetDragging] = useState(false);
   const flowSheetSwipeMetaRef = useRef(null);
+  // Permet d'ancrer le bottom-sheet `flowSheet` aux bornes du panneau de la
+  // modale (au lieu du viewport) sur desktop, pour qu'il apparaisse collé en
+  // bas de la modale comme un bottom-sheet classique. Sur mobile la modale
+  // est plein écran donc on garde panelRect = null (= inset-0 viewport).
+  const panelRef = useRef(null);
+  const [panelRect, setPanelRect] = useState(null);
   // Reset la translation du parent quand on ouvre un sous-modal
   const openSubModal = useCallback((name) => {
     setOverlayTranslateY(0);
@@ -149,6 +155,43 @@ export default function WalletDashboardSendChoiceModal({
     setFlowSheetDragging(false);
     flowSheetSwipeMetaRef.current = null;
   }, []);
+
+  // Mesure les bornes du panneau de la modale pendant que le flowSheet est ouvert
+  // (desktop uniquement) afin d'y ancrer la bottom-sheet. Sur mobile / petits
+  // écrans, on retombe sur `null` => positionnement plein viewport classique.
+  useEffect(() => {
+    if (!flowSheet || typeof window === 'undefined') {
+      setPanelRect(null);
+      return undefined;
+    }
+    const measure = () => {
+      const el = panelRef.current;
+      if (!el) {
+        setPanelRect(null);
+        return;
+      }
+      const isDesktop = window.matchMedia('(min-width: 768px)').matches;
+      if (!isDesktop) {
+        setPanelRect(null);
+        return;
+      }
+      const r = el.getBoundingClientRect();
+      setPanelRect({ top: r.top, left: r.left, width: r.width, height: r.height });
+    };
+    measure();
+    window.addEventListener('resize', measure);
+    window.addEventListener('scroll', measure, true);
+    let ro = null;
+    if (typeof ResizeObserver !== 'undefined' && panelRef.current) {
+      ro = new ResizeObserver(measure);
+      ro.observe(panelRef.current);
+    }
+    return () => {
+      window.removeEventListener('resize', measure);
+      window.removeEventListener('scroll', measure, true);
+      if (ro) ro.disconnect();
+    };
+  }, [flowSheet]);
 
   const handleFlowSheetPillDown = useCallback((event) => {
     if (!flowSheet) return;
@@ -657,6 +700,7 @@ export default function WalletDashboardSendChoiceModal({
           onPointerCancel={handleOverlayPointerEnd}
         >
           <div
+            ref={panelRef}
             className={panelClass}
             onClick={e => { if (!inline) e.stopPropagation(); }}
           >
@@ -765,7 +809,7 @@ export default function WalletDashboardSendChoiceModal({
                             {t('ui_send_simple_hint_long', 'Saisissez une adresse, choisissez la devise et indiquez le montant.')}
                           </p>
 	                          <div className="mt-3 flex flex-wrap items-center gap-2">
-	                            <Badge className="bg-transparent ring-[0.3px] ring-xcannes-green/70">{t('ui_send_choice_simple_badge_steps', '3 étapes')}</Badge>
+	                            <Badge className="bg-transparent ring-[0.3px] ring-xcannes-green/70">{t('ui_send_choice_simple_badge_steps', '4 étapes')}</Badge>
 	                            <span className="w-1 h-1 rounded-full bg-xcannes-green/80" aria-hidden />
 	                            <span className="inline-flex items-center text-[10px] md:text-[11px] text-white/65">
 	                              {t('ui_send_choice_simple_badge_secure', 'Rapide & sécurisé')}
@@ -1589,7 +1633,17 @@ export default function WalletDashboardSendChoiceModal({
 
         {/* Flow dropdown (bottom sheet) */}
         {flowSheet ? (
-          <div className="fixed inset-0 z-[10006] pointer-events-none">
+          <div
+            className="fixed inset-0 z-[10006] pointer-events-none"
+            style={panelRect ? {
+              top: panelRect.top,
+              left: panelRect.left,
+              width: panelRect.width,
+              height: panelRect.height,
+              right: 'auto',
+              bottom: 'auto',
+            } : undefined}
+          >
             <div
               className="absolute inset-0 bg-black/35 md:bg-black/20 pointer-events-auto"
               style={flowSheetTranslateY > 0 ? { opacity: Math.max(0, Math.min(1, 1 - flowSheetTranslateY / 320)) } : undefined}
@@ -1604,8 +1658,8 @@ export default function WalletDashboardSendChoiceModal({
                 willChange: flowSheetTranslateY ? 'transform' : undefined,
               }}
             >
-	              <div className="mx-auto w-full md:max-w-lg">
-	                <div className="relative rounded-t-[22px] md:rounded-[22px] bg-[#070a0b]/95 md:bg-black/80 md:backdrop-blur-md ring-1 ring-white/10 ring-inset shadow-[0_-18px_44px_rgba(0,0,0,0.62)] px-5 md:px-6 pt-4 pb-5">
+	              <div className={panelRect ? 'w-full' : 'mx-auto w-full md:max-w-lg'}>
+	                <div className="relative rounded-t-[22px] md:rounded-t-[22px] md:rounded-b-2xl bg-[#070a0b]/95 md:bg-black/80 md:backdrop-blur-md ring-1 ring-white/10 ring-inset shadow-[0_-18px_44px_rgba(0,0,0,0.62)] px-5 md:px-6 pt-4 pb-5">
 	                  <div className="pb-3" onPointerDown={handleFlowSheetPillDown}>
 	                    <div className="md:hidden flex justify-center" aria-hidden>
 	                      <span className="block w-12 h-1.5 rounded-full bg-white/15" />
