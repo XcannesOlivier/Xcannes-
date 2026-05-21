@@ -780,9 +780,9 @@ export default function WalletDashboardSendChoiceModal({
 	                      }}
 	                      className="relative mt-4 pt-3 flex items-center justify-between text-[13px] text-white/75 hover:text-white transition-colors duration-150 w-full"
 	                    >
-                      <div className="absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-xcannes-green/45 via-white/10 to-transparent" aria-hidden />
+                      <div className="absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-xcannes-green/45 to-transparent" aria-hidden />
                       <span className="inline-flex items-center gap-2">
-                        <OpenFlowIcon className="w-[18px] h-[18px] text-xcannes-green/85" />
+                        <OpenFlowIcon className="w-[12px] h-[12px] text-xcannes-green/85" />
                         <span className="text-white">{t('ui_open_flow', 'Ouvrir le parcours')}</span>
                       </span>
 	                      <svg className={`w-5 h-5 text-xcannes-green/85 transition-transform duration-200 ${flowSheet === 'simple' ? 'rotate-90' : 'rotate-0'}`} viewBox="0 0 24 24" fill="none" aria-hidden>
@@ -849,9 +849,9 @@ export default function WalletDashboardSendChoiceModal({
 	                      }}
 	                      className="relative mt-4 pt-3 flex items-center justify-between text-[13px] text-white/75 hover:text-white transition-colors duration-150 w-full"
 	                    >
-                      <div className="absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-[#f5a623] via-white/10 to-transparent opacity-40" aria-hidden />
+                      <div className="absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-[#f5a623]/40 to-transparent" aria-hidden />
                       <span className="inline-flex items-center gap-2">
-                        <OpenFlowIcon className="w-[18px] h-[18px] text-[#f5a623]/85" />
+                        <OpenFlowIcon className="w-[12px] h-[12px] text-[#f5a623]/85" />
                         <span className="text-white">{t('ui_open_flow', 'Ouvrir le parcours')}</span>
                       </span>
 	                      <svg className={`w-5 h-5 text-[#f5a623]/85 transition-transform duration-200 ${flowSheet === 'payreq' ? 'rotate-90' : 'rotate-0'}`} viewBox="0 0 24 24" fill="none" aria-hidden>
@@ -1582,12 +1582,16 @@ export default function WalletDashboardSendChoiceModal({
         {/* Flow dropdown (bottom sheet) */}
         {flowSheet ? (
           <div className="fixed inset-0 z-[10006] pointer-events-none">
-            <div className="absolute inset-0 bg-black/35 md:bg-black/20 pointer-events-auto" />
+            <div
+              className="absolute inset-0 bg-black/35 md:bg-black/20 pointer-events-auto"
+              style={flowSheetTranslateY > 0 ? { opacity: Math.max(0, Math.min(1, 1 - flowSheetTranslateY / 320)) } : undefined}
+            />
             <div
               ref={flowSheetRef}
               className="absolute left-0 right-0 bottom-0 pointer-events-auto"
               style={{
                 transform: flowSheetTranslateY ? `translateY(${Math.max(0, flowSheetTranslateY)}px)` : undefined,
+                opacity: flowSheetTranslateY > 0 ? Math.max(0, Math.min(1, 1 - flowSheetTranslateY / 320)) : undefined,
                 transition: flowSheetDragging ? 'none' : 'transform 220ms cubic-bezier(0.2,0,0,1)',
                 willChange: flowSheetTranslateY ? 'transform' : undefined,
               }}
@@ -1595,7 +1599,7 @@ export default function WalletDashboardSendChoiceModal({
 	              <div className="mx-auto w-full md:max-w-lg">
 	                <div className="relative rounded-t-[22px] md:rounded-[22px] bg-[#070a0b]/95 md:bg-black/80 md:backdrop-blur-md ring-1 ring-white/10 ring-inset shadow-[0_-18px_44px_rgba(0,0,0,0.62)] px-5 md:px-6 pt-4 pb-5">
 	                  <div className="pb-3" onPointerDown={handleFlowSheetPillDown}>
-	                    <div className="flex justify-center" aria-hidden>
+	                    <div className="md:hidden flex justify-center" aria-hidden>
 	                      <span className="block w-12 h-1.5 rounded-full bg-white/15" />
 	                    </div>
 	                    <div className="mt-3 text-[19px] md:text-[21px] leading-tight text-white/95 font-bold text-center tracking-tight">
