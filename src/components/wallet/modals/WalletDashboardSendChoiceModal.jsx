@@ -421,7 +421,7 @@ export default function WalletDashboardSendChoiceModal({
   );
 
   const cardClassName =
-    'relative overflow-hidden w-full text-left rounded-[22px] px-4 py-4 md:px-6 md:py-5 bg-white/[0.02] hover:bg-white/[0.035] active:bg-white/[0.03] transition-all duration-[140ms] ease-[cubic-bezier(0.4,0,0.2,1)] hover:-translate-y-px active:translate-y-0 active:scale-[0.99]';
+    'relative overflow-hidden w-full text-left rounded-[18px] px-4 py-4 md:px-6 md:py-5 bg-white/[0.02] hover:bg-white/[0.035] active:bg-white/[0.03] transition-all duration-[140ms] ease-[cubic-bezier(0.4,0,0.2,1)] hover:-translate-y-px active:translate-y-0 active:scale-[0.99]';
 
   const accordionBtnClass =
     'flex items-center justify-center gap-2.5 w-full rounded-[20px] px-3 py-2.5 bg-white/[0.07] hover:bg-white/[0.10] active:bg-white/[0.04] transition-colors duration-100';
@@ -843,6 +843,7 @@ export default function WalletDashboardSendChoiceModal({
 	                      }}
 	                      className="relative mt-4 pt-3 flex items-center justify-between text-[13px] text-white/75 hover:text-white transition-colors duration-150 w-full"
 	                    >
+                      <div className="absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-[#f5a623]/40 to-transparent" aria-hidden />
                       <span className="inline-flex items-center gap-2">
                         <OpenFlowIcon className="w-[12px] h-[12px] text-[#f5a623]/85" />
                         <span className="text-white">{t('ui_open_flow', 'Ouvrir le parcours')}</span>
