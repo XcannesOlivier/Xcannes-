@@ -726,9 +726,6 @@ export default function WalletDashboardSendChoiceModal({
                   <div className={`${cardClassName} xcannes-irregular-green-border xcannes-sendchoice-accent-green`}>
                     <div className="pointer-events-none absolute inset-0" aria-hidden>
                       <div className="xcannes-sendchoice-border-fade-green z-10" />
-                      <div className="absolute left-0 top-0 bottom-0 w-px opacity-50 bg-[linear-gradient(to_bottom,transparent_0%,rgba(0,255,150,0.75)_22%,rgba(0,255,150,0.20)_60%,transparent_100%)]" />
-                      <div className="absolute -left-[1px] top-0 bottom-0 w-[1px] blur-[1px] opacity-60 bg-[linear-gradient(to_bottom,transparent_0%,rgba(0,255,150,0.55)_24%,rgba(0,255,150,0.95)_48%,rgba(0,255,150,0.35)_62%,transparent_100%)]" />
-                      <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[1px] h-[80px] blur-[2px] opacity-70 bg-[radial-gradient(12px_42px_at_0%_50%,rgba(0,255,150,0.95)_0%,rgba(0,255,150,0.35)_45%,transparent_75%)]" />
                       <div className="absolute inset-0 bg-[radial-gradient(190px_190px_at_-8%_38%,rgba(0,255,150,0.55)_0%,rgba(0,255,150,0.22)_22%,rgba(0,255,150,0.08)_38%,transparent_62%)]" />
                       <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] via-transparent to-black/40" />
                     </div>
@@ -795,9 +792,6 @@ export default function WalletDashboardSendChoiceModal({
                   <div className={`${cardClassName} xcannes-irregular-amber-border xcannes-sendchoice-accent-amber`}>
                     <div className="pointer-events-none absolute inset-0" aria-hidden>
                       <div className="xcannes-sendchoice-border-fade-amber z-10" />
-                      <div className="absolute left-0 top-0 bottom-0 w-px opacity-50 bg-[linear-gradient(to_bottom,transparent_0%,rgba(245,166,35,0.70)_22%,rgba(245,166,35,0.18)_60%,transparent_100%)]" />
-                      <div className="absolute -left-[1px] top-0 bottom-0 w-[1px] blur-[1px] opacity-60 bg-[linear-gradient(to_bottom,transparent_0%,rgba(245,166,35,0.45)_24%,rgba(245,166,35,0.90)_48%,rgba(245,166,35,0.32)_62%,transparent_100%)]" />
-                      <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[1px] h-[80px] blur-[2px] opacity-70 bg-[radial-gradient(12px_42px_at_0%_50%,rgba(245,166,35,0.92)_0%,rgba(245,166,35,0.32)_45%,transparent_75%)]" />
                       <div className="absolute inset-0 bg-[radial-gradient(190px_190px_at_-8%_38%,rgba(245,166,35,0.46)_0%,rgba(245,166,35,0.20)_22%,rgba(245,166,35,0.08)_38%,transparent_62%)]" />
                       <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] via-transparent to-black/40" />
                     </div>
