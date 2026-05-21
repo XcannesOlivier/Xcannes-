@@ -463,12 +463,6 @@ export default function DemoWalletDashboardSendChoiceModal({
               if (!inline) e.stopPropagation();
             }}
           >
-            {/* Ambient glow */}
-            <div className="pointer-events-none absolute inset-0" aria-hidden>
-              <div className="absolute inset-0 bg-[radial-gradient(900px_circle_at_12%_0%,rgba(255,255,255,0.08),transparent_55%),radial-gradient(600px_circle_at_100%_50%,rgba(0,255,150,0.06),transparent_60%)]" />
-              <div className="absolute inset-0 bg-gradient-to-b from-black/0 via-black/10 to-black/55" />
-            </div>
-
             <div className="relative z-10 flex flex-col flex-1 min-h-0">
               {!inline ? (
                 <div
@@ -559,7 +553,7 @@ export default function DemoWalletDashboardSendChoiceModal({
                     onClick={() => setSubModal("quickscan")}
                     className="relative w-full text-left"
                   >
-                    <div className="grid grid-cols-[64px_1px_1fr_28px] gap-3 items-start">
+                    <div className="grid grid-cols-[48px_1px_1fr_28px] gap-3 items-start">
                       <div className="relative">
                         <div className="w-12 h-12 rounded-[16px] bg-white/[0.02] ring-1 ring-white/10 ring-inset flex items-center justify-center">
                           <QuickScanIcon />
@@ -611,7 +605,7 @@ export default function DemoWalletDashboardSendChoiceModal({
                     onClick={() => setSubModal("payreq")}
                     className="relative w-full text-left"
                   >
-                    <div className="grid grid-cols-[64px_1px_1fr_28px] gap-3 items-start">
+                    <div className="grid grid-cols-[48px_1px_1fr_28px] gap-3 items-start">
                       <div className="relative">
                         <div className="w-12 h-12 rounded-[16px] bg-white/[0.02] ring-1 ring-white/10 ring-inset flex items-center justify-center">
                           <PayRequestIcon />
