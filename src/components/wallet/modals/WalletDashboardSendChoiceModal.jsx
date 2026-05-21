@@ -320,8 +320,8 @@ export default function WalletDashboardSendChoiceModal({
       className={className}
       aria-hidden="true"
     >
-      <circle cx="7" cy="7.25" r="1.6" />
-      <circle cx="17" cy="16.75" r="1.6" />
+      <path d="M6 5.9l1.35 1.35L6 8.6" />
+      <path d="M16.2 15.4l1.35 1.35-1.35 1.35" />
       <path d="M8.6 7.25h5.1a3 3 0 0 1 0 6h-3.4a3 3 0 0 0 0 6h5.1" />
     </svg>
   );
