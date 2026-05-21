@@ -625,7 +625,7 @@ export default function WalletDashboardSendChoiceModal({
                       <div className="absolute left-0 top-0 bottom-0 w-px opacity-80 bg-[linear-gradient(to_bottom,transparent_0%,rgba(0,255,150,0.75)_22%,rgba(0,255,150,0.20)_60%,transparent_100%)]" />
                       <div className="absolute -left-[1px] top-0 bottom-0 w-[3px] blur-[1px] opacity-90 bg-[linear-gradient(to_bottom,transparent_0%,rgba(0,255,150,0.55)_24%,rgba(0,255,150,0.95)_48%,rgba(0,255,150,0.35)_62%,transparent_100%)]" />
                       <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[1px] h-[80px] blur-[2px] opacity-95 bg-[radial-gradient(12px_42px_at_0%_50%,rgba(0,255,150,0.95)_0%,rgba(0,255,150,0.35)_45%,transparent_75%)]" />
-                      <div className="absolute inset-0 bg-[radial-gradient(190px_190px_at_-8%_45%,rgba(0,255,150,0.55)_0%,rgba(0,255,150,0.22)_22%,rgba(0,255,150,0.08)_38%,transparent_62%)]" />
+                      <div className="absolute inset-0 bg-[radial-gradient(190px_190px_at_-8%_38%,rgba(0,255,150,0.55)_0%,rgba(0,255,150,0.22)_22%,rgba(0,255,150,0.08)_38%,transparent_62%)]" />
                       <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] via-transparent to-black/40" />
                     </div>
 	                    <button
@@ -650,7 +650,7 @@ export default function WalletDashboardSendChoiceModal({
                             {t('ui_send_simple_hint_long', 'Saisissez une adresse, choisissez la devise et indiquez le montant.')}
                           </p>
 	                          <div className="mt-3 flex flex-wrap items-center gap-2">
-	                            <Badge className="bg-transparent ring-[0.6px] ring-xcannes-green/70">{t('ui_send_choice_simple_badge_steps', '3 étapes')}</Badge>
+	                            <Badge className="bg-transparent ring-[0.3px] ring-xcannes-green/70">{t('ui_send_choice_simple_badge_steps', '3 étapes')}</Badge>
 	                            <span className="w-1 h-1 rounded-full bg-xcannes-green/80" aria-hidden />
 	                            <span className="inline-flex items-center text-[10px] md:text-[11px] text-white/65">
 	                              {t('ui_send_choice_simple_badge_secure', 'Rapide & sécurisé')}
@@ -670,7 +670,7 @@ export default function WalletDashboardSendChoiceModal({
                           <OpenFlowIcon className="w-[18px] h-[18px] text-xcannes-green/85" />
                           <span className="text-white">{t('ui_open_flow', 'Ouvrir le parcours')}</span>
                         </span>
-                        <svg className="w-6 h-6 text-xcannes-green/85" viewBox="0 0 24 24" fill="none" aria-hidden>
+                        <svg className="w-5 h-5 text-xcannes-green/85" viewBox="0 0 24 24" fill="none" aria-hidden>
                           <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                       </div>
@@ -684,7 +684,7 @@ export default function WalletDashboardSendChoiceModal({
                       <div className="absolute left-0 top-0 bottom-0 w-px opacity-80 bg-[linear-gradient(to_bottom,transparent_0%,rgba(245,166,35,0.70)_22%,rgba(245,166,35,0.18)_60%,transparent_100%)]" />
                       <div className="absolute -left-[1px] top-0 bottom-0 w-[3px] blur-[1px] opacity-90 bg-[linear-gradient(to_bottom,transparent_0%,rgba(245,166,35,0.45)_24%,rgba(245,166,35,0.90)_48%,rgba(245,166,35,0.32)_62%,transparent_100%)]" />
                       <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[1px] h-[80px] blur-[2px] opacity-95 bg-[radial-gradient(12px_42px_at_0%_50%,rgba(245,166,35,0.92)_0%,rgba(245,166,35,0.32)_45%,transparent_75%)]" />
-                      <div className="absolute inset-0 bg-[radial-gradient(190px_190px_at_-8%_45%,rgba(245,166,35,0.46)_0%,rgba(245,166,35,0.20)_22%,rgba(245,166,35,0.08)_38%,transparent_62%)]" />
+                      <div className="absolute inset-0 bg-[radial-gradient(190px_190px_at_-8%_38%,rgba(245,166,35,0.46)_0%,rgba(245,166,35,0.20)_22%,rgba(245,166,35,0.08)_38%,transparent_62%)]" />
                       <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] via-transparent to-black/40" />
                     </div>
 	                    <button
@@ -709,7 +709,7 @@ export default function WalletDashboardSendChoiceModal({
                             {t('ui_send_pay_request_hint', 'Scannez, importez un QR code ou saisissez une demande de paiement.')}
                           </p>
 	                          <div className="mt-3 flex flex-wrap items-center gap-2">
-	                            <Badge className="bg-transparent ring-[0.6px] ring-[#f5a623]/90">{t('ui_send_choice_payreq_badge_modes', 'QR, import, saisie')}</Badge>
+	                            <Badge className="bg-transparent ring-[0.3px] ring-[#f5a623]/90">{t('ui_send_choice_payreq_badge_modes', 'QR, import, saisie')}</Badge>
 	                            <span className="w-1 h-1 rounded-full bg-[#f5a623]/80" aria-hidden />
 	                            <span className="inline-flex items-center text-[10px] md:text-[11px] text-white/65">
 	                              {t('ui_send_choice_payreq_badge_flexible', 'Flexible & pratique')}
@@ -729,7 +729,7 @@ export default function WalletDashboardSendChoiceModal({
                           <OpenFlowIcon className="w-[18px] h-[18px] text-[#f5a623]/85" />
                           <span className="text-white">{t('ui_open_flow', 'Ouvrir le parcours')}</span>
                         </span>
-                        <svg className="w-6 h-6 text-[#f5a623]/85" viewBox="0 0 24 24" fill="none" aria-hidden>
+                        <svg className="w-5 h-5 text-[#f5a623]/85" viewBox="0 0 24 24" fill="none" aria-hidden>
                           <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                       </div>
