@@ -786,7 +786,7 @@ export default function WalletDashboardSendChoiceModal({
 	                    </button>
 	                  </div>
 
-                  {/* ── 2. Payer une demande ── */}}
+                  {/* ── 2. Payer une demande ── */}
                   <div className={`${cardClassName} xcannes-irregular-amber-border xcannes-sendchoice-accent-amber`}>
                     <div className="pointer-events-none absolute inset-0" aria-hidden>
                       <div className="xcannes-sendchoice-border-fade-amber z-10" />
