@@ -314,15 +314,18 @@ export default function WalletDashboardSendChoiceModal({
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="1.8"
+      strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
       className={className}
       aria-hidden="true"
     >
-      <path d="M6.15 6.55L6.95 7.25L6.15 7.95" />
-      <path d="M17.85 16.05L17.05 16.75L17.85 17.45" />
-      <path d="M8.6 7.25h5.1a3 3 0 0 1 0 6h-3.4a3 3 0 0 0 0 6h5.1" />
+      <circle cx="6" cy="6" r="1.6" />
+      <circle cx="6" cy="18" r="1.6" />
+      <circle cx="18" cy="12" r="1.6" />
+      <path d="M7.9 6h4.6a3.6 3.6 0 0 1 0 7.2H11a3.6 3.6 0 0 0 0 7.2h4.6" />
+      <path d="M16 12h3.2" />
+      <path d="M18.2 10.4 20 12l-1.8 1.6" />
     </svg>
   );
 
