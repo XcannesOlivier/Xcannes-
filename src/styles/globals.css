@@ -959,14 +959,18 @@ body.header-hero-mode .home-content-wrapper {
 .xcannes-sendchoice-accent-green::before {
   background:
     radial-gradient(38px 38px at 0% 0%, rgba(0, 255, 150, 1.0), rgba(0, 255, 150, 0) 70%),
-    radial-gradient(38px 38px at 0% 100%, rgba(0, 255, 150, 1.0), rgba(0, 255, 150, 0) 70%),
+    /* Coin bas-gauche légèrement plus dense pour rattraper l'amincissement
+       visuel du trait en bas */
+    radial-gradient(46px 46px at 0% 100%, rgba(0, 255, 150, 1.0), rgba(0, 255, 150, 0) 72%),
     linear-gradient(90deg, rgba(0, 255, 150, 0.35) 0%, rgba(0, 255, 150, 0) 34%);
 }
 
 .xcannes-sendchoice-accent-amber::before {
   background:
     radial-gradient(38px 38px at 0% 0%, rgba(245, 166, 35, 1.0), rgba(245, 166, 35, 0) 70%),
-    radial-gradient(38px 38px at 0% 100%, rgba(245, 166, 35, 1.0), rgba(245, 166, 35, 0) 70%),
+    /* Coin bas-gauche légèrement plus dense pour rattraper l'amincissement
+       visuel du trait en bas */
+    radial-gradient(46px 46px at 0% 100%, rgba(245, 166, 35, 1.0), rgba(245, 166, 35, 0) 72%),
     linear-gradient(90deg, rgba(245, 166, 35, 0.30) 0%, rgba(245, 166, 35, 0) 46%);
 }
 

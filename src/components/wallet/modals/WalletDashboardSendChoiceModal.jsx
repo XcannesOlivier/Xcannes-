@@ -740,7 +740,7 @@ export default function WalletDashboardSendChoiceModal({
                   <div className={`${cardClassName} xcannes-irregular-green-border xcannes-sendchoice-accent-green`}>
                     <div className="pointer-events-none absolute inset-0" aria-hidden>
                       <div className="xcannes-sendchoice-border-fade-green z-10" />
-                      <div className="absolute inset-0 bg-[radial-gradient(190px_190px_at_-8%_38%,rgba(0,255,150,0.55)_0%,rgba(0,255,150,0.22)_22%,rgba(0,255,150,0.08)_38%,transparent_62%)]" />
+                      <div className="absolute inset-0 bg-[radial-gradient(190px_190px_at_-8%_18%,rgba(0,255,150,0.55)_0%,rgba(0,255,150,0.22)_22%,rgba(0,255,150,0.08)_38%,transparent_62%)]" />
                       <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] via-transparent to-black/40" />
                     </div>
 	                    <button
@@ -806,7 +806,7 @@ export default function WalletDashboardSendChoiceModal({
                   <div className={`${cardClassName} xcannes-irregular-amber-border xcannes-sendchoice-accent-amber`}>
                     <div className="pointer-events-none absolute inset-0" aria-hidden>
                       <div className="xcannes-sendchoice-border-fade-amber z-10" />
-                      <div className="absolute inset-0 bg-[radial-gradient(190px_190px_at_-8%_38%,rgba(245,166,35,0.46)_0%,rgba(245,166,35,0.20)_22%,rgba(245,166,35,0.08)_38%,transparent_62%)]" />
+                      <div className="absolute inset-0 bg-[radial-gradient(190px_190px_at_-8%_18%,rgba(245,166,35,0.46)_0%,rgba(245,166,35,0.20)_22%,rgba(245,166,35,0.08)_38%,transparent_62%)]" />
                       <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] via-transparent to-black/40" />
                     </div>
 	                    <button
