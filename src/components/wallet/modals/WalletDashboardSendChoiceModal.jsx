@@ -1278,14 +1278,14 @@ export default function WalletDashboardSendChoiceModal({
                   </div>
                 </div>
 
-                <div className="pt-6 md:pt-12">
+                <div className={pendingDestination.address ? 'pt-2 md:pt-3' : 'pt-6 md:pt-12'}>
                   {pendingDestination.address ? (() => {
                     const addr = String(pendingDestination.address || '').trim();
                     const label = String(pendingDestination.label || '').trim();
                     const showLabel = label && label !== addr && label !== t('ui_wallet_unknown', 'Unknown wallet');
                     const addrShort = addr.length > 24 ? `${addr.slice(0, 12)}…${addr.slice(-8)}` : addr;
                     return (
-                      <div className="mb-3 px-3 py-2 rounded-xl bg-white/[0.04] ring-1 ring-white/10 ring-inset flex items-center gap-2 min-w-0">
+                      <div className="mb-3 px-3 py-2 bg-transparent flex items-center gap-2 min-w-0">
                         <span className="flex-shrink-0 text-[11px] uppercase tracking-wide text-white/45">
                           {t('ui_recipient_label', 'Destinataire')}
                         </span>
