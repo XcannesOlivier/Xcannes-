@@ -639,7 +639,7 @@ export default function WalletDashboardSendChoiceModal({
                             <QuickScanIcon />
                           </div>
                         </div>
-                        <div className="self-stretch w-px bg-gradient-to-b from-transparent via-white/15 to-transparent opacity-80" aria-hidden />
+                        <div className="self-stretch w-px opacity-90 bg-[linear-gradient(to_bottom,transparent_0%,rgba(0,255,150,0.22)_50%,transparent_100%)]" aria-hidden />
                         <div className="min-w-0">
                           <div className="flex items-start justify-between gap-2">
                             <p className="text-[18px] md:text-[22px] text-white font-semibold tracking-tight truncate md:whitespace-normal md:break-words">
@@ -698,7 +698,7 @@ export default function WalletDashboardSendChoiceModal({
                             <PayRequestIcon />
                           </div>
                         </div>
-                        <div className="self-stretch w-px bg-gradient-to-b from-transparent via-white/15 to-transparent opacity-80" aria-hidden />
+                        <div className="self-stretch w-px opacity-90 bg-[linear-gradient(to_bottom,transparent_0%,rgba(245,166,35,0.22)_50%,transparent_100%)]" aria-hidden />
                         <div className="min-w-0">
                           <div className="flex items-start justify-between gap-2">
                             <p className="text-[18px] md:text-[22px] text-white font-semibold tracking-tight truncate md:whitespace-normal md:break-words">
