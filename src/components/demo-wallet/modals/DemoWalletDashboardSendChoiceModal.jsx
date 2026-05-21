@@ -393,6 +393,23 @@ export default function DemoWalletDashboardSendChoiceModal({
     </span>
   );
 
+  const OpenFlowIcon = ({ className = "" }) => (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <circle cx="7" cy="7.25" r="1.6" />
+      <circle cx="17" cy="16.75" r="1.6" />
+      <path d="M8.6 7.25h5.1a3 3 0 0 1 0 6h-3.4a3 3 0 0 0 0 6h5.1" />
+    </svg>
+  );
+
   const content = (
     <>
       {!inline ? (
@@ -467,18 +484,18 @@ export default function DemoWalletDashboardSendChoiceModal({
 
               <div className="flex-1 min-h-0 flex flex-col">
                 <div
-                  className="pt-[70px] pb-3 flex flex-col items-center text-center"
+                  className="pt-[40px] md:pt-[66px] pb-3 flex flex-col items-center text-center"
                   onPointerDown={(event) => {
                     maybeStartOverlayDrag(event, "fixed");
                   }}
                 >
-                  <h3 className="mt-1 px-6 text-[30px] font-semibold text-white/95 tracking-tight">
+                  <h3 className="mt-1 px-6 text-[28px] md:text-[32px] font-semibold text-white/95 tracking-tight">
                     {t(
                       "ui_send_choice_subtitle",
                       "Comment souhaitez-vous envoyer de l'argent ?",
                     )}
                   </h3>
-                  <p className="mt-2 text-[14px] text-white/60 max-w-[34ch] leading-relaxed">
+                  <p className="mt-2 text-[13px] md:text-[15px] text-white/50 max-w-[34ch] leading-relaxed">
                     {t(
                       "ui_send_choice_hint",
                       "Choisissez le type d’envoi qui correspond à votre besoin.",
@@ -552,7 +569,7 @@ export default function DemoWalletDashboardSendChoiceModal({
                         <p className="text-[18px] text-white font-semibold tracking-tight truncate">
                           {t("ui_send_simple_title", "Envoi simple")}
                         </p>
-                        <p className="mt-1 text-[15px] leading-snug text-white/60">
+                        <p className="mt-1 text-[13px] md:text-[15px] leading-snug text-white/50">
                           {t(
                             "ui_send_simple_hint_long",
                             "Saisissez une adresse, choisissez la devise et indiquez le montant.",
@@ -563,14 +580,18 @@ export default function DemoWalletDashboardSendChoiceModal({
                           <Badge>{t("ui_send_choice_simple_badge_secure", "Rapide & sécurisé")}</Badge>
                         </div>
                       </div>
-                      <div className="pt-1 flex justify-end">
-                        <svg className="w-5 h-5 text-xcannes-green/90 flex-shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden>
-                          <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      <div className="self-center flex justify-end">
+                        <svg className="w-7 h-7 md:w-8 md:h-8 text-xcannes-green/90 flex-shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden>
+                          <path d="M7 18L13 12L7 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                          <path d="M13 18L19 12L13 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                       </div>
                     </div>
                     <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-[13px] text-white/75 hover:text-white transition-colors duration-150">
-                      <span className="text-xcannes-green/85">{t("ui_open_flow", "Ouvrir le parcours")}</span>
+                      <span className="inline-flex items-center gap-2">
+                        <OpenFlowIcon className="w-4 h-4 text-xcannes-green/85" />
+                        <span className="text-white">{t("ui_open_flow", "Ouvrir le parcours")}</span>
+                      </span>
                       <svg className="w-4 h-4 text-xcannes-green/85" viewBox="0 0 24 24" fill="none" aria-hidden>
                         <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
@@ -599,7 +620,7 @@ export default function DemoWalletDashboardSendChoiceModal({
                         <p className="text-[18px] text-white font-semibold tracking-tight truncate">
                           {t("ui_send_choice_pay_request_title", "Payer une demande")}
                         </p>
-                        <p className="mt-1 text-[15px] leading-snug text-white/60">
+                        <p className="mt-1 text-[13px] md:text-[15px] leading-snug text-white/50">
                           {t(
                             "ui_send_choice_pay_request_hint",
                             "Payez une demande en scannant ou saisissant un code (payreq).",
@@ -610,14 +631,18 @@ export default function DemoWalletDashboardSendChoiceModal({
                           <Badge>{t("ui_send_choice_payreq_badge_flexible", "Flexible & pratique")}</Badge>
                         </div>
                       </div>
-                      <div className="pt-1 flex justify-end">
-                        <svg className="w-5 h-5 text-[#f5a623]/90 flex-shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden>
-                          <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      <div className="self-center flex justify-end">
+                        <svg className="w-7 h-7 md:w-8 md:h-8 text-[#f5a623]/90 flex-shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden>
+                          <path d="M7 18L13 12L7 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                          <path d="M13 18L19 12L13 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                       </div>
                     </div>
                     <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-[13px] text-white/75 hover:text-white transition-colors duration-150">
-                      <span className="text-[#f5a623]/85">{t("ui_open_flow", "Ouvrir le parcours")}</span>
+                      <span className="inline-flex items-center gap-2">
+                        <OpenFlowIcon className="w-4 h-4 text-[#f5a623]/85" />
+                        <span className="text-white">{t("ui_open_flow", "Ouvrir le parcours")}</span>
+                      </span>
                       <svg className="w-4 h-4 text-[#f5a623]/85" viewBox="0 0 24 24" fill="none" aria-hidden>
                         <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
