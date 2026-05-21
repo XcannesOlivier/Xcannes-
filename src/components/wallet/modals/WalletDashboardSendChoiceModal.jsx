@@ -657,6 +657,15 @@ export default function WalletDashboardSendChoiceModal({
                   <span className="block w-12 h-1.5 rounded-full bg-white/20" />
                 </div>
               ) : null}
+              {/* Bottom bar – mobile only */}
+              {!inline ? (
+                <div
+                  className="md:hidden pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-[max(env(safe-area-inset-bottom),10px)] z-20"
+                  aria-hidden
+                >
+                  <span className="block w-36 h-1.5 rounded-full bg-white/80" />
+                </div>
+              ) : null}
 
               <div className="flex-1 min-h-0 flex flex-col">
                 {/* Title + subtitle + arrow */}
@@ -854,6 +863,10 @@ export default function WalletDashboardSendChoiceModal({
                   {/* Hidden div for html5-qrcode reader */}
                   <div id={manualQrReaderIdRef.current} className="hidden" />
                 </div>
+              </div>
+              {/* Bottom bar – desktop only (visual balance) */}
+              <div className="hidden md:flex pointer-events-none justify-center pt-2 pb-4" aria-hidden>
+                <span className="block w-[120px] h-[4px] rounded-full bg-white/10" />
               </div>
             </div>
           </div>
@@ -1580,7 +1593,7 @@ export default function WalletDashboardSendChoiceModal({
               }}
             >
 	              <div className="mx-auto w-full md:max-w-lg">
-	                <div className="rounded-t-[22px] md:rounded-[22px] bg-[#070a0b]/95 md:bg-black/80 md:backdrop-blur-md ring-1 ring-white/10 ring-inset shadow-[0_-18px_44px_rgba(0,0,0,0.62)] px-5 md:px-6 pt-4 pb-5">
+	                <div className="relative rounded-t-[22px] md:rounded-[22px] bg-[#070a0b]/95 md:bg-black/80 md:backdrop-blur-md ring-1 ring-white/10 ring-inset shadow-[0_-18px_44px_rgba(0,0,0,0.62)] px-5 md:px-6 pt-4 pb-5">
 	                  <div className="pb-3" onPointerDown={handleFlowSheetPillDown}>
 	                    <div className="flex justify-center" aria-hidden>
 	                      <span className="block w-12 h-1.5 rounded-full bg-white/15" />
@@ -1665,7 +1678,7 @@ export default function WalletDashboardSendChoiceModal({
                   ? 'bg-white/[0.06] text-xcannes-green/90 ring-1 ring-xcannes-green/30'
                   : 'bg-white/[0.06] text-[#f5a623]/90 ring-1 ring-[#f5a623]/25';
 	                return (
-	                  <div key={idx} className="rounded-[14px] bg-white/[0.055] px-4 py-4">
+	                  <div key={idx} className="rounded-[14px] bg-black/40 px-4 py-4">
 	                    <div className="flex items-start gap-3.5">
 	                      <div className={`mt-[1px] w-9 h-9 flex-none shrink-0 rounded-full ring-inset flex items-center justify-center text-[14px] font-bold leading-none ${numberClass}`}>
 	                        {idx + 1}
@@ -1696,9 +1709,19 @@ export default function WalletDashboardSendChoiceModal({
 	              })}
 	                    </div>
 	                  </div>
+                  {/* Bottom bar – desktop only (visual balance) */}
+                  <div className="hidden md:flex pointer-events-none justify-center pt-2 pb-2" aria-hidden>
+                    <span className="block w-[120px] h-[4px] rounded-full bg-white/10" />
+                  </div>
                 </div>
               </div>
             </div>
+          </div>
+        ) : null}
+        {/* Bottom bar – mobile only (flowSheet) */}
+        {flowSheet ? (
+          <div className="md:hidden pointer-events-none fixed left-1/2 -translate-x-1/2 bottom-[max(env(safe-area-inset-bottom),10px)] z-[10010]" aria-hidden>
+            <span className="block w-36 h-1.5 rounded-full bg-white/80" />
           </div>
         ) : null}
 	    </>
