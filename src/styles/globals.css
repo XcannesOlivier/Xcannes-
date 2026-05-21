@@ -927,6 +927,13 @@ body.header-hero-mode .home-content-wrapper {
   opacity: 0;
 }
 
+/* Neutralise le box-shadow du ::before sur les cartes sendchoice
+   pour éviter le doublon d'épaisseur aux coins */
+.xcannes-sendchoice-accent-green.xcannes-irregular-green-border::before,
+.xcannes-sendchoice-accent-amber.xcannes-irregular-amber-border::before {
+  box-shadow: none;
+}
+
 /* ── Send choice card: colored reflection on left corners ── */
 .xcannes-sendchoice-accent-green,
 .xcannes-sendchoice-accent-amber {
