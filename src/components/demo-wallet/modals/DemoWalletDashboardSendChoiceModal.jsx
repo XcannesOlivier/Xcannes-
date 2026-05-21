@@ -558,13 +558,13 @@ export default function DemoWalletDashboardSendChoiceModal({
                     onClick={() => setSubModal("quickscan")}
                     className="relative w-full text-left"
                   >
-                    <div className="grid grid-cols-[64px_1fr_28px] gap-3 items-start">
+                    <div className="grid grid-cols-[64px_1px_1fr_28px] gap-3 items-start">
                       <div className="relative">
                         <div className="w-12 h-12 rounded-[16px] bg-white/[0.02] ring-1 ring-white/10 ring-inset flex items-center justify-center">
                           <QuickScanIcon />
                         </div>
-                        <div className="absolute top-1 bottom-1 -right-3 w-px bg-gradient-to-b from-transparent via-white/15 to-transparent opacity-70" aria-hidden />
                       </div>
+                      <div className="self-stretch w-px bg-gradient-to-b from-transparent via-white/15 to-transparent opacity-80" aria-hidden />
                       <div className="min-w-0">
                         <p className="text-[18px] text-white font-semibold tracking-tight truncate">
                           {t("ui_send_simple_title", "Envoi simple")}
@@ -575,7 +575,7 @@ export default function DemoWalletDashboardSendChoiceModal({
                             "Saisissez une adresse, choisissez la devise et indiquez le montant.",
                           )}
                         </p>
-                        <div className="mt-3 flex flex-wrap gap-2">
+                        <div className="mt-3 pt-3 border-t border-white/10 flex flex-wrap gap-2">
                           <Badge>{t("ui_send_choice_simple_badge_steps", "3 étapes")}</Badge>
                           <Badge>{t("ui_send_choice_simple_badge_secure", "Rapide & sécurisé")}</Badge>
                         </div>
@@ -609,13 +609,13 @@ export default function DemoWalletDashboardSendChoiceModal({
                     onClick={() => setSubModal("payreq")}
                     className="relative w-full text-left"
                   >
-                    <div className="grid grid-cols-[64px_1fr_28px] gap-3 items-start">
+                    <div className="grid grid-cols-[64px_1px_1fr_28px] gap-3 items-start">
                       <div className="relative">
                         <div className="w-12 h-12 rounded-[16px] bg-white/[0.02] ring-1 ring-white/10 ring-inset flex items-center justify-center">
                           <PayRequestIcon />
                         </div>
-                        <div className="absolute top-1 bottom-1 -right-3 w-px bg-gradient-to-b from-transparent via-white/15 to-transparent opacity-70" aria-hidden />
                       </div>
+                      <div className="self-stretch w-px bg-gradient-to-b from-transparent via-white/15 to-transparent opacity-80" aria-hidden />
                       <div className="min-w-0">
                         <p className="text-[18px] text-white font-semibold tracking-tight truncate">
                           {t("ui_send_choice_pay_request_title", "Payer une demande")}
@@ -626,7 +626,7 @@ export default function DemoWalletDashboardSendChoiceModal({
                             "Payez une demande en scannant ou saisissant un code (payreq).",
                           )}
                         </p>
-                        <div className="mt-3 flex flex-wrap gap-2">
+                        <div className="mt-3 pt-3 border-t border-white/10 flex flex-wrap gap-2">
                           <Badge>{t("ui_send_choice_payreq_badge_modes", "QR, import, saisie")}</Badge>
                           <Badge>{t("ui_send_choice_payreq_badge_flexible", "Flexible & pratique")}</Badge>
                         </div>

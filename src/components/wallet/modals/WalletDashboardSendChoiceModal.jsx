@@ -635,13 +635,13 @@ export default function WalletDashboardSendChoiceModal({
                       onClick={() => openSubModal('quickscan')}
                       className="relative w-full text-left"
                     >
-                      <div className="grid grid-cols-[64px_1fr_28px] md:grid-cols-[72px_1fr_32px] gap-3 md:gap-4 items-start">
+                      <div className="grid grid-cols-[64px_1px_1fr_28px] md:grid-cols-[72px_1px_1fr_32px] gap-3 md:gap-4 items-start">
                         <div className="relative">
                           <div className="w-12 h-12 md:w-14 md:h-14 rounded-[16px] bg-white/[0.02] ring-1 ring-white/10 ring-inset flex items-center justify-center">
                             <QuickScanIcon />
                           </div>
-                          <div className="absolute top-1 bottom-1 -right-3 md:-right-4 w-px bg-gradient-to-b from-transparent via-white/15 to-transparent opacity-70" aria-hidden />
                         </div>
+                        <div className="self-stretch w-px bg-gradient-to-b from-transparent via-white/15 to-transparent opacity-80" aria-hidden />
                         <div className="min-w-0">
                           <div className="flex items-start justify-between gap-2">
                             <p className="text-[18px] md:text-[22px] text-white font-semibold tracking-tight truncate md:whitespace-normal md:break-words">
@@ -651,7 +651,7 @@ export default function WalletDashboardSendChoiceModal({
                           <p className="mt-1 text-[13px] md:text-[15px] leading-snug text-white/50">
                             {t('ui_send_simple_hint_long', 'Saisissez une adresse, choisissez la devise et indiquez le montant.')}
                           </p>
-                          <div className="mt-3 flex flex-wrap gap-2">
+                          <div className="mt-3 pt-3 border-t border-white/10 flex flex-wrap gap-2">
                             <Badge>{t('ui_send_choice_simple_badge_steps', '3 étapes')}</Badge>
                             <Badge>{t('ui_send_choice_simple_badge_secure', 'Rapide & sécurisé')}</Badge>
                           </div>
@@ -686,13 +686,13 @@ export default function WalletDashboardSendChoiceModal({
                       onClick={() => openSubModal('payreq')}
                       className="relative w-full text-left"
                     >
-                      <div className="grid grid-cols-[64px_1fr_28px] md:grid-cols-[72px_1fr_32px] gap-3 md:gap-4 items-start">
+                      <div className="grid grid-cols-[64px_1px_1fr_28px] md:grid-cols-[72px_1px_1fr_32px] gap-3 md:gap-4 items-start">
                         <div className="relative">
                           <div className="w-12 h-12 md:w-14 md:h-14 rounded-[16px] bg-white/[0.02] ring-1 ring-white/10 ring-inset flex items-center justify-center">
                             <PayRequestIcon />
                           </div>
-                          <div className="absolute top-1 bottom-1 -right-3 md:-right-4 w-px bg-gradient-to-b from-transparent via-white/15 to-transparent opacity-70" aria-hidden />
                         </div>
+                        <div className="self-stretch w-px bg-gradient-to-b from-transparent via-white/15 to-transparent opacity-80" aria-hidden />
                         <div className="min-w-0">
                           <div className="flex items-start justify-between gap-2">
                             <p className="text-[18px] md:text-[22px] text-white font-semibold tracking-tight truncate md:whitespace-normal md:break-words">
@@ -702,7 +702,7 @@ export default function WalletDashboardSendChoiceModal({
                           <p className="mt-1 text-[13px] md:text-[15px] leading-snug text-white/50">
                             {t('ui_send_pay_request_hint', 'Scannez, importez un QR code ou saisissez une demande de paiement.')}
                           </p>
-                          <div className="mt-3 flex flex-wrap gap-2">
+                          <div className="mt-3 pt-3 border-t border-white/10 flex flex-wrap gap-2">
                             <Badge>{t('ui_send_choice_payreq_badge_modes', 'QR, import, saisie')}</Badge>
                             <Badge>{t('ui_send_choice_payreq_badge_flexible', 'Flexible & pratique')}</Badge>
                           </div>
