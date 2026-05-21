@@ -66,6 +66,8 @@ export default function WalletDashboardSendChoiceModal({
 
   // ── Sub-modal state ──────────────────────────────────────────
   const [subModal, setSubModal] = useState(null); // 'quickscan' | 'payreq' | null
+  const [simpleFlowOpen, setSimpleFlowOpen] = useState(false);
+  const [payreqFlowOpen, setPayreqFlowOpen] = useState(false);
   // Reset la translation du parent quand on ouvre un sous-modal
   const openSubModal = useCallback((name) => {
     setOverlayTranslateY(0);
@@ -115,6 +117,8 @@ export default function WalletDashboardSendChoiceModal({
   useEffect(() => {
     if (!open) {
       setSubModal(null);
+      setSimpleFlowOpen(false);
+      setPayreqFlowOpen(false);
       setPayreqPasteValue('');
       setPayreqSelfSendError(false);
       setSimpleSendSelfError(false);
@@ -668,17 +672,77 @@ export default function WalletDashboardSendChoiceModal({
                           </svg>
                         </div>
                       </div>
-                      <div className="relative mt-4 pt-3 flex items-center justify-between text-[13px] text-white/75 hover:text-white transition-colors duration-150">
-                        <div className="absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-xcannes-green/45 via-white/10 to-transparent" aria-hidden />
-                        <span className="inline-flex items-center gap-2">
-                          <OpenFlowIcon className="w-[18px] h-[18px] text-xcannes-green/85" />
-                          <span className="text-white">{t('ui_open_flow', 'Ouvrir le parcours')}</span>
-                        </span>
-                        <svg className="w-5 h-5 text-xcannes-green/85" viewBox="0 0 24 24" fill="none" aria-hidden>
-                          <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                      </div>
                     </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setSimpleFlowOpen((v) => !v)}
+                      className="relative mt-4 pt-3 flex items-center justify-between text-[13px] text-white/75 hover:text-white transition-colors duration-150 w-full"
+                    >
+                      <div className="absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-xcannes-green/45 via-white/10 to-transparent" aria-hidden />
+                      <span className="inline-flex items-center gap-2">
+                        <OpenFlowIcon className="w-[18px] h-[18px] text-xcannes-green/85" />
+                        <span className="text-white">{t('ui_open_flow', 'Ouvrir le parcours')}</span>
+                      </span>
+                      <svg className={`w-5 h-5 text-xcannes-green/85 transition-transform duration-200 ${simpleFlowOpen ? 'rotate-90' : 'rotate-0'}`} viewBox="0 0 24 24" fill="none" aria-hidden>
+                        <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </button>
+
+                    {simpleFlowOpen ? (
+                      <div className="mt-3 rounded-[18px] bg-black/30 ring-1 ring-white/5 ring-inset px-3 py-3">
+                        {[
+                          {
+                            title: t('home_v2_essentials_2_modal_flow_2_step_1_title', 'Choisir le destinataire'),
+                            desc: t('home_v2_essentials_2_modal_flow_2_step_1_desc', 'Définissez le wallet du destinataire en :'),
+                            details: [
+                              t('home_v2_essentials_2_modal_flow_2_step_1_detail_1', 'Scannant un QR code s’il est en face de vous'),
+                              t('home_v2_essentials_2_modal_flow_2_step_1_detail_2', 'Collant une adresse reçue par message, e-mail ou SMS'),
+                              t('home_v2_essentials_2_modal_flow_2_step_1_detail_3', 'Ou sélectionnant une adresse enregistrée dans votre liste de wallets'),
+                            ],
+                          },
+                          {
+                            title: t('home_v2_essentials_2_modal_flow_2_step_2_title', 'Indiquer le paiement'),
+                            desc: t('home_v2_essentials_2_modal_flow_2_step_2_desc', 'Renseignez :'),
+                            details: [
+                              t('home_v2_essentials_2_modal_flow_2_step_2_detail_1', 'La devise'),
+                              t('home_v2_essentials_2_modal_flow_2_step_2_detail_2', 'Le montant'),
+                            ],
+                          },
+                          {
+                            title: t('home_v2_essentials_2_modal_flow_2_step_3_title', 'Vérifier et confirmer'),
+                            desc: t('home_v2_essentials_2_modal_flow_2_step_3_desc', 'Vérifiez les informations affichées, puis confirmez l’envoi.'),
+                          },
+                          {
+                            title: t('home_v2_essentials_2_modal_flow_2_step_4_title', 'Confirmer la transaction'),
+                            desc: t('home_v2_essentials_2_modal_flow_2_step_4_desc', 'Chaque transaction nécessite une validation explicite afin de garantir sécurité et contrôle.'),
+                          },
+                        ].map((step, idx) => (
+                          <div key={idx} className={idx ? 'mt-3 pt-3 border-t border-white/5' : ''}>
+                            <div className="flex items-start gap-3">
+                              <div className="mt-0.5 w-6 h-6 rounded-full bg-xcannes-green/10 text-xcannes-green/80 ring-1 ring-xcannes-green/25 ring-inset flex items-center justify-center text-[11px] font-semibold">
+                                {idx + 1}
+                              </div>
+                              <div className="min-w-0">
+                                <div className="text-[12px] md:text-[13px] text-white/85 font-semibold">
+                                  {step.title}
+                                </div>
+                                <div className="mt-0.5 text-[11px] md:text-[12px] text-white/55">
+                                  {step.desc}
+                                </div>
+                                {step.details?.length ? (
+                                  <ul className="mt-2 space-y-1 list-disc pl-4 text-[11px] md:text-[12px] text-white/45">
+                                    {step.details.map((d, j) => (
+                                      <li key={j}>{d}</li>
+                                    ))}
+                                  </ul>
+                                ) : null}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : null}
                   </div>
 
                   {/* ── 2. Payer une demande ── */}
@@ -727,17 +791,76 @@ export default function WalletDashboardSendChoiceModal({
                           </svg>
                         </div>
                       </div>
-                      <div className="relative mt-4 pt-3 flex items-center justify-between text-[13px] text-white/75 hover:text-white transition-colors duration-150">
-                        <div className="absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-[#f5a623] via-white/10 to-transparent opacity-40" aria-hidden />
-                        <span className="inline-flex items-center gap-2">
-                          <OpenFlowIcon className="w-[18px] h-[18px] text-[#f5a623]/85" />
-                          <span className="text-white">{t('ui_open_flow', 'Ouvrir le parcours')}</span>
-                        </span>
-                        <svg className="w-5 h-5 text-[#f5a623]/85" viewBox="0 0 24 24" fill="none" aria-hidden>
-                          <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                      </div>
                     </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setPayreqFlowOpen((v) => !v)}
+                      className="relative mt-4 pt-3 flex items-center justify-between text-[13px] text-white/75 hover:text-white transition-colors duration-150 w-full"
+                    >
+                      <div className="absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-[#f5a623] via-white/10 to-transparent opacity-40" aria-hidden />
+                      <span className="inline-flex items-center gap-2">
+                        <OpenFlowIcon className="w-[18px] h-[18px] text-[#f5a623]/85" />
+                        <span className="text-white">{t('ui_open_flow', 'Ouvrir le parcours')}</span>
+                      </span>
+                      <svg className={`w-5 h-5 text-[#f5a623]/85 transition-transform duration-200 ${payreqFlowOpen ? 'rotate-90' : 'rotate-0'}`} viewBox="0 0 24 24" fill="none" aria-hidden>
+                        <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </button>
+
+                    {payreqFlowOpen ? (
+                      <div className="mt-3 rounded-[18px] bg-black/30 ring-1 ring-white/5 ring-inset px-3 py-3">
+                        {[
+                          {
+                            title: t('home_v2_essentials_2_modal_flow_1_step_1_title', 'Recevoir la demande'),
+                            desc: t('home_v2_essentials_2_modal_flow_1_step_1_desc', 'Le destinataire vous envoie une demande contenant le montant, la devise, son wallet.'),
+                            note: t('home_v2_essentials_2_modal_flow_1_step_1_note', 'Elle peut être reçue par message, e-mail, SMS, ou présentée en face à face via un QR code.'),
+                          },
+                          {
+                            title: t('home_v2_essentials_2_modal_flow_1_step_2_title', 'Charger la demande'),
+                            desc: t('home_v2_essentials_2_modal_flow_1_step_2_desc', 'Depuis votre wallet, importez la demande en :'),
+                            details: [
+                              t('home_v2_essentials_2_modal_flow_1_step_2_detail_1', 'Scannant le QR code'),
+                              t('home_v2_essentials_2_modal_flow_1_step_2_detail_2', 'Chargeant une image du QR'),
+                              t('home_v2_essentials_2_modal_flow_1_step_2_detail_3', 'Ou collant le code reçu'),
+                            ],
+                          },
+                          {
+                            title: t('home_v2_essentials_2_modal_flow_1_step_3_title', 'Vérifier et confirmer'),
+                            desc: t('home_v2_essentials_2_modal_flow_1_step_3_desc', 'Les informations s’affichent automatiquement. Vérifiez-les, puis confirmez la transaction.'),
+                            note: t('home_v2_essentials_2_modal_flow_1_step_3_note', 'Chaque paiement nécessite une validation explicite pour garantir sécurité et contrôle.'),
+                          },
+                        ].map((step, idx) => (
+                          <div key={idx} className={idx ? 'mt-3 pt-3 border-t border-white/5' : ''}>
+                            <div className="flex items-start gap-3">
+                              <div className="mt-0.5 w-6 h-6 rounded-full bg-[#f5a623]/10 text-[#f5a623]/80 ring-1 ring-[#f5a623]/20 ring-inset flex items-center justify-center text-[11px] font-semibold">
+                                {idx + 1}
+                              </div>
+                              <div className="min-w-0">
+                                <div className="text-[12px] md:text-[13px] text-white/85 font-semibold">
+                                  {step.title}
+                                </div>
+                                <div className="mt-0.5 text-[11px] md:text-[12px] text-white/55">
+                                  {step.desc}
+                                </div>
+                                {step.details?.length ? (
+                                  <ul className="mt-2 space-y-1 list-disc pl-4 text-[11px] md:text-[12px] text-white/45">
+                                    {step.details.map((d, j) => (
+                                      <li key={j}>{d}</li>
+                                    ))}
+                                  </ul>
+                                ) : null}
+                                {step.note ? (
+                                  <div className="mt-2 text-[11px] md:text-[12px] text-white/40">
+                                    {step.note}
+                                  </div>
+                                ) : null}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : null}
                   </div>
 
                   {/* Hidden div for html5-qrcode reader */}
