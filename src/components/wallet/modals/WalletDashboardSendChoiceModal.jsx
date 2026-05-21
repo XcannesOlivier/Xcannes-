@@ -1579,21 +1579,22 @@ export default function WalletDashboardSendChoiceModal({
                 willChange: flowSheetTranslateY ? 'transform' : undefined,
               }}
             >
-              <div className="mx-auto w-full md:max-w-lg">
-                <div className="rounded-t-[22px] md:rounded-[22px] bg-[#070a0b]/95 md:bg-black/80 md:backdrop-blur-md ring-1 ring-white/10 ring-inset shadow-[0_-18px_44px_rgba(0,0,0,0.62)] px-4 pt-3 pb-4">
-                  <div className="pt-1 pb-2" onPointerDown={handleFlowSheetPillDown}>
-                    <div className="text-[14px] text-white/85 font-semibold text-center">
-                      {flowSheet === 'simple'
-                        ? t('ui_send_simple_title', 'Envoi simple')
-                        : t('ui_send_choice_pay_request_title', 'Payer une demande')}
-                    </div>
-                    <div className="mt-2 flex justify-center" aria-hidden>
-                      <span className="block w-12 h-1.5 rounded-full bg-white/15" />
-                    </div>
-                  </div>
-                  <div className="hidden md:flex items-center justify-end -mt-10 pb-2">
-                    <button
-                      type="button"
+	              <div className="mx-auto w-full md:max-w-lg">
+	                <div className="rounded-t-[22px] md:rounded-[22px] bg-[#070a0b]/95 md:bg-black/80 md:backdrop-blur-md ring-1 ring-white/10 ring-inset shadow-[0_-18px_44px_rgba(0,0,0,0.62)] px-5 md:px-6 pt-4 pb-5">
+	                  <div className="pb-3" onPointerDown={handleFlowSheetPillDown}>
+	                    <div className="flex justify-center" aria-hidden>
+	                      <span className="block w-12 h-1.5 rounded-full bg-white/15" />
+	                    </div>
+	                    <div className="mt-3 text-[15px] md:text-[16px] leading-tight text-white/90 font-semibold text-center tracking-tight">
+	                      {flowSheet === 'simple'
+	                        ? t('ui_send_simple_title', 'Envoi simple')
+	                        : t('ui_send_choice_pay_request_title', 'Payer une demande')}
+	                    </div>
+	                  </div>
+	                  <div className="h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent" aria-hidden />
+	                  <div className="hidden md:flex items-center justify-end -mt-10 pb-2">
+	                    <button
+	                      type="button"
                       onClick={closeFlowSheet}
                       className="h-9 w-9 rounded-full bg-white/[0.06] hover:bg-white/[0.09] active:bg-white/[0.05] transition-colors flex items-center justify-center"
                       aria-label={t('ui_close', 'Fermer')}
@@ -1601,12 +1602,12 @@ export default function WalletDashboardSendChoiceModal({
                       <svg viewBox="0 0 24 24" className="w-5 h-5 text-white/70" fill="none" aria-hidden>
                         <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                       </svg>
-                    </button>
-                  </div>
+	                    </button>
+	                  </div>
 
-                  <div className="mt-3 max-h-[62vh] md:max-h-[60vh] overflow-y-auto overscroll-contain pr-1">
-                    {(flowSheet === 'simple'
-                ? [
+	                  <div className="mt-4 max-h-[62vh] md:max-h-[60vh] overflow-y-auto overscroll-contain pr-1">
+	                    {(flowSheet === 'simple'
+	                ? [
 	                    {
 	                      title: t('home_v2_essentials_2_modal_flow_2_step_1_title', 'Choisir le destinataire'),
 	                      desc: t(
@@ -1657,41 +1658,41 @@ export default function WalletDashboardSendChoiceModal({
                       note: t('home_v2_essentials_2_modal_flow_1_step_3_note', 'Chaque paiement nécessite une validation explicite pour garantir sécurité et contrôle.'),
                     },
                   ]
-              ).map((step, idx) => {
+	              ).map((step, idx) => {
                 const isSimple = flowSheet === 'simple';
                 const numberClass = isSimple
                   ? 'bg-white/[0.04] text-xcannes-green/80 ring-1 ring-xcannes-green/25'
                   : 'bg-white/[0.04] text-[#f5a623]/80 ring-1 ring-[#f5a623]/20';
-                return (
-                  <div key={idx} className={idx ? 'mt-3 pt-3 border-t border-white/5' : ''}>
-                    <div className="flex items-start gap-3">
-                      <div className={`mt-0.5 w-6 h-6 rounded-full ring-inset flex items-center justify-center text-[11px] font-semibold ${numberClass}`}>
-                        {idx + 1}
-                      </div>
-                      <div className="min-w-0">
-                        <div className="text-[12px] md:text-[13px] text-white/85 font-semibold">
-                          {step.title}
-                        </div>
-                        <div className="mt-0.5 text-[11px] md:text-[12px] text-white/55">
-                          {step.desc}
-                        </div>
-                        {step.details?.length ? (
-                          <ul className="mt-2 space-y-1 list-disc pl-4 text-[11px] md:text-[12px] text-white/45">
-                            {step.details.map((d, j) => (
-                              <li key={j}>{d}</li>
-                            ))}
-                          </ul>
-                        ) : null}
-                        {step.note ? (
-                          <div className="mt-2 text-[11px] md:text-[12px] text-white/40">
-                            {step.note}
-                          </div>
-                        ) : null}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
+	                return (
+	                  <div key={idx} className={idx ? 'mt-4 pt-4 border-t border-white/7' : ''}>
+	                    <div className="flex items-start gap-3.5">
+	                      <div className={`mt-[2px] w-6 h-6 flex-none shrink-0 rounded-full ring-inset flex items-center justify-center text-[11px] font-semibold leading-none ${numberClass}`}>
+	                        {idx + 1}
+	                      </div>
+	                      <div className="min-w-0">
+	                        <div className="text-[13px] md:text-[14px] leading-snug text-white/90 font-semibold">
+	                          {step.title}
+	                        </div>
+	                        <div className="mt-1 text-[12px] md:text-[13px] leading-relaxed text-white/60">
+	                          {step.desc}
+	                        </div>
+	                        {step.details?.length ? (
+	                          <ul className="mt-2.5 space-y-1.5 list-disc pl-4 text-[12px] md:text-[13px] text-white/50">
+	                            {step.details.map((d, j) => (
+	                              <li key={j}>{d}</li>
+	                            ))}
+	                          </ul>
+	                        ) : null}
+	                        {step.note ? (
+	                          <div className="mt-2.5 text-[12px] md:text-[13px] leading-relaxed text-white/45">
+	                            {step.note}
+	                          </div>
+	                        ) : null}
+	                      </div>
+	                    </div>
+	                  </div>
+	                );
+	              })}
                   </div>
                 </div>
               </div>
