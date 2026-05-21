@@ -634,7 +634,7 @@ export default function WalletDashboardSendChoiceModal({
 	                      className="relative w-full text-left"
 	                    >
                       <div className="grid grid-cols-[48px_1px_1fr_28px] md:grid-cols-[56px_1px_1fr_32px] gap-3 md:gap-4 items-start">
-                        <div className="relative">
+                        <div className="relative self-center">
                           <div className="relative w-12 h-12 md:w-14 md:h-14 rounded-[16px] bg-[#0b0f10] xcannes-irregular-green-border-icon flex items-center justify-center">
                             <QuickScanIcon />
                           </div>
@@ -693,7 +693,7 @@ export default function WalletDashboardSendChoiceModal({
 	                      className="relative w-full text-left"
 	                    >
                       <div className="grid grid-cols-[48px_1px_1fr_28px] md:grid-cols-[56px_1px_1fr_32px] gap-3 md:gap-4 items-start">
-                        <div className="relative">
+                        <div className="relative self-center">
                           <div className="relative w-12 h-12 md:w-14 md:h-14 rounded-[16px] bg-[#0b0f10] xcannes-irregular-amber-border-icon flex items-center justify-center">
                             <PayRequestIcon />
                           </div>
@@ -709,7 +709,7 @@ export default function WalletDashboardSendChoiceModal({
                             {t('ui_send_pay_request_hint', 'Scannez, importez un QR code ou saisissez une demande de paiement.')}
                           </p>
 	                          <div className="mt-3 flex flex-wrap items-center gap-2">
-	                            <Badge className="bg-transparent ring-[0.3px] ring-[#f5a623]/90">{t('ui_send_choice_payreq_badge_modes', 'QR, import, saisie')}</Badge>
+	                            <Badge className="bg-transparent ring-[0.3px] ring-[#f5a623]/60">{t('ui_send_choice_payreq_badge_modes', 'QR, import, saisie')}</Badge>
 	                            <span className="w-1 h-1 rounded-full bg-[#f5a623]/80" aria-hidden />
 	                            <span className="inline-flex items-center text-[10px] md:text-[11px] text-white/65">
 	                              {t('ui_send_choice_payreq_badge_flexible', 'Flexible & pratique')}
