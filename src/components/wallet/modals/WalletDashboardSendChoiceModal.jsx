@@ -301,7 +301,7 @@ export default function WalletDashboardSendChoiceModal({
     <span
       className={[
         'inline-flex items-center rounded-full px-2.5 py-1 text-[10px] md:text-[11px] leading-none',
-        'bg-white/[0.03] text-white/70 ring-1 ring-white/10 ring-inset',
+        'bg-white/[0.03] text-white/70 ring-inset',
         className,
       ].join(' ')}
     >
@@ -635,7 +635,7 @@ export default function WalletDashboardSendChoiceModal({
 	                    >
                       <div className="grid grid-cols-[48px_1px_1fr_28px] md:grid-cols-[56px_1px_1fr_32px] gap-3 md:gap-4 items-start">
                         <div className="relative">
-                          <div className="relative w-12 h-12 md:w-14 md:h-14 rounded-[16px] bg-black xcannes-irregular-green-border flex items-center justify-center">
+                          <div className="relative w-12 h-12 md:w-14 md:h-14 rounded-[16px] bg-[#0b0f10] xcannes-irregular-green-border-icon flex items-center justify-center">
                             <QuickScanIcon />
                           </div>
                         </div>
@@ -652,12 +652,12 @@ export default function WalletDashboardSendChoiceModal({
 	                          <div className="mt-3 flex flex-wrap items-center gap-2">
 	                            <Badge className="bg-transparent ring-[0.6px] ring-xcannes-green/70">{t('ui_send_choice_simple_badge_steps', '3 étapes')}</Badge>
 	                            <span className="w-1 h-1 rounded-full bg-xcannes-green/80" aria-hidden />
-	                            <span className="inline-flex items-center text-[8px] md:text-[11px] text-white/65">
+	                            <span className="inline-flex items-center text-[10px] md:text-[11px] text-white/65">
 	                              {t('ui_send_choice_simple_badge_secure', 'Rapide & sécurisé')}
 	                            </span>
 	                          </div>
                         </div>
-                        <div className="self-center flex justify-end -mr-[15.5px] md:mr-0">
+                        <div className="self-center flex justify-end mr-2 md:mr-0">
                           <svg className="w-7 h-7 md:w-8 md:h-8 text-xcannes-green/90 flex-shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden>
                             <path d="M7 18L13 12L7 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                             <path d="M13 18L19 12L13 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -670,7 +670,7 @@ export default function WalletDashboardSendChoiceModal({
                           <OpenFlowIcon className="w-[18px] h-[18px] text-xcannes-green/85" />
                           <span className="text-white">{t('ui_open_flow', 'Ouvrir le parcours')}</span>
                         </span>
-                        <svg className="w-4 h-4 text-xcannes-green/85" viewBox="0 0 24 24" fill="none" aria-hidden>
+                        <svg className="w-6 h-6 text-xcannes-green/85" viewBox="0 0 24 24" fill="none" aria-hidden>
                           <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                       </div>
@@ -694,7 +694,7 @@ export default function WalletDashboardSendChoiceModal({
 	                    >
                       <div className="grid grid-cols-[48px_1px_1fr_28px] md:grid-cols-[56px_1px_1fr_32px] gap-3 md:gap-4 items-start">
                         <div className="relative">
-                          <div className="relative w-12 h-12 md:w-14 md:h-14 rounded-[16px] bg-black xcannes-irregular-amber-border flex items-center justify-center">
+                          <div className="relative w-12 h-12 md:w-14 md:h-14 rounded-[16px] bg-[#0b0f10] xcannes-irregular-amber-border-icon flex items-center justify-center">
                             <PayRequestIcon />
                           </div>
                         </div>
@@ -711,12 +711,12 @@ export default function WalletDashboardSendChoiceModal({
 	                          <div className="mt-3 flex flex-wrap items-center gap-2">
 	                            <Badge className="bg-transparent ring-[0.6px] ring-[#f5a623]/90">{t('ui_send_choice_payreq_badge_modes', 'QR, import, saisie')}</Badge>
 	                            <span className="w-1 h-1 rounded-full bg-[#f5a623]/80" aria-hidden />
-	                            <span className="inline-flex items-center text-[8px] md:text-[11px] text-white/65">
+	                            <span className="inline-flex items-center text-[10px] md:text-[11px] text-white/65">
 	                              {t('ui_send_choice_payreq_badge_flexible', 'Flexible & pratique')}
 	                            </span>
 	                          </div>
                         </div>
-                        <div className="self-center flex justify-end -mr-[15.5px] md:mr-0">
+                        <div className="self-center flex justify-end mr-2 md:mr-0">
                           <svg className="w-7 h-7 md:w-8 md:h-8 text-[#f5a623]/90 flex-shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden>
                             <path d="M7 18L13 12L7 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                             <path d="M13 18L19 12L13 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -729,7 +729,7 @@ export default function WalletDashboardSendChoiceModal({
                           <OpenFlowIcon className="w-[18px] h-[18px] text-[#f5a623]/85" />
                           <span className="text-white">{t('ui_open_flow', 'Ouvrir le parcours')}</span>
                         </span>
-                        <svg className="w-4 h-4 text-[#f5a623]/85" viewBox="0 0 24 24" fill="none" aria-hidden>
+                        <svg className="w-6 h-6 text-[#f5a623]/85" viewBox="0 0 24 24" fill="none" aria-hidden>
                           <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                       </div>

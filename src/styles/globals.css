@@ -818,6 +818,38 @@ body.header-hero-mode .home-content-wrapper {
   opacity: 0.9;
 }
 
+/* ── Icon variant: tint from left + bottom ── */
+.xcannes-irregular-green-border-icon::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.xcannes-irregular-green-border-icon::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  padding: 1px;
+  background:
+    radial-gradient(72px 44px at 0% 50%, rgba(0, 255, 150, 0.16), rgba(0, 255, 150, 0) 72%),
+    radial-gradient(92px 48px at 50% 100%, rgba(0, 255, 150, 0.12), rgba(0, 255, 150, 0) 76%),
+    linear-gradient(90deg,
+      rgba(0, 255, 150, 0.20) 0%,
+      rgba(0, 255, 150, 0.08) 18%,
+      rgba(255, 255, 255, 0.10) 52%,
+      rgba(255, 255, 255, 0.08) 100%);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0.9;
+}
+
 /* ── Thin irregular amber border (for accent cards) ── */
 .xcannes-irregular-amber-border {
   /* Do not set `position` here, to avoid overriding Tailwind `absolute`/`relative`. */
@@ -846,6 +878,38 @@ body.header-hero-mode .home-content-wrapper {
       rgba(245, 166, 35, 0.14) 50%,
       rgba(245, 166, 35, 0.14) 80%,
       rgba(245, 166, 35, 0) 100%);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0.9;
+}
+
+/* ── Icon variant: tint from left + bottom ── */
+.xcannes-irregular-amber-border-icon::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.xcannes-irregular-amber-border-icon::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  padding: 1px;
+  background:
+    radial-gradient(72px 44px at 0% 50%, rgba(245, 166, 35, 0.14), rgba(245, 166, 35, 0) 72%),
+    radial-gradient(92px 48px at 50% 100%, rgba(245, 166, 35, 0.10), rgba(245, 166, 35, 0) 76%),
+    linear-gradient(90deg,
+      rgba(245, 166, 35, 0.18) 0%,
+      rgba(245, 166, 35, 0.08) 18%,
+      rgba(255, 255, 255, 0.10) 52%,
+      rgba(255, 255, 255, 0.08) 100%);
   -webkit-mask:
     linear-gradient(#000 0 0) content-box,
     linear-gradient(#000 0 0);
