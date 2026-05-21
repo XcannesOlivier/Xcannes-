@@ -3,7 +3,7 @@
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'next-i18next';
 import { useModalTransition } from '@/hooks/useModalTransition';
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, useCallback } from 'react';
 import { normalizeQrImageFile } from '@/utils/qrImage';
 
 const EyeIcon = ({ className = '', slashed = false }) => (
@@ -68,10 +68,19 @@ export default function WalletDashboardSendChoiceModal({
   const [subModal, setSubModal] = useState(null); // 'quickscan' | 'payreq' | null
   const [simpleFlowOpen, setSimpleFlowOpen] = useState(false);
   const [payreqFlowOpen, setPayreqFlowOpen] = useState(false);
+  const simpleFlowTriggerRef = useRef(null);
+  const payreqFlowTriggerRef = useRef(null);
+  const flowPopoverRef = useRef(null);
+  const flowPopoverRafRef = useRef(0);
+  const flowPopoverLastPosRef = useRef(null);
+  const [flowPopoverPos, setFlowPopoverPos] = useState(null);
   // Reset la translation du parent quand on ouvre un sous-modal
   const openSubModal = useCallback((name) => {
     setOverlayTranslateY(0);
     setOverlayDragging(false);
+    setSimpleFlowOpen(false);
+    setPayreqFlowOpen(false);
+    setFlowPopoverPos(null);
     setSubModal(name);
   }, []);
   const [payreqPasteValue, setPayreqPasteValue] = useState('');
@@ -119,6 +128,12 @@ export default function WalletDashboardSendChoiceModal({
       setSubModal(null);
       setSimpleFlowOpen(false);
       setPayreqFlowOpen(false);
+      setFlowPopoverPos(null);
+      flowPopoverLastPosRef.current = null;
+      if (typeof window !== 'undefined' && flowPopoverRafRef.current) {
+        window.cancelAnimationFrame(flowPopoverRafRef.current);
+        flowPopoverRafRef.current = 0;
+      }
       setPayreqPasteValue('');
       setPayreqSelfSendError(false);
       setSimpleSendSelfError(false);
@@ -133,6 +148,113 @@ export default function WalletDashboardSendChoiceModal({
       setSavedAddressModes({});
     }
   }, [open]);
+
+  const closeFlowPopover = useCallback(() => {
+    if (typeof window !== 'undefined' && flowPopoverRafRef.current) {
+      window.cancelAnimationFrame(flowPopoverRafRef.current);
+      flowPopoverRafRef.current = 0;
+    }
+    flowPopoverLastPosRef.current = null;
+    setSimpleFlowOpen(false);
+    setPayreqFlowOpen(false);
+    setFlowPopoverPos(null);
+  }, []);
+
+  const updateFlowPopoverPosition = useCallback(() => {
+    if (typeof window === 'undefined') return;
+    const kind = simpleFlowOpen ? 'simple' : payreqFlowOpen ? 'payreq' : null;
+    if (!kind) return;
+    const anchorEl = kind === 'simple' ? simpleFlowTriggerRef.current : payreqFlowTriggerRef.current;
+    if (!anchorEl?.getBoundingClientRect) return;
+
+    const rect = anchorEl.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+
+    const viewportW = window.innerWidth || 0;
+    const viewportH = window.innerHeight || 0;
+    const sidePad = 12;
+    const gap = 10;
+
+    const width = Math.max(220, Math.min(rect.width, viewportW - sidePad * 2));
+    const left = Math.max(sidePad, Math.min(rect.left, viewportW - sidePad - width));
+
+    const spaceAbove = rect.top - sidePad;
+    const spaceBelow = viewportH - rect.bottom - sidePad;
+    const preferTop = spaceAbove >= 180 || spaceAbove >= spaceBelow;
+    const placement = preferTop ? 'top' : 'bottom';
+    const maxHeightRaw = (placement === 'top' ? spaceAbove : spaceBelow) - gap;
+    const maxHeight = Math.max(140, Math.min(520, maxHeightRaw));
+    const top = placement === 'top' ? rect.top - gap : rect.bottom + gap;
+
+    const next = { kind, placement, left, top, width, maxHeight };
+    const prev = flowPopoverLastPosRef.current;
+    if (
+      prev &&
+      prev.kind === next.kind &&
+      prev.placement === next.placement &&
+      Math.abs(prev.left - next.left) < 0.5 &&
+      Math.abs(prev.top - next.top) < 0.5 &&
+      Math.abs(prev.width - next.width) < 0.5 &&
+      Math.abs(prev.maxHeight - next.maxHeight) < 0.5
+    ) {
+      return;
+    }
+    flowPopoverLastPosRef.current = next;
+    setFlowPopoverPos(next);
+  }, [simpleFlowOpen, payreqFlowOpen]);
+
+  const scheduleFlowPopoverPosition = useCallback(() => {
+    if (typeof window === 'undefined') return;
+    if (flowPopoverRafRef.current) return;
+    flowPopoverRafRef.current = window.requestAnimationFrame(() => {
+      flowPopoverRafRef.current = 0;
+      updateFlowPopoverPosition();
+    });
+  }, [updateFlowPopoverPosition]);
+
+  useLayoutEffect(() => {
+    if (!simpleFlowOpen && !payreqFlowOpen) {
+      flowPopoverLastPosRef.current = null;
+      setFlowPopoverPos(null);
+      return;
+    }
+    scheduleFlowPopoverPosition();
+  }, [simpleFlowOpen, payreqFlowOpen, scheduleFlowPopoverPosition]);
+
+  useEffect(() => {
+    if (!simpleFlowOpen && !payreqFlowOpen) return;
+    const scrollEl = overlayListRef.current;
+    const onScroll = () => scheduleFlowPopoverPosition();
+    scrollEl?.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    return () => {
+      scrollEl?.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+    };
+  }, [simpleFlowOpen, payreqFlowOpen, scheduleFlowPopoverPosition]);
+
+  useEffect(() => {
+    if (!simpleFlowOpen && !payreqFlowOpen) return;
+    const onPointerDown = (event) => {
+      const target = event?.target;
+      if (!target) return;
+      if (flowPopoverRef.current && flowPopoverRef.current.contains(target)) return;
+      if (simpleFlowTriggerRef.current && simpleFlowTriggerRef.current.contains(target)) return;
+      if (payreqFlowTriggerRef.current && payreqFlowTriggerRef.current.contains(target)) return;
+      closeFlowPopover();
+    };
+    const onKeyDown = (event) => {
+      if (event?.key === 'Escape') closeFlowPopover();
+    };
+    document.addEventListener('mousedown', onPointerDown);
+    document.addEventListener('touchstart', onPointerDown, { passive: true });
+    window.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', onPointerDown);
+      document.removeEventListener('touchstart', onPointerDown);
+      window.removeEventListener('keydown', onKeyDown);
+    };
+  }, [simpleFlowOpen, payreqFlowOpen, closeFlowPopover]);
 
   useEffect(() => {
     if (!manualEntryOpen) return;
@@ -674,11 +796,18 @@ export default function WalletDashboardSendChoiceModal({
                       </div>
                     </button>
 
-                    <button
-                      type="button"
-                      onClick={() => setSimpleFlowOpen((v) => !v)}
-                      className="relative mt-4 pt-3 flex items-center justify-between text-[13px] text-white/75 hover:text-white transition-colors duration-150 w-full"
-                    >
+	                    <button
+	                      type="button"
+	                      ref={simpleFlowTriggerRef}
+	                      onClick={() => {
+	                        setSimpleFlowOpen((v) => {
+	                          const next = !v;
+	                          if (next) setPayreqFlowOpen(false);
+	                          return next;
+	                        });
+	                      }}
+	                      className="relative mt-4 pt-3 flex items-center justify-between text-[13px] text-white/75 hover:text-white transition-colors duration-150 w-full"
+	                    >
                       <div className="absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-xcannes-green/45 via-white/10 to-transparent" aria-hidden />
                       <span className="inline-flex items-center gap-2">
                         <OpenFlowIcon className="w-[18px] h-[18px] text-xcannes-green/85" />
@@ -687,63 +816,8 @@ export default function WalletDashboardSendChoiceModal({
                       <svg className={`w-5 h-5 text-xcannes-green/85 transition-transform duration-200 ${simpleFlowOpen ? 'rotate-90' : 'rotate-0'}`} viewBox="0 0 24 24" fill="none" aria-hidden>
                         <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
-                    </button>
-
-                    {simpleFlowOpen ? (
-                      <div className="mt-3 rounded-[18px] bg-black/30 ring-1 ring-white/5 ring-inset px-3 py-3">
-                        {[
-                          {
-                            title: t('home_v2_essentials_2_modal_flow_2_step_1_title', 'Choisir le destinataire'),
-                            desc: t('home_v2_essentials_2_modal_flow_2_step_1_desc', 'Définissez le wallet du destinataire en :'),
-                            details: [
-                              t('home_v2_essentials_2_modal_flow_2_step_1_detail_1', 'Scannant un QR code s’il est en face de vous'),
-                              t('home_v2_essentials_2_modal_flow_2_step_1_detail_2', 'Collant une adresse reçue par message, e-mail ou SMS'),
-                              t('home_v2_essentials_2_modal_flow_2_step_1_detail_3', 'Ou sélectionnant une adresse enregistrée dans votre liste de wallets'),
-                            ],
-                          },
-                          {
-                            title: t('home_v2_essentials_2_modal_flow_2_step_2_title', 'Indiquer le paiement'),
-                            desc: t('home_v2_essentials_2_modal_flow_2_step_2_desc', 'Renseignez :'),
-                            details: [
-                              t('home_v2_essentials_2_modal_flow_2_step_2_detail_1', 'La devise'),
-                              t('home_v2_essentials_2_modal_flow_2_step_2_detail_2', 'Le montant'),
-                            ],
-                          },
-                          {
-                            title: t('home_v2_essentials_2_modal_flow_2_step_3_title', 'Vérifier et confirmer'),
-                            desc: t('home_v2_essentials_2_modal_flow_2_step_3_desc', 'Vérifiez les informations affichées, puis confirmez l’envoi.'),
-                          },
-                          {
-                            title: t('home_v2_essentials_2_modal_flow_2_step_4_title', 'Confirmer la transaction'),
-                            desc: t('home_v2_essentials_2_modal_flow_2_step_4_desc', 'Chaque transaction nécessite une validation explicite afin de garantir sécurité et contrôle.'),
-                          },
-                        ].map((step, idx) => (
-                          <div key={idx} className={idx ? 'mt-3 pt-3 border-t border-white/5' : ''}>
-                            <div className="flex items-start gap-3">
-                              <div className="mt-0.5 w-6 h-6 rounded-full bg-xcannes-green/10 text-xcannes-green/80 ring-1 ring-xcannes-green/25 ring-inset flex items-center justify-center text-[11px] font-semibold">
-                                {idx + 1}
-                              </div>
-                              <div className="min-w-0">
-                                <div className="text-[12px] md:text-[13px] text-white/85 font-semibold">
-                                  {step.title}
-                                </div>
-                                <div className="mt-0.5 text-[11px] md:text-[12px] text-white/55">
-                                  {step.desc}
-                                </div>
-                                {step.details?.length ? (
-                                  <ul className="mt-2 space-y-1 list-disc pl-4 text-[11px] md:text-[12px] text-white/45">
-                                    {step.details.map((d, j) => (
-                                      <li key={j}>{d}</li>
-                                    ))}
-                                  </ul>
-                                ) : null}
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    ) : null}
-                  </div>
+	                    </button>
+	                  </div>
 
                   {/* ── 2. Payer une demande ── */}
                   <div className={`${cardClassName} xcannes-irregular-amber-border xcannes-sendchoice-accent-amber`}>
@@ -793,11 +867,18 @@ export default function WalletDashboardSendChoiceModal({
                       </div>
                     </button>
 
-                    <button
-                      type="button"
-                      onClick={() => setPayreqFlowOpen((v) => !v)}
-                      className="relative mt-4 pt-3 flex items-center justify-between text-[13px] text-white/75 hover:text-white transition-colors duration-150 w-full"
-                    >
+	                    <button
+	                      type="button"
+	                      ref={payreqFlowTriggerRef}
+	                      onClick={() => {
+	                        setPayreqFlowOpen((v) => {
+	                          const next = !v;
+	                          if (next) setSimpleFlowOpen(false);
+	                          return next;
+	                        });
+	                      }}
+	                      className="relative mt-4 pt-3 flex items-center justify-between text-[13px] text-white/75 hover:text-white transition-colors duration-150 w-full"
+	                    >
                       <div className="absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-[#f5a623] via-white/10 to-transparent opacity-40" aria-hidden />
                       <span className="inline-flex items-center gap-2">
                         <OpenFlowIcon className="w-[18px] h-[18px] text-[#f5a623]/85" />
@@ -806,62 +887,8 @@ export default function WalletDashboardSendChoiceModal({
                       <svg className={`w-5 h-5 text-[#f5a623]/85 transition-transform duration-200 ${payreqFlowOpen ? 'rotate-90' : 'rotate-0'}`} viewBox="0 0 24 24" fill="none" aria-hidden>
                         <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
-                    </button>
-
-                    {payreqFlowOpen ? (
-                      <div className="mt-3 rounded-[18px] bg-black/30 ring-1 ring-white/5 ring-inset px-3 py-3">
-                        {[
-                          {
-                            title: t('home_v2_essentials_2_modal_flow_1_step_1_title', 'Recevoir la demande'),
-                            desc: t('home_v2_essentials_2_modal_flow_1_step_1_desc', 'Le destinataire vous envoie une demande contenant le montant, la devise, son wallet.'),
-                            note: t('home_v2_essentials_2_modal_flow_1_step_1_note', 'Elle peut être reçue par message, e-mail, SMS, ou présentée en face à face via un QR code.'),
-                          },
-                          {
-                            title: t('home_v2_essentials_2_modal_flow_1_step_2_title', 'Charger la demande'),
-                            desc: t('home_v2_essentials_2_modal_flow_1_step_2_desc', 'Depuis votre wallet, importez la demande en :'),
-                            details: [
-                              t('home_v2_essentials_2_modal_flow_1_step_2_detail_1', 'Scannant le QR code'),
-                              t('home_v2_essentials_2_modal_flow_1_step_2_detail_2', 'Chargeant une image du QR'),
-                              t('home_v2_essentials_2_modal_flow_1_step_2_detail_3', 'Ou collant le code reçu'),
-                            ],
-                          },
-                          {
-                            title: t('home_v2_essentials_2_modal_flow_1_step_3_title', 'Vérifier et confirmer'),
-                            desc: t('home_v2_essentials_2_modal_flow_1_step_3_desc', 'Les informations s’affichent automatiquement. Vérifiez-les, puis confirmez la transaction.'),
-                            note: t('home_v2_essentials_2_modal_flow_1_step_3_note', 'Chaque paiement nécessite une validation explicite pour garantir sécurité et contrôle.'),
-                          },
-                        ].map((step, idx) => (
-                          <div key={idx} className={idx ? 'mt-3 pt-3 border-t border-white/5' : ''}>
-                            <div className="flex items-start gap-3">
-                              <div className="mt-0.5 w-6 h-6 rounded-full bg-[#f5a623]/10 text-[#f5a623]/80 ring-1 ring-[#f5a623]/20 ring-inset flex items-center justify-center text-[11px] font-semibold">
-                                {idx + 1}
-                              </div>
-                              <div className="min-w-0">
-                                <div className="text-[12px] md:text-[13px] text-white/85 font-semibold">
-                                  {step.title}
-                                </div>
-                                <div className="mt-0.5 text-[11px] md:text-[12px] text-white/55">
-                                  {step.desc}
-                                </div>
-                                {step.details?.length ? (
-                                  <ul className="mt-2 space-y-1 list-disc pl-4 text-[11px] md:text-[12px] text-white/45">
-                                    {step.details.map((d, j) => (
-                                      <li key={j}>{d}</li>
-                                    ))}
-                                  </ul>
-                                ) : null}
-                                {step.note ? (
-                                  <div className="mt-2 text-[11px] md:text-[12px] text-white/40">
-                                    {step.note}
-                                  </div>
-                                ) : null}
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    ) : null}
-                  </div>
+	                    </button>
+	                  </div>
 
                   {/* Hidden div for html5-qrcode reader */}
                   <div id={manualQrReaderIdRef.current} className="hidden" />
@@ -1576,9 +1603,113 @@ export default function WalletDashboardSendChoiceModal({
             </div>
           </div>
         </div>
-      ) : null}
-    </>
-  );
+	      ) : null}
+
+        {/* Flow dropdown (popover) — opens above cards and scrolls if needed */}
+        {flowPopoverPos ? (
+          <div
+            ref={flowPopoverRef}
+            className="fixed z-[10005] pointer-events-auto"
+            style={{
+              left: `${flowPopoverPos.left}px`,
+              top: `${flowPopoverPos.top}px`,
+              width: `${flowPopoverPos.width}px`,
+              transform: flowPopoverPos.placement === 'top' ? 'translateY(-100%)' : undefined,
+            }}
+          >
+            <div
+              className="rounded-[18px] bg-black/65 backdrop-blur-md ring-1 ring-white/10 ring-inset shadow-[0_18px_44px_rgba(0,0,0,0.62)] px-3 py-3 overflow-y-auto overscroll-contain"
+              style={{ maxHeight: `${flowPopoverPos.maxHeight}px` }}
+            >
+              {(flowPopoverPos.kind === 'simple'
+                ? [
+                    {
+                      title: t('home_v2_essentials_2_modal_flow_2_step_1_title', 'Choisir le destinataire'),
+                      desc: t('home_v2_essentials_2_modal_flow_2_step_1_desc', 'Définissez le wallet du destinataire en :'),
+                      details: [
+                        t('home_v2_essentials_2_modal_flow_2_step_1_detail_1', 'Scannant un QR code s’il est en face de vous'),
+                        t('home_v2_essentials_2_modal_flow_2_step_1_detail_2', 'Collant une adresse reçue par message, e-mail ou SMS'),
+                        t('home_v2_essentials_2_modal_flow_2_step_1_detail_3', 'Ou sélectionnant une adresse enregistrée dans votre liste de wallets'),
+                      ],
+                    },
+                    {
+                      title: t('home_v2_essentials_2_modal_flow_2_step_2_title', 'Indiquer le paiement'),
+                      desc: t('home_v2_essentials_2_modal_flow_2_step_2_desc', 'Renseignez :'),
+                      details: [
+                        t('home_v2_essentials_2_modal_flow_2_step_2_detail_1', 'La devise'),
+                        t('home_v2_essentials_2_modal_flow_2_step_2_detail_2', 'Le montant'),
+                      ],
+                    },
+                    {
+                      title: t('home_v2_essentials_2_modal_flow_2_step_3_title', 'Vérifier et confirmer'),
+                      desc: t('home_v2_essentials_2_modal_flow_2_step_3_desc', 'Vérifiez les informations affichées, puis confirmez l’envoi.'),
+                    },
+                    {
+                      title: t('home_v2_essentials_2_modal_flow_2_step_4_title', 'Confirmer la transaction'),
+                      desc: t('home_v2_essentials_2_modal_flow_2_step_4_desc', 'Chaque transaction nécessite une validation explicite afin de garantir sécurité et contrôle.'),
+                    },
+                  ]
+                : [
+                    {
+                      title: t('home_v2_essentials_2_modal_flow_1_step_1_title', 'Recevoir la demande'),
+                      desc: t('home_v2_essentials_2_modal_flow_1_step_1_desc', 'Le destinataire vous envoie une demande contenant le montant, la devise, son wallet.'),
+                      note: t('home_v2_essentials_2_modal_flow_1_step_1_note', 'Elle peut être reçue par message, e-mail, SMS, ou présentée en face à face via un QR code.'),
+                    },
+                    {
+                      title: t('home_v2_essentials_2_modal_flow_1_step_2_title', 'Charger la demande'),
+                      desc: t('home_v2_essentials_2_modal_flow_1_step_2_desc', 'Depuis votre wallet, importez la demande en :'),
+                      details: [
+                        t('home_v2_essentials_2_modal_flow_1_step_2_detail_1', 'Scannant le QR code'),
+                        t('home_v2_essentials_2_modal_flow_1_step_2_detail_2', 'Chargeant une image du QR'),
+                        t('home_v2_essentials_2_modal_flow_1_step_2_detail_3', 'Ou collant le code reçu'),
+                      ],
+                    },
+                    {
+                      title: t('home_v2_essentials_2_modal_flow_1_step_3_title', 'Vérifier et confirmer'),
+                      desc: t('home_v2_essentials_2_modal_flow_1_step_3_desc', 'Les informations s’affichent automatiquement. Vérifiez-les, puis confirmez la transaction.'),
+                      note: t('home_v2_essentials_2_modal_flow_1_step_3_note', 'Chaque paiement nécessite une validation explicite pour garantir sécurité et contrôle.'),
+                    },
+                  ]
+              ).map((step, idx) => {
+                const isSimple = flowPopoverPos.kind === 'simple';
+                const numberClass = isSimple
+                  ? 'bg-xcannes-green/10 text-xcannes-green/80 ring-1 ring-xcannes-green/25'
+                  : 'bg-[#f5a623]/10 text-[#f5a623]/80 ring-1 ring-[#f5a623]/20';
+                return (
+                  <div key={idx} className={idx ? 'mt-3 pt-3 border-t border-white/5' : ''}>
+                    <div className="flex items-start gap-3">
+                      <div className={`mt-0.5 w-6 h-6 rounded-full ring-inset flex items-center justify-center text-[11px] font-semibold ${numberClass}`}>
+                        {idx + 1}
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-[12px] md:text-[13px] text-white/85 font-semibold">
+                          {step.title}
+                        </div>
+                        <div className="mt-0.5 text-[11px] md:text-[12px] text-white/55">
+                          {step.desc}
+                        </div>
+                        {step.details?.length ? (
+                          <ul className="mt-2 space-y-1 list-disc pl-4 text-[11px] md:text-[12px] text-white/45">
+                            {step.details.map((d, j) => (
+                              <li key={j}>{d}</li>
+                            ))}
+                          </ul>
+                        ) : null}
+                        {step.note ? (
+                          <div className="mt-2 text-[11px] md:text-[12px] text-white/40">
+                            {step.note}
+                          </div>
+                        ) : null}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ) : null}
+	    </>
+	  );
 
   if (inline) return content;
   if (typeof document === 'undefined') return null;
