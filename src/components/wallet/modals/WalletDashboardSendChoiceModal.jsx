@@ -68,11 +68,17 @@ export default function WalletDashboardSendChoiceModal({
   const [subModal, setSubModal] = useState(null); // 'quickscan' | 'payreq' | null
   const [flowSheet, setFlowSheet] = useState(null); // 'simple' | 'payreq' | null
   const flowSheetRef = useRef(null);
+  const [flowSheetTranslateY, setFlowSheetTranslateY] = useState(0);
+  const [flowSheetDragging, setFlowSheetDragging] = useState(false);
+  const flowSheetSwipeMetaRef = useRef(null);
   // Reset la translation du parent quand on ouvre un sous-modal
   const openSubModal = useCallback((name) => {
     setOverlayTranslateY(0);
     setOverlayDragging(false);
     setFlowSheet(null);
+    setFlowSheetTranslateY(0);
+    setFlowSheetDragging(false);
+    flowSheetSwipeMetaRef.current = null;
     setSubModal(name);
   }, []);
   const [payreqPasteValue, setPayreqPasteValue] = useState('');
@@ -119,6 +125,9 @@ export default function WalletDashboardSendChoiceModal({
     if (!open) {
       setSubModal(null);
       setFlowSheet(null);
+      setFlowSheetTranslateY(0);
+      setFlowSheetDragging(false);
+      flowSheetSwipeMetaRef.current = null;
       setPayreqPasteValue('');
       setPayreqSelfSendError(false);
       setSimpleSendSelfError(false);
@@ -134,16 +143,73 @@ export default function WalletDashboardSendChoiceModal({
     }
   }, [open]);
 
+  const closeFlowSheet = useCallback(() => {
+    setFlowSheet(null);
+    setFlowSheetTranslateY(0);
+    setFlowSheetDragging(false);
+    flowSheetSwipeMetaRef.current = null;
+  }, []);
+
+  const handleFlowSheetPillDown = useCallback((event) => {
+    if (!flowSheet) return;
+    if (!event?.isPrimary || event.pointerType === 'mouse') return;
+    if (event.target?.closest?.('input,textarea,select,button,a,[role="button"]')) return;
+    flowSheetSwipeMetaRef.current = {
+      startY: event.clientY,
+      startAt: Date.now(),
+      pointerId: event.pointerId,
+      lastDeltaY: 0,
+    };
+
+    const onMove = (e) => {
+      const meta = flowSheetSwipeMetaRef.current;
+      if (!meta || e.pointerId !== meta.pointerId) return;
+      const delta = e.clientY - meta.startY;
+      if (delta <= 0) return;
+      meta.lastDeltaY = delta;
+      setFlowSheetDragging(true);
+      setFlowSheetTranslateY(delta);
+    };
+
+    const onEnd = (e) => {
+      const meta = flowSheetSwipeMetaRef.current;
+      if (!meta || e.pointerId !== meta.pointerId) return;
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onEnd);
+      window.removeEventListener('pointercancel', onEnd);
+
+      const delta = meta.lastDeltaY || 0;
+      const duration = Math.max(1, Date.now() - (meta.startAt || 0));
+      const velocity = delta / duration;
+      const height = typeof window !== 'undefined' ? window.innerHeight : 800;
+      const closeDistance = Math.max(140, Math.min(240, height * 0.20));
+      const shouldClose = delta > closeDistance || (delta > closeDistance * 0.55 && velocity > 1.15);
+
+      setFlowSheetDragging(false);
+      flowSheetSwipeMetaRef.current = null;
+      if (shouldClose) {
+        setFlowSheetTranslateY(Math.max(delta, height));
+        window.setTimeout(() => closeFlowSheet(), 160);
+        return;
+      }
+      setFlowSheetTranslateY(0);
+    };
+
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onEnd);
+    window.addEventListener('pointercancel', onEnd);
+  }, [flowSheet, closeFlowSheet]);
+
   useEffect(() => {
     if (!flowSheet) return;
     const onPointerDown = (event) => {
       const target = event?.target;
       if (!target) return;
       if (flowSheetRef.current && flowSheetRef.current.contains(target)) return;
-      setFlowSheet(null);
+      closeFlowSheet();
     };
     const onKeyDown = (event) => {
-      if (event?.key === 'Escape') setFlowSheet(null);
+      if (event?.key === 'Escape') closeFlowSheet();
     };
     document.addEventListener('mousedown', onPointerDown);
     document.addEventListener('touchstart', onPointerDown, { passive: true });
@@ -153,7 +219,7 @@ export default function WalletDashboardSendChoiceModal({
       document.removeEventListener('touchstart', onPointerDown);
       window.removeEventListener('keydown', onKeyDown);
     };
-  }, [flowSheet]);
+  }, [flowSheet, closeFlowSheet]);
 
   useEffect(() => {
     if (!manualEntryOpen) return;
@@ -698,6 +764,9 @@ export default function WalletDashboardSendChoiceModal({
 	                    <button
 	                      type="button"
 	                      onClick={() => {
+	                        setFlowSheetTranslateY(0);
+	                        setFlowSheetDragging(false);
+	                        flowSheetSwipeMetaRef.current = null;
 	                        setFlowSheet((v) => (v === 'simple' ? null : 'simple'));
 	                      }}
 	                      className="relative mt-4 pt-3 flex items-center justify-between text-[13px] text-white/75 hover:text-white transition-colors duration-150 w-full"
@@ -764,6 +833,9 @@ export default function WalletDashboardSendChoiceModal({
 	                    <button
 	                      type="button"
 	                      onClick={() => {
+	                        setFlowSheetTranslateY(0);
+	                        setFlowSheetDragging(false);
+	                        flowSheetSwipeMetaRef.current = null;
 	                        setFlowSheet((v) => (v === 'payreq' ? null : 'payreq'));
 	                      }}
 	                      className="relative mt-4 pt-3 flex items-center justify-between text-[13px] text-white/75 hover:text-white transition-colors duration-150 w-full"
@@ -1501,21 +1573,28 @@ export default function WalletDashboardSendChoiceModal({
             <div
               ref={flowSheetRef}
               className="absolute left-0 right-0 bottom-0 pointer-events-auto"
+              style={{
+                transform: flowSheetTranslateY ? `translateY(${Math.max(0, flowSheetTranslateY)}px)` : undefined,
+                transition: flowSheetDragging ? 'none' : 'transform 220ms cubic-bezier(0.2,0,0,1)',
+                willChange: flowSheetTranslateY ? 'transform' : undefined,
+              }}
             >
               <div className="mx-auto w-full md:max-w-lg">
                 <div className="rounded-t-[22px] md:rounded-[22px] bg-[#070a0b]/95 md:bg-black/80 md:backdrop-blur-md ring-1 ring-white/10 ring-inset shadow-[0_-18px_44px_rgba(0,0,0,0.62)] px-4 pt-3 pb-4">
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <div className="h-1.5 w-10 rounded-full bg-white/15 md:hidden" aria-hidden />
-                      <div className="text-[14px] text-white/85 font-semibold truncate">
-                        {flowSheet === 'simple'
-                          ? t('ui_send_simple_title', 'Envoi simple')
-                          : t('ui_send_choice_pay_request_title', 'Payer une demande')}
-                      </div>
+                  <div className="pt-1 pb-2" onPointerDown={handleFlowSheetPillDown}>
+                    <div className="text-[14px] text-white/85 font-semibold text-center">
+                      {flowSheet === 'simple'
+                        ? t('ui_send_simple_title', 'Envoi simple')
+                        : t('ui_send_choice_pay_request_title', 'Payer une demande')}
                     </div>
+                    <div className="mt-2 flex justify-center" aria-hidden>
+                      <span className="block w-12 h-1.5 rounded-full bg-white/15" />
+                    </div>
+                  </div>
+                  <div className="hidden md:flex items-center justify-end -mt-10 pb-2">
                     <button
                       type="button"
-                      onClick={() => setFlowSheet(null)}
+                      onClick={closeFlowSheet}
                       className="h-9 w-9 rounded-full bg-white/[0.06] hover:bg-white/[0.09] active:bg-white/[0.05] transition-colors flex items-center justify-center"
                       aria-label={t('ui_close', 'Fermer')}
                     >
@@ -1528,31 +1607,34 @@ export default function WalletDashboardSendChoiceModal({
                   <div className="mt-3 max-h-[62vh] md:max-h-[60vh] overflow-y-auto overscroll-contain pr-1">
                     {(flowSheet === 'simple'
                 ? [
-                    {
-                      title: t('home_v2_essentials_2_modal_flow_2_step_1_title', 'Choisir le destinataire'),
-                      desc: t('home_v2_essentials_2_modal_flow_2_step_1_desc', 'Définissez le wallet du destinataire en :'),
-                      details: [
-                        t('home_v2_essentials_2_modal_flow_2_step_1_detail_1', 'Scannant un QR code s’il est en face de vous'),
-                        t('home_v2_essentials_2_modal_flow_2_step_1_detail_2', 'Collant une adresse reçue par message, e-mail ou SMS'),
-                        t('home_v2_essentials_2_modal_flow_2_step_1_detail_3', 'Ou sélectionnant une adresse enregistrée dans votre liste de wallets'),
-                      ],
-                    },
-                    {
-                      title: t('home_v2_essentials_2_modal_flow_2_step_2_title', 'Indiquer le paiement'),
-                      desc: t('home_v2_essentials_2_modal_flow_2_step_2_desc', 'Renseignez :'),
-                      details: [
-                        t('home_v2_essentials_2_modal_flow_2_step_2_detail_1', 'La devise'),
-                        t('home_v2_essentials_2_modal_flow_2_step_2_detail_2', 'Le montant'),
-                      ],
-                    },
-                    {
-                      title: t('home_v2_essentials_2_modal_flow_2_step_3_title', 'Vérifier et confirmer'),
-                      desc: t('home_v2_essentials_2_modal_flow_2_step_3_desc', 'Vérifiez les informations affichées, puis confirmez l’envoi.'),
-                    },
-                    {
-                      title: t('home_v2_essentials_2_modal_flow_2_step_4_title', 'Confirmer la transaction'),
-                      desc: t('home_v2_essentials_2_modal_flow_2_step_4_desc', 'Chaque transaction nécessite une validation explicite afin de garantir sécurité et contrôle.'),
-                    },
+	                    {
+	                      title: t('home_v2_essentials_2_modal_flow_2_step_1_title', 'Choisir le destinataire'),
+	                      desc: t(
+	                        'ui_send_choice_simple_flow_step1_desc_v2',
+	                        'Ajoutez le wallet du destinataire en scannant un QR code, en collant une adresse reçue, ou en sélectionnant un wallet enregistré.',
+	                      ),
+	                    },
+	                    {
+	                      title: t('home_v2_essentials_2_modal_flow_2_step_2_title', 'Indiquer le paiement'),
+	                      desc: t(
+	                        'ui_send_choice_simple_flow_step2_desc_v2',
+	                        'Choisissez la devise, puis saisissez le montant à envoyer.',
+	                      ),
+	                    },
+	                    {
+	                      title: t('ui_send_choice_simple_flow_step3_title_v2', 'Vérifier l’envoi'),
+	                      desc: t(
+	                        'ui_send_choice_simple_flow_step3_desc_v2',
+	                        'Contrôlez les informations affichées avant de continuer.',
+	                      ),
+	                    },
+	                    {
+	                      title: t('home_v2_essentials_2_modal_flow_2_step_4_title', 'Confirmer la transaction'),
+	                      desc: t(
+	                        'ui_send_choice_simple_flow_step4_desc_v2',
+	                        'Validez explicitement la transaction pour finaliser l’envoi en toute sécurité.',
+	                      ),
+	                    },
                   ]
                 : [
                     {
