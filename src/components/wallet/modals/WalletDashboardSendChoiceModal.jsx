@@ -427,7 +427,8 @@ export default function WalletDashboardSendChoiceModal({
   const maybeStartOverlayDrag = (event, source) => {
     if (inline) return false;
     if (!event?.isPrimary || event.pointerType === 'mouse') return false;
-    if (event.target?.closest?.('input,textarea,select')) return false;
+    // Do not start a drag from interactive elements (prevents tap → accidental drag cancelling clicks).
+    if (event.target?.closest?.('input,textarea,select,button,a,[role="button"]')) return false;
     if (source === 'list') {
       const listEl = overlayListRef.current;
       if (!listEl || listEl.scrollTop > 0) return false;
