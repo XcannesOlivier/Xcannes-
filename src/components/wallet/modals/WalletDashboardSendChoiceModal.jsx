@@ -1279,6 +1279,31 @@ export default function WalletDashboardSendChoiceModal({
                 </div>
 
                 <div className="pt-6 md:pt-12">
+                  {pendingDestination.address ? (() => {
+                    const addr = String(pendingDestination.address || '').trim();
+                    const label = String(pendingDestination.label || '').trim();
+                    const showLabel = label && label !== addr && label !== t('ui_wallet_unknown', 'Unknown wallet');
+                    const addrShort = addr.length > 24 ? `${addr.slice(0, 12)}…${addr.slice(-8)}` : addr;
+                    return (
+                      <div className="mb-3 px-3 py-2 rounded-xl bg-white/[0.04] ring-1 ring-white/10 ring-inset flex items-center gap-2 min-w-0">
+                        <span className="flex-shrink-0 text-[11px] uppercase tracking-wide text-white/45">
+                          {t('ui_recipient_label', 'Destinataire')}
+                        </span>
+                        <span className="text-white/20">·</span>
+                        <div className="min-w-0 flex-1 flex items-center gap-2 overflow-hidden">
+                          {showLabel ? (
+                            <>
+                              <span className="min-w-0 truncate text-[13px] text-white/90">{label}</span>
+                              <span className="flex-shrink-0 text-white/30">·</span>
+                              <span className="flex-shrink-0 font-mono text-[12px] text-white/70">{addrShort}</span>
+                            </>
+                          ) : (
+                            <span className="min-w-0 truncate font-mono text-[12px] text-white/80">{addrShort}</span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })() : null}
                   <button
                     type="button"
                     disabled={!pendingDestination.address}
@@ -1298,54 +1323,7 @@ export default function WalletDashboardSendChoiceModal({
                     }}
                   >
                     {pendingDestination.address
-                      ? (() => {
-                          const addr = String(pendingDestination.address || "").trim();
-                          const label = String(pendingDestination.label || "").trim();
-                          const showLabel =
-                            label && label !== addr && label !== t("ui_wallet_unknown", "Unknown wallet");
-                          const addrShort = (() => {
-                            if (!addr) return "";
-                            if (showLabel) {
-                              // When label is shown, keep the address very short.
-                              return addr.length > 10
-                                ? `${addr.slice(0, 3)}…${addr.slice(-2)}`
-                                : addr;
-                            }
-                            // Without label, keep more than half of the address visible.
-                            if (addr.length > 26) return `${addr.slice(0, 14)}…${addr.slice(-10)}`;
-                            if (addr.length > 18) return `${addr.slice(0, 10)}…${addr.slice(-6)}`;
-                            return addr;
-                          })();
-                          return (
-                            <span className="inline-flex items-center gap-2 whitespace-nowrap overflow-hidden text-ellipsis max-w-full">
-                              <span className="shrink-0">
-                                {t(
-                                  "ui_validate_recipient_address",
-                                  "Valider l'adresse",
-                                )}
-                              </span>
-                              <span className="text-white/35">:</span>
-                              {showLabel ? (
-                                <span className="min-w-0 flex items-center gap-1">
-                                  <span className="min-w-0 truncate text-white/90">
-                                    {label}
-                                  </span>
-                                  <span className="shrink-0 text-white/35">
-                                    {" "}
-                                    ·{" "}
-                                  </span>
-                                  <span className="shrink-0 font-mono text-white/85">
-                                    {addrShort}
-                                  </span>
-                                </span>
-                              ) : (
-                                <span className="min-w-0 overflow-hidden text-ellipsis font-mono text-white/85">
-                                  {addrShort}
-                                </span>
-                              )}
-                            </span>
-                          );
-                        })()
+                      ? <span>{t('ui_continue', 'Continuer')}</span>
                       : <span className="inline-flex items-center gap-1.5 text-white/85">
                           <span className="text-[14px] md:text-[16px]">{t('ui_fill_recipient_address', "Renseigner l'adresse du destinataire")}</span>
                           <span className="inline-flex items-end gap-[3px] mb-[-1px]">
@@ -1692,7 +1670,7 @@ export default function WalletDashboardSendChoiceModal({
 	                      title: t('home_v2_essentials_2_modal_flow_2_step_1_title', 'Choisir le destinataire'),
 	                      desc: t(
 	                        'ui_send_choice_simple_flow_step1_desc_v2',
-	                        'Ajoutez le wallet du destinataire en scannant un QR code, en collant une adresse reçue, ou en sélectionnant un wallet enregistré.',
+	                        'Ajoutez le compte du destinataire en scannant un QR code, en collant une adresse reçue, ou en sélectionnant un compte enregistré.',
 	                      ),
 	                    },
 	                    {
@@ -1720,12 +1698,12 @@ export default function WalletDashboardSendChoiceModal({
                 : [
                     {
                       title: t('home_v2_essentials_2_modal_flow_1_step_1_title', 'Recevoir la demande'),
-                      desc: t('home_v2_essentials_2_modal_flow_1_step_1_desc', 'Le destinataire vous envoie une demande contenant le montant, la devise, son wallet.'),
+                      desc: t('home_v2_essentials_2_modal_flow_1_step_1_desc', 'Le destinataire vous envoie une demande contenant le montant, la devise, son compte.'),
                       note: t('home_v2_essentials_2_modal_flow_1_step_1_note', 'Elle peut être reçue par message, e-mail, SMS, ou présentée en face à face via un QR code.'),
                     },
                     {
                       title: t('home_v2_essentials_2_modal_flow_1_step_2_title', 'Charger la demande'),
-                      desc: t('home_v2_essentials_2_modal_flow_1_step_2_desc', 'Depuis votre wallet, importez la demande en :'),
+                      desc: t('home_v2_essentials_2_modal_flow_1_step_2_desc', 'Depuis votre compte, importez la demande en :'),
                       details: [
                         t('home_v2_essentials_2_modal_flow_1_step_2_detail_1', 'Scannant le QR code'),
                         t('home_v2_essentials_2_modal_flow_1_step_2_detail_2', 'Chargeant une image du QR'),
