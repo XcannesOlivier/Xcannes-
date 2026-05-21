@@ -3,7 +3,7 @@
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'next-i18next';
 import { useModalTransition } from '@/hooks/useModalTransition';
-import { useEffect, useLayoutEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { normalizeQrImageFile } from '@/utils/qrImage';
 
 const EyeIcon = ({ className = '', slashed = false }) => (
@@ -66,21 +66,13 @@ export default function WalletDashboardSendChoiceModal({
 
   // ── Sub-modal state ──────────────────────────────────────────
   const [subModal, setSubModal] = useState(null); // 'quickscan' | 'payreq' | null
-  const [simpleFlowOpen, setSimpleFlowOpen] = useState(false);
-  const [payreqFlowOpen, setPayreqFlowOpen] = useState(false);
-  const simpleFlowTriggerRef = useRef(null);
-  const payreqFlowTriggerRef = useRef(null);
-  const flowPopoverRef = useRef(null);
-  const flowPopoverRafRef = useRef(0);
-  const flowPopoverLastPosRef = useRef(null);
-  const [flowPopoverPos, setFlowPopoverPos] = useState(null);
+  const [flowSheet, setFlowSheet] = useState(null); // 'simple' | 'payreq' | null
+  const flowSheetRef = useRef(null);
   // Reset la translation du parent quand on ouvre un sous-modal
   const openSubModal = useCallback((name) => {
     setOverlayTranslateY(0);
     setOverlayDragging(false);
-    setSimpleFlowOpen(false);
-    setPayreqFlowOpen(false);
-    setFlowPopoverPos(null);
+    setFlowSheet(null);
     setSubModal(name);
   }, []);
   const [payreqPasteValue, setPayreqPasteValue] = useState('');
@@ -126,14 +118,7 @@ export default function WalletDashboardSendChoiceModal({
   useEffect(() => {
     if (!open) {
       setSubModal(null);
-      setSimpleFlowOpen(false);
-      setPayreqFlowOpen(false);
-      setFlowPopoverPos(null);
-      flowPopoverLastPosRef.current = null;
-      if (typeof window !== 'undefined' && flowPopoverRafRef.current) {
-        window.cancelAnimationFrame(flowPopoverRafRef.current);
-        flowPopoverRafRef.current = 0;
-      }
+      setFlowSheet(null);
       setPayreqPasteValue('');
       setPayreqSelfSendError(false);
       setSimpleSendSelfError(false);
@@ -149,102 +134,16 @@ export default function WalletDashboardSendChoiceModal({
     }
   }, [open]);
 
-  const closeFlowPopover = useCallback(() => {
-    if (typeof window !== 'undefined' && flowPopoverRafRef.current) {
-      window.cancelAnimationFrame(flowPopoverRafRef.current);
-      flowPopoverRafRef.current = 0;
-    }
-    flowPopoverLastPosRef.current = null;
-    setSimpleFlowOpen(false);
-    setPayreqFlowOpen(false);
-    setFlowPopoverPos(null);
-  }, []);
-
-  const updateFlowPopoverPosition = useCallback(() => {
-    if (typeof window === 'undefined') return;
-    const kind = simpleFlowOpen ? 'simple' : payreqFlowOpen ? 'payreq' : null;
-    if (!kind) return;
-    const anchorEl = kind === 'simple' ? simpleFlowTriggerRef.current : payreqFlowTriggerRef.current;
-    if (!anchorEl?.getBoundingClientRect) return;
-
-    const rect = anchorEl.getBoundingClientRect();
-    if (!rect.width || !rect.height) return;
-
-    const viewportW = window.innerWidth || 0;
-    const viewportH = window.innerHeight || 0;
-    const sidePad = 12;
-    const gap = 10;
-
-    const width = Math.max(220, Math.min(rect.width, viewportW - sidePad * 2));
-    const left = Math.max(sidePad, Math.min(rect.left, viewportW - sidePad - width));
-
-    const spaceAbove = rect.top - sidePad;
-    const spaceBelow = viewportH - rect.bottom - sidePad;
-    const preferTop = spaceAbove >= 180 || spaceAbove >= spaceBelow;
-    const placement = preferTop ? 'top' : 'bottom';
-    const maxHeightRaw = (placement === 'top' ? spaceAbove : spaceBelow) - gap;
-    const maxHeight = Math.max(140, Math.min(520, maxHeightRaw));
-    const top = placement === 'top' ? rect.top - gap : rect.bottom + gap;
-
-    const next = { kind, placement, left, top, width, maxHeight };
-    const prev = flowPopoverLastPosRef.current;
-    if (
-      prev &&
-      prev.kind === next.kind &&
-      prev.placement === next.placement &&
-      Math.abs(prev.left - next.left) < 0.5 &&
-      Math.abs(prev.top - next.top) < 0.5 &&
-      Math.abs(prev.width - next.width) < 0.5 &&
-      Math.abs(prev.maxHeight - next.maxHeight) < 0.5
-    ) {
-      return;
-    }
-    flowPopoverLastPosRef.current = next;
-    setFlowPopoverPos(next);
-  }, [simpleFlowOpen, payreqFlowOpen]);
-
-  const scheduleFlowPopoverPosition = useCallback(() => {
-    if (typeof window === 'undefined') return;
-    if (flowPopoverRafRef.current) return;
-    flowPopoverRafRef.current = window.requestAnimationFrame(() => {
-      flowPopoverRafRef.current = 0;
-      updateFlowPopoverPosition();
-    });
-  }, [updateFlowPopoverPosition]);
-
-  useLayoutEffect(() => {
-    if (!simpleFlowOpen && !payreqFlowOpen) {
-      flowPopoverLastPosRef.current = null;
-      setFlowPopoverPos(null);
-      return;
-    }
-    scheduleFlowPopoverPosition();
-  }, [simpleFlowOpen, payreqFlowOpen, scheduleFlowPopoverPosition]);
-
   useEffect(() => {
-    if (!simpleFlowOpen && !payreqFlowOpen) return;
-    const scrollEl = overlayListRef.current;
-    const onScroll = () => scheduleFlowPopoverPosition();
-    scrollEl?.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll);
-    return () => {
-      scrollEl?.removeEventListener('scroll', onScroll);
-      window.removeEventListener('resize', onScroll);
-    };
-  }, [simpleFlowOpen, payreqFlowOpen, scheduleFlowPopoverPosition]);
-
-  useEffect(() => {
-    if (!simpleFlowOpen && !payreqFlowOpen) return;
+    if (!flowSheet) return;
     const onPointerDown = (event) => {
       const target = event?.target;
       if (!target) return;
-      if (flowPopoverRef.current && flowPopoverRef.current.contains(target)) return;
-      if (simpleFlowTriggerRef.current && simpleFlowTriggerRef.current.contains(target)) return;
-      if (payreqFlowTriggerRef.current && payreqFlowTriggerRef.current.contains(target)) return;
-      closeFlowPopover();
+      if (flowSheetRef.current && flowSheetRef.current.contains(target)) return;
+      setFlowSheet(null);
     };
     const onKeyDown = (event) => {
-      if (event?.key === 'Escape') closeFlowPopover();
+      if (event?.key === 'Escape') setFlowSheet(null);
     };
     document.addEventListener('mousedown', onPointerDown);
     document.addEventListener('touchstart', onPointerDown, { passive: true });
@@ -254,7 +153,7 @@ export default function WalletDashboardSendChoiceModal({
       document.removeEventListener('touchstart', onPointerDown);
       window.removeEventListener('keydown', onKeyDown);
     };
-  }, [simpleFlowOpen, payreqFlowOpen, closeFlowPopover]);
+  }, [flowSheet]);
 
   useEffect(() => {
     if (!manualEntryOpen) return;
@@ -798,13 +697,8 @@ export default function WalletDashboardSendChoiceModal({
 
 	                    <button
 	                      type="button"
-	                      ref={simpleFlowTriggerRef}
 	                      onClick={() => {
-	                        setSimpleFlowOpen((v) => {
-	                          const next = !v;
-	                          if (next) setPayreqFlowOpen(false);
-	                          return next;
-	                        });
+	                        setFlowSheet((v) => (v === 'simple' ? null : 'simple'));
 	                      }}
 	                      className="relative mt-4 pt-3 flex items-center justify-between text-[13px] text-white/75 hover:text-white transition-colors duration-150 w-full"
 	                    >
@@ -813,9 +707,9 @@ export default function WalletDashboardSendChoiceModal({
                         <OpenFlowIcon className="w-[18px] h-[18px] text-xcannes-green/85" />
                         <span className="text-white">{t('ui_open_flow', 'Ouvrir le parcours')}</span>
                       </span>
-                      <svg className={`w-5 h-5 text-xcannes-green/85 transition-transform duration-200 ${simpleFlowOpen ? 'rotate-90' : 'rotate-0'}`} viewBox="0 0 24 24" fill="none" aria-hidden>
-                        <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
+	                      <svg className={`w-5 h-5 text-xcannes-green/85 transition-transform duration-200 ${flowSheet === 'simple' ? 'rotate-90' : 'rotate-0'}`} viewBox="0 0 24 24" fill="none" aria-hidden>
+	                        <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+	                      </svg>
 	                    </button>
 	                  </div>
 
@@ -869,13 +763,8 @@ export default function WalletDashboardSendChoiceModal({
 
 	                    <button
 	                      type="button"
-	                      ref={payreqFlowTriggerRef}
 	                      onClick={() => {
-	                        setPayreqFlowOpen((v) => {
-	                          const next = !v;
-	                          if (next) setSimpleFlowOpen(false);
-	                          return next;
-	                        });
+	                        setFlowSheet((v) => (v === 'payreq' ? null : 'payreq'));
 	                      }}
 	                      className="relative mt-4 pt-3 flex items-center justify-between text-[13px] text-white/75 hover:text-white transition-colors duration-150 w-full"
 	                    >
@@ -884,9 +773,9 @@ export default function WalletDashboardSendChoiceModal({
                         <OpenFlowIcon className="w-[18px] h-[18px] text-[#f5a623]/85" />
                         <span className="text-white">{t('ui_open_flow', 'Ouvrir le parcours')}</span>
                       </span>
-                      <svg className={`w-5 h-5 text-[#f5a623]/85 transition-transform duration-200 ${payreqFlowOpen ? 'rotate-90' : 'rotate-0'}`} viewBox="0 0 24 24" fill="none" aria-hidden>
-                        <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
+	                      <svg className={`w-5 h-5 text-[#f5a623]/85 transition-transform duration-200 ${flowSheet === 'payreq' ? 'rotate-90' : 'rotate-0'}`} viewBox="0 0 24 24" fill="none" aria-hidden>
+	                        <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+	                      </svg>
 	                    </button>
 	                  </div>
 
@@ -1605,23 +1494,39 @@ export default function WalletDashboardSendChoiceModal({
         </div>
 	      ) : null}
 
-        {/* Flow dropdown (popover) — opens above cards and scrolls if needed */}
-        {flowPopoverPos ? (
-          <div
-            ref={flowPopoverRef}
-            className="fixed z-[10005] pointer-events-auto"
-            style={{
-              left: `${flowPopoverPos.left}px`,
-              top: `${flowPopoverPos.top}px`,
-              width: `${flowPopoverPos.width}px`,
-              transform: flowPopoverPos.placement === 'top' ? 'translateY(-100%)' : undefined,
-            }}
-          >
+        {/* Flow dropdown (bottom sheet) */}
+        {flowSheet ? (
+          <div className="fixed inset-0 z-[10006] pointer-events-none">
+            <div className="absolute inset-0 bg-black/35 md:bg-black/20 pointer-events-auto" />
             <div
-              className="rounded-[18px] bg-black/65 backdrop-blur-md ring-1 ring-white/10 ring-inset shadow-[0_18px_44px_rgba(0,0,0,0.62)] px-3 py-3 overflow-y-auto overscroll-contain"
-              style={{ maxHeight: `${flowPopoverPos.maxHeight}px` }}
+              ref={flowSheetRef}
+              className="absolute left-0 right-0 bottom-0 pointer-events-auto"
             >
-              {(flowPopoverPos.kind === 'simple'
+              <div className="mx-auto w-full md:max-w-lg">
+                <div className="rounded-t-[22px] md:rounded-[22px] bg-[#070a0b]/95 md:bg-black/80 md:backdrop-blur-md ring-1 ring-white/10 ring-inset shadow-[0_-18px_44px_rgba(0,0,0,0.62)] px-4 pt-3 pb-4">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <div className="h-1.5 w-10 rounded-full bg-white/15 md:hidden" aria-hidden />
+                      <div className="text-[14px] text-white/85 font-semibold truncate">
+                        {flowSheet === 'simple'
+                          ? t('ui_send_simple_title', 'Envoi simple')
+                          : t('ui_send_choice_pay_request_title', 'Payer une demande')}
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setFlowSheet(null)}
+                      className="h-9 w-9 rounded-full bg-white/[0.06] hover:bg-white/[0.09] active:bg-white/[0.05] transition-colors flex items-center justify-center"
+                      aria-label={t('ui_close', 'Fermer')}
+                    >
+                      <svg viewBox="0 0 24 24" className="w-5 h-5 text-white/70" fill="none" aria-hidden>
+                        <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                      </svg>
+                    </button>
+                  </div>
+
+                  <div className="mt-3 max-h-[62vh] md:max-h-[60vh] overflow-y-auto overscroll-contain pr-1">
+                    {(flowSheet === 'simple'
                 ? [
                     {
                       title: t('home_v2_essentials_2_modal_flow_2_step_1_title', 'Choisir le destinataire'),
@@ -1671,10 +1576,10 @@ export default function WalletDashboardSendChoiceModal({
                     },
                   ]
               ).map((step, idx) => {
-                const isSimple = flowPopoverPos.kind === 'simple';
+                const isSimple = flowSheet === 'simple';
                 const numberClass = isSimple
-                  ? 'bg-xcannes-green/10 text-xcannes-green/80 ring-1 ring-xcannes-green/25'
-                  : 'bg-[#f5a623]/10 text-[#f5a623]/80 ring-1 ring-[#f5a623]/20';
+                  ? 'bg-white/[0.04] text-xcannes-green/80 ring-1 ring-xcannes-green/25'
+                  : 'bg-white/[0.04] text-[#f5a623]/80 ring-1 ring-[#f5a623]/20';
                 return (
                   <div key={idx} className={idx ? 'mt-3 pt-3 border-t border-white/5' : ''}>
                     <div className="flex items-start gap-3">
@@ -1705,6 +1610,9 @@ export default function WalletDashboardSendChoiceModal({
                   </div>
                 );
               })}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         ) : null}
