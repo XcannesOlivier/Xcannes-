@@ -852,6 +852,15 @@ body.header-hero-mode .home-content-wrapper {
   opacity: 0.9;
 }
 
+/* Override irregular border tint on send-choice cards:
+   keep border fade overlay responsible for the left→right gradient,
+   and avoid any residual tint on the right edge. */
+.xcannes-sendchoice-accent-green.xcannes-irregular-green-border::after,
+.xcannes-sendchoice-accent-amber.xcannes-irregular-amber-border::after {
+  background: none;
+  opacity: 0;
+}
+
 /* ── Send choice card: colored reflection on left corners ── */
 .xcannes-sendchoice-accent-green,
 .xcannes-sendchoice-accent-amber {
