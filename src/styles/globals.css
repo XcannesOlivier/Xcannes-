@@ -969,7 +969,7 @@ body.header-hero-mode .home-content-wrapper {
   inset: 0;
   border-radius: inherit;
   opacity: 0.95;
-  padding: 0px;
+  padding: 1px;
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
@@ -980,8 +980,8 @@ body.header-hero-mode .home-content-wrapper {
     90deg,
     rgba(0, 255, 150, 0.70) 0%,
     rgba(0, 255, 150, 0.24) 14%,
-    rgba(255, 255, 255, 0.14) 46%,
-    rgba(255, 255, 255, 0.12) 100%
+    rgba(255, 255, 255, 0.08) 46%,
+    rgba(255, 255, 255, 0) 100%
   );
 }
 
@@ -997,8 +997,8 @@ body.header-hero-mode .home-content-wrapper {
     90deg,
     rgba(245, 166, 35, 0.62) 0%,
     rgba(245, 166, 35, 0.21) 14%,
-    rgba(255, 255, 255, 0.14) 46%,
-    rgba(255, 255, 255, 0.12) 100%
+    rgba(255, 255, 255, 0.08) 46%,
+    rgba(255, 255, 255, 0) 100%
   );
 }
 
