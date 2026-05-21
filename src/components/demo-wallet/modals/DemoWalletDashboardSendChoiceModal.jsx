@@ -550,7 +550,7 @@ export default function DemoWalletDashboardSendChoiceModal({
 
                 <div className={`${cardClassName} xcannes-irregular-green-border`}>
                   <div className="pointer-events-none absolute inset-0" aria-hidden>
-                    <div className="absolute -inset-10 bg-[radial-gradient(520px_circle_at_18%_0%,rgba(0,255,150,0.14),transparent_62%),radial-gradient(560px_circle_at_105%_0%,rgba(255,255,255,0.07),transparent_58%)]" />
+                    <div className="absolute -inset-8 bg-[radial-gradient(220px_220px_at_0%_45%,rgba(0,255,150,0.34),rgba(0,255,150,0.16)_36%,transparent_70%),linear-gradient(90deg,rgba(0,255,150,0.10),transparent_55%)]" />
                     <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] via-transparent to-black/40" />
                   </div>
                   <button
@@ -601,7 +601,7 @@ export default function DemoWalletDashboardSendChoiceModal({
 
                 <div className={`${cardClassName} xcannes-irregular-amber-border`}>
                   <div className="pointer-events-none absolute inset-0" aria-hidden>
-                    <div className="absolute -inset-10 bg-[radial-gradient(520px_circle_at_18%_0%,rgba(245,166,35,0.14),transparent_62%),radial-gradient(560px_circle_at_105%_0%,rgba(255,255,255,0.06),transparent_60%)]" />
+                    <div className="absolute -inset-8 bg-[radial-gradient(220px_220px_at_0%_45%,rgba(245,166,35,0.30),rgba(245,166,35,0.14)_36%,transparent_70%),linear-gradient(90deg,rgba(245,166,35,0.09),transparent_55%)]" />
                     <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] via-transparent to-black/40" />
                   </div>
                   <button
