@@ -777,6 +777,7 @@ export default function WalletDashboardSendChoiceModal({
 	                      }}
 	                      className="relative mt-4 pt-3 flex items-center justify-between text-[13px] text-white/75 hover:text-white transition-colors duration-150 w-full"
 	                    >
+                      <div className="absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-xcannes-green/45 to-transparent" aria-hidden />
                       <span className="inline-flex items-center gap-2">
                         <OpenFlowIcon className="w-[12px] h-[12px] text-xcannes-green/85" />
                         <span className="text-white">{t('ui_open_flow', 'Ouvrir le parcours')}</span>
