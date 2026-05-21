@@ -886,6 +886,40 @@ body.header-hero-mode .home-content-wrapper {
     linear-gradient(90deg, rgba(245, 166, 35, 0.30) 0%, rgba(245, 166, 35, 0) 46%);
 }
 
+/* ── Send choice card: border fade left→right (accent→white) ── */
+.xcannes-sendchoice-border-fade-green,
+.xcannes-sendchoice-border-fade-amber {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  opacity: 0.95;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+.xcannes-sendchoice-border-fade-green {
+  background: linear-gradient(
+    90deg,
+    rgba(0, 255, 150, 0.70) 0%,
+    rgba(0, 255, 150, 0.26) 18%,
+    rgba(255, 255, 255, 0.14) 55%,
+    rgba(255, 255, 255, 0.12) 100%
+  );
+}
+
+.xcannes-sendchoice-border-fade-amber {
+  background: linear-gradient(
+    90deg,
+    rgba(245, 166, 35, 0.62) 0%,
+    rgba(245, 166, 35, 0.22) 18%,
+    rgba(255, 255, 255, 0.14) 55%,
+    rgba(255, 255, 255, 0.12) 100%
+  );
+}
+
 .xcannes-fade-ring-y {
   position: relative;
 }

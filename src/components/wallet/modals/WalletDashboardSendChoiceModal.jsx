@@ -621,7 +621,7 @@ export default function WalletDashboardSendChoiceModal({
                   {/* ── 1. Envoi simple ── */}
                   <div className={`${cardClassName} xcannes-irregular-green-border xcannes-sendchoice-accent-green`}>
                     <div className="pointer-events-none absolute inset-0" aria-hidden>
-                      <div className="absolute inset-0 rounded-[inherit] p-px opacity-90 [background:linear-gradient(90deg,rgba(0,255,150,0.85)_0%,rgba(0,255,150,0.35)_22%,rgba(255,255,255,0.16)_55%,rgba(255,255,255,0.12)_100%)] [mask:linear-gradient(#000_0_0)_content-box,linear-gradient(#000_0_0)] [mask-composite:exclude] [webkit-mask:linear-gradient(#000_0_0)_content-box,linear-gradient(#000_0_0)] [webkit-mask-composite:xor]" />
+                      <div className="xcannes-sendchoice-border-fade-green" />
                       <div className="absolute left-0 top-0 bottom-0 w-px opacity-80 bg-[linear-gradient(to_bottom,transparent_0%,rgba(0,255,150,0.75)_22%,rgba(0,255,150,0.20)_60%,transparent_100%)]" />
                       <div className="absolute -left-[1px] top-0 bottom-0 w-[3px] blur-[1px] opacity-90 bg-[linear-gradient(to_bottom,transparent_0%,rgba(0,255,150,0.55)_24%,rgba(0,255,150,0.95)_48%,rgba(0,255,150,0.35)_62%,transparent_100%)]" />
                       <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[10px] h-[80px] blur-[2px] opacity-95 bg-[radial-gradient(12px_42px_at_0%_50%,rgba(0,255,150,0.95)_0%,rgba(0,255,150,0.35)_45%,transparent_75%)]" />
@@ -677,7 +677,7 @@ export default function WalletDashboardSendChoiceModal({
                   {/* ── 2. Payer une demande ── */}
                   <div className={`${cardClassName} xcannes-irregular-amber-border xcannes-sendchoice-accent-amber`}>
                     <div className="pointer-events-none absolute inset-0" aria-hidden>
-                      <div className="absolute inset-0 rounded-[inherit] p-px opacity-90 [background:linear-gradient(90deg,rgba(245,166,35,0.78)_0%,rgba(245,166,35,0.32)_22%,rgba(255,255,255,0.16)_55%,rgba(255,255,255,0.12)_100%)] [mask:linear-gradient(#000_0_0)_content-box,linear-gradient(#000_0_0)] [mask-composite:exclude] [webkit-mask:linear-gradient(#000_0_0)_content-box,linear-gradient(#000_0_0)] [webkit-mask-composite:xor]" />
+                      <div className="xcannes-sendchoice-border-fade-amber" />
                       <div className="absolute left-0 top-0 bottom-0 w-px opacity-80 bg-[linear-gradient(to_bottom,transparent_0%,rgba(245,166,35,0.70)_22%,rgba(245,166,35,0.18)_60%,transparent_100%)]" />
                       <div className="absolute -left-[1px] top-0 bottom-0 w-[3px] blur-[1px] opacity-90 bg-[linear-gradient(to_bottom,transparent_0%,rgba(245,166,35,0.45)_24%,rgba(245,166,35,0.90)_48%,rgba(245,166,35,0.32)_62%,transparent_100%)]" />
                       <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[10px] h-[80px] blur-[2px] opacity-95 bg-[radial-gradient(12px_42px_at_0%_50%,rgba(245,166,35,0.92)_0%,rgba(245,166,35,0.32)_45%,transparent_75%)]" />
