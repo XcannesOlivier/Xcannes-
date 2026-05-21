@@ -405,7 +405,7 @@ export default function WalletDashboardSendChoiceModal({
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="1.8"
+      strokeWidth="1.1"
       strokeLinecap="round"
       strokeLinejoin="round"
       className={className}
@@ -414,13 +414,23 @@ export default function WalletDashboardSendChoiceModal({
       {/* Chemin sinueux du parcours */}
       <path
         d="M4 19c2.5 0 3-3 1.5-4.5S3 12 4 10s3.5-1 5 0 3 2.5 5 1.5 2-3 1-4.5"
-        strokeDasharray="0.1 2.6"
+        strokeDasharray="0.1 2.4"
       />
       {/* Point de départ */}
-      <circle cx="4" cy="19" r="1.8" fill="currentColor" strokeWidth="0" />
-      {/* Drapeau d'arrivée */}
-      <path d="M15 5v8" />
-      <path d="M15 5h5l-1.2 2L20 9h-5" fill="currentColor" strokeWidth="0" />
+      <circle cx="4" cy="19" r="1.6" fill="currentColor" strokeWidth="0" />
+      <circle cx="4" cy="19" r="0.5" fill="#0b0f10" strokeWidth="0" />
+      {/* Mât du drapeau */}
+      <path d="M15 4.2v9.2" strokeWidth="1.2" />
+      <circle cx="15" cy="13.6" r="0.6" fill="currentColor" strokeWidth="0" />
+      {/* Drapeau ondulé avec détails */}
+      <path
+        d="M15 4.6c1.4-0.9 2.7 0.6 4.1-0.3 0.5-0.3 0.8-0.1 0.8 0.4v4.2c0 0.4-0.3 0.6-0.7 0.4-1.4-0.8-2.8 0.6-4.2-0.2"
+        fill="currentColor"
+        strokeWidth="0"
+      />
+      {/* Plis du drapeau */}
+      <path d="M17 4.6v4.4" stroke="#0b0f10" strokeWidth="0.5" opacity="0.45" />
+      <path d="M18.6 4.5v4.4" stroke="#0b0f10" strokeWidth="0.5" opacity="0.3" />
     </svg>
   );
 
@@ -783,7 +793,7 @@ export default function WalletDashboardSendChoiceModal({
 	                    >
                       <div className="absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-xcannes-green/45 to-transparent" aria-hidden />
                       <span className="inline-flex items-center gap-2">
-                        <OpenFlowIcon className="w-[20px] h-[20px] text-xcannes-green/85" />
+                        <OpenFlowIcon className="w-[26px] h-[26px] text-xcannes-green/85" />
                         <span className="text-white">{t('ui_open_flow', 'Ouvrir le parcours')}</span>
                       </span>
 	                      <svg className={`w-4 h-4 text-xcannes-green/85 transition-transform duration-200 ${flowSheet === 'simple' ? 'rotate-90' : 'rotate-0'}`} viewBox="0 0 24 24" fill="none" aria-hidden>
@@ -849,7 +859,7 @@ export default function WalletDashboardSendChoiceModal({
 	                    >
                       <div className="absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-[#f5a623]/40 to-transparent" aria-hidden />
                       <span className="inline-flex items-center gap-2">
-                        <OpenFlowIcon className="w-[20px] h-[20px] text-[#f5a623]/85" />
+                        <OpenFlowIcon className="w-[26px] h-[26px] text-[#f5a623]/85" />
                         <span className="text-white">{t('ui_open_flow', 'Ouvrir le parcours')}</span>
                       </span>
 	                      <svg className={`w-4 h-4 text-[#f5a623]/85 transition-transform duration-200 ${flowSheet === 'payreq' ? 'rotate-90' : 'rotate-0'}`} viewBox="0 0 24 24" fill="none" aria-hidden>
