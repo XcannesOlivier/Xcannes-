@@ -2049,7 +2049,7 @@ export default function WalletDashboardReceiveModal({
 
 	                    {/* ── Static wallet pill (style "Depuis le compte") ── */}
 	                    <div className="flex justify-center pt-1 pb-1">
-	                      <div className="inline-flex flex-col items-center gap-1 bg-elevated px-6 py-2 rounded-3xl shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]">
+	                      <div className="inline-flex flex-col items-center gap-1 bg-transparent px-6 py-2 rounded-3xl ring-1 ring-white/15 ring-inset">
 	                        <span className="text-white/70 text-[14px] md:text-[15px] font-medium tracking-wide">
 		                          {t('ui_receive_receiving_account_label', 'Compte de réception')}
 	                        </span>
