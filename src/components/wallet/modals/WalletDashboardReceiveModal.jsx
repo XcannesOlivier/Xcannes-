@@ -2119,14 +2119,14 @@ export default function WalletDashboardReceiveModal({
 					                        </div>
 
 					                        {/* ── Amount (standalone, centered) ── */}
-					                        <div className="text-center">
+					                        <div className="text-center -mt-2 md:mt-0">
 					                          <div className="text-white text-[40px] md:text-[48px] font-bold tracking-tight leading-none">
 					                            {requestDisplayAmountLabel}
 					                          </div>
 					                        </div>
 
 					                        {/* ── Details (date, message) ── */}
-					                        <div className="-mt-3 md:mt-0 flex flex-col gap-1 px-3 py-2 rounded-[14px] ring-1 ring-white/15 ring-inset">
+					                        <div className="-mt-5 md:mt-0 flex flex-col gap-1 px-3 py-2 rounded-[14px] bg-[#232829] ring-1 ring-white/15 ring-inset">
 					                          <div className="flex items-center justify-between">
 					                            <span className="text-[13px] text-white/70 font-medium">{t('ui_date_time_label', 'Date & Heure')}</span>
 					                            <span className="text-[13px] text-white/95 font-medium">
@@ -2223,8 +2223,8 @@ export default function WalletDashboardReceiveModal({
             ) : null}
             {/* Bottom bar – desktop only (visual balance) – Demande prête */}
             {receiveView === 'request_qr' ? (
-              <div className="hidden md:flex pointer-events-none justify-center pt-2 pb-4" aria-hidden>
-                <span className="block w-[120px] h-[4px] rounded-full bg-white/10" />
+              <div className="hidden md:flex pointer-events-none justify-center pt-2 pb-4 relative z-[5]" aria-hidden>
+                <span className="block w-[120px] h-[4px] rounded-full bg-white/30" />
               </div>
             ) : null}
           </div>
