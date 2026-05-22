@@ -1638,10 +1638,9 @@ export default function WalletDashboardReceiveModal({
 	                          await handleCopyQr(false);
 	                        }}
 	                        className={[
-	                          'w-full h-11 rounded-[20px] bg-[#101415] ring-1 ring-white/10 ring-inset text-white/85 text-xs font-semibold',
+	                          'w-full h-11 rounded-[20px] bg-[#101415] ring-1 ring-white/10 ring-inset text-white/85 text-xs font-semibold mt-6 md:mt-[50px]',
 	                          'shadow-[0_4px_12px_rgba(0,0,0,0.4)] hover:ring-white/20 hover:bg-white/[0.04] transition-all duration-[140ms] active:scale-[0.99]',
 	                        ].join(' ')}
-	                        style={{ marginTop: '50px' }}
 	                      >
 	                        {t('ui_copy_address', 'Copier l’adresse')}
 	                      </button>
@@ -1651,8 +1650,8 @@ export default function WalletDashboardReceiveModal({
 	                          e.stopPropagation();
 	                          await handleShareQr(false);
 	                        }}
-                          className="w-full h-11 rounded-[20px] bg-[#101415] text-white text-[17px] font-bold tracking-wide py-2 px-6 transition-all duration-[140ms] inline-flex items-center justify-center gap-2.5 hover:bg-white/[0.04] scale-[1.04] active:scale-[0.98]"
-                          style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(255,255,255,0.10), inset 0 1px 0 rgba(255,255,255,0.06), inset 0 -8px 16px rgba(0,0,0,0.25)', marginTop: '50px' }}
+                          className="w-full h-11 rounded-[20px] bg-[#101415] text-white text-[17px] font-bold tracking-wide py-2 px-6 transition-all duration-[140ms] inline-flex items-center justify-center gap-2.5 hover:bg-white/[0.04] scale-[1.04] active:scale-[0.98] mt-6 md:mt-[50px]"
+                          style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(255,255,255,0.10), inset 0 1px 0 rgba(255,255,255,0.06), inset 0 -8px 16px rgba(0,0,0,0.25)' }}
 	                      >
 	                        <ShareIcon className="w-5 h-5" />
 	                        <span>{shareActionLabel}</span>
@@ -2127,7 +2126,7 @@ export default function WalletDashboardReceiveModal({
 					                        </div>
 
 					                        {/* ── Details (date, message) ── */}
-					                        <div className="flex flex-col gap-1 px-3 py-2 rounded-[14px] ring-1 ring-white/15 ring-inset">
+					                        <div className="-mt-3 md:mt-0 flex flex-col gap-1 px-3 py-2 rounded-[14px] ring-1 ring-white/15 ring-inset">
 					                          <div className="flex items-center justify-between">
 					                            <span className="text-[13px] text-white/70 font-medium">{t('ui_date_time_label', 'Date & Heure')}</span>
 					                            <span className="text-[13px] text-white/95 font-medium">
