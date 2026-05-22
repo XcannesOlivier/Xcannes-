@@ -1210,13 +1210,13 @@ export default function WalletDashboardReceiveModal({
             <div className="pointer-events-none absolute inset-0" aria-hidden>
               {!hasGeneratedRequest ? (
                 <>
-                  <div className="absolute inset-0 md:hidden bg-[radial-gradient(700px_circle_at_100%_50%,rgba(245,166,35,0.07),transparent_60%)]" />
-                  <div className="absolute inset-0 hidden md:block bg-[radial-gradient(1000px_circle_at_100%_50%,rgba(245,166,35,0.07),transparent_60%)]" />
+                  <div className="absolute inset-0 md:hidden bg-[radial-gradient(700px_circle_at_100%_50%,rgba(245,166,35,0.18),transparent_60%)]" />
+                  <div className="absolute inset-0 hidden md:block bg-[radial-gradient(1000px_circle_at_100%_50%,rgba(245,166,35,0.18),transparent_60%)]" />
                 </>
               ) : (
                 <>
-                  <div className="absolute inset-0 md:hidden bg-[radial-gradient(900px_circle_at_100%_75%,rgba(245,166,35,0.06),transparent_60%)]" />
-                  <div className="absolute inset-0 hidden md:block bg-[radial-gradient(1300px_circle_at_100%_75%,rgba(245,166,35,0.06),transparent_60%)]" />
+                  <div className="absolute inset-0 md:hidden bg-[radial-gradient(900px_circle_at_100%_75%,rgba(245,166,35,0.16),transparent_60%)]" />
+                  <div className="absolute inset-0 hidden md:block bg-[radial-gradient(1300px_circle_at_100%_75%,rgba(245,166,35,0.16),transparent_60%)]" />
                 </>
               )}
             </div>
@@ -2036,9 +2036,9 @@ export default function WalletDashboardReceiveModal({
 	                  {/* Glow ambre — vue request_qr (Demande générée) */}
 	                  <div className="pointer-events-none absolute inset-0 z-[-1]" aria-hidden>
 	                    <div className="absolute inset-0 bg-[radial-gradient(400px_circle_at_88%_0%,rgba(255,255,255,0.07),transparent_50%)]" />
-	                    <div className="absolute inset-0 md:hidden bg-[radial-gradient(900px_circle_at_100%_75%,rgba(245,166,35,0.06),transparent_60%)]" />
-	                    <div className="absolute inset-0 hidden md:block bg-[radial-gradient(1300px_circle_at_100%_75%,rgba(245,166,35,0.06),transparent_60%)]" />
-	                    <div className="absolute inset-0 bg-[radial-gradient(700px_circle_at_0%_100%,rgba(245,166,35,0.04),transparent_65%)]" />
+	                    <div className="absolute inset-0 md:hidden bg-[radial-gradient(900px_circle_at_100%_75%,rgba(245,166,35,0.16),transparent_60%)]" />
+	                    <div className="absolute inset-0 hidden md:block bg-[radial-gradient(1300px_circle_at_100%_75%,rgba(245,166,35,0.16),transparent_60%)]" />
+	                    <div className="absolute inset-0 bg-[radial-gradient(700px_circle_at_0%_100%,rgba(245,166,35,0.10),transparent_65%)]" />
 	                  </div>
 		                  {/* SECTION 3 — REQUEST QR */}
 		                  <div className="space-y-5 pt-2 relative z-[2]">
