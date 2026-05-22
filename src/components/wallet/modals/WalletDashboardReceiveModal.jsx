@@ -1653,7 +1653,7 @@ export default function WalletDashboardReceiveModal({
                             <button
                               type="button"
                               onClick={hasMultipleWallets ? () => setRequestWalletDropdownOpen((prev) => !prev) : undefined}
-                              className={`relative flex w-fit flex-col items-center gap-1 bg-elevated px-6 py-2 ${requestWalletDropdownOpen ? accountDropdownOpenPillClassName : 'rounded-3xl'} ${requestCurrencyDropdownOpen ? 'shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_10px_rgba(255,255,255,0.16)]' : 'shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]'} ${requestWalletDropdownOpen ? 'shadow-[0_4px_12px_rgba(0,0,0,0.45)]' : ''} ${requestCurrencyDropdownOpen ? 'ring-1 ring-white/20 ring-inset' : ''} ${hasMultipleWallets ? 'cursor-pointer' : ''}`}
+                              className={`relative flex w-fit flex-col items-center gap-1 bg-transparent px-6 py-2 ${requestWalletDropdownOpen ? accountDropdownOpenPillClassName : 'rounded-3xl'} ring-1 ring-white/15 ring-inset ${hasMultipleWallets ? 'cursor-pointer' : ''}`}
                               aria-haspopup={hasMultipleWallets ? 'menu' : undefined}
                               aria-expanded={hasMultipleWallets ? requestWalletDropdownOpen : undefined}
                             >
