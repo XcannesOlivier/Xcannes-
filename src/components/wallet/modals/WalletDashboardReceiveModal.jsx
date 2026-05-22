@@ -2102,10 +2102,10 @@ export default function WalletDashboardReceiveModal({
 					                        </div>
 
 					                        {/* ── Details (date, message) ── */}
-					                        <div className="flex flex-col gap-1 px-1">
+					                        <div className="flex flex-col gap-1 px-3 py-2 rounded-[14px] ring-1 ring-white/15 ring-inset">
 					                          <div className="flex items-center justify-between">
-					                            <span className="text-[13px] text-white/40 font-medium">{t('ui_date_time_label', 'Date & Heure')}</span>
-					                            <span className="text-[13px] text-white/60 font-medium">
+					                            <span className="text-[13px] text-white/70 font-medium">{t('ui_date_time_label', 'Date & Heure')}</span>
+					                            <span className="text-[13px] text-white/95 font-medium">
 					                              {requestDateParts.date && requestDateParts.time
 					                                ? `${requestDateParts.date} · ${requestDateParts.time}`
 					                                : requestDateLabel || '—'}
@@ -2113,8 +2113,8 @@ export default function WalletDashboardReceiveModal({
 					                          </div>
 					                          {generatedRequest?.memo ? (
 					                            <div className="flex items-center justify-between">
-				                              <span className="text-[13px] text-white/40 font-medium">{t('ui_memo_label', 'Motif')}</span>
-					                              <span className="text-[13px] text-white/60 font-medium">
+				                              <span className="text-[13px] text-white/70 font-medium">{t('ui_memo_label', 'Motif')}</span>
+					                              <span className="text-[13px] text-white/95 font-medium">
 					                                {generatedRequest.memo}
 					                              </span>
 					                            </div>
