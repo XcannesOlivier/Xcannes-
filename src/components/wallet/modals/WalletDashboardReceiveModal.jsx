@@ -2119,14 +2119,14 @@ export default function WalletDashboardReceiveModal({
 					                        </div>
 
 					                        {/* ── Amount (standalone, centered) ── */}
-					                        <div className="text-center !-mt-2 md:!mt-0">
+					                        <div className="text-center !mt-2 md:!mt-5">
 					                          <div className="text-white text-[40px] md:text-[48px] font-bold tracking-tight leading-none">
 					                            {requestDisplayAmountLabel}
 					                          </div>
 					                        </div>
 
 					                        {/* ── Details (date, message) ── */}
-					                        <div className="!-mt-5 md:!mt-0 flex flex-col gap-1 px-3 py-2 rounded-[14px] bg-[#232829] ring-1 ring-white/15 ring-inset">
+					                        <div className="!mt-1.5 md:!mt-5 flex flex-col gap-1 px-3 py-2 rounded-[14px] bg-[#232829] ring-1 ring-white/15 ring-inset">
 					                          <div className="flex items-center justify-between">
 					                            <span className="text-[13px] text-white/70 font-medium">{t('ui_date_time_label', 'Date & Heure')}</span>
 					                            <span className="text-[13px] text-white/95 font-medium">
