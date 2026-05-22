@@ -1210,13 +1210,13 @@ export default function WalletDashboardReceiveModal({
             <div className="pointer-events-none absolute inset-0" aria-hidden>
               {!hasGeneratedRequest ? (
                 <>
-                  <div className="absolute inset-0 md:hidden bg-[radial-gradient(700px_circle_at_100%_50%,rgba(0,255,150,0.07),transparent_60%)]" />
-                  <div className="absolute inset-0 hidden md:block bg-[radial-gradient(1000px_circle_at_100%_50%,rgba(0,255,150,0.07),transparent_60%)]" />
+                  <div className="absolute inset-0 md:hidden bg-[radial-gradient(700px_circle_at_100%_50%,rgba(245,166,35,0.07),transparent_60%)]" />
+                  <div className="absolute inset-0 hidden md:block bg-[radial-gradient(1000px_circle_at_100%_50%,rgba(245,166,35,0.07),transparent_60%)]" />
                 </>
               ) : (
                 <>
-                  <div className="absolute inset-0 md:hidden bg-[radial-gradient(900px_circle_at_100%_75%,rgba(0,255,150,0.06),transparent_60%)]" />
-                  <div className="absolute inset-0 hidden md:block bg-[radial-gradient(1300px_circle_at_100%_75%,rgba(0,255,150,0.06),transparent_60%)]" />
+                  <div className="absolute inset-0 md:hidden bg-[radial-gradient(900px_circle_at_100%_75%,rgba(245,166,35,0.06),transparent_60%)]" />
+                  <div className="absolute inset-0 hidden md:block bg-[radial-gradient(1300px_circle_at_100%_75%,rgba(245,166,35,0.06),transparent_60%)]" />
                 </>
               )}
             </div>
@@ -1657,7 +1657,7 @@ export default function WalletDashboardReceiveModal({
 		                            {t('ui_receive_receiving_account_label', 'Compte de réception')}
 	                          </span>
 	                          <div className="flex items-center gap-2">
-	                            <span className="h-3 w-3 rounded-full bg-xcannes-green ring-4 ring-xcannes-green/20 shrink-0 animate-pulse" aria-hidden />
+	                            <span className="h-3 w-3 rounded-full bg-[#f5a623] ring-4 ring-[#f5a623]/20 shrink-0 animate-pulse" aria-hidden />
 	                            <span className="text-white/95 text-[14px] md:text-[15px] font-semibold">
 	                              {activeWalletLabel || t('nav_wallet', 'Wallet')}
 	                            </span>
@@ -1991,12 +1991,12 @@ export default function WalletDashboardReceiveModal({
                           className={[
                             'w-full h-14 rounded-[20px] text-lg font-semibold transition-all duration-200 tracking-[-0.01em]',
                             generateButtonDisabled
-                              ? 'bg-xcannes-green/[0.07] text-xcannes-green/60 cursor-not-allowed ring-[0.5px] ring-xcannes-green/40 ring-inset'
+                              ? 'bg-[#f5a623]/[0.07] text-[#f5a623]/60 cursor-not-allowed ring-[0.5px] ring-[#f5a623]/40 ring-inset'
                               : 'text-white hover:scale-[1.01] active:scale-[0.98]',
                           ].join(' ')}
                           style={generateButtonDisabled
                             ? undefined
-                            : { background: 'linear-gradient(180deg, rgba(34,154,86,1) 0%, rgba(14,103,58,1) 100%)', boxShadow: '0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)' }}
+                            : { background: 'linear-gradient(180deg, #f5a623 0%, #d98c0f 100%)', boxShadow: '0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)' }}
                         >
                           {generateButtonDisabled
                             ? <span className="inline-flex items-center gap-1.5 text-white/20">
@@ -2033,12 +2033,12 @@ export default function WalletDashboardReceiveModal({
 
 	              {receiveView === 'request_qr' ? (
 	                <>
-	                  {/* Glow vert — vue request_qr (Demande générée) */}
+	                  {/* Glow ambre — vue request_qr (Demande générée) */}
 	                  <div className="pointer-events-none absolute inset-0 z-[-1]" aria-hidden>
 	                    <div className="absolute inset-0 bg-[radial-gradient(400px_circle_at_88%_0%,rgba(255,255,255,0.07),transparent_50%)]" />
-	                    <div className="absolute inset-0 md:hidden bg-[radial-gradient(900px_circle_at_100%_75%,rgba(0,255,150,0.06),transparent_60%)]" />
-	                    <div className="absolute inset-0 hidden md:block bg-[radial-gradient(1300px_circle_at_100%_75%,rgba(0,255,150,0.06),transparent_60%)]" />
-	                    <div className="absolute inset-0 bg-[radial-gradient(700px_circle_at_0%_100%,rgba(0,255,150,0.04),transparent_65%)]" />
+	                    <div className="absolute inset-0 md:hidden bg-[radial-gradient(900px_circle_at_100%_75%,rgba(245,166,35,0.06),transparent_60%)]" />
+	                    <div className="absolute inset-0 hidden md:block bg-[radial-gradient(1300px_circle_at_100%_75%,rgba(245,166,35,0.06),transparent_60%)]" />
+	                    <div className="absolute inset-0 bg-[radial-gradient(700px_circle_at_0%_100%,rgba(245,166,35,0.04),transparent_65%)]" />
 	                  </div>
 		                  {/* SECTION 3 — REQUEST QR */}
 		                  <div className="space-y-5 pt-2 relative z-[2]">
@@ -2050,7 +2050,7 @@ export default function WalletDashboardReceiveModal({
 		                          {t('ui_receive_receiving_account_label', 'Compte de réception')}
 	                        </span>
 	                        <div className="flex items-center gap-2">
-	                          <span className="h-3 w-3 rounded-full bg-xcannes-green ring-4 ring-xcannes-green/20 shrink-0 animate-pulse" aria-hidden />
+	                          <span className="h-3 w-3 rounded-full bg-[#f5a623] ring-4 ring-[#f5a623]/20 shrink-0 animate-pulse" aria-hidden />
 	                          <span className="text-white/95 text-[14px] md:text-[15px] font-semibold">
 	                            {activeWalletLabel || t('nav_wallet', 'Wallet')}
 	                          </span>
