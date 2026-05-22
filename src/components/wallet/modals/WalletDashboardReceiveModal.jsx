@@ -1338,6 +1338,8 @@ export default function WalletDashboardReceiveModal({
                 <>
                   {/* Glow vert — vue share (Coordonnées de réception) */}
                   <div className="pointer-events-none absolute inset-0 z-[-1]" aria-hidden>
+                    <div className="absolute inset-0 md:hidden bg-[radial-gradient(700px_circle_at_100%_50%,rgba(0,255,150,0.07),transparent_60%)]" />
+                    <div className="absolute inset-0 hidden md:block bg-[radial-gradient(1000px_circle_at_100%_50%,rgba(0,255,150,0.07),transparent_60%)]" />
                     <div className="absolute inset-0 md:hidden bg-[radial-gradient(900px_circle_at_100%_75%,rgba(0,255,150,0.06),transparent_60%)]" />
                     <div className="absolute inset-0 hidden md:block bg-[radial-gradient(1300px_circle_at_100%_75%,rgba(0,255,150,0.06),transparent_60%)]" />
                     <div className="absolute inset-0 bg-[radial-gradient(700px_circle_at_0%_100%,rgba(0,255,150,0.04),transparent_65%)]" />
@@ -1352,7 +1354,7 @@ export default function WalletDashboardReceiveModal({
                           <button
                             type="button"
                             onClick={hasMultipleWallets ? () => setShareWalletDropdownOpen((prev) => !prev) : undefined}
-                            className={`relative flex w-fit flex-col items-center gap-1 bg-elevated px-6 py-2 ${shareWalletDropdownOpen ? accountDropdownOpenPillClassName : 'rounded-3xl'} ${shareWalletDropdownOpen ? 'shadow-[0_4px_12px_rgba(0,0,0,0.45)]' : 'shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]'} ${hasMultipleWallets ? 'cursor-pointer' : ''}`}
+                            className={`relative flex w-fit flex-col items-center gap-1 bg-white/5 backdrop-blur-sm px-6 py-2 ${shareWalletDropdownOpen ? accountDropdownOpenPillClassName : 'rounded-3xl'} ring-1 ring-white/15 ring-inset ${hasMultipleWallets ? 'cursor-pointer' : ''}`}
                             aria-haspopup={hasMultipleWallets ? 'menu' : undefined}
                             aria-expanded={hasMultipleWallets ? shareWalletDropdownOpen : undefined}
                           >
