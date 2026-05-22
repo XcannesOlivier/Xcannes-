@@ -1354,7 +1354,7 @@ export default function WalletDashboardReceiveModal({
                           <button
                             type="button"
                             onClick={hasMultipleWallets ? () => setShareWalletDropdownOpen((prev) => !prev) : undefined}
-                            className={`relative flex w-fit flex-col items-center gap-1 bg-white/5 backdrop-blur-sm px-6 py-2 ${shareWalletDropdownOpen ? accountDropdownOpenPillClassName : 'rounded-3xl'} ring-1 ring-white/15 ring-inset ${hasMultipleWallets ? 'cursor-pointer' : ''}`}
+                            className={`relative flex w-fit flex-col items-center gap-1 bg-transparent px-6 py-2 ${shareWalletDropdownOpen ? accountDropdownOpenPillClassName : 'rounded-3xl'} ring-1 ring-white/15 ring-inset ${hasMultipleWallets ? 'cursor-pointer' : ''}`}
                             aria-haspopup={hasMultipleWallets ? 'menu' : undefined}
                             aria-expanded={hasMultipleWallets ? shareWalletDropdownOpen : undefined}
                           >
