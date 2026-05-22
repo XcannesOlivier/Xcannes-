@@ -1995,16 +1995,21 @@ export default function WalletDashboardReceiveModal({
                           className={[
                             'w-full h-14 rounded-[20px] text-lg font-semibold transition-all duration-200 tracking-[-0.01em]',
                             generateButtonDisabled
-                              ? 'bg-[#f5a623]/[0.07] text-[#f5a623]/60 cursor-not-allowed ring-[0.5px] ring-[#f5a623]/40 ring-inset'
+                              ? 'text-white/90 cursor-not-allowed ring-[0.5px] ring-[#f5a623]/30 ring-inset'
                               : 'text-white hover:scale-[1.01] active:scale-[0.98]',
                           ].join(' ')}
-                          style={generateButtonDisabled
-                            ? undefined
-                            : { background: 'linear-gradient(180deg, #f5a623 0%, #d98c0f 100%)', boxShadow: '0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)' }}
+                          style={{
+                            background: generateButtonDisabled
+                              ? 'linear-gradient(180deg, rgba(245,166,35,0.34) 0%, rgba(217,140,15,0.34) 100%)'
+                              : 'linear-gradient(180deg, #f5a623 0%, #d98c0f 100%)',
+                            boxShadow: generateButtonDisabled
+                              ? '0 12px 24px rgba(0,0,0,0.44), 0 5px 12px rgba(0,0,0,0.24), inset 0 1px 0 rgba(255,255,255,0.12), inset 0 -10px 16px rgba(0,0,0,0.24)'
+                              : '0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)',
+                          }}
                         >
                           {generateButtonDisabled
-                            ? <span className="inline-flex items-center gap-1.5 text-white/20">
-                                <span className="text-xs">{t('ui_complete_request_cta', 'Compléter votre demande')}</span>
+                            ? <span className="inline-flex items-center gap-1.5 text-white/85">
+                                <span className="text-[14px] md:text-[16px]">{t('ui_complete_request_cta', 'Compléter votre demande')}</span>
                                 <span className="inline-flex items-end gap-[3px] mb-[-1px]">
                                   <span className="receive-req-dot" style={{ animationDelay: '0s' }}>·</span>
                                   <span className="receive-req-dot" style={{ animationDelay: '0.6s' }}>·</span>
