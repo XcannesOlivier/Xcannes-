@@ -782,6 +782,47 @@ body.header-hero-mode .home-content-wrapper {
   );
 }
 
+/* ── Bottom-sheet fade border (themed, strongest at top) ── */
+.xcannes-sheet-fade-border-green,
+.xcannes-sheet-fade-border-orange {
+  position: relative;
+}
+.xcannes-sheet-fade-border-green::after,
+.xcannes-sheet-fade-border-orange::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  z-index: 30;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 0.85) 18%,
+    rgba(0, 0, 0, 0.5) 45%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 0.85) 18%,
+    rgba(0, 0, 0, 0.5) 45%,
+    rgba(0, 0, 0, 0) 100%
+  );
+}
+.xcannes-sheet-fade-border-green::after {
+  border: 1px solid rgba(0, 255, 150, 0.55);
+  box-shadow:
+    inset 0 1px 0 rgba(0, 255, 150, 0.25),
+    0 0 24px rgba(0, 255, 150, 0.18);
+}
+.xcannes-sheet-fade-border-orange::after {
+  border: 1px solid rgba(245, 166, 35, 0.6);
+  box-shadow:
+    inset 0 1px 0 rgba(245, 166, 35, 0.28),
+    0 0 24px rgba(245, 166, 35, 0.18);
+}
+
 /* ── Thin irregular green border (for select-like inputs) ── */
 .xcannes-irregular-green-border {
   /* Do not set `position` here, to avoid overriding Tailwind `absolute`/`relative`. */

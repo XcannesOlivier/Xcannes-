@@ -932,7 +932,7 @@ export default function WalletDashboardSendChoiceModal({
           <div className={inline ? 'w-full h-full' : 'relative z-10 pointer-events-auto w-full md:max-w-lg wallet-modal-lift-in'} style={!inline ? { boxShadow: '8px 16px 48px rgba(255,255,255,0.07), 0 0 0 1px rgba(255,255,255,0.06)' } : undefined}>
             <div
               ref={subModalRef}
-              className={inline ? 'relative w-full h-full overflow-hidden flex flex-col bg-elevated rounded-xl' : 'relative w-full wallet-modal-panel wallet-cash-modal border-white/10 md:border overflow-hidden flex flex-col bg-elevated h-screen md:h-auto md:max-h-[80vh] rounded-none md:rounded-2xl pb-[env(safe-area-inset-bottom)]'}
+              className={inline ? 'relative w-full h-full overflow-hidden flex flex-col bg-elevated rounded-xl xcannes-sheet-fade-border-green' : 'relative w-full wallet-modal-panel wallet-cash-modal overflow-hidden flex flex-col bg-elevated h-screen md:h-auto md:max-h-[80vh] rounded-none md:rounded-2xl pb-[env(safe-area-inset-bottom)] xcannes-sheet-fade-border-green'}
               style={!inline && overlayTranslateY ? { transform: `translateY(${Math.max(0, overlayTranslateY)}px)`, transition: overlayDragging ? 'none' : 'transform 220ms cubic-bezier(0.2,0,0,1)', opacity: Math.max(0, Math.min(1, 1 - overlayTranslateY / 420)) } : undefined}
               onPointerDown={handleSubModalPillDown}
             >
@@ -958,7 +958,7 @@ export default function WalletDashboardSendChoiceModal({
                     <span className="block w-36 h-1.5 rounded-full bg-white/80" />
                   </div>
                 ) : null}
-                <div className="px-5 pt-[30px] md:pt-[60px] pb-5 flex flex-col flex-1 min-h-0 overflow-y-auto overscroll-contain">
+                <div className="px-5 pt-[30px] md:pt-[60px] pb-10 md:pb-12 flex flex-col flex-1 min-h-0 overflow-y-auto overscroll-contain">
                 {/* Title + subtitle (centered) */}
                 <div className="flex flex-col items-center text-center mb-[40px]">
                   <h3 className="mt-1 text-[28px] md:text-[32px] font-semibold text-white/95 tracking-tight">
@@ -989,8 +989,8 @@ export default function WalletDashboardSendChoiceModal({
 	                  </div>
                 </div>
 
-                <div className="rounded-[26px] bg-[#0b0f10]/40 ring-1 ring-white/10 ring-inset shadow-[inset_0_1px_0_rgba(255,255,255,0.05),inset_0_-26px_46px_rgba(0,0,0,0.55)] p-3 md:p-4">
-                  <div className="flex flex-col gap-3">
+                <div className="rounded-[26px] bg-[#0b0f10]/40 ring-1 ring-white/10 ring-inset shadow-[inset_0_1px_0_rgba(255,255,255,0.05),inset_0_-26px_46px_rgba(0,0,0,0.55)] p-4 md:p-5">
+                  <div className="flex flex-col gap-4 md:gap-5">
 
                   {/* 4. Choisir un contact */}
                   <div className="relative" ref={quickscanSavedPickerRef}>
@@ -1278,7 +1278,7 @@ export default function WalletDashboardSendChoiceModal({
                   </div>
                 </div>
 
-                <div className={pendingDestination.address ? 'pt-0' : 'pt-6 md:pt-12'}>
+                <div className={pendingDestination.address ? 'pt-0 md:pt-6' : 'pt-6 md:pt-12'}>
                   {pendingDestination.address ? (() => {
                     const addr = String(pendingDestination.address || '').trim();
                     const label = String(pendingDestination.label || '').trim();
@@ -1365,7 +1365,7 @@ export default function WalletDashboardSendChoiceModal({
           {!inline ? <div className="fixed inset-0 bg-black/70 md:backdrop-blur-sm pointer-events-auto wallet-modal-backdrop-in" onClick={() => setSubModal(null)} style={overlayTranslateY > 0 ? { opacity: Math.max(0, 1 - overlayTranslateY / 420) } : undefined} /> : null}
           <div className={inline ? 'w-full h-full' : 'relative z-10 pointer-events-auto w-full md:max-w-lg wallet-modal-lift-in'} style={!inline ? { boxShadow: '8px 16px 48px rgba(255,255,255,0.07), 0 0 0 1px rgba(255,255,255,0.06)' } : undefined}>
             <div
-              className={inline ? 'relative w-full h-full overflow-hidden flex flex-col bg-elevated rounded-xl' : 'relative w-full wallet-modal-panel wallet-cash-modal border-white/10 md:border overflow-hidden flex flex-col bg-elevated h-screen md:h-auto md:max-h-[80vh] rounded-none md:rounded-2xl pb-[env(safe-area-inset-bottom)]'}
+              className={inline ? 'relative w-full h-full overflow-hidden flex flex-col bg-elevated rounded-xl xcannes-sheet-fade-border-orange' : 'relative w-full wallet-modal-panel wallet-cash-modal overflow-hidden flex flex-col bg-elevated h-screen md:h-auto md:max-h-[80vh] rounded-none md:rounded-2xl pb-[env(safe-area-inset-bottom)] xcannes-sheet-fade-border-orange'}
               style={!inline && overlayTranslateY ? { transform: `translateY(${Math.max(0, overlayTranslateY)}px)`, transition: overlayDragging ? 'none' : 'transform 220ms cubic-bezier(0.2,0,0,1)', opacity: Math.max(0, Math.min(1, 1 - overlayTranslateY / 420)) } : undefined}
               onPointerDown={handleSubModalPillDown}
             >
@@ -1391,7 +1391,7 @@ export default function WalletDashboardSendChoiceModal({
 		                    <span className="block w-36 h-1.5 rounded-full bg-white/80" />
 		                  </div>
 		                ) : null}
-		                <div className="px-5 pt-[70px] md:pt-[90px] pb-5 flex flex-col flex-1 min-h-0 overflow-y-auto overscroll-contain">
+		                <div className="px-5 pt-[70px] md:pt-[90px] pb-10 md:pb-12 flex flex-col flex-1 min-h-0 overflow-y-auto overscroll-contain">
 		                {/* Title + subtitle (centered) */}
 		                <div className="flex flex-col items-center text-center mb-[40px]">
                   <h3 className="mt-1 text-[28px] md:text-[32px] font-semibold text-white/95 tracking-tight">
@@ -1412,8 +1412,8 @@ export default function WalletDashboardSendChoiceModal({
 		                  </div>
                 </div>
 
-	                <div className="rounded-[26px] bg-[#0b0f10]/40 ring-1 ring-white/10 ring-inset shadow-[inset_0_1px_0_rgba(255,255,255,0.05),inset_0_-26px_46px_rgba(0,0,0,0.55)] p-3 md:p-4">
-	                  <div className="flex flex-col gap-3">
+	                <div className="rounded-[26px] bg-[#0b0f10]/40 ring-1 ring-white/10 ring-inset shadow-[inset_0_1px_0_rgba(255,255,255,0.05),inset_0_-26px_46px_rgba(0,0,0,0.55)] p-4 md:p-5">
+	                  <div className="flex flex-col gap-4 md:gap-5">
 
                   {/* 1. Scanner un QR code */}
                   <button

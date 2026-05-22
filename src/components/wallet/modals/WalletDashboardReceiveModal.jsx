@@ -1126,8 +1126,8 @@ export default function WalletDashboardReceiveModal({
   const choiceCardBaseClassName =
     // Match the "CashChoice" action button background (wallet-actions.css).
     'relative w-full text-left rounded-[20px] px-4 py-[18px] bg-white/[0.02] hover:bg-white/[0.05] active:bg-white/[0.03] ring-1 ring-white/10 ring-inset shadow-[0_8px_26px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-22px_34px_rgba(0,0,0,0.68)] transition-all duration-[140ms] ease-[cubic-bezier(0.4,0,0.2,1)] hover:ring-white/20 hover:-translate-y-px active:translate-y-0 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-xcannes-green/60';
-  const choiceCardGreenClassName = choiceCardBaseClassName;
-  const choiceCardNeutralClassName = choiceCardBaseClassName;
+  const choiceCardGreenClassName = `${choiceCardBaseClassName} xcannes-sheet-fade-border-green`;
+  const choiceCardNeutralClassName = `${choiceCardBaseClassName} xcannes-sheet-fade-border-orange`;
 
   const content = (
     <>
@@ -1272,7 +1272,7 @@ export default function WalletDashboardReceiveModal({
                     </p>
                   </div>
 
-                  <div className="flex-1 min-h-0 flex flex-col justify-center gap-5 pt-[10px] pb-6">
+                  <div className="flex-1 min-h-0 flex flex-col justify-center gap-8 md:gap-10 pt-[10px] pb-6">
                     <button
                       type="button"
                       className={choiceCardGreenClassName}
@@ -1282,7 +1282,7 @@ export default function WalletDashboardReceiveModal({
                       }}
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-13 h-13 rounded-[16px] bg-transparent flex items-center justify-center flex-shrink-0 text-white/90">
+                        <div className="w-13 h-13 rounded-[16px] bg-transparent flex items-center justify-center flex-shrink-0 text-xcannes-green">
                           <ShareAddressIcon className="w-12 h-12" />
                         </div>
                         <div className="flex-1 min-w-0">
@@ -1290,7 +1290,10 @@ export default function WalletDashboardReceiveModal({
                             <div className="text-[18px] md:text-[19px] font-semibold text-white truncate">
                               {t('ui_receive_choice_share_title', 'Partager votre adresse')}
                             </div>
-                            <ChevronRightIcon className="w-5 h-5 text-white/45" />
+                            <svg className="w-7 h-7 md:w-8 md:h-8 text-xcannes-green/90 flex-shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden>
+                              <path d="M7 18L13 12L7 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                              <path d="M13 18L19 12L13 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
                           </div>
                           <div className="mt-1 text-[15px] md:text-sm leading-snug text-white/60">
                             {t(
@@ -1311,7 +1314,7 @@ export default function WalletDashboardReceiveModal({
                       }}
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-11 h-11 rounded-[16px] bg-transparent flex items-center justify-center flex-shrink-0 text-white/85">
+                        <div className="w-11 h-11 rounded-[16px] bg-transparent flex items-center justify-center flex-shrink-0 text-[#f5a623]">
                           <RequestIcon className="w-11 h-11" />
                         </div>
                         <div className="flex-1 min-w-0">
@@ -1319,7 +1322,10 @@ export default function WalletDashboardReceiveModal({
                             <div className="text-[18px] md:text-[19px] font-semibold text-white truncate">
                               {t('ui_receive_choice_request_title', 'Demander un paiement')}
                             </div>
-                            <ChevronRightIcon className="w-5 h-5 text-white/45" />
+                            <svg className="w-7 h-7 md:w-8 md:h-8 text-[#f5a623]/90 flex-shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden>
+                              <path d="M7 18L13 12L7 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                              <path d="M13 18L19 12L13 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
                           </div>
                           <div className="mt-1 text-[15px] md:text-sm leading-snug text-white/60">
                             {t(
@@ -2196,8 +2202,14 @@ export default function WalletDashboardReceiveModal({
                 <span className="block w-36 h-1.5 rounded-full bg-white/80" />
               </div>
             ) : null}
-            {/* Bottom bar – desktop only (visual balance) – Votre adresse de compte / Demande prête */}
-            {receiveView === 'share' || receiveView === 'request_qr' ? (
+            {/* Bottom bar – desktop only (visual balance) – Votre adresse de compte */}
+            {receiveView === 'share' ? (
+              <div className="hidden md:flex pointer-events-none justify-center pt-6 pb-2" aria-hidden>
+                <span className="block w-[120px] h-[4px] rounded-full bg-white/10" />
+              </div>
+            ) : null}
+            {/* Bottom bar – desktop only (visual balance) – Demande prête */}
+            {receiveView === 'request_qr' ? (
               <div className="hidden md:flex pointer-events-none justify-center pt-2 pb-4" aria-hidden>
                 <span className="block w-[120px] h-[4px] rounded-full bg-white/10" />
               </div>
