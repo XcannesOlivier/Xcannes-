@@ -107,19 +107,33 @@ const ShareAddressIcon = ({ className = '' }) => (
 
 const RequestIcon = ({ className = '' }) => (
   <svg
-    viewBox="0 0 24 24"
+    viewBox="0 0 512 512"
     fill="none"
     stroke="currentColor"
-    strokeWidth="0.9"
-    strokeLinecap="round"
-    strokeLinejoin="round"
     className={className}
     aria-hidden="true"
   >
-    <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7l-5-5Z" />
-    <path d="M15 2v5h5" />
-    <path d="M12 10v6" />
-    <path d="M10 11.5c0-.83.67-1.5 2-1.5s2 .67 2 1.5-.9 1.3-2 1.5c-1.1.2-2 .67-2 1.5 0 .83.67 1.5 2 1.5s2-.67 2-1.5" />
+    {/* Speech bubble — a payment "ask" */}
+    <path
+      d="M96 132 q0 -40 40 -40 h240 q40 0 40 40 v160 q0 40 -40 40 H236 l-72 72 v-72 h-28 q-40 0 -40 -40 Z"
+      strokeWidth="3.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    {/* Dollar sign inside bubble (thick) */}
+    <line x1="256" y1="130" x2="256" y2="298" strokeWidth="14" strokeLinecap="round" />
+    <path
+      d="M302 168 q-16 -22 -46 -22 q-40 0 -40 34 q0 28 40 34 q40 6 40 36 q0 34 -40 34 q-30 0 -48 -22"
+      strokeWidth="14"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    {/* Small accent network — like share icon */}
+    <circle cx="430" cy="380" r="14" strokeWidth="14" />
+    <circle cx="378" cy="432" r="10" strokeWidth="14" />
+    <circle cx="452" cy="442" r="6" strokeWidth="14" />
+    <line x1="420" y1="392" x2="386" y2="424" strokeWidth="3.5" strokeLinecap="round" />
+    <line x1="438" y1="392" x2="448" y2="430" strokeWidth="3.5" strokeLinecap="round" />
   </svg>
 );
 
@@ -1149,7 +1163,7 @@ export default function WalletDashboardReceiveModal({
             </svg>
           </button>
           <div
-            className="w-[80vw] max-w-[360px] aspect-square rounded-none border-[20px] border-black flex items-center justify-center"
+            className="w-[96vw] max-w-[min(96vw,96vh)] md:w-[80vw] md:max-w-[360px] aspect-square rounded-none border-[12px] md:border-[20px] border-black flex items-center justify-center"
             style={{ backgroundColor: '#E8E8E8' }}
             onClick={e => e.stopPropagation()}
           >
@@ -1314,8 +1328,8 @@ export default function WalletDashboardReceiveModal({
                       }}
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-11 h-11 rounded-[16px] bg-transparent flex items-center justify-center flex-shrink-0 text-[#f5a623]">
-                          <RequestIcon className="w-11 h-11" />
+                        <div className="w-13 h-13 rounded-[16px] bg-transparent flex items-center justify-center flex-shrink-0 text-[#f5a623]">
+                          <RequestIcon className="w-12 h-12" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between gap-2">
