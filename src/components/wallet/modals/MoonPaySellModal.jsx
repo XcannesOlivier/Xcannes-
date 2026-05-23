@@ -1874,7 +1874,8 @@ const MoonPaySellModal = ({
 
 	          {/* Content */}
 	          {renderContent()}
-
+	        </div>
+      </div>
 
       {/* Bottom sheet — Détails de l'opération */}
       {opDetailsOpen && typeof document !== 'undefined' && modalPanelRef.current ? createPortal(
