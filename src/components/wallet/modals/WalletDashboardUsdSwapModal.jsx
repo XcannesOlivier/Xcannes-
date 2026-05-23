@@ -3891,7 +3891,7 @@ export default function WalletDashboardUsdSwapModal({
                         : { background: isBinanceYellow
                             ? 'linear-gradient(180deg, rgba(240,185,11,1) 0%, rgba(217,168,10,1) 100%)'
                             : 'linear-gradient(180deg, rgba(8,112,248,1) 0%, rgba(7,101,223,1) 100%)',
-                          boxShadow: '0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)' }
+                          boxShadow: '0 20px 40px rgba(0,0,0,0.72), 0 10px 22px rgba(0,0,0,0.5), 0 4px 10px rgba(0,0,0,0.32), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -14px 24px rgba(0,0,0,0.42)' }
                       }
                     >
                       {(!hasValidAmount || amountOutOfRange || insufficientSourceBalance || sourceConversionMissing || targetConversionMissing || hasReceiveAddressValidationError || pairUnavailable || !fromCurrency || !toCurrency || !stableCurrency || ((walletSourceSelectionEnabled || walletTargetSelectionEnabled) && !selectedSourceOption))
@@ -3944,7 +3944,7 @@ export default function WalletDashboardUsdSwapModal({
                         : { background: isBinanceYellow
                             ? 'linear-gradient(180deg, rgba(240,185,11,1) 0%, rgba(217,168,10,1) 100%)'
                             : 'linear-gradient(180deg, rgba(8,112,248,1) 0%, rgba(7,101,223,1) 100%)',
-                          boxShadow: '0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)' }
+                          boxShadow: '0 20px 40px rgba(0,0,0,0.72), 0 10px 22px rgba(0,0,0,0.5), 0 4px 10px rgba(0,0,0,0.32), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -14px 24px rgba(0,0,0,0.42)' }
                       }
                     >
                       {(!hasValidAmount || amountOutOfRange || insufficientSourceBalance || sourceConversionMissing || targetConversionMissing || hasReceiveAddressValidationError || pairUnavailable || !fromCurrency || !toCurrency || !stableCurrency || ((walletSourceSelectionEnabled || walletTargetSelectionEnabled) && !selectedSourceOption))
@@ -4161,7 +4161,7 @@ export default function WalletDashboardUsdSwapModal({
                         : { background: isBinanceYellow
                             ? 'linear-gradient(180deg, rgba(240,185,11,1) 0%, rgba(217,168,10,1) 100%)'
                             : 'linear-gradient(180deg, rgba(8,112,248,1) 0%, rgba(7,101,223,1) 100%)',
-                          boxShadow: '0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)' }
+                          boxShadow: '0 20px 40px rgba(0,0,0,0.72), 0 10px 22px rgba(0,0,0,0.5), 0 4px 10px rgba(0,0,0,0.32), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -14px 24px rgba(0,0,0,0.42)' }
                       }
                     >
                       {(!hasValidAmount || amountOutOfRange || hasReceiveAddressValidationError || pairUnavailable || !fromCurrency || !toCurrency || !stableCurrency || !effectiveReceiveAddress)
@@ -4217,7 +4217,7 @@ export default function WalletDashboardUsdSwapModal({
                         : { background: isBinanceYellow
                             ? 'linear-gradient(180deg, rgba(240,185,11,1) 0%, rgba(217,168,10,1) 100%)'
                             : 'linear-gradient(180deg, rgba(8,112,248,1) 0%, rgba(7,101,223,1) 100%)',
-                          boxShadow: '0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)' }
+                          boxShadow: '0 20px 40px rgba(0,0,0,0.72), 0 10px 22px rgba(0,0,0,0.5), 0 4px 10px rgba(0,0,0,0.32), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -14px 24px rgba(0,0,0,0.42)' }
                       }
                     >
                       {(!hasValidAmount || amountOutOfRange || hasReceiveAddressValidationError || pairUnavailable || !fromCurrency || !toCurrency || !stableCurrency || !effectiveReceiveAddress)
