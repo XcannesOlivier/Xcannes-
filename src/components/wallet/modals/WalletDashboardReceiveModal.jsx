@@ -674,18 +674,62 @@ export default function WalletDashboardReceiveModal({
     const qrDrawW = srcWidth * scale;
     const qrDrawH = srcHeight * scale;
 
-    // Green vertical gradient at the bottom (from solid xcannes-green at bottom,
-    // fading to transparent slightly below the QR code).
+    // Green gradients on all four sides, fading to transparent towards the QR.
+    // Each gradient stops a bit before/after the QR so the QR area stays white.
     {
+      const qrLeft = qrDrawX;
+      const qrRight = qrDrawX + qrDrawW;
+      const qrTop = qrDrawY;
       const qrBottom = qrDrawY + qrDrawH;
-      const gradientStart = qrBottom + Math.round(offset * 0.4); // a bit below the QR
-      const gradientEnd = exportCanvas.height;
-      if (gradientEnd > gradientStart) {
-        const gradient = ctx.createLinearGradient(0, gradientEnd, 0, gradientStart);
-        gradient.addColorStop(0, 'rgba(22, 163, 74, 1)');
-        gradient.addColorStop(1, 'rgba(22, 163, 74, 0)');
-        ctx.fillStyle = gradient;
-        ctx.fillRect(0, gradientStart, exportCanvas.width, gradientEnd - gradientStart);
+      const pad = Math.round(offset * 0.4); // distance from QR where gradient becomes transparent
+
+      // Bottom gradient (solid at bottom edge, transparent a bit below the QR)
+      {
+        const start = qrBottom + pad;
+        const end = exportCanvas.height;
+        if (end > start) {
+          const g = ctx.createLinearGradient(0, end, 0, start);
+          g.addColorStop(0, 'rgba(22, 163, 74, 1)');
+          g.addColorStop(1, 'rgba(22, 163, 74, 0)');
+          ctx.fillStyle = g;
+          ctx.fillRect(0, start, exportCanvas.width, end - start);
+        }
+      }
+      // Top gradient (solid at top edge, transparent a bit above the QR)
+      {
+        const start = qrTop - pad;
+        const end = 0;
+        if (start > end) {
+          const g = ctx.createLinearGradient(0, end, 0, start);
+          g.addColorStop(0, 'rgba(22, 163, 74, 1)');
+          g.addColorStop(1, 'rgba(22, 163, 74, 0)');
+          ctx.fillStyle = g;
+          ctx.fillRect(0, end, exportCanvas.width, start - end);
+        }
+      }
+      // Left gradient (solid at left edge, transparent a bit left of the QR)
+      {
+        const start = qrLeft - pad;
+        const end = 0;
+        if (start > end) {
+          const g = ctx.createLinearGradient(end, 0, start, 0);
+          g.addColorStop(0, 'rgba(22, 163, 74, 1)');
+          g.addColorStop(1, 'rgba(22, 163, 74, 0)');
+          ctx.fillStyle = g;
+          ctx.fillRect(end, 0, start - end, exportCanvas.height);
+        }
+      }
+      // Right gradient (solid at right edge, transparent a bit right of the QR)
+      {
+        const start = qrRight + pad;
+        const end = exportCanvas.width;
+        if (end > start) {
+          const g = ctx.createLinearGradient(end, 0, start, 0);
+          g.addColorStop(0, 'rgba(22, 163, 74, 1)');
+          g.addColorStop(1, 'rgba(22, 163, 74, 0)');
+          ctx.fillStyle = g;
+          ctx.fillRect(start, 0, end - start, exportCanvas.height);
+        }
       }
     }
 
@@ -738,7 +782,7 @@ export default function WalletDashboardReceiveModal({
     {
       const by = exportCanvas.height - brandLineHeight - Math.round(brandGap / 3);
       ctx.font = brandFont;
-      ctx.fillStyle = '#9ca3af';
+      ctx.fillStyle = '#000000';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'top';
       ctx.fillText('XCANNES', exportWidth / 2, by);
