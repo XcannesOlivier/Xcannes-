@@ -618,11 +618,11 @@ export default function WalletCurrencySelector({
                           <line x1="12" y1="8" x2="12" y2="16" />
                           <line x1="8" y1="12" x2="16" y2="12" />
                         </svg>
-                        <div className="text-white/95 font-semibold text-[30px] md:text-[34px] tracking-tight leading-tight">
+                        <div className="text-white/95 font-semibold text-[28px] md:text-[32px] tracking-tight">
                           {t("ui_select_currency_title", "Ajouter une devise")}
                         </div>
                       </div>
-                      <div className="mt-1 text-[17px] md:text-[18px] text-white/60 leading-relaxed max-w-[52ch]">
+                      <div className="mt-2 text-[13px] md:text-[15px] text-white/50 leading-relaxed max-w-[34ch]">
                         {t(
                           "ui_select_currency_subtitle_add_currency",
                           "Une transaction validera l’ajout, aucun montant minimum requis.",
