@@ -561,12 +561,16 @@ export default function WalletDashboardReceiveModal({
     if (!ctx) return null;
 
     const maxTextWidth = exportWidth - margin * scale * 2;
+    const titleFontSize = Math.max(18, Math.round(exportWidth * 0.034));
     const labelFontSize = Math.max(16, Math.round(exportWidth * 0.032));
     const addressFontSize = Math.max(13, Math.round(exportWidth * 0.026));
     const metaFontSize = Math.max(12, Math.round(exportWidth * 0.024));
+    const brandFontSize = Math.max(11, Math.round(exportWidth * 0.022));
+    const titleFont = `700 ${titleFontSize}px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif`;
     const labelFont = `600 ${labelFontSize}px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif`;
     const addressFont = `${addressFontSize}px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace`;
     const metaFont = `${metaFontSize}px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif`;
+    const brandFont = `600 ${brandFontSize}px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif`;
 
     const wrapText = (text, font) => {
       if (!text) return [];
@@ -616,6 +620,18 @@ export default function WalletDashboardReceiveModal({
       });
     };
 
+    // Title at the top of the exported image
+    const titleText = t('ui_qr_share_title', "QR code d'adresse du compte");
+    const titleLineHeight = Math.round(titleFontSize * 1.35);
+    const titleLinesArr = wrapText(titleText, titleFont).map(line => ({
+      text: line,
+      font: titleFont,
+      color: '#111111',
+      lineHeight: titleLineHeight,
+    }));
+    const titleBlockHeight = titleLinesArr.reduce((sum, line) => sum + line.lineHeight, 0);
+    const titleGap = titleLinesArr.length ? Math.round(titleFontSize * 0.7) : 0;
+
     const labelText = String(
       useRequest
         ? generatedRequest?.beneficiaryLabel || activeWalletLabel || fallbackWalletLabel
@@ -640,34 +656,80 @@ export default function WalletDashboardReceiveModal({
 
     const textGap = textLines.length ? Math.round(labelFontSize * 0.8) : 0;
     const textBlockHeight = textLines.reduce((sum, line) => sum + line.lineHeight, 0);
-    exportCanvas.height = baseHeight + textGap + textBlockHeight;
+
+    // Brand footer "XCANNES" — discreet under the address
+    const brandLineHeight = Math.round(brandFontSize * 1.4);
+    const brandGap = Math.round(brandFontSize * 1.2);
+
+    exportCanvas.height = titleBlockHeight + titleGap + baseHeight + textGap + textBlockHeight + brandGap + brandLineHeight;
 
     ctx.imageSmoothingEnabled = false;
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
+
+    // Draw title at the top
+    if (titleLinesArr.length > 0) {
+      let ty = Math.round(titleGap / 2);
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      titleLinesArr.forEach(line => {
+        ctx.font = line.font;
+        ctx.fillStyle = line.color;
+        ctx.fillText(line.text, exportWidth / 2, ty);
+        ty += line.lineHeight;
+      });
+    }
+
+    const qrTopOffset = titleBlockHeight + titleGap;
     const offset = margin * scale;
-    ctx.drawImage(canvas, offset, offset, srcWidth * scale, srcHeight * scale);
+    const qrDrawX = offset;
+    const qrDrawY = qrTopOffset + offset;
+    const qrDrawW = srcWidth * scale;
+    const qrDrawH = srcHeight * scale;
+
+    // Green frame around the QR (xcannes-green #16a34a)
+    const frameInset = Math.max(6, Math.round(scale * 4));
+    const frameThickness = Math.max(4, Math.round(scale * 3));
+    const frameRadius = Math.max(10, Math.round(scale * 8));
+    const fx = qrDrawX - frameInset;
+    const fy = qrDrawY - frameInset;
+    const fw = qrDrawW + frameInset * 2;
+    const fh = qrDrawH + frameInset * 2;
+    ctx.save();
+    ctx.strokeStyle = '#16a34a';
+    ctx.lineWidth = frameThickness;
+    ctx.lineJoin = 'round';
+    if (typeof ctx.roundRect === 'function') {
+      ctx.beginPath();
+      ctx.roundRect(fx, fy, fw, fh, frameRadius);
+      ctx.stroke();
+    } else {
+      ctx.strokeRect(fx, fy, fw, fh);
+    }
+    ctx.restore();
+
+    ctx.drawImage(canvas, qrDrawX, qrDrawY, qrDrawW, qrDrawH);
     try {
       const srcCtx = canvas.getContext('2d');
       const srcPixel = srcCtx?.getImageData(0, 0, 1, 1)?.data;
       const isDarkBg = srcPixel && srcPixel.length >= 3 ? srcPixel[0] + srcPixel[1] + srcPixel[2] < 128 * 3 : false;
       if (isDarkBg) {
-        const imageData = ctx.getImageData(offset, offset, srcWidth * scale, srcHeight * scale);
+        const imageData = ctx.getImageData(qrDrawX, qrDrawY, qrDrawW, qrDrawH);
         const data = imageData.data;
         for (let i = 0; i < data.length; i += 4) {
           data[i] = 255 - data[i];
           data[i + 1] = 255 - data[i + 1];
           data[i + 2] = 255 - data[i + 2];
         }
-        ctx.putImageData(imageData, offset, offset);
+        ctx.putImageData(imageData, qrDrawX, qrDrawY);
       }
     } catch {
       // fallback to raw canvas if pixel access fails
-      ctx.drawImage(canvas, offset, offset, srcWidth * scale, srcHeight * scale);
+      ctx.drawImage(canvas, qrDrawX, qrDrawY, qrDrawW, qrDrawH);
     }
 
     if (textLines.length > 0) {
-      let y = offset + srcHeight * scale + textGap;
+      let y = qrTopOffset + offset + qrDrawH + textGap;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'top';
       textLines.forEach(line => {
@@ -676,6 +738,16 @@ export default function WalletDashboardReceiveModal({
         ctx.fillText(line.text, exportWidth / 2, y);
         y += line.lineHeight;
       });
+    }
+
+    // Brand footer
+    {
+      const by = exportCanvas.height - brandLineHeight - Math.round(brandGap / 3);
+      ctx.font = brandFont;
+      ctx.fillStyle = '#9ca3af';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      ctx.fillText('XCANNES', exportWidth / 2, by);
     }
 
     const dataUrl = exportCanvas.toDataURL('image/png');
