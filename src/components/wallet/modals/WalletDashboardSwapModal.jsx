@@ -930,7 +930,7 @@ export default function WalletDashboardSwapModal({
                       }}
                       disabled={convertButtonDisabled}
                       className={[
-                        "w-full py-3.5 rounded-[14px] text-[18px] font-semibold transition-all duration-200 tracking-[-0.01em]",
+                        "w-full py-3.5 rounded-[14px] text-[22px] md:text-[24px] font-semibold transition-all duration-200 tracking-[-0.01em]",
                         convertButtonDisabled
                           ? "text-white/90 cursor-not-allowed ring-[0.5px] ring-xcannes-green/30 ring-inset"
                           : "text-white hover:scale-[1.01] active:scale-[0.98]",

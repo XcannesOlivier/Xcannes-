@@ -1308,7 +1308,7 @@ export default function WalletDashboardSendChoiceModal({
                     type="button"
                     disabled={!pendingDestination.address}
                     onClick={() => { if (pendingDestination.address) { setSendDestination?.(pendingDestination.address); setSendDestinationLabel?.(pendingDestination.label); onChooseSimpleSend?.(); } }}
-                    className={`w-full py-3.5 rounded-[14px] text-[18px] font-semibold transition-all duration-200 ${
+                    className={`w-full py-3.5 rounded-[14px] text-[22px] md:text-[24px] font-semibold transition-all duration-200 ${
                       pendingDestination.address
                         ? 'text-white hover:scale-[1.01] active:scale-[0.98]'
                         : 'text-white/90 cursor-not-allowed ring-[0.5px] ring-xcannes-green/30 ring-inset'
