@@ -846,20 +846,6 @@ export default function WalletDashboardSendModal({
         ) : null}
       </div>
 
-      {selfSendBlocked ? (
-        <div className="mt-2 rounded-lg ring-1 ring-orange-400/30 ring-inset bg-orange-400/10 px-3 py-2 text-xs text-orange-200/90">
-          <div className="font-semibold">
-            {t("ui_invalid_recipient_title", "Destinataire invalide")}
-          </div>
-          <div>
-            {t(
-              "ui_cannot_send_to_self",
-              "Vous ne pouvez pas envoyer à votre propre compte.",
-            )}
-          </div>
-        </div>
-      ) : null}
-
       {saveAddressBlock}
     </div>
     )
@@ -1094,24 +1080,6 @@ export default function WalletDashboardSendModal({
               containerClassName="pt-5 pb-5 rounded-[18px] bg-[#111518] ring-1 ring-white/10 ring-inset transition-all duration-200 shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30)] focus-within:ring-white/25 focus-within:shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30),0_0_0_1px_rgba(255,255,255,0.10),0_0_24px_rgba(255,255,255,0.06)] wallet-amount-shimmer [&_input]:!text-4xl [&_input]:md:!text-5xl [&_input]:font-bold [&_input]:placeholder:text-white/35"
             />
             </div>
-            {manualInsufficientBalance ? (
-              <div className="mt-2 rounded-lg ring-1 ring-orange-400/30 ring-inset bg-orange-400/10 px-3 py-2 text-xs text-orange-200/90">
-                <div className="font-semibold">
-                  {t("ui_insufficient_balance_title", "Solde insuffisant")}
-                </div>
-                <div>
-                  {t(
-                    "ui_insufficient_balance_manual_detail",
-                    "Vous n'avez pas assez de {{currency}} pour ce montant.",
-                    {
-                      currency: String(
-                        selectedSendToken?.currency || "",
-                      ).toUpperCase(),
-                    },
-                  )}
-                </div>
-              </div>
-            ) : null}
           </div>
         </div>
         )}
@@ -1237,6 +1205,20 @@ export default function WalletDashboardSendModal({
 	          : null)
 	    : null;
 
+	  const manualWarningMessage = !hasPaymentRequest && !sendProcessing && !hasMoonpaySellRequest
+	    ? (selfSendBlocked
+	        ? t("ui_cannot_send_to_self", "Vous ne pouvez pas envoyer à votre propre compte.")
+	        : manualInsufficientBalance
+	          ? t(
+	              "ui_insufficient_balance_manual_detail",
+	              "Vous n'avez pas assez de {{currency}} pour ce montant.",
+	              {
+	                currency: String(selectedSendToken?.currency || "").toUpperCase(),
+	              },
+	            )
+	          : null)
+	    : null;
+
 	  const sendButtonLabel = sendProcessing
 	    ? hasMoonpaySellRequest
 	      ? t("moonpay_sell_signing_action", "Signature en cours...")
@@ -1287,7 +1269,9 @@ export default function WalletDashboardSendModal({
 	            : null),
 	        }}
 	      >
-	        {sendButtonDisabled && !sendProcessing && !hasPaymentRequest
+	        {sendButtonDisabled && !sendProcessing && !hasPaymentRequest && manualWarningMessage
+	          ? <span className="block px-3 text-[13px] leading-snug text-white/90 normal-case whitespace-normal">{manualWarningMessage}</span>
+	          : sendButtonDisabled && !sendProcessing && !hasPaymentRequest
 	          ? <span className="inline-flex items-center gap-1.5 text-white/85">
 	              <span className="text-[14px]">{t('ui_send_fill_cta', 'Choisissez la devise et le montant')}</span>
               <span className="inline-flex items-end gap-[3px] mb-[-1px]">
@@ -1330,7 +1314,9 @@ export default function WalletDashboardSendModal({
 	            : null),
 	        }}
 	      >
-	        {sendButtonDisabled && !sendProcessing && !hasPaymentRequest
+	        {sendButtonDisabled && !sendProcessing && !hasPaymentRequest && manualWarningMessage
+	          ? <span className="block px-4 text-[15px] leading-snug text-white/90 normal-case whitespace-normal">{manualWarningMessage}</span>
+	          : sendButtonDisabled && !sendProcessing && !hasPaymentRequest
 	          ? <span className="inline-flex items-center gap-1.5 text-white/85">
 	              <span className="text-[16px]">{t('ui_send_fill_cta', 'Choisissez la devise et le montant')}</span>
               <span className="inline-flex items-end gap-[3px] mb-[-1px]">

@@ -1513,12 +1513,6 @@ export default function WalletDashboardSendChoiceModal({
                             </button>
                           ) : null}
                         </div>
-                        {payreqSelfSendError ? (
-                          <div className="rounded-lg ring-1 ring-orange-400/30 ring-inset bg-orange-400/10 px-3 py-2.5 text-xs text-orange-200/90 mt-2">
-                            <div className="font-semibold">{t('ui_invalid_recipient_title', 'Destinataire invalide')}</div>
-                            <div className="mt-0.5 text-orange-200/70">{t('ui_cannot_send_to_self', 'Vous ne pouvez pas envoyer à votre propre compte.')}</div>
-                          </div>
-                        ) : null}
                       </div>
                     ) : null}
                   </div>
@@ -1583,7 +1577,9 @@ export default function WalletDashboardSendChoiceModal({
 	                  >
 	                    {pendingPayreq
 	                      ? t('ui_validate_payreq', 'Vérifier la demande de paiement')
-	                      : <span className="inline-flex items-center gap-1.5 text-white/85">
+	                      : payreqSelfSendError
+	                        ? <span className="block px-3 text-[13px] md:text-[15px] leading-snug text-white/90 normal-case whitespace-normal">{t('ui_cannot_send_to_self', 'Vous ne pouvez pas envoyer à votre propre compte.')}</span>
+	                        : <span className="inline-flex items-center gap-1.5 text-white/85">
 	                          <span className="text-[14px] md:text-[16px]">{t('ui_fill_payreq', 'Renseignez la demande de paiement')}</span>
 	                          <span className="inline-flex items-end gap-[3px] mb-[-1px]">
 	                            <span className="payreq-cta-dot" style={{ animationDelay: '0s' }}>·</span>
