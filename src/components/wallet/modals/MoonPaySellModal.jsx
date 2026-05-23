@@ -1874,6 +1874,8 @@ const MoonPaySellModal = ({
            >
              <span className="block w-36 h-1.5 rounded-full bg-white/80" />
            </div>
+         </div>
+       </div>
 
       {/* Bottom sheet — Détails de l'opération */}
       {opDetailsOpen && typeof document !== 'undefined' && modalPanelRef.current ? createPortal(
