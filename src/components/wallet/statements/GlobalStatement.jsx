@@ -716,10 +716,19 @@ export default function GlobalStatement({
       ctx.lineWidth = 2;
       ctx.stroke();
 
-      // Header
-      ctx.fillStyle = "rgba(255,255,255,0.70)";
-      ctx.font = "600 26px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
-      ctx.fillText("XCANNES", cardX + 44, cardY + 62);
+      // Header — "Votre compte: <nom> • <adresse tronquée à moitié>" at top-right
+      {
+        const accountName = String(walletLabel || t("nav_wallet", "Wallet")).trim();
+        const addrRaw = String(walletAddress || "").trim();
+        const half = addrRaw ? `${addrRaw.slice(0, Math.ceil(addrRaw.length / 2))}…` : "";
+        const accountHeader = `${t("ui_your_account_label", "Votre compte")}: ${accountName}${half ? " • " + half : ""}`;
+        ctx.fillStyle = "rgba(255,255,255,0.70)";
+        ctx.font = "600 26px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+        ctx.textAlign = "right";
+        ctx.textBaseline = "alphabetic";
+        ctx.fillText(ellipsize(accountHeader, cardW - 88), cardX + cardW - 44, cardY + 62);
+        ctx.textAlign = "left";
+      }
 
       ctx.fillStyle = "rgba(255,255,255,0.90)";
       ctx.font = "800 44px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
@@ -804,18 +813,6 @@ export default function GlobalStatement({
         ctx.fillText(ellipsize(fromLine, cardW - 88), cardX + 44, y + 38);
         ctx.fillText(ellipsize(toLine, cardW - 88), cardX + 44, y + 116);
         ctx.fillText(ellipsize(feeLine, cardW - 88), cardX + 44, y + 194);
-      }
-
-      // Tx hash (if any)
-      const hash = String(detailMovement?.txHash || "").trim();
-      if (hash) {
-        ctx.fillStyle = "rgba(255,255,255,0.50)";
-        ctx.font = "600 18px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace";
-        ctx.fillText(
-          ellipsize(hash, cardW - 88),
-          cardX + 44,
-          cardY + cardH - 44,
-        );
       }
 
         if (typeof canvas.toBlob === "function") {

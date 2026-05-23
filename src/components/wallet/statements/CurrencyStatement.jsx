@@ -1203,10 +1203,19 @@ export default function CurrencyStatement({
       ctx.lineWidth = 2;
       ctx.stroke();
 
-      // Header
-      ctx.fillStyle = "rgba(255,255,255,0.70)";
-      ctx.font = "600 26px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
-      ctx.fillText("XCANNES", cardX + 44, cardY + 62);
+      // Header — "Votre compte: <nom> • <adresse tronquée à moitié>" at top-right
+      {
+        const accountName = walletLabelText;
+        const addrRaw = String(walletAddress || "").trim();
+        const half = addrRaw ? `${addrRaw.slice(0, Math.ceil(addrRaw.length / 2))}…` : "";
+        const accountHeader = `${t("ui_your_account_label", "Votre compte")}: ${accountName}${half ? " • " + half : ""}`;
+        ctx.fillStyle = "rgba(255,255,255,0.70)";
+        ctx.font = "600 26px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+        ctx.textAlign = "right";
+        ctx.textBaseline = "alphabetic";
+        ctx.fillText(ellipsize(accountHeader, cardW - 88), cardX + cardW - 44, cardY + 62);
+        ctx.textAlign = "left";
+      }
 
       ctx.fillStyle = "rgba(255,255,255,0.90)";
       ctx.font = "700 44px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
