@@ -1472,7 +1472,7 @@ const MoonPayBuyModal = ({
                 </div>
               ) : null}
 	              <div className="flex justify-center">
-	                <div className={`inline-flex flex-col items-center gap-1 bg-elevated px-4 py-2 rounded-3xl shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)] ${assetDropdownOpen ? 'ring-1 ring-white/20 ring-inset' : ''}`}>
+	                <div className={`inline-flex flex-col items-center gap-1 bg-transparent xcannes-fade-border-y px-4 py-2 rounded-[20px] shadow-none ${assetDropdownOpen ? 'ring-1 ring-white/20 ring-inset' : ''}`}>
                   <span className="text-white/50 text-[11px] font-medium tracking-wide">
                     {t('moonpay_from_account', 'Compte de réception')}
                   </span>
