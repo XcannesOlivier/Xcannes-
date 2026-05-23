@@ -2217,7 +2217,7 @@ export default function WalletDashboardReceiveModal({
             ) : null}
             {/* Bottom bar – desktop only (visual balance) – Votre adresse de compte */}
             {receiveView === 'share' ? (
-              <div className="hidden md:flex pointer-events-none justify-center pt-6 pb-2" aria-hidden>
+              <div className="hidden md:flex pointer-events-none justify-center pt-10 pb-4" aria-hidden>
                 <span className="block w-[120px] h-[4px] rounded-full bg-white/10" />
               </div>
             ) : null}
@@ -2232,7 +2232,7 @@ export default function WalletDashboardReceiveModal({
             ) : null}
             {/* Bottom bar – desktop only (visual balance) – Demande prête */}
             {receiveView === 'request_qr' ? (
-              <div className="hidden md:flex pointer-events-none justify-center pt-2 pb-4 relative z-[5]" aria-hidden>
+              <div className="hidden md:flex pointer-events-none justify-center pt-10 pb-4 relative z-[5]" aria-hidden>
                 <span className="block w-[120px] h-[4px] rounded-full bg-white/30" />
               </div>
             ) : null}

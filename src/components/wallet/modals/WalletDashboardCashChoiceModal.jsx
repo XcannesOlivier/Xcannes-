@@ -451,7 +451,7 @@ export default function WalletDashboardCashChoiceModal({
             </div>
             {/* Bottom bar – desktop only (visual balance) */}
             <div className="hidden md:flex pointer-events-none justify-center pt-2 pb-4" aria-hidden>
-              <span className="block w-[120px] h-[4px] rounded-full bg-white/10" />
+              <span className="block w-[120px] h-[4px] rounded-full bg-white/30" />
             </div>
             {/* Bottom bar – mobile only */}
             {!inline ? (
