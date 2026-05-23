@@ -91,9 +91,11 @@ export default function WalletCurrencySelector({
     const clampedY = Math.max(0, Number(nextY) || 0);
 
     if (overlayEl) {
+      const panelOpacity = Math.max(0, Math.min(1, 1 - clampedY / 420));
       overlayEl.style.transform = `translate3d(0, ${clampedY}px, 0)`;
+      overlayEl.style.opacity = String(panelOpacity);
       overlayEl.style.transition = animate
-        ? "transform 220ms cubic-bezier(0.2,0,0,1)"
+        ? "transform 220ms cubic-bezier(0.2,0,0,1), opacity 220ms cubic-bezier(0.2,0,0,1)"
         : "none";
     }
 
@@ -112,7 +114,10 @@ export default function WalletCurrencySelector({
       const overlayEl = fullscreenOverlayRef.current;
       const backdropEl = fullscreenBackdropRef.current;
       const clampedY = Math.max(0, Number(overlayTranslateYRef.current) || 0);
-      if (overlayEl) overlayEl.style.transform = `translate3d(0, ${clampedY}px, 0)`;
+      if (overlayEl) {
+        overlayEl.style.transform = `translate3d(0, ${clampedY}px, 0)`;
+        overlayEl.style.opacity = String(Math.max(0, Math.min(1, 1 - clampedY / 420)));
+      }
       if (backdropEl) {
         backdropEl.style.opacity = String(Math.max(0, Math.min(1, 1 - clampedY / 420)));
       }
