@@ -561,10 +561,11 @@ export default function WalletDashboardReceiveModal({
     if (!ctx) return null;
 
     const maxTextWidth = exportWidth - margin * scale * 2;
-    const titleFontSize = Math.max(18, Math.round(exportWidth * 0.034));
-    const labelFontSize = Math.max(20, Math.round(exportWidth * 0.040));
+    const titleFontSize = Math.max(28, Math.round(exportWidth * 0.052));
+    const labelFontSize = Math.max(28, Math.round(exportWidth * 0.052));
     const addressFontSize = Math.max(13, Math.round(exportWidth * 0.026));
     const metaFontSize = Math.max(16, Math.round(exportWidth * 0.032));
+    const amountFontSize = Math.max(36, Math.round(exportWidth * 0.064));
     const brandFontSize = Math.max(11, Math.round(exportWidth * 0.022));
     // Accent color used for all text: green for the address QR, orange for the
     // payment request QR.
@@ -573,6 +574,7 @@ export default function WalletDashboardReceiveModal({
     const labelFont = `600 ${labelFontSize}px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif`;
     const addressFont = `${addressFontSize}px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace`;
     const metaFont = `${metaFontSize}px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif`;
+    const amountFont = `700 ${amountFontSize}px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif`;
     const brandFont = `600 ${brandFontSize}px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif`;
 
     const wrapText = (text, font) => {
@@ -653,7 +655,7 @@ export default function WalletDashboardReceiveModal({
       addLines(addressText, addressFont, accentColor, Math.round(addressFontSize * 1.35));
     }
     if (amountLine) {
-      addLines(amountLine, metaFont, accentColor, Math.round(metaFontSize * 1.35));
+      addLines(amountLine, amountFont, accentColor, Math.round(amountFontSize * 1.35));
     }
     if (dateLine) {
       addLines(dateLine, metaFont, accentColor, Math.round(metaFontSize * 1.35));
@@ -679,70 +681,30 @@ export default function WalletDashboardReceiveModal({
     const qrDrawW = srcWidth * scale;
     const qrDrawH = srcHeight * scale;
 
-    // Side gradients fading to transparent towards the QR.
-    // Green for the address QR, orange for the payment request QR.
+    // Solid dark-grey background filling everything around the QR (right up to
+    // its canvas edge). The QR canvas already includes its own white quiet zone,
+    // so scanners can still detect it.
     {
       const qrLeft = qrDrawX;
       const qrRight = qrDrawX + qrDrawW;
       const qrTop = qrDrawY;
       const qrBottom = qrDrawY + qrDrawH;
-      const pad = Math.round(offset * 0.15); // smaller pad → gradient reaches closer to the QR
-      const gradientRgb = '70, 70, 70'; // lighter black (soft dark grey)
-      const solid = `rgba(${gradientRgb}, 1)`;
-      const midOpaque = `rgba(${gradientRgb}, 0.92)`; // stays nearly opaque most of the way
-      const transparent = `rgba(${gradientRgb}, 0)`;
-
-      // Bottom gradient (solid at bottom edge, transparent a bit below the QR)
-      {
-        const start = qrBottom + pad;
-        const end = exportCanvas.height;
-        if (end > start) {
-          const g = ctx.createLinearGradient(0, end, 0, start);
-          g.addColorStop(0, solid);
-          g.addColorStop(0.7, midOpaque);
-          g.addColorStop(1, transparent);
-          ctx.fillStyle = g;
-          ctx.fillRect(0, start, exportCanvas.width, end - start);
-        }
+      ctx.fillStyle = 'rgba(70, 70, 70, 1)';
+      // Top band
+      if (qrTop > 0) {
+        ctx.fillRect(0, 0, exportCanvas.width, qrTop);
       }
-      // Top gradient (solid at top edge, transparent a bit above the QR)
-      {
-        const start = qrTop - pad;
-        const end = 0;
-        if (start > end) {
-          const g = ctx.createLinearGradient(0, end, 0, start);
-          g.addColorStop(0, solid);
-          g.addColorStop(0.7, midOpaque);
-          g.addColorStop(1, transparent);
-          ctx.fillStyle = g;
-          ctx.fillRect(0, end, exportCanvas.width, start - end);
-        }
+      // Bottom band
+      if (qrBottom < exportCanvas.height) {
+        ctx.fillRect(0, qrBottom, exportCanvas.width, exportCanvas.height - qrBottom);
       }
-      // Left gradient (solid at left edge, transparent a bit left of the QR)
-      {
-        const start = qrLeft - pad;
-        const end = 0;
-        if (start > end) {
-          const g = ctx.createLinearGradient(end, 0, start, 0);
-          g.addColorStop(0, solid);
-          g.addColorStop(0.7, midOpaque);
-          g.addColorStop(1, transparent);
-          ctx.fillStyle = g;
-          ctx.fillRect(end, 0, start - end, exportCanvas.height);
-        }
+      // Left band (between top and bottom of QR)
+      if (qrLeft > 0) {
+        ctx.fillRect(0, qrTop, qrLeft, qrBottom - qrTop);
       }
-      // Right gradient (solid at right edge, transparent a bit right of the QR)
-      {
-        const start = qrRight + pad;
-        const end = exportCanvas.width;
-        if (end > start) {
-          const g = ctx.createLinearGradient(end, 0, start, 0);
-          g.addColorStop(0, solid);
-          g.addColorStop(0.7, midOpaque);
-          g.addColorStop(1, transparent);
-          ctx.fillStyle = g;
-          ctx.fillRect(start, 0, end - start, exportCanvas.height);
-        }
+      // Right band (between top and bottom of QR)
+      if (qrRight < exportCanvas.width) {
+        ctx.fillRect(qrRight, qrTop, exportCanvas.width - qrRight, qrBottom - qrTop);
       }
     }
 
