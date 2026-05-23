@@ -1,3 +1,4 @@
+import { useCallback, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 /**
@@ -38,17 +39,107 @@ export default function GlobalMovementDetailModal({
   t,
   locale,
 }) {
+  const [dragY, setDragY] = useState(0);
+  const [dragging, setDragging] = useState(false);
+  const dragMetaRef = useRef(null);
+
+  const onPointerDown = useCallback((e) => {
+    if (!e.isPrimary || e.pointerType === "mouse") return;
+    if (
+      e.target?.closest?.(
+        'input,textarea,select,button,a,[role="button"]',
+      )
+    )
+      return;
+    dragMetaRef.current = {
+      startY: e.clientY,
+      startAt: Date.now(),
+      pointerId: e.pointerId,
+      lastDelta: 0,
+    };
+  }, []);
+
+  const onPointerMove = useCallback((e) => {
+    const meta = dragMetaRef.current;
+    if (!meta || e.pointerId !== meta.pointerId) return;
+    const delta = e.clientY - meta.startY;
+    if (delta <= 0) {
+      meta.lastDelta = 0;
+      setDragY(0);
+      return;
+    }
+    meta.lastDelta = delta;
+    setDragging(true);
+    setDragY(delta);
+  }, []);
+
+  const onPointerEnd = useCallback(
+    (e) => {
+      const meta = dragMetaRef.current;
+      if (!meta || e.pointerId !== meta.pointerId) return;
+      const delta = meta.lastDelta || 0;
+      const duration = Math.max(1, Date.now() - meta.startAt);
+      const velocity = delta / duration;
+      const height =
+        typeof window !== "undefined" ? window.innerHeight : 800;
+      const closeDistance = Math.max(140, Math.min(240, height * 0.2));
+      const shouldClose =
+        delta > closeDistance ||
+        (delta > closeDistance * 0.55 && velocity > 1.15);
+      dragMetaRef.current = null;
+      setDragging(false);
+      if (shouldClose) {
+        setDragY(Math.max(delta, height));
+        window.setTimeout(() => {
+          onClose?.();
+        }, 180);
+        return;
+      }
+      setDragY(0);
+    },
+    [onClose],
+  );
+
   if (!detailMovement || typeof document === "undefined") return null;
+
+  const fadeOpacity =
+    dragY > 0 ? Math.max(0, Math.min(1, 1 - dragY / 420)) : 1;
+  const panelTransition = dragging
+    ? "none"
+    : "transform 220ms cubic-bezier(0.2,0,0,1), opacity 220ms cubic-bezier(0.2,0,0,1)";
 
   return createPortal(
     <div className="fixed inset-0 z-[10300] flex items-center justify-center p-4">
       <div
         className="absolute inset-0 bg-black/80 backdrop-blur-sm wallet-modal-backdrop-in"
         onClick={onClose}
+        style={dragY > 0 ? { opacity: fadeOpacity } : undefined}
       />
       <div
         className={`relative w-full max-w-md rounded-[20px] ${modalBgClass} p-4 md:p-5 ring-1 ring-white/10 ring-inset shadow-[0_24px_60px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-26px_46px_rgba(0,0,0,0.55)] wallet-modal-lift-in`}
+        style={{
+          transform: dragY ? `translateY(${dragY}px)` : undefined,
+          opacity: dragY ? fadeOpacity : undefined,
+          transition: panelTransition,
+          willChange: dragY ? "transform, opacity" : undefined,
+          touchAction: "none",
+        }}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerEnd}
+        onPointerCancel={onPointerEnd}
       >
+        {/* Swipe handle (mobile) */}
+        <div className="md:hidden -mt-1 mb-2 flex justify-center" aria-hidden>
+          <span className="block w-12 h-1.5 rounded-full bg-white/20" />
+        </div>
+        {/* Bottom bar – mobile only (home indicator) */}
+        <div
+          className="md:hidden pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-[max(env(safe-area-inset-bottom),10px)] z-20"
+          aria-hidden
+        >
+          <span className="block w-36 h-1.5 rounded-full bg-white/80" />
+        </div>
         {/* Header */}
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
