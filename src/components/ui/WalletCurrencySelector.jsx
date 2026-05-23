@@ -639,7 +639,7 @@ export default function WalletCurrencySelector({
                     </button>
                   </div>
 
-                  <div className="px-4 pb-4" style={{ paddingTop: 'clamp(48px, 8vw, 100px)' }}>
+                  <div className="px-4 pb-4" style={{ paddingTop: 'clamp(20px, 3vw, 32px)' }}>
                     <div className="relative">
                       <div className="pointer-events-none absolute inset-y-0 left-4 flex items-center text-white/45">
                         <svg
