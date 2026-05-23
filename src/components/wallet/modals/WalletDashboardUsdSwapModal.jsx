@@ -2383,10 +2383,13 @@ export default function WalletDashboardUsdSwapModal({
             swipeEnabled
               ? {
                   transform: `translateY(${Math.max(0, modalOverlayTranslateY)}px)`,
+                  opacity: modalOverlayTranslateY > 0
+                    ? Math.max(0, Math.min(1, 1 - modalOverlayTranslateY / 420))
+                    : undefined,
                   transition: modalOverlayDragging
                     ? "none"
-                    : "transform 220ms cubic-bezier(0.2,0,0,1)",
-                  willChange: modalOverlayTranslateY ? "transform" : undefined,
+                    : "transform 220ms cubic-bezier(0.2,0,0,1), opacity 220ms cubic-bezier(0.2,0,0,1)",
+                  willChange: modalOverlayTranslateY ? "transform, opacity" : undefined,
                 }
               : undefined
           }
