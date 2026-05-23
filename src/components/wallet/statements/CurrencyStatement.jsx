@@ -1475,7 +1475,7 @@ export default function CurrencyStatement({
                   {getCurrencyFlag(displayCurrency)}
                 </span>
               )}
-              <h2 className="text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight min-w-0 truncate">
+              <h2 className="text-[28px] md:text-[32px] font-semibold text-white/95 tracking-tight min-w-0 truncate">
                 {headerTitle}
               </h2>
               {noticeVariant === "demo" ? (
@@ -1484,7 +1484,7 @@ export default function CurrencyStatement({
                 </span>
               ) : null}
                 </div>
-              <p className="-mt-1 text-[17px] md:text-[18px] text-white/55 leading-relaxed">
+              <p className="mt-2 text-[13px] md:text-[15px] text-white/50 max-w-[34ch] leading-relaxed">
                 {t(
                   "ui_currency_statement_subtitle_periods",
                   "Suivez le solde et les mouvements de cette devise.",
