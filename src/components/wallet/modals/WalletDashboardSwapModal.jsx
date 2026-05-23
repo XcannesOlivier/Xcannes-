@@ -930,21 +930,22 @@ export default function WalletDashboardSwapModal({
                       }}
                       disabled={convertButtonDisabled}
                       className={[
-                        "w-full h-14 rounded-[20px] text-lg font-semibold transition-all duration-200 tracking-[-0.01em]",
+                        "w-full py-3.5 rounded-[14px] text-[17px] md:text-[16px] font-semibold transition-all duration-200 tracking-[-0.01em]",
                         convertButtonDisabled
-                          ? "bg-xcannes-green/[0.07] text-xcannes-green/60 cursor-not-allowed ring-[0.5px] ring-xcannes-green/40 ring-inset"
-                          : "text-white hover:scale-[1.01] hover:brightness-110 active:scale-[0.98] active:brightness-95",
+                          ? "text-white/90 cursor-not-allowed ring-[0.5px] ring-xcannes-green/30 ring-inset"
+                          : "text-white hover:scale-[1.01] active:scale-[0.98]",
                       ].join(" ")}
-                      style={convertButtonDisabled
-                        ? undefined
-                        : {
-                            background: 'linear-gradient(180deg, #2da861 0%, #0d6b3a 100%)',
-                            boxShadow: '0 8px 24px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.07) inset, inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -10px 18px rgba(0,0,0,0.22), 0 0 18px rgba(34,180,90,0.18)',
-                          }
-                      }
+                      style={{
+                        background: convertButtonDisabled
+                          ? 'linear-gradient(180deg, rgba(44, 185, 103, 0.34) 0%, rgba(14, 103, 58, 0.34) 100%)'
+                          : 'linear-gradient(180deg, rgba(44, 185, 103, 1) 0%, rgba(14, 103, 58, 1) 100%)',
+                        boxShadow: convertButtonDisabled
+                          ? '0 12px 24px rgba(0,0,0,0.44), 0 5px 12px rgba(0,0,0,0.24), inset 0 1px 0 rgba(255,255,255,0.12), inset 0 -10px 16px rgba(0,0,0,0.24)'
+                          : '0 14px 28px rgba(0,0,0,0.52), 0 6px 14px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.30), inset 0 10px 18px rgba(0,0,0,0.10)',
+                      }}
                     >
                       {convertButtonDisabled && !convertProcessing
-                        ? <span className="inline-flex items-center gap-1.5 text-white/20">
+                        ? <span className="inline-flex items-center gap-1.5 text-white/85">
                             <span className="text-xs">{t('ui_swap_fill_cta', 'Choisissez les devises et le montant')}</span>
                             <span className="inline-flex items-end gap-[3px] mb-[-1px]">
                               <span className="swap-dot" style={{ animationDelay: '0s' }}>·</span>

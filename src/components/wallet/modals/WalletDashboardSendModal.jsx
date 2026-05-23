@@ -1303,7 +1303,7 @@ export default function WalletDashboardSendModal({
 	        }}
 	      >
 	        {sendButtonDisabled && !sendProcessing
-	          ? <span className="inline-flex items-center gap-1.5 text-white/20">
+	          ? <span className="inline-flex items-center gap-1.5 text-white/85">
 	              <span className="text-[14px]">{t('ui_send_fill_cta', 'Choisissez la devise et le montant')}</span>
               <span className="inline-flex items-end gap-[3px] mb-[-1px]">
                 <span className="send-modal-dot" style={{ animationDelay: '0s' }}>·</span>
@@ -1344,7 +1344,7 @@ export default function WalletDashboardSendModal({
 	        }}
 	      >
 	        {sendButtonDisabled && !sendProcessing
-	          ? <span className="inline-flex items-center gap-1.5 text-white/20">
+	          ? <span className="inline-flex items-center gap-1.5 text-white/85">
 	              <span className="text-[16px]">{t('ui_send_fill_cta', 'Choisissez la devise et le montant')}</span>
               <span className="inline-flex items-end gap-[3px] mb-[-1px]">
                 <span className="send-modal-dot" style={{ animationDelay: '0s' }}>·</span>
