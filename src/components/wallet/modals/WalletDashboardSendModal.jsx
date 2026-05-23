@@ -1214,35 +1214,7 @@ export default function WalletDashboardSendModal({
         </div>
       </div>
 
-      {selfSendBlocked ? (
-        <div className="rounded-lg ring-1 ring-orange-400/30 ring-inset bg-orange-400/10 px-3 py-2 text-xs text-orange-200/90">
-          <div className="font-semibold">
-            {t("ui_invalid_recipient_title", "Destinataire invalide")}
-          </div>
-          <div>
-            {t("ui_cannot_send_to_self", "Vous ne pouvez pas envoyer à votre propre compte.")}
-          </div>
-        </div>
-      ) : null}
       {saveAddressBlock}
-
-      {/* Insufficient balance warning */}
-      {insufficientBalance ? (
-        <div className="rounded-lg ring-1 ring-orange-400/30 ring-inset bg-orange-400/10 px-3 py-2 text-xs text-orange-200/90 space-y-1">
-          <div className="font-semibold">
-            {t("ui_insufficient_balance_title", "Solde insuffisant")}
-          </div>
-          <div>
-            {t(
-              "ui_insufficient_balance_detail",
-              "Vous n'avez pas assez de {{currency}} pour payer cette demande. Convertissez vos fonds via le bouton Convertir, puis revenez payer.",
-              {
-                currency: String(requestCurrencyCode || selectedSendToken?.currency || "").toUpperCase(),
-              },
-            )}
-          </div>
-        </div>
-      ) : null}
     </div>
   ) : null;
 
@@ -1251,6 +1223,20 @@ export default function WalletDashboardSendModal({
       ? (insufficientBalance || selfSendBlocked)
       : (!canManualSend || manualInsufficientBalance || selfSendBlocked));
 
+	  const payreqWarningMessage = hasPaymentRequest && !sendProcessing
+	    ? (selfSendBlocked
+	        ? t("ui_cannot_send_to_self", "Vous ne pouvez pas envoyer à votre propre compte.")
+	        : insufficientBalance
+	          ? t(
+	              "ui_insufficient_balance_detail",
+	              "Vous n'avez pas assez de {{currency}} pour payer cette demande. Convertissez vos fonds via le bouton Convertir, puis revenez payer.",
+	              {
+	                currency: String(requestCurrencyCode || selectedSendToken?.currency || "").toUpperCase(),
+	              },
+	            )
+	          : null)
+	    : null;
+
 	  const sendButtonLabel = sendProcessing
 	    ? hasMoonpaySellRequest
 	      ? t("moonpay_sell_signing_action", "Signature en cours...")
@@ -1258,7 +1244,7 @@ export default function WalletDashboardSendModal({
 	    : hasMoonpaySellRequest
 	      ? t("moonpay_sell_sign_submit", "Signer et envoyer")
 	      : hasPaymentRequest
-	        ? t("ui_payreq_verify_validate", "Vérifier et valider")
+	        ? (payreqWarningMessage || t("ui_payreq_verify_validate", "Vérifier et valider"))
 	        : t("ui_send_504b64a87b", "Envoyer");
 
 	  const ctaEnabledBg = hasPaymentRequest
@@ -1301,7 +1287,7 @@ export default function WalletDashboardSendModal({
 	            : null),
 	        }}
 	      >
-	        {sendButtonDisabled && !sendProcessing
+	        {sendButtonDisabled && !sendProcessing && !hasPaymentRequest
 	          ? <span className="inline-flex items-center gap-1.5 text-white/85">
 	              <span className="text-[14px]">{t('ui_send_fill_cta', 'Choisissez la devise et le montant')}</span>
               <span className="inline-flex items-end gap-[3px] mb-[-1px]">
@@ -1310,7 +1296,9 @@ export default function WalletDashboardSendModal({
                 <span className="send-modal-dot" style={{ animationDelay: '1.2s' }}>·</span>
               </span>
             </span>
-          : sendButtonLabel}
+          : sendButtonDisabled && !sendProcessing && hasPaymentRequest && payreqWarningMessage
+            ? <span className="block px-3 text-[13px] leading-snug text-white/90 normal-case whitespace-normal">{payreqWarningMessage}</span>
+            : sendButtonLabel}
       </button>
 	      <button
 	        type="button"
@@ -1342,7 +1330,7 @@ export default function WalletDashboardSendModal({
 	            : null),
 	        }}
 	      >
-	        {sendButtonDisabled && !sendProcessing
+	        {sendButtonDisabled && !sendProcessing && !hasPaymentRequest
 	          ? <span className="inline-flex items-center gap-1.5 text-white/85">
 	              <span className="text-[16px]">{t('ui_send_fill_cta', 'Choisissez la devise et le montant')}</span>
               <span className="inline-flex items-end gap-[3px] mb-[-1px]">
@@ -1351,7 +1339,9 @@ export default function WalletDashboardSendModal({
                 <span className="send-modal-dot" style={{ animationDelay: '1.2s' }}>·</span>
               </span>
             </span>
-          : sendButtonLabel}
+          : sendButtonDisabled && !sendProcessing && hasPaymentRequest && payreqWarningMessage
+            ? <span className="block px-4 text-[15px] leading-snug text-white/90 normal-case whitespace-normal">{payreqWarningMessage}</span>
+            : sendButtonLabel}
       </button>
       <style>{`
         @keyframes sendModalDotBlink {

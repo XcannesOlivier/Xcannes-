@@ -306,6 +306,28 @@ export default function WalletDashboardSwapModal({
   const convertButtonLabel = convertProcessing
     ? t("ui_converting_71c2b9a4e5", "Conversion…")
     : t("ui_convert_cta_fr", "Convertir");
+
+  const swapWarningMessage = !convertProcessing
+    ? (sameCurrencySelected
+        ? t(
+            "ui_convert_same_asset_warning_6f13d5c9c2",
+            "Veuillez choisir 2 actifs différents.",
+          )
+        : insufficientBalance
+          ? t(
+              "ui_insufficient_balance_convert_a3b4c5d6",
+              "Solde insuffisant. Disponible : {{amount}} {{currency}}",
+            )
+              .replace(
+                "{{amount}}",
+                insufficientBalance.availableUnits.toLocaleString(locale, { maximumFractionDigits: 2 }),
+              )
+              .replace(
+                "{{currency}}",
+                getDisplayCurrencyCode(insufficientBalance.currency),
+              )
+          : null)
+    : null;
   const handleConvertAction = () => {
     handleDemoConvert();
   };
@@ -844,24 +866,6 @@ export default function WalletDashboardSwapModal({
 	                </div>
 
                   <div className="space-y-2">
-                    {sameCurrencySelected ? (
-                      <div className="rounded-lg ring-1 ring-amber-300/30 ring-inset bg-amber-300/10 px-3 py-2 text-xs text-amber-100/90">
-                        {t(
-                          "ui_convert_same_asset_warning_6f13d5c9c2",
-                          "Veuillez choisir 2 actifs différents.",
-                        )}
-                      </div>
-                    ) : null}
-                    {insufficientBalance && !sameCurrencySelected ? (
-                      <div className="rounded-lg ring-1 ring-white ring-inset bg-transparent px-3 py-2 text-xs text-white">
-                        {t(
-                          "ui_insufficient_balance_convert_a3b4c5d6",
-                          "Solde insuffisant. Disponible : {{amount}} {{currency}}",
-                        )
-                          .replace("{{amount}}", insufficientBalance.availableUnits.toLocaleString(locale, { maximumFractionDigits: 2 }))
-                          .replace("{{currency}}", getDisplayCurrencyCode(insufficientBalance.currency))}
-                      </div>
-                    ) : null}
                     {/* ── SECTION 3: Summary ─────────────────────────────── */}
                     <div className="rounded-[16px] overflow-hidden">
                       {/* Rows: Frais + Taux — note technique discrète */}
@@ -944,7 +948,9 @@ export default function WalletDashboardSwapModal({
                           : '0 22px 42px rgba(0,0,0,0.78), 0 10px 22px rgba(0,0,0,0.55), 0 4px 10px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -16px 26px rgba(0,0,0,0.55), inset 0 12px 22px rgba(0,0,0,0.18)',
                       }}
                     >
-                      {convertButtonDisabled && !convertProcessing
+                      {convertButtonDisabled && !convertProcessing && swapWarningMessage
+                        ? <span className="block px-3 text-[13px] md:text-[15px] leading-snug text-white/90 normal-case whitespace-normal">{swapWarningMessage}</span>
+                        : convertButtonDisabled && !convertProcessing
                         ? <span className="inline-flex items-center gap-1.5 text-white/85">
                             <span className="text-[14px] md:text-[16px]">{t('ui_swap_fill_cta', 'Choisissez les devises et le montant')}</span>
                             <span className="inline-flex items-end gap-[3px] mb-[-1px]">
