@@ -2681,7 +2681,7 @@ export default function WalletDashboardUsdSwapModal({
 
                 {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE || walletTargetSelectionEnabled ? (
                   <div className="relative px-4 pt-[40px] md:pt-[90px] pb-4 text-center">
-                    <h3 className="text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight mb-2">
+                    <h3 className="text-[30px] md:text-[34px] font-semibold text-white/95 tracking-tight mb-2">
                       {flowTitleDisplay}
                     </h3>
                     <p className="mb-4 text-[14px] md:text-[15px] text-white/80 leading-relaxed">

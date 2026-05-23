@@ -1508,7 +1508,7 @@ export default function GlobalStatement({
                   <line x1="8" y1="9" x2="10" y2="9" />
                   <line x1="8" y1="17" x2="11" y2="17" />
                 </svg>
-                <h2 className="text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight leading-tight text-left">
+                <h2 className="text-[30px] md:text-[34px] font-semibold text-white/95 tracking-tight leading-tight text-left">
                   {globalTitle}
                 </h2>
                 {noticeVariant === "demo" ? (

@@ -622,7 +622,7 @@ export default function WalletDashboardSwapModal({
               <div className="flex flex-col gap-4">
                 {/* ── Title / subtitle ── */}
 	                <div className="text-center relative z-[70]">
-                  <h3 className="text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight">
+                  <h3 className="text-[30px] md:text-[34px] font-semibold text-white/95 tracking-tight">
                     {t("ui_convert_title_main", "Convertissez vos devises")}
                   </h3>
                   <p className="mt-2 text-[14px] md:text-[15px] text-white/80 max-w-[34ch] mx-auto leading-relaxed">

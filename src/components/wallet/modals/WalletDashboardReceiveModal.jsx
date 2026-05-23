@@ -1254,7 +1254,7 @@ export default function WalletDashboardReceiveModal({
                   if (!disableSwipeToClose) maybeStartOverlayDrag(event, 'fixed');
                 }}
               >
-                <h2 className={`${receiveView === 'request' ? 'mt-[46px] md:mt-[70px]' : receiveView === 'request_qr' ? 'mt-4 md:mt-[25px]' : 'mt-[19px] md:mt-[70px]'} text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight`}>
+                <h2 className={`${receiveView === 'request' ? 'mt-[46px] md:mt-[70px]' : receiveView === 'request_qr' ? 'mt-4 md:mt-[25px]' : 'mt-[19px] md:mt-[70px]'} text-[30px] md:text-[34px] font-semibold text-white/95 tracking-tight`}>
                   {headerTitle}
                 </h2>
 
@@ -1278,7 +1278,7 @@ export default function WalletDashboardReceiveModal({
                       maybeStartOverlayDrag(event, 'fixed');
                     }}
                   >
-                    <h3 className="mt-1 text-[30px] md:text-[32px] font-semibold text-white/95 tracking-tight">
+                    <h3 className="mt-1 text-[30px] md:text-[32px] font-medium text-white/95 tracking-tight">
                       {t('ui_receive_choice_decision_title', 'Comment souhaitez-vous recevoir ?')}
                     </h3>
                     <p className="mt-2 text-[14px] md:text-[15px] text-white/60 max-w-[34ch] leading-relaxed">
