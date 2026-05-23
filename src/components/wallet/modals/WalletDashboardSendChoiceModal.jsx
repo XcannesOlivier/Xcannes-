@@ -1278,7 +1278,7 @@ export default function WalletDashboardSendChoiceModal({
                   </div>
                 </div>
 
-                <div className={pendingDestination.address ? 'pt-6 md:pt-6' : 'pt-6 md:pt-12'}>
+                <div className={pendingDestination.address ? 'pt-2 md:pt-6' : 'pt-6 md:pt-12'}>
                   {pendingDestination.address ? (() => {
                     const addr = String(pendingDestination.address || '').trim();
                     const label = String(pendingDestination.label || '').trim();
