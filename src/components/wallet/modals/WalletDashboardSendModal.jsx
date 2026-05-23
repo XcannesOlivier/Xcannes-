@@ -1247,10 +1247,9 @@ export default function WalletDashboardSendModal({
   ) : null;
 
   const sendButtonDisabled = sendProcessing ||
-    !canManualSend ||
-    (hasPaymentRequest && insufficientBalance) ||
-    (!hasPaymentRequest && manualInsufficientBalance) ||
-    selfSendBlocked;
+    (hasPaymentRequest
+      ? (insufficientBalance || selfSendBlocked)
+      : (!canManualSend || manualInsufficientBalance || selfSendBlocked));
 
 	  const sendButtonLabel = sendProcessing
 	    ? hasMoonpaySellRequest
@@ -1259,7 +1258,7 @@ export default function WalletDashboardSendModal({
 	    : hasMoonpaySellRequest
 	      ? t("moonpay_sell_sign_submit", "Signer et envoyer")
 	      : hasPaymentRequest
-	        ? t("ui_confirm_payment_button", "Confirmer le paiement")
+	        ? t("ui_payreq_verify_validate", "Vérifier et valider")
 	        : t("ui_send_504b64a87b", "Envoyer");
 
 	  const ctaEnabledBg = hasPaymentRequest
@@ -1293,7 +1292,7 @@ export default function WalletDashboardSendModal({
 	            : ctaEnabledBg,
 	          boxShadow: sendButtonDisabled
 	            ? "0 12px 24px rgba(0,0,0,0.44), 0 5px 12px rgba(0,0,0,0.24), inset 0 1px 0 rgba(255,255,255,0.12), inset 0 -10px 16px rgba(0,0,0,0.24)"
-	            : "0 14px 28px rgba(0,0,0,0.52), 0 6px 14px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.30), inset 0 10px 18px rgba(0,0,0,0.10)",
+	            : "0 22px 42px rgba(0,0,0,0.78), 0 10px 22px rgba(0,0,0,0.55), 0 4px 10px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -16px 26px rgba(0,0,0,0.55), inset 0 12px 22px rgba(0,0,0,0.18)",
 	          ...(sendProcessing
 	            ? {
 	                background: ctaDisabledBg,
@@ -1334,7 +1333,7 @@ export default function WalletDashboardSendModal({
 	            : ctaEnabledBg,
 	          boxShadow: sendButtonDisabled
 	            ? "0 12px 24px rgba(0,0,0,0.44), 0 5px 12px rgba(0,0,0,0.24), inset 0 1px 0 rgba(255,255,255,0.12), inset 0 -10px 16px rgba(0,0,0,0.24)"
-	            : "0 14px 28px rgba(0,0,0,0.52), 0 6px 14px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.30), inset 0 10px 18px rgba(0,0,0,0.10)",
+	            : "0 22px 42px rgba(0,0,0,0.78), 0 10px 22px rgba(0,0,0,0.55), 0 4px 10px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -16px 26px rgba(0,0,0,0.55), inset 0 12px 22px rgba(0,0,0,0.18)",
 	          ...(sendProcessing
 	            ? {
 	                background: ctaDisabledBg,

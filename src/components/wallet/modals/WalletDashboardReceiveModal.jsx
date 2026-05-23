@@ -2012,7 +2012,7 @@ export default function WalletDashboardReceiveModal({
                           }}
                           disabled={generateButtonDisabled}
                           className={[
-                            'w-full h-14 rounded-[20px] text-lg font-semibold transition-all duration-200 tracking-[-0.01em]',
+                            'w-full h-14 rounded-[20px] text-[22px] md:text-[24px] font-semibold transition-all duration-200 tracking-[-0.01em]',
                             generateButtonDisabled
                               ? 'text-white/90 cursor-not-allowed ring-[0.5px] ring-[#f5a623]/30 ring-inset'
                               : 'text-white hover:scale-[1.01] active:scale-[0.98]',
@@ -2023,7 +2023,7 @@ export default function WalletDashboardReceiveModal({
                               : 'linear-gradient(180deg, #f5a623 0%, #d98c0f 100%)',
                             boxShadow: generateButtonDisabled
                               ? '0 12px 24px rgba(0,0,0,0.44), 0 5px 12px rgba(0,0,0,0.24), inset 0 1px 0 rgba(255,255,255,0.12), inset 0 -10px 16px rgba(0,0,0,0.24)'
-                              : '0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)',
+                              : '0 22px 42px rgba(0,0,0,0.78), 0 10px 22px rgba(0,0,0,0.55), 0 4px 10px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -16px 26px rgba(0,0,0,0.55), inset 0 12px 22px rgba(0,0,0,0.18)',
                           }}
                         >
                           {generateButtonDisabled
