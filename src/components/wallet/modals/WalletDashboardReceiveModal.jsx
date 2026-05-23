@@ -620,8 +620,10 @@ export default function WalletDashboardReceiveModal({
       });
     };
 
-    // Title at the top of the exported image
-    const titleText = t('ui_qr_share_title', "QR code d'adresse du compte");
+    // Title at the top of the exported image (different label for payment requests)
+    const titleText = useRequest
+      ? t('ui_qr_share_title_request', 'QR code de demande de paiement')
+      : t('ui_qr_share_title', "QR code d'adresse du compte");
     const titleLineHeight = Math.round(titleFontSize * 1.35);
     const titleLinesArr = wrapText(titleText, titleFont).map(line => ({
       text: line,
@@ -674,14 +676,17 @@ export default function WalletDashboardReceiveModal({
     const qrDrawW = srcWidth * scale;
     const qrDrawH = srcHeight * scale;
 
-    // Green gradients on all four sides, fading to transparent towards the QR.
-    // Each gradient stops a bit before/after the QR so the QR area stays white.
+    // Side gradients fading to transparent towards the QR.
+    // Green for the address QR, orange for the payment request QR.
     {
       const qrLeft = qrDrawX;
       const qrRight = qrDrawX + qrDrawW;
       const qrTop = qrDrawY;
       const qrBottom = qrDrawY + qrDrawH;
       const pad = Math.round(offset * 0.4); // distance from QR where gradient becomes transparent
+      const gradientRgb = useRequest ? '249, 115, 22' : '22, 163, 74';
+      const solid = `rgba(${gradientRgb}, 1)`;
+      const transparent = `rgba(${gradientRgb}, 0)`;
 
       // Bottom gradient (solid at bottom edge, transparent a bit below the QR)
       {
@@ -689,8 +694,8 @@ export default function WalletDashboardReceiveModal({
         const end = exportCanvas.height;
         if (end > start) {
           const g = ctx.createLinearGradient(0, end, 0, start);
-          g.addColorStop(0, 'rgba(22, 163, 74, 1)');
-          g.addColorStop(1, 'rgba(22, 163, 74, 0)');
+          g.addColorStop(0, solid);
+          g.addColorStop(1, transparent);
           ctx.fillStyle = g;
           ctx.fillRect(0, start, exportCanvas.width, end - start);
         }
@@ -701,8 +706,8 @@ export default function WalletDashboardReceiveModal({
         const end = 0;
         if (start > end) {
           const g = ctx.createLinearGradient(0, end, 0, start);
-          g.addColorStop(0, 'rgba(22, 163, 74, 1)');
-          g.addColorStop(1, 'rgba(22, 163, 74, 0)');
+          g.addColorStop(0, solid);
+          g.addColorStop(1, transparent);
           ctx.fillStyle = g;
           ctx.fillRect(0, end, exportCanvas.width, start - end);
         }
@@ -713,8 +718,8 @@ export default function WalletDashboardReceiveModal({
         const end = 0;
         if (start > end) {
           const g = ctx.createLinearGradient(end, 0, start, 0);
-          g.addColorStop(0, 'rgba(22, 163, 74, 1)');
-          g.addColorStop(1, 'rgba(22, 163, 74, 0)');
+          g.addColorStop(0, solid);
+          g.addColorStop(1, transparent);
           ctx.fillStyle = g;
           ctx.fillRect(end, 0, start - end, exportCanvas.height);
         }
@@ -725,8 +730,8 @@ export default function WalletDashboardReceiveModal({
         const end = exportCanvas.width;
         if (end > start) {
           const g = ctx.createLinearGradient(end, 0, start, 0);
-          g.addColorStop(0, 'rgba(22, 163, 74, 1)');
-          g.addColorStop(1, 'rgba(22, 163, 74, 0)');
+          g.addColorStop(0, solid);
+          g.addColorStop(1, transparent);
           ctx.fillStyle = g;
           ctx.fillRect(start, 0, end - start, exportCanvas.height);
         }
