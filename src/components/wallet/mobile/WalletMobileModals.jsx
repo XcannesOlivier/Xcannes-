@@ -426,6 +426,13 @@ export default function WalletMobileModals({
                 <div className="md:hidden flex justify-center pt-3 pb-2" aria-hidden>
                   <span className="block w-12 h-1.5 rounded-full bg-white/20" />
                 </div>
+                {/* Bottom bar – mobile only (home indicator, comme dans send choice) */}
+                <div
+                  className="md:hidden pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-[max(env(safe-area-inset-bottom),10px)] z-20"
+                  aria-hidden
+                >
+                  <span className="block w-36 h-1.5 rounded-full bg-white/80" />
+                </div>
                 {/* Titre */}
                 <p className="w-full text-center text-sm text-white/45 px-6 pt-4 pb-0">
                   Scannez une adresse, une demande de paiement ou un QR de connexion.
