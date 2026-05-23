@@ -784,11 +784,13 @@ body.header-hero-mode .home-content-wrapper {
 
 /* ── Bottom-sheet fade border (themed, strongest at top) ── */
 .xcannes-sheet-fade-border-green,
-.xcannes-sheet-fade-border-orange {
+.xcannes-sheet-fade-border-orange,
+.xcannes-sheet-fade-border-violet {
   position: relative;
 }
 .xcannes-sheet-fade-border-green::after,
-.xcannes-sheet-fade-border-orange::after {
+.xcannes-sheet-fade-border-orange::after,
+.xcannes-sheet-fade-border-violet::after {
   content: "";
   position: absolute;
   inset: 0;
@@ -821,6 +823,12 @@ body.header-hero-mode .home-content-wrapper {
   box-shadow:
     inset 0 1px 0 rgba(245, 166, 35, 0.28),
     0 0 24px rgba(245, 166, 35, 0.18);
+}
+.xcannes-sheet-fade-border-violet::after {
+  border: 1px solid rgba(139, 92, 246, 0.6);
+  box-shadow:
+    inset 0 1px 0 rgba(139, 92, 246, 0.28),
+    0 0 24px rgba(139, 92, 246, 0.18);
 }
 
 /* ── Thin irregular green border (for select-like inputs) ── */

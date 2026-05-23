@@ -1900,7 +1900,7 @@ const MoonPayBuyModal = ({
             />
             {/* Sheet */}
             <div
-              className="relative w-full bg-elevated rounded-t-3xl ring-1 ring-white/10 shadow-2xl px-6 pt-5 pb-8 max-h-full overflow-y-auto"
+              className="relative w-full bg-elevated rounded-t-[22px] xcannes-sheet-fade-border-green shadow-2xl px-6 pt-5 pb-8 max-h-full overflow-y-auto"
               style={{ transform: `translateY(${sheetDragY}px)`, transition: sheetDragY ? 'none' : 'transform 200ms ease' }}
               onPointerDown={handleSheetPointerDown}
               onPointerMove={handleSheetPointerMove}
@@ -1909,7 +1909,14 @@ const MoonPayBuyModal = ({
             >
               {/* Handle — mobile uniquement */}
               <div className="flex justify-center mb-4 md:hidden">
-                <span className="block w-10 h-1.5 rounded-full bg-white/20" aria-hidden />
+                <span className="block w-12 h-1.5 rounded-full bg-white/15" aria-hidden />
+              </div>
+              {/* Bottom indicator – mobile only */}
+              <div
+                className="md:hidden pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-[max(env(safe-area-inset-bottom),10px)] z-20"
+                aria-hidden
+              >
+                <span className="block w-36 h-1.5 rounded-full bg-white/80" />
               </div>
 
               {/* Header */}
@@ -2212,10 +2219,17 @@ const MoonPayBuyModal = ({
             onClick={() => setOpDetailsOpen(false)}
           />
           {/* Sheet */}
-          <div className="relative w-full bg-elevated rounded-t-3xl ring-1 ring-white/10 shadow-2xl px-6 pt-5 pb-8 max-h-full overflow-y-auto">
+          <div className="relative w-full bg-elevated rounded-t-[22px] xcannes-sheet-fade-border-green shadow-2xl px-6 pt-5 pb-8 max-h-full overflow-y-auto">
             {/* Handle */}
-            <div className="flex justify-center mb-4">
-              <span className="block w-10 h-1.5 rounded-full bg-white/20" aria-hidden />
+            <div className="md:hidden flex justify-center mb-4">
+              <span className="block w-12 h-1.5 rounded-full bg-white/15" aria-hidden />
+            </div>
+            {/* Bottom indicator – mobile only */}
+            <div
+              className="md:hidden pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-[max(env(safe-area-inset-bottom),10px)] z-20"
+              aria-hidden
+            >
+              <span className="block w-36 h-1.5 rounded-full bg-white/80" />
             </div>
 
             {/* Header */}

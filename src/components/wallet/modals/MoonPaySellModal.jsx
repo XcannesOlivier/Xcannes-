@@ -1258,7 +1258,7 @@ const MoonPaySellModal = ({
               </div>
             ) : null}
 	            <div className="flex justify-center">
-	              <div className={`inline-flex flex-col items-center gap-1 bg-elevated px-4 py-2 rounded-3xl shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)] ${cryptoDropdownOpen ? 'ring-1 ring-white/20 ring-inset' : ''}`}>
+	              <div className={`inline-flex flex-col items-center gap-1 bg-transparent xcannes-fade-border-y px-4 py-2 rounded-[20px] shadow-none ${cryptoDropdownOpen ? 'ring-1 ring-white/20 ring-inset' : ''}`}>
                 <span className="text-white/50 text-[11px] font-medium tracking-wide">
                   {t("moonpay_from_account", "Compte source")}
                 </span>
@@ -1886,9 +1886,16 @@ const MoonPaySellModal = ({
             className="absolute inset-0 bg-black/70 backdrop-blur-sm"
             onClick={() => setOpDetailsOpen(false)}
           />
-          <div className="relative w-full bg-elevated rounded-t-3xl ring-1 ring-white/10 shadow-2xl px-6 pt-5 pb-8 max-h-full overflow-y-auto">
-            <div className="flex justify-center mb-4">
-              <span className="block w-10 h-1.5 rounded-full bg-white/20" aria-hidden />
+          <div className="relative w-full bg-elevated rounded-t-[22px] xcannes-sheet-fade-border-violet shadow-2xl px-6 pt-5 pb-8 max-h-full overflow-y-auto">
+            <div className="md:hidden flex justify-center mb-4">
+              <span className="block w-12 h-1.5 rounded-full bg-white/15" aria-hidden />
+            </div>
+            {/* Bottom indicator – mobile only */}
+            <div
+              className="md:hidden pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-[max(env(safe-area-inset-bottom),10px)] z-20"
+              aria-hidden
+            >
+              <span className="block w-36 h-1.5 rounded-full bg-white/80" />
             </div>
             {/* Header */}
             <div className="flex items-start justify-between gap-3 mb-5">
