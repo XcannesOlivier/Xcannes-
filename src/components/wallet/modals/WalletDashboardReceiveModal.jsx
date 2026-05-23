@@ -562,10 +562,13 @@ export default function WalletDashboardReceiveModal({
 
     const maxTextWidth = exportWidth - margin * scale * 2;
     const titleFontSize = Math.max(18, Math.round(exportWidth * 0.034));
-    const labelFontSize = Math.max(16, Math.round(exportWidth * 0.032));
+    const labelFontSize = Math.max(20, Math.round(exportWidth * 0.040));
     const addressFontSize = Math.max(13, Math.round(exportWidth * 0.026));
-    const metaFontSize = Math.max(12, Math.round(exportWidth * 0.024));
+    const metaFontSize = Math.max(16, Math.round(exportWidth * 0.032));
     const brandFontSize = Math.max(11, Math.round(exportWidth * 0.022));
+    // Accent color used for all text: green for the address QR, orange for the
+    // payment request QR.
+    const accentColor = useRequest ? '#f97316' : '#16a34a';
     const titleFont = `700 ${titleFontSize}px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif`;
     const labelFont = `600 ${labelFontSize}px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif`;
     const addressFont = `${addressFontSize}px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace`;
@@ -628,7 +631,7 @@ export default function WalletDashboardReceiveModal({
     const titleLinesArr = wrapText(titleText, titleFont).map(line => ({
       text: line,
       font: titleFont,
-      color: '#111111',
+      color: accentColor,
       lineHeight: titleLineHeight,
     }));
     const titleBlockHeight = titleLinesArr.reduce((sum, line) => sum + line.lineHeight, 0);
@@ -644,16 +647,16 @@ export default function WalletDashboardReceiveModal({
     const dateLine = useRequest ? requestDateLabel : '';
 
     if (labelText) {
-      addLines(labelText, labelFont, '#111111', Math.round(labelFontSize * 1.35));
+      addLines(labelText, labelFont, accentColor, Math.round(labelFontSize * 1.35));
     }
     if (addressText) {
-      addLines(addressText, addressFont, '#333333', Math.round(addressFontSize * 1.35));
+      addLines(addressText, addressFont, accentColor, Math.round(addressFontSize * 1.35));
     }
     if (amountLine) {
-      addLines(amountLine, metaFont, '#444444', Math.round(metaFontSize * 1.35));
+      addLines(amountLine, metaFont, accentColor, Math.round(metaFontSize * 1.35));
     }
     if (dateLine) {
-      addLines(dateLine, metaFont, '#555555', Math.round(metaFontSize * 1.35));
+      addLines(dateLine, metaFont, accentColor, Math.round(metaFontSize * 1.35));
     }
 
     const textGap = textLines.length ? Math.round(labelFontSize * 0.8) : 0;
@@ -684,7 +687,7 @@ export default function WalletDashboardReceiveModal({
       const qrTop = qrDrawY;
       const qrBottom = qrDrawY + qrDrawH;
       const pad = Math.round(offset * 0.4); // distance from QR where gradient becomes transparent
-      const gradientRgb = useRequest ? '249, 115, 22' : '22, 163, 74';
+      const gradientRgb = '0, 0, 0';
       const solid = `rgba(${gradientRgb}, 1)`;
       const transparent = `rgba(${gradientRgb}, 0)`;
 
@@ -787,7 +790,7 @@ export default function WalletDashboardReceiveModal({
     {
       const by = exportCanvas.height - brandLineHeight - Math.round(brandGap / 3);
       ctx.font = brandFont;
-      ctx.fillStyle = '#000000';
+      ctx.fillStyle = accentColor;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'top';
       ctx.fillText('XCANNES', exportWidth / 2, by);
