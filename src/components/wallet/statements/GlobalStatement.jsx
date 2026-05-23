@@ -716,7 +716,7 @@ export default function GlobalStatement({
       ctx.lineWidth = 2;
       ctx.stroke();
 
-      // Header — "Votre compte: <nom> • <adresse tronquée à moitié>" at top-right
+      // Header — "Votre compte: <nom> • <adresse tronquée à moitié>" at top-left
       {
         const accountName = String(walletLabel || t("nav_wallet", "Wallet")).trim();
         const addrRaw = String(walletAddress || "").trim();
@@ -724,10 +724,9 @@ export default function GlobalStatement({
         const accountHeader = `${t("ui_your_account_label", "Votre compte")}: ${accountName}${half ? " • " + half : ""}`;
         ctx.fillStyle = "rgba(255,255,255,0.70)";
         ctx.font = "600 26px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
-        ctx.textAlign = "right";
-        ctx.textBaseline = "alphabetic";
-        ctx.fillText(ellipsize(accountHeader, cardW - 88), cardX + cardW - 44, cardY + 62);
         ctx.textAlign = "left";
+        ctx.textBaseline = "alphabetic";
+        ctx.fillText(ellipsize(accountHeader, cardW - 88), cardX + 44, cardY + 62);
       }
 
       ctx.fillStyle = "rgba(255,255,255,0.90)";
@@ -814,6 +813,14 @@ export default function GlobalStatement({
         ctx.fillText(ellipsize(toLine, cardW - 88), cardX + 44, y + 116);
         ctx.fillText(ellipsize(feeLine, cardW - 88), cardX + 44, y + 194);
       }
+
+      // Discreet centered brand footer
+      ctx.fillStyle = "rgba(255,255,255,0.35)";
+      ctx.font = "600 18px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "alphabetic";
+      ctx.fillText("xcannes", cardX + cardW / 2, cardY + cardH - 28);
+      ctx.textAlign = "left";
 
         if (typeof canvas.toBlob === "function") {
           return await new Promise((resolve) => {
@@ -905,6 +912,7 @@ export default function GlobalStatement({
     t,
     toast,
     walletLabel,
+    walletAddress,
   ]);
 
   /* ── ledger status ─────────────────────────────────────── */
@@ -1421,6 +1429,7 @@ export default function GlobalStatement({
       isXrplAddress={isXrplAddress}
       truncateMiddle={truncateMiddle}
       walletLabel={walletLabel}
+      walletAddress={walletAddress}
       t={t}
       locale={locale}
     />

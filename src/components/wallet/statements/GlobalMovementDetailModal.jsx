@@ -36,6 +36,7 @@ export default function GlobalMovementDetailModal({
   isXrplAddress,
   truncateMiddle,
   walletLabel,
+  walletAddress,
   t,
   locale,
 }) {
@@ -136,7 +137,15 @@ export default function GlobalMovementDetailModal({
         {/* Header */}
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <div className="text-[11px] tracking-[0.08em] text-[#8B98A5]">
+            <div className="text-[11px] text-white/60 truncate">
+              {(() => {
+                const name = String(walletLabel || t("nav_wallet", "Wallet")).trim();
+                const addr = String(walletAddress || "").trim();
+                const half = addr ? `${addr.slice(0, Math.ceil(addr.length / 2))}…` : "";
+                return `${t("ui_your_account_label", "Votre compte")}: ${name}${half ? " • " + half : ""}`;
+              })()}
+            </div>
+            <div className="mt-1 text-[11px] tracking-[0.08em] text-[#8B98A5]">
               {detailIsConversion ? detailConversionHeader : detailTypeLabel}
             </div>
             {!detailIsConversion ? (
@@ -233,16 +242,60 @@ export default function GlobalMovementDetailModal({
                       .trim() || "—"}
                   </span>
                 </div>
-                <div className="flex items-center justify-between gap-3">
-                  <span className="text-xs text-white/60">
+                <div className="flex items-start justify-between gap-3">
+                  <span className="text-xs text-white/60 pt-0.5">
                     {t(
                       "ui_recipient_label_2c7a1d9b5e",
                       "Destinataire",
                     )}
                   </span>
-                  <span className="text-sm font-semibold text-white/90 truncate">
-                    {detailRecipientLabel}
-                  </span>
+                  <div className="min-w-0 text-right">
+                    <div className="text-sm font-semibold text-white/90 truncate">
+                      {detailRecipientLabel}
+                    </div>
+                    {detailMovement?.counterparty &&
+                    isXrplAddress(detailMovement.counterparty) ? (
+                      <div className="mt-1 flex items-center justify-end gap-2">
+                        <span className="text-[11px] text-white/60 font-mono truncate">
+                          {(() => {
+                            const a = String(
+                              detailMovement.counterparty || "",
+                            );
+                            return a
+                              ? `${a.slice(0, Math.ceil(a.length / 2))}…`
+                              : "";
+                          })()}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            await copyToClipboard(
+                              detailMovement.counterparty,
+                              t("ui_copied_address", "Adresse copiée"),
+                            );
+                            setCopiedCounterparty(true);
+                            window.setTimeout(
+                              () => setCopiedCounterparty(false),
+                              1200,
+                            );
+                          }}
+                          className="inline-flex items-center justify-center w-7 h-7 rounded-[14px] bg-white/[0.04] border border-white/[0.06] text-white/70 hover:text-white hover:bg-white/[0.06] transition-colors"
+                          aria-label={t("ui_copy_address", "Copier l'adresse")}
+                          title={t("ui_copy_address", "Copier l'adresse")}
+                        >
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5" aria-hidden="true">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                          </svg>
+                        </button>
+                        {copiedCounterparty ? (
+                          <span className="text-[10px] text-xcannes-green/90 font-medium">
+                            {t("ui_copied", "Copié")}
+                          </span>
+                        ) : null}
+                      </div>
+                    ) : null}
+                  </div>
                 </div>
               </>
             ) : detailIsPaymentReceive ? (
@@ -257,16 +310,60 @@ export default function GlobalMovementDetailModal({
                       .trim() || "—"}
                   </span>
                 </div>
-                <div className="flex items-center justify-between gap-3">
-                  <span className="text-xs text-white/60">
+                <div className="flex items-start justify-between gap-3">
+                  <span className="text-xs text-white/60 pt-0.5">
                     {t(
                       "ui_sender_label_2c7a1d9b5e",
                       "Expéditeur",
                     )}
                   </span>
-                  <span className="text-sm font-semibold text-white/90 truncate">
-                    {detailSenderLabel}
-                  </span>
+                  <div className="min-w-0 text-right">
+                    <div className="text-sm font-semibold text-white/90 truncate">
+                      {detailSenderLabel}
+                    </div>
+                    {detailMovement?.counterparty &&
+                    isXrplAddress(detailMovement.counterparty) ? (
+                      <div className="mt-1 flex items-center justify-end gap-2">
+                        <span className="text-[11px] text-white/60 font-mono truncate">
+                          {(() => {
+                            const a = String(
+                              detailMovement.counterparty || "",
+                            );
+                            return a
+                              ? `${a.slice(0, Math.ceil(a.length / 2))}…`
+                              : "";
+                          })()}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            await copyToClipboard(
+                              detailMovement.counterparty,
+                              t("ui_copied_address", "Adresse copiée"),
+                            );
+                            setCopiedCounterparty(true);
+                            window.setTimeout(
+                              () => setCopiedCounterparty(false),
+                              1200,
+                            );
+                          }}
+                          className="inline-flex items-center justify-center w-7 h-7 rounded-[14px] bg-white/[0.04] border border-white/[0.06] text-white/70 hover:text-white hover:bg-white/[0.06] transition-colors"
+                          aria-label={t("ui_copy_address", "Copier l'adresse")}
+                          title={t("ui_copy_address", "Copier l'adresse")}
+                        >
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5" aria-hidden="true">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                          </svg>
+                        </button>
+                        {copiedCounterparty ? (
+                          <span className="text-[10px] text-xcannes-green/90 font-medium">
+                            {t("ui_copied", "Copié")}
+                          </span>
+                        ) : null}
+                      </div>
+                    ) : null}
+                  </div>
                 </div>
               </>
             ) : (
@@ -348,88 +445,29 @@ export default function GlobalMovementDetailModal({
           </div>
         </div>
 
-        {/* Counterparty copy */}
-        {detailMovement?.counterparty &&
-        isXrplAddress(detailMovement.counterparty) &&
-        !detailIsPaymentSent ? (
-          <div className="mt-3 flex items-center justify-end gap-2">
-            <button
-              type="button"
-              onClick={async () => {
-                await copyToClipboard(
-                  detailMovement.counterparty,
-                  t("ui_copied_address", "Adresse copiée"),
-                );
-                setCopiedCounterparty(true);
-                window.setTimeout(
-                  () => setCopiedCounterparty(false),
-                  1200,
-                );
-              }}
-              className="inline-flex items-center justify-center px-3 py-2 rounded-[20px] bg-white/[0.04] border border-white/[0.06] text-white/70 hover:text-white hover:bg-white/[0.06] transition-colors text-sm font-semibold"
-            >
-              {t("ui_copy_address", "Copier l'adresse")}
-            </button>
-            {copiedCounterparty ? (
-              <span className="text-[10px] text-xcannes-green/90 font-medium">
-                {t("ui_copied", "Copié")}
-              </span>
-            ) : null}
-          </div>
-        ) : null}
+        {/* Counterparty copy (legacy block removed; copy icon shown inline under recipient/sender) */}
 
         <div className="h-px bg-white/[0.04] my-3" />
 
-        {/* Wallet + partage */}
+        {/* Partage */}
         {detailMovement?.txHash ? (
           <div className="space-y-2">
             <div className="rounded-[20px] border border-white/[0.06] bg-white/[0.03] px-3 py-3">
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-2 min-w-0">
-                  <span className="h-2.5 w-2.5 rounded-full bg-xcannes-green ring-4 ring-xcannes-green/20 shrink-0 animate-pulse" aria-hidden />
-                  <span className="text-sm text-white/90 font-semibold truncate">
-                    {walletLabel || t("nav_wallet", "Wallet")}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2 flex-none">
-                  <button
-                    type="button"
-                    onClick={async () => {
-                      await copyToClipboard(
-                        detailMovement.txHash,
-                        t("ui_copied_hash", "Hash copié"),
-                      );
-                      setCopiedHash(true);
-                      window.setTimeout(
-                        () => setCopiedHash(false),
-                        1200,
-                      );
-                    }}
-                    className="inline-flex items-center justify-center w-9 h-9 rounded-[20px] bg-white/[0.04] border border-white/[0.06] text-white/70 hover:text-white hover:bg-white/[0.06] transition-colors"
-                    aria-label={t("ui_copy_hash", "Copy hash")}
-                    title={t("ui_copy_hash", "Copy hash")}
-                  >
-                    ⧉
-                  </button>
-                  {copiedHash ? (
-                    <span className="text-[10px] text-xcannes-green/90 font-medium">
-                      {t("ui_copied", "Copié")}
-                    </span>
-                  ) : null}
-                  <button
-                    type="button"
-                    onClick={handleShare}
-                    className="inline-flex items-center justify-center w-9 h-9 rounded-[20px] bg-white/[0.04] border border-white/[0.06] text-white/70 hover:text-white hover:bg-white/[0.06] transition-colors"
-                    aria-label={t("ui_share", "Partager")}
-                    title={t("ui_share", "Partager")}
-                  >
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4" aria-hidden="true">
-                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                      <polyline points="17 8 12 3 7 8" />
-                      <line x1="12" y1="3" x2="12" y2="15" />
-                    </svg>
-                  </button>
-                </div>
+              <div className="flex items-center justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={handleShare}
+                  className="inline-flex items-center gap-2 px-3 h-9 rounded-[20px] bg-white/[0.04] border border-white/[0.06] text-white/80 hover:text-white hover:bg-white/[0.06] transition-colors text-sm font-semibold"
+                  aria-label={t("ui_share", "Partager")}
+                  title={t("ui_share", "Partager")}
+                >
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4" aria-hidden="true">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="17 8 12 3 7 8" />
+                    <line x1="12" y1="3" x2="12" y2="15" />
+                  </svg>
+                  <span>{t("ui_share", "Partager")}</span>
+                </button>
               </div>
               {shareNotice ? (
                 <div
@@ -446,6 +484,10 @@ export default function GlobalMovementDetailModal({
             </div>
           </div>
         ) : null}
+
+        <div className="mt-4 text-center text-[10px] tracking-[0.08em] text-white/30">
+          xcannes
+        </div>
       </div>
     </div>,
     document.body,

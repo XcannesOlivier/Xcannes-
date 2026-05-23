@@ -1180,6 +1180,18 @@ export default function CurrencyStatement({
         ctx.closePath();
       };
 
+      const ellipsize = (text, maxWidth) => {
+        const raw = String(text || "");
+        if (!raw) return "";
+        if (ctx.measureText(raw).width <= maxWidth) return raw;
+        const ell = "…";
+        let out = raw;
+        while (out.length > 0 && ctx.measureText(out + ell).width > maxWidth) {
+          out = out.slice(0, -1);
+        }
+        return out ? out + ell : ell;
+      };
+
       // Background
       ctx.fillStyle = "#0b0f10";
       ctx.fillRect(0, 0, w, h);
@@ -1203,7 +1215,7 @@ export default function CurrencyStatement({
       ctx.lineWidth = 2;
       ctx.stroke();
 
-      // Header — "Votre compte: <nom> • <adresse tronquée à moitié>" at top-right
+      // Header — "Votre compte: <nom> • <adresse tronquée à moitié>" at top-left
       {
         const accountName = walletLabelText;
         const addrRaw = String(walletAddress || "").trim();
@@ -1211,10 +1223,9 @@ export default function CurrencyStatement({
         const accountHeader = `${t("ui_your_account_label", "Votre compte")}: ${accountName}${half ? " • " + half : ""}`;
         ctx.fillStyle = "rgba(255,255,255,0.70)";
         ctx.font = "600 26px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
-        ctx.textAlign = "right";
-        ctx.textBaseline = "alphabetic";
-        ctx.fillText(ellipsize(accountHeader, cardW - 88), cardX + cardW - 44, cardY + 62);
         ctx.textAlign = "left";
+        ctx.textBaseline = "alphabetic";
+        ctx.fillText(ellipsize(accountHeader, cardW - 88), cardX + 44, cardY + 62);
       }
 
       ctx.fillStyle = "rgba(255,255,255,0.90)";
@@ -1277,6 +1288,14 @@ export default function CurrencyStatement({
           ctx.fillText(addr, cardX + 44, cpY + 78);
         }
       }
+
+      // Discreet centered brand footer
+      ctx.fillStyle = "rgba(255,255,255,0.35)";
+      ctx.font = "600 18px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "alphabetic";
+      ctx.fillText("xcannes", cardX + cardW / 2, cardY + cardH - 28);
+      ctx.textAlign = "left";
 
       return await new Promise((resolve) =>
         canvas.toBlob((b) => resolve(b || null), "image/png", 0.92),
@@ -1344,6 +1363,7 @@ export default function CurrencyStatement({
     showConversionFee,
     t,
     walletLabel,
+    walletAddress,
   ]);
 
   const transactionDetailModal = detailOpen && detailTx ? (
@@ -1357,6 +1377,7 @@ export default function CurrencyStatement({
       formatDateTime={formatDateTime}
       formatAmountRlusdAsLocal={formatAmountRlusdAsLocal}
       walletLabel={walletLabel}
+      walletAddress={walletAddress}
       counterpartyAddress={counterpartyAddress}
       counterpartyTitle={counterpartyTitle}
       counterpartyName={counterpartyName}
