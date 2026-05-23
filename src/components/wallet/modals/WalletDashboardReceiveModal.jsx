@@ -686,8 +686,8 @@ export default function WalletDashboardReceiveModal({
       const qrRight = qrDrawX + qrDrawW;
       const qrTop = qrDrawY;
       const qrBottom = qrDrawY + qrDrawH;
-      const pad = Math.round(offset * 0.4); // distance from QR where gradient becomes transparent
-      const gradientRgb = '0, 0, 0';
+      const pad = Math.round(offset * 0.15); // smaller pad → gradient reaches closer to the QR
+      const gradientRgb = '70, 70, 70'; // lighter black (soft dark grey)
       const solid = `rgba(${gradientRgb}, 1)`;
       const transparent = `rgba(${gradientRgb}, 0)`;
 
