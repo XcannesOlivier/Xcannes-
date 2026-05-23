@@ -1886,16 +1886,17 @@ const MoonPaySellModal = ({
             className="absolute inset-0 bg-black/70 backdrop-blur-sm"
             onClick={() => setOpDetailsOpen(false)}
           />
-          <div className="relative w-full bg-elevated rounded-t-[22px] xcannes-sheet-fade-border-violet shadow-2xl px-6 pt-5 pb-8 max-h-full overflow-y-auto">
-            <div className="md:hidden flex justify-center mb-4">
-              <span className="block w-12 h-1.5 rounded-full bg-white/15" aria-hidden />
-            </div>
+          <div className="relative w-full max-h-full bg-elevated rounded-t-[22px] xcannes-sheet-fade-border-violet shadow-2xl">
             {/* Bottom indicator – mobile only */}
             <div
               className="md:hidden pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-[max(env(safe-area-inset-bottom),10px)] z-20"
               aria-hidden
             >
               <span className="block w-36 h-1.5 rounded-full bg-white/80" />
+            </div>
+            <div className="px-6 pt-5 pb-8 max-h-[inherit] overflow-y-auto rounded-t-[22px]">
+            <div className="md:hidden flex justify-center mb-4">
+              <span className="block w-12 h-1.5 rounded-full bg-white/15" aria-hidden />
             </div>
             {/* Header */}
             <div className="flex items-start justify-between gap-3 mb-5">
@@ -2079,6 +2080,11 @@ const MoonPaySellModal = ({
                   </div>
                 </div>
               ) : null}
+            </div>
+            </div>
+            {/* Bottom bar – desktop only (visual balance) */}
+            <div className="hidden md:flex pointer-events-none justify-center pt-6 pb-2" aria-hidden>
+              <span className="block w-[120px] h-[4px] rounded-full bg-white/10" />
             </div>
           </div>
         </div>,
