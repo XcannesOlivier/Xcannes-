@@ -1234,8 +1234,8 @@ const MoonPaySellModal = ({
 
   // Mode embedded: retourner seulement le contenu
   const renderContent = () => (
-    <div ref={contentRootRef} className="relative">
-      <div className={embedded ? undefined : "p-4 md:p-5"}>
+    <div ref={contentRootRef} className="relative min-h-full flex flex-col">
+      <div className={embedded ? "flex-1" : "flex-1 p-4 md:p-5"}>
       {/* Form */}
       {step === "form" && (
         <div className="space-y-5">
