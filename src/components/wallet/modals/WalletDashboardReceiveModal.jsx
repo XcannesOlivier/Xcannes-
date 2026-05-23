@@ -652,13 +652,13 @@ export default function WalletDashboardReceiveModal({
       addLines(labelText, labelFont, accentColor, Math.round(labelFontSize * 1.35));
     }
     if (addressText) {
-      addLines(addressText, addressFont, accentColor, Math.round(addressFontSize * 1.35));
+      addLines(addressText, addressFont, '#ffffff', Math.round(addressFontSize * 1.35));
     }
     if (amountLine) {
       addLines(amountLine, amountFont, accentColor, Math.round(amountFontSize * 1.35));
     }
     if (dateLine) {
-      addLines(dateLine, metaFont, accentColor, Math.round(metaFontSize * 1.35));
+      addLines(dateLine, metaFont, '#ffffff', Math.round(metaFontSize * 1.35));
     }
 
     const textGap = textLines.length ? Math.round(labelFontSize * 0.8) : 0;
@@ -757,7 +757,7 @@ export default function WalletDashboardReceiveModal({
     {
       const by = exportCanvas.height - brandLineHeight - Math.round(brandGap / 3);
       ctx.font = brandFont;
-      ctx.fillStyle = accentColor;
+      ctx.fillStyle = '#ffffff';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'top';
       ctx.fillText('XCANNES', exportWidth / 2, by);
