@@ -218,8 +218,13 @@ export default function WalletDashboardCashModal({
           className={inline ? "w-full h-full flex" : "pointer-events-auto w-full h-full"}
           style={{
             transform: `translateY(${Math.max(0, overlayTranslateY)}px)`,
-            transition: overlayDragging ? "none" : "transform 220ms cubic-bezier(0.2,0,0,1)",
-            willChange: overlayTranslateY ? "transform" : undefined,
+            opacity: overlayTranslateY > 0
+              ? Math.max(0, Math.min(1, 1 - overlayTranslateY / 420))
+              : closeRequestedRef.current ? 0 : undefined,
+            transition: overlayDragging
+              ? "none"
+              : "transform 220ms cubic-bezier(0.2,0,0,1), opacity 220ms cubic-bezier(0.2,0,0,1)",
+            willChange: overlayTranslateY ? "transform, opacity" : undefined,
           }}
           onPointerMove={handleOverlayPointerMove}
           onPointerUp={handleOverlayPointerEnd}

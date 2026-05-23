@@ -808,61 +808,6 @@ const MoonPayBuyModal = ({
     };
   }, [deactivateMoonpayActive]);
 
-  // Swipe-to-close (mobile) — fait disparaître le modale en glissant vers le bas
-  const [swipeDragY, setSwipeDragY] = useState(0);
-  const [swipeDragging, setSwipeDragging] = useState(false);
-  const swipeMetaRef = useRef({ startY: 0, startAt: 0, pointerId: null, lastDelta: 0, dragging: false });
-  const swipeClosingRef = useRef(false);
-  const swipeFadeOpacity = Math.max(0, Math.min(1, 1 - swipeDragY / 420));
-
-  const handlePanelPointerDown = (e) => {
-    if (step === 'iframe') return;
-    if (e.pointerType === 'mouse') return;
-    if (!e.isPrimary) return;
-    if (e.target?.closest?.('input,textarea,select,button,a,[role="button"]')) return;
-    swipeMetaRef.current = { startY: e.clientY, startAt: Date.now(), pointerId: e.pointerId, lastDelta: 0, dragging: false };
-  };
-  const handlePanelPointerMove = (e) => {
-    const meta = swipeMetaRef.current;
-    if (meta.pointerId !== e.pointerId) return;
-    const delta = e.clientY - meta.startY;
-    if (delta <= 0) {
-      if (meta.dragging) { meta.lastDelta = 0; setSwipeDragY(0); }
-      return;
-    }
-    if (!meta.dragging) {
-      if (delta < 8) return;
-      try { modalPanelRef.current?.setPointerCapture?.(e.pointerId); } catch { /* ignore */ }
-      meta.dragging = true;
-      setSwipeDragging(true);
-    }
-    meta.lastDelta = delta;
-    setSwipeDragY(delta);
-  };
-  const handlePanelPointerEnd = (e) => {
-    const meta = swipeMetaRef.current;
-    if (meta.pointerId !== e.pointerId) return;
-    const delta = meta.lastDelta || 0;
-    const duration = Math.max(1, Date.now() - (meta.startAt || 0));
-    const velocity = delta / duration;
-    const height = typeof window !== 'undefined' ? window.innerHeight : 800;
-    const closeDistance = Math.max(140, Math.min(240, height * 0.2));
-    const shouldClose = delta > closeDistance || (delta > closeDistance * 0.55 && velocity > 1.15);
-    swipeMetaRef.current = { startY: 0, startAt: 0, pointerId: null, lastDelta: 0, dragging: false };
-    setSwipeDragging(false);
-    if (shouldClose && !swipeClosingRef.current) {
-      swipeClosingRef.current = true;
-      setSwipeDragY(Math.max(delta, height));
-      window.setTimeout(() => {
-        swipeClosingRef.current = false;
-        setSwipeDragY(0);
-        handleUserClose();
-      }, 200);
-      return;
-    }
-    setSwipeDragY(0);
-  };
-
   const handleWidgetClose = useMemo(() => {
     return () => {
       clearResumeState();
@@ -2219,7 +2164,6 @@ const MoonPayBuyModal = ({
         className={`fixed inset-0 z-[10000] bg-black/80 md:backdrop-blur-sm ${
           isClosing ? 'wallet-modal-backdrop-out' : 'wallet-modal-backdrop-in'
         }`}
-        style={swipeDragY ? { opacity: swipeFadeOpacity, transition: swipeDragging ? 'none' : 'opacity 200ms ease' } : undefined}
         onClick={step === 'iframe' ? null : onClose}
       />
 
@@ -2230,19 +2174,8 @@ const MoonPayBuyModal = ({
           className={`relative w-full wallet-modal-panel max-w-2xl border rounded-2xl overflow-hidden pointer-events-auto shadow-2xl ${
             noticeVariant === 'demo' ? 'bg-xcannes-surface-demo border-white/10' : 'bg-elevated border-subtle'
           } ${isClosing ? 'wallet-modal-lift-out' : 'wallet-modal-lift-in'}`}
-          style={swipeDragY ? { transform: `translateY(${swipeDragY}px)`, opacity: swipeFadeOpacity, transition: swipeDragging ? 'none' : 'transform 200ms cubic-bezier(0.2,0,0,1), opacity 200ms ease', willChange: 'transform, opacity' } : undefined}
           onClick={e => e.stopPropagation()}
-          onPointerDown={handlePanelPointerDown}
-          onPointerMove={handlePanelPointerMove}
-          onPointerUp={handlePanelPointerEnd}
-          onPointerCancel={handlePanelPointerEnd}
         >
-          {/* Grabber bar (mobile) */}
-          {step !== 'iframe' && (
-            <div className="md:hidden flex justify-center pt-3 pb-1 touch-none" aria-hidden>
-              <span className="block w-12 h-1.5 rounded-full bg-white/20" />
-            </div>
-          )}
           {/* Header — visible uniquement pendant l'iframe */}
           {step === 'iframe' && (
             <div className="flex items-center gap-3 p-4 md:p-5 border-b border-white/10">
