@@ -1639,15 +1639,23 @@ const MoonPaySellModal = ({
           <div className={`${sheetPos} inset-0 ${sheetZ} flex items-end`}>
             <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setOpDetailsOpen(false)} />
             <div
-              className="relative w-full bg-elevated rounded-t-3xl ring-1 ring-white/10 shadow-2xl px-6 pt-5 pb-8 max-h-full overflow-y-auto"
+              className="relative w-full max-h-full bg-elevated rounded-t-[22px] xcannes-sheet-fade-border-violet shadow-2xl"
               style={{ transform: `translateY(${sheetDragY}px)`, transition: sheetDragY ? 'none' : 'transform 200ms ease' }}
               onPointerDown={handleSheetPointerDown}
               onPointerMove={handleSheetPointerMove}
               onPointerUp={handleSheetPointerUp}
               onPointerCancel={handleSheetPointerUp}
             >
+              {/* Bottom indicator – mobile only */}
+              <div
+                className="md:hidden pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-[max(env(safe-area-inset-bottom),10px)] z-20"
+                aria-hidden
+              >
+                <span className="block w-36 h-1.5 rounded-full bg-white/80" />
+              </div>
+              <div className="px-6 pt-5 pb-8 max-h-[inherit] overflow-y-auto rounded-t-[22px]">
               <div className="flex justify-center mb-4 md:hidden">
-                <span className="block w-10 h-1.5 rounded-full bg-white/20" aria-hidden />
+                <span className="block w-12 h-1.5 rounded-full bg-white/15" aria-hidden />
               </div>
 
               {/* Header */}
@@ -1832,6 +1840,11 @@ const MoonPaySellModal = ({
                     </div>
                   </div>
                 ) : null}
+              </div>
+              </div>
+              {/* Bottom bar – desktop only (visual balance) */}
+              <div className="hidden md:flex pointer-events-none justify-center pt-6 pb-2" aria-hidden>
+                <span className="block w-[120px] h-[4px] rounded-full bg-white/10" />
               </div>
             </div>
           </div>,
