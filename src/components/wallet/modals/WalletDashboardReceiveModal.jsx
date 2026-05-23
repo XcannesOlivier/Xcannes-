@@ -667,7 +667,29 @@ export default function WalletDashboardReceiveModal({
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
 
-    // Draw title at the top
+    const qrTopOffset = titleBlockHeight + titleGap;
+    const offset = margin * scale;
+    const qrDrawX = offset;
+    const qrDrawY = qrTopOffset + offset;
+    const qrDrawW = srcWidth * scale;
+    const qrDrawH = srcHeight * scale;
+
+    // Green vertical gradient at the bottom (from solid xcannes-green at bottom,
+    // fading to transparent slightly below the QR code).
+    {
+      const qrBottom = qrDrawY + qrDrawH;
+      const gradientStart = qrBottom + Math.round(offset * 0.4); // a bit below the QR
+      const gradientEnd = exportCanvas.height;
+      if (gradientEnd > gradientStart) {
+        const gradient = ctx.createLinearGradient(0, gradientEnd, 0, gradientStart);
+        gradient.addColorStop(0, 'rgba(22, 163, 74, 1)');
+        gradient.addColorStop(1, 'rgba(22, 163, 74, 0)');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, gradientStart, exportCanvas.width, gradientEnd - gradientStart);
+      }
+    }
+
+    // Draw title at the top (on white background)
     if (titleLinesArr.length > 0) {
       let ty = Math.round(titleGap / 2);
       ctx.textAlign = 'center';
@@ -679,34 +701,6 @@ export default function WalletDashboardReceiveModal({
         ty += line.lineHeight;
       });
     }
-
-    const qrTopOffset = titleBlockHeight + titleGap;
-    const offset = margin * scale;
-    const qrDrawX = offset;
-    const qrDrawY = qrTopOffset + offset;
-    const qrDrawW = srcWidth * scale;
-    const qrDrawH = srcHeight * scale;
-
-    // Green frame around the QR (xcannes-green #16a34a)
-    const frameInset = Math.max(6, Math.round(scale * 4));
-    const frameThickness = Math.max(4, Math.round(scale * 3));
-    const frameRadius = Math.max(10, Math.round(scale * 8));
-    const fx = qrDrawX - frameInset;
-    const fy = qrDrawY - frameInset;
-    const fw = qrDrawW + frameInset * 2;
-    const fh = qrDrawH + frameInset * 2;
-    ctx.save();
-    ctx.strokeStyle = '#16a34a';
-    ctx.lineWidth = frameThickness;
-    ctx.lineJoin = 'round';
-    if (typeof ctx.roundRect === 'function') {
-      ctx.beginPath();
-      ctx.roundRect(fx, fy, fw, fh, frameRadius);
-      ctx.stroke();
-    } else {
-      ctx.strokeRect(fx, fy, fw, fh);
-    }
-    ctx.restore();
 
     ctx.drawImage(canvas, qrDrawX, qrDrawY, qrDrawW, qrDrawH);
     try {
