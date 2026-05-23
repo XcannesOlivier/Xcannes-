@@ -1234,7 +1234,8 @@ const MoonPaySellModal = ({
 
   // Mode embedded: retourner seulement le contenu
   const renderContent = () => (
-    <div ref={contentRootRef} className={embedded ? "relative" : "relative p-4 md:p-5"}>
+    <div ref={contentRootRef} className="relative">
+      <div className={embedded ? undefined : "p-4 md:p-5"}>
       {/* Form */}
       {step === "form" && (
         <div className="space-y-5">
@@ -1611,6 +1612,7 @@ const MoonPaySellModal = ({
           </div>
         </div>
       )}
+      </div>
       {/* Bottom bar – desktop only (visual balance) */}
       <div className="hidden md:flex pointer-events-none justify-center pt-2 pb-4" aria-hidden>
         <span className="block w-[120px] h-[4px] rounded-full bg-white/30" />
