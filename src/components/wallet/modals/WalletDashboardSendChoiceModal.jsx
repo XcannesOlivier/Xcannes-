@@ -958,7 +958,7 @@ export default function WalletDashboardSendChoiceModal({
                     <span className="block w-36 h-1.5 rounded-full bg-white/80" />
                   </div>
                 ) : null}
-                <div className="px-5 pt-[30px] md:pt-[60px] pb-5 flex flex-col flex-1 min-h-0 overflow-y-auto overscroll-contain">
+                <div className={`px-5 ${pendingDestination.address ? 'pt-[12px] md:pt-[24px]' : 'pt-[30px] md:pt-[60px]'} pb-5 flex flex-col flex-1 min-h-0 overflow-y-auto overscroll-contain`}>
                 {/* Title + subtitle (centered) */}
                 <div className="flex flex-col items-center text-center mb-[40px]">
                   <h3 className="mt-1 text-[28px] md:text-[32px] font-semibold text-white/95 tracking-tight">
@@ -1278,7 +1278,7 @@ export default function WalletDashboardSendChoiceModal({
                   </div>
                 </div>
 
-                <div className={pendingDestination.address ? 'pt-0 md:pt-6' : 'pt-6 md:pt-12'}>
+                <div className={pendingDestination.address ? 'pt-6 md:pt-6' : 'pt-6 md:pt-12'}>
                   {pendingDestination.address ? (() => {
                     const addr = String(pendingDestination.address || '').trim();
                     const label = String(pendingDestination.label || '').trim();
