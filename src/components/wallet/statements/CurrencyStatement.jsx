@@ -1496,7 +1496,7 @@ export default function CurrencyStatement({
 
           {/* Sélecteur de période */}
           {!isXrpNetworkView ? (
-            <div className="flex justify-center px-4 md:px-6 mt-10 mb-2 w-full">
+            <div className="flex justify-center px-4 md:px-6 mt-6 md:mt-7 mb-2 w-full">
               <StatementMonthSelect
                 value={selectedMonth}
                 onOpenChange={setPeriodDropdownOpen}
