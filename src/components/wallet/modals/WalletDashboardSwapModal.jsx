@@ -930,7 +930,7 @@ export default function WalletDashboardSwapModal({
                       }}
                       disabled={convertButtonDisabled}
                       className={[
-                        "w-full py-3.5 rounded-[14px] text-[17px] md:text-[16px] font-semibold transition-all duration-200 tracking-[-0.01em]",
+                        "w-full py-3.5 rounded-[14px] text-[18px] font-semibold transition-all duration-200 tracking-[-0.01em]",
                         convertButtonDisabled
                           ? "text-white/90 cursor-not-allowed ring-[0.5px] ring-xcannes-green/30 ring-inset"
                           : "text-white hover:scale-[1.01] active:scale-[0.98]",
@@ -946,7 +946,7 @@ export default function WalletDashboardSwapModal({
                     >
                       {convertButtonDisabled && !convertProcessing
                         ? <span className="inline-flex items-center gap-1.5 text-white/85">
-                            <span className="text-xs">{t('ui_swap_fill_cta', 'Choisissez les devises et le montant')}</span>
+                            <span className="text-[14px] md:text-[16px]">{t('ui_swap_fill_cta', 'Choisissez les devises et le montant')}</span>
                             <span className="inline-flex items-end gap-[3px] mb-[-1px]">
                               <span className="swap-dot" style={{ animationDelay: '0s' }}>·</span>
                               <span className="swap-dot" style={{ animationDelay: '0.6s' }}>·</span>
