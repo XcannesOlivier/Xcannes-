@@ -1247,7 +1247,7 @@ export default function WalletDashboardSendModal({
 	        }}
 	        disabled={sendButtonDisabled}
 	        className={[
-	          "md:hidden w-full py-3.5 rounded-[14px] text-[22px] font-semibold transition-all duration-200 tracking-[-0.01em]",
+	          "md:hidden w-full h-[52px] flex items-center justify-center rounded-[14px] text-[22px] font-semibold transition-all duration-200 tracking-[-0.01em]",
 	          sendButtonDisabled
 	            ? sendProcessing
 	              ? "opacity-45 cursor-not-allowed"
@@ -1292,7 +1292,7 @@ export default function WalletDashboardSendModal({
 	        }}
 	        disabled={sendButtonDisabled}
 	        className={[
-	          "hidden md:flex items-center justify-center w-full py-3.5 rounded-[14px] text-[24px] font-semibold transition-all duration-200 tracking-[-0.01em]",
+	          "hidden md:flex items-center justify-center w-full h-[56px] rounded-[14px] text-[24px] font-semibold transition-all duration-200 tracking-[-0.01em]",
 	          sendButtonDisabled
 	            ? sendProcessing
 	              ? "opacity-45 cursor-not-allowed"

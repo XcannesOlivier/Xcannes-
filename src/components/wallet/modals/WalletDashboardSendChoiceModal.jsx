@@ -1561,7 +1561,7 @@ export default function WalletDashboardSendChoiceModal({
 	                        onChoosePayRequest?.();
 	                      }
 	                    }}
-	                    className={`w-full py-3.5 rounded-[14px] text-[17px] md:text-[16px] font-semibold transition-all duration-200 ${
+	                    className={`w-full h-[52px] md:h-[56px] flex items-center justify-center rounded-[14px] text-[17px] md:text-[16px] font-semibold transition-all duration-200 ${
 	                      pendingPayreq
 	                        ? 'text-white hover:scale-[1.01] active:scale-[0.98]'
 	                        : 'text-white/90 cursor-not-allowed ring-[0.5px] ring-[#f5a623]/30 ring-inset'
