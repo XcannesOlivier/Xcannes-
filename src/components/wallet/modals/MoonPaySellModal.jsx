@@ -1637,10 +1637,19 @@ const MoonPaySellModal = ({
         {renderContent()}
         {opDetailsOpen && typeof document !== 'undefined' ? createPortal(
           <div className={`${sheetPos} inset-0 ${sheetZ} flex items-end`}>
-            <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setOpDetailsOpen(false)} />
+            <div
+              className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+              style={sheetDragY ? { opacity: Math.max(0, Math.min(1, 1 - sheetDragY / 420)), transition: 'opacity 200ms ease' } : undefined}
+              onClick={() => setOpDetailsOpen(false)}
+            />
             <div
               className="relative w-full max-h-full bg-elevated rounded-t-[22px] xcannes-sheet-fade-border-violet shadow-2xl"
-              style={{ transform: `translateY(${sheetDragY}px)`, transition: sheetDragY ? 'none' : 'transform 200ms ease' }}
+              style={{
+                transform: `translateY(${sheetDragY}px)`,
+                opacity: sheetDragY ? Math.max(0, Math.min(1, 1 - sheetDragY / 420)) : undefined,
+                transition: sheetDragY ? 'none' : 'transform 200ms ease, opacity 200ms ease',
+                willChange: sheetDragY ? 'transform, opacity' : undefined,
+              }}
               onPointerDown={handleSheetPointerDown}
               onPointerMove={handleSheetPointerMove}
               onPointerUp={handleSheetPointerUp}

@@ -4258,10 +4258,19 @@ export default function WalletDashboardUsdSwapModal({
 	    {/* Bottom sheet — Détails de l'opération */}
 	    {opDetailsOpen && typeof document !== 'undefined' ? createPortal(
 	      <div className="absolute inset-0 z-[50] flex items-end">
-	        <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => { setSheetDragY(0); setOpDetailsOpen(false); }} />
+	        <div
+	          className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+	          style={sheetDragY ? { opacity: Math.max(0, Math.min(1, 1 - sheetDragY / 420)), transition: 'opacity 200ms ease' } : undefined}
+	          onClick={() => { setSheetDragY(0); setOpDetailsOpen(false); }}
+	        />
 	        <div
 	          className={`relative w-full max-h-full bg-elevated rounded-t-[22px] shadow-2xl ${isBinanceYellow ? 'xcannes-sheet-fade-border-yellow' : 'xcannes-sheet-fade-border-blue'}`}
-	          style={{ transform: `translateY(${sheetDragY}px)`, transition: sheetDragY ? 'none' : 'transform 200ms ease' }}
+	          style={{
+	            transform: `translateY(${sheetDragY}px)`,
+	            opacity: sheetDragY ? Math.max(0, Math.min(1, 1 - sheetDragY / 420)) : undefined,
+	            transition: sheetDragY ? 'none' : 'transform 200ms ease, opacity 200ms ease',
+	            willChange: sheetDragY ? 'transform, opacity' : undefined,
+	          }}
 	          onPointerDown={handleSheetPointerDown}
 	          onPointerMove={handleSheetPointerMove}
 	          onPointerUp={handleSheetPointerUp}
