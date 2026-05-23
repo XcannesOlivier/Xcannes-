@@ -689,6 +689,7 @@ export default function WalletDashboardReceiveModal({
       const pad = Math.round(offset * 0.15); // smaller pad → gradient reaches closer to the QR
       const gradientRgb = '70, 70, 70'; // lighter black (soft dark grey)
       const solid = `rgba(${gradientRgb}, 1)`;
+      const midOpaque = `rgba(${gradientRgb}, 0.92)`; // stays nearly opaque most of the way
       const transparent = `rgba(${gradientRgb}, 0)`;
 
       // Bottom gradient (solid at bottom edge, transparent a bit below the QR)
@@ -698,6 +699,7 @@ export default function WalletDashboardReceiveModal({
         if (end > start) {
           const g = ctx.createLinearGradient(0, end, 0, start);
           g.addColorStop(0, solid);
+          g.addColorStop(0.7, midOpaque);
           g.addColorStop(1, transparent);
           ctx.fillStyle = g;
           ctx.fillRect(0, start, exportCanvas.width, end - start);
@@ -710,6 +712,7 @@ export default function WalletDashboardReceiveModal({
         if (start > end) {
           const g = ctx.createLinearGradient(0, end, 0, start);
           g.addColorStop(0, solid);
+          g.addColorStop(0.7, midOpaque);
           g.addColorStop(1, transparent);
           ctx.fillStyle = g;
           ctx.fillRect(0, end, exportCanvas.width, start - end);
@@ -722,6 +725,7 @@ export default function WalletDashboardReceiveModal({
         if (start > end) {
           const g = ctx.createLinearGradient(end, 0, start, 0);
           g.addColorStop(0, solid);
+          g.addColorStop(0.7, midOpaque);
           g.addColorStop(1, transparent);
           ctx.fillStyle = g;
           ctx.fillRect(end, 0, start - end, exportCanvas.height);
@@ -734,6 +738,7 @@ export default function WalletDashboardReceiveModal({
         if (end > start) {
           const g = ctx.createLinearGradient(end, 0, start, 0);
           g.addColorStop(0, solid);
+          g.addColorStop(0.7, midOpaque);
           g.addColorStop(1, transparent);
           ctx.fillStyle = g;
           ctx.fillRect(start, 0, end - start, exportCanvas.height);
