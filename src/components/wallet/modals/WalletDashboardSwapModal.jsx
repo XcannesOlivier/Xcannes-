@@ -309,23 +309,41 @@ export default function WalletDashboardSwapModal({
 
   const swapWarningMessage = !convertProcessing
     ? (sameCurrencySelected
-        ? t(
-            "ui_convert_same_asset_warning_6f13d5c9c2",
-            "Veuillez choisir 2 actifs différents.",
+        ? (
+            <span className="inline-flex items-center gap-2">
+              <svg viewBox="0 0 24 24" className="w-4 h-4 flex-shrink-0 text-white" fill="none" aria-hidden>
+                <path d="M12 3.5L21.5 20H2.5L12 3.5Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+                <path d="M12 10v4.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+                <circle cx="12" cy="17.25" r="0.9" fill="currentColor" />
+              </svg>
+              <span>{t(
+                "ui_convert_same_asset_warning_6f13d5c9c2",
+                "Veuillez choisir 2 actifs différents.",
+              )}</span>
+            </span>
           )
         : insufficientBalance
-          ? t(
-              "ui_insufficient_balance_convert_a3b4c5d6",
-              "Solde insuffisant. Disponible : {{amount}} {{currency}}",
+          ? (
+              <span className="inline-flex items-center gap-2">
+                <svg viewBox="0 0 24 24" className="w-4 h-4 flex-shrink-0 text-white" fill="none" aria-hidden>
+                  <path d="M12 3.5L21.5 20H2.5L12 3.5Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+                  <path d="M12 10v4.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+                  <circle cx="12" cy="17.25" r="0.9" fill="currentColor" />
+                </svg>
+                <span>{t(
+                  "ui_insufficient_balance_convert_a3b4c5d6",
+                  "Solde insuffisant. Disponible : {{amount}} {{currency}}",
+                )
+                  .replace(
+                    "{{amount}}",
+                    insufficientBalance.availableUnits.toLocaleString(locale, { maximumFractionDigits: 2 }),
+                  )
+                  .replace(
+                    "{{currency}}",
+                    getDisplayCurrencyCode(insufficientBalance.currency),
+                  )}</span>
+              </span>
             )
-              .replace(
-                "{{amount}}",
-                insufficientBalance.availableUnits.toLocaleString(locale, { maximumFractionDigits: 2 }),
-              )
-              .replace(
-                "{{currency}}",
-                getDisplayCurrencyCode(insufficientBalance.currency),
-              )
           : null)
     : null;
   const handleConvertAction = () => {
