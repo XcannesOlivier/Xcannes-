@@ -1154,6 +1154,41 @@ body.header-hero-mode .home-content-wrapper {
   );
 }
 
+/* Mobile: trait plus fin (0.8px) */
+@media (max-width: 767px) {
+  .xcannes-sendchoice-border-fade-green,
+  .xcannes-sendchoice-border-fade-amber {
+    padding: 0.8px;
+  }
+}
+
+/* Desktop (≥768px) : on conserve 1.5px de padding (compensation des coins arrondis)
+   mais on réduit l'intensité du dégradé pour un rendu plus discret. */
+@media (min-width: 768px) {
+  .xcannes-sendchoice-border-fade-green,
+  .xcannes-sendchoice-border-fade-amber {
+    opacity: 0.7;
+  }
+  .xcannes-sendchoice-border-fade-green {
+    background: linear-gradient(
+      90deg,
+      rgba(0, 255, 150, 0.42) 0%,
+      rgba(0, 255, 150, 0.14) 14%,
+      rgba(255, 255, 255, 0.05) 46%,
+      rgba(255, 255, 255, 0) 100%
+    );
+  }
+  .xcannes-sendchoice-border-fade-amber {
+    background: linear-gradient(
+      90deg,
+      rgba(245, 166, 35, 0.38) 0%,
+      rgba(245, 166, 35, 0.12) 14%,
+      rgba(255, 255, 255, 0.05) 46%,
+      rgba(255, 255, 255, 0) 100%
+    );
+  }
+}
+
 .xcannes-fade-ring-y {
   position: relative;
 }
