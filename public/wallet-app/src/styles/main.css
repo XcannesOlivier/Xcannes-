@@ -486,7 +486,25 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
   background: transparent;
   border: none;
   box-shadow: none;
-  margin-bottom: 18px;
+  margin-bottom: 22px;
+  width: 104px;
+  height: 104px;
+}
+
+#screen-choice .choice-bottom-bar {
+  display: flex;
+  justify-content: center;
+  margin-top: 28px;
+  padding-bottom: 8px;
+  pointer-events: none;
+}
+
+#screen-choice .choice-bottom-bar > span {
+  display: block;
+  width: 120px;
+  height: 4px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 #screen-choice .choice-title {
@@ -1672,7 +1690,9 @@ textarea.error {
 }
 
 #screen-backup .screen-header {
-  justify-content: center;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 10px;
   margin-bottom: 18px;
 }
 
@@ -1680,10 +1700,40 @@ textarea.error {
   display: none;
 }
 
+#screen-backup .screen-header .btn-back {
+  background: transparent;
+  border: none;
+  backdrop-filter: none;
+  box-shadow: none;
+}
+
+#screen-backup .screen-header .btn-back:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
 #screen-backup .screen-header h2 {
-  font-size: 22px;
-  font-weight: 800;
-  letter-spacing: -0.35px;
+  flex: 0 1 auto;
+  text-align: left;
+  font-size: 24px;
+  font-weight: 500;
+  letter-spacing: -0.2px;
+  line-height: 1.15;
+}
+
+#screen-backup .choice-bottom-bar {
+  display: flex;
+  justify-content: center;
+  margin-top: 24px;
+  padding-bottom: 8px;
+  pointer-events: none;
+}
+
+#screen-backup .choice-bottom-bar > span {
+  display: block;
+  width: 120px;
+  height: 4px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .backup-warning {
@@ -1765,17 +1815,8 @@ textarea.error {
 
 .mnemonic-grid::before,
 .mnemonic-grid::after {
-  content: "";
-  position: absolute;
-  left: 18px;
-  right: 18px;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, rgba(0, 200, 83, 0.55), transparent);
-  opacity: 0.9;
+  content: none;
 }
-
-.mnemonic-grid::before { top: -10px; }
-.mnemonic-grid::after { bottom: -10px; }
 
 .mnemonic-word {
   display: flex;
