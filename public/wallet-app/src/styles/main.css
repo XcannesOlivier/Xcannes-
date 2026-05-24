@@ -492,11 +492,16 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
 }
 
 #screen-choice .choice-bottom-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
   display: flex;
   justify-content: center;
-  margin-top: 28px;
-  padding-bottom: 8px;
+  padding-top: 24px;
+  padding-bottom: calc(env(safe-area-inset-bottom, 16px) + 16px);
   pointer-events: none;
+  z-index: 2;
 }
 
 #screen-choice .choice-bottom-bar > span {
@@ -1721,11 +1726,16 @@ textarea.error {
 }
 
 #screen-backup .choice-bottom-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
   display: flex;
   justify-content: center;
-  margin-top: 24px;
-  padding-bottom: 8px;
+  padding-top: 24px;
+  padding-bottom: calc(env(safe-area-inset-bottom, 16px) + 16px);
   pointer-events: none;
+  z-index: 2;
 }
 
 #screen-backup .choice-bottom-bar > span {
@@ -1755,15 +1765,7 @@ textarea.error {
 }
 
 .backup-warning::after {
-  content: "";
-  position: absolute;
-  left: 20px;
-  right: 20px;
-  bottom: -10px;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, rgba(0, 200, 83, 0.55), transparent);
-  filter: blur(0.2px);
-  opacity: 0.9;
+  content: none;
 }
 
 .backup-warning-icon {
@@ -1798,18 +1800,16 @@ textarea.error {
 .mnemonic-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px 16px;
+  gap: 12px 20px;
   width: 100%;
   max-width: 360px;
   margin: 10px auto 18px;
-  padding: 18px 16px;
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(16px);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.06),
-    0 18px 46px rgba(0, 0, 0, 0.55);
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  backdrop-filter: none;
+  box-shadow: none;
   position: relative;
 }
 
@@ -1835,23 +1835,23 @@ textarea.error {
 }
 
 .mnemonic-num {
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   font-weight: 700;
   color: rgba(0, 200, 83, 0.95);
-  min-width: 22px;
-  height: 22px;
+  min-width: 26px;
+  height: 26px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: rgba(0, 200, 83, 0.12);
-  border-radius: 6px;
+  border-radius: 7px;
   flex-shrink: 0;
 }
 
 .mnemonic-text {
-  font-size: 0.95rem;
+  font-size: 1.15rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.88);
+  color: rgba(255, 255, 255, 0.92);
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   letter-spacing: 0.01em;
 }
