@@ -1154,11 +1154,11 @@ body.header-hero-mode .home-content-wrapper {
   );
 }
 
-/* Mobile: trait plus fin (0.8px) */
+/* Mobile: trait plus fin (0.7px) */
 @media (max-width: 767px) {
   .xcannes-sendchoice-border-fade-green,
   .xcannes-sendchoice-border-fade-amber {
-    padding: 0.8px;
+    padding: 0.7px;
   }
 }
 
@@ -1167,6 +1167,7 @@ body.header-hero-mode .home-content-wrapper {
 @media (min-width: 768px) {
   .xcannes-sendchoice-border-fade-green,
   .xcannes-sendchoice-border-fade-amber {
+    padding: 1px;
     opacity: 0.7;
   }
   .xcannes-sendchoice-border-fade-green {
