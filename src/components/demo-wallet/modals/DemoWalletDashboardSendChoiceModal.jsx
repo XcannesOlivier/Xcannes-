@@ -590,11 +590,8 @@ export default function DemoWalletDashboardSendChoiceModal({
                       <div className="absolute left-0 right-0 top-0 h-px bg-gradient-to-l from-xcannes-green/45 via-white/10 to-transparent" aria-hidden />
                       <span className="inline-flex items-center gap-2">
                         <OpenFlowIcon className="w-[18px] h-[18px] text-xcannes-green/85" />
-                        <span className="text-white">{t("ui_open_flow", "Ouvrir le parcours")}</span>
+                        <span className="text-white">{t("ui_open_flow", "Voir les étapes")}</span>
                       </span>
-                      <svg className="w-4 h-4 text-xcannes-green/85" viewBox="0 0 24 24" fill="none" aria-hidden>
-                        <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
                     </div>
                   </button>
                 </div>
@@ -647,11 +644,8 @@ export default function DemoWalletDashboardSendChoiceModal({
                       <div className="absolute left-0 right-0 top-0 h-px bg-gradient-to-l from-[#f5a623]/42 via-white/10 to-transparent" aria-hidden />
                       <span className="inline-flex items-center gap-2">
                         <OpenFlowIcon className="w-[18px] h-[18px] text-[#f5a623]/85" />
-                        <span className="text-white">{t("ui_open_flow", "Ouvrir le parcours")}</span>
+                        <span className="text-white">{t("ui_open_flow", "Voir les étapes")}</span>
                       </span>
-                      <svg className="w-4 h-4 text-[#f5a623]/85" viewBox="0 0 24 24" fill="none" aria-hidden>
-                        <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
                     </div>
                   </button>
                 </div>

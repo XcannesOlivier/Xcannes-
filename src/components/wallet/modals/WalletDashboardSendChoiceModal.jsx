@@ -838,11 +838,8 @@ export default function WalletDashboardSendChoiceModal({
                       <div className="absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-xcannes-green/45 to-transparent" aria-hidden />
                       <span className="inline-flex items-center gap-2">
                         <OpenFlowIcon className="w-[38px] h-[28px] text-xcannes-green/85" />
-                        <span className="text-white">{t('ui_open_flow', 'Ouvrir le parcours')}</span>
+                        <span className="text-white">{t('ui_open_flow', 'Voir les étapes')}</span>
                       </span>
-	                      <svg className={`w-4 h-4 text-xcannes-green/85 transition-transform duration-200 ${flowSheet === 'simple' ? 'rotate-90' : 'rotate-0'}`} viewBox="0 0 24 24" fill="none" aria-hidden>
-	                        <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-	                      </svg>
 	                    </button>
 	                  </div>
 
@@ -904,11 +901,8 @@ export default function WalletDashboardSendChoiceModal({
                       <div className="absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-[#f5a623]/40 to-transparent" aria-hidden />
                       <span className="inline-flex items-center gap-2">
                         <OpenFlowIcon className="w-[38px] h-[28px] text-[#f5a623]/85" />
-                        <span className="text-white">{t('ui_open_flow', 'Ouvrir le parcours')}</span>
+                        <span className="text-white">{t('ui_open_flow', 'Voir les étapes')}</span>
                       </span>
-	                      <svg className={`w-4 h-4 text-[#f5a623]/85 transition-transform duration-200 ${flowSheet === 'payreq' ? 'rotate-90' : 'rotate-0'}`} viewBox="0 0 24 24" fill="none" aria-hidden>
-	                        <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-	                      </svg>
 	                    </button>
 	                  </div>
 
