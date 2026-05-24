@@ -130,7 +130,7 @@ export default function CurrencyTransactionDetailModal({
         {/* Header */}
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <div className="text-[11px] text-white/60 truncate">
+            <div className="text-[15px] md:text-[16px] font-semibold text-white/85 truncate">
               {(() => {
                 const name = String(walletLabel || t("nav_wallet", "Wallet")).trim();
                 const addr = String(walletAddress || "").trim();
@@ -298,41 +298,35 @@ export default function CurrencyTransactionDetailModal({
           </div>
         </div>
 
-        <div className="h-px bg-white/[0.04] my-3" />
-
         {/* Partage */}
         {detailTx?.txHash ? (
-          <div className="space-y-2">
-            <div className="rounded-[20px] border border-white/[0.06] bg-white/[0.03] px-3 py-3">
-              <div className="flex items-center justify-end gap-3">
-                <button
-                  type="button"
-                  onClick={handleShare}
-                  className="inline-flex items-center gap-2 px-3 h-9 rounded-[20px] bg-white/[0.04] border border-white/[0.06] text-white/80 hover:text-white hover:bg-white/[0.06] transition-colors text-sm font-semibold"
-                  aria-label={t("ui_share", "Partager")}
-                  title={t("ui_share", "Partager")}
-                >
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4" aria-hidden="true">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                    <polyline points="17 8 12 3 7 8" />
-                    <line x1="12" y1="3" x2="12" y2="15" />
-                  </svg>
-                  <span>{t("ui_share", "Partager")}</span>
-                </button>
+          <div className="mt-3 flex flex-col items-end gap-2">
+            <button
+              type="button"
+              onClick={handleShare}
+              className="inline-flex items-center gap-2 px-2 h-9 bg-transparent text-white/80 hover:text-white transition-colors text-sm font-semibold"
+              aria-label={t("ui_share", "Partager")}
+              title={t("ui_share", "Partager")}
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4" aria-hidden="true">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="17 8 12 3 7 8" />
+                <line x1="12" y1="3" x2="12" y2="15" />
+              </svg>
+              <span>{t("ui_share", "Partager")}</span>
+            </button>
+            {shareNotice ? (
+              <div
+                className={[
+                  "text-xs font-medium",
+                  shareNoticeTone === "error"
+                    ? "text-red-200"
+                    : "text-xcannes-green/90",
+                ].join(" ")}
+              >
+                {shareNotice}
               </div>
-              {shareNotice ? (
-                <div
-                  className={[
-                    "mt-3 text-xs font-medium",
-                    shareNoticeTone === "error"
-                      ? "text-red-200"
-                      : "text-xcannes-green/90",
-                  ].join(" ")}
-                >
-                  {shareNotice}
-                </div>
-              ) : null}
-            </div>
+            ) : null}
           </div>
         ) : null}
 
