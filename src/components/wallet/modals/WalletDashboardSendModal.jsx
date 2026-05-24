@@ -127,10 +127,10 @@ export default function WalletDashboardSendModal({
   const { insufficientBalance, manualInsufficientBalance } = useMemo(() => {
     const check = (requiresPayreq) => {
       const hasPayreq = Boolean(sendPaymentRequest);
-      if (requiresPayreq ? !hasPayreq : hasPayreq) return false;
-      if (!selectedSendToken) return false;
+      if (requiresPayreq ? !hasPayreq : hasPayreq) return null;
+      if (!selectedSendToken) return null;
       const requiredAmount = Number(sendAmount || 0);
-      if (!Number.isFinite(requiredAmount) || requiredAmount <= 0) return false;
+      if (!Number.isFinite(requiredAmount) || requiredAmount <= 0) return null;
       // Trustline-only tokens (EUR, GBP, etc.) are backed by RLUSD allocation.
       // In payreq mode, sendFxInfo.paymentRlusd provides the RLUSD estimate.
       if (selectedSendToken.isTrustlineOnly) {
@@ -138,13 +138,17 @@ export default function WalletDashboardSendModal({
         const requiredRlusd =
           code === "USD" ? requiredAmount : Number(sendFxInfo?.paymentRlusd);
         const availableAllocatedRlusd = Number(selectedSendToken.allocatedRlusd);
-        if (!Number.isFinite(requiredRlusd) || requiredRlusd <= 0) return false;
-        if (!Number.isFinite(availableAllocatedRlusd) || availableAllocatedRlusd < 0) return false;
-        return availableAllocatedRlusd < requiredRlusd;
+        if (!Number.isFinite(requiredRlusd) || requiredRlusd <= 0) return null;
+        if (!Number.isFinite(availableAllocatedRlusd) || availableAllocatedRlusd < 0) return null;
+        if (availableAllocatedRlusd >= requiredRlusd) return null;
+        const rlusdPerUnit = code === "USD" ? 1 : (requiredRlusd / requiredAmount);
+        const availableUnits = rlusdPerUnit > 0 ? availableAllocatedRlusd / rlusdPerUnit : 0;
+        return { availableUnits };
       }
       const available = Number(selectedSendToken.value || 0);
-      if (!Number.isFinite(available)) return false;
-      return available < requiredAmount;
+      if (!Number.isFinite(available)) return null;
+      if (available >= requiredAmount) return null;
+      return { availableUnits: available };
     };
     return {
       insufficientBalance: check(true),
@@ -1191,30 +1195,61 @@ export default function WalletDashboardSendModal({
       ? (insufficientBalance || selfSendBlocked)
       : (!canManualSend || manualInsufficientBalance || selfSendBlocked));
 
+	  const selfSendWarningNode = (
+	    <span className="inline-flex items-center gap-1.5">
+	      <svg viewBox="0 0 24 24" className="w-4 h-4 flex-shrink-0 text-white" fill="none" aria-hidden>
+	        <path d="M12 3.5L21.5 20H2.5L12 3.5Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+	        <path d="M12 10v4.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+	        <circle cx="12" cy="17.25" r="0.9" fill="currentColor" />
+	      </svg>
+	      <span>{t("ui_cannot_send_to_self_short", "Comptes expéditeur et destinataire identiques.")}</span>
+	    </span>
+	  );
+
 	  const payreqWarningMessage = hasPaymentRequest && !sendProcessing
 	    ? (selfSendBlocked
-	        ? t("ui_cannot_send_to_self", "Vous ne pouvez pas envoyer à votre propre compte.")
+	        ? selfSendWarningNode
 	        : insufficientBalance
-	          ? t(
-	              "ui_insufficient_balance_detail",
-	              "Vous n'avez pas assez de {{currency}} pour payer cette demande. Convertissez vos fonds via le bouton Convertir, puis revenez payer.",
-	              {
-	                currency: String(requestCurrencyCode || selectedSendToken?.currency || "").toUpperCase(),
-	              },
+	          ? (
+	              <span className="inline-flex items-center gap-1.5">
+	                <svg viewBox="0 0 24 24" className="w-4 h-4 flex-shrink-0 text-white" fill="none" aria-hidden>
+	                  <path d="M12 3.5L21.5 20H2.5L12 3.5Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+	                  <path d="M12 10v4.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+	                  <circle cx="12" cy="17.25" r="0.9" fill="currentColor" />
+	                </svg>
+	                <span>{t(
+	                  "ui_insufficient_balance_short",
+	                  "Solde insuffisant. Disponible : {{amount}} {{currency}}",
+	                  {
+	                    amount: Number(insufficientBalance?.availableUnits || 0).toLocaleString(locale, { maximumFractionDigits: 2 }),
+	                    currency: String(requestCurrencyCode || selectedSendToken?.currency || "").toUpperCase(),
+	                  },
+	                )}</span>
+	              </span>
 	            )
 	          : null)
 	    : null;
 
 	  const manualWarningMessage = !hasPaymentRequest && !sendProcessing && !hasMoonpaySellRequest
 	    ? (selfSendBlocked
-	        ? t("ui_cannot_send_to_self", "Vous ne pouvez pas envoyer à votre propre compte.")
+	        ? selfSendWarningNode
 	        : manualInsufficientBalance
-	          ? t(
-	              "ui_insufficient_balance_manual_detail",
-	              "Vous n'avez pas assez de {{currency}} pour ce montant.",
-	              {
-	                currency: String(selectedSendToken?.currency || "").toUpperCase(),
-	              },
+	          ? (
+	              <span className="inline-flex items-center gap-1.5">
+	                <svg viewBox="0 0 24 24" className="w-4 h-4 flex-shrink-0 text-white" fill="none" aria-hidden>
+	                  <path d="M12 3.5L21.5 20H2.5L12 3.5Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+	                  <path d="M12 10v4.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+	                  <circle cx="12" cy="17.25" r="0.9" fill="currentColor" />
+	                </svg>
+	                <span>{t(
+	                  "ui_insufficient_balance_manual_short",
+	                  "Solde insuffisant. Disponible : {{amount}} {{currency}}",
+	                  {
+	                    amount: Number(manualInsufficientBalance?.availableUnits || 0).toLocaleString(locale, { maximumFractionDigits: 2 }),
+	                    currency: String(selectedSendToken?.currency || "").toUpperCase(),
+	                  },
+	                )}</span>
+	              </span>
 	            )
 	          : null)
 	    : null;

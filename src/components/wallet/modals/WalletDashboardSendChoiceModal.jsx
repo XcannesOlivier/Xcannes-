@@ -89,6 +89,7 @@ export default function WalletDashboardSendChoiceModal({
   }, []);
   const [payreqPasteValue, setPayreqPasteValue] = useState('');
   const [payreqSelfSendError, setPayreqSelfSendError] = useState(false);
+  const [payreqDecodeError, setPayreqDecodeError] = useState(false);
   const [simpleSendSelfError, setSimpleSendSelfError] = useState(false);
   const [quickscanPasteValue, setQuickscanPasteValue] = useState('');
   const [manualEntryOpen, setManualEntryOpen] = useState(false);
@@ -136,6 +137,7 @@ export default function WalletDashboardSendChoiceModal({
       flowSheetSwipeMetaRef.current = null;
       setPayreqPasteValue('');
       setPayreqSelfSendError(false);
+      setPayreqDecodeError(false);
       setSimpleSendSelfError(false);
       setPendingPayreq('');
       setPayreqScannedDisplay('');
@@ -348,7 +350,8 @@ export default function WalletDashboardSendChoiceModal({
       try { await instance.clear(); } catch { /* ignore */ }
       if (decodedText) {
         if (isPayreq) {
-          if (isPayreqSelfSend(decodedText)) { setPayreqSelfSendError(true); return; }
+          if (isPayreqSelfSend(decodedText)) { setPayreqSelfSendError(true); setPayreqDecodeError(false); return; }
+          setPayreqDecodeError(false);
           setPayreqImportedDisplay(decodedText.trim());
           setPendingPayreq(decodedText.trim());
         } else {
@@ -368,6 +371,7 @@ export default function WalletDashboardSendChoiceModal({
         }
       }
     } catch {
+      if (isPayreq) setPayreqDecodeError(true);
       toast?.error(t('ui_qr_decode_failed_3b5d7f9a2c', 'Unable to decode this image. Try a clearer screenshot.'));
     }
   }, [handlePaymentRequestScan, normalizedCurrentWallet, onChoosePayRequest, isPayreqSelfSend, toast, t]);
@@ -401,8 +405,9 @@ export default function WalletDashboardSendChoiceModal({
   const handlePayreqPasteSubmit = useCallback(() => {
     const raw = payreqPasteValue.trim();
     if (!raw) return;
-    if (isPayreqSelfSend(raw)) { setPayreqSelfSendError(true); return; }
+    if (isPayreqSelfSend(raw)) { setPayreqSelfSendError(true); setPayreqDecodeError(false); return; }
     setPayreqSelfSendError(false);
+    setPayreqDecodeError(false);
     setPendingPayreq(raw);
   }, [payreqPasteValue, isPayreqSelfSend]);
 
@@ -1444,6 +1449,7 @@ export default function WalletDashboardSendChoiceModal({
                       type="button"
                       onClick={() => {
                         setPayreqSelfSendError(false);
+                        setPayreqDecodeError(false);
                         setPayreqManualEntryOpen((prev) => !prev);
                       }}
                       className="w-full grid grid-cols-[56px_1fr_24px] items-center gap-2 md:gap-3 pl-2 pr-3 md:px-6 py-4 md:py-5 hover:bg-white/[0.02] transition-colors duration-150 text-left"
@@ -1476,6 +1482,7 @@ export default function WalletDashboardSendChoiceModal({
                             onChange={(e) => {
                               setPayreqPasteValue(e.target.value);
                               setPayreqSelfSendError(false);
+                              setPayreqDecodeError(false);
                             }}
                             onKeyDown={(e) => {
                               if (e.key === 'Enter') handlePayreqPasteSubmit();
@@ -1487,9 +1494,11 @@ export default function WalletDashboardSendChoiceModal({
                                 setPayreqPasteValue(text);
                                 if (isPayreqSelfSend(text)) {
                                   setPayreqSelfSendError(true);
+                                  setPayreqDecodeError(false);
                                   return;
                                 }
                                 setPayreqSelfSendError(false);
+                                setPayreqDecodeError(false);
                                 setPendingPayreq(text);
                               }
                             }}
@@ -1551,6 +1560,7 @@ export default function WalletDashboardSendChoiceModal({
 	                    onClick={() => {
 	                      if (pendingPayreq) {
 	                        setPayreqSelfSendError(false);
+	                        setPayreqDecodeError(false);
 	                        handlePaymentRequestScan?.(pendingPayreq);
 	                        onChoosePayRequest?.();
 	                      }
@@ -1572,8 +1582,24 @@ export default function WalletDashboardSendChoiceModal({
 	                    {pendingPayreq
 	                      ? t('ui_validate_payreq', 'Vérifier la demande de paiement')
 	                      : payreqSelfSendError
-	                        ? <span className="block px-3 text-[13px] md:text-[15px] leading-snug text-white/90 normal-case whitespace-normal">{t('ui_cannot_send_to_self', 'Vous ne pouvez pas envoyer à votre propre compte.')}</span>
-	                        : <span className="inline-flex items-center gap-1.5 text-white/85">
+	                        ? <span className="inline-flex items-center gap-2 px-3 text-[13px] md:text-[15px] leading-snug text-white normal-case whitespace-normal">
+	                            <svg viewBox="0 0 24 24" className="w-4 h-4 flex-shrink-0 text-white" fill="none" aria-hidden>
+	                              <path d="M12 3.5L21.5 20H2.5L12 3.5Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+	                              <path d="M12 10v4.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+	                              <circle cx="12" cy="17.25" r="0.9" fill="currentColor" />
+	                            </svg>
+	                            <span>{t('ui_cannot_send_to_self_short', 'Comptes expéditeur et destinataire identiques.')}</span>
+	                          </span>
+	                        : payreqDecodeError
+	                          ? <span className="inline-flex items-center gap-2 px-3 text-[13px] md:text-[15px] leading-snug text-white normal-case whitespace-normal">
+	                              <svg viewBox="0 0 24 24" className="w-4 h-4 flex-shrink-0 text-white" fill="none" aria-hidden>
+	                                <path d="M12 3.5L21.5 20H2.5L12 3.5Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+	                                <path d="M12 10v4.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+	                                <circle cx="12" cy="17.25" r="0.9" fill="currentColor" />
+	                              </svg>
+	                              <span>{t('ui_qr_decode_failed_short', 'QR illisible. Réessayez avec une image plus nette.')}</span>
+	                            </span>
+	                          : <span className="inline-flex items-center gap-1.5 text-white/85">
 	                          <span className="text-[14px] md:text-[16px]">{t('ui_fill_payreq', 'Renseignez la demande de paiement')}</span>
 	                          <span className="inline-flex items-end gap-[3px] mb-[-1px]">
 	                            <span className="payreq-cta-dot" style={{ animationDelay: '0s' }}>·</span>
