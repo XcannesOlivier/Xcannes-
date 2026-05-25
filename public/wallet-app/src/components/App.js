@@ -993,6 +993,9 @@ function setupBackupVerifyScreen(words) {
     // Fallback: if the keyboard is dismissed, validate the current word.
     inp.addEventListener('blur', () => {
       setTimeout(() => {
+        // If the word was already validated, we mask+disable the input which can
+        // trigger a blur; never re-validate masked/disabled fields.
+        if (inp.disabled) return;
         if (i !== currentIndex) return;
         if (!inp.value.trim()) return;
         handleValidate();
