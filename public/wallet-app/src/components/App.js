@@ -48,6 +48,115 @@ let isUnlocked = false;
 let pendingMnemonic = null;
 let pendingWalletData = null; // { address, seed, publicKey, mnemonic, wallet }
 
+// --- Screen Wake Lock (keep screen on during mnemonic backup) ---
+// Note: This is supported on Chromium-based browsers (secure context). iOS Safari
+// may ignore it — we fail silently.
+let wakeLockSentinel = null;
+let wakeLockWanted = false;
+let wakeLockNeedsUserGesture = false;
+
+function screenWantsWakeLock(screenName) {
+  return screenName === 'backup' || screenName === 'backup-verify' || screenName === 'import';
+}
+
+function getWakeLockHintTargets() {
+  const hintEls = Array.from(document.querySelectorAll('[data-wakelock-hint]'));
+  return hintEls
+    .map((el) => {
+      const textEl = el.querySelector('[data-wakelock-hint-text]');
+      if (!textEl) return null;
+      return { el, textEl };
+    })
+    .filter(Boolean);
+}
+
+function updateWakeLockHint() {
+  const targets = getWakeLockHintTargets();
+  if (!targets.length) return;
+
+  if (!wakeLockWanted) {
+    targets.forEach(({ el }) => el.classList.add('hidden'));
+    return;
+  }
+
+  // Unsupported: show guidance to prevent sleep.
+  if (!('wakeLock' in navigator)) {
+    const html =
+      `Astuce : pour éviter la mise en veille pendant cette étape, ` +
+      `touchez l’écran de temps en temps pendant que vous notez les 12 mots.`;
+    targets.forEach(({ el, textEl }) => {
+      textEl.innerHTML = html;
+      el.classList.remove('hidden');
+    });
+    return;
+  }
+
+  // Supported + active: no need to distract; keep it hidden.
+  if (wakeLockSentinel) {
+    targets.forEach(({ el }) => el.classList.add('hidden'));
+    return;
+  }
+
+  // Supported but not active: either needs a user gesture or request failed.
+  const html =
+    `Astuce : pour éviter la mise en veille pendant cette étape, ` +
+    `touchez l’écran de temps en temps pendant que vous notez les 12 mots.`;
+  targets.forEach(({ el, textEl }) => {
+    textEl.innerHTML = html;
+    el.classList.remove('hidden');
+  });
+}
+
+async function requestScreenWakeLock() {
+  if (!wakeLockWanted) return;
+  if (wakeLockSentinel) return;
+  if (!('wakeLock' in navigator)) return;
+  if (document.visibilityState !== 'visible') return;
+
+  try {
+    wakeLockSentinel = await navigator.wakeLock.request('screen');
+    wakeLockNeedsUserGesture = false;
+    wakeLockSentinel.addEventListener('release', () => {
+      wakeLockSentinel = null;
+      updateWakeLockHint();
+    });
+    updateWakeLockHint();
+  } catch {
+    // NotAllowedError / NotSupportedError / etc — ignore.
+    wakeLockSentinel = null;
+    // On some browsers, wake lock requires a user activation.
+    wakeLockNeedsUserGesture = true;
+    updateWakeLockHint();
+  }
+}
+
+async function releaseScreenWakeLock() {
+  const sentinel = wakeLockSentinel;
+  wakeLockSentinel = null;
+  wakeLockNeedsUserGesture = false;
+  if (!sentinel) return;
+  try {
+    await sentinel.release();
+  } catch {
+    /* ignore */
+  }
+  updateWakeLockHint();
+}
+
+function setWakeLockWanted(wanted) {
+  wakeLockWanted = Boolean(wanted);
+  if (!wakeLockWanted) {
+    void releaseScreenWakeLock();
+    updateWakeLockHint();
+    return;
+  }
+  // Many browsers require a user gesture; we try immediately, and we also
+  // re-try on the next interaction while on the backup screens.
+  wakeLockNeedsUserGesture = true;
+  updateWakeLockHint();
+  void requestScreenWakeLock();
+}
+
 // --- Auto-lock ---
 const AUTO_LOCK_MS = 5 * 60 * 1000;
 let inactivityTimer = null;
@@ -81,6 +190,8 @@ function resetInactivityTimer() {
 
 document.addEventListener('visibilitychange', async () => {
   if (document.hidden && isUnlocked) {
+    // Wake Lock is released automatically when hidden; keep desired state to
+    // re-request when the app becomes visible again.
     if (moonpayActiveInDashboard) {
       // Allow a single background grace window per MoonPay session so native
       // iOS auth (Apple/PayPal sheets) doesn't force an immediate lock, but
@@ -97,6 +208,8 @@ document.addEventListener('visibilitychange', async () => {
     lockWallet();
   } else if (!document.hidden && !isUnlocked) {
     clearMoonpayBackgroundLockTimer();
+    // If we’re on backup screens, re-acquire Wake Lock when returning.
+    void requestScreenWakeLock();
     // App came back — try Face ID auto-unlock if on unlock screen
     const unlockScreen = document.getElementById('screen-unlock');
     if (unlockScreen && !unlockScreen.classList.contains('hidden')) {
@@ -120,11 +233,21 @@ document.addEventListener('visibilitychange', async () => {
     }
   } else if (!document.hidden) {
     clearMoonpayBackgroundLockTimer();
+    // If we’re on backup screens, re-acquire Wake Lock when returning.
+    void requestScreenWakeLock();
   }
 });
 
 ['touchstart', 'mousedown', 'keydown', 'scroll'].forEach(evt => {
   document.addEventListener(evt, resetInactivityTimer, { passive: true });
+});
+
+// Try to (re)acquire wake lock on first user interaction while on backup screens.
+['touchstart', 'mousedown', 'keydown'].forEach(evt => {
+  document.addEventListener(evt, () => {
+    if (!wakeLockWanted) return;
+    void requestScreenWakeLock();
+  }, { passive: true });
 });
 
 // --- Notify parent iframe if running embedded (for site onboarding) ---
@@ -275,6 +398,9 @@ function showScreen(screenName) {
   document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
   const el = document.getElementById(`screen-${screenName}`);
   if (el) el.classList.remove('hidden');
+
+  // Keep screen awake only on mnemonic backup/verify screens.
+  setWakeLockWanted(screenWantsWakeLock(screenName));
 }
 
 /**

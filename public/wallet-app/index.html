@@ -316,6 +316,12 @@
 	          </div>
 	        </div>
 
+          <!-- Wake lock hint (shown by JS when needed) -->
+          <div id="wakelock-hint" class="wakelock-hint hidden" data-wakelock-hint role="status" aria-live="polite">
+            <div class="wakelock-hint-icon" aria-hidden="true">i</div>
+            <div class="wakelock-hint-text" id="wakelock-hint-text" data-wakelock-hint-text></div>
+          </div>
+
 	        <div class="mnemonic-grid" id="mnemonic-grid">
 	          <!-- 12 word slots filled by JS -->
 	        </div>
@@ -336,6 +342,12 @@
           <h2>Vérification</h2>
         </div>
         <p class="verify-intro">Confirmez chaque mot, un par un, dans l’ordre.</p>
+
+        <!-- Wake lock hint (shown by JS when needed) -->
+        <div class="wakelock-hint hidden" data-wakelock-hint role="status" aria-live="polite">
+          <div class="wakelock-hint-icon" aria-hidden="true">i</div>
+          <div class="wakelock-hint-text" data-wakelock-hint-text></div>
+        </div>
 
         <div class="verify-progress">
           <span id="verify-progress-text">Mot 1 / 12</span>
@@ -368,6 +380,13 @@
 
         <!-- Import method: BIP39 Mnemonic (12 words) -->
         <p class="tab-desc">Entrez votre phrase de récupération (12 mots)</p>
+
+        <!-- Wake lock hint (shown by JS when needed) -->
+        <div class="wakelock-hint hidden" data-wakelock-hint role="status" aria-live="polite">
+          <div class="wakelock-hint-icon" aria-hidden="true">i</div>
+          <div class="wakelock-hint-text" data-wakelock-hint-text></div>
+        </div>
+
         <div class="import-mnemonic-grid" id="import-mnemonic-grid"></div>
 
         <p id="import-status" class="status"></p>
