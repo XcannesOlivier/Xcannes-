@@ -1652,7 +1652,7 @@ export default function CurrencyStatement({
           )}
           <div
             ref={overlayListRef}
-            className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden"
+            className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden border-t border-white/[0.10] md:border-white/[0.06]"
             onPointerDown={(event) => {
               maybeStartOverlayDrag(event, "list");
             }}
@@ -1737,7 +1737,7 @@ export default function CurrencyStatement({
         </div>
 
         {/* Footer */}
-        <div className="shrink-0 px-4 md:px-6 py-1.5 md:py-3 pb-[max(2px,env(safe-area-inset-bottom))] md:pb-[max(12px,env(safe-area-inset-bottom))] border-t border-white/[0.06] bg-[#111518] shadow-[inset_0_-46px_70px_rgba(0,0,0,0.55)] flex items-center justify-between gap-1 md:gap-2">
+        <div className="shrink-0 px-4 md:px-6 py-1.5 md:py-3 pb-[max(2px,env(safe-area-inset-bottom))] md:pb-[max(12px,env(safe-area-inset-bottom))] border-t border-white/[0.10] md:border-white/[0.06] bg-[#111518] shadow-[inset_0_-46px_70px_rgba(0,0,0,0.55)] flex items-center justify-between gap-1 md:gap-2">
           {/* Compte actuel */}
           <div className="flex items-center gap-3 min-w-0">
             <div className="relative w-auto min-w-[120px] max-w-[180px]" ref={footerDropdownRef}>

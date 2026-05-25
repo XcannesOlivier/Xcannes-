@@ -109,6 +109,13 @@ export default function CurrencyTransactionDetailModal({
         onClick={onClose}
         style={dragY > 0 ? { opacity: fadeOpacity } : undefined}
       />
+      {/* Bottom bar – mobile only (home indicator, comme dans send choice) */}
+      <div
+        className="md:hidden pointer-events-none fixed left-1/2 -translate-x-1/2 bottom-[max(env(safe-area-inset-bottom),10px)] z-[10310]"
+        aria-hidden
+      >
+        <span className="block w-36 h-1.5 rounded-full bg-white/80" />
+      </div>
       <div
         className={`relative w-full max-w-md rounded-[14px] ${modalBgClass} p-4 md:p-5 ring-1 ring-white/10 ring-inset shadow-[0_24px_60px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-26px_46px_rgba(0,0,0,0.55)] wallet-modal-lift-in`}
         style={{
@@ -126,13 +133,6 @@ export default function CurrencyTransactionDetailModal({
         {/* Swipe handle (mobile) */}
         <div className="md:hidden -mt-1 mb-2 flex justify-center" aria-hidden>
           <span className="block w-12 h-1.5 rounded-full bg-white/20" />
-        </div>
-        {/* Bottom bar – mobile only (home indicator, comme dans send choice) */}
-        <div
-          className="md:hidden pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-[max(env(safe-area-inset-bottom),10px)] z-20"
-          aria-hidden
-        >
-          <span className="block w-36 h-1.5 rounded-full bg-white/80" />
         </div>
         {/* Header */}
         <div className="flex items-start justify-between gap-3">
@@ -337,7 +337,7 @@ export default function CurrencyTransactionDetailModal({
           </div>
         ) : null}
 
-        <div className="mt-4 mb-6 md:mb-0 text-center text-[11px] tracking-[0.08em] text-white/30">
+        <div className="mt-4 text-center text-[11px] tracking-[0.08em] text-white/30">
           XCANNES
         </div>
       </div>

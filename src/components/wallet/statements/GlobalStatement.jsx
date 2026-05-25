@@ -1574,7 +1574,7 @@ export default function GlobalStatement({
         {/* Content - Zone scrollable */}
         <div
           ref={overlayListRef}
-          className="flex-1 min-h-0 overflow-y-auto px-4 md:px-5 py-6 flex flex-col gap-4 bg-gradient-to-b from-[#101415] to-[#0d1214]"
+          className="flex-1 min-h-0 overflow-y-auto px-4 md:px-5 py-6 flex flex-col gap-4 bg-gradient-to-b from-[#101415] to-[#0d1214] border-t border-white/[0.10] md:border-white/[0.06]"
           onPointerDown={(event) => {
             maybeStartOverlayDrag(event, "list");
           }}
@@ -1753,7 +1753,7 @@ export default function GlobalStatement({
         </div>
 
         {/* Footer */}
-        <div className="shrink-0 px-4 md:px-6 py-1.5 md:py-3 pb-[max(2px,env(safe-area-inset-bottom))] md:pb-[max(12px,env(safe-area-inset-bottom))] border-t border-white/[0.06] bg-[#111518] shadow-[inset_0_-46px_70px_rgba(0,0,0,0.55)] flex items-center justify-between gap-3">
+        <div className="shrink-0 px-4 md:px-6 py-1.5 md:py-3 pb-[max(2px,env(safe-area-inset-bottom))] md:pb-[max(12px,env(safe-area-inset-bottom))] border-t border-white/[0.10] md:border-white/[0.06] bg-[#111518] shadow-[inset_0_-46px_70px_rgba(0,0,0,0.55)] flex items-center justify-between gap-3">
           {/* Compte actuel */}
           <div className="flex items-center gap-3 min-w-0">
             <div className="relative w-auto min-w-[120px] max-w-[180px]" ref={accountDropdownRef}>

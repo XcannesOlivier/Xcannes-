@@ -652,9 +652,8 @@ export default function WalletDashboardSwapModal({
                       className: "w-full flex justify-center wallet-meta--plus-4 wallet-meta--desktop-gap relative z-[120]",
                       prefix: t("moonpay_from_account", "Compte source"),
 	                      labelWrap: false,
-	                      pillClassName: `bg-elevated px-5 py-1 gap-4 ${baseDropdownOpen || quoteDropdownOpen
-	                        ? "ring-1 ring-white/20 ring-inset shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_10px_rgba(255,255,255,0.16)]"
-	                        : "shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]"}`  ,
+	                      pillClassName:
+	                        "bg-transparent px-5 py-1 gap-4 xcannes-fade-border-y",
 	                      prefixClassName:
 	                        "!text-white/45 text-[12px] md:text-[13px] font-normal tracking-wide mr-4",
                       labelClassName:
