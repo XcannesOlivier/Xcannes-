@@ -806,22 +806,22 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
 
 .unlock-welcome {
   font-family: var(--font-montserrat);
-  font-size: 16px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
   text-transform: uppercase;
   color: var(--text-primary);
   margin-top: -6px;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   opacity: 0.9;
 }
 
 .unlock-title {
-  font-size: 22px;
-  font-weight: 800;
-  letter-spacing: -0.3px;
-  color: rgba(255, 255, 255, 0.82);
-  margin-bottom: 18px;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: rgba(255, 255, 255, 0.45);
+  margin-bottom: 22px;
 }
 
 .btn-biometric--hero {
