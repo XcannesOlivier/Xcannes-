@@ -820,8 +820,8 @@ export default function WalletDashboard({
                       activitySkeletonExpired ? (
                       /* ── Message vide après 5s ── */
                       <div
-                        className="mx-0 mb-0 px-4 py-[9px] animate-fade-in"
-                        style={{ background: '#0d1214', boxShadow: 'inset 0 -16px 20px rgba(0,0,0,0.88)' }}
+                        className="mx-0 mb-0 px-4 py-[9px] animate-fade-in recent-activity-fade-border"
+                        style={{ boxShadow: 'inset 0 -16px 20px rgba(0,0,0,0.88)' }}
                       >
                         <div className="flex items-center gap-2 min-h-[52px] lg:min-h-[38px]">
                           <svg className="w-4 h-4 shrink-0 text-white/20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
@@ -836,8 +836,8 @@ export default function WalletDashboard({
                       ) : (
                       /* ── Skeleton pendant le chargement ── */
                       <div
-                        className="mx-0 mb-0 px-4 py-[9px]"
-                        style={{ background: '#0d1214', boxShadow: 'inset 0 -16px 20px rgba(0,0,0,0.88)' }}
+                        className="mx-0 mb-0 px-4 py-[9px] recent-activity-fade-border"
+                        style={{ boxShadow: 'inset 0 -16px 20px rgba(0,0,0,0.88)' }}
                       >
                         {/* Mobile : deux lignes skeleton */}
                         <div className="lg:hidden flex flex-col justify-center gap-[5px] min-h-[52px]">
@@ -881,8 +881,8 @@ export default function WalletDashboard({
                     >
                       {/* Mini-card activité récente */}
                       <div
-                        className="mx-0 mb-0 px-4 py-[9px] transition-colors"
-                        style={{ background: '#0d1214', boxShadow: 'inset 0 -16px 20px rgba(0,0,0,0.88)' }}
+                        className="mx-0 mb-0 px-4 py-[9px] transition-colors recent-activity-fade-border"
+                        style={{ boxShadow: 'inset 0 -16px 20px rgba(0,0,0,0.88)' }}
                       >
                         {/* Mobile : deux lignes */}
                         <div className="lg:hidden flex flex-col justify-center gap-[2px] min-h-[52px]">

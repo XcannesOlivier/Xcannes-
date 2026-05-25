@@ -50,6 +50,16 @@
   background-clip: padding-box, border-box;
 }
 
+/* Subtle white fade border for the "recent activity" banner. */
+.recent-activity-fade-border {
+  border: 1px solid transparent;
+  background-image:
+    linear-gradient(180deg, #0d1214, #0d1214),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.00));
+  background-origin: padding-box, border-box;
+  background-clip: padding-box, border-box;
+}
+
 /* ── Mouse hover (vrais pointeurs uniquement) ── */
 @media (hover: hover) {
   .wallet-action-btn:hover::before {
