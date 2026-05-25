@@ -783,9 +783,30 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
   pointer-events: none;
 }
 
+#screen-unlock .choice-bottom-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  padding-top: 24px;
+  padding-bottom: calc(env(safe-area-inset-bottom, 16px) + 16px);
+  pointer-events: none;
+  z-index: 2;
+}
+
+#screen-unlock .choice-bottom-bar > span {
+  display: block;
+  width: 144px;
+  height: 6px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.8);
+}
+
 .unlock-welcome {
   font-family: var(--font-montserrat);
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -796,10 +817,11 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
 }
 
 .unlock-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.45);
-  margin-bottom: 22px;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+  color: rgba(255, 255, 255, 0.82);
+  margin-bottom: 18px;
 }
 
 .btn-biometric--hero {
@@ -944,12 +966,12 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
 }
 
 #screen-unlock .logo {
-  width: 86px;
-  height: 86px;
+  width: 112px;
+  height: 112px;
   background: transparent;
   border: none;
   box-shadow: none;
-  margin-bottom: 22px;
+  margin-bottom: 18px;
 }
 
 #screen-unlock #unlock-status.status {
