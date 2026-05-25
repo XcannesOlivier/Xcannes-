@@ -273,18 +273,19 @@ export default function WalletDesktopModals({
 			                "Sélectionnez le stablecoin, indiquez le montant et choisissez la devise qui sera créditée à votre compte",
 			            });
 			          }}
-		          onChooseUsdSwapIn={() => {
-		            resetCashChoiceState();
-		            openUsdSwapOut("", {
-		              direction: "rlusd_to_stable",
-		              accentVariant: "binanceYellow",
-		              sourceSelectionMode: "wallet",
-		              initialSourceCurrency: "USD",
-			              titleOverride: "Acheter des stablecoins",
-			              subtitleOverride:
-			                "Choisissez la devise, le montant et le stablecoin.",
-			            });
-			          }}
+			          onChooseUsdSwapIn={() => {
+			            resetCashChoiceState();
+			            const walletLabelForSubtitle = String(cashModalProps?.walletLabel || "").trim() || "[Nom du compte]";
+			            openUsdSwapOut("", {
+			              direction: "rlusd_to_stable",
+			              accentVariant: "binanceYellow",
+			              sourceSelectionMode: "wallet",
+			              initialSourceCurrency: "USD",
+				              titleOverride: "Acheter des stablecoins",
+				              subtitleOverride:
+				                `Depuis le compte Voyant Lumineux jaune – ${walletLabelForSubtitle}, sélectionnez la devise et le montant, puis choisissez le stablecoin à recevoir.`,
+				            });
+				          }}
 	        />
 	      ) : null}
 
