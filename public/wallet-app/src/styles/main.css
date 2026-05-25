@@ -1711,10 +1711,15 @@ textarea.error {
   border: none;
   backdrop-filter: none;
   box-shadow: none;
-}
-
-#screen-backup .screen-header .btn-back:hover {
-  background: rgba(255, 255, 255, 0.04);
+  width: 52px;
+  height: 52px;
+  font-size: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  z-index: 1;
 }
 
 #screen-backup .screen-header h2 {
@@ -1898,40 +1903,49 @@ textarea.error {
 }
 
 #screen-backup-verify .screen-header {
-  justify-content: flex-start;
+  justify-content: center;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 18px;
-}
-
-#screen-backup-verify .screen-header span {
-  display: none;
+  min-height: 52px;
+  gap: 0;
+  position: relative;
 }
 
 #screen-backup-verify .screen-header .btn-back {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
   background: transparent;
   border: none;
   backdrop-filter: none;
   box-shadow: none;
-}
-
-#screen-backup-verify .screen-header .btn-back:hover {
-  background: rgba(255, 255, 255, 0.04);
+  width: 52px;
+  height: 52px;
+  font-size: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  z-index: 1;
 }
 
 #screen-backup-verify .screen-header h2 {
-  flex: 0 1 auto;
-  text-align: left;
-  font-size: 24px;
-  font-weight: 500;
+  flex: none;
+  text-align: center;
+  font-size: 28px;
+  font-weight: 400;
   letter-spacing: -0.2px;
   line-height: 1.15;
+  margin: 0 auto;
 }
 
 #screen-backup-verify .verify-intro {
   max-width: 360px;
-  margin: 0 auto 14px;
+  margin: 0 auto 22px;
   color: rgba(255, 255, 255, 0.55);
+  font-size: 17px;
+  text-align: center;
 }
 
 #screen-backup-verify .verify-progress {
@@ -1960,18 +1974,22 @@ textarea.error {
   margin: 10px auto 18px;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  max-height: 420px;
+  min-height: 320px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
-#screen-backup-verify .verify-row {
+.verify-row {
   padding: 12px 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-#screen-backup-verify .verify-row:last-child {
+.verify-row:last-child {
   border-bottom: none;
 }
 
-#screen-backup-verify .verify-row .row-num {
+.verify-row .row-num {
   min-width: 30px;
   height: 30px;
   border-radius: 10px;
@@ -1981,19 +1999,19 @@ textarea.error {
   font-size: 12px;
 }
 
-#screen-backup-verify .verify-row.active .row-num {
+.verify-row.active .row-num {
   background: rgba(0, 200, 83, 0.12);
   border-color: rgba(0, 200, 83, 0.22);
   color: rgba(0, 200, 83, 0.92);
 }
 
-#screen-backup-verify .verify-row.done .row-num {
+.verify-row.done .row-num {
   background: rgba(0, 200, 83, 0.10);
   border-color: rgba(0, 200, 83, 0.18);
   color: rgba(0, 200, 83, 0.85);
 }
 
-#screen-backup-verify .verify-row .row-input {
+.verify-row .row-input {
   background: rgba(0, 0, 0, 0.18);
   border: 1px solid rgba(255, 255, 255, 0.07);
   border-radius: 14px;
@@ -2003,21 +2021,21 @@ textarea.error {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
-#screen-backup-verify .verify-row.active .row-input {
+.verify-row.active .row-input {
   border-color: rgba(0, 200, 83, 0.35);
   background: rgba(0, 200, 83, 0.06);
 }
 
-#screen-backup-verify .verify-row.locked {
+.verify-row.locked {
   opacity: 0.32;
 }
 
-#screen-backup-verify .verify-row.locked .row-input {
+.verify-row.locked .row-input {
   background: rgba(255, 255, 255, 0.02);
 }
 
-#screen-backup-verify .verify-row .row-status,
-#screen-backup-verify .verify-row .row-error-msg {
+.verify-row .row-status,
+.verify-row .row-error-msg {
   display: none;
 }
 
