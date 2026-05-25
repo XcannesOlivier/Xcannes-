@@ -592,7 +592,12 @@ export default function WalletDashboardUsdSwapModal({
     const clean = String(flowTitle || "").trim();
     const overrideRaw = String(titleOverride || "").trim().toLowerCase();
     if (isStablecoinBuySellTitleMobile && !isDesktop) return clean;
-    if (isDesktop && overrideRaw === "vendre vos stablecoins") return clean;
+    if (
+      isDesktop &&
+      (overrideRaw === "vendre vos stablecoins" || overrideRaw === "acheter des stablecoins")
+    ) {
+      return clean;
+    }
     return clean.toUpperCase();
   }, [flowTitle, isDesktop, isStablecoinBuySellTitleMobile, titleOverride]);
   const flowSubtitle =
@@ -3380,7 +3385,28 @@ export default function WalletDashboardUsdSwapModal({
 		                                        "ui_search_limit",
 		                                        `Résultats limités à ${MAX_STABLE_SEARCH_RESULTS}. Affinez votre recherche.`,
 		                                      )
-		                                    : t("ui_search_results", "Sélectionnez un actif.")}
+		                                    : direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD &&
+		                                      walletTargetSelectionEnabled ? (
+		                                        <div className="flex items-center justify-center gap-2 text-center">
+		                                          <span>
+		                                            {t(
+		                                              "ui_wallet_credited_account",
+		                                              "Compte accrédité",
+		                                            )}
+		                                          </span>
+		                                          <span className="inline-flex items-center gap-1.5">
+		                                            <span
+		                                              className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse"
+		                                              aria-hidden
+		                                            />
+		                                            <span className="text-white/85 font-medium">
+		                                              {String(walletLabel || "XCANNES").trim()}
+		                                            </span>
+		                                          </span>
+		                                        </div>
+		                                      ) : (
+		                                        t("ui_search_results", "Sélectionnez un actif.")
+		                                      )}
 		                                </div>
 		                              </div>
 		                            </div>,
@@ -3590,7 +3616,28 @@ export default function WalletDashboardUsdSwapModal({
 	                                        "ui_search_limit",
 	                                        `Résultats limités à ${MAX_STABLE_SEARCH_RESULTS}. Affinez votre recherche.`,
 	                                      )
-	                                    : t("ui_search_results", "Sélectionnez un actif.")}
+	                                    : direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD &&
+	                                      walletTargetSelectionEnabled ? (
+	                                        <div className="flex items-center justify-center gap-2 text-center">
+	                                          <span>
+	                                            {t(
+	                                              "ui_wallet_credited_account",
+	                                              "Compte accrédité",
+	                                            )}
+	                                          </span>
+	                                          <span className="inline-flex items-center gap-1.5">
+	                                            <span
+	                                              className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse"
+	                                              aria-hidden
+	                                            />
+	                                            <span className="text-white/85 font-medium">
+	                                              {String(walletLabel || "XCANNES").trim()}
+	                                            </span>
+	                                          </span>
+	                                        </div>
+	                                      ) : (
+	                                        t("ui_search_results", "Sélectionnez un actif.")
+	                                      )}
 	                                </div>
 	                              </div>
 	                            </div>,
@@ -4365,10 +4412,14 @@ export default function WalletDashboardUsdSwapModal({
             >
               <span className="block w-36 h-1.5 rounded-full bg-white/80" />
             </div>
-            {/* Bottom bar – desktop only (visual balance) */}
-            <div className="hidden md:flex pointer-events-none justify-center pt-2 pb-3" aria-hidden>
-              <span className="block w-[120px] h-[4px] rounded-full bg-white/10" />
-            </div>
+          </div>
+
+          {/* Bottom bar – desktop only (pinned to modal bottom) */}
+          <div
+            className="hidden md:flex pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-3 z-30"
+            aria-hidden
+          >
+            <span className="block w-[120px] h-[4px] rounded-full bg-white/10" />
           </div>
         </div>
       </div>
