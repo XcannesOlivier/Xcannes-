@@ -2454,14 +2454,14 @@ export default function WalletDashboardUsdSwapModal({
 
                 {step === "form" ? (
                   <>
-		                    <div className={["rounded-[18px] ring-1 ring-white/10 ring-inset bg-[#101415] overflow-hidden", accentShadowCard].join(" ")}>
-                      <div className="p-4">
+			                    <div className={["rounded-[18px] ring-1 ring-white/10 ring-inset bg-[#101415] overflow-hidden", accentShadowCard].join(" ")}>
+                      <div className="p-4 md:p-6">
                         {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD ? (
-                          <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-x-3 gap-y-2">
+                          <div className="grid grid-cols-[minmax(0,1fr)_auto] md:grid-cols-2 gap-x-4 md:gap-x-7 gap-y-3 md:gap-y-4 items-end">
                             <div className="text-[12px] md:text-[13px] text-white/55">
                               {t("ui_usd_swap_enter_amount_label", "Indiquer le montant")}
                             </div>
-                            <div className="text-[12px] md:text-[13px] text-white/55 text-center">
+                            <div className="text-[12px] md:text-[13px] text-white/55 text-center md:text-left">
                               {t("ui_usd_swap_choose_stablecoin_label", "Choisissez le stablecoin")}
                             </div>
 
@@ -2480,7 +2480,7 @@ export default function WalletDashboardUsdSwapModal({
                               <div className="text-sm text-white/50 whitespace-nowrap pb-1" />
                             </div>
 
-                            <div ref={stableDropdownRef} className="shrink-0 flex items-end">
+                            <div ref={stableDropdownRef} className="flex items-end">
                               <button
                                 type="button"
                                 onClick={() => {
@@ -2489,7 +2489,7 @@ export default function WalletDashboardUsdSwapModal({
                                   setStableDropdownOpen(true);
                                 }}
                                 aria-expanded={stableDropdownOpen}
-                                className="inline-flex items-center gap-2 rounded-full bg-elevated ring-1 ring-white/10 px-3 py-1.5 text-white/85 hover:ring-white/20 transition-colors"
+                                className="inline-flex items-center gap-2 md:gap-3 rounded-full bg-elevated ring-1 ring-white/10 px-3 py-1.5 md:px-4 md:py-2 text-white/85 hover:ring-white/20 transition-colors md:w-full"
                               >
                                 {stableCurrency ? (
                                   renderCurrencyIcon(stableCurrency)
@@ -2507,7 +2507,7 @@ export default function WalletDashboardUsdSwapModal({
                                     : "—"}
                                 </span>
                                 <svg
-                                  className="w-4 h-4 flex-shrink-0"
+                                  className="w-4 h-4 flex-shrink-0 ml-auto"
                                   viewBox="0 0 20 20"
                                   fill="currentColor"
                                   aria-hidden
@@ -2524,11 +2524,11 @@ export default function WalletDashboardUsdSwapModal({
                         ) : (
                           <>
                             {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE && walletSourceSelectionEnabled ? (
-                              <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-x-3 gap-y-[6px]">
+                              <div className="grid grid-cols-[minmax(0,1fr)_auto] md:grid-cols-2 gap-x-4 md:gap-x-7 gap-y-3 md:gap-y-4 items-end">
                                 <div className="text-[12px] md:text-[13px] text-white/55">
                                   {t("ui_usd_swap_enter_amount_label", "Indiquer le montant")}
                                 </div>
-                                <div className="text-[12px] md:text-[13px] text-white/55 text-center">
+                                <div className="text-[12px] md:text-[13px] text-white/55 text-center md:text-left">
                                   {t(
                                     "ui_usd_swap_choose_wallet_currency_label",
                                     "Choisissez la devise",
@@ -2550,7 +2550,7 @@ export default function WalletDashboardUsdSwapModal({
                                   <div className="text-sm text-white/50 whitespace-nowrap pb-1" />
                                 </div>
 
-                                <div ref={sourceDropdownRef} className="shrink-0 flex items-end">
+                                <div ref={sourceDropdownRef} className="flex items-end">
                                   <button
                                     type="button"
                                     onClick={() => {
@@ -2559,7 +2559,7 @@ export default function WalletDashboardUsdSwapModal({
                                       setSourceDropdownOpen((prev) => !prev);
                                     }}
                                     aria-expanded={sourceDropdownOpen}
-                                    className="inline-flex items-center gap-2 rounded-full bg-elevated ring-1 ring-white/10 px-3 py-1.5 text-white/85 hover:ring-white/20 transition-colors"
+                                    className="inline-flex items-center gap-2 md:gap-3 rounded-full bg-elevated ring-1 ring-white/10 px-3 py-1.5 md:px-4 md:py-2 text-white/85 hover:ring-white/20 transition-colors md:w-full"
                                   >
                                     <span className="shrink-0">
                                       {renderWalletOptionIcon(selectedSourceOption?.icon)}
@@ -2571,7 +2571,7 @@ export default function WalletDashboardUsdSwapModal({
                                       {selectedSourceOption?.labelRight || ""}
                                     </span>
                                     <svg
-                                      className="w-4 h-4 flex-shrink-0"
+                                      className="w-4 h-4 flex-shrink-0 ml-auto"
                                       viewBox="0 0 20 20"
                                       fill="currentColor"
                                       aria-hidden
@@ -2772,15 +2772,15 @@ export default function WalletDashboardUsdSwapModal({
                           </div>
                         </div>
 
-                        <div className="p-4 pt-6">
-                          {walletTargetSelectionEnabled ? (
-                            <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-x-3 gap-y-2">
-                              <div className="text-[12px] md:text-[13px] text-white/55">
-                                {t("ui_usd_swap_received_amount", "Montant reçu")}
-                              </div>
-                              <div className="text-[12px] md:text-[13px] text-white/55 text-center">
-                                {t("ui_usd_swap_receive_currency", "Devise de réception")}
-                              </div>
+	                        <div className="p-4 pt-6 md:p-6 md:pt-7">
+	                          {walletTargetSelectionEnabled ? (
+	                            <div className="grid grid-cols-[minmax(0,1fr)_auto] md:grid-cols-2 gap-x-4 md:gap-x-7 gap-y-3 md:gap-y-4 items-end">
+	                              <div className="text-[12px] md:text-[13px] text-white/55">
+	                                {t("ui_usd_swap_received_amount", "Montant reçu")}
+	                              </div>
+	                              <div className="text-[12px] md:text-[13px] text-white/55 text-center md:text-left">
+	                                {t("ui_usd_swap_receive_currency", "Devise de réception")}
+	                              </div>
 
                               <div className="text-white text-4xl md:text-5xl font-semibold tracking-tight truncate">
                                 {hasValidAmount ? (
@@ -2799,34 +2799,34 @@ export default function WalletDashboardUsdSwapModal({
                                   "—"
                                 )}
                               </div>
-                              <div ref={sourceDropdownRef} className="shrink-0 flex items-end pb-1">
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setStableDropdownOpen(false);
-                                    setSourceSearch("");
-                                    setSourceDropdownOpen((prev) => !prev);
-                                  }}
-                                  aria-expanded={sourceDropdownOpen}
-                                  className="inline-flex items-center gap-2 rounded-full bg-elevated ring-1 ring-white/10 px-3 py-1.5 text-white/85 hover:ring-white/20 transition-colors"
-                                >
-                                  <span className="shrink-0">
-                                    {renderWalletOptionIcon(selectedSourceOption?.icon)}
-                                  </span>
-                                  <span className="text-sm font-semibold">
-                                    {selectedSourceOption?.label || selectedSourceCurrencyCode}
-                                  </span>
+	                              <div ref={sourceDropdownRef} className="flex items-end pb-1">
+	                                <button
+	                                  type="button"
+	                                  onClick={() => {
+	                                    setStableDropdownOpen(false);
+	                                    setSourceSearch("");
+	                                    setSourceDropdownOpen((prev) => !prev);
+	                                  }}
+	                                  aria-expanded={sourceDropdownOpen}
+	                                  className="inline-flex items-center gap-2 md:gap-3 rounded-full bg-elevated ring-1 ring-white/10 px-3 py-1.5 md:px-4 md:py-2 text-white/85 hover:ring-white/20 transition-colors md:w-full"
+	                                >
+	                                  <span className="shrink-0">
+	                                    {renderWalletOptionIcon(selectedSourceOption?.icon)}
+	                                  </span>
+	                                  <span className="text-sm font-semibold">
+	                                    {selectedSourceOption?.label || selectedSourceCurrencyCode}
+	                                  </span>
                                   {walletCurrencyShowBalance ? (
                                     <span className="text-white/70 font-mono tabular-nums text-sm">
                                       {selectedSourceOption?.labelRight || ""}
                                     </span>
                                   ) : null}
-                                  <svg
-                                    className="w-4 h-4 flex-shrink-0"
-                                    viewBox="0 0 20 20"
-                                    fill="currentColor"
-                                    aria-hidden
-                                  >
+	                                  <svg
+	                                    className="w-4 h-4 flex-shrink-0 ml-auto"
+	                                    viewBox="0 0 20 20"
+	                                    fill="currentColor"
+	                                    aria-hidden
+	                                  >
                                     <path
                                       fillRule="evenodd"
                                       d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 1 1 1.06 1.06l-4.24 4.24a.75.75 0 0 1-1.06 0L5.21 8.29a.75.75 0 0 1 .02-1.08z"
@@ -2836,18 +2836,18 @@ export default function WalletDashboardUsdSwapModal({
                                 </button>
                               </div>
                             </div>
-                          ) : (
-                            direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE && isBuyStablecoinsTitle ? (
-                              <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-x-3 gap-y-2">
-                                <div className="text-[12px] md:text-[13px] text-white/55">
-                                  {t("ui_usd_swap_received_amount", "Montant reçu")}
-                                </div>
-                                <div className="text-[12px] md:text-[13px] text-white/55 text-center">
-                                  {t(
-                                    "ui_usd_swap_choose_stablecoin_label",
-                                    "Choisissez le stablecoin",
-                                  )}
-                                </div>
+	                          ) : (
+	                            direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE && isBuyStablecoinsTitle ? (
+	                              <div className="grid grid-cols-[minmax(0,1fr)_auto] md:grid-cols-2 gap-x-4 md:gap-x-7 gap-y-3 md:gap-y-4 items-end">
+	                                <div className="text-[12px] md:text-[13px] text-white/55">
+	                                  {t("ui_usd_swap_received_amount", "Montant reçu")}
+	                                </div>
+	                                <div className="text-[12px] md:text-[13px] text-white/55 text-center md:text-left">
+	                                  {t(
+	                                    "ui_usd_swap_choose_stablecoin_label",
+	                                    "Choisissez le stablecoin",
+	                                  )}
+	                                </div>
 
                                 <div className="text-white text-4xl md:text-5xl font-semibold tracking-tight truncate">
                                   {hasValidAmount ? (
@@ -2867,22 +2867,22 @@ export default function WalletDashboardUsdSwapModal({
                                   )}
                                 </div>
 
-                                <div ref={stableDropdownRef} className="shrink-0 flex items-end pb-1">
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      setSourceDropdownOpen(false);
-                                      setSourceSearch("");
-                                      setStableDropdownOpen(true);
-                                    }}
-                                    aria-expanded={stableDropdownOpen}
-                                    className="inline-flex items-center gap-2 rounded-full bg-elevated ring-1 ring-white/10 px-3 py-1.5 text-white/85 hover:ring-white/20 transition-colors"
-                                  >
-                                    {stableCurrency ? (
-                                      renderCurrencyIcon(stableCurrency)
-                                    ) : (
-                                      <div className="w-5 h-5 rounded-full bg-white/10 ring-1 ring-white/10 flex-shrink-0" />
-                                    )}
+	                                <div ref={stableDropdownRef} className="flex items-end pb-1">
+	                                  <button
+	                                    type="button"
+	                                    onClick={() => {
+	                                      setSourceDropdownOpen(false);
+	                                      setSourceSearch("");
+	                                      setStableDropdownOpen(true);
+	                                    }}
+	                                    aria-expanded={stableDropdownOpen}
+	                                    className="inline-flex items-center gap-2 md:gap-3 rounded-full bg-elevated ring-1 ring-white/10 px-3 py-1.5 md:px-4 md:py-2 text-white/85 hover:ring-white/20 transition-colors md:w-full"
+	                                  >
+	                                    {stableCurrency ? (
+	                                      renderCurrencyIcon(stableCurrency)
+	                                    ) : (
+	                                      <div className="w-5 h-5 rounded-full bg-white/10 ring-1 ring-white/10 flex-shrink-0" />
+	                                    )}
                                     <span className="text-sm font-semibold">
                                       {stableCurrency
                                         ? normalizeCurrencyCode(stableCurrency?.ticker)
@@ -2893,12 +2893,12 @@ export default function WalletDashboardUsdSwapModal({
                                         ? normalizeCurrencyCode(stableCurrency?.network)
                                         : "—"}
                                     </span>
-                                    <svg
-                                      className="w-4 h-4 flex-shrink-0"
-                                      viewBox="0 0 20 20"
-                                      fill="currentColor"
-                                      aria-hidden
-                                    >
+	                                    <svg
+	                                      className="w-4 h-4 flex-shrink-0 ml-auto"
+	                                      viewBox="0 0 20 20"
+	                                      fill="currentColor"
+	                                      aria-hidden
+	                                    >
                                       <path
                                         fillRule="evenodd"
                                         d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 1 1 1.06 1.06l-4.24 4.24a.75.75 0 0 1-1.06 0L5.21 8.29a.75.75 0 0 1 .02-1.08z"
