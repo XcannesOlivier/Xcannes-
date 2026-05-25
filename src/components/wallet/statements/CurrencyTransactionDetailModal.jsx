@@ -127,6 +127,13 @@ export default function CurrencyTransactionDetailModal({
         <div className="md:hidden -mt-1 mb-2 flex justify-center" aria-hidden>
           <span className="block w-12 h-1.5 rounded-full bg-white/20" />
         </div>
+        {/* Bottom bar – mobile only (home indicator, comme dans send choice) */}
+        <div
+          className="md:hidden pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-[max(env(safe-area-inset-bottom),10px)] z-20"
+          aria-hidden
+        >
+          <span className="block w-36 h-1.5 rounded-full bg-white/80" />
+        </div>
         {/* Header */}
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
@@ -330,7 +337,7 @@ export default function CurrencyTransactionDetailModal({
           </div>
         ) : null}
 
-        <div className="mt-4 text-center text-[11px] tracking-[0.08em] text-white/30">
+        <div className="mt-4 mb-6 md:mb-0 text-center text-[11px] tracking-[0.08em] text-white/30">
           XCANNES
         </div>
       </div>

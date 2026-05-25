@@ -584,6 +584,10 @@ export default function WalletDashboardUsdSwapModal({
     (direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD
       ? t("ui_swap_title_in_wallet", "Recevoir des stablecoins")
       : t("ui_swap_title_out", "RLUSD → stablecoin USD"));
+  const isStablecoinBuySellTitleMobile = useMemo(() => {
+    const raw = String(titleOverride || "").trim().toLowerCase();
+    return raw === "acheter des stablecoins" || raw === "vendre vos stablecoins";
+  }, [titleOverride]);
   const flowTitleDisplay = String(flowTitle || "")
     .trim()
     .toUpperCase();
@@ -2684,7 +2688,14 @@ export default function WalletDashboardUsdSwapModal({
 
                 {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE || walletTargetSelectionEnabled ? (
                   <div className="relative px-4 pt-[40px] md:pt-[90px] pb-4 text-center">
-                    <h3 className="text-[30px] md:text-[34px] font-semibold text-white/95 tracking-tight mb-2">
+                    <h3
+                      className={[
+                        isStablecoinBuySellTitleMobile
+                          ? "text-[28px] md:text-[34px] font-medium md:font-semibold"
+                          : "text-[30px] md:text-[34px] font-semibold",
+                        "text-white/95 tracking-tight mb-2",
+                      ].join(" ")}
+                    >
                       {flowTitleDisplay}
                     </h3>
                     <p className="mb-4 text-[14px] md:text-[15px] text-white/80 leading-relaxed">

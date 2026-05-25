@@ -1753,14 +1753,14 @@ export default function GlobalStatement({
         </div>
 
         {/* Footer */}
-        <div className="shrink-0 px-4 md:px-6 py-1.5 md:py-3 pb-[max(6px,env(safe-area-inset-bottom))] md:pb-[max(12px,env(safe-area-inset-bottom))] border-t border-white/[0.06] bg-[#111518] shadow-[inset_0_-46px_70px_rgba(0,0,0,0.55)] flex items-center justify-between gap-3">
+        <div className="shrink-0 px-4 md:px-6 py-1.5 md:py-3 pb-[max(2px,env(safe-area-inset-bottom))] md:pb-[max(12px,env(safe-area-inset-bottom))] border-t border-white/[0.06] bg-[#111518] shadow-[inset_0_-46px_70px_rgba(0,0,0,0.55)] flex items-center justify-between gap-3">
           {/* Compte actuel */}
           <div className="flex items-center gap-3 min-w-0">
             <div className="relative w-auto min-w-[120px] max-w-[180px]" ref={accountDropdownRef}>
               <button
                 type="button"
                 onClick={() => setAccountDropdownOpen((prev) => !prev)}
-                className={`w-full inline-flex items-center justify-center gap-2 px-3 py-2 bg-transparent transition-all rounded-[10px]`}
+                className={`w-full inline-flex items-center justify-center gap-2 px-3 py-1.5 md:py-2 bg-transparent transition-all rounded-[10px]`}
                 aria-haspopup="menu"
                 aria-expanded={accountDropdownOpen}
                 title={t("ui_current_account_plain", "Compte actuel")}
@@ -1828,7 +1828,7 @@ export default function GlobalStatement({
           <button
             onClick={handleExportPdf}
             disabled={exportFormat === "pdf"}
-            className="shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-[10px] text-sm font-medium transition-colors disabled:opacity-50 text-white/70 hover:text-white bg-transparent hover:bg-white/[0.04]"
+            className="shrink-0 inline-flex items-center gap-2 px-4 py-1.5 md:py-2 rounded-[10px] text-sm font-medium transition-colors disabled:opacity-50 text-white/70 hover:text-white bg-transparent hover:bg-white/[0.04]"
             aria-label={t("ui_export_pdf_9c8d16b4fe", "Télécharger")}
           >
             <ShareIcon className={`w-4 h-4 ${exportFormat === "pdf" ? "opacity-40" : ""}`} />

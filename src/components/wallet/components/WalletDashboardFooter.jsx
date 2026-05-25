@@ -46,7 +46,10 @@ export default function WalletDashboardFooter({ onScan, addCurrencySlot, onHisto
       {/* Mobile footer — barre flat 3 boutons */}
       <div
         className="relative md:hidden shrink-0"
-        style={{ paddingBottom: "max(12px, env(safe-area-inset-bottom))" }}
+        style={{
+          paddingTop: "6px",
+          paddingBottom: "max(6px, env(safe-area-inset-bottom))",
+        }}
       >
         {/* Gradient au-dessus du footer — sépare du contenu */}
         <div className="pointer-events-none absolute inset-x-0 bottom-full h-[64px] bg-gradient-to-t from-[#0d1012]/90 to-transparent" />
