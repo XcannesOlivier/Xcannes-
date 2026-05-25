@@ -627,10 +627,9 @@ export default function WalletDashboardUsdSwapModal({
       </>
     );
   }, [direction, flowSubtitle, titleOverride, walletLabel]);
-  const walletSelectorDialogTitle = t(
-    "ui_choose_wallet_currency",
-    "Choisir une devise",
-  );
+  const walletSelectorDialogTitle = walletTargetSelectionEnabled
+    ? t("ui_choose_wallet_currency_receive", "Choisir une devise de réception")
+    : t("ui_choose_wallet_currency", "Choisir une devise");
 
   const quotedReceiveAmount = useMemo(() => parseSimpleSwapEstimateAmount(quote), [quote]);
   const quotedPartnerReceiveAmount = useMemo(() => {
@@ -3627,7 +3626,7 @@ export default function WalletDashboardUsdSwapModal({
                               >
                                 <div className="flex items-center justify-between gap-3 px-4 py-4 border-b border-white/10">
                                   <div className="min-w-0">
-                                    <div className="text-white font-semibold text-lg leading-tight truncate">
+                                    <div className="text-white font-medium text-[19px] md:text-[20px] leading-tight truncate">
                                       {walletSelectorDialogTitle}
                                     </div>
                                   </div>
@@ -3727,7 +3726,24 @@ export default function WalletDashboardUsdSwapModal({
                                 </div>
 
                                 <div className="px-3 py-2 text-[11px] text-white/55 bg-white/[0.02] border-t border-white/5">
-                                  {t("ui_search_results", "Sélectionnez un actif.")}
+                                  {walletTargetSelectionEnabled ? (
+                                    <div className="flex items-center justify-center gap-2 text-center">
+                                      <span>
+                                        {t("ui_wallet_credit_target", "Compte à créditer")}
+                                      </span>
+                                      <span className="inline-flex items-center gap-1.5">
+                                        <span
+                                          className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse"
+                                          aria-hidden
+                                        />
+                                        <span className="text-white/85 font-medium">
+                                          {String(walletLabel || "XCANNES").trim()}
+                                        </span>
+                                      </span>
+                                    </div>
+                                  ) : (
+                                    t("ui_search_results", "Sélectionnez un actif.")
+                                  )}
                                 </div>
                               </div>
                             </div>,
@@ -3782,7 +3798,7 @@ export default function WalletDashboardUsdSwapModal({
 
                                   <div className="flex items-center justify-between gap-3 px-4 py-4">
                                     <div className="min-w-0">
-                                      <div className="text-white font-semibold text-lg leading-tight truncate">
+                                      <div className="text-white font-medium text-[19px] md:text-[20px] leading-tight truncate">
                                         {walletSelectorDialogTitle}
                                       </div>
                                     </div>
@@ -3886,7 +3902,24 @@ export default function WalletDashboardUsdSwapModal({
                                 </div>
 
                                 <div className="px-3 py-2 text-[11px] text-white/55 bg-white/[0.02] border-t border-white/5">
-                                  {t("ui_search_results", "Sélectionnez un actif.")}
+                                  {walletTargetSelectionEnabled ? (
+                                    <div className="flex items-center justify-center gap-2 text-center">
+                                      <span>
+                                        {t("ui_wallet_credit_target", "Compte à créditer")}
+                                      </span>
+                                      <span className="inline-flex items-center gap-1.5">
+                                        <span
+                                          className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse"
+                                          aria-hidden
+                                        />
+                                        <span className="text-white/85 font-medium">
+                                          {String(walletLabel || "XCANNES").trim()}
+                                        </span>
+                                      </span>
+                                    </div>
+                                  ) : (
+                                    t("ui_search_results", "Sélectionnez un actif.")
+                                  )}
                                 </div>
                               </div>
                             </div>,
