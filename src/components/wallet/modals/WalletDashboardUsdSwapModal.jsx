@@ -588,9 +588,11 @@ export default function WalletDashboardUsdSwapModal({
     const raw = String(titleOverride || "").trim().toLowerCase();
     return raw === "acheter des stablecoins" || raw === "vendre vos stablecoins";
   }, [titleOverride]);
-  const flowTitleDisplay = String(flowTitle || "")
-    .trim()
-    .toUpperCase();
+  const flowTitleDisplay = useMemo(() => {
+    const clean = String(flowTitle || "").trim();
+    if (isStablecoinBuySellTitleMobile && !isDesktop) return clean;
+    return clean.toUpperCase();
+  }, [flowTitle, isDesktop, isStablecoinBuySellTitleMobile]);
   const flowSubtitle =
     String(subtitleOverride || "").trim() ||
     (direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD
@@ -2691,7 +2693,7 @@ export default function WalletDashboardUsdSwapModal({
                     <h3
                       className={[
                         isStablecoinBuySellTitleMobile
-                          ? "text-[28px] md:text-[34px] font-medium md:font-semibold"
+                          ? "text-[26px] md:text-[34px] font-medium md:font-semibold"
                           : "text-[30px] md:text-[34px] font-semibold",
                         "text-white/95 tracking-tight mb-2",
                       ].join(" ")}

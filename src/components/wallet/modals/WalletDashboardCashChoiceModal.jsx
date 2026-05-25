@@ -24,17 +24,7 @@ export default function WalletDashboardCashChoiceModal({
   const withdrawHintText = t('ui_funds_withdraw_hint', 'Vers votre compte bancaire');
   const highlightWithdraw = value => {
     const input = String(value || '');
-    if (!input) return input;
-    const parts = input.split(/(compte bancaire)/i);
-    return parts.map((part, idx) =>
-      /^compte bancaire$/i.test(part) ? (
-        <span key={`${idx}-${part}`} className="text-xcannes-green/90">
-          {part}
-        </span>
-      ) : (
-        <span key={`${idx}-${part}`}>{part}</span>
-      ),
-    );
+    return input;
   };
   const swapOutHintText = t('ui_funds_swap_out_hint', 'Créditer votre compte XCannes');
   const swapOutSubhintText = t('ui_funds_swap_out_subhint', 'Ajoutés automatiquement à votre solde');
@@ -308,7 +298,7 @@ export default function WalletDashboardCashChoiceModal({
                               />
                             </svg>
                           </div>
-                          <p className="mt-1 text-[15px] md:text-sm leading-snug text-xcannes-green/90">
+                          <p className="mt-1 text-[15px] md:text-sm leading-snug text-white/60">
                             {(() => {
                               const text = String(withdrawHintText || '');
                               const prefix = 'Vers votre ';
@@ -357,19 +347,40 @@ export default function WalletDashboardCashChoiceModal({
                               .split('\n')
                               .map((line, lineIdx, lines) => {
                                 const text = String(line || '');
-                                const highlightStablecoin = value => {
-                                  const input = String(value || '');
+                                const renderSwapOutHint = (value) => {
+                                  const input = String(value || "");
                                   if (!input) return input;
-                                  const parts = input.split(/(stablecoins?\s+USD)/i);
-                                  return parts.map((part, idx) =>
-                                    /^stablecoins?\s+usd$/i.test(part) || /USDC|USDT|RLUSD/i.test(part) ? (
-                                      <span key={`${lineIdx}-${idx}-${part}`} className="text-xcannes-green/90">
-                                        {part}
-                                      </span>
-                                    ) : (
-                                      <span key={`${lineIdx}-${idx}-${part}`}>{part}</span>
-                                    ),
-                                  );
+                                  const brandParts = input.split(/(xcannes)/i);
+                                  return brandParts.flatMap((brandPart, brandIdx) => {
+                                    if (/^xcannes$/i.test(brandPart)) {
+                                      return (
+                                        <span
+                                          key={`${lineIdx}-brand-${brandIdx}`}
+                                          className="uppercase text-[0.9em]"
+                                        >
+                                          XCANNES
+                                        </span>
+                                      );
+                                    }
+                                    const parts = String(brandPart || "").split(
+                                      /(stablecoins?\s+USD)/i,
+                                    );
+                                    return parts.map((part, idx) =>
+                                      /^stablecoins?\s+usd$/i.test(part) ||
+                                      /USDC|USDT|RLUSD/i.test(part) ? (
+                                        <span
+                                          key={`${lineIdx}-${brandIdx}-${idx}-${part}`}
+                                          className="text-xcannes-green/90"
+                                        >
+                                          {part}
+                                        </span>
+                                      ) : (
+                                        <span key={`${lineIdx}-${brandIdx}-${idx}-${part}`}>
+                                          {part}
+                                        </span>
+                                      ),
+                                    );
+                                  });
                                 };
                                 const openIdx = text.indexOf('(');
                                 const closeIdx = text.lastIndexOf(')');
@@ -379,9 +390,9 @@ export default function WalletDashboardCashChoiceModal({
                                 const after = hasParens ? text.slice(closeIdx + 1) : '';
                                 return (
                                   <span key={`${lineIdx}-${text}`}>
-                                    {highlightStablecoin(before)}
+                                    {renderSwapOutHint(before)}
                                     {parens ? <span className="text-xcannes-green/90">{parens}</span> : null}
-                                    {highlightStablecoin(after)}
+                                    {renderSwapOutHint(after)}
                                     {lineIdx < lines.length - 1 ? <br /> : null}
                                   </span>
                                 );
