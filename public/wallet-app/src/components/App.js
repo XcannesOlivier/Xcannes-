@@ -916,6 +916,8 @@ function setupBackupVerifyScreen(words) {
   }
 
   inputs.forEach((inp, i) => {
+    const expectedLower = words[i].toLowerCase();
+
     inp.addEventListener('input', () => {
       const row = rows[i];
       if (row.classList.contains('error')) {
@@ -923,12 +925,20 @@ function setupBackupVerifyScreen(words) {
         row.classList.add('active');
         row.querySelector('.row-status').textContent = '';
       }
+
+      // Auto-validate when the word matches exactly (mobile-friendly flow).
+      if (i !== currentIndex) return;
+      const val = inp.value.trim().toLowerCase();
+      if (val && val === expectedLower) {
+        // Let the UI paint the last keystroke before moving on.
+        setTimeout(() => handleValidate(), 0);
+      }
     });
 
     const handleValidate = () => {
       if (i !== currentIndex) return;
       const val = inp.value.trim().toLowerCase();
-      const expected = words[i].toLowerCase();
+      const expected = expectedLower;
       const row = rows[i];
       if (!val) return;
 
@@ -961,6 +971,15 @@ function setupBackupVerifyScreen(words) {
       if (e.key === 'Enter') { e.preventDefault(); handleValidate(); }
       // Convenience: validate and advance on space (no spaces allowed in words).
       if (e.key === ' ') { e.preventDefault(); handleValidate(); }
+    });
+
+    // Fallback: if the keyboard is dismissed, validate the current word.
+    inp.addEventListener('blur', () => {
+      setTimeout(() => {
+        if (i !== currentIndex) return;
+        if (!inp.value.trim()) return;
+        handleValidate();
+      }, 120);
     });
   });
 
