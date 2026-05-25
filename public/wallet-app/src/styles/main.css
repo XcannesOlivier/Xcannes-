@@ -1951,47 +1951,6 @@ textarea.error {
   background: rgba(255, 255, 255, 0.8);
 }
 
-/* Mobile-only bottom bar (used on embedded dashboard screen) */
-.choice-bottom-bar--mobile-only {
-  display: none;
-}
-
-@media (hover: none) and (pointer: coarse) {
-  .choice-bottom-bar--mobile-only {
-    display: flex;
-  }
-
-  /* Reserve space so iframe content/buttons aren't covered by the footer bar */
-  #screen-wallet-embedded .embedded-container {
-    padding-bottom: var(--embedded-footer-space);
-  }
-}
-
-/* Ensure the bar is visible/positioned above the iframe on the embedded dashboard screen */
-#screen-wallet-embedded {
-  --embedded-footer-space: calc(env(safe-area-inset-bottom, 0px) + 22px);
-}
-
-#screen-wallet-embedded .choice-bottom-bar--mobile-only {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  justify-content: center;
-  padding-top: 0px;
-  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
-  pointer-events: none;
-  z-index: 5;
-}
-
-#screen-wallet-embedded .choice-bottom-bar--mobile-only > span {
-  display: block;
-  width: 144px;
-  height: 6px;
-  border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.8);
-}
-
 #screen-backup-verify {
   background:
     radial-gradient(850px 520px at 50% 0%, rgba(0, 200, 83, 0.12), transparent 62%),

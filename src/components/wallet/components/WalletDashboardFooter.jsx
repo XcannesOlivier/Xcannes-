@@ -100,6 +100,14 @@ export default function WalletDashboardFooter({ onScan, addCurrencySlot, onHisto
             ) : null}
           </div>
         </div>
+
+        {/* Home indicator bar (mobile only) */}
+        <div
+          className="pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-[max(env(safe-area-inset-bottom),10px)] z-20"
+          aria-hidden
+        >
+          <div className="w-[144px] h-[6px] rounded-full bg-white/80" />
+        </div>
       </div>
 
       {/* Desktop footer */}
