@@ -479,8 +479,8 @@ export default function GlobalMovementDetailModal({
           </div>
         ) : null}
 
-        <div className="mt-4 text-center text-[10px] tracking-[0.08em] text-white/30">
-          xcannes
+        <div className="mt-4 text-center text-[11px] tracking-[0.08em] text-white/30">
+          XCANNES
         </div>
       </div>
     </div>,

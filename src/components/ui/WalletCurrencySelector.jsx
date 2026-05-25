@@ -734,17 +734,7 @@ export default function WalletCurrencySelector({
                     <span className="text-[15px] font-light text-white/55">{t("ui_search_results", "Sélectionnez une devise.")}</span>
                   )}
                 </div>
-                {/* Bottom indicator – mobile only */}
-                <div
-                  className="md:hidden pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-[max(env(safe-area-inset-bottom),10px)] z-20"
-                  aria-hidden
-                >
-                  <span className="block w-36 h-1.5 rounded-full bg-white/80" />
-                </div>
-                {/* Bottom bar – desktop only (visual balance) */}
-                <div className="hidden md:flex pointer-events-none justify-center pt-2 pb-3" aria-hidden>
-                  <span className="block w-[120px] h-[4px] rounded-full bg-white/10" />
-                </div>
+                {/* Bottom indicator removed */}
               </div>
             </div>,
             fullscreenPortalTarget || document.body,
