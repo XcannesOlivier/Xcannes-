@@ -1801,7 +1801,7 @@ textarea.error {
 .mnemonic-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px 20px;
+  gap: 26px 20px;
   width: 100%;
   max-width: 360px;
   margin: 10px auto 18px;
@@ -2730,17 +2730,18 @@ textarea.error {
 }
 
 #screen-import .screen-header {
-  justify-content: flex-start;
+  justify-content: center;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 18px;
-}
-
-#screen-import .screen-header span {
-  display: none;
+  min-height: 52px;
+  gap: 0;
+  position: relative;
 }
 
 #screen-import .screen-header .btn-back {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
   background: transparent;
   border: none;
   backdrop-filter: none;
@@ -2751,14 +2752,19 @@ textarea.error {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: 0;
-  margin-bottom: 0;
+  margin: 0;
   padding: 0;
+  z-index: 1;
 }
 
-#screen-import .screen-header {
-  align-items: center;
-  min-height: 52px;
+#screen-import .screen-header h2 {
+  flex: none;
+  text-align: center;
+  font-size: 28px;
+  font-weight: 400;
+  letter-spacing: -0.2px;
+  line-height: 1.15;
+  margin: 0 auto;
 }
 
 #screen-import .tab-desc {
