@@ -270,7 +270,7 @@ export default function WalletDesktopModals({
 		              initialTargetCurrency: "USD",
 		              titleOverride: "Vendre vos stablecoins",
 			              subtitleOverride:
-			                "Sélectionnez le stablecoin, le réseau et la devise qui sera créditée sur votre solde.",
+			                "Sélectionnez le stablecoin, indiquez le montant et choisissez la devise qui sera créditée à votre compte",
 			            });
 			          }}
 		          onChooseUsdSwapIn={() => {

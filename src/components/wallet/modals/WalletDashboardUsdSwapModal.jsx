@@ -598,12 +598,22 @@ export default function WalletDashboardUsdSwapModal({
     (direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD
       ? t(
           "ui_swap_subtitle_in_wallet",
-          "Sélectionnez le stablecoin, le réseau et la devise qui sera créditée sur votre solde.",
+          "Sélectionnez le stablecoin, indiquez le montant et choisissez la devise qui sera créditée à votre compte.",
         )
 	      : t(
 	          "ui_swap_subtitle_out",
 	          "Choisissez la devise, le montant et le stablecoin.",
 	        ));
+  const flowSubtitleDisplay = useMemo(() => {
+    const base = String(flowSubtitle || "").trim();
+    if (direction !== SWAP_DIRECTIONS.STABLE_TO_RLUSD) return base;
+    const overrideRaw = String(titleOverride || "").trim().toLowerCase();
+    if (overrideRaw !== "vendre vos stablecoins") return base;
+    const name = String(walletLabel || "XCANNES").trim();
+    const baseNoPunct = base.replace(/[\s.]+$/, "");
+    if (!name) return baseNoPunct;
+    return `${baseNoPunct} ${name}`;
+  }, [direction, flowSubtitle, titleOverride, walletLabel]);
   const walletSelectorDialogTitle = t(
     "ui_choose_wallet_currency",
     "Choisir une devise",
@@ -2701,7 +2711,7 @@ export default function WalletDashboardUsdSwapModal({
                       {flowTitleDisplay}
                     </h3>
                     <p className="mb-4 text-[14px] md:text-[15px] text-white/80 leading-relaxed">
-                      {flowSubtitle}
+                      {flowSubtitleDisplay}
                     </p>
                   </div>
                 ) : null}
@@ -2733,18 +2743,82 @@ export default function WalletDashboardUsdSwapModal({
                   <>
 		                    <div className={["rounded-[18px] ring-1 ring-white/10 ring-inset bg-[#101415] overflow-hidden", accentShadowCard].join(" ")}>
                       <div className="p-4">
-                        <div className="flex items-center justify-between gap-3">
-	                          <div
-		                            className={
-		                              direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE ||
-		                              direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD
-		                                ? "text-[12px] md:text-[13px] text-white/55"
-		                                : "text-[11px] tracking-[0.22em] uppercase text-white/45"
-		                            }
-		                          >
-				                            {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD
-				                              ? null
-				                              : (
+                        {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD ? (
+                          <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-x-3 gap-y-2">
+                            <div className="text-[12px] md:text-[13px] text-white/55">
+                              {t("ui_usd_swap_enter_amount_label", "Indiquer le montant")}
+                            </div>
+                            <div className="text-[12px] md:text-[13px] text-white/55 text-right">
+                              {t("ui_usd_swap_choose_stablecoin_label", "Choisissez le stablecoin")}
+                            </div>
+
+                            <div className="flex items-end justify-between gap-3 min-w-0">
+                              <input
+                                type="text"
+                                inputMode="decimal"
+                                value={amount}
+                                onChange={(e) => {
+                                  setAmount(e.target.value);
+                                  setApiError("");
+                                }}
+                                placeholder={direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE ? "25" : "100"}
+                                className="w-full bg-transparent text-white text-4xl md:text-5xl font-semibold tracking-tight focus:outline-none xcannes-no-spinner"
+                              />
+                              <div className="text-sm text-white/50 whitespace-nowrap pb-1" />
+                            </div>
+
+                            <div ref={stableDropdownRef} className="shrink-0 flex items-end">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setSourceDropdownOpen(false);
+                                  setSourceSearch("");
+                                  setStableDropdownOpen(true);
+                                }}
+                                aria-expanded={stableDropdownOpen}
+                                className="inline-flex items-center gap-2 rounded-full bg-elevated ring-1 ring-white/10 px-3 py-1.5 text-white/85 hover:ring-white/20 transition-colors"
+                              >
+                                {stableCurrency ? (
+                                  renderCurrencyIcon(stableCurrency)
+                                ) : (
+                                  <div className="w-5 h-5 rounded-full bg-white/10 ring-1 ring-white/10 flex-shrink-0" />
+                                )}
+                                <span className="text-sm font-semibold">
+                                  {stableCurrency
+                                    ? normalizeCurrencyCode(stableCurrency?.ticker)
+                                    : t("ui_choose", "Choisir")}
+                                </span>
+                                <span className="text-[10px] tracking-[0.18em] uppercase px-2 py-0.5 rounded-full bg-white/10 text-white/70">
+                                  {stableCurrency
+                                    ? normalizeCurrencyCode(stableCurrency?.network)
+                                    : "—"}
+                                </span>
+                                <svg
+                                  className="w-4 h-4 flex-shrink-0"
+                                  viewBox="0 0 20 20"
+                                  fill="currentColor"
+                                  aria-hidden
+                                >
+                                  <path
+                                    fillRule="evenodd"
+                                    d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 1 1 1.06 1.06l-4.24 4.24a.75.75 0 0 1-1.06 0L5.21 8.29a.75.75 0 0 1 .02-1.08z"
+                                    clipRule="evenodd"
+                                  />
+                                </svg>
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <>
+                            <div className="flex items-center justify-between gap-3">
+	                              <div
+		                                className={
+		                                  direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE ||
+		                                  direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD
+		                                    ? "text-[12px] md:text-[13px] text-white/55"
+		                                    : "text-[11px] tracking-[0.22em] uppercase text-white/45"
+		                                }
+		                              >
 				                                <span className="inline-flex items-center gap-1.5 flex-wrap">
 				                                  <span>{t("ui_swap_you_send_from", "Depuis le compte")}</span>
 				                                  {String(walletLabel || "").trim() ? (
@@ -2755,135 +2829,85 @@ export default function WalletDashboardUsdSwapModal({
 				                                  ) : null}
 				                                  <span>{t("ui_swap_you_send_pre", ", choisissez le montant et la devise")}</span>
 				                                </span>
-				                              )}
-                          </div>
-                          <div className="flex items-center gap-2">
-                            {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD ? (
-                              <div ref={stableDropdownRef} className="flex flex-col items-end gap-1">
-                                <div className="text-[12px] md:text-[13px] text-white/55">
-                                  {t("ui_usd_swap_choose_stablecoin_label", "Choisissez le stablecoin")}
-                                </div>
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setSourceDropdownOpen(false);
-                                    setSourceSearch("");
-                                    setStableDropdownOpen(true);
-                                  }}
-                                  aria-expanded={stableDropdownOpen}
-                                  className="inline-flex items-center gap-2 rounded-full bg-elevated ring-1 ring-white/10 px-3 py-1.5 text-white/85 hover:ring-white/20 transition-colors"
-                                >
-                                  {stableCurrency ? (
-                                    renderCurrencyIcon(stableCurrency)
-                                  ) : (
-                                    <div className="w-5 h-5 rounded-full bg-white/10 ring-1 ring-white/10 flex-shrink-0" />
-                                  )}
-                                  <span className="text-sm font-semibold">
-                                    {stableCurrency
-                                      ? normalizeCurrencyCode(stableCurrency?.ticker)
-                                      : t("ui_choose", "Choisir")}
+	                              </div>
+                              <div className="flex items-center gap-2">
+                                {walletSourceSelectionEnabled ? (
+                                  <div ref={sourceDropdownRef}>
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setStableDropdownOpen(false);
+                                        setSourceSearch("");
+                                        setSourceDropdownOpen((prev) => !prev);
+                                      }}
+                                      aria-expanded={sourceDropdownOpen}
+                                      className="inline-flex items-center gap-2 rounded-full bg-elevated ring-1 ring-white/10 px-3 py-1.5 text-white/85 hover:ring-white/20 transition-colors"
+                                    >
+                                      <span className="shrink-0">
+                                        {renderWalletOptionIcon(selectedSourceOption?.icon)}
+                                      </span>
+                                      <span className="text-sm font-semibold">
+                                        {selectedSourceOption?.label || selectedSourceCurrencyCode}
+                                      </span>
+                                      <span className="text-white/70 font-mono tabular-nums text-sm">
+                                        {selectedSourceOption?.labelRight || ""}
+                                      </span>
+                                      <svg
+                                        className="w-4 h-4 flex-shrink-0"
+                                        viewBox="0 0 20 20"
+                                        fill="currentColor"
+                                        aria-hidden
+                                      >
+                                        <path
+                                          fillRule="evenodd"
+                                          d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 1 1 1.06 1.06l-4.24 4.24a.75.75 0 0 1-1.06 0L5.21 8.29a.75.75 0 0 1 .02-1.08z"
+                                          clipRule="evenodd"
+                                        />
+                                      </svg>
+                                    </button>
+                                  </div>
+                                ) : (
+	                                  <div className="inline-flex items-center gap-2 text-white/90">
+	                                    <Image
+	                                      src={
+	                                        String(rlusdDisplayCurrency?.image || "").trim() ||
+	                                        CRYPTO_ICONS?.RLUSD ||
+	                                        "/symbols/rlusd.png"
+	                                      }
+	                                      loader={({ src }) => src}
+	                                      unoptimized
+	                                      alt=""
+	                                      width={32}
+	                                      height={32}
+	                                      className="w-8 h-8 rounded-full object-cover flex-shrink-0"
+	                                    />
+	                                    <span className="text-base font-semibold tracking-tight">
+	                                      {String(rlusdDisplayCurrency?.ticker || "RLUSD").toUpperCase()}
+	                                    </span>
+	                                    <span className="text-[11px] tracking-[0.22em] uppercase text-white/55">
+                                    {String(rlusdDisplayCurrency?.network || "xrp").toUpperCase()}
                                   </span>
-                                  <span className="text-[10px] tracking-[0.18em] uppercase px-2 py-0.5 rounded-full bg-white/10 text-white/70">
-                                    {stableCurrency
-                                      ? normalizeCurrencyCode(stableCurrency?.network)
-                                      : "—"}
-                                  </span>
-                                  <svg
-                                    className="w-4 h-4 flex-shrink-0"
-                                    viewBox="0 0 20 20"
-                                    fill="currentColor"
-                                    aria-hidden
-                                  >
-                                    <path
-                                      fillRule="evenodd"
-                                      d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 1 1 1.06 1.06l-4.24 4.24a.75.75 0 0 1-1.06 0L5.21 8.29a.75.75 0 0 1 .02-1.08z"
-                                      clipRule="evenodd"
-                                    />
-                                  </svg>
-                                </button>
+	                                  </div>
+                                )}
                               </div>
-                            ) : walletSourceSelectionEnabled ? (
-                              <div ref={sourceDropdownRef}>
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setStableDropdownOpen(false);
-                                    setSourceSearch("");
-                                    setSourceDropdownOpen((prev) => !prev);
-                                  }}
-                                  aria-expanded={sourceDropdownOpen}
-                                  className="inline-flex items-center gap-2 rounded-full bg-elevated ring-1 ring-white/10 px-3 py-1.5 text-white/85 hover:ring-white/20 transition-colors"
-                                >
-                                  <span className="shrink-0">
-                                    {renderWalletOptionIcon(selectedSourceOption?.icon)}
-                                  </span>
-                                  <span className="text-sm font-semibold">
-                                    {selectedSourceOption?.label || selectedSourceCurrencyCode}
-                                  </span>
-                                  <span className="text-white/70 font-mono tabular-nums text-sm">
-                                    {selectedSourceOption?.labelRight || ""}
-                                  </span>
-                                  <svg
-                                    className="w-4 h-4 flex-shrink-0"
-                                    viewBox="0 0 20 20"
-                                    fill="currentColor"
-                                    aria-hidden
-                                  >
-                                    <path
-                                      fillRule="evenodd"
-                                      d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 1 1 1.06 1.06l-4.24 4.24a.75.75 0 0 1-1.06 0L5.21 8.29a.75.75 0 0 1 .02-1.08z"
-                                      clipRule="evenodd"
-                                    />
-                                  </svg>
-                                </button>
-                              </div>
-                            ) : (
-	                              <div className="inline-flex items-center gap-2 text-white/90">
-	                                <Image
-	                                  src={
-	                                    String(rlusdDisplayCurrency?.image || "").trim() ||
-	                                    CRYPTO_ICONS?.RLUSD ||
-	                                    "/symbols/rlusd.png"
-	                                  }
-	                                  loader={({ src }) => src}
-	                                  unoptimized
-	                                  alt=""
-	                                  width={32}
-	                                  height={32}
-	                                  className="w-8 h-8 rounded-full object-cover flex-shrink-0"
-	                                />
-	                                <span className="text-base font-semibold tracking-tight">
-	                                  {String(rlusdDisplayCurrency?.ticker || "RLUSD").toUpperCase()}
-	                                </span>
-	                                <span className="text-[11px] tracking-[0.22em] uppercase text-white/55">
-                                  {String(rlusdDisplayCurrency?.network || "xrp").toUpperCase()}
-                                </span>
-                              </div>
-                            )}
-                          </div>
-                        </div>
+                            </div>
 
-                        {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD ? (
-                          <div className="mt-3 text-[12px] md:text-[13px] text-white/55">
-                            {t("ui_usd_swap_enter_amount_label", "Indiquer le montant")}
-                          </div>
-                        ) : null}
-
-                        <div className="mt-2 flex items-end justify-between gap-3">
-                          <input
-                            type="text"
-                            inputMode="decimal"
-                            value={amount}
-                            onChange={(e) => {
-                              setAmount(e.target.value);
-                              setApiError("");
-                            }}
-                            placeholder={direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE ? "25" : "100"}
-                            className="w-full bg-transparent text-white text-4xl md:text-5xl font-semibold tracking-tight focus:outline-none xcannes-no-spinner"
-                          />
-                          <div className="text-sm text-white/50 whitespace-nowrap pb-1">
-                          </div>
-                        </div>
+                            <div className="mt-2 flex items-end justify-between gap-3">
+                              <input
+                                type="text"
+                                inputMode="decimal"
+                                value={amount}
+                                onChange={(e) => {
+                                  setAmount(e.target.value);
+                                  setApiError("");
+                                }}
+                                placeholder={direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE ? "25" : "100"}
+                                className="w-full bg-transparent text-white text-4xl md:text-5xl font-semibold tracking-tight focus:outline-none xcannes-no-spinner"
+                              />
+                              <div className="text-sm text-white/50 whitespace-nowrap pb-1" />
+                            </div>
+                          </>
+                        )}
 
                         {null /* XRP envoyé masqué */}
 
@@ -2974,18 +2998,9 @@ export default function WalletDashboardUsdSwapModal({
 		                                  : "text-[11px] tracking-[0.22em] uppercase text-white/45"
 		                              }
 		                            >
-			                              {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD ? (
-			                                <span className="inline-flex items-center gap-1.5 flex-wrap">
-			                                  <span>{t("ui_usd_swap_credited_pre", "Votre compte")}</span>
-			                                  {String(walletLabel || "").trim() ? (
-			                                    <span className="inline-flex items-center gap-1 rounded-full bg-black/60 ring-1 ring-white/10 px-2 py-0.5 text-white/85 animate-pulse">
-			                                      <span className="w-1.5 h-1.5 rounded-full bg-blue-400 inline-block" />
-			                                      <span className="font-medium">{walletLabel}</span>
-			                                    </span>
-			                                  ) : null}
-			                                  <span>{t("ui_usd_swap_credited_post", "sera crédité de")}</span>
-			                                </span>
-			                              ) : t("ui_usd_swap_recipient_receives", "Le wallet destinataire recevra")}
+			                              {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD
+			                                ? t("ui_usd_swap_received_amount", "Montant reçu")
+			                                : t("ui_usd_swap_recipient_receives", "Le wallet destinataire recevra")}
 		                            </div>
                             <div className="flex items-center gap-2">
                               {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE ? (
@@ -3032,7 +3047,13 @@ export default function WalletDashboardUsdSwapModal({
                                   {/* Portal content rendered once above (stableDropdownOpen) */}
                                 </div>
                               ) : walletTargetSelectionEnabled ? (
-                                <div ref={sourceDropdownRef}>
+                                <div
+                                  ref={sourceDropdownRef}
+                                  className="flex flex-col items-end gap-1"
+                                >
+                                  <div className="text-[11px] md:text-[12px] text-white/55">
+                                    {t("ui_usd_swap_receive_currency", "Devise de réception")}
+                                  </div>
                                   <button
                                     type="button"
                                     onClick={() => {
