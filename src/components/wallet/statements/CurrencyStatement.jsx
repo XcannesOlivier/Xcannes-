@@ -1824,17 +1824,7 @@ export default function CurrencyStatement({
             <span>{exportFormat === "pdf" ? t("ui_loading_1386baebe9", "Loading…") : t("ui_export_pdf_9c8d16b4fe", "Télécharger")}</span>
           </button>
         </div>
-        {/* Bottom indicator – mobile only */}
-        <div
-          className="md:hidden pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-[max(env(safe-area-inset-bottom),10px)] z-[10210]"
-          aria-hidden
-        >
-          <span className="block w-36 h-1.5 rounded-full bg-white/80" />
-        </div>
-        {/* Bottom bar – desktop only (visual balance) */}
-        <div className="hidden md:flex pointer-events-none justify-center pt-0.5 pb-3" aria-hidden>
-          <span className="block w-[120px] h-[4px] rounded-full bg-white/10" />
-        </div>
+        {/* Bottom indicator removed */}
 
       </div>
     </div>
