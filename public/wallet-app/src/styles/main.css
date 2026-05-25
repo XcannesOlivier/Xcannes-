@@ -2114,6 +2114,65 @@ textarea.error {
   line-height: 1.5;
 }
 
+.btn-verify-show-words.btn-link {
+  margin-top: 6px;
+  margin-bottom: 10px;
+  padding: 6px 6px;
+  color: rgba(255, 255, 255, 0.70);
+  text-decoration-thickness: 1px;
+}
+
+.verify-words-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(8px);
+}
+
+.verify-words-card {
+  width: 100%;
+  max-width: 420px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(14, 18, 20, 0.96);
+  box-shadow: 0 26px 70px rgba(0, 0, 0, 0.65);
+  padding: 14px 14px 12px;
+}
+
+.verify-words-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.verify-words-title {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.2px;
+  color: rgba(255, 255, 255, 0.90);
+}
+
+.verify-mnemonic-grid.mnemonic-grid {
+  max-width: none;
+  margin: 8px auto 10px;
+  gap: 16px 14px;
+}
+
+.verify-words-note {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 12px;
+  line-height: 1.4;
+  text-align: center;
+}
+
 .verify-progress {
   margin-bottom: 20px;
 }

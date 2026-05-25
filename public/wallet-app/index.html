@@ -349,6 +349,19 @@
           <div class="wakelock-hint-text" data-wakelock-hint-text></div>
         </div>
 
+        <button id="btn-verify-show-words" class="btn-link btn-verify-show-words">Voir les 12 mots</button>
+
+        <div id="verify-words-overlay" class="verify-words-overlay hidden" role="dialog" aria-modal="true">
+          <div class="verify-words-card" role="document">
+            <div class="verify-words-header">
+              <h3 class="verify-words-title">Vos 12 mots</h3>
+              <button id="btn-verify-words-close" class="btn-icon-round" title="Fermer" aria-label="Fermer">✕</button>
+            </div>
+            <div class="mnemonic-grid verify-mnemonic-grid" id="verify-mnemonic-grid"></div>
+            <p class="verify-words-note">Fermez cette fenêtre puis continuez la vérification.</p>
+          </div>
+        </div>
+
         <div class="verify-progress">
           <span id="verify-progress-text">Mot 1 / 12</span>
           <div class="verify-progress-bar">

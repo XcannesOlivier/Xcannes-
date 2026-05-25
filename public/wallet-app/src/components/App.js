@@ -855,6 +855,10 @@ function setupBackupVerifyScreen(words) {
   const progressFill = document.getElementById('verify-progress-fill');
   const btnConfirm = document.getElementById('btn-verify-confirm');
   const btnBack = document.getElementById('btn-verify-back');
+  const btnShowWords = document.getElementById('btn-verify-show-words');
+  const overlay = document.getElementById('verify-words-overlay');
+  const overlayGrid = document.getElementById('verify-mnemonic-grid');
+  const btnOverlayClose = document.getElementById('btn-verify-words-close');
 
   let currentIndex = 0;
   container.innerHTML = '';
@@ -947,19 +951,72 @@ function setupBackupVerifyScreen(words) {
         row.className = 'verify-row error';
         row.querySelector('.row-status').textContent = '✖';
         updateStatus(statusEl, `❌ Le mot #${i + 1} est incorrect. Réessayez.`, true);
+        // Ensure focus stays on the field for quick correction.
+        inp.focus();
         inp.select();
       }
     };
 
     inp.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') { e.preventDefault(); handleValidate(); }
-    });
-    inp.addEventListener('blur', () => {
-      setTimeout(() => { if (i === currentIndex && inp.value.trim()) handleValidate(); }, 100);
+      // Convenience: validate and advance on space (no spaces allowed in words).
+      if (e.key === ' ') { e.preventDefault(); handleValidate(); }
     });
   });
 
   setTimeout(() => inputs[0]?.focus(), 200);
+
+  // Overlay showing the 12 words again (helps correcting a single typo without restarting).
+  if (overlayGrid) {
+    overlayGrid.innerHTML = '';
+    words.forEach((word, idx) => {
+      const div = document.createElement('div');
+      div.className = 'mnemonic-word';
+      div.innerHTML = `
+        <span class="mnemonic-num">${idx + 1}</span>
+        <span class="mnemonic-text">${word}</span>
+      `;
+      overlayGrid.appendChild(div);
+    });
+  }
+
+  function openVerifyWordsOverlay() {
+    if (!overlay) return;
+    // Hide keyboard while reading the words.
+    inputs[currentIndex]?.blur();
+    overlay.classList.remove('hidden');
+  }
+
+  function closeVerifyWordsOverlay() {
+    if (!overlay) return;
+    overlay.classList.add('hidden');
+    setTimeout(() => inputs[currentIndex]?.focus(), 80);
+  }
+
+  if (btnShowWords) {
+    const freshBtn = btnShowWords.cloneNode(true);
+    btnShowWords.replaceWith(freshBtn);
+    document.getElementById('btn-verify-show-words')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      openVerifyWordsOverlay();
+    }, { once: false });
+  }
+
+  if (btnOverlayClose) {
+    const freshBtnClose = btnOverlayClose.cloneNode(true);
+    btnOverlayClose.replaceWith(freshBtnClose);
+    document.getElementById('btn-verify-words-close')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      closeVerifyWordsOverlay();
+    }, { once: false });
+  }
+
+  if (overlay && !overlay.dataset.bound) {
+    overlay.dataset.bound = '1';
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) closeVerifyWordsOverlay();
+    });
+  }
 
   btnBack?.addEventListener('click', () => {
     showScreen('backup');
