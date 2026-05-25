@@ -1180,7 +1180,7 @@ export default function WalletDashboardUsdSwapModal({
     if (source === "list") {
       const listEl = stableDropdownListRef.current;
       if (!listEl) return false;
-      if (listEl.scrollTop > 0) return false;
+      if (listEl.scrollTop > 2) return false;
     }
 
     stableOverlayDragMetaRef.current = {
@@ -1307,7 +1307,7 @@ export default function WalletDashboardUsdSwapModal({
     if (source === "list") {
       const listEl = sourceDropdownListRef.current;
       if (!listEl) return false;
-      if (listEl.scrollTop > 0) return false;
+      if (listEl.scrollTop > 2) return false;
     }
 
     sourceOverlayDragMetaRef.current = {
@@ -2268,7 +2268,7 @@ export default function WalletDashboardUsdSwapModal({
     if (source === "list") {
       const listEl = modalOverlayListRef.current;
       if (!listEl) return false;
-      if (listEl.scrollTop > 0) return false;
+      if (listEl.scrollTop > 2) return false;
     }
 
     modalOverlayDragMetaRef.current = {
@@ -3601,7 +3601,7 @@ export default function WalletDashboardUsdSwapModal({
 	                                role="dialog"
 	                                aria-modal="true"
 	                                className={[
-	                                  "absolute inset-0 bg-elevated flex flex-col min-h-0 overflow-hidden pb-[env(safe-area-inset-bottom)]",
+	                                  "absolute inset-0 bg-elevated flex flex-col min-h-0 overflow-hidden pb-[env(safe-area-inset-bottom)] touch-pan-y",
 	                                  "sm:inset-6 sm:rounded-2xl sm:ring-1 sm:ring-white/10 sm:shadow-2xl",
 	                                  "will-change-transform",
 	                                ].join(" ")}
@@ -3727,7 +3727,7 @@ export default function WalletDashboardUsdSwapModal({
 
 	                                <div
 	                                  ref={stableDropdownListRef}
-	                                  className="flex-1 min-h-0 overflow-y-auto"
+	                                  className="flex-1 min-h-0 overflow-y-auto overscroll-contain touch-pan-y"
 	                                  onPointerDown={(event) => {
 	                                    maybeStartStableOverlayDrag(event, "list");
 	                                  }}
@@ -4023,7 +4023,7 @@ export default function WalletDashboardUsdSwapModal({
                                 role="dialog"
                                 aria-modal="true"
                                 className={[
-                                  "absolute inset-0 bg-elevated flex flex-col min-h-0 overflow-hidden pb-[env(safe-area-inset-bottom)]",
+                                  "absolute inset-0 bg-elevated flex flex-col min-h-0 overflow-hidden pb-[env(safe-area-inset-bottom)] touch-pan-y",
                                   "sm:inset-6 sm:rounded-2xl sm:ring-1 sm:ring-white/10 sm:shadow-2xl",
                                   "will-change-transform",
                                 ].join(" ")}
@@ -4096,7 +4096,7 @@ export default function WalletDashboardUsdSwapModal({
 
                                 <div
                                   ref={sourceDropdownListRef}
-                                  className="flex-1 min-h-0 overflow-y-auto"
+                                  className="flex-1 min-h-0 overflow-y-auto overscroll-contain touch-pan-y"
                                   onPointerDown={(event) => {
                                     maybeStartSourceOverlayDrag(event, "list");
                                   }}
