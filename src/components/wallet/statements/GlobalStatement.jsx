@@ -1506,9 +1506,9 @@ export default function GlobalStatement({
             <div className="min-w-0 flex flex-col items-start justify-center text-left gap-3">
               <div className="flex items-center justify-start gap-3">
                 <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-white/70" aria-hidden="true">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h8" />
-                  <polyline points="14 2 14 8 20 8" />
-                  <circle cx="18" cy="17" r="4" />
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h8" strokeWidth="1.1" />
+                  <polyline points="14 2 14 8 20 8" strokeWidth="1.1" />
+                  <circle cx="18" cy="17" r="4" strokeWidth="1.1" />
                   <polyline points="18 15 18 17 19.5 18.5" />
                   <line x1="8" y1="13" x2="12" y2="13" />
                   <line x1="8" y1="9" x2="10" y2="9" />
@@ -1534,7 +1534,7 @@ export default function GlobalStatement({
           </div>
 
         {/* Filtres */}
-        <div className="px-4 md:px-6 pt-6 md:pt-7 pb-0 flex flex-row items-stretch md:items-center gap-2">
+        <div className="px-4 md:px-6 pt-6 md:pt-7 pb-2 md:pb-3 flex flex-row items-stretch md:items-center gap-2">
           <div className="flex flex-1 items-center rounded-[16px] p-1 ring-1 ring-white/[0.05] ring-inset bg-gradient-to-b from-[#101415] to-[#0d1214]">
             {[
               { key: "all", label: t("ui_all_0c90d41d71", "Tout") },
@@ -1546,10 +1546,10 @@ export default function GlobalStatement({
                 key={item.key}
                 type="button"
                 onClick={() => setTxFilter(item.key)}
-                className={`px-3 py-3 flex-1 text-center rounded-[12px] text-sm font-medium transition-colors whitespace-nowrap ${
-                  txFilter === item.key
-                    ? item.key === "all"
-                      ? "bg-[#0d1114] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.12),inset_0_-14px_18px_rgba(0,0,0,0.6)]"
+                  className={`px-3 py-3 flex-1 text-center rounded-[12px] text-sm font-medium transition-colors whitespace-nowrap ${
+                    txFilter === item.key
+                      ? item.key === "all"
+                      ? "bg-[#14191c] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.12),inset_0_-14px_18px_rgba(0,0,0,0.6)]"
                       : item.key === "credit"
                         ? "bg-green-500/15 text-green-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]"
                         : item.key === "debit"
