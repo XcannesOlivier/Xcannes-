@@ -2455,7 +2455,7 @@ export default function WalletDashboardUsdSwapModal({
                 {step === "form" ? (
                   <>
 			                    <div className={["rounded-[18px] ring-1 ring-white/10 ring-inset bg-[#101415] overflow-hidden", accentShadowCard].join(" ")}>
-                      <div className="p-4 md:p-6">
+                      <div className="p-4 pb-8 md:p-6 md:pb-10">
                         {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD ? (
                           <div className="grid grid-cols-[minmax(0,1fr)_auto] md:grid-cols-2 gap-x-4 md:gap-x-7 gap-y-3 md:gap-y-4 items-end">
                             <div className="text-[12px] md:text-[13px] text-white/55">
@@ -2737,17 +2737,17 @@ export default function WalletDashboardUsdSwapModal({
                         ) : null}
                       </div>
 
-	                      <div className="relative border-t border-white/10">
-	                        <div className="absolute -top-3 md:-top-5 left-1/2 -translate-x-1/2">
-	                          <div className={`w-10 h-10 rounded-full flex items-center justify-center ${accentSwapIconShell}`}>
-	                            <svg
-	                              viewBox="0 0 24 24"
-	                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2"
-	                              className={`w-5 h-5 ${accentSwapIcon}`}
-	                              aria-hidden
-	                            >
+		                      <div className="relative border-t border-white/10">
+		                        <div className="absolute -top-4 md:-top-6 left-1/2 -translate-x-1/2">
+		                          <div className={`w-11 h-11 rounded-full flex items-center justify-center ${accentSwapIconShell}`}>
+		                            <svg
+		                              viewBox="0 0 24 24"
+		                              fill="none"
+		                              stroke="currentColor"
+		                              strokeWidth="2"
+		                              className={`w-6 h-6 ${accentSwapIcon}`}
+		                              aria-hidden
+		                            >
                               <polyline
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
@@ -2772,7 +2772,7 @@ export default function WalletDashboardUsdSwapModal({
                           </div>
                         </div>
 
-	                        <div className="p-4 pt-6 md:p-6 md:pt-7">
+		                        <div className="p-4 pt-8 md:p-6 md:pt-10">
 	                          {walletTargetSelectionEnabled ? (
 	                            <div className="grid grid-cols-[minmax(0,1fr)_auto] md:grid-cols-2 gap-x-4 md:gap-x-7 gap-y-3 md:gap-y-4 items-end">
 	                              <div className="text-[12px] md:text-[13px] text-white/55">
