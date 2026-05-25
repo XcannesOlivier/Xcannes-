@@ -3144,7 +3144,7 @@ export default function WalletDashboardUsdSwapModal({
                               </div>
                             </div>
                           ) : (
-                            {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE && isBuyStablecoinsTitle ? (
+                            direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE && isBuyStablecoinsTitle ? (
                               <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-x-3 gap-y-2">
                                 <div className="text-[12px] md:text-[13px] text-white/55">
                                   {t("ui_usd_swap_received_amount", "Montant reçu")}
@@ -3307,7 +3307,7 @@ export default function WalletDashboardUsdSwapModal({
                                 )}
                               </div>
                             </div>
-                            )}
+                            )
                           )}
 
                           {null /* XRP reçu d'abord masqué */}

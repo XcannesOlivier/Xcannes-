@@ -140,10 +140,20 @@ export default function CurrencyStatement({
   const [accountAddressExpanded, setAccountAddressExpanded] = useState(false);
   const [accountCopyNotice, setAccountCopyNotice] = useState("");
   const accountCopyNoticeTimerRef = useRef(null);
+  const clearAccountCopyNoticeTimer = useCallback(() => {
+    if (!accountCopyNoticeTimerRef.current) return;
+    clearTimeout(accountCopyNoticeTimerRef.current);
+    accountCopyNoticeTimerRef.current = null;
+  }, []);
   const [footerDropdownOpen, setFooterDropdownOpen] = useState(false);
   const [footerAddressExpanded, setFooterAddressExpanded] = useState(false);
   const [footerCopyNotice, setFooterCopyNotice] = useState("");
   const footerCopyNoticeTimerRef = useRef(null);
+  const clearFooterCopyNoticeTimer = useCallback(() => {
+    if (!footerCopyNoticeTimerRef.current) return;
+    clearTimeout(footerCopyNoticeTimerRef.current);
+    footerCopyNoticeTimerRef.current = null;
+  }, []);
   const [periodDropdownOpen, setPeriodDropdownOpen] = useState(false);
   const [isMobileDate, setIsMobileDate] = useState(false);
   const [highlightedTransactionId, setHighlightedTransactionId] =
@@ -499,20 +509,20 @@ export default function CurrencyStatement({
   useEffect(() => {
     if (!accountDropdownOpen) {
       setAccountCopyNotice("");
-      if (accountCopyNoticeTimerRef.current) clearTimeout(accountCopyNoticeTimerRef.current);
+      clearAccountCopyNoticeTimer();
     }
-  }, [accountDropdownOpen]);
+  }, [accountDropdownOpen, clearAccountCopyNoticeTimer]);
 
   useEffect(() => {
     setAccountCopyNotice("");
-    if (accountCopyNoticeTimerRef.current) clearTimeout(accountCopyNoticeTimerRef.current);
-  }, [walletAddress]);
+    clearAccountCopyNoticeTimer();
+  }, [walletAddress, clearAccountCopyNoticeTimer]);
 
   useEffect(() => {
     return () => {
-      if (accountCopyNoticeTimerRef.current) clearTimeout(accountCopyNoticeTimerRef.current);
+      clearAccountCopyNoticeTimer();
     };
-  }, []);
+  }, [clearAccountCopyNoticeTimer]);
 
   useEffect(() => {
     if (!accountDropdownOpen) return;
@@ -537,15 +547,15 @@ export default function CurrencyStatement({
     if (!footerDropdownOpen) {
       setFooterAddressExpanded(false);
       setFooterCopyNotice("");
-      if (footerCopyNoticeTimerRef.current) clearTimeout(footerCopyNoticeTimerRef.current);
+      clearFooterCopyNoticeTimer();
     }
-  }, [footerDropdownOpen]);
+  }, [footerDropdownOpen, clearFooterCopyNoticeTimer]);
 
   useEffect(() => {
     return () => {
-      if (footerCopyNoticeTimerRef.current) clearTimeout(footerCopyNoticeTimerRef.current);
+      clearFooterCopyNoticeTimer();
     };
-  }, []);
+  }, [clearFooterCopyNoticeTimer]);
 
   useEffect(() => {
     if (!footerDropdownOpen) return;
