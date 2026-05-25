@@ -3390,8 +3390,8 @@ export default function WalletDashboardUsdSwapModal({
 		                                        <div className="flex items-center justify-center gap-2 text-center">
 		                                          <span>
 		                                            {t(
-		                                              "ui_wallet_credited_account",
-		                                              "Compte accrédité",
+		                                              "ui_wallet_credit_target",
+		                                              "Compte à créditer",
 		                                            )}
 		                                          </span>
 		                                          <span className="inline-flex items-center gap-1.5">
@@ -3621,8 +3621,8 @@ export default function WalletDashboardUsdSwapModal({
 	                                        <div className="flex items-center justify-center gap-2 text-center">
 	                                          <span>
 	                                            {t(
-	                                              "ui_wallet_credited_account",
-	                                              "Compte accrédité",
+	                                              "ui_wallet_credit_target",
+	                                              "Compte à créditer",
 	                                            )}
 	                                          </span>
 	                                          <span className="inline-flex items-center gap-1.5">
