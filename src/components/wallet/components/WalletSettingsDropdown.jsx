@@ -141,7 +141,7 @@ export default function WalletSettingsDropdown({
         } catch {
           // ignore
         }
-      }, 3000);
+      }, 2000);
     },
     [clearMobileStickyHoverReset],
   );
@@ -791,7 +791,7 @@ export default function WalletSettingsDropdown({
                     }}
                     className={settingsRowClassName}
                   >
-                    <span className={`${settingsIconShellClassName} bg-transparent`}>
+                    <span className={`${settingsIconShellClassName} bg-black`}>
                       <SettingsXrplIcon />
                     </span>
                     <div className="min-w-0 flex-1">
@@ -852,7 +852,7 @@ export default function WalletSettingsDropdown({
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={() => setIsOpen(false)}
-                    className="wallet-settings-row w-full flex items-center gap-3 px-3 py-0 text-left bg-white/5 shadow-[inset_0_-34px_34px_-20px_rgba(0,0,0,0.95),inset_0_-18px_70px_-45px_rgba(0,0,0,0.9)] hover:bg-transparent transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-xcannes-green/20 focus-visible:ring-inset"
+                    className="wallet-settings-row w-full flex items-center gap-3 px-3 py-0 text-left bg-white/5 border border-white/10 shadow-[inset_0_-34px_34px_-20px_rgba(0,0,0,0.95),inset_0_-18px_70px_-45px_rgba(0,0,0,0.9)] hover:bg-transparent hover:border-white/15 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-xcannes-green/20 focus-visible:ring-inset"
                   >
                     <span className={`${settingsSupportIconShellClassName} text-white/85`}>
                       <SettingsRlusdIcon />

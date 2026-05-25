@@ -1612,7 +1612,7 @@ export default function CurrencyStatement({
         {/* Content - Zone scrollable */}
         <div
           className={[
-            "px-0 py-4 md:py-6 flex flex-col gap-4 overscroll-contain bg-gradient-to-b from-[#101415] to-[#0d1214]",
+            "px-0 py-4 md:py-6 flex flex-col gap-4 overscroll-contain bg-gradient-to-b from-[#101415] to-[#0d1214] border-t border-white/[0.10] md:border-white/[0.06]",
             isXrpNetworkView ? "flex-none" : "flex-1 min-h-0",
             isXrpNetworkView
               ? "overflow-visible"
@@ -1652,7 +1652,7 @@ export default function CurrencyStatement({
           )}
           <div
             ref={overlayListRef}
-            className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden border-t border-white/[0.10] md:border-white/[0.06]"
+            className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden"
             onPointerDown={(event) => {
               maybeStartOverlayDrag(event, "list");
             }}

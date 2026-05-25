@@ -1534,7 +1534,7 @@ export default function GlobalStatement({
           </div>
 
         {/* Filtres */}
-        <div className="px-4 md:px-6 pt-6 md:pt-7 pb-4 flex flex-row items-stretch md:items-center gap-2">
+        <div className="px-4 md:px-6 pt-6 md:pt-7 pb-0 flex flex-row items-stretch md:items-center gap-2">
           <div className="flex flex-1 items-center rounded-[16px] p-1 ring-1 ring-white/[0.05] ring-inset bg-gradient-to-b from-[#101415] to-[#0d1214]">
             {[
               { key: "all", label: t("ui_all_0c90d41d71", "Tout") },
@@ -1574,7 +1574,7 @@ export default function GlobalStatement({
         {/* Content - Zone scrollable */}
         <div
           ref={overlayListRef}
-          className="flex-1 min-h-0 overflow-y-auto px-4 md:px-5 py-6 flex flex-col gap-4 bg-gradient-to-b from-[#101415] to-[#0d1214] border-t border-white/[0.10] md:border-white/[0.06]"
+          className="flex-1 min-h-0 overflow-y-auto px-4 md:px-5 pt-4 md:pt-6 pb-6 md:pb-6 flex flex-col gap-4 bg-gradient-to-b from-[#101415] to-[#0d1214] border-t border-white/[0.10] md:border-white/[0.06]"
           onPointerDown={(event) => {
             maybeStartOverlayDrag(event, "list");
           }}

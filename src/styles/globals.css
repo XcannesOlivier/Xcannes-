@@ -1253,7 +1253,7 @@ body.header-hero-mode .home-content-wrapper {
 }
 
 /* iOS Safari sticky :hover fix (Wallet settings dropdown)
-   After a touch, we add `.xcannes-reset-hover` to the tapped row (after 3s)
+   After a touch, we add `.xcannes-reset-hover` to the tapped row (after 2s)
    to force it back to its normal (non-hover) visuals without another tap. */
 @media (hover: none) and (pointer: coarse) {
   .xcannes-reset-hover,
