@@ -1969,7 +1969,7 @@ textarea.error {
 
 /* Ensure the bar is visible/positioned above the iframe on the embedded dashboard screen */
 #screen-wallet-embedded {
-  --embedded-footer-space: calc(env(safe-area-inset-bottom, 0px) + 34px);
+  --embedded-footer-space: calc(env(safe-area-inset-bottom, 0px) + 28px);
 }
 
 #screen-wallet-embedded .choice-bottom-bar--mobile-only {
