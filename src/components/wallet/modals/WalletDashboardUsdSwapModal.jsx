@@ -191,6 +191,8 @@ export default function WalletDashboardUsdSwapModal({
   const stableDropdownListRef = useRef(null);
   const [stableOverlayDragging, setStableOverlayDragging] = useState(false);
   const [stableOverlayTranslateY, setStableOverlayTranslateY] = useState(0);
+  const stableOverlayTranslateTargetRef = useRef(0);
+  const stableOverlayTranslateRafRef = useRef(null);
   const stableOverlayDragMetaRef = useRef({
     startY: 0,
     startAt: 0,
@@ -212,6 +214,8 @@ export default function WalletDashboardUsdSwapModal({
   const sourceDropdownListRef = useRef(null);
   const [sourceOverlayDragging, setSourceOverlayDragging] = useState(false);
   const [sourceOverlayTranslateY, setSourceOverlayTranslateY] = useState(0);
+  const sourceOverlayTranslateTargetRef = useRef(0);
+  const sourceOverlayTranslateRafRef = useRef(null);
   const sourceOverlayDragMetaRef = useRef({
     startY: 0,
     startAt: 0,
@@ -1126,7 +1130,12 @@ export default function WalletDashboardUsdSwapModal({
   useEffect(() => {
     if (stableDropdownOpen) return;
     setStableOverlayDragging(false);
+    stableOverlayTranslateTargetRef.current = 0;
     setStableOverlayTranslateY(0);
+    if (stableOverlayTranslateRafRef.current) {
+      window.cancelAnimationFrame(stableOverlayTranslateRafRef.current);
+      stableOverlayTranslateRafRef.current = null;
+    }
     stableOverlayDragMetaRef.current = {
       startY: 0,
       startAt: 0,
@@ -1143,7 +1152,12 @@ export default function WalletDashboardUsdSwapModal({
   useEffect(() => {
     if (sourceDropdownOpen) return;
     setSourceOverlayDragging(false);
+    sourceOverlayTranslateTargetRef.current = 0;
     setSourceOverlayTranslateY(0);
+    if (sourceOverlayTranslateRafRef.current) {
+      window.cancelAnimationFrame(sourceOverlayTranslateRafRef.current);
+      sourceOverlayTranslateRafRef.current = null;
+    }
     sourceOverlayDragMetaRef.current = {
       startY: 0,
       startAt: 0,
@@ -1233,7 +1247,13 @@ export default function WalletDashboardUsdSwapModal({
     }
 
     meta.lastDelta = delta;
-    setStableOverlayTranslateY(delta);
+    stableOverlayTranslateTargetRef.current = delta;
+    if (!stableOverlayTranslateRafRef.current) {
+      stableOverlayTranslateRafRef.current = window.requestAnimationFrame(() => {
+        stableOverlayTranslateRafRef.current = null;
+        setStableOverlayTranslateY(stableOverlayTranslateTargetRef.current);
+      });
+    }
   };
 
   const handleStableOverlayPointerEnd = (event) => {
@@ -1252,7 +1272,8 @@ export default function WalletDashboardUsdSwapModal({
 
     if (shouldClose) {
       const height = typeof window !== "undefined" ? window.innerHeight : 9999;
-      setStableOverlayTranslateY(Math.max(delta, height));
+      stableOverlayTranslateTargetRef.current = Math.max(delta, height);
+      setStableOverlayTranslateY(stableOverlayTranslateTargetRef.current);
       window.setTimeout(() => {
         setStableDropdownOpen(false);
       }, 180);
@@ -1270,6 +1291,7 @@ export default function WalletDashboardUsdSwapModal({
       return;
     }
 
+    stableOverlayTranslateTargetRef.current = 0;
     setStableOverlayTranslateY(0);
     stableOverlayDragMetaRef.current = {
       startY: 0,
@@ -1359,7 +1381,13 @@ export default function WalletDashboardUsdSwapModal({
     }
 
     meta.lastDelta = delta;
-    setSourceOverlayTranslateY(delta);
+    sourceOverlayTranslateTargetRef.current = delta;
+    if (!sourceOverlayTranslateRafRef.current) {
+      sourceOverlayTranslateRafRef.current = window.requestAnimationFrame(() => {
+        sourceOverlayTranslateRafRef.current = null;
+        setSourceOverlayTranslateY(sourceOverlayTranslateTargetRef.current);
+      });
+    }
   };
 
   const handleSourceOverlayPointerEnd = (event) => {
@@ -1378,7 +1406,8 @@ export default function WalletDashboardUsdSwapModal({
 
     if (shouldClose) {
       const height = typeof window !== "undefined" ? window.innerHeight : 9999;
-      setSourceOverlayTranslateY(Math.max(delta, height));
+      sourceOverlayTranslateTargetRef.current = Math.max(delta, height);
+      setSourceOverlayTranslateY(sourceOverlayTranslateTargetRef.current);
       window.setTimeout(() => {
         setSourceDropdownOpen(false);
         setSourceSearch("");
@@ -1397,6 +1426,7 @@ export default function WalletDashboardUsdSwapModal({
       return;
     }
 
+    sourceOverlayTranslateTargetRef.current = 0;
     setSourceOverlayTranslateY(0);
     sourceOverlayDragMetaRef.current = {
       startY: 0,
