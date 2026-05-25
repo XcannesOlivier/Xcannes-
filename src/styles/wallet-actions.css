@@ -39,6 +39,17 @@
   z-index: 1;
 }
 
+/* Subtle white fade border for the footer "Scanner" button.
+   Easy to remove: delete this block + `scanner-btn-fade-border` class usage. */
+.scanner-btn-fade-border {
+  border: 1px solid transparent;
+  background-image:
+    linear-gradient(180deg, #101415, #0d1214),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.00));
+  background-origin: padding-box, border-box;
+  background-clip: padding-box, border-box;
+}
+
 /* ── Mouse hover (vrais pointeurs uniquement) ── */
 @media (hover: hover) {
   .wallet-action-btn:hover::before {
