@@ -20,7 +20,7 @@
   <link rel="apple-touch-icon" href="../symbols/logoxcannestransaparent.png">
 
   <!-- Styles -->
-  <link rel="stylesheet" href="src/styles/main.css?v=20260524d">
+  <link rel="stylesheet" href="src/styles/main.css?v=20260525d">
 
   <!-- xrpl.js — self-hosted, no external CDN dependency -->
   <script src="lib/xrpl-4.4.3.min.js"></script>
@@ -334,7 +334,6 @@
         <div class="screen-header">
           <button class="btn-back" id="btn-verify-back">‹</button>
           <h2>Vérification</h2>
-          <span></span>
         </div>
         <p class="verify-intro">Confirmez chaque mot, un par un, dans l’ordre.</p>
 
@@ -354,6 +353,8 @@
         <div class="button-group">
           <button id="btn-verify-confirm" class="btn btn-primary" disabled>Confirmer</button>
         </div>
+
+        <div class="choice-bottom-bar" aria-hidden="true"><span></span></div>
       </div>
     </div>
 
@@ -375,6 +376,8 @@
         <div class="button-group">
           <button id="btn-import-confirm" class="btn btn-primary">Importer</button>
         </div>
+
+        <div class="choice-bottom-bar" aria-hidden="true"><span></span></div>
       </div>
     </div>
 

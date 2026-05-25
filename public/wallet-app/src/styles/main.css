@@ -506,10 +506,10 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
 
 #screen-choice .choice-bottom-bar > span {
   display: block;
-  width: 120px;
-  height: 4px;
+  width: 144px;
+  height: 6px;
   border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.8);
 }
 
 #screen-choice .choice-title {
@@ -1740,10 +1740,10 @@ textarea.error {
 
 #screen-backup .choice-bottom-bar > span {
   display: block;
-  width: 120px;
-  height: 4px;
+  width: 144px;
+  height: 6px;
   border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.8);
 }
 
 .backup-warning {
@@ -1858,6 +1858,29 @@ textarea.error {
 
 /* ===== VERIFY FIELDS (sequential 1–12) ===== */
 
+#screen-backup-verify .choice-bottom-bar,
+#screen-import .choice-bottom-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  padding-top: 24px;
+  padding-bottom: calc(env(safe-area-inset-bottom, 16px) + 16px);
+  pointer-events: none;
+  z-index: 2;
+}
+
+#screen-backup-verify .choice-bottom-bar > span,
+#screen-import .choice-bottom-bar > span {
+  display: block;
+  width: 144px;
+  height: 6px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.8);
+}
+
 #screen-backup-verify {
   background:
     radial-gradient(850px 520px at 50% 0%, rgba(0, 200, 83, 0.12), transparent 62%),
@@ -1873,9 +1896,35 @@ textarea.error {
   pointer-events: none;
 }
 
+#screen-backup-verify .screen-header {
+  justify-content: flex-start;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+#screen-backup-verify .screen-header span {
+  display: none;
+}
+
+#screen-backup-verify .screen-header .btn-back {
+  background: transparent;
+  border: none;
+  backdrop-filter: none;
+  box-shadow: none;
+}
+
+#screen-backup-verify .screen-header .btn-back:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
 #screen-backup-verify .screen-header h2 {
-  font-size: 18px;
-  font-weight: 800;
+  flex: 0 1 auto;
+  text-align: left;
+  font-size: 24px;
+  font-weight: 500;
+  letter-spacing: -0.2px;
+  line-height: 1.15;
 }
 
 #screen-backup-verify .verify-intro {
@@ -1978,14 +2027,7 @@ textarea.error {
 }
 
 #screen-backup-verify .button-group::before {
-  content: "";
-  position: absolute;
-  left: 20px;
-  right: 20px;
-  top: -14px;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, rgba(0, 200, 83, 0.55), transparent);
-  opacity: 0.9;
+  content: none;
 }
 
 #screen-backup-verify .btn-primary {
