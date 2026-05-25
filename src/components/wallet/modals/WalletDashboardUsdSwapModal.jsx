@@ -588,6 +588,9 @@ export default function WalletDashboardUsdSwapModal({
     const raw = String(titleOverride || "").trim().toLowerCase();
     return raw === "acheter des stablecoins" || raw === "vendre vos stablecoins";
   }, [titleOverride]);
+  const isBuyStablecoinsTitle = useMemo(() => {
+    return String(titleOverride || "").trim().toLowerCase() === "acheter des stablecoins";
+  }, [titleOverride]);
   const flowTitleDisplay = useMemo(() => {
     const clean = String(flowTitle || "").trim();
     const overrideRaw = String(titleOverride || "").trim().toLowerCase();
@@ -3141,16 +3144,81 @@ export default function WalletDashboardUsdSwapModal({
                               </div>
                             </div>
                           ) : (
-                            <div
-                              className={[
-                                "flex justify-between gap-3",
-                                direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE &&
-                                String(titleOverride || "").trim().toLowerCase() ===
-                                  "acheter des stablecoins"
-                                  ? "items-start"
-                                  : "items-baseline",
-                              ].join(" ")}
-                            >
+                            {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE && isBuyStablecoinsTitle ? (
+                              <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-x-3 gap-y-2">
+                                <div className="text-[12px] md:text-[13px] text-white/55">
+                                  {t("ui_usd_swap_received_amount", "Montant reçu")}
+                                </div>
+                                <div className="text-[12px] md:text-[13px] text-white/55 text-center">
+                                  {t(
+                                    "ui_usd_swap_choose_stablecoin_label",
+                                    "Choisissez le stablecoin",
+                                  )}
+                                </div>
+
+                                <div className="text-white text-4xl md:text-5xl font-semibold tracking-tight truncate">
+                                  {hasValidAmount ? (
+                                    receiveDisplayAmount ? (
+                                      `≈${
+                                        formatAmountNumber
+                                          ? formatAmountNumber.format(receiveDisplayAmount)
+                                          : String(receiveDisplayAmount)
+                                      }`
+                                    ) : quoteLoading ? (
+                                      "…"
+                                    ) : (
+                                      "—"
+                                    )
+                                  ) : (
+                                    "—"
+                                  )}
+                                </div>
+
+                                <div ref={stableDropdownRef} className="shrink-0 flex items-end pb-1">
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setSourceDropdownOpen(false);
+                                      setSourceSearch("");
+                                      setStableDropdownOpen(true);
+                                    }}
+                                    aria-expanded={stableDropdownOpen}
+                                    className="inline-flex items-center gap-2 rounded-full bg-elevated ring-1 ring-white/10 px-3 py-1.5 text-white/85 hover:ring-white/20 transition-colors"
+                                  >
+                                    {stableCurrency ? (
+                                      renderCurrencyIcon(stableCurrency)
+                                    ) : (
+                                      <div className="w-5 h-5 rounded-full bg-white/10 ring-1 ring-white/10 flex-shrink-0" />
+                                    )}
+                                    <span className="text-sm font-semibold">
+                                      {stableCurrency
+                                        ? normalizeCurrencyCode(stableCurrency?.ticker)
+                                        : t("ui_choose", "Choisir")}
+                                    </span>
+                                    <span className="text-[10px] tracking-[0.18em] uppercase px-2 py-0.5 rounded-full bg-white/10 text-white/70">
+                                      {stableCurrency
+                                        ? normalizeCurrencyCode(stableCurrency?.network)
+                                        : "—"}
+                                    </span>
+                                    <svg
+                                      className="w-4 h-4 flex-shrink-0"
+                                      viewBox="0 0 20 20"
+                                      fill="currentColor"
+                                      aria-hidden
+                                    >
+                                      <path
+                                        fillRule="evenodd"
+                                        d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 1 1 1.06 1.06l-4.24 4.24a.75.75 0 0 1-1.06 0L5.21 8.29a.75.75 0 0 1 .02-1.08z"
+                                        clipRule="evenodd"
+                                      />
+                                    </svg>
+                                  </button>
+
+                                  {/* Portal content rendered once above (stableDropdownOpen) */}
+                                </div>
+                              </div>
+                            ) : (
+                            <div className="flex items-baseline justify-between gap-3">
                               <div
                                 className={
                                   direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE ||
@@ -3161,35 +3229,14 @@ export default function WalletDashboardUsdSwapModal({
                               >
                                 {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD
                                   ? t("ui_usd_swap_received_amount", "Montant reçu")
-                                  : direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE &&
-                                      String(titleOverride || "").trim().toLowerCase() ===
-                                        "acheter des stablecoins"
-                                    ? t("ui_usd_swap_received_amount", "Montant reçu")
-                                    : t(
-                                        "ui_usd_swap_recipient_receives",
-                                        "Le wallet destinataire recevra",
-                                      )}
+                                  : t(
+                                      "ui_usd_swap_recipient_receives",
+                                      "Le wallet destinataire recevra",
+                                    )}
                               </div>
                               <div className="flex items-center gap-2">
                                 {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE ? (
-                                  <div
-                                    ref={stableDropdownRef}
-                                    className={
-                                      String(titleOverride || "").trim().toLowerCase() ===
-                                      "acheter des stablecoins"
-                                        ? "flex flex-col items-end gap-1"
-                                        : undefined
-                                    }
-                                  >
-                                    {String(titleOverride || "").trim().toLowerCase() ===
-                                    "acheter des stablecoins" ? (
-                                      <div className="text-[11px] md:text-[12px] text-white/55 text-center w-full">
-                                        {t(
-                                          "ui_usd_swap_choose_stablecoin_label",
-                                          "Choisissez le stablecoin",
-                                        )}
-                                      </div>
-                                    ) : null}
+                                  <div ref={stableDropdownRef}>
                                     <button
                                       type="button"
                                       onClick={() => {
@@ -3260,11 +3307,14 @@ export default function WalletDashboardUsdSwapModal({
                                 )}
                               </div>
                             </div>
+                            )}
                           )}
 
                           {null /* XRP reçu d'abord masqué */}
 
-                          {walletTargetSelectionEnabled ? null : (
+                          {walletTargetSelectionEnabled ||
+                          (direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE &&
+                            isBuyStablecoinsTitle) ? null : (
                             <div className="mt-2 flex items-end justify-between gap-3">
                               <div className="text-white text-4xl md:text-5xl font-semibold tracking-tight truncate">
                                 {hasValidAmount ? (
@@ -3505,6 +3555,26 @@ export default function WalletDashboardUsdSwapModal({
 		                                            </span>
 		                                          </span>
 		                                        </div>
+		                                      ) : direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE &&
+		                                        walletSourceSelectionEnabled &&
+		                                        isBuyStablecoinsTitle ? (
+		                                        <div className="flex items-center justify-center gap-2 text-center">
+		                                          <span>
+		                                            {t(
+		                                              "ui_wallet_debit_target",
+		                                              "Compte à débiter",
+		                                            )}
+		                                          </span>
+		                                          <span className="inline-flex items-center gap-1.5">
+		                                            <span
+		                                              className="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse"
+		                                              aria-hidden
+		                                            />
+		                                            <span className="text-white/85 font-medium">
+		                                              {String(walletLabel || "XCANNES").trim()}
+		                                            </span>
+		                                          </span>
+		                                        </div>
 		                                      ) : (
 		                                        t("ui_search_results", "Sélectionnez un actif.")
 		                                      )}
@@ -3736,6 +3806,26 @@ export default function WalletDashboardUsdSwapModal({
 	                                            </span>
 	                                          </span>
 	                                        </div>
+	                                      ) : direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE &&
+	                                        walletSourceSelectionEnabled &&
+	                                        isBuyStablecoinsTitle ? (
+	                                        <div className="flex items-center justify-center gap-2 text-center">
+	                                          <span>
+	                                            {t(
+	                                              "ui_wallet_debit_target",
+	                                              "Compte à débiter",
+	                                            )}
+	                                          </span>
+	                                          <span className="inline-flex items-center gap-1.5">
+	                                            <span
+	                                              className="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse"
+	                                              aria-hidden
+	                                            />
+	                                            <span className="text-white/85 font-medium">
+	                                              {String(walletLabel || "XCANNES").trim()}
+	                                            </span>
+	                                          </span>
+	                                        </div>
 	                                      ) : (
 	                                        t("ui_search_results", "Sélectionnez un actif.")
 	                                      )}
@@ -3882,6 +3972,21 @@ export default function WalletDashboardUsdSwapModal({
                                       <span className="inline-flex items-center gap-1.5">
                                         <span
                                           className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse"
+                                          aria-hidden
+                                        />
+                                        <span className="text-white/85 font-medium">
+                                          {String(walletLabel || "XCANNES").trim()}
+                                        </span>
+                                      </span>
+                                    </div>
+                                  ) : walletSourceSelectionEnabled && isBuyStablecoinsTitle ? (
+                                    <div className="flex items-center justify-center gap-2 text-center">
+                                      <span>
+                                        {t("ui_wallet_debit_target", "Compte à débiter")}
+                                      </span>
+                                      <span className="inline-flex items-center gap-1.5">
+                                        <span
+                                          className="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse"
                                           aria-hidden
                                         />
                                         <span className="text-white/85 font-medium">
@@ -4058,6 +4163,21 @@ export default function WalletDashboardUsdSwapModal({
                                       <span className="inline-flex items-center gap-1.5">
                                         <span
                                           className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse"
+                                          aria-hidden
+                                        />
+                                        <span className="text-white/85 font-medium">
+                                          {String(walletLabel || "XCANNES").trim()}
+                                        </span>
+                                      </span>
+                                    </div>
+                                  ) : walletSourceSelectionEnabled && isBuyStablecoinsTitle ? (
+                                    <div className="flex items-center justify-center gap-2 text-center">
+                                      <span>
+                                        {t("ui_wallet_debit_target", "Compte à débiter")}
+                                      </span>
+                                      <span className="inline-flex items-center gap-1.5">
+                                        <span
+                                          className="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse"
                                           aria-hidden
                                         />
                                         <span className="text-white/85 font-medium">
