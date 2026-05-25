@@ -2743,7 +2743,7 @@ export default function WalletDashboardUsdSwapModal({
 		                            }
 		                          >
 				                            {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD
-				                              ? t("ui_usd_swap_you_receive", "Choisissez le montant et le stablecoin")
+				                              ? null
 				                              : (
 				                                <span className="inline-flex items-center gap-1.5 flex-wrap">
 				                                  <span>{t("ui_swap_you_send_from", "Depuis le compte")}</span>
@@ -2756,10 +2756,13 @@ export default function WalletDashboardUsdSwapModal({
 				                                  <span>{t("ui_swap_you_send_pre", ", choisissez le montant et la devise")}</span>
 				                                </span>
 				                              )}
-	                          </div>
+                          </div>
                           <div className="flex items-center gap-2">
                             {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD ? (
-                              <div ref={stableDropdownRef}>
+                              <div ref={stableDropdownRef} className="flex flex-col items-end gap-1">
+                                <div className="text-[12px] md:text-[13px] text-white/55">
+                                  {t("ui_usd_swap_choose_stablecoin_label", "Choisissez le stablecoin")}
+                                </div>
                                 <button
                                   type="button"
                                   onClick={() => {
@@ -2859,6 +2862,12 @@ export default function WalletDashboardUsdSwapModal({
                             )}
                           </div>
                         </div>
+
+                        {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD ? (
+                          <div className="mt-3 text-[12px] md:text-[13px] text-white/55">
+                            {t("ui_usd_swap_enter_amount_label", "Indiquer le montant")}
+                          </div>
+                        ) : null}
 
                         <div className="mt-2 flex items-end justify-between gap-3">
                           <input
