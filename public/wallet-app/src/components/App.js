@@ -874,7 +874,10 @@ function setupBackupVerifyScreen(words) {
              autocapitalize="off" spellcheck="false"
              placeholder="Mot #${i + 1}" ${i !== 0 ? 'disabled' : ''}>
       <span class="row-status"></span>
-      <span class="row-error-msg">✖ Incorrect — vérifiez le mot #${i + 1}</span>
+      <span class="row-hint">
+        <span class="row-hint-text">Mot différent</span>
+        <button type="button" class="row-retry-btn">Recommencer</button>
+      </span>
     `;
     container.appendChild(row);
     rows.push(row);
@@ -917,19 +920,30 @@ function setupBackupVerifyScreen(words) {
 
   inputs.forEach((inp, i) => {
     const expectedLower = words[i].toLowerCase();
+    const retryBtn = rows[i].querySelector('.row-retry-btn');
 
     inp.addEventListener('input', () => {
       const row = rows[i];
-      if (row.classList.contains('error')) {
-        row.classList.remove('error');
-        row.classList.add('active');
+      if (row.classList.contains('warn')) {
+        row.classList.remove('warn');
         row.querySelector('.row-status').textContent = '';
       }
 
       // Auto-validate when the word matches exactly (mobile-friendly flow).
       if (i !== currentIndex) return;
-      const val = inp.value.trim().toLowerCase();
-      if (val && val === expectedLower) {
+      const raw = inp.value || '';
+      const val = raw.trim().toLowerCase();
+      if (!val) return;
+
+      // Gentle inline feedback while typing: show a hint as soon as the input
+      // diverges from the expected word (prefix mismatch) or is too long.
+      const isPrefix = expectedLower.startsWith(val);
+      if (!isPrefix || val.length > expectedLower.length) {
+        row.classList.add('warn');
+        row.querySelector('.row-status').textContent = '!';
+      }
+
+      if (val === expectedLower) {
         // Let the UI paint the last keystroke before moving on.
         setTimeout(() => handleValidate(), 0);
       }
@@ -945,7 +959,6 @@ function setupBackupVerifyScreen(words) {
       if (val === expected) {
         row.className = 'verify-row done';
         row.querySelector('.row-status').textContent = '✔';
-        row.querySelector('.row-error-msg').style.display = 'none';
         // Mask the validated word with asterisks
         inp.value = '•'.repeat(expected.length);
         inp.disabled = true;
@@ -958,10 +971,14 @@ function setupBackupVerifyScreen(words) {
           activateRow(i + 1);
         }
       } else {
-        row.className = 'verify-row error';
-        row.querySelector('.row-status').textContent = '✖';
-        updateStatus(statusEl, `❌ Le mot #${i + 1} est incorrect. Réessayez.`, true);
-        // Ensure focus stays on the field for quick correction.
+        // If the user hasn't finished typing yet (still a valid prefix),
+        // don't show an error — just keep them on the same word.
+        if (expected.startsWith(val) && val.length < expected.length) return;
+
+        // Keep the user on the same row; show a gentle hint + quick reset.
+        row.classList.add('warn');
+        row.querySelector('.row-status').textContent = '!';
+        updateStatus(statusEl, '', false);
         inp.focus();
         inp.select();
       }
@@ -980,6 +997,15 @@ function setupBackupVerifyScreen(words) {
         if (!inp.value.trim()) return;
         handleValidate();
       }, 120);
+    });
+
+    retryBtn?.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (i !== currentIndex) return;
+      inp.value = '';
+      rows[i].classList.remove('warn');
+      rows[i].querySelector('.row-status').textContent = '';
+      inp.focus();
     });
   });
 

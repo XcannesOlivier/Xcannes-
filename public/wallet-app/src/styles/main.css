@@ -2077,8 +2077,44 @@ textarea.error {
 }
 
 .verify-row .row-status,
-.verify-row .row-error-msg {
+.verify-row .row-hint {
   display: none;
+}
+
+#screen-backup-verify .verify-row.warn .row-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex: 0 1 auto;
+  max-width: 240px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(245, 158, 11, 0.10);
+  border: 1px solid rgba(245, 158, 11, 0.20);
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+#screen-backup-verify .verify-row.warn .row-hint-text {
+  color: rgba(255, 255, 255, 0.72);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 120px;
+}
+
+#screen-backup-verify .verify-row.warn .row-retry-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  color: rgba(255, 255, 255, 0.78);
+  border-radius: 999px;
+  padding: 4px 9px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+#screen-backup-verify .verify-row.warn .row-retry-btn:active {
+  transform: scale(0.98);
 }
 
 #screen-backup-verify .button-group {
@@ -2254,10 +2290,10 @@ textarea.error {
   color: #fff;
 }
 
-.verify-row.error .row-num {
-  background: var(--error);
-  border-color: var(--error);
-  color: #fff;
+.verify-row.warn .row-num {
+  background: rgba(245, 158, 11, 0.14);
+  border-color: rgba(245, 158, 11, 0.22);
+  color: rgba(245, 158, 11, 0.95);
 }
 
 .verify-row .row-input {
@@ -2285,26 +2321,22 @@ textarea.error {
   background: transparent;
 }
 
-.verify-row.error .row-input {
-  border-color: var(--error);
-}
-
 .verify-row .row-status {
   min-width: 24px;
   text-align: center;
   font-size: 16px;
 }
 
-.verify-row .row-error-msg {
-  display: none;
-  font-size: 12px;
-  color: var(--error);
-  margin-top: 2px;
-  padding-left: 40px;
+.verify-row.warn .row-input {
+  border-color: rgba(245, 158, 11, 0.35);
+  background: rgba(245, 158, 11, 0.05);
+  box-shadow: 0 0 0 1px rgba(245, 158, 11, 0.08);
 }
 
-.verify-row.error .row-error-msg {
-  display: block;
+.verify-row.warn .row-status {
+  display: inline-block;
+  color: rgba(245, 158, 11, 0.95);
+  font-weight: 900;
 }
 
 /* ===== TABS (import) ===== */
