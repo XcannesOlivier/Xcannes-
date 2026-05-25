@@ -1969,7 +1969,7 @@ textarea.error {
 
 /* Ensure the bar is visible/positioned above the iframe on the embedded dashboard screen */
 #screen-wallet-embedded {
-  --embedded-footer-space: calc(env(safe-area-inset-bottom, 0px) + 40px);
+  --embedded-footer-space: calc(env(safe-area-inset-bottom, 0px) + 34px);
 }
 
 #screen-wallet-embedded .choice-bottom-bar--mobile-only {
@@ -1978,8 +1978,8 @@ textarea.error {
   right: 0;
   bottom: 0;
   justify-content: center;
-  padding-top: 6px;
-  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 22px);
+  padding-top: 0px;
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
   pointer-events: none;
   z-index: 5;
 }
