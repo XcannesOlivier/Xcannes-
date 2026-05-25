@@ -2831,7 +2831,7 @@ export default function WalletDashboardUsdSwapModal({
                         ) : (
                           <>
                             {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE && walletSourceSelectionEnabled ? (
-                              <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-x-3 gap-y-2">
+                              <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-x-3 gap-y-[6px]">
                                 <div className="text-[12px] md:text-[13px] text-white/55">
                                   {t("ui_usd_swap_enter_amount_label", "Indiquer le montant")}
                                 </div>
