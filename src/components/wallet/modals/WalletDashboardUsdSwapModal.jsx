@@ -189,21 +189,6 @@ export default function WalletDashboardUsdSwapModal({
   const stableDropdownRef = useRef(null);
   const stableDropdownOverlayRef = useRef(null);
   const stableDropdownListRef = useRef(null);
-  const [stableOverlayDragging, setStableOverlayDragging] = useState(false);
-  const [stableOverlayTranslateY, setStableOverlayTranslateY] = useState(0);
-  const stableOverlayTranslateTargetRef = useRef(0);
-  const stableOverlayTranslateRafRef = useRef(null);
-  const stableOverlayDragMetaRef = useRef({
-    startY: 0,
-    startAt: 0,
-    pointerId: null,
-    lastDelta: 0,
-    pending: false,
-    source: null,
-    dragging: false,
-    scrollLocked: false,
-    lockedOverflowY: "",
-  });
   const [modalOverlayDragging, setModalOverlayDragging] = useState(false);
   const [modalOverlayTranslateY, setModalOverlayTranslateY] = useState(0);
   const [sourceSearch, setSourceSearch] = useState("");
@@ -212,21 +197,6 @@ export default function WalletDashboardUsdSwapModal({
   const sourceDropdownRef = useRef(null);
   const sourceDropdownOverlayRef = useRef(null);
   const sourceDropdownListRef = useRef(null);
-  const [sourceOverlayDragging, setSourceOverlayDragging] = useState(false);
-  const [sourceOverlayTranslateY, setSourceOverlayTranslateY] = useState(0);
-  const sourceOverlayTranslateTargetRef = useRef(0);
-  const sourceOverlayTranslateRafRef = useRef(null);
-  const sourceOverlayDragMetaRef = useRef({
-    startY: 0,
-    startAt: 0,
-    pointerId: null,
-    lastDelta: 0,
-    pending: false,
-    source: null,
-    dragging: false,
-    scrollLocked: false,
-    lockedOverflowY: "",
-  });
   const modalOverlayRef = useRef(null);
   const modalOverlayListRef = useRef(null);
   const modalPanelRef = useRef(null);
@@ -595,6 +565,13 @@ export default function WalletDashboardUsdSwapModal({
   const isBuyStablecoinsTitle = useMemo(() => {
     return String(titleOverride || "").trim().toLowerCase() === "acheter des stablecoins";
   }, [titleOverride]);
+  const showCurrenciesLoadingInCta = currenciesLoading && isStablecoinBuySellTitleMobile;
+  const currenciesLoadingCtaLabel = useMemo(() => {
+    const raw = String(
+      t("ui_usd_swap_loading_currencies", "Chargement des devises SimpleSwap…"),
+    ).trim();
+    return raw.replace(/[.…]+$/u, "");
+  }, [t]);
   const flowTitleDisplay = useMemo(() => {
     const clean = String(flowTitle || "").trim();
     const overrideRaw = String(titleOverride || "").trim().toLowerCase();
@@ -1126,320 +1103,6 @@ export default function WalletDashboardUsdSwapModal({
       }
     };
   }, [isDesktop, sourceDropdownOpen]);
-
-  useEffect(() => {
-    if (stableDropdownOpen) return;
-    setStableOverlayDragging(false);
-    stableOverlayTranslateTargetRef.current = 0;
-    setStableOverlayTranslateY(0);
-    if (stableOverlayTranslateRafRef.current) {
-      window.cancelAnimationFrame(stableOverlayTranslateRafRef.current);
-      stableOverlayTranslateRafRef.current = null;
-    }
-    stableOverlayDragMetaRef.current = {
-      startY: 0,
-      startAt: 0,
-      pointerId: null,
-      lastDelta: 0,
-      pending: false,
-      source: null,
-      dragging: false,
-      scrollLocked: false,
-      lockedOverflowY: "",
-    };
-  }, [stableDropdownOpen]);
-
-  useEffect(() => {
-    if (sourceDropdownOpen) return;
-    setSourceOverlayDragging(false);
-    sourceOverlayTranslateTargetRef.current = 0;
-    setSourceOverlayTranslateY(0);
-    if (sourceOverlayTranslateRafRef.current) {
-      window.cancelAnimationFrame(sourceOverlayTranslateRafRef.current);
-      sourceOverlayTranslateRafRef.current = null;
-    }
-    sourceOverlayDragMetaRef.current = {
-      startY: 0,
-      startAt: 0,
-      pointerId: null,
-      lastDelta: 0,
-      pending: false,
-      source: null,
-      dragging: false,
-      scrollLocked: false,
-      lockedOverflowY: "",
-    };
-  }, [sourceDropdownOpen]);
-
-  const releaseStableOverlayScrollLock = () => {
-    const meta = stableOverlayDragMetaRef.current;
-    if (meta?.source !== "list") return;
-    if (!meta?.scrollLocked) return;
-    const listEl = stableDropdownListRef.current;
-    if (!listEl) return;
-    try {
-      listEl.style.overflowY = meta.lockedOverflowY;
-    } catch {
-      // ignore
-    }
-    meta.scrollLocked = false;
-    meta.lockedOverflowY = "";
-  };
-
-  const maybeStartStableOverlayDrag = (event, source) => {
-    if (!event?.isPrimary) return false;
-    if (event.pointerType === "mouse") return false;
-    if (event.target?.closest?.("input,textarea,select")) return false;
-
-    if (source === "list") {
-      const listEl = stableDropdownListRef.current;
-      if (!listEl) return false;
-      if (listEl.scrollTop > 2) return false;
-    }
-
-    stableOverlayDragMetaRef.current = {
-      startY: event.clientY,
-      startAt: Date.now(),
-      pointerId: event.pointerId,
-      lastDelta: 0,
-      pending: true,
-      source,
-      dragging: false,
-      scrollLocked: false,
-      lockedOverflowY: "",
-    };
-    return true;
-  };
-
-  const handleStableOverlayPointerMove = (event) => {
-    const meta = stableOverlayDragMetaRef.current;
-    if (!meta?.pending && !meta?.dragging) return;
-    if (meta.pointerId !== event.pointerId) return;
-
-    const delta = event.clientY - meta.startY;
-    if (delta <= 0) return;
-
-    if (!meta.dragging) {
-      if (delta < 8) return;
-      // Start drag.
-      try {
-        event.currentTarget?.setPointerCapture?.(event.pointerId);
-      } catch {
-        // ignore
-      }
-
-      if (meta.source === "list") {
-        const listEl = stableDropdownListRef.current;
-        if (listEl && listEl.scrollTop <= 0) {
-          try {
-            meta.lockedOverflowY = listEl.style.overflowY;
-            meta.scrollLocked = true;
-            listEl.style.overflowY = "hidden";
-            listEl.scrollTop = 0;
-          } catch {
-            // ignore
-          }
-        }
-      }
-
-      meta.dragging = true;
-      setStableOverlayDragging(true);
-    }
-
-    meta.lastDelta = delta;
-    stableOverlayTranslateTargetRef.current = delta;
-    if (!stableOverlayTranslateRafRef.current) {
-      stableOverlayTranslateRafRef.current = window.requestAnimationFrame(() => {
-        stableOverlayTranslateRafRef.current = null;
-        setStableOverlayTranslateY(stableOverlayTranslateTargetRef.current);
-      });
-    }
-  };
-
-  const handleStableOverlayPointerEnd = (event) => {
-    const meta = stableOverlayDragMetaRef.current;
-    if (meta.pointerId !== event.pointerId) return;
-
-    const delta = meta.lastDelta || 0;
-    const duration = Math.max(1, Date.now() - (meta.startAt || 0));
-    const velocity = delta / duration; // px/ms
-    const shouldClose = delta > 160 || velocity > 1.0;
-
-    stableOverlayDragMetaRef.current.pending = false;
-    stableOverlayDragMetaRef.current.dragging = false;
-    setStableOverlayDragging(false);
-    releaseStableOverlayScrollLock();
-
-    if (shouldClose) {
-      const height = typeof window !== "undefined" ? window.innerHeight : 9999;
-      stableOverlayTranslateTargetRef.current = Math.max(delta, height);
-      setStableOverlayTranslateY(stableOverlayTranslateTargetRef.current);
-      window.setTimeout(() => {
-        setStableDropdownOpen(false);
-      }, 180);
-      stableOverlayDragMetaRef.current = {
-        startY: 0,
-        startAt: 0,
-        pointerId: null,
-        lastDelta: 0,
-        pending: false,
-        source: null,
-        dragging: false,
-        scrollLocked: false,
-        lockedOverflowY: "",
-      };
-      return;
-    }
-
-    stableOverlayTranslateTargetRef.current = 0;
-    setStableOverlayTranslateY(0);
-    stableOverlayDragMetaRef.current = {
-      startY: 0,
-      startAt: 0,
-      pointerId: null,
-      lastDelta: 0,
-      pending: false,
-      source: null,
-      dragging: false,
-      scrollLocked: false,
-      lockedOverflowY: "",
-    };
-  };
-
-  const releaseSourceOverlayScrollLock = () => {
-    const meta = sourceOverlayDragMetaRef.current;
-    if (meta?.source !== "list") return;
-    if (!meta?.scrollLocked) return;
-    const listEl = sourceDropdownListRef.current;
-    if (!listEl) return;
-    try {
-      listEl.style.overflowY = meta.lockedOverflowY;
-    } catch {
-      // ignore
-    }
-    meta.scrollLocked = false;
-    meta.lockedOverflowY = "";
-  };
-
-  const maybeStartSourceOverlayDrag = (event, source) => {
-    if (!event?.isPrimary) return false;
-    if (event.pointerType === "mouse") return false;
-    if (event.target?.closest?.("input,textarea,select")) return false;
-
-    if (source === "list") {
-      const listEl = sourceDropdownListRef.current;
-      if (!listEl) return false;
-      if (listEl.scrollTop > 2) return false;
-    }
-
-    sourceOverlayDragMetaRef.current = {
-      startY: event.clientY,
-      startAt: Date.now(),
-      pointerId: event.pointerId,
-      lastDelta: 0,
-      pending: true,
-      source,
-      dragging: false,
-      scrollLocked: false,
-      lockedOverflowY: "",
-    };
-    return true;
-  };
-
-  const handleSourceOverlayPointerMove = (event) => {
-    const meta = sourceOverlayDragMetaRef.current;
-    if (!meta?.pending && !meta?.dragging) return;
-    if (meta.pointerId !== event.pointerId) return;
-
-    const delta = event.clientY - meta.startY;
-    if (delta <= 0) return;
-
-    if (!meta.dragging) {
-      if (delta < 8) return;
-      try {
-        event.currentTarget?.setPointerCapture?.(event.pointerId);
-      } catch {
-        // ignore
-      }
-
-      if (meta.source === "list") {
-        const listEl = sourceDropdownListRef.current;
-        if (listEl && listEl.scrollTop <= 0) {
-          try {
-            meta.lockedOverflowY = listEl.style.overflowY;
-            meta.scrollLocked = true;
-            listEl.style.overflowY = "hidden";
-            listEl.scrollTop = 0;
-          } catch {
-            // ignore
-          }
-        }
-      }
-
-      meta.dragging = true;
-      setSourceOverlayDragging(true);
-    }
-
-    meta.lastDelta = delta;
-    sourceOverlayTranslateTargetRef.current = delta;
-    if (!sourceOverlayTranslateRafRef.current) {
-      sourceOverlayTranslateRafRef.current = window.requestAnimationFrame(() => {
-        sourceOverlayTranslateRafRef.current = null;
-        setSourceOverlayTranslateY(sourceOverlayTranslateTargetRef.current);
-      });
-    }
-  };
-
-  const handleSourceOverlayPointerEnd = (event) => {
-    const meta = sourceOverlayDragMetaRef.current;
-    if (meta.pointerId !== event.pointerId) return;
-
-    const delta = meta.lastDelta || 0;
-    const duration = Math.max(1, Date.now() - (meta.startAt || 0));
-    const velocity = delta / duration;
-    const shouldClose = delta > 160 || velocity > 1.0;
-
-    sourceOverlayDragMetaRef.current.pending = false;
-    sourceOverlayDragMetaRef.current.dragging = false;
-    setSourceOverlayDragging(false);
-    releaseSourceOverlayScrollLock();
-
-    if (shouldClose) {
-      const height = typeof window !== "undefined" ? window.innerHeight : 9999;
-      sourceOverlayTranslateTargetRef.current = Math.max(delta, height);
-      setSourceOverlayTranslateY(sourceOverlayTranslateTargetRef.current);
-      window.setTimeout(() => {
-        setSourceDropdownOpen(false);
-        setSourceSearch("");
-      }, 180);
-      sourceOverlayDragMetaRef.current = {
-        startY: 0,
-        startAt: 0,
-        pointerId: null,
-        lastDelta: 0,
-        pending: false,
-        source: null,
-        dragging: false,
-        scrollLocked: false,
-        lockedOverflowY: "",
-      };
-      return;
-    }
-
-    sourceOverlayTranslateTargetRef.current = 0;
-    setSourceOverlayTranslateY(0);
-    sourceOverlayDragMetaRef.current = {
-      startY: 0,
-      startAt: 0,
-      pointerId: null,
-      lastDelta: 0,
-      pending: false,
-      source: null,
-      dragging: false,
-      scrollLocked: false,
-      lockedOverflowY: "",
-    };
-  };
 
   const fetchCurrencies = async () => {
     setCurrenciesLoading(true);
@@ -2775,11 +2438,11 @@ export default function WalletDashboardUsdSwapModal({
                   </div>
                 ) : null}
 
-                {currenciesLoading ? (
-                  <InfoBanner>
-                    {t("ui_usd_swap_loading_currencies", "Chargement des devises SimpleSwap…")}
-                  </InfoBanner>
-                ) : null}
+	                {currenciesLoading && !showCurrenciesLoadingInCta ? (
+	                  <InfoBanner>
+	                    {t("ui_usd_swap_loading_currencies", "Chargement des devises SimpleSwap…")}
+	                  </InfoBanner>
+	                ) : null}
 
                 {currenciesError ? (
                   <ErrorBanner>{currenciesError}</ErrorBanner>
@@ -3616,50 +3279,23 @@ export default function WalletDashboardUsdSwapModal({
 		                          : null
 		                        : createPortal(
 	                            <div className="fixed inset-0 z-[10020]">
-	                              <div
-	                                className="absolute inset-0 bg-black/80 md:backdrop-blur-sm"
-	                                onClick={() => setStableDropdownOpen(false)}
-	                                style={{
-	                                  opacity: Math.max(
-	                                    0,
-	                                    Math.min(1, 1 - stableOverlayTranslateY / 420),
-	                                  ),
-	                                }}
-	                              />
-	                              <div
-	                                ref={stableDropdownOverlayRef}
-	                                role="dialog"
-	                                aria-modal="true"
+		                              <div
+		                                className="absolute inset-0 bg-black/80 md:backdrop-blur-sm"
+		                                onClick={() => setStableDropdownOpen(false)}
+		                              />
+		                              <div
+		                                ref={stableDropdownOverlayRef}
+		                                role="dialog"
+		                                aria-modal="true"
 	                                className={[
 	                                  "absolute inset-0 bg-elevated flex flex-col min-h-0 overflow-hidden pb-[env(safe-area-inset-bottom)] touch-pan-y",
 	                                  "sm:inset-6 sm:rounded-2xl sm:ring-1 sm:ring-white/10 sm:shadow-2xl",
 	                                  "will-change-transform",
 	                                ].join(" ")}
-	                                style={{
-	                                  transform: `translateY(${Math.max(0, stableOverlayTranslateY)}px)`,
-	                                  transition: stableOverlayDragging
-	                                    ? "none"
-	                                    : "transform 220ms cubic-bezier(0.2,0,0,1)",
-	                                }}
-	                                onPointerMove={handleStableOverlayPointerMove}
-	                                onPointerUp={handleStableOverlayPointerEnd}
-	                                onPointerCancel={handleStableOverlayPointerEnd}
-	                              >
+		                              >
 	                                <div
 	                                  className="border-b border-white/10"
-	                                  onPointerDown={(event) => {
-	                                    maybeStartStableOverlayDrag(event, "fixed");
-	                                  }}
 	                                >
-	                                  <div className="sm:hidden flex justify-center pt-3 pb-1">
-	                                    <div
-	                                      className="w-16 h-5 flex items-center justify-center"
-	                                      aria-hidden
-	                                    >
-	                                      <span className="block w-12 h-1.5 rounded-full bg-white/20" />
-	                                    </div>
-	                                  </div>
-
 	                                  <div className="flex items-center justify-between gap-3 px-4 py-4">
 	                                    <div className="min-w-0">
 	                                      <div className="text-white font-semibold text-lg leading-tight truncate">
@@ -3678,7 +3314,7 @@ export default function WalletDashboardUsdSwapModal({
 	                                    <button
 	                                      type="button"
 	                                      onClick={() => setStableDropdownOpen(false)}
-	                                      className="hidden sm:inline-flex text-white/70 hover:text-white transition-colors text-xl"
+	                                      className="inline-flex text-white/70 hover:text-white transition-colors text-xl"
 	                                      aria-label={t("ui_close", "Fermer")}
 	                                    >
 	                                      ✕
@@ -3758,9 +3394,6 @@ export default function WalletDashboardUsdSwapModal({
 	                                <div
 	                                  ref={stableDropdownListRef}
 	                                  className="flex-1 min-h-0 overflow-y-auto overscroll-contain touch-pan-y"
-	                                  onPointerDown={(event) => {
-	                                    maybeStartStableOverlayDrag(event, "list");
-	                                  }}
 	                                >
 	                                  {stableSearchResults.length ? (
 	                                    stableSearchResults.map((cur) => {
@@ -4035,68 +3668,44 @@ export default function WalletDashboardUsdSwapModal({
                           : null
                         : createPortal(
                             <div className="fixed inset-0 z-[10020]">
-                              <div
-                                className="absolute inset-0 bg-black/80 md:backdrop-blur-sm"
-                                onClick={() => {
-                                  setSourceDropdownOpen(false);
-                                  setSourceSearch("");
-                                }}
-                                style={{
-                                  opacity: Math.max(
-                                    0,
-                                    Math.min(1, 1 - sourceOverlayTranslateY / 420),
-                                  ),
-                                }}
-                              />
-                              <div
-                                ref={sourceDropdownOverlayRef}
-                                role="dialog"
-                                aria-modal="true"
-                                className={[
-                                  "absolute inset-0 bg-elevated flex flex-col min-h-0 overflow-hidden pb-[env(safe-area-inset-bottom)] touch-pan-y",
-                                  "sm:inset-6 sm:rounded-2xl sm:ring-1 sm:ring-white/10 sm:shadow-2xl",
-                                  "will-change-transform",
-                                ].join(" ")}
-                                style={{
-                                  transform: `translateY(${Math.max(0, sourceOverlayTranslateY)}px)`,
-                                  transition: sourceOverlayDragging
-                                    ? "none"
-                                    : "transform 220ms cubic-bezier(0.2,0,0,1)",
-                                }}
-                                onPointerMove={handleSourceOverlayPointerMove}
-                                onPointerUp={handleSourceOverlayPointerEnd}
-                                onPointerCancel={handleSourceOverlayPointerEnd}
-                              >
-                                <div
-                                  className="border-b border-white/10"
-                                  onPointerDown={(event) => {
-                                    maybeStartSourceOverlayDrag(event, "fixed");
-                                  }}
-                                >
-                                  <div className="sm:hidden flex justify-center pt-3 pb-1">
-                                    <div className="w-16 h-5 flex items-center justify-center" aria-hidden>
-                                      <span className="block w-12 h-1.5 rounded-full bg-white/20" />
-                                    </div>
-                                  </div>
-
-                                  <div className="flex items-center justify-between gap-3 px-4 py-4">
-                                    <div className="min-w-0">
-                                      <div className="text-white font-medium text-[19px] md:text-[20px] leading-tight truncate">
-                                        {walletSelectorDialogTitle}
-                                      </div>
-                                    </div>
-                                    <button
-                                      type="button"
-                                      onClick={() => {
-                                        setSourceDropdownOpen(false);
-                                        setSourceSearch("");
-                                      }}
-                                      className="hidden sm:inline-flex text-white/70 hover:text-white transition-colors text-xl"
-                                      aria-label={t("ui_close", "Fermer")}
-                                    >
-                                      ✕
-                                    </button>
-                                  </div>
+	                              <div
+	                                className="absolute inset-0 bg-black/80 md:backdrop-blur-sm"
+	                                onClick={() => {
+	                                  setSourceDropdownOpen(false);
+	                                  setSourceSearch("");
+	                                }}
+	                              />
+		                              <div
+		                                ref={sourceDropdownOverlayRef}
+		                                role="dialog"
+		                                aria-modal="true"
+	                                className={[
+	                                  "absolute inset-0 bg-elevated flex flex-col min-h-0 overflow-hidden pb-[env(safe-area-inset-bottom)] touch-pan-y",
+	                                  "sm:inset-6 sm:rounded-2xl sm:ring-1 sm:ring-white/10 sm:shadow-2xl",
+	                                  "will-change-transform",
+	                                ].join(" ")}
+		                              >
+	                                <div
+	                                  className="border-b border-white/10"
+	                                >
+	                                  <div className="flex items-center justify-between gap-3 px-4 py-4">
+	                                    <div className="min-w-0">
+	                                      <div className="text-white font-medium text-[19px] md:text-[20px] leading-tight truncate">
+	                                        {walletSelectorDialogTitle}
+	                                      </div>
+	                                    </div>
+	                                    <button
+	                                      type="button"
+	                                      onClick={() => {
+	                                        setSourceDropdownOpen(false);
+	                                        setSourceSearch("");
+	                                      }}
+	                                      className="inline-flex text-white/70 hover:text-white transition-colors text-xl"
+	                                      aria-label={t("ui_close", "Fermer")}
+	                                    >
+	                                      ✕
+	                                    </button>
+	                                  </div>
 
                                   <div className="px-4 pb-4">
                                     <div className="relative">
@@ -4127,9 +3736,6 @@ export default function WalletDashboardUsdSwapModal({
                                 <div
                                   ref={sourceDropdownListRef}
                                   className="flex-1 min-h-0 overflow-y-auto overscroll-contain touch-pan-y"
-                                  onPointerDown={(event) => {
-                                    maybeStartSourceOverlayDrag(event, "list");
-                                  }}
                                 >
                                   {filteredSourceCurrencyOptions.length ? (
                                     filteredSourceCurrencyOptions.map((option) => {
@@ -4275,6 +3881,7 @@ export default function WalletDashboardUsdSwapModal({
                     <button
                       type="button"
                       disabled={
+                        showCurrenciesLoadingInCta ||
                         !hasValidAmount ||
                         amountOutOfRange ||
                         insufficientSourceBalance ||
@@ -4314,7 +3921,24 @@ export default function WalletDashboardUsdSwapModal({
                           boxShadow: '0 20px 40px rgba(0,0,0,0.72), 0 10px 22px rgba(0,0,0,0.5), 0 4px 10px rgba(0,0,0,0.32), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -14px 24px rgba(0,0,0,0.42)' }
                       }
                     >
-                      {(!hasValidAmount || amountOutOfRange || insufficientSourceBalance || sourceConversionMissing || targetConversionMissing || hasReceiveAddressValidationError || pairUnavailable || !fromCurrency || !toCurrency || !stableCurrency || ((walletSourceSelectionEnabled || walletTargetSelectionEnabled) && !selectedSourceOption))
+                      {showCurrenciesLoadingInCta ? (
+                        <span className="inline-flex items-center gap-1.5 text-white/85">
+                          <span className="text-[14px] md:text-[16px]">
+                            {currenciesLoadingCtaLabel}
+                          </span>
+                          <span className="inline-flex items-end gap-[3px] mb-[-1px]">
+                            <span className="usdswap-dot" style={{ animationDelay: "0s" }}>
+                              ·
+                            </span>
+                            <span className="usdswap-dot" style={{ animationDelay: "0.6s" }}>
+                              ·
+                            </span>
+                            <span className="usdswap-dot" style={{ animationDelay: "1.2s" }}>
+                              ·
+                            </span>
+                          </span>
+                        </span>
+                      ) : (!hasValidAmount || amountOutOfRange || insufficientSourceBalance || sourceConversionMissing || targetConversionMissing || hasReceiveAddressValidationError || pairUnavailable || !fromCurrency || !toCurrency || !stableCurrency || ((walletSourceSelectionEnabled || walletTargetSelectionEnabled) && !selectedSourceOption))
                         ? <span className="inline-flex items-center gap-1.5 text-white/85">
                             <span className="text-[14px] md:text-[16px]">{t('ui_usdswap_fill_cta', 'Choisissez les actifs et le montant')}</span>
                             <span className="inline-flex items-end gap-[3px] mb-[-1px]">
@@ -4328,6 +3952,7 @@ export default function WalletDashboardUsdSwapModal({
                     <button
                       type="button"
                       disabled={
+                        showCurrenciesLoadingInCta ||
                         !hasValidAmount ||
                         amountOutOfRange ||
                         insufficientSourceBalance ||
@@ -4367,7 +3992,24 @@ export default function WalletDashboardUsdSwapModal({
                           boxShadow: '0 20px 40px rgba(0,0,0,0.72), 0 10px 22px rgba(0,0,0,0.5), 0 4px 10px rgba(0,0,0,0.32), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -14px 24px rgba(0,0,0,0.42)' }
                       }
                     >
-                      {(!hasValidAmount || amountOutOfRange || insufficientSourceBalance || sourceConversionMissing || targetConversionMissing || hasReceiveAddressValidationError || pairUnavailable || !fromCurrency || !toCurrency || !stableCurrency || ((walletSourceSelectionEnabled || walletTargetSelectionEnabled) && !selectedSourceOption))
+                      {showCurrenciesLoadingInCta ? (
+                        <span className="inline-flex items-center gap-1.5 text-white/85">
+                          <span className="text-[14px] md:text-[16px]">
+                            {currenciesLoadingCtaLabel}
+                          </span>
+                          <span className="inline-flex items-end gap-[3px] mb-[-1px]">
+                            <span className="usdswap-dot" style={{ animationDelay: "0s" }}>
+                              ·
+                            </span>
+                            <span className="usdswap-dot" style={{ animationDelay: "0.6s" }}>
+                              ·
+                            </span>
+                            <span className="usdswap-dot" style={{ animationDelay: "1.2s" }}>
+                              ·
+                            </span>
+                          </span>
+                        </span>
+                      ) : (!hasValidAmount || amountOutOfRange || insufficientSourceBalance || sourceConversionMissing || targetConversionMissing || hasReceiveAddressValidationError || pairUnavailable || !fromCurrency || !toCurrency || !stableCurrency || ((walletSourceSelectionEnabled || walletTargetSelectionEnabled) && !selectedSourceOption))
                         ? <span className="inline-flex items-center gap-1.5 text-white/85">
                             <span className="text-[14px] md:text-[16px]">{t('ui_usdswap_fill_cta', 'Choisissez les actifs et le montant')}</span>
                             <span className="inline-flex items-end gap-[3px] mb-[-1px]">
