@@ -820,7 +820,7 @@ export default function WalletDashboard({
                       activitySkeletonExpired ? (
                       /* ── Message vide après 5s ── */
                       <div
-                        className="mx-0 mb-0 px-4 py-[9px] animate-fade-in recent-activity-fade-border"
+                        className="mx-0 mb-0 px-4 py-[9px] animate-fade-in recent-activity-fade-border rounded-[18px] overflow-hidden"
                         style={{ boxShadow: 'inset 0 -16px 20px rgba(0,0,0,0.88)' }}
                       >
                         <div className="flex items-center gap-2 min-h-[52px] lg:min-h-[38px]">
@@ -836,7 +836,7 @@ export default function WalletDashboard({
                       ) : (
                       /* ── Skeleton pendant le chargement ── */
                       <div
-                        className="mx-0 mb-0 px-4 py-[9px] recent-activity-fade-border"
+                        className="mx-0 mb-0 px-4 py-[9px] recent-activity-fade-border rounded-[18px] overflow-hidden"
                         style={{ boxShadow: 'inset 0 -16px 20px rgba(0,0,0,0.88)' }}
                       >
                         {/* Mobile : deux lignes skeleton */}
@@ -881,7 +881,7 @@ export default function WalletDashboard({
                     >
                       {/* Mini-card activité récente */}
                       <div
-                        className="mx-0 mb-0 px-4 py-[9px] transition-colors recent-activity-fade-border"
+                        className="mx-0 mb-0 px-4 py-[9px] transition-colors recent-activity-fade-border rounded-[18px] overflow-hidden"
                         style={{ boxShadow: 'inset 0 -16px 20px rgba(0,0,0,0.88)' }}
                       >
                         {/* Mobile : deux lignes */}
