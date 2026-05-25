@@ -604,7 +604,7 @@ export default function WalletDashboardUsdSwapModal({
     if (direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE && overrideRaw === "acheter des stablecoins") {
       return (
         <>
-          {"Depuis le compte Voyant Lumineux jaune – "}
+          {"Depuis le compte "}
           <span className="inline-flex items-center gap-1.5 whitespace-nowrap align-middle">
             <span
               className={`w-1.5 h-1.5 rounded-full ring-2 shrink-0 animate-pulse ${accentPulseDot}`}
