@@ -916,6 +916,108 @@ body.header-hero-mode .home-content-wrapper {
   }
 }
 
+/* ── Receive choice: slightly thinner top fade on desktop ── */
+.xcannes-receivechoice-fade-border-green,
+.xcannes-receivechoice-fade-border-orange {
+  position: relative;
+}
+.xcannes-receivechoice-fade-border-green::after,
+.xcannes-receivechoice-fade-border-orange::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  z-index: 30;
+  border: 0.5px solid transparent;
+  box-shadow: none;
+  /* Default matches the regular sheet fade; desktop override below makes it thinner. */
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 0.85) 8%,
+    rgba(0, 0, 0, 0.4) 22%,
+    rgba(0, 0, 0, 0) 45%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 0.85) 8%,
+    rgba(0, 0, 0, 0.4) 22%,
+    rgba(0, 0, 0, 0) 45%
+  );
+}
+.xcannes-receivechoice-fade-border-green::after {
+  border-color: rgba(0, 255, 150, 0.55);
+  box-shadow:
+    inset 0 0.5px 0 rgba(0, 255, 150, 0.25),
+    0 0 24px rgba(0, 255, 150, 0.18);
+}
+.xcannes-receivechoice-fade-border-orange::after {
+  border-color: rgba(245, 166, 35, 0.6);
+  box-shadow:
+    inset 0 0.5px 0 rgba(245, 166, 35, 0.28),
+    0 0 24px rgba(245, 166, 35, 0.18);
+}
+
+@media (max-width: 767px) {
+  .xcannes-receivechoice-fade-border-green::after {
+    border-width: 0.8px;
+    box-shadow:
+      inset 0 0.8px 0 rgba(0, 255, 150, 0.25),
+      0 0 24px rgba(0, 255, 150, 0.18);
+  }
+  .xcannes-receivechoice-fade-border-orange::after {
+    border-width: 0.8px;
+    box-shadow:
+      inset 0 0.8px 0 rgba(245, 166, 35, 0.28),
+      0 0 24px rgba(245, 166, 35, 0.18);
+  }
+}
+
+@media (min-width: 768px) {
+  .xcannes-receivechoice-fade-border-green::after {
+    border-color: rgba(0, 255, 150, 0.3);
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 1) 0%,
+      rgba(0, 0, 0, 0.8) 6%,
+      rgba(0, 0, 0, 0.3) 14%,
+      rgba(0, 0, 0, 0) 32%
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 1) 0%,
+      rgba(0, 0, 0, 0.8) 6%,
+      rgba(0, 0, 0, 0.3) 14%,
+      rgba(0, 0, 0, 0) 32%
+    );
+    box-shadow:
+      inset 0 0.5px 0 rgba(0, 255, 150, 0.12),
+      0 0 24px rgba(0, 255, 150, 0.1);
+  }
+  .xcannes-receivechoice-fade-border-orange::after {
+    border-color: rgba(245, 166, 35, 0.32);
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 1) 0%,
+      rgba(0, 0, 0, 0.8) 6%,
+      rgba(0, 0, 0, 0.3) 14%,
+      rgba(0, 0, 0, 0) 32%
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 1) 0%,
+      rgba(0, 0, 0, 0.8) 6%,
+      rgba(0, 0, 0, 0.3) 14%,
+      rgba(0, 0, 0, 0) 32%
+    );
+    box-shadow:
+      inset 0 0.5px 0 rgba(245, 166, 35, 0.14),
+      0 0 24px rgba(245, 166, 35, 0.1);
+  }
+}
+
 /* ── Thin irregular green border (for select-like inputs) ── */
 .xcannes-irregular-green-border {
   /* Do not set `position` here, to avoid overriding Tailwind `absolute`/`relative`. */
@@ -1121,7 +1223,7 @@ body.header-hero-mode .home-content-wrapper {
      se "pince" et paraît plus fin que les côtés droits avec un padding de 1px).
      Les coins du bas sont assombris par l'overlay `to-black/40` du fond,
      donc on a besoin d'un peu plus de matière qu'en haut. */
-  padding: 1.5px;
+  padding: 1px;
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
@@ -1158,7 +1260,7 @@ body.header-hero-mode .home-content-wrapper {
 @media (max-width: 767px) {
   .xcannes-sendchoice-border-fade-green,
   .xcannes-sendchoice-border-fade-amber {
-    padding: 0.7px;
+    padding: 0.55px;
   }
 }
 
@@ -1167,7 +1269,7 @@ body.header-hero-mode .home-content-wrapper {
 @media (min-width: 768px) {
   .xcannes-sendchoice-border-fade-green,
   .xcannes-sendchoice-border-fade-amber {
-    padding: 1px;
+    padding: 0.8px;
     opacity: 0.7;
   }
   .xcannes-sendchoice-border-fade-green {

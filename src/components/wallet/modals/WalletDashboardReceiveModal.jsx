@@ -1225,8 +1225,8 @@ export default function WalletDashboardReceiveModal({
   const choiceCardBaseClassName =
     // Match the "CashChoice" action button background (wallet-actions.css).
     'relative w-full text-left rounded-[20px] px-4 py-[18px] bg-white/[0.02] hover:bg-white/[0.05] active:bg-white/[0.03] ring-1 ring-white/10 ring-inset shadow-[0_8px_26px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-22px_34px_rgba(0,0,0,0.68)] transition-all duration-[140ms] ease-[cubic-bezier(0.4,0,0.2,1)] hover:ring-white/20 hover:-translate-y-px active:translate-y-0 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-xcannes-green/60';
-  const choiceCardGreenClassName = `${choiceCardBaseClassName} xcannes-sheet-fade-border-green`;
-  const choiceCardNeutralClassName = `${choiceCardBaseClassName} xcannes-sheet-fade-border-orange`;
+  const choiceCardGreenClassName = `${choiceCardBaseClassName} xcannes-receivechoice-fade-border-green`;
+  const choiceCardNeutralClassName = `${choiceCardBaseClassName} xcannes-receivechoice-fade-border-orange`;
 
   const content = (
     <>

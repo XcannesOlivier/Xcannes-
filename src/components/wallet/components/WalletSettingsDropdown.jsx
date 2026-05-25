@@ -641,8 +641,6 @@ export default function WalletSettingsDropdown({
                     ? "none"
                     : "transform 220ms cubic-bezier(0.2,0,0,1)",
                   opacity: overlayTranslateY > 0 ? Math.max(0, Math.min(1, 1 - overlayTranslateY / 420)) : undefined,
-                  backgroundImage:
-                    "radial-gradient(520px circle at 80% 0%, rgba(255,255,255,0.08), transparent 55%), radial-gradient(900px circle at 100% 50%, rgba(255,255,255,0.10), transparent 35%), radial-gradient(700px circle at 0% 100%, rgba(255,255,255,0.07), transparent 60%)",
                 }}
                 className={[
                   shouldPortalToInlinePanel
