@@ -1951,6 +1951,17 @@ textarea.error {
   background: rgba(255, 255, 255, 0.8);
 }
 
+/* Mobile-only bottom bar (used on embedded dashboard screen) */
+.choice-bottom-bar--mobile-only {
+  display: none;
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .choice-bottom-bar--mobile-only {
+    display: flex;
+  }
+}
+
 #screen-backup-verify {
   background:
     radial-gradient(850px 520px at 50% 0%, rgba(0, 200, 83, 0.12), transparent 62%),

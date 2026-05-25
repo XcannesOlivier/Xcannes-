@@ -462,18 +462,21 @@
       </div>
     </div>
 
-    <!-- ========== 10b. WALLET EMBEDDED SCREEN (iframe with full dashboard) ========== -->
-    <div id="screen-wallet-embedded" class="screen hidden">
-      <div class="embedded-container">
-        <iframe
-          id="wallet-iframe"
-          class="wallet-iframe"
-          sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"
-          allow="camera 'self'; clipboard-write"
-          title="Xcannes Wallet Dashboard"
-        ></iframe>
-      </div>
-    </div>
+	    <!-- ========== 10b. WALLET EMBEDDED SCREEN (iframe with full dashboard) ========== -->
+	    <div id="screen-wallet-embedded" class="screen hidden">
+	      <div class="embedded-container">
+	        <iframe
+	          id="wallet-iframe"
+	          class="wallet-iframe"
+	          sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"
+	          allow="camera 'self'; clipboard-write"
+	          title="Xcannes Wallet Dashboard"
+	        ></iframe>
+	      </div>
+
+        <!-- Mobile-only bottom bar (home-indicator style) -->
+        <div class="choice-bottom-bar choice-bottom-bar--mobile-only" aria-hidden="true"><span></span></div>
+	    </div>
 
 		    <!-- ========== 11. UNLOCK SCREEN (Face ID + PIN fallback) ========== -->
 			    <div id="screen-unlock" class="screen hidden">
