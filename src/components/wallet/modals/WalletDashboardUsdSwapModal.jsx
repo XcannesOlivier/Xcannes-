@@ -597,25 +597,44 @@ export default function WalletDashboardUsdSwapModal({
 	        ));
   const flowSubtitleDisplay = useMemo(() => {
     const base = String(flowSubtitle || "").trim();
-    if (direction !== SWAP_DIRECTIONS.STABLE_TO_RLUSD) return base;
     const overrideRaw = String(titleOverride || "").trim().toLowerCase();
+    const rawWalletLabel = String(walletLabel || "").trim();
+    const buyWalletLabel = rawWalletLabel || "[Nom du compte]";
+
+    if (direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE && overrideRaw === "acheter des stablecoins") {
+      return (
+        <>
+          {"Depuis le compte Voyant Lumineux jaune – "}
+          <span className="inline-flex items-center gap-1.5 whitespace-nowrap align-middle">
+            <span
+              className={`w-1.5 h-1.5 rounded-full ring-2 shrink-0 animate-pulse ${accentPulseDot}`}
+              aria-hidden
+            />
+            <span className="font-medium text-white/90">{buyWalletLabel}</span>
+          </span>
+          {", sélectionnez la devise et le montant, puis choisissez le stablecoin à recevoir."}
+        </>
+      );
+    }
+
+    if (direction !== SWAP_DIRECTIONS.STABLE_TO_RLUSD) return base;
     if (overrideRaw !== "vendre vos stablecoins") return base;
-    const name = String(walletLabel || "XCANNES").trim();
+
     const baseNoPunct = base.replace(/[\s.]+$/, "");
-    if (!name) return baseNoPunct;
+    if (!rawWalletLabel) return baseNoPunct;
     return (
       <>
         {baseNoPunct}{" "}
         <span className="inline-flex items-center gap-1.5 whitespace-nowrap align-middle">
           <span
-            className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse"
+            className={`w-1.5 h-1.5 rounded-full ring-2 shrink-0 animate-pulse ${accentPulseDot}`}
             aria-hidden
           />
-          <span className="font-medium text-white/90">{name}</span>
+          <span className="font-medium text-white/90">{rawWalletLabel}</span>
         </span>
       </>
     );
-  }, [direction, flowSubtitle, titleOverride, walletLabel]);
+  }, [accentPulseDot, direction, flowSubtitle, titleOverride, walletLabel]);
   const walletSelectorDialogTitle = walletTargetSelectionEnabled
     ? t("ui_choose_wallet_currency_receive", "Choisir une devise de réception")
     : t("ui_choose_wallet_currency", "Choisir une devise");
