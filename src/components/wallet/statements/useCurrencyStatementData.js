@@ -125,6 +125,58 @@ export default function useCurrencyStatementData({
     });
   }, [baseTransactions, selectedMonthKeys]);
 
+  /* ── auto-fallback to last active month ──────────────────
+   * If the user selects a month with zero transactions, we automatically
+   * jump to the most recent month that actually has activity so they don't
+   * land on an empty statement by default.
+   */
+  const lastActiveMonthKey = useMemo(() => {
+    let bestTime = -Infinity;
+    let bestKey = null;
+    for (const tx of baseTransactions || []) {
+      const raw = tx?.createdAt || tx?.date || "";
+      const d = new Date(raw);
+      const tms = d.getTime();
+      if (!Number.isFinite(tms)) continue;
+      if (tms <= bestTime) continue;
+      const key = getMonthKeyFromTransaction(tx);
+      if (!key) continue;
+      bestTime = tms;
+      bestKey = key;
+    }
+    return bestKey;
+  }, [baseTransactions]);
+
+  useEffect(() => {
+    if (!baseTransactions.length) return;
+    if (selectedMonth === "archives") return;
+    if (!lastActiveMonthKey) return;
+    if (!selectedMonthKey) return;
+    if (periodTransactions.length > 0) return;
+    if (selectedMonthKey === lastActiveMonthKey) return;
+
+    const direct = availableMonths.find(
+      (option) => option?.key === lastActiveMonthKey,
+    );
+    if (direct && typeof direct.value === "number") {
+      setSelectedMonth(direct.value);
+      return;
+    }
+
+    const hasArchives = availableMonths.some(
+      (option) => option?.value === "archives",
+    );
+    if (hasArchives) setSelectedMonth("archives");
+  }, [
+    availableMonths,
+    baseTransactions.length,
+    lastActiveMonthKey,
+    periodTransactions.length,
+    selectedMonth,
+    selectedMonthKey,
+    setSelectedMonth,
+  ]);
+
   /* ── filtered transactions ─────────────────────────────── */
   const filteredTransactions = useMemo(() => {
     return periodTransactions.filter((tok) => {

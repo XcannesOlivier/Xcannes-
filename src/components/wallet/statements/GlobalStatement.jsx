@@ -1523,7 +1523,7 @@ export default function GlobalStatement({
                   </span>
                 ) : null}
               </div>
-              <p className="mt-2 text-[13px] md:text-[15px] text-white/50 max-w-[34ch] leading-relaxed">
+              <p className="mt-2 text-[13px] md:text-[15px] text-white/50 max-w-[46ch] md:max-w-[60ch] leading-relaxed">
                 {t(
                   "ui_global_statement_subtitle_recent_20",
                   "Consultez vos transactions récentes et ouvrez-en une pour voir les détails.",

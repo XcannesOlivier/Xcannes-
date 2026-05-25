@@ -326,7 +326,7 @@ export default function WalletMobileModals({
 		                  accentVariant: "simpleSwapBlue",
 		                  targetSelectionMode: "wallet",
 		                  initialTargetCurrency: "USD",
-		                  titleOverride: "Vendre vos USDC, USDT, RLUSD, ...",
+		                  titleOverride: "Vendre vos stablecoins",
 			                  subtitleOverride:
 			                    "Sélectionnez le stablecoin, le réseau et la devise qui sera créditée sur votre solde.",
 			                });

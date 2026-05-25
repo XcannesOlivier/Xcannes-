@@ -627,7 +627,7 @@ export default function WalletCurrencySelector({
                           {t("ui_select_currency_title", "Ajouter une devise")}
                         </div>
                       </div>
-                      <div className="mt-2 text-[13px] md:text-[15px] text-white/50 leading-relaxed max-w-[34ch]">
+                      <div className="mt-2 text-[13px] md:text-[15px] text-white/50 leading-relaxed max-w-[46ch] md:max-w-[60ch]">
                         {t(
                           "ui_select_currency_subtitle_add_currency",
                           "Une transaction validera l’ajout, aucun montant minimum requis.",
