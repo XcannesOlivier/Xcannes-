@@ -101,6 +101,8 @@ export default function WalletSettingsDropdown({
   const ref = useRef(null);
   const buttonRef = useRef(null);
   const menuRef = useRef(null);
+  const hoverResetTimerRef = useRef(null);
+  const lastMobileHoverElRef = useRef(null);
   const [desktopMenuStyle, setDesktopMenuStyle] = useState(null);
   const [desktopArrowX, setDesktopArrowX] = useState(null);
   const [desktopPlacement, setDesktopPlacement] = useState("bottom");
@@ -109,7 +111,48 @@ export default function WalletSettingsDropdown({
   const settingsSupportIconShellClassName =
     "inline-flex h-[70px] w-[96px] items-center justify-center rounded-[26px] shrink-0";
   const settingsRowClassName =
-    "w-full flex items-center gap-3 px-3 py-3 rounded-[20px] border border-white/10 text-left bg-white/5 shadow-[inset_0_-34px_34px_-20px_rgba(0,0,0,0.95),inset_0_-18px_70px_-45px_rgba(0,0,0,0.9)] hover:bg-transparent hover:border-white/15 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/10";
+    "wallet-settings-row w-full flex items-center gap-3 px-3 py-3 rounded-[20px] border border-white/10 text-left bg-white/5 shadow-[inset_0_-34px_34px_-20px_rgba(0,0,0,0.95),inset_0_-18px_70px_-45px_rgba(0,0,0,0.9)] hover:bg-transparent hover:border-white/15 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/10";
+
+  const clearMobileStickyHoverReset = useCallback(() => {
+    if (hoverResetTimerRef.current) {
+      clearTimeout(hoverResetTimerRef.current);
+      hoverResetTimerRef.current = null;
+    }
+    const last = lastMobileHoverElRef.current;
+    if (last) {
+      last.classList.remove("xcannes-reset-hover");
+      lastMobileHoverElRef.current = null;
+    }
+  }, []);
+
+  const scheduleMobileStickyHoverReset = useCallback(
+    (el) => {
+      if (!el) return;
+      clearMobileStickyHoverReset();
+      try {
+        el.classList.remove("xcannes-reset-hover");
+      } catch {
+        // ignore
+      }
+      lastMobileHoverElRef.current = el;
+      hoverResetTimerRef.current = setTimeout(() => {
+        try {
+          el.classList.add("xcannes-reset-hover");
+        } catch {
+          // ignore
+        }
+      }, 3000);
+    },
+    [clearMobileStickyHoverReset],
+  );
+
+  useEffect(() => {
+    if (!isOpen) {
+      clearMobileStickyHoverReset();
+      return;
+    }
+    return () => clearMobileStickyHoverReset();
+  }, [isOpen, clearMobileStickyHoverReset]);
   const SettingsAddWalletIcon = () => (
     <svg viewBox="0 0 48 48" className="w-10 h-10" fill="none" aria-hidden>
       <path
@@ -609,6 +652,15 @@ export default function WalletSettingsDropdown({
                     ? ""
                     : "md:fixed md:inset-auto md:w-[min(420px,calc(100vw-32px))] md:rounded-xl md:border md:border-white/10 md:bg-elevated md:shadow-[0_28px_90px_rgba(0,0,0,0.6)] md:overflow-visible md:animate-walletSettingsIn",
                 ].join(" ")}
+                onPointerDownCapture={(event) => {
+                  if (event.pointerType !== "touch") return;
+                  const el =
+                    event.target instanceof Element
+                      ? event.target.closest(".wallet-settings-row")
+                      : null;
+                  if (!el) return;
+                  scheduleMobileStickyHoverReset(el);
+                }}
                 onPointerMove={handleOverlayPointerMove}
                 onPointerUp={handleOverlayPointerEnd}
                 onPointerCancel={handleOverlayPointerEnd}
@@ -800,7 +852,7 @@ export default function WalletSettingsDropdown({
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={() => setIsOpen(false)}
-                    className="w-full flex items-center gap-3 px-3 py-0 text-left bg-white/5 shadow-[inset_0_-34px_34px_-20px_rgba(0,0,0,0.95),inset_0_-18px_70px_-45px_rgba(0,0,0,0.9)] hover:bg-transparent transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-xcannes-green/20 focus-visible:ring-inset"
+                    className="wallet-settings-row w-full flex items-center gap-3 px-3 py-0 text-left bg-white/5 shadow-[inset_0_-34px_34px_-20px_rgba(0,0,0,0.95),inset_0_-18px_70px_-45px_rgba(0,0,0,0.9)] hover:bg-transparent transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-xcannes-green/20 focus-visible:ring-inset"
                   >
                     <span className={`${settingsSupportIconShellClassName} text-white/85`}>
                       <SettingsRlusdIcon />
@@ -823,7 +875,7 @@ export default function WalletSettingsDropdown({
                       onOpenInfo?.();
                       setIsOpen(false);
                     }}
-                    className="w-full flex items-center gap-3 px-3 py-0 border-t border-white/10 text-left bg-white/5 shadow-[inset_0_-34px_34px_-20px_rgba(0,0,0,0.95),inset_0_-18px_70px_-45px_rgba(0,0,0,0.9)] hover:bg-transparent transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-xcannes-green/20 focus-visible:ring-inset"
+                    className="wallet-settings-row w-full flex items-center gap-3 px-3 py-0 border-t border-white/10 text-left bg-white/5 shadow-[inset_0_-34px_34px_-20px_rgba(0,0,0,0.95),inset_0_-18px_70px_-45px_rgba(0,0,0,0.9)] hover:bg-transparent transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-xcannes-green/20 focus-visible:ring-inset"
                   >
                     <span className={`${settingsSupportIconShellClassName} text-white/85`}>
                       <SettingsInfoIcon />
@@ -850,7 +902,7 @@ export default function WalletSettingsDropdown({
                       }
                       setShowSecurityModal(true);
                     }}
-                    className="w-full flex items-center gap-3 px-3 py-0 border-t border-white/10 text-left bg-white/5 shadow-[inset_0_-34px_34px_-20px_rgba(0,0,0,0.95),inset_0_-18px_70px_-45px_rgba(0,0,0,0.9)] hover:bg-transparent transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-xcannes-green/20 focus-visible:ring-inset"
+                    className="wallet-settings-row w-full flex items-center gap-3 px-3 py-0 border-t border-white/10 text-left bg-white/5 shadow-[inset_0_-34px_34px_-20px_rgba(0,0,0,0.95),inset_0_-18px_70px_-45px_rgba(0,0,0,0.9)] hover:bg-transparent transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-xcannes-green/20 focus-visible:ring-inset"
                   >
                     <span className={`${settingsSupportIconShellClassName} text-white/85`}>
                       <SettingsSecurityIcon />
@@ -878,7 +930,7 @@ export default function WalletSettingsDropdown({
                       setHelpOpenIndex(0);
                       setShowHelpModal(true);
                     }}
-                    className="w-full flex items-center gap-3 px-3 py-0 border-t border-white/10 text-left bg-white/5 shadow-[inset_0_-34px_34px_-20px_rgba(0,0,0,0.95),inset_0_-18px_70px_-45px_rgba(0,0,0,0.9)] hover:bg-transparent transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-xcannes-green/20 focus-visible:ring-inset"
+                    className="wallet-settings-row w-full flex items-center gap-3 px-3 py-0 border-t border-white/10 text-left bg-white/5 shadow-[inset_0_-34px_34px_-20px_rgba(0,0,0,0.95),inset_0_-18px_70px_-45px_rgba(0,0,0,0.9)] hover:bg-transparent transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-xcannes-green/20 focus-visible:ring-inset"
                   >
                     <span className={`${settingsSupportIconShellClassName} text-white/85`}>
                       <SettingsHelpIcon />
@@ -905,7 +957,7 @@ export default function WalletSettingsDropdown({
                       }
                       setShowTermsModal(true);
                     }}
-                    className="w-full flex items-center gap-3 px-3 py-0 border-t border-white/10 text-left bg-white/5 shadow-[inset_0_-34px_34px_-20px_rgba(0,0,0,0.95),inset_0_-18px_70px_-45px_rgba(0,0,0,0.9)] hover:bg-transparent transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-xcannes-green/20 focus-visible:ring-inset"
+                    className="wallet-settings-row w-full flex items-center gap-3 px-3 py-0 border-t border-white/10 text-left bg-white/5 shadow-[inset_0_-34px_34px_-20px_rgba(0,0,0,0.95),inset_0_-18px_70px_-45px_rgba(0,0,0,0.9)] hover:bg-transparent transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-xcannes-green/20 focus-visible:ring-inset"
                   >
                     <span className={`${settingsSupportIconShellClassName} text-white/85`}>
                       <SettingsDocIcon />
@@ -922,6 +974,12 @@ export default function WalletSettingsDropdown({
                   </button>
                 </div>
               </div>
+
+              {/* Bottom indicator — desktop only */}
+              <div className="hidden md:flex pointer-events-none justify-center pt-2 pb-3" aria-hidden>
+                <span className="block w-36 h-1.5 rounded-full bg-white/80" />
+              </div>
+
                 </div>
               </div>
             );

@@ -1832,7 +1832,7 @@ export default function CurrencyStatement({
           <span className="block w-36 h-1.5 rounded-full bg-white/80" />
         </div>
         {/* Bottom bar – desktop only (visual balance) */}
-        <div className="hidden md:flex pointer-events-none justify-center pt-2 pb-3" aria-hidden>
+        <div className="hidden md:flex pointer-events-none justify-center pt-0.5 pb-3" aria-hidden>
           <span className="block w-[120px] h-[4px] rounded-full bg-white/10" />
         </div>
 
