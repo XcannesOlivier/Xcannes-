@@ -1025,6 +1025,34 @@ export default function WalletDashboardUsdSwapModal({
     return t("ui_send_your_funds", "Envoyer vos stablecoins");
   }, [direction, partnerFromNetwork, partnerFromTicker, t]);
 
+  const humanStatusLabel = useMemo(() => {
+    const raw = String(status || "").trim().toLowerCase();
+    if (!raw) return "";
+    const normalized = raw.replace(/[_-]+/g, " ");
+    if (normalized === "waiting" || normalized === "created" || normalized === "new") {
+      return t("ui_usd_swap_status_waiting_deposit", "En attente du dépôt");
+    }
+    if (normalized === "confirming") {
+      return t("ui_usd_swap_status_confirming", "Confirmation du dépôt");
+    }
+    if (normalized === "exchanging") {
+      return t("ui_usd_swap_status_exchanging", "Conversion en cours");
+    }
+    if (normalized === "sending") {
+      return t("ui_usd_swap_status_sending", "Envoi en cours");
+    }
+    if (normalized === "finished" || normalized === "completed") {
+      return t("ui_usd_swap_status_finished", "Terminé");
+    }
+    if (normalized === "failed") {
+      return t("ui_usd_swap_status_failed", "Échec");
+    }
+    if (normalized === "refunded") {
+      return t("ui_usd_swap_status_refunded", "Remboursé");
+    }
+    return status;
+  }, [status, t]);
+
   const resetState = (prefill = "") => {
     setStep("form");
     setSearch("");
@@ -2355,130 +2383,144 @@ export default function WalletDashboardUsdSwapModal({
                     ) : null}
                   </div>
 
-                  <div className="mt-3 border-t border-white/10 pt-3 space-y-3 text-sm text-white/80">
-                    {exchangeId ? (
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="min-w-0">
-                          <div className="text-white/60 text-xs">
-                            {t("ui_usd_swap_exchange_id", "ID")}
-                          </div>
-                          <div className="font-mono break-all">{exchangeId}</div>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() =>
-                            navigator?.clipboard?.writeText(exchangeId).catch(() => {})
-                          }
-                          className="shrink-0 rounded-lg bg-white/10 hover:bg-white/15 text-white/80 text-xs font-semibold px-3 py-2"
-                        >
-                          {t("ui_copy", "Copier")}
-                        </button>
-                      </div>
-                    ) : null}
+	                  <div className="mt-3 border-t border-white/10 pt-3 space-y-3 text-sm text-white/80">
+	                    {depositAddress ? (
+	                      <div className="space-y-2">
+	                        <div className="flex items-start justify-between gap-3">
+	                          <div className="min-w-0">
+	                            <div className="text-white/60 text-xs">
+	                              {t("ui_usd_swap_deposit_address", "Adresse de dépôt")}
+	                            </div>
+	                            <div className="font-mono break-all">{depositAddress}</div>
+	                          </div>
+	                          <button
+	                            type="button"
+	                            onClick={() =>
+	                              navigator?.clipboard?.writeText(depositAddress).catch(() => {})
+	                            }
+	                            className="shrink-0 rounded-lg bg-white/10 hover:bg-white/15 text-white/80 text-xs font-semibold px-3 py-2"
+	                          >
+	                            {t("ui_copy", "Copier")}
+	                          </button>
+	                        </div>
+	                        {depositExtraId ? (
+	                          <div className="flex items-start justify-between gap-3">
+	                            <div className="min-w-0">
+	                              <div className="text-white/60 text-xs">
+	                                {t("ui_usd_swap_deposit_tag", "Tag / Memo")}
+	                              </div>
+	                              <div className="font-mono break-all">{depositExtraId}</div>
+	                            </div>
+	                            <button
+	                              type="button"
+	                              onClick={() =>
+	                                navigator?.clipboard?.writeText(depositExtraId).catch(() => {})
+	                              }
+	                              className="shrink-0 rounded-lg bg-white/10 hover:bg-white/15 text-white/80 text-xs font-semibold px-3 py-2"
+	                            >
+	                              {t("ui_copy", "Copier")}
+	                            </button>
+	                          </div>
+	                        ) : null}
+	                      </div>
+	                    ) : exchangeId ? (
+	                      <div className="flex items-start justify-between gap-3">
+	                        <div className="min-w-0">
+	                          <div className="text-white/60 text-xs">
+	                            {t("ui_usd_swap_deposit_address", "Adresse de dépôt")}
+	                          </div>
+	                          <div className="text-white/70 text-sm">
+	                            {exchangeRefreshing
+	                              ? t("ui_usd_swap_refreshing", "Rafraîchissement…")
+	                              : t(
+	                                  "ui_usd_swap_deposit_address_pending",
+	                                  "Génération de l’adresse SimpleSwap…",
+	                                )}
+	                          </div>
+	                        </div>
+	                        <button
+	                          type="button"
+	                          onClick={refreshExchange}
+	                          disabled={exchangeRefreshing}
+	                          className="shrink-0 rounded-lg bg-white/10 hover:bg-white/15 disabled:opacity-60 text-white/80 text-xs font-semibold px-3 py-2"
+	                        >
+	                          {t("ui_refresh", "Rafraîchir")}
+	                        </button>
+	                      </div>
+	                    ) : null}
 
-                    {depositAddress ? (
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="min-w-0">
-                          <div className="text-white/60 text-xs">
-                            {t("ui_usd_swap_deposit_address", "Adresse de dépôt")}
-                          </div>
-                          <div className="font-mono break-all">{depositAddress}</div>
-                          <div className="mt-1 text-white/55 text-xs leading-snug">
-                            {t(
-                              "ui_usd_swap_deposit_explainer",
-                              "Envoyez vos stablecoins à cette adresse SimpleSwap. Ils seront convertis puis crédités sur votre compte.",
-                            )}
-                          </div>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() =>
-                            navigator?.clipboard?.writeText(depositAddress).catch(() => {})
-                          }
-                          className="shrink-0 rounded-lg bg-white/10 hover:bg-white/15 text-white/80 text-xs font-semibold px-3 py-2"
-                        >
-                          {t("ui_copy", "Copier")}
-                        </button>
-                      </div>
-                    ) : exchangeId ? (
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="min-w-0">
-                          <div className="text-white/60 text-xs">
-                            {t("ui_usd_swap_deposit_address", "Adresse de dépôt")}
-                          </div>
-                          <div className="text-white/70 text-sm">
-                            {exchangeRefreshing
-                              ? t("ui_usd_swap_refreshing", "Rafraîchissement…")
-                              : t(
-                                  "ui_usd_swap_deposit_address_pending",
-                                  "Génération de l’adresse SimpleSwap…",
-                                )}
-                          </div>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={refreshExchange}
-                          disabled={exchangeRefreshing}
-                          className="shrink-0 rounded-lg bg-white/10 hover:bg-white/15 disabled:opacity-60 text-white/80 text-xs font-semibold px-3 py-2"
-                        >
-                          {t("ui_refresh", "Rafraîchir")}
-                        </button>
-                      </div>
-                    ) : null}
+	                    {exchangeId ? (
+	                      <div className="flex items-start justify-between gap-3">
+	                        <div className="min-w-0">
+	                          <div className="text-white/60 text-xs">
+	                            {t("ui_usd_swap_exchange_id", "ID de suivi")}
+	                          </div>
+	                          <div className="font-mono break-all">{exchangeId}</div>
+	                        </div>
+	                        <button
+	                          type="button"
+	                          onClick={() =>
+	                            navigator?.clipboard?.writeText(exchangeId).catch(() => {})
+	                          }
+	                          className="shrink-0 rounded-lg bg-white/10 hover:bg-white/15 text-white/80 text-xs font-semibold px-3 py-2"
+	                        >
+	                          {t("ui_copy", "Copier")}
+	                        </button>
+	                      </div>
+	                    ) : null}
 
-                    {depositExtraId ? (
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="min-w-0">
-                          <div className="text-white/60 text-xs">
-                            {t("ui_usd_swap_deposit_tag", "Tag / Memo")}
-                          </div>
-                          <div className="font-mono break-all">{depositExtraId}</div>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() =>
-                            navigator?.clipboard?.writeText(depositExtraId).catch(() => {})
-                          }
-                          className="shrink-0 rounded-lg bg-white/10 hover:bg-white/15 text-white/80 text-xs font-semibold px-3 py-2"
-                        >
-                          {t("ui_copy", "Copier")}
-                        </button>
-                      </div>
-                    ) : null}
+	                    {status ? (
+	                      <div className="space-y-1">
+	                        <div className="text-white/60 text-xs">
+	                          {t("ui_usd_swap_status", "Statut")}
+	                        </div>
+	                        <div className="text-white font-semibold">
+	                          {humanStatusLabel || status}
+	                        </div>
+	                        {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD ? (
+	                          <div className="text-white/55 text-xs leading-snug">
+	                            {t(
+	                              "ui_usd_swap_waiting_for_deposit",
+	                              "Nous attendons la réception des fonds sur le réseau sélectionné.",
+	                            )}
+	                          </div>
+	                        ) : null}
+	                      </div>
+	                    ) : null}
+	                  </div>
 
-                    {status ? (
-                      <div>
-                        <div className="text-white/60 text-xs">
-                          {t("ui_usd_swap_status", "Statut")}
-                        </div>
-                        <div className="text-white font-semibold">{status}</div>
-                      </div>
-                    ) : null}
-                  </div>
+	                  {depositAddress ? (
+	                    <div className="mt-4 flex justify-center">
+	                      <div className="w-full">
+	                        <div className="text-center text-white/65 text-xs font-semibold tracking-wide mb-2">
+	                          {t("ui_usd_swap_scan_deposit_address", "Scanner l’adresse de dépôt")}
+	                        </div>
+	                        <div className="flex justify-center">
+	                          <div className="rounded-2xl bg-white p-3">
+	                            <QRCodeCanvas value={depositAddress} size={190} includeMargin />
+	                          </div>
+	                        </div>
+	                      </div>
+	                    </div>
+	                  ) : null}
+	                </div>
 
-                  {depositAddress ? (
-                    <div className="mt-4 flex justify-center">
-                      <div className="rounded-2xl bg-white p-3">
-                        <QRCodeCanvas value={depositAddress} size={190} includeMargin />
-                      </div>
-                    </div>
-                  ) : null}
-                </div>
-
-                {partnerToTicker ? (
-                  <div className="rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-black/20">
-                    <div className="flex items-center justify-between gap-3">
-                      <div className="text-white/60 text-xs">
-                        {t("ui_you_get", "Vous recevez")}
-                      </div>
-                      {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE && partnerToNetwork ? (
-                        <span className="shrink-0 rounded-full bg-white/10 text-white/70 text-xs font-semibold px-2.5 py-1">
-                          {partnerToNetwork}
-                        </span>
+	                {partnerToTicker ? (
+	                  <div className="rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-black/20">
+	                    <div className="flex items-center justify-between gap-3">
+	                      <div className="text-white/60 text-xs">
+	                        {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD
+	                          ? t("ui_estimated_receive_amount", "Montant estimé à recevoir")
+	                          : t("ui_you_get", "Vous recevez")}
+	                      </div>
+	                      {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE && partnerToNetwork ? (
+	                        <span className="shrink-0 rounded-full bg-white/10 text-white/70 text-xs font-semibold px-2.5 py-1">
+	                          {partnerToNetwork}
+	                        </span>
                       ) : null}
                     </div>
-                    <div className="mt-1 text-white font-semibold text-lg leading-tight">
-                      {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD
+	                    <div className="mt-1 text-white font-semibold text-lg leading-tight">
+	                      {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD
                         ? (Number.isFinite(Number(receiveDisplayAmount)) && Number(receiveDisplayAmount) > 0
                             ? `≈${formatAmountNumber ? formatAmountNumber.format(Number(receiveDisplayAmount)) : String(receiveDisplayAmount)} ${selectedSourceCurrencyCode}`
                             : `— ${selectedSourceCurrencyCode}`)
@@ -2486,10 +2528,18 @@ export default function WalletDashboardUsdSwapModal({
                             ? `${receiveAmountExact} ${partnerToTicker}`
                             : quotedReceiveAmount
                               ? `≈${formatAmountNumber ? formatAmountNumber.format(quotedReceiveAmount) : String(quotedReceiveAmount)} ${partnerToTicker}`
-                              : `— ${partnerToTicker}`)}
-                    </div>
-                  </div>
-                ) : null}
+	                              : `— ${partnerToTicker}`)}
+	                    </div>
+	                    {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD ? (
+	                      <div className="mt-2 text-white/55 text-xs leading-snug">
+	                        {t(
+	                          "ui_usd_swap_receive_amount_disclaimer",
+	                          "Le montant final peut varier selon le taux appliqué au moment de la conversion.",
+	                        )}
+	                      </div>
+	                    ) : null}
+	                  </div>
+	                ) : null}
 
                 <WarnBanner>
                   {t(
