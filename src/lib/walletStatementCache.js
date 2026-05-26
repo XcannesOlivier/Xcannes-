@@ -56,3 +56,17 @@ export function listCachedStatementKeys() {
   const cache = readCache();
   return Object.keys(cache || {});
 }
+
+/**
+ * peekCachedStatement — returns cached statement even if stale.
+ * Does not delete entries (SWR hydration helper).
+ */
+export function peekCachedStatement(cacheKey) {
+  if (!cacheKey) return null;
+  const cache = readCache();
+  const entry = cache?.[cacheKey];
+  if (!entry || typeof entry !== "object") return null;
+  const ts = Number(entry.ts || 0);
+  if (!Number.isFinite(ts)) return null;
+  return { ts, data: entry.data ?? null };
+}

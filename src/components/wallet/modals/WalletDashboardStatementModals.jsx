@@ -5,6 +5,7 @@ import { useTranslation } from "next-i18next";
 import { apiUrl } from "@/lib/runtimeConfig";
 import {
   getCachedStatement,
+  peekCachedStatement,
   setCachedStatement,
 } from "@/lib/walletStatementCache";
 import CurrencyStatement from "../statements/CurrencyStatement";
@@ -141,8 +142,31 @@ export default function WalletDashboardStatementModals({
 
   const loadGlobalFirstPage = useCallback(async () => {
     if (!canFetchStatements) return;
-    setGlobalLoading(true);
     setGlobalError(null);
+
+    // SWR: hydrate instantly from cached snapshot (even if stale),
+    // then fetch fresh data in the background.
+    let hadCached = false;
+    try {
+      const url = new URL(apiUrl("/wallet/statement"));
+      url.searchParams.set("address", backendWalletAddress);
+      url.searchParams.set("limit", "60");
+      url.searchParams.set("source", "onchain");
+      const cacheKey = url.toString();
+      const cachedEntry = peekCachedStatement(cacheKey);
+      const cached = cachedEntry?.data || null;
+      if (cached && typeof cached === "object") {
+        hadCached = true;
+        setGlobalMovements(Array.isArray(cached?.movements) ? cached.movements : []);
+        setGlobalHasMore(Boolean(cached?.hasMore));
+        setGlobalCursorNext(cached?.cursorNext || null);
+      }
+    } catch {
+      // ignore cache hydration errors
+    }
+
+    if (!hadCached) setGlobalLoading(true);
+    else setGlobalLoading(false);
     try {
       const data = await fetchStatement(
         {
@@ -162,11 +186,13 @@ export default function WalletDashboardStatementModals({
         err?.message ||
           t("ui_statement_load_failed_9b1c7a2d5e", "Failed to load statement."),
       );
-      setGlobalMovements([]);
-      setGlobalHasMore(false);
-      setGlobalCursorNext(null);
+      if (!hadCached) {
+        setGlobalMovements([]);
+        setGlobalHasMore(false);
+        setGlobalCursorNext(null);
+      }
     } finally {
-      setGlobalLoading(false);
+      if (!hadCached) setGlobalLoading(false);
     }
   }, [backendWalletAddress, canFetchStatements, fetchStatement, t]);
 
@@ -218,10 +244,33 @@ export default function WalletDashboardStatementModals({
         .toUpperCase();
       if (!code) return;
 
-      setCurrencyLoading(true);
       setCurrencyError(null);
-      setCurrencyTransactions([]);
-      setCurrencyStatementMonths([]);
+
+      // SWR hydration (stale ok): show first page immediately if cached.
+      let hadCached = false;
+      try {
+        const url = new URL(apiUrl("/wallet/statement"));
+        url.searchParams.set("address", backendWalletAddress);
+        url.searchParams.set("currencyCode", code);
+        url.searchParams.set("limit", "100");
+        url.searchParams.set("source", "onchain");
+        const cacheKey = url.toString();
+        const cachedEntry = peekCachedStatement(cacheKey);
+        const cached = cachedEntry?.data || null;
+        if (cached && typeof cached === "object") {
+          hadCached = true;
+          setCurrencyTransactions(Array.isArray(cached?.transactions) ? cached.transactions : []);
+          setCurrencyStatementMonths(Array.isArray(cached?.statementMonths) ? cached.statementMonths : []);
+        }
+      } catch {
+        // ignore
+      }
+
+      setCurrencyLoading(!hadCached);
+      if (!hadCached) {
+        setCurrencyTransactions([]);
+        setCurrencyStatementMonths([]);
+      }
       setCurrencyHasMore(false);
       setCurrencyCursorNext(null);
       setCurrencyBalanceAfterNext(null);
@@ -279,13 +328,15 @@ export default function WalletDashboardStatementModals({
               "Failed to load statement.",
             ),
         );
-        setCurrencyTransactions([]);
-        setCurrencyStatementMonths([]);
-        setCurrencyHasMore(false);
-        setCurrencyCursorNext(null);
-        setCurrencyBalanceAfterNext(null);
+        if (!hadCached) {
+          setCurrencyTransactions([]);
+          setCurrencyStatementMonths([]);
+          setCurrencyHasMore(false);
+          setCurrencyCursorNext(null);
+          setCurrencyBalanceAfterNext(null);
+        }
       } finally {
-        setCurrencyLoading(false);
+        if (!hadCached) setCurrencyLoading(false);
       }
     },
     [backendWalletAddress, canFetchStatements, fetchStatement, t],

@@ -19,6 +19,7 @@ import {
   listCachedStatementKeys,
   setCachedStatement,
 } from "@/lib/walletStatementCache";
+import { peekCachedBalance, setCachedBalance } from "@/lib/walletBalanceCache";
 import { decodeXrplCurrencyCode } from "@/utils/xrpl";
 
 export function useWalletCore({ logPrefix = "Wallet" } = {}) {
@@ -33,6 +34,15 @@ export function useWalletCore({ logPrefix = "Wallet" } = {}) {
 
   /** Stable ref — always holds the current wallet address for callbacks */
   const walletRef = useRef("");
+  const warmFullReplayTimeoutRef = useRef(null);
+  const warmFullReplayLastAddressRef = useRef("");
+
+  const clearWarmFullReplayTimeout = useCallback(() => {
+    if (warmFullReplayTimeoutRef.current) {
+      clearTimeout(warmFullReplayTimeoutRef.current);
+      warmFullReplayTimeoutRef.current = null;
+    }
+  }, []);
 
   // ─── fetchBalance ────────────────────────────────────────────────
   const fetchBalance = useCallback(async (address) => {
@@ -57,6 +67,23 @@ export function useWalletCore({ logPrefix = "Wallet" } = {}) {
           xrpLowAlert: Boolean(data.xrpLowAlert),
           tokens,
         });
+        try {
+          setCachedBalance(address, {
+            isWalletActivated: true,
+            balance: {
+              xrp: data.xrp,
+              xrpReserveBase: data.xrpReserveBase ?? null,
+              xrpReserveInc: data.xrpReserveInc ?? null,
+              xrpOwnerCount: data.xrpOwnerCount ?? null,
+              xrpReserved: data.xrpReserved ?? 0,
+              xrpAvailable: data.xrpAvailable ?? 0,
+              xrpLowAlert: Boolean(data.xrpLowAlert),
+              tokens,
+            },
+          });
+        } catch {
+          // ignore cache write errors
+        }
         return;
       }
       if (
@@ -66,7 +93,7 @@ export function useWalletCore({ logPrefix = "Wallet" } = {}) {
           .includes("not activated")
       ) {
         setIsWalletActivated(false);
-        setBalance({
+        const emptyBalance = {
           xrp: 0,
           xrpReserveBase: null,
           xrpReserveInc: null,
@@ -75,7 +102,13 @@ export function useWalletCore({ logPrefix = "Wallet" } = {}) {
           xrpAvailable: 0,
           xrpLowAlert: false,
           tokens: [],
-        });
+        };
+        setBalance(emptyBalance);
+        try {
+          setCachedBalance(address, { isWalletActivated: false, balance: emptyBalance });
+        } catch {
+          // ignore
+        }
       }
     } catch (error) {
       console.error(`[${logPrefix}] Fetch balance error:`, error);
@@ -108,6 +141,56 @@ export function useWalletCore({ logPrefix = "Wallet" } = {}) {
       // best-effort
     }
   }, []);
+
+  const scheduleWarmFullReplay = useCallback(
+    (address) => {
+      const addr = String(address || "").trim();
+      if (!addr) return;
+
+      clearWarmFullReplayTimeout();
+      warmFullReplayLastAddressRef.current = addr;
+
+      // Skip aggressive warm-up when we already have any statement cache for this wallet
+      // (or when we warmed up recently). This reduces cold-start network pressure.
+      try {
+        const cacheKeys = listCachedStatementKeys();
+        const hasAnyForAddress = cacheKeys.some(
+          (key) =>
+            key.includes("/wallet/statement") &&
+            key.includes(`address=${encodeURIComponent(addr)}`),
+        );
+        const lastWarmKey = `xcannes_wallet_last_warm_full_replay:${addr}`;
+        const lastWarm =
+          typeof window !== "undefined"
+            ? Number(window.localStorage?.getItem(lastWarmKey) || 0)
+            : 0;
+        const warmedRecently = Number.isFinite(lastWarm) && Date.now() - lastWarm < 20 * 60 * 1000;
+        if (hasAnyForAddress && warmedRecently) return;
+      } catch {
+        // ignore
+      }
+
+      warmFullReplayTimeoutRef.current = setTimeout(() => {
+        try {
+          if (walletRef.current !== addr) return;
+          warmFullReplay(addr);
+          try {
+            if (typeof window !== "undefined") {
+              window.localStorage?.setItem(
+                `xcannes_wallet_last_warm_full_replay:${addr}`,
+                String(Date.now()),
+              );
+            }
+          } catch {
+            // ignore
+          }
+        } catch {
+          // best-effort only
+        }
+      }, 2200);
+    },
+    [clearWarmFullReplayTimeout, warmFullReplay],
+  );
 
   // ─── refreshCachedStatementsForAddress ────────────────────────────
   const refreshCachedStatementsForAddress = useCallback(async (address) => {
@@ -153,36 +236,66 @@ export function useWalletCore({ logPrefix = "Wallet" } = {}) {
   // ─── activateWallet / deactivateWallet ────────────────────────────
   const activateWallet = useCallback(
     (account) => {
+      clearWarmFullReplayTimeout();
       walletRef.current = account;
       setWallet(account);
       setIsConnected(true);
       setIsWalletActivated(null);
+      try {
+        const cached = peekCachedBalance(account);
+        const snapshot = cached?.data || null;
+        if (snapshot && typeof snapshot === "object") {
+          if (typeof snapshot.isWalletActivated === "boolean") {
+            setIsWalletActivated(snapshot.isWalletActivated);
+          }
+          if (snapshot.balance) {
+            setBalance(snapshot.balance);
+          }
+        }
+      } catch {
+        // ignore hydration errors
+      }
       fetchBalance(account);
-      warmFullReplay(account);
+      scheduleWarmFullReplay(account);
     },
-    [fetchBalance, warmFullReplay]
+    [clearWarmFullReplayTimeout, fetchBalance, scheduleWarmFullReplay]
   );
 
   const deactivateWallet = useCallback(() => {
+    clearWarmFullReplayTimeout();
     walletRef.current = "";
     setWallet("");
     setIsConnected(false);
     setBalance(null);
     setIsWalletActivated(null);
-  }, []);
+  }, [clearWarmFullReplayTimeout]);
 
   // ─── switchToWallet (reset balance then re-fetch) ─────────────────
   const switchToWallet = useCallback(
     (address) => {
       if (!address) return;
+      clearWarmFullReplayTimeout();
       walletRef.current = address;
       setWallet(address);
       setIsWalletActivated(null);
-      setBalance(null);
+      try {
+        const cached = peekCachedBalance(address);
+        const snapshot = cached?.data || null;
+        if (snapshot && typeof snapshot === "object" && snapshot.balance) {
+          if (typeof snapshot.isWalletActivated === "boolean") {
+            setIsWalletActivated(snapshot.isWalletActivated);
+          }
+          setBalance(snapshot.balance);
+        } else {
+          setBalance(null);
+        }
+      } catch {
+        setBalance(null);
+      }
       fetchBalance(address);
-      warmFullReplay(address);
+      scheduleWarmFullReplay(address);
     },
-    [fetchBalance, warmFullReplay]
+    [clearWarmFullReplayTimeout, fetchBalance, scheduleWarmFullReplay]
   );
 
   // ─── refreshBalance ──────────────────────────────────────────────
