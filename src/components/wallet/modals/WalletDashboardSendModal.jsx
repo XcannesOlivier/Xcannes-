@@ -123,28 +123,44 @@ export default function WalletDashboardSendModal({
     normalizedSendAmount > 0;
   const hasPaymentRequest = Boolean(sendPaymentRequest);
 
-  // ── Insufficient balance detection (shared logic, payreq + manual) ──
-  const { insufficientBalance, manualInsufficientBalance } = useMemo(() => {
-    const check = (requiresPayreq) => {
-      const hasPayreq = Boolean(sendPaymentRequest);
-      if (requiresPayreq ? !hasPayreq : hasPayreq) return null;
-      if (!selectedSendToken) return null;
-      const requiredAmount = Number(sendAmount || 0);
-      if (!Number.isFinite(requiredAmount) || requiredAmount <= 0) return null;
-      // Trustline-only tokens (EUR, GBP, etc.) are backed by RLUSD allocation.
-      // In payreq mode, sendFxInfo.paymentRlusd provides the RLUSD estimate.
-      if (selectedSendToken.isTrustlineOnly) {
-        const code = String(selectedSendToken?.currency || "").trim().toUpperCase();
-        const requiredRlusd =
-          code === "USD" ? requiredAmount : Number(sendFxInfo?.paymentRlusd);
-        const availableAllocatedRlusd = Number(selectedSendToken.allocatedRlusd);
-        if (!Number.isFinite(requiredRlusd) || requiredRlusd <= 0) return null;
-        if (!Number.isFinite(availableAllocatedRlusd) || availableAllocatedRlusd < 0) return null;
-        if (availableAllocatedRlusd >= requiredRlusd) return null;
-        const rlusdPerUnit = code === "USD" ? 1 : (requiredRlusd / requiredAmount);
-        const availableUnits = rlusdPerUnit > 0 ? availableAllocatedRlusd / rlusdPerUnit : 0;
-        return { availableUnits };
-      }
+	  // ── Insufficient balance detection (shared logic, payreq + manual) ──
+	  const { insufficientBalance, manualInsufficientBalance } = useMemo(() => {
+	    const check = (requiresPayreq) => {
+	      const hasPayreq = Boolean(sendPaymentRequest);
+	      if (requiresPayreq ? !hasPayreq : hasPayreq) return null;
+	      if (!selectedSendToken) return null;
+	      const requiredAmount = Number(sendAmount || 0);
+	      if (!Number.isFinite(requiredAmount) || requiredAmount <= 0) return null;
+	      // Trustline-only tokens (EUR, GBP, etc.) are backed by RLUSD allocation.
+	      // In payreq mode, prefer the RLUSD amount embedded in the request (amountRlusd / fxRate),
+	      // then fall back to sendFxInfo.paymentRlusd when available.
+	      if (selectedSendToken.isTrustlineOnly) {
+	        const code = String(selectedSendToken?.currency || "").trim().toUpperCase();
+	        let requiredRlusd = Number.NaN;
+	        if (code === "USD") {
+	          requiredRlusd = requiredAmount;
+	        } else if (hasPayreq) {
+	          const payreqAmountRlusd = Number(sendPaymentRequest?.amountRlusd);
+	          if (Number.isFinite(payreqAmountRlusd) && payreqAmountRlusd > 0) {
+	            requiredRlusd = payreqAmountRlusd;
+	          } else {
+	            const payreqFxRate = Number(sendPaymentRequest?.fxRate);
+	            if (Number.isFinite(payreqFxRate) && payreqFxRate > 0) {
+	              requiredRlusd = requiredAmount * payreqFxRate;
+	            }
+	          }
+	        }
+	        if (!Number.isFinite(requiredRlusd) || requiredRlusd <= 0) {
+	          requiredRlusd = Number(sendFxInfo?.paymentRlusd);
+	        }
+	        const availableAllocatedRlusd = Number(selectedSendToken.allocatedRlusd);
+	        if (!Number.isFinite(requiredRlusd) || requiredRlusd <= 0) return null;
+	        if (!Number.isFinite(availableAllocatedRlusd) || availableAllocatedRlusd < 0) return null;
+	        if (availableAllocatedRlusd >= requiredRlusd) return null;
+	        const rlusdPerUnit = code === "USD" ? 1 : (requiredRlusd / requiredAmount);
+	        const availableUnits = rlusdPerUnit > 0 ? availableAllocatedRlusd / rlusdPerUnit : 0;
+	        return { availableUnits };
+	      }
       const available = Number(selectedSendToken.value || 0);
       if (!Number.isFinite(available)) return null;
       if (available >= requiredAmount) return null;
@@ -1195,8 +1211,8 @@ export default function WalletDashboardSendModal({
       ? (insufficientBalance || selfSendBlocked)
       : (!canManualSend || manualInsufficientBalance || selfSendBlocked));
 
-	  const selfSendWarningNode = (
-	    <span className="inline-flex items-center gap-1.5">
+		  const selfSendWarningNode = (
+		    <span className="inline-flex items-center gap-1.5">
 	      <svg viewBox="0 0 24 24" className="w-4 h-4 flex-shrink-0 text-white" fill="none" aria-hidden>
 	        <path d="M12 3.5L21.5 20H2.5L12 3.5Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
 	        <path d="M12 10v4.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
@@ -1206,10 +1222,10 @@ export default function WalletDashboardSendModal({
 	    </span>
 	  );
 
-	  const payreqWarningMessage = hasPaymentRequest && !sendProcessing
-	    ? (selfSendBlocked
-	        ? selfSendWarningNode
-	        : insufficientBalance
+		  const payreqWarningMessage = hasPaymentRequest && !sendProcessing
+		    ? (selfSendBlocked
+		        ? selfSendWarningNode
+		        : insufficientBalance
 	          ? (
 	              <span className="inline-flex items-center gap-1.5">
 	                <svg viewBox="0 0 24 24" className="w-4 h-4 flex-shrink-0 text-white" fill="none" aria-hidden>
@@ -1227,8 +1243,58 @@ export default function WalletDashboardSendModal({
 	                )}</span>
 	              </span>
 	            )
-	          : null)
-	    : null;
+		          : null)
+		    : null;
+
+		  const payreqWarningText = hasPaymentRequest && !sendProcessing
+		    ? (selfSendBlocked
+		        ? t("ui_cannot_send_to_self_short", "Comptes expéditeur et destinataire identiques.")
+		        : insufficientBalance
+		          ? t(
+		              "ui_insufficient_balance_short",
+		              "Solde insuffisant. Disponible : {{amount}} {{currency}}",
+		              {
+		                amount: Number(insufficientBalance?.availableUnits || 0).toLocaleString(locale, {
+		                  maximumFractionDigits: 2,
+		                }),
+		                currency: String(requestCurrencyCode || selectedSendToken?.currency || "")
+		                  .toUpperCase(),
+		              },
+		            )
+		          : "")
+		    : "";
+
+		  const WarningTriangle = ({ className = "w-4 h-4" } = {}) => (
+		    <svg
+		      viewBox="0 0 24 24"
+		      className={className}
+		      fill="none"
+		      aria-hidden
+		    >
+		      <path
+		        d="M12 3.5L21.5 20H2.5L12 3.5Z"
+		        stroke="currentColor"
+		        strokeWidth="1.6"
+		        strokeLinejoin="round"
+		      />
+		      <path
+		        d="M12 10v4.5"
+		        stroke="currentColor"
+		        strokeWidth="1.6"
+		        strokeLinecap="round"
+		      />
+		      <circle cx="12" cy="17.25" r="0.9" fill="currentColor" />
+		    </svg>
+		  );
+
+		  const renderCtaError = (message, { paddingXClass } = { paddingXClass: "px-4" }) => (
+		    <span className={`block ${paddingXClass} text-[15px] leading-snug text-white/90 normal-case whitespace-normal`}>
+		      <span className="inline-flex items-start gap-1.5">
+		        <WarningTriangle className="w-4 h-4 flex-shrink-0 mt-[2px] text-white/95" />
+		        <span>{message}</span>
+		      </span>
+		    </span>
+		  );
 
 	  const manualWarningMessage = !hasPaymentRequest && !sendProcessing && !hasMoonpaySellRequest
 	    ? (selfSendBlocked
@@ -1315,9 +1381,9 @@ export default function WalletDashboardSendModal({
                 <span className="send-modal-dot" style={{ animationDelay: '1.2s' }}>·</span>
               </span>
             </span>
-          : sendButtonDisabled && !sendProcessing && hasPaymentRequest && payreqWarningMessage
-            ? <span className="block px-3 text-[13px] leading-snug text-white/90 normal-case whitespace-normal">{payreqWarningMessage}</span>
-            : sendButtonLabel}
+	          : sendButtonDisabled && !sendProcessing && hasPaymentRequest && payreqWarningText
+	            ? renderCtaError(payreqWarningText, { paddingXClass: "px-3" })
+	            : sendButtonLabel}
       </button>
 	      <button
 	        type="button"
@@ -1360,9 +1426,9 @@ export default function WalletDashboardSendModal({
                 <span className="send-modal-dot" style={{ animationDelay: '1.2s' }}>·</span>
               </span>
             </span>
-          : sendButtonDisabled && !sendProcessing && hasPaymentRequest && payreqWarningMessage
-            ? <span className="block px-4 text-[15px] leading-snug text-white/90 normal-case whitespace-normal">{payreqWarningMessage}</span>
-            : sendButtonLabel}
+	          : sendButtonDisabled && !sendProcessing && hasPaymentRequest && payreqWarningText
+	            ? renderCtaError(payreqWarningText, { paddingXClass: "px-4" })
+	            : sendButtonLabel}
       </button>
       <style>{`
         @keyframes sendModalDotBlink {
