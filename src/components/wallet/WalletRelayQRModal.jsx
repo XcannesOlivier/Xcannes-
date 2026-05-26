@@ -176,22 +176,22 @@ export default function WalletRelayQRModal() {
         if (e.target === e.currentTarget) handleClose();
       }}
     >
-      <div
-        className={`relative w-full max-w-sm rounded-2xl border border-white/10 bg-xcannes-surface-demo overflow-hidden p-6 shadow-2xl transition-all duration-250 ${
-          closing ? "scale-95 opacity-0" : "scale-100 opacity-100"
-        }`}
-      >
+	      <div
+	        className={`relative w-full max-w-sm rounded-2xl border border-white/10 bg-xcannes-surface-demo overflow-hidden p-6 shadow-2xl transition-all duration-250 ${
+	          closing ? "scale-95 opacity-0" : "scale-100 opacity-100"
+	        }`}
+	      >
         <div className="pointer-events-none absolute inset-0" aria-hidden>
           <div className="absolute inset-0 bg-xcannes-surface-demo bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.06),transparent_60%),radial-gradient(ellipse_at_bottom,rgba(255,255,255,0.025),transparent_55%)]" />
           <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-black/5 to-black/70" />
         </div>
-        {/* Close button */}
-        <button
-          type="button"
-          onClick={handleClose}
-          className="absolute top-3 right-3 z-20 p-1.5 text-white/45 hover:text-white/75 transition-colors"
-          aria-label={t("close")}
-        >
+	        {/* Close button */}
+	        <button
+	          type="button"
+	          onClick={handleClose}
+	          className="absolute top-4 right-4 z-20 p-2 text-white/45 hover:text-white/75 transition-colors"
+	          aria-label={t("close")}
+	        >
           <svg
             className="w-5 h-5"
             fill="none"
@@ -204,13 +204,13 @@ export default function WalletRelayQRModal() {
           </svg>
         </button>
 
-        <div className="relative z-10">
+	        <div className="relative z-10">
 
-        {/* Title */}
-        <h3 className="text-lg font-semibold text-white mb-1">{titleText}</h3>
-        <p className="text-sm text-white/60 mb-6">
-          {subtitleText}
-        </p>
+	        {/* Title */}
+	        <h3 className="text-lg font-semibold text-white mb-1 pr-10 pt-2">{titleText}</h3>
+	        <p className="text-sm text-white/60 mb-6 pr-10">
+	          {subtitleText}
+	        </p>
 
         {/* QR Code / Mobile redirect */}
         <div className="flex justify-center mb-6">
