@@ -990,6 +990,19 @@ export default function WalletDashboardUsdSwapModal({
     () => pick(exchangeResolved, ["networkFrom"], fromNetwork).toUpperCase(),
     [exchangeResolved, fromNetwork],
   );
+  const partnerFromNetworkLabel = useMemo(() => {
+    const raw = String(partnerFromNetwork || "").trim();
+    const upper = raw.toUpperCase();
+    if (upper === "ETH" || upper === "ETHEREUM" || upper === "ERC20") return "Ethereum";
+    if (upper === "TRX" || upper === "TRON" || upper === "TRC20") return "Tron";
+    if (upper === "BSC" || upper === "BNB" || upper === "BEP20") return "BSC";
+    if (upper === "POLYGON" || upper === "MATIC") return "Polygon";
+    if (upper === "ARBITRUM" || upper === "ARB") return "Arbitrum";
+    if (upper === "OPTIMISM" || upper === "OP") return "Optimism";
+    if (upper === "BASE") return "Base";
+    if (upper === "SOL" || upper === "SOLANA") return "Solana";
+    return raw ? raw.charAt(0).toUpperCase() + raw.slice(1).toLowerCase() : "";
+  }, [partnerFromNetwork]);
   const partnerToTicker = useMemo(
     () => pick(exchangeResolved, ["tickerTo"], toTicker).toUpperCase(),
     [exchangeResolved, toTicker],
@@ -1007,23 +1020,8 @@ export default function WalletDashboardUsdSwapModal({
     if (direction !== SWAP_DIRECTIONS.STABLE_TO_RLUSD) {
       return t("ui_send_your_funds", "Envoyer vos stablecoins");
     }
-    const asset = String(partnerFromTicker || "").trim();
-    const network = String(partnerFromNetwork || "").trim();
-    if (asset && network) {
-      return t("ui_send_your_asset_network", {
-        defaultValue: "Envoyer vos {{asset}} {{network}}",
-        asset,
-        network,
-      });
-    }
-    if (asset) {
-      return t("ui_send_your_asset", {
-        defaultValue: "Envoyer vos {{asset}}",
-        asset,
-      });
-    }
-    return t("ui_send_your_funds", "Envoyer vos stablecoins");
-  }, [direction, partnerFromNetwork, partnerFromTicker, t]);
+    return t("ui_deposit_your_stablecoins", "Déposez vos stablecoins");
+  }, [direction, t]);
 
   const humanStatusLabel = useMemo(() => {
     const raw = String(status || "").trim().toLowerCase();
@@ -2351,34 +2349,35 @@ export default function WalletDashboardUsdSwapModal({
                           "ui_usd_swap_created_body_from_wallet_xrp",
                           "Le flow prépare un swap RLUSD → XRP sur XRPL, puis envoie automatiquement le XRP exact vers SimpleSwap.",
                         )
-                      : t(
-                          "ui_usd_swap_created_body_external_xrp",
-                          "Envoyez le stablecoin que vous avez choisi vers SimpleSwap.",
-                        )}
-                  </div>
-                </div>
+	                      : t(
+	                          "ui_usd_swap_created_body_external_xrp",
+	                          "Envoyez le montant indiqué depuis votre wallet. Nous nous occupons de la conversion et du crédit sur votre compte.",
+	                        )}
+	                  </div>
+	                </div>
 
                 {apiError ? (
                   <ErrorBanner>{apiError}</ErrorBanner>
                 ) : null}
 
-                <div className="rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-black/20">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <div className="text-white/60 text-xs">
-                        {t("ui_usd_swap_send_amount", "Montant à envoyer")}
-                      </div>
-                      <div className="text-white font-semibold text-lg leading-tight">
-                        {sendAmountExact || (hasValidAmount ? parsedAmount : "—")}{" "}
-                        {partnerFromTicker || ""}
-                      </div>
-                    </div>
-                    {partnerFromNetwork ? (
-                      <span className="shrink-0 rounded-full bg-white/10 text-white/70 text-xs font-semibold px-2.5 py-1">
-                        {partnerFromNetwork}
-                      </span>
-                    ) : null}
-                  </div>
+	                <div className="rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-black/20">
+	                  <div className="min-w-0">
+	                    <div className="text-white/60 text-xs">
+	                      {t("ui_to_send_short", "À envoyer")}
+	                    </div>
+	                    <div className="text-white font-semibold text-lg leading-tight">
+	                      {sendAmountExact || (hasValidAmount ? parsedAmount : "—")}{" "}
+	                      {partnerFromTicker || ""}
+	                    </div>
+	                    {partnerFromNetworkLabel ? (
+	                      <div className="mt-1 text-white/70 text-sm">
+	                        {t("ui_network_label", {
+	                          defaultValue: "Réseau : {{network}}",
+	                          network: partnerFromNetworkLabel,
+	                        })}
+	                      </div>
+	                    ) : null}
+	                  </div>
 
 	                  <div className="mt-3 border-t border-white/10 pt-3 space-y-3 text-sm text-white/80">
 	                    {depositAddress ? (
@@ -2386,7 +2385,7 @@ export default function WalletDashboardUsdSwapModal({
 	                        <div className="flex items-start justify-between gap-3">
 	                          <div className="min-w-0">
 	                            <div className="text-white/60 text-xs">
-	                              {t("ui_usd_swap_deposit_address", "Adresse de dépôt")}
+	                              {t("ui_usd_swap_receive_address", "Adresse de réception")}
 	                            </div>
 	                            <div className="font-mono break-all">{depositAddress}</div>
 	                          </div>
@@ -2397,7 +2396,7 @@ export default function WalletDashboardUsdSwapModal({
 	                            }
 	                            className="shrink-0 rounded-lg bg-white/10 hover:bg-white/15 text-white/80 text-xs font-semibold px-3 py-2"
 	                          >
-	                            {t("ui_copy", "Copier")}
+	                            {t("ui_copy_address", "Copier l’adresse")}
 	                          </button>
 	                        </div>
 	                        {depositExtraId ? (
@@ -2424,7 +2423,7 @@ export default function WalletDashboardUsdSwapModal({
 	                      <div className="flex items-start justify-between gap-3">
 	                        <div className="min-w-0">
 	                          <div className="text-white/60 text-xs">
-	                            {t("ui_usd_swap_deposit_address", "Adresse de dépôt")}
+	                            {t("ui_usd_swap_receive_address", "Adresse de réception")}
 	                          </div>
 	                          <div className="text-white/70 text-sm">
 	                            {exchangeRefreshing
@@ -2446,51 +2445,33 @@ export default function WalletDashboardUsdSwapModal({
 	                      </div>
 	                    ) : null}
 
-	                    {exchangeId ? (
-	                      <div className="flex items-start justify-between gap-3">
-	                        <div className="min-w-0">
-	                          <div className="text-white/60 text-xs">
-	                            {t("ui_usd_swap_exchange_id", "ID de suivi")}
-	                          </div>
-	                          <div className="font-mono break-all">{exchangeId}</div>
-	                        </div>
-	                        <button
-	                          type="button"
-	                          onClick={() =>
-	                            navigator?.clipboard?.writeText(exchangeId).catch(() => {})
-	                          }
-	                          className="shrink-0 rounded-lg bg-white/10 hover:bg-white/15 text-white/80 text-xs font-semibold px-3 py-2"
-	                        >
-	                          {t("ui_copy", "Copier")}
-	                        </button>
-	                      </div>
-	                    ) : null}
+                    {exchangeId && direction !== SWAP_DIRECTIONS.STABLE_TO_RLUSD ? (
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <div className="text-white/60 text-xs">
+                            {t("ui_usd_swap_exchange_id", "ID de suivi")}
+                          </div>
+                          <div className="font-mono break-all">{exchangeId}</div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            navigator?.clipboard?.writeText(exchangeId).catch(() => {})
+                          }
+                          className="shrink-0 rounded-lg bg-white/10 hover:bg-white/15 text-white/80 text-xs font-semibold px-3 py-2"
+                        >
+                          {t("ui_copy", "Copier")}
+                        </button>
+                      </div>
+                    ) : null}
 
-	                    {status ? (
-	                      <div className="space-y-1">
-	                        <div className="text-white/60 text-xs">
-	                          {t("ui_usd_swap_status", "Statut")}
-	                        </div>
-	                        <div className="text-white font-semibold">
-	                          {humanStatusLabel || status}
-	                        </div>
-	                        {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD ? (
-	                          <div className="text-white/55 text-xs leading-snug">
-	                            {t(
-	                              "ui_usd_swap_waiting_for_deposit",
-	                              "Nous attendons la réception des fonds sur le réseau sélectionné.",
-	                            )}
-	                          </div>
-	                        ) : null}
-	                      </div>
-	                    ) : null}
 	                  </div>
 
 	                  {depositAddress ? (
 	                    <div className="mt-4 flex justify-center">
 	                      <div className="w-full">
 	                        <div className="text-center text-white/65 text-xs font-semibold tracking-wide mb-2">
-	                          {t("ui_usd_swap_scan_deposit_address", "Scanner l’adresse de dépôt")}
+	                          {t("ui_usd_swap_scan_with_wallet", "Scanner avec votre wallet")}
 	                        </div>
 	                        <div className="flex justify-center">
 	                          <div className="rounded-2xl bg-white p-3">
@@ -2500,6 +2481,27 @@ export default function WalletDashboardUsdSwapModal({
 	                      </div>
 	                    </div>
 	                  ) : null}
+
+	                  {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD || status ? (
+	                    <div className="mt-4 space-y-1">
+	                      <div className="text-white/60 text-xs">
+	                        {t("ui_usd_swap_status", "Statut")}
+	                      </div>
+	                      <div className="text-white font-semibold">
+	                        {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD
+	                          ? t("ui_usd_swap_status_waiting_user_send", "En attente de votre envoi")
+	                          : (humanStatusLabel || status)}
+	                      </div>
+	                      {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD ? (
+	                        <div className="text-white/55 text-xs leading-snug">
+	                          {t(
+	                            "ui_usd_swap_auto_detect_after_receive",
+	                            "Nous détecterons automatiquement les fonds après réception.",
+	                          )}
+	                        </div>
+	                      ) : null}
+	                    </div>
+	                  ) : null}
 	                </div>
 
 	                {partnerToTicker ? (
@@ -2507,7 +2509,7 @@ export default function WalletDashboardUsdSwapModal({
 	                    <div className="flex items-center justify-between gap-3">
 	                      <div className="text-white/60 text-xs">
 	                        {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD
-	                          ? t("ui_estimated_receive_amount", "Montant estimé à recevoir")
+	                          ? t("ui_you_will_receive_about", "Vous recevrez environ")
 	                          : t("ui_you_get", "Vous recevez")}
 	                      </div>
 	                      {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE && partnerToNetwork ? (
@@ -2516,39 +2518,52 @@ export default function WalletDashboardUsdSwapModal({
 	                        </span>
                       ) : null}
                     </div>
-	                    <div className="mt-1 text-white font-semibold text-lg leading-tight">
-	                      {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD
-                        ? (Number.isFinite(Number(receiveDisplayAmount)) && Number(receiveDisplayAmount) > 0
-                            ? `≈${formatAmountNumber ? formatAmountNumber.format(Number(receiveDisplayAmount)) : String(receiveDisplayAmount)} ${selectedSourceCurrencyCode}`
-                            : `— ${selectedSourceCurrencyCode}`)
-                        : (String(receiveAmountExact || "").trim()
-                            ? `${receiveAmountExact} ${partnerToTicker}`
-                            : quotedReceiveAmount
-                              ? `≈${formatAmountNumber ? formatAmountNumber.format(quotedReceiveAmount) : String(quotedReceiveAmount)} ${partnerToTicker}`
-	                              : `— ${partnerToTicker}`)}
-	                    </div>
-	                    {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD ? (
-	                      <div className="mt-2 text-white/55 text-xs leading-snug">
-	                        {t(
-	                          "ui_usd_swap_receive_amount_disclaimer",
-	                          "Le montant final peut varier selon le taux appliqué au moment de la conversion.",
-	                        )}
-	                      </div>
-	                    ) : null}
+		                    <div className="mt-1 text-white font-semibold text-lg leading-tight">
+		                      {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD
+	                        ? (Number.isFinite(Number(receiveDisplayAmount)) && Number(receiveDisplayAmount) > 0
+	                            ? `${formatAmountNumber ? formatAmountNumber.format(Number(receiveDisplayAmount)) : String(receiveDisplayAmount)} ${selectedSourceCurrencyCode}`
+	                            : `— ${selectedSourceCurrencyCode}`)
+	                        : (String(receiveAmountExact || "").trim()
+	                            ? `${receiveAmountExact} ${partnerToTicker}`
+	                            : quotedReceiveAmount
+	                              ? `≈${formatAmountNumber ? formatAmountNumber.format(quotedReceiveAmount) : String(quotedReceiveAmount)} ${partnerToTicker}`
+		                              : `— ${partnerToTicker}`)}
+		                    </div>
+		                    {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD ? (
+		                      <div className="mt-2 text-white/55 text-xs leading-snug">
+		                        {t(
+		                          "ui_usd_swap_receive_amount_disclaimer",
+		                          "Le montant final peut légèrement varier pendant la conversion.",
+		                        )}
+		                      </div>
+		                    ) : null}
 	                  </div>
 	                ) : null}
 
-                <WarnBanner>
-                  {t(
-                    "ui_usd_swap_warning",
-                    `Attention : envoyez uniquement ${partnerFromTicker || "l'actif sélectionné"} (${partnerFromNetwork || "réseau sélectionné"}). Envoyer un autre actif ou oublier un Tag/Memo peut entraîner une perte.`,
-                  )}
-                </WarnBanner>
+	                <WarnBanner>
+	                  {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD ? (
+	                    <span className="whitespace-pre-line">
+	                      {t(
+	                        "ui_usd_swap_warning_sell",
+	                        `Important : envoyez uniquement ${
+	                          sendAmountExact || (hasValidAmount ? parsedAmount : "le montant indiqué")
+	                        } ${partnerFromTicker || "l'actif sélectionné"} sur ${
+	                          partnerFromNetworkLabel || "le réseau sélectionné"
+	                        }.\nUn autre actif ou un autre réseau peut entraîner une perte des fonds.`,
+	                      )}
+	                    </span>
+	                  ) : (
+	                    t(
+	                      "ui_usd_swap_warning",
+	                      `Attention : envoyez uniquement ${partnerFromTicker || "l'actif sélectionné"} (${partnerFromNetwork || "réseau sélectionné"}). Envoyer un autre actif ou oublier un Tag/Memo peut entraîner une perte.`,
+	                    )
+	                  )}
+	                </WarnBanner>
 
-                <div className="flex gap-2">
-                  {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE ? (
-                    <button
-                      type="button"
+		                <div className="flex gap-2">
+	                  {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE ? (
+	                    <button
+	                      type="button"
                       onClick={handleExecuteOutboundSwapAndDeposit}
                       disabled={swapSubmitting || !preparedSwap?.txjson || !depositAddress}
                       className={`flex-1 py-3 ${actionBtnBase}`}
@@ -2558,20 +2573,23 @@ export default function WalletDashboardUsdSwapModal({
                         : t("ui_execute_swap_and_send_btn", "Signer le swap puis envoyer")}
                     </button>
                   ) : null}
-                  {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD ? (
-                    <button
-                      type="button"
-                      onClick={handleConvertInboundToRlusd}
-                      disabled={swapSubmitting || !signTransaction || !Number.isFinite(exactInboundXrp)}
-                      className={`flex-1 py-3 ${actionBtnBase}`}
-                    >
-                      {swapSubmitting
-                        ? t("ui_signing_swap", "Signature…")
-                        : t("ui_convert_xrp_to_rlusd", "Finaliser la transaction")}
-                    </button>
-                  ) : null}
-                </div>
-              </div>
+		                  {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD ? (
+		                    <button
+		                      type="button"
+		                      onClick={refreshExchange}
+		                      disabled={exchangeRefreshing || !exchangeId}
+		                      className={`flex-1 py-3 ${actionBtnBase}`}
+		                    >
+		                      {exchangeRefreshing
+		                        ? t("ui_usd_swap_refreshing", "Rafraîchissement…")
+		                        : t("ui_check_reception", "Vérifier la réception")}
+		                    </button>
+		                  ) : null}
+		                </div>
+		                <div className="text-center text-[12px] text-white/55">
+		                  {t("ui_simpleswap_secured_conversion", "Conversion sécurisée par SimpleSwap")}
+		                </div>
+	              </div>
             ) : (
               <div className="space-y-5 relative z-[2]">
                 {null /* Compte source masqué */}
@@ -4463,13 +4481,7 @@ export default function WalletDashboardUsdSwapModal({
 
               </div>
             )}
-            {/* Bottom indicator – mobile only */}
-            <div
-              className="md:hidden pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-[max(env(safe-area-inset-bottom),10px)] z-30"
-              aria-hidden
-            >
-              <span className="block w-36 h-1.5 rounded-full bg-white/80" />
-            </div>
+            {null /* Mobile bottom indicator removed (avoid double drag-handle) */}
           </div>
 
           {/* Bottom bar – desktop only (pinned to modal bottom) */}
@@ -4504,13 +4516,7 @@ export default function WalletDashboardUsdSwapModal({
 	          onPointerUp={handleSheetPointerUp}
 	          onPointerCancel={handleSheetPointerUp}
 	        >
-	          {/* Bottom indicator – mobile only */}
-	          <div
-	            className="md:hidden pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-[max(env(safe-area-inset-bottom),10px)] z-20"
-	            aria-hidden
-	          >
-	            <span className="block w-36 h-1.5 rounded-full bg-white/80" />
-	          </div>
+		          {null /* Mobile bottom indicator removed (avoid double drag-handle) */}
 		          <div className="px-6 pt-5 pb-8 max-h-[inherit] overflow-y-auto rounded-t-[26px]">
 	          {/* Handle — mobile uniquement */}
 	          <div className="flex justify-center mb-4 md:hidden">
@@ -4603,10 +4609,9 @@ export default function WalletDashboardUsdSwapModal({
 			              </p>
 		            </div>
 
-				            <div className="text-[14px] leading-snug text-white/80">
-				              <div className="flex gap-x-4">
-				                <div className="flex w-10 flex-col items-center">
-					                <div className="flex h-10 items-center justify-center">
+					            <div className="text-[14px] leading-snug text-white/80 space-y-8">
+					              <div className="relative isolate flex gap-x-4">
+					                <div className="relative z-10 flex w-10 justify-center">
 					                  <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-transparent", accentTextSolid].join(" ")}>
 					                    {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE ? (
 					                      <CheckCircleIcon
@@ -4623,27 +4628,36 @@ export default function WalletDashboardUsdSwapModal({
 					                    )}
 					                  </span>
 					                </div>
-				                  <div className={["relative flex-1 min-h-8 w-px", sheetAccentFlowLineVia].join(" ")}>
-				                    <span className={["absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full motion-safe:animate-pulse", sheetAccentFlowDotStrong].join(" ")} />
-				                  </div>
-				                </div>
-				                <div className="min-w-0 self-center pb-8">
-				                  <div className="text-white/90 font-semibold">
-				                    {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
-				                      ? t("ui_op_flow_swap_step1_out", "Vous confirmez la conversion")
-				                      : t("ui_op_flow_swap_step1_in", "Vous envoyez vos stablecoins")}
-				                  </div>
-				                  <div className="mt-1 text-white/55">
-				                    {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
-				                      ? t("ui_op_flow_swap_step1_out_sub", "Vous validez l’opération sur XCannes.")
-				                      : t("ui_op_flow_swap_step1_in_sub", "Vous envoyez les fonds à l’adresse SimpleSwap.")}
-				                  </div>
-				                </div>
-				              </div>
+					                <div className="relative z-10 min-w-0">
+					                  <div className="text-white/90 font-semibold">
+					                    {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
+					                      ? t("ui_op_flow_swap_step1_out", "Vous confirmez la conversion")
+					                      : t("ui_op_flow_swap_step1_in", "Vous envoyez vos stablecoins")}
+					                  </div>
+					                  <div className="mt-1 text-white/55">
+					                    {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
+					                      ? t("ui_op_flow_swap_step1_out_sub", "Vous validez l’opération sur XCannes.")
+					                      : t("ui_op_flow_swap_step1_in_sub", "Vous envoyez les fonds à l’adresse SimpleSwap.")}
+					                  </div>
+					                </div>
+					                <div
+					                  className={[
+					                    "pointer-events-none absolute left-5 top-5 w-px h-[calc(100%_+_32px)] z-0",
+					                    sheetAccentFlowLineVia,
+					                  ].join(" ")}
+					                  aria-hidden
+					                >
+					                  <span
+					                    className={[
+					                      "absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full motion-safe:animate-pulse",
+					                      sheetAccentFlowDotStrong,
+					                    ].join(" ")}
+					                  />
+					                </div>
+					              </div>
 
-				              <div className="flex gap-x-4">
-				                <div className="flex w-10 flex-col items-center">
-					                <div className="flex h-10 items-center justify-center">
+					              <div className="relative isolate flex gap-x-4">
+					                <div className="relative z-10 flex w-10 justify-center">
 					                  <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-transparent", accentTextSolid].join(" ")}>
 					                    <ArrowPathIcon
 					                      className={opFlowIconSizeClass}
@@ -4652,23 +4666,32 @@ export default function WalletDashboardUsdSwapModal({
 					                    />
 					                  </span>
 					                </div>
-				                  <div className={["relative flex-1 min-h-8 w-px", sheetAccentFlowLineVia].join(" ")}>
-				                    <span className={["absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full motion-safe:animate-pulse", sheetAccentFlowDotSoft].join(" ")} />
-				                  </div>
-				                </div>
-				                <div className="min-w-0 self-center pb-8">
-				                  <div className="text-white/90 font-semibold">
-				                    {t("ui_op_flow_step2_title", { defaultValue: "SimpleSwap traite l’opération" })}
-				                  </div>
-				                  <div className="mt-1 text-white/55">
-				                    {t("ui_op_flow_step2_subtitle", "Conversion automatique via les services de liquidité.")}
-				                  </div>
-				                </div>
-				              </div>
+					                <div className="relative z-10 min-w-0">
+					                  <div className="text-white/90 font-semibold">
+					                    {t("ui_op_flow_step2_title", { defaultValue: "SimpleSwap traite l’opération" })}
+					                  </div>
+					                  <div className="mt-1 text-white/55">
+					                    {t("ui_op_flow_step2_subtitle", "Conversion automatique via les services de liquidité.")}
+					                  </div>
+					                </div>
+					                <div
+					                  className={[
+					                    "pointer-events-none absolute left-5 top-5 w-px h-[calc(100%_+_32px)] z-0",
+					                    sheetAccentFlowLineVia,
+					                  ].join(" ")}
+					                  aria-hidden
+					                >
+					                  <span
+					                    className={[
+					                      "absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full motion-safe:animate-pulse",
+					                      sheetAccentFlowDotSoft,
+					                    ].join(" ")}
+					                  />
+					                </div>
+					              </div>
 
-				              <div className="flex gap-x-4">
-				                <div className="flex w-10 flex-col items-center">
-					                <div className="flex h-10 items-center justify-center">
+					              <div className="flex gap-x-4">
+					                <div className="flex w-10 justify-center">
 					                  <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-transparent", accentTextSolid].join(" ")}>
 					                    {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE ? (
 					                      <PaperAirplaneIcon
@@ -4685,21 +4708,20 @@ export default function WalletDashboardUsdSwapModal({
 					                    )}
 					                  </span>
 					                </div>
-				                </div>
-				                <div className="min-w-0 self-center">
-				                  <div className="text-white/90 font-semibold">
-				                    {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
-				                      ? t("ui_op_flow_swap_step3_out", "Le stablecoin est envoyé")
-				                      : t("ui_op_flow_swap_step3_in", "Votre compte XCannes est crédité")}
-				                  </div>
-				                  <div className="mt-1 text-white/55">
-				                    {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
-				                      ? t("ui_op_flow_swap_step3_out_sub", "Envoi vers l’adresse de réception une fois validé.")
-				                      : t("ui_op_flow_swap_step3_in_sub", "Crédit RLUSD après réception des XRP.")}
-				                  </div>
-				                </div>
-				              </div>
-				            </div>
+					                <div className="relative z-10 min-w-0">
+					                  <div className="text-white/90 font-semibold">
+					                    {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
+					                      ? t("ui_op_flow_swap_step3_out", "Le stablecoin est envoyé")
+					                      : t("ui_op_flow_swap_step3_in", "Votre compte XCannes est crédité")}
+					                  </div>
+					                  <div className="mt-1 text-white/55">
+					                    {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
+					                      ? t("ui_op_flow_swap_step3_out_sub", "Envoi vers l’adresse de réception une fois validé.")
+					                      : t("ui_op_flow_swap_step3_in_sub", "Crédit RLUSD après réception des XRP.")}
+					                  </div>
+					                </div>
+					              </div>
+					            </div>
 
 		            {(quotedXrpSentToPartner != null || quotedPartnerReceiveAmount != null) ? (
 		              <div className="mt-5">
