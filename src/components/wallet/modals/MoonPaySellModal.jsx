@@ -1751,7 +1751,7 @@ const MoonPaySellModal = ({
 			                <div className="grid grid-cols-[2.5rem_minmax(0,1fr)] gap-x-4 text-[14px] leading-snug text-white/80">
 			                  <div className="flex h-10 items-center justify-center">
 			                    <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-transparent", sheetAccentFlowIconText].join(" ")}>
-			                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" className="h-[40px] w-[40px]" aria-hidden="true"><path strokeWidth="0.5" d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" /><path strokeWidth="1" d="M9 12.75 11.25 15 15 9.75" /></svg>
+				                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" className="h-[40px] w-[40px]" aria-hidden="true"><path strokeWidth="1.25" d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" /><path strokeWidth="1" d="M9 12.75 11.25 15 15 9.75" /></svg>
 			                      </span>
 			                  </div>
 			                  <div className="min-w-0 self-center">
@@ -1775,7 +1775,7 @@ const MoonPaySellModal = ({
 
 			                  <div className="flex h-10 items-center justify-center">
 			                    <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-transparent", sheetAccentFlowIconText].join(" ")}>
-			                        <ShieldCheckIcon className="h-[40px] w-[40px]" style={{ strokeWidth: 0.5 }} />
+				                        <ShieldCheckIcon className="h-[40px] w-[40px]" style={{ strokeWidth: 1.25 }} />
 			                      </span>
 			                  </div>
 			                  <div className="min-w-0 self-center">
@@ -1800,12 +1800,12 @@ const MoonPaySellModal = ({
 
 			                  <div className="flex h-10 items-center justify-center">
 			                    <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-transparent", sheetAccentFlowIconText].join(" ")}>
-			                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.5" strokeLinecap="round" strokeLinejoin="round" className="h-[40px] w-[40px]" aria-hidden="true">
-			                          <path d="M3 10h18" />
-			                          <path d="M5 10V8a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v2" />
-			                          <path d="M7 14h10" />
-			                          <path d="M5 10v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8" />
-			                        </svg>
+				                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.15" strokeLinecap="round" strokeLinejoin="round" className="h-[40px] w-[40px]" aria-hidden="true">
+				                          <path d="M3 10h18" />
+				                          <path d="M5 10V8a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v2" />
+				                          <path d="M7 14h10" />
+				                          <path d="M5 10v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8" />
+				                        </svg>
 			                      </span>
 			                  </div>
 			                  <div className="min-w-0 self-center">
@@ -1827,10 +1827,10 @@ const MoonPaySellModal = ({
                       aria-expanded={techDetailsOpen}
                     >
 	                      <span className="text-[13px] font-semibold text-white/65">
-	                        {t(
-	                          "ui_op_details_network_tech_title",
-	                          "Détails techniques des transactions sur le réseau (XRPL).",
-	                        )}
+		                      {t(
+		                        "ui_op_details_network_tech_title",
+		                        "Détails techniques du réseau (XRP)",
+		                      )}
                       </span>
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={["h-4 w-4 text-white/45 transition-transform duration-200", techDetailsOpen ? "rotate-180" : ""].join(" ")} aria-hidden="true">
                         <polyline points="6 9 12 15 18 9" />
@@ -2004,7 +2004,7 @@ const MoonPaySellModal = ({
 			              <div className="grid grid-cols-[2.5rem_minmax(0,1fr)] gap-x-4 text-[14px] leading-snug text-white/80">
 			                <div className="flex h-10 items-center justify-center">
 			                  <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-transparent", sheetAccentFlowIconText].join(" ")}>
-			                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" className="h-[40px] w-[40px]" aria-hidden="true"><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" /><path d="M9 12.75 11.25 15 15 9.75" /></svg>
+				                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" className="h-[40px] w-[40px]" aria-hidden="true"><path strokeWidth="1.25" d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" /><path strokeWidth="1" d="M9 12.75 11.25 15 15 9.75" /></svg>
 			                    </span>
 			                </div>
 			                <div className="min-w-0 self-center">
@@ -2028,7 +2028,7 @@ const MoonPaySellModal = ({
 
 			                <div className="flex h-10 items-center justify-center">
 			                  <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-transparent", sheetAccentFlowIconText].join(" ")}>
-			                      <ShieldCheckIcon className="h-[40px] w-[40px]" style={{ strokeWidth: 1 }} />
+				                      <ShieldCheckIcon className="h-[40px] w-[40px]" style={{ strokeWidth: 1.25 }} />
 			                    </span>
 			                </div>
 			                <div className="min-w-0 self-center">
@@ -2053,12 +2053,12 @@ const MoonPaySellModal = ({
 
 			                <div className="flex h-10 items-center justify-center">
 			                  <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-transparent", sheetAccentFlowIconText].join(" ")}>
-			                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="h-[40px] w-[40px]" aria-hidden="true">
-			                        <path d="M3 10h18" />
-			                        <path d="M5 10V8a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v2" />
-			                        <path d="M7 14h10" />
-			                        <path d="M5 10v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8" />
-			                      </svg>
+				                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.15" strokeLinecap="round" strokeLinejoin="round" className="h-[40px] w-[40px]" aria-hidden="true">
+				                        <path d="M3 10h18" />
+				                        <path d="M5 10V8a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v2" />
+				                        <path d="M7 14h10" />
+				                        <path d="M5 10v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8" />
+				                      </svg>
 			                    </span>
 			                </div>
 			                <div className="min-w-0 self-center">
@@ -2080,10 +2080,10 @@ const MoonPaySellModal = ({
                     aria-expanded={techDetailsOpen}
                   >
 	                    <span className="text-[13px] font-semibold text-white/65">
-	                      {t(
-	                        "ui_op_details_network_tech_title",
-	                        "Détails techniques des transactions sur le réseau (XRPL).",
-	                      )}
+		                        {t(
+		                          "ui_op_details_network_tech_title",
+		                          "Détails techniques du réseau (XRP)",
+		                        )}
                     </span>
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={["h-4 w-4 text-white/45 transition-transform duration-200", techDetailsOpen ? "rotate-180" : ""].join(" ")} aria-hidden="true">
                       <polyline points="6 9 12 15 18 9" />
