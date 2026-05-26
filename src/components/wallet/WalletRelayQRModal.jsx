@@ -150,16 +150,26 @@ export default function WalletRelayQRModal() {
           <div className="absolute inset-0 bg-xcannes-surface-demo bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.06),transparent_60%),radial-gradient(ellipse_at_bottom,rgba(255,255,255,0.025),transparent_55%)]" />
           <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-black/5 to-black/70" />
         </div>
-        <div className="relative z-10">
         {/* Close button */}
         <button
           type="button"
           onClick={handleClose}
-          className="absolute top-3 right-3 w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white/60 hover:text-white flex items-center justify-center transition-colors"
+          className="absolute top-3 right-3 z-20 p-1.5 text-white/45 hover:text-white/75 transition-colors"
           aria-label={t("close")}
         >
-          ✕
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            strokeWidth={2}
+            aria-hidden
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
         </button>
+
+        <div className="relative z-10">
 
         {/* Title */}
         <h3 className="text-lg font-semibold text-white mb-1">{titleText}</h3>
@@ -230,7 +240,7 @@ export default function WalletRelayQRModal() {
                 {relayParsedAmount.currency || "—"}
               </div>
               <div className="text-white/45">
-                {t("ui_recipient_wallet", "Wallet destinataire")}
+                {t("ui_recipient_wallet", "Compte destinataire")}
               </div>
               <div className="text-white/80 font-semibold truncate">
                 {relayBeneficiaryDisplay || "—"}
@@ -256,8 +266,8 @@ export default function WalletRelayQRModal() {
             </div>
           )}
         </div>
-        </div>
-      </div>
-    </div>
-  );
-}
+	      </div>
+	    </div>
+	  </div>
+	  );
+	}
