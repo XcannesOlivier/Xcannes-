@@ -1581,21 +1581,21 @@ export default function GlobalStatement({
         >
           {/* Recent transactions */}
           <div className="space-y-2">
-            {movementsLoading ? (
-              <div className="rounded-[20px] px-3 py-3 ring-1 ring-white/10 ring-inset bg-white/5 text-sm text-white/70">
-                {t("ui_loading_1386baebe9", "Loading…")}
-              </div>
-            ) : movementsError ? (
-              <div className="rounded-[20px] px-3 py-3 ring-1 ring-red-500/20 ring-inset bg-red-500/10 text-sm text-red-200">
-                {String(movementsError)}
-              </div>
-            ) : recentMovements.length === 0 ? (
-              <div className="rounded-[20px] px-3 py-3 ring-1 ring-white/10 ring-inset bg-white/5 text-sm text-white/70">
-                {t(
-                  "ui_no_transactions_yet_2c7a1d9b5e",
-                  "Aucune transaction pour le moment",
-                )}
-              </div>
+	            {movementsLoading ? (
+	              <div className="rounded-[18px] px-3 py-3 ring-1 ring-white/10 ring-inset bg-white/5 text-sm text-white/70">
+	                {t("ui_loading_1386baebe9", "Loading…")}
+	              </div>
+	            ) : movementsError ? (
+	              <div className="rounded-[18px] px-3 py-3 ring-1 ring-red-500/20 ring-inset bg-red-500/10 text-sm text-red-200">
+	                {String(movementsError)}
+	              </div>
+	            ) : recentMovements.length === 0 ? (
+	              <div className="rounded-[18px] px-3 py-3 ring-1 ring-white/10 ring-inset bg-white/5 text-sm text-white/70">
+	                {t(
+	                  "ui_no_transactions_yet_2c7a1d9b5e",
+	                  "Aucune transaction pour le moment",
+	                )}
+	              </div>
             ) : (
               <div className="space-y-1.5">
                 {recentMovements.filter((m) => {
@@ -1646,13 +1646,13 @@ export default function GlobalStatement({
                     m?.id ||
                     `${m?.txHash || "nohash"}-${m?.ledgerIndex || "n"}-${m?.kind || ""}-${m?.createdAt || ""}-${idx}`;
 
-                  return (
-                    <button
-                      key={key}
-                      type="button"
+	                  return (
+	                    <button
+	                      key={key}
+	                      type="button"
 	                      onClick={() => openMovementDetails(m)}
 	                        className={[
-	                          "w-full text-left rounded-[20px] px-3 transition-colors duration-150",
+	                          "w-full text-left rounded-[18px] px-3 transition-colors duration-150",
 	                          isLatest
 	                            ? "py-3 ring-1 ring-inset bg-[#101415] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-14px_22px_rgba(0,0,0,0.5)] md:shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_14px_22px_rgba(0,0,0,0.5)] ring-white/10 transform-gpu scale-[1.04] origin-center drop-shadow-[0_10px_18px_rgba(0,0,0,0.55)] transition-transform duration-150"
 	                            : "py-2 ring-1 ring-inset ring-white/[0.06] bg-[#101415] shadow-[inset_0_-14px_18px_rgba(0,0,0,0.8)]",
