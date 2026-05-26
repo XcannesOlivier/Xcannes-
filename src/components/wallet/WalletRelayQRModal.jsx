@@ -91,6 +91,46 @@ export default function WalletRelayQRModal() {
 
   const isConnect = qrModalData.type === "connect";
   const isSigned = qrModalData.status === "signed";
+  const isSendSign =
+    !isConnect && String(qrModalData?.action || "").trim().toLowerCase() === "wallet:send";
+  const relayProgressDetails = qrModalData?.progressDetails || null;
+  const relayAmountLabel = String(relayProgressDetails?.amountLabel || "").trim();
+  const relayBeneficiaryLabel = String(relayProgressDetails?.beneficiaryLabel || "").trim();
+  const relayBeneficiaryAddress = String(relayProgressDetails?.beneficiaryAddress || "").trim();
+
+  const relayParsedAmount = (() => {
+    const raw = String(relayAmountLabel || "").trim();
+    if (!raw) return { amount: "", currency: "" };
+    const parts = raw.split(/\s+/);
+    if (parts.length < 2) return { amount: raw, currency: "" };
+    const currencyCandidate = parts[parts.length - 1];
+    const amountPart = parts.slice(0, -1).join(" ");
+    if (/^[A-Z]{2,10}$/u.test(currencyCandidate)) {
+      return { amount: amountPart, currency: currencyCandidate };
+    }
+    return { amount: raw, currency: "" };
+  })();
+
+  const relayBeneficiaryDisplay = (() => {
+    if (relayBeneficiaryLabel) return relayBeneficiaryLabel;
+    if (!relayBeneficiaryAddress) return "";
+    if (relayBeneficiaryAddress.length <= 18) return relayBeneficiaryAddress;
+    return `${relayBeneficiaryAddress.slice(0, 8)}…${relayBeneficiaryAddress.slice(-6)}`;
+  })();
+
+  const titleText = isConnect
+    ? t("wallet_relay_title_connect", "Connecter votre wallet")
+    : isSendSign
+      ? "Validez votre envoi sur l’APP XCANNES"
+      : t("wallet_relay_title_sign", "Signer la transaction");
+
+  const subtitleText = isMobile
+    ? t("wallet_relay_desc_mobile", "Ouvrez votre wallet pour confirmer l’opération.")
+    : isConnect
+      ? t("wallet_relay_desc_desktop_connect", "Scannez ce QR code avec votre wallet XCANNES.")
+      : isSendSign
+        ? "Scannez ce QR code pour valider la transaction"
+        : t("wallet_relay_desc_desktop_sign", "Confirmez la transaction dans votre wallet.");
 
   return (
     <div
@@ -102,10 +142,15 @@ export default function WalletRelayQRModal() {
       }}
     >
       <div
-        className={`relative w-full max-w-sm rounded-2xl border border-white/10 bg-[#111518] p-6 shadow-2xl transition-all duration-250 ${
+        className={`relative w-full max-w-sm rounded-2xl border border-white/10 bg-xcannes-surface-demo overflow-hidden p-6 shadow-2xl transition-all duration-250 ${
           closing ? "scale-95 opacity-0" : "scale-100 opacity-100"
         }`}
       >
+        <div className="pointer-events-none absolute inset-0" aria-hidden>
+          <div className="absolute inset-0 bg-xcannes-surface-demo bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.06),transparent_60%),radial-gradient(ellipse_at_bottom,rgba(255,255,255,0.025),transparent_55%)]" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-black/5 to-black/70" />
+        </div>
+        <div className="relative z-10">
         {/* Close button */}
         <button
           type="button"
@@ -117,15 +162,9 @@ export default function WalletRelayQRModal() {
         </button>
 
         {/* Title */}
-        <h3 className="text-lg font-semibold text-white mb-1">
-          {isConnect ? t("wallet_relay_title_connect") : t("wallet_relay_title_sign")}
-        </h3>
+        <h3 className="text-lg font-semibold text-white mb-1">{titleText}</h3>
         <p className="text-sm text-white/60 mb-6">
-          {isMobile
-            ? t("wallet_relay_desc_mobile")
-            : isConnect
-              ? t("wallet_relay_desc_desktop_connect")
-              : t("wallet_relay_desc_desktop_sign")}
+          {subtitleText}
         </p>
 
         {/* QR Code / Mobile redirect */}
@@ -178,6 +217,28 @@ export default function WalletRelayQRModal() {
           )}
         </div>
 
+        {/* Send details (desktop only) */}
+        {!isMobile && isSendSign && !isSigned ? (
+          <div className="mb-6 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-left">
+            <div className="grid grid-cols-[120px_minmax(0,1fr)] gap-x-3 gap-y-2 text-sm">
+              <div className="text-white/45">{t("ui_amount", "Montant")}</div>
+              <div className="text-white/90 font-semibold tabular-nums">
+                {relayParsedAmount.amount || (relayAmountLabel || "—")}
+              </div>
+              <div className="text-white/45">{t("ui_currency", "Devise")}</div>
+              <div className="text-white/80 font-semibold">
+                {relayParsedAmount.currency || "—"}
+              </div>
+              <div className="text-white/45">
+                {t("ui_recipient_wallet", "Wallet destinataire")}
+              </div>
+              <div className="text-white/80 font-semibold truncate">
+                {relayBeneficiaryDisplay || "—"}
+              </div>
+            </div>
+          </div>
+        ) : null}
+
         {/* Status */}
         <div className="text-center">
           {isSigned ? (
@@ -194,6 +255,7 @@ export default function WalletRelayQRModal() {
               En attente de confirmation…
             </div>
           )}
+        </div>
         </div>
       </div>
     </div>

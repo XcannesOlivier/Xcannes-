@@ -727,7 +727,7 @@ export default function WalletCurrencySelector({
 	                <div className="px-6 py-3 sm:py-3 pb-6 sm:pb-3 bg-transparent border-t border-white/5 flex items-center justify-center gap-2 text-center">
 	                  {walletLabel ? (
 	                    <span className="text-[15px] sm:text-[17px] text-white/55 inline-flex items-center justify-center gap-2.5">
-	                      <span className="text-[12px] sm:text-[13px] tracking-[0.18em] uppercase text-white/45">
+	                      <span className="text-[12px] sm:text-[13px] tracking-wide text-white/45">
 	                        {t("ui_current_account", "Compte actuel")}
 	                      </span>
 	                      <span className="h-2.5 w-2.5 rounded-full bg-xcannes-green shrink-0 animate-pulse" aria-hidden />

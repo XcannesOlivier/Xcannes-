@@ -1007,21 +1007,26 @@ export default function WalletSettingsDropdown({
       )}
 
       {/* QR Code modal (desktop) — scanné par wallet-app mobile */}
-      {showQrModal && (
-        <div
-          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm"
-          onClick={() => setShowQrModal(false)}
-        >
-          <div
-            className="relative bg-[#151b1e] border border-white/10 rounded-2xl p-6 shadow-2xl max-w-xs w-full mx-4 text-center"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              type="button"
-              onClick={() => setShowQrModal(false)}
-              className="absolute top-3 right-3 text-white/40 hover:text-white/80 transition-colors"
-              aria-label="Fermer"
-            >
+	      {showQrModal && (
+	        <div
+	          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm"
+	          onClick={() => setShowQrModal(false)}
+	        >
+	          <div
+	            className="relative overflow-hidden bg-xcannes-surface-demo border border-white/10 rounded-2xl p-6 shadow-2xl max-w-xs w-full mx-4 text-center"
+	            onClick={(e) => e.stopPropagation()}
+	          >
+	            <div className="pointer-events-none absolute inset-0" aria-hidden>
+	              <div className="absolute inset-0 bg-xcannes-surface-demo bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.06),transparent_60%),radial-gradient(ellipse_at_bottom,rgba(255,255,255,0.025),transparent_55%)]" />
+	              <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-black/5 to-black/65" />
+	            </div>
+	            <div className="relative z-10">
+	            <button
+	              type="button"
+	              onClick={() => setShowQrModal(false)}
+	              className="absolute top-3 right-3 text-white/40 hover:text-white/80 transition-colors"
+	              aria-label="Fermer"
+	            >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
@@ -1037,12 +1042,13 @@ export default function WalletSettingsDropdown({
                 includeMargin={false}
               />
             </div>
-            <p className="mt-3 text-[11px] text-white/40">
-              {t("ui_create_or_import_wallet", "Créer ou importer un compte")}
-            </p>
-          </div>
-        </div>
-      )}
+		            <p className="mt-3 text-[11px] text-white/40">
+		              {t("ui_create_or_import_wallet", "Créer ou importer un compte")}
+		            </p>
+	            </div>
+	          </div>
+	        </div>
+	      )}
 
       {/* Fullscreen security modal */}
       <SettingsPageModal

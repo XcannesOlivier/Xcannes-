@@ -309,7 +309,7 @@ export const NativeWalletProvider = ({ children }) => {
   }, [cleanupRelaySubscription, clearAutoClose, setIsConnecting, subscribeToChallengeStatus]);
 
   // ─── SIGN TRANSACTION via relay ───────────────────────────────────
-  const signTransaction = useCallback(async (txjson, { action } = {}) => {
+  const signTransaction = useCallback(async (txjson, { action, progressDetails } = {}) => {
     if (!isConnected) {
       alert("Please connect your wallet first");
       return null;
@@ -351,6 +351,8 @@ export const NativeWalletProvider = ({ children }) => {
           status: "waiting",
           visible: true,
           mobile: true,
+          action: action || "",
+          progressDetails: progressDetails || null,
           walletAppUrl: `/wallet-app/?sign=${challengeId}`,
         });
       } else {
@@ -363,6 +365,8 @@ export const NativeWalletProvider = ({ children }) => {
           status: "waiting",
           visible: true,
           mobile: false,
+          action: action || "",
+          progressDetails: progressDetails || null,
         });
       }
 
