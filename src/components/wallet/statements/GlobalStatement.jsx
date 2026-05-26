@@ -1470,9 +1470,9 @@ export default function GlobalStatement({
 
       <div
         ref={overlayRef}
-        className={`relative w-full wallet-modal-panel wallet-modal-no-top-highlight-mobile ${modalBgClass} flex flex-col overflow-hidden ${inline ? "z-[1]" : "z-[10201]"} shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-26px_46px_rgba(0,0,0,0.55)] ${
-          resolvedLayout.panelClass
-        } ${inline ? "wallet-inline-zoom-in" : liftAnimClass}`}
+	        className={`relative w-full wallet-modal-panel wallet-modal-no-top-highlight-mobile ${modalBgClass} flex flex-col overflow-hidden ${inline ? "z-[1]" : "z-[10201]"} shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-26px_46px_rgba(0,0,0,0.55)] md:shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_26px_46px_rgba(0,0,0,0.55)] ${
+	          resolvedLayout.panelClass
+	        } ${inline ? "wallet-inline-zoom-in" : liftAnimClass}`}
         style={
           swipeEnabled
             ? {
@@ -1574,7 +1574,7 @@ export default function GlobalStatement({
         {/* Content - Zone scrollable */}
         <div
 	          ref={overlayListRef}
-	          className="flex-1 min-h-0 overflow-y-auto px-4 md:px-5 pt-4 md:pt-6 pb-6 md:pb-6 flex flex-col gap-4 bg-gradient-to-b from-[#101415] to-[#0d1214] md:from-[#0d1214] md:to-[#101415] border-t border-white/[0.10] md:border-white/[0.06]"
+	          className="flex-1 min-h-0 overflow-y-auto px-4 md:px-5 pt-4 md:pt-6 pb-6 md:pb-6 flex flex-col gap-4 bg-gradient-to-b from-[#101415] to-[#0d1214] md:from-black/55 md:via-[#101415] md:to-[#101415] border-t border-white/[0.10] md:border-white/[0.06]"
 	          onPointerDown={(event) => {
 	            maybeStartOverlayDrag(event, "list");
 	          }}
@@ -1582,15 +1582,15 @@ export default function GlobalStatement({
           {/* Recent transactions */}
           <div className="space-y-2">
 	            {movementsLoading ? (
-	              <div className="rounded-[18px] px-3 py-3 ring-1 ring-white/10 ring-inset bg-white/5 text-sm text-white/70">
+	              <div className="rounded-[18px] md:rounded-[16px] px-3 py-3 ring-1 ring-white/10 ring-inset bg-white/5 text-sm text-white/70">
 	                {t("ui_loading_1386baebe9", "Loading…")}
 	              </div>
 	            ) : movementsError ? (
-	              <div className="rounded-[18px] px-3 py-3 ring-1 ring-red-500/20 ring-inset bg-red-500/10 text-sm text-red-200">
+	              <div className="rounded-[18px] md:rounded-[16px] px-3 py-3 ring-1 ring-red-500/20 ring-inset bg-red-500/10 text-sm text-red-200">
 	                {String(movementsError)}
 	              </div>
 	            ) : recentMovements.length === 0 ? (
-	              <div className="rounded-[18px] px-3 py-3 ring-1 ring-white/10 ring-inset bg-white/5 text-sm text-white/70">
+	              <div className="rounded-[18px] md:rounded-[16px] px-3 py-3 ring-1 ring-white/10 ring-inset bg-white/5 text-sm text-white/70">
 	                {t(
 	                  "ui_no_transactions_yet_2c7a1d9b5e",
 	                  "Aucune transaction pour le moment",
@@ -1652,7 +1652,7 @@ export default function GlobalStatement({
 	                      type="button"
 	                      onClick={() => openMovementDetails(m)}
 	                        className={[
-	                          "w-full text-left rounded-[18px] px-3 transition-colors duration-150",
+	                          "w-full text-left rounded-[18px] md:rounded-[16px] px-3 transition-colors duration-150",
 	                          isLatest
 	                            ? "py-3 ring-1 ring-inset bg-[#101415] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-14px_22px_rgba(0,0,0,0.5)] md:shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_14px_22px_rgba(0,0,0,0.5)] ring-white/10 transform-gpu scale-[1.04] origin-center drop-shadow-[0_10px_18px_rgba(0,0,0,0.55)] transition-transform duration-150"
 	                            : "py-2 ring-1 ring-inset ring-white/[0.06] bg-[#101415] shadow-[inset_0_-14px_18px_rgba(0,0,0,0.8)]",
@@ -1753,7 +1753,7 @@ export default function GlobalStatement({
         </div>
 
         {/* Footer */}
-        <div className="shrink-0 px-4 md:px-6 py-1.5 md:py-3 pb-[max(2px,env(safe-area-inset-bottom))] md:pb-[max(12px,env(safe-area-inset-bottom))] border-t border-white/[0.10] md:border-white/[0.06] bg-[#111518] shadow-[inset_0_-46px_70px_rgba(0,0,0,0.55)] flex items-center justify-between gap-3">
+	        <div className="shrink-0 px-4 md:px-6 py-1.5 md:py-3 pb-[max(2px,env(safe-area-inset-bottom))] md:pb-[max(12px,env(safe-area-inset-bottom))] border-t border-white/[0.10] md:border-white/[0.06] bg-[#111518] shadow-[inset_0_-46px_70px_rgba(0,0,0,0.55)] md:shadow-none flex items-center justify-between gap-3">
           {/* Compte actuel */}
           <div className="flex items-center gap-3 min-w-0">
             <div className="relative w-auto min-w-[120px] max-w-[180px]" ref={accountDropdownRef}>
