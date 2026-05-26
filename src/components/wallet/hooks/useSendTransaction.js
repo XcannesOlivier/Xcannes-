@@ -664,19 +664,20 @@ export function useSendTransaction({
       String(savedEntry?.onChainLabel || savedEntry?.label || "").trim() ||
       "";
 
-    const payResult = await signTransaction(payTx, {
-      action: isMoonpaySell ? "moonpay:sell" : "wallet:send",
-      progressDetails: {
-        amountLabel: `${amountNum.toLocaleString("en-US", {
-          maximumFractionDigits: 2,
-        })} ${currency}`,
-        beneficiaryLabel: beneficiaryLabel || null,
-        beneficiaryAddress: dest,
-        moonpayReturnUrl: isMoonpaySell
-          ? String(moonpaySellRequest?.returnUrl || "").trim()
-          : "",
-      },
-    });
+	    const payResult = await signTransaction(payTx, {
+	      action: isMoonpaySell ? "moonpay:sell" : "wallet:send",
+	      progressDetails: {
+	        amountLabel: `${amountNum.toLocaleString("en-US", {
+	          maximumFractionDigits: 2,
+	        })} ${currency}`,
+	        beneficiaryLabel: beneficiaryLabel || null,
+	        beneficiaryAddress: dest,
+	        memo: sendPaymentRequest?.memo || null,
+	        moonpayReturnUrl: isMoonpaySell
+	          ? String(moonpaySellRequest?.returnUrl || "").trim()
+	          : "",
+	      },
+	    });
 
     if (usedSimpleSwap) {
       consumeSimpleSwapDeposit(dest);

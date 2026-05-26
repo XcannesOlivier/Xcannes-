@@ -97,6 +97,7 @@ export default function WalletRelayQRModal() {
   const relayAmountLabel = String(relayProgressDetails?.amountLabel || "").trim();
   const relayBeneficiaryLabel = String(relayProgressDetails?.beneficiaryLabel || "").trim();
   const relayBeneficiaryAddress = String(relayProgressDetails?.beneficiaryAddress || "").trim();
+  const relayMemo = String(relayProgressDetails?.memo || "").trim();
 
   const relayParsedAmount = (() => {
     const raw = String(relayAmountLabel || "").trim();
@@ -230,21 +231,27 @@ export default function WalletRelayQRModal() {
         {/* Send details (desktop only) */}
         {!isMobile && isSendSign && !isSigned ? (
           <div className="mb-6 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-left">
-            <div className="grid grid-cols-[120px_minmax(0,1fr)] gap-x-3 gap-y-2 text-sm">
-              <div className="text-white/45">{t("ui_amount", "Montant")}</div>
-              <div className="text-white/90 font-semibold tabular-nums">
+            <div className="grid grid-cols-[160px_minmax(0,1fr)] gap-x-4 gap-y-2 text-sm items-center">
+              <div className="text-white/45 whitespace-nowrap">{t("ui_amount", "Montant")}</div>
+              <div className="text-white/90 font-semibold tabular-nums text-right justify-self-end">
                 {relayParsedAmount.amount || (relayAmountLabel || "—")}
               </div>
-              <div className="text-white/45">{t("ui_currency", "Devise")}</div>
-              <div className="text-white/80 font-semibold">
+              <div className="text-white/45 whitespace-nowrap">{t("ui_currency", "Devise")}</div>
+              <div className="text-white/80 font-semibold text-right justify-self-end">
                 {relayParsedAmount.currency || "—"}
               </div>
-              <div className="text-white/45">
-                {t("ui_recipient_wallet", "Compte destinataire")}
-              </div>
-              <div className="text-white/80 font-semibold truncate">
+              <div className="text-white/45 whitespace-nowrap">{t("ui_recipient_wallet", "Compte destinataire")}</div>
+              <div className="text-white/80 font-semibold truncate text-right justify-self-end">
                 {relayBeneficiaryDisplay || "—"}
               </div>
+              {relayMemo ? (
+                <>
+                  <div className="text-white/45 whitespace-nowrap">{t("ui_memo_label", "Motif")}</div>
+                  <div className="text-white/80 font-medium text-right justify-self-end break-words max-w-[220px]">
+                    {relayMemo}
+                  </div>
+                </>
+              ) : null}
             </div>
           </div>
         ) : null}
