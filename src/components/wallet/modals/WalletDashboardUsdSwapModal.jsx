@@ -935,34 +935,52 @@ export default function WalletDashboardUsdSwapModal({
     }).filter(Boolean);
   }, [currencies]);
 
+  const exchangePayload = useMemo(() => {
+    if (exchange && typeof exchange === "object") {
+      if (exchange.data && typeof exchange.data === "object") return exchange.data;
+      if (exchange.exchange && typeof exchange.exchange === "object") return exchange.exchange;
+      if (exchange.result && typeof exchange.result === "object") return exchange.result;
+    }
+    return exchange || {};
+  }, [exchange]);
   const exchangeId = useMemo(
-    () => pick(exchange, ["id", "exchangeId", "publicId"], ""),
-    [exchange],
+    () => pick(exchangePayload, ["id", "exchangeId", "publicId", "exchange_id"], ""),
+    [exchangePayload],
   );
   const exchangeResolved = useMemo(() => {
     if (exchange?.xcannesResolved && typeof exchange.xcannesResolved === "object") {
       return exchange.xcannesResolved;
     }
-    return exchange || {};
-  }, [exchange]);
+    return exchangePayload || {};
+  }, [exchange, exchangePayload]);
   const depositAddress = useMemo(
-    () => pick(exchange, ["addressFrom", "address_from", "depositAddress"], ""),
-    [exchange],
+    () =>
+      pick(
+        exchangePayload,
+        ["addressFrom", "address_from", "depositAddress", "deposit_address"],
+        "",
+      ),
+    [exchangePayload],
   );
   const depositExtraId = useMemo(
-    () => pick(exchange, ["extraIdFrom", "extra_id_from", "depositExtraId"], ""),
-    [exchange],
+    () =>
+      pick(
+        exchangePayload,
+        ["extraIdFrom", "extra_id_from", "depositExtraId", "deposit_extra_id"],
+        "",
+      ),
+    [exchangePayload],
   );
   const sendAmountExact = useMemo(
-    () => pick(exchange, ["amountFrom", "amount_from", "amount", "amountSend"], ""),
-    [exchange],
+    () => pick(exchangePayload, ["amountFrom", "amount_from", "amount", "amountSend"], ""),
+    [exchangePayload],
   );
   const receiveAmountExact = useMemo(() => {
-    return pick(exchange, ["amountTo", "amount_to", "amountReceive", "amount_received"], "");
-  }, [exchange]);
+    return pick(exchangePayload, ["amountTo", "amount_to", "amountReceive", "amount_received"], "");
+  }, [exchangePayload]);
   const status = useMemo(
-    () => pick(exchange, ["status", "state"], ""),
-    [exchange],
+    () => pick(exchangePayload, ["status", "state"], ""),
+    [exchangePayload],
   );
   const partnerFromTicker = useMemo(
     () => pick(exchangeResolved, ["tickerFrom"], fromTicker).toUpperCase(),
@@ -1593,10 +1611,16 @@ export default function WalletDashboardUsdSwapModal({
         direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE &&
         typeof window !== "undefined"
       ) {
-        const exchangeIdValue = pick(data, ["id", "exchangeId", "publicId"], "");
-        const depositAddr = pick(data, ["addressFrom", "address_from", "depositAddress"], "");
-        const depositMemo = pick(data, ["extraIdFrom", "extra_id_from", "depositExtraId"], "");
-        const amountFromValue = pick(data, ["amountFrom", "amount_from", "amount", "amountSend"], "");
+        const payload =
+          data && typeof data === "object" && data.data && typeof data.data === "object"
+            ? data.data
+            : data && typeof data === "object" && data.exchange && typeof data.exchange === "object"
+              ? data.exchange
+              : data;
+        const exchangeIdValue = pick(payload, ["id", "exchangeId", "publicId", "exchange_id"], "");
+        const depositAddr = pick(payload, ["addressFrom", "address_from", "depositAddress", "deposit_address"], "");
+        const depositMemo = pick(payload, ["extraIdFrom", "extra_id_from", "depositExtraId", "deposit_extra_id"], "");
+        const amountFromValue = pick(payload, ["amountFrom", "amount_from", "amount", "amountSend"], "");
         if (depositAddr) {
           try {
             const prev = safeReadJsonArray(
@@ -2337,6 +2361,12 @@ export default function WalletDashboardUsdSwapModal({
                             {t("ui_usd_swap_deposit_address", "Adresse de dépôt")}
                           </div>
                           <div className="font-mono break-all">{depositAddress}</div>
+                          <div className="mt-1 text-white/55 text-xs leading-snug">
+                            {t(
+                              "ui_usd_swap_deposit_explainer",
+                              "Envoyez vos stablecoins à cette adresse SimpleSwap. Ils seront convertis puis crédités sur votre compte.",
+                            )}
+                          </div>
                         </div>
                         <button
                           type="button"
