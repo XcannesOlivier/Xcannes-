@@ -1980,14 +1980,14 @@ const MoonPayBuyModal = ({
                     </span>
                   </span>
                 </div>
-	                <div className="mt-3">
-	                  <span className="inline-flex rounded-full bg-white/5 ring-1 ring-white/10 px-3 py-1 text-[11px] text-white/70">
-	                    {t(
-	                      "ui_op_details_summary_auto_conversion",
-	                      "Conversion automatique",
-	                    )}
-	                  </span>
-	                </div>
+		              <div className="mt-3">
+		                <span className="inline-flex rounded-2xl bg-white/5 ring-1 ring-white/10 px-3 py-1 text-[11px] text-white/70">
+		                  {t(
+		                    "ui_op_details_summary_auto_conversion",
+		                    "Conversion automatique",
+		                  )}
+		                </span>
+		              </div>
               </div>
               <div className="rounded-2xl bg-black/40 backdrop-blur-sm ring-1 ring-white/10 ring-inset p-4 shadow-[0_14px_28px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.05)]">
 	                <div

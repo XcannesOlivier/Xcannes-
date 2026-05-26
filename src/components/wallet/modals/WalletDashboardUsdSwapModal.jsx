@@ -7,6 +7,13 @@ import { useTranslation } from "next-i18next";
 import { QRCodeCanvas } from "qrcode.react";
 import { useModalTransition } from "@/hooks/useModalTransition";
 import xcannesApi from "@/lib/xcannesApi";
+import {
+  ArrowPathIcon,
+  CheckCircleIcon,
+  CreditCardIcon,
+  PaperAirplaneIcon,
+  ShieldCheckIcon,
+} from "@heroicons/react/24/outline";
 import { buildSimpleSwapMemo, buildXrplJsonMemo } from "@/utils/xrplMemo";
 import { getCurrencyDescription } from "@/utils/currencyDescriptions";
 import {
@@ -72,6 +79,8 @@ export default function WalletDashboardUsdSwapModal({
   const { t, i18n } = useTranslation("common");
   const locale = i18n?.language || "en";
   const isDesktop = useIsDesktop();
+  const opFlowIconSizeClass = "h-10 w-10";
+  const opFlowIconStrokeWidth = 1.25;
   const resolvedAccent = String(accentVariant || "").trim().toLowerCase();
   const isBinanceYellow =
     resolvedAccent === "binanceyellow" ||
@@ -4376,23 +4385,15 @@ export default function WalletDashboardUsdSwapModal({
 		              <span
 		                className={[
 		                  "inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl",
-		                  sheetAccentChipClass,
+		                  accentTextSolid,
 		                ].join(" ")}
 		                aria-hidden
 		              >
-	                <svg
-	                  viewBox="0 0 24 24"
-	                  fill="none"
-	                  stroke="currentColor"
-	                  strokeWidth="1"
-	                  strokeLinecap="round"
-	                  strokeLinejoin="round"
-	                  className="h-[40px] w-[40px]"
-	                >
-	                  <path d="M12 2l7 4v6c0 5-3 9-7 10-4-1-7-5-7-10V6l7-4Z" strokeWidth="0.5" />
-	                  <path d="M9 12l2 2 4-4" />
-	                </svg>
-	              </span>
+		                <ShieldCheckIcon
+		                  className={opFlowIconSizeClass}
+		                  strokeWidth={opFlowIconStrokeWidth}
+		                />
+		              </span>
 	              <div className="min-w-0">
 	                <h2 className="text-white font-semibold text-lg leading-tight">
 	                  {t("ui_op_details_swap_header_title", "Conversion sécurisée")}
@@ -4465,15 +4466,31 @@ export default function WalletDashboardUsdSwapModal({
 			              </p>
 		            </div>
 
-				            <div className="grid grid-cols-[2.5rem_minmax(0,1fr)] gap-x-4 text-[14px] leading-snug text-white/80">
-				              <div className="flex h-10 items-center justify-center">
-				                <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-transparent", accentTextSolid].join(" ")}>
-				                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="h-[40px] w-[40px]" aria-hidden="true">
-				                      <path d="M20 6L9 17l-5-5" />
-				                    </svg>
-				                  </span>
-				              </div>
-				              <div className="min-w-0 self-center">
+				            <div className="text-[14px] leading-snug text-white/80">
+				              <div className="flex gap-x-4">
+				                <div className="flex w-10 flex-col items-center">
+					                <div className="flex h-10 items-center justify-center">
+					                  <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-transparent", accentTextSolid].join(" ")}>
+					                    {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE ? (
+					                      <CheckCircleIcon
+					                        className={opFlowIconSizeClass}
+					                        strokeWidth={opFlowIconStrokeWidth}
+					                        aria-hidden="true"
+					                      />
+					                    ) : (
+					                      <PaperAirplaneIcon
+					                        className={opFlowIconSizeClass}
+					                        strokeWidth={opFlowIconStrokeWidth}
+					                        aria-hidden="true"
+					                      />
+					                    )}
+					                  </span>
+					                </div>
+				                  <div className={["relative flex-1 min-h-8 w-px", sheetAccentFlowLineVia].join(" ")}>
+				                    <span className={["absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full motion-safe:animate-pulse", sheetAccentFlowDotStrong].join(" ")} />
+				                  </div>
+				                </div>
+				                <div className="min-w-0 self-center pb-8">
 				                  <div className="text-white/90 font-semibold">
 				                    {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
 				                      ? t("ui_op_flow_swap_step1_out", "Vous confirmez la conversion")
@@ -4484,49 +4501,55 @@ export default function WalletDashboardUsdSwapModal({
 				                      ? t("ui_op_flow_swap_step1_out_sub", "Vous validez l’opération sur XCannes.")
 				                      : t("ui_op_flow_swap_step1_in_sub", "Vous envoyez les fonds à l’adresse SimpleSwap.")}
 				                  </div>
-				              </div>
-
-				              <div className="flex h-8 items-center justify-center">
-				                <div className={["relative h-full w-px", sheetAccentFlowLineVia].join(" ")}>
-				                  <span className={["absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full motion-safe:animate-pulse", sheetAccentFlowDotStrong].join(" ")} />
 				                </div>
 				              </div>
-				              <div />
 
-				              <div className="flex h-10 items-center justify-center">
-				                <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-transparent", accentTextSolid].join(" ")}>
-				                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="h-[40px] w-[40px]" aria-hidden="true">
-				                      <path d="M8 7h-3a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-3" />
-				                      <path d="M16 3h5v5" />
-				                      <path d="M21 3l-9 9" />
-				                    </svg>
-				                  </span>
-				              </div>
-				              <div className="min-w-0 self-center">
+				              <div className="flex gap-x-4">
+				                <div className="flex w-10 flex-col items-center">
+					                <div className="flex h-10 items-center justify-center">
+					                  <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-transparent", accentTextSolid].join(" ")}>
+					                    <ArrowPathIcon
+					                      className={opFlowIconSizeClass}
+					                      strokeWidth={opFlowIconStrokeWidth}
+					                      aria-hidden="true"
+					                    />
+					                  </span>
+					                </div>
+				                  <div className={["relative flex-1 min-h-8 w-px", sheetAccentFlowLineVia].join(" ")}>
+				                    <span className={["absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full motion-safe:animate-pulse", sheetAccentFlowDotSoft].join(" ")} />
+				                  </div>
+				                </div>
+				                <div className="min-w-0 self-center pb-8">
 				                  <div className="text-white/90 font-semibold">
 				                    {t("ui_op_flow_step2_title", { defaultValue: "SimpleSwap traite l’opération" })}
 				                  </div>
 				                  <div className="mt-1 text-white/55">
 				                    {t("ui_op_flow_step2_subtitle", "Conversion automatique via les services de liquidité.")}
 				                  </div>
-				              </div>
-
-				              <div className="flex h-8 items-center justify-center">
-				                <div className={["relative h-full w-px", sheetAccentFlowLineVia].join(" ")}>
-				                  <span className={["absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full motion-safe:animate-pulse", sheetAccentFlowDotSoft].join(" ")} />
 				                </div>
 				              </div>
-				              <div />
 
-				              <div className="flex h-10 items-center justify-center">
-				                <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-transparent", accentTextSolid].join(" ")}>
-				                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="h-[40px] w-[40px]" aria-hidden="true">
-				                      <path d="M3 7h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z" strokeWidth="0.5" />
-				                      <path d="M16 11h3" />
-				                    </svg>
-				                  </span>
-				              </div>
-				              <div className="min-w-0 self-center">
+				              <div className="flex gap-x-4">
+				                <div className="flex w-10 flex-col items-center">
+					                <div className="flex h-10 items-center justify-center">
+					                  <span className={["inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-transparent", accentTextSolid].join(" ")}>
+					                    {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE ? (
+					                      <PaperAirplaneIcon
+					                        className={opFlowIconSizeClass}
+					                        strokeWidth={opFlowIconStrokeWidth}
+					                        aria-hidden="true"
+					                      />
+					                    ) : (
+					                      <CreditCardIcon
+					                        className={opFlowIconSizeClass}
+					                        strokeWidth={opFlowIconStrokeWidth}
+					                        aria-hidden="true"
+					                      />
+					                    )}
+					                  </span>
+					                </div>
+				                </div>
+				                <div className="min-w-0 self-center">
 				                  <div className="text-white/90 font-semibold">
 				                    {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
 				                      ? t("ui_op_flow_swap_step3_out", "Le stablecoin est envoyé")
@@ -4537,6 +4560,7 @@ export default function WalletDashboardUsdSwapModal({
 				                      ? t("ui_op_flow_swap_step3_out_sub", "Envoi vers l’adresse de réception une fois validé.")
 				                      : t("ui_op_flow_swap_step3_in_sub", "Crédit RLUSD après réception des XRP.")}
 				                  </div>
+				                </div>
 				              </div>
 				            </div>
 
@@ -4548,12 +4572,12 @@ export default function WalletDashboardUsdSwapModal({
 		                  className="w-full flex items-center justify-between gap-3 rounded-2xl bg-white/5 ring-1 ring-white/10 px-4 py-3 text-left"
 		                  aria-expanded={techDetailsOpen}
 		                >
-			                  <span className="text-[13px] font-semibold text-white/65">
-			                    {t(
-			                      "ui_op_details_network_tech_title",
-			                      "Détails techniques des transactions sur le réseau (XRPL).",
-			                    )}
-		                  </span>
+				                  <span className="text-[13px] font-semibold text-white/65">
+				                    {t(
+				                      "ui_op_details_network_tech_title",
+				                      "Détails techniques du réseau (XRP)",
+				                    )}
+				                  </span>
 		                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={["h-4 w-4 text-white/45 transition-transform duration-200", techDetailsOpen ? "rotate-180" : ""].join(" ")} aria-hidden="true">
 		                    <polyline points="6 9 12 15 18 9" />
 		                  </svg>
