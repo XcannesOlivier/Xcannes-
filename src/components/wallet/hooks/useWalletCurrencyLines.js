@@ -2,7 +2,8 @@ import { useState, useCallback, useEffect, useRef } from "react";
 import { apiUrl } from "@/lib/runtimeConfig";
 
 // ── localStorage SWR helpers ─────────────────────────────────
-const CL_CACHE_TTL_MS = 120_000; // 2 minutes
+const CL_CACHE_TTL_MS = 120_000; // 2 minutes (fresh window)
+const CL_CACHE_MAX_STALE_MS = 24 * 60 * 60 * 1000; // 24h (SWR hydration window)
 
 function clCacheKey(addr) {
   return `xcannes_cl_${addr}`;
@@ -18,6 +19,21 @@ function readClCache(addr) {
       return null;
     }
     return parsed.data;
+  } catch {
+    return null;
+  }
+}
+
+function peekClCache(addr) {
+  try {
+    const raw = localStorage.getItem(clCacheKey(addr));
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== "object") return null;
+    const ts = Number(parsed.ts || 0);
+    if (!Number.isFinite(ts)) return null;
+    if (Date.now() - ts > CL_CACHE_MAX_STALE_MS) return null;
+    return parsed.data ?? null;
   } catch {
     return null;
   }
@@ -188,7 +204,8 @@ export function useWalletCurrencyLines(address) {
       fetchCurrencyLines();
       return;
     }
-    const cached = readClCache(address);
+    // SWR: hydrate from stale cache (up to CL_CACHE_MAX_STALE_MS), then revalidate.
+    const cached = peekClCache(address) || readClCache(address);
     if (cached) {
       applyData(cached);
       setInitialReady(true);
