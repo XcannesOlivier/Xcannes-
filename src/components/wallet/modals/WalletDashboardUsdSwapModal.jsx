@@ -2324,29 +2324,26 @@ export default function WalletDashboardUsdSwapModal({
                 : undefined
             }
           >
-            {step === "deposit" ? (
-              <div className="space-y-5">
-                {/* Barre swipe mobile / croix fermeture desktop */}
-                <div className="flex items-center justify-between">
-                  <div className="md:hidden flex justify-center w-full cursor-grab select-none" aria-hidden>
-                    <span className="block w-12 h-1.5 rounded-full bg-white/20" />
-                  </div>
-                  <button
-                    type="button"
-                    onClick={closeModal}
-                    aria-label="Fermer"
-                    className="hidden md:flex ml-auto items-center justify-center w-8 h-8 rounded-full text-white/50 hover:text-white hover:bg-white/10 transition-colors"
-                  >
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="w-5 h-5" aria-hidden>
-                      <path d="M18 6L6 18M6 6l12 12" />
-                    </svg>
-                  </button>
-                </div>
-	                <div className="text-center pt-1">
-	                  <div className="text-white font-semibold text-2xl leading-tight">
-	                    {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
-	                      ? t("ui_execute_swap_and_send", "Swap XRPL puis dépôt partenaire")
-	                      : sendFundsTitle}
+	            {step === "deposit" ? (
+	              <div className="space-y-5">
+	                {/* Croix fermeture desktop (handle mobile déjà présent dans le header global) */}
+	                <div className="flex justify-end">
+	                  <button
+	                    type="button"
+	                    onClick={closeModal}
+	                    aria-label="Fermer"
+	                    className="hidden md:flex items-center justify-center w-8 h-8 rounded-full text-white/50 hover:text-white hover:bg-white/10 transition-colors"
+	                  >
+	                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="w-5 h-5" aria-hidden>
+	                      <path d="M18 6L6 18M6 6l12 12" />
+	                    </svg>
+	                  </button>
+	                </div>
+		                <div className="text-center pt-1">
+		                  <div className="text-white font-semibold text-2xl leading-tight">
+		                    {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
+		                      ? t("ui_execute_swap_and_send", "Swap XRPL puis dépôt partenaire")
+		                      : sendFundsTitle}
 	                  </div>
                   <div className="mt-2 text-sm text-white/60 max-w-sm mx-auto">
                     {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
