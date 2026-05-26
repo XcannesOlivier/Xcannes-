@@ -4355,7 +4355,7 @@ export default function WalletDashboardUsdSwapModal({
 	          onClick={() => { setSheetDragY(0); setOpDetailsOpen(false); }}
 	        />
 	        <div
-	          className={`relative w-full max-h-full bg-elevated rounded-t-[22px] shadow-2xl ${isBinanceYellow ? 'xcannes-sheet-fade-border-yellow' : 'xcannes-sheet-fade-border-blue'}`}
+		          className={`relative w-full max-h-full bg-elevated rounded-t-[26px] shadow-2xl ${isBinanceYellow ? 'xcannes-sheet-fade-border-yellow' : 'xcannes-sheet-fade-border-blue'}`}
 	          style={{
 	            transform: `translateY(${sheetDragY}px)`,
 	            opacity: sheetDragY ? Math.max(0, Math.min(1, 1 - sheetDragY / 420)) : undefined,
@@ -4374,7 +4374,7 @@ export default function WalletDashboardUsdSwapModal({
 	          >
 	            <span className="block w-36 h-1.5 rounded-full bg-white/80" />
 	          </div>
-	          <div className="px-6 pt-5 pb-8 max-h-[inherit] overflow-y-auto rounded-t-[22px]">
+		          <div className="px-6 pt-5 pb-8 max-h-[inherit] overflow-y-auto rounded-t-[26px]">
 	          {/* Handle — mobile uniquement */}
 	          <div className="flex justify-center mb-4 md:hidden">
 	            <span className="block w-12 h-1.5 rounded-full bg-white/15" aria-hidden />
@@ -4415,7 +4415,7 @@ export default function WalletDashboardUsdSwapModal({
 	          </div>
 
 	          {/* Summary */}
-	          <div className="mb-5 rounded-2xl bg-black/40 backdrop-blur-sm ring-1 ring-white/10 ring-inset p-4 shadow-[0_14px_28px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.05)]">
+		          <div className="mb-5 rounded-[26px] bg-black/40 backdrop-blur-sm ring-1 ring-white/10 ring-inset p-4 shadow-[0_14px_28px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.05)]">
 	            <div className="flex items-center justify-between gap-3">
 	              <span className="text-[12px] text-white/55">
 	                {t("ui_op_details_summary_send", "Vous envoyez")}
@@ -4447,17 +4447,17 @@ export default function WalletDashboardUsdSwapModal({
 	              </span>
 	            </div>
 		            <div className="mt-3">
-		              <span className="inline-flex rounded-full bg-white/5 ring-1 ring-white/10 px-3 py-1 text-[11px] text-white/70">
-		                {t("ui_op_details_summary_auto_conversion", "Conversion automatique")}
-		              </span>
+			              <span className="inline-flex rounded-[26px] bg-white/5 ring-1 ring-white/10 px-3 py-1 text-[11px] text-white/70">
+			                {t("ui_op_details_summary_auto_conversion", "Conversion automatique")}
+			              </span>
 		            </div>
 	          </div>
 
 	          {/* Flow */}
-		          <div className="rounded-2xl bg-black/40 backdrop-blur-sm ring-1 ring-white/10 ring-inset p-4 shadow-[0_14px_28px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.05)]">
+		          <div className="rounded-[26px] bg-black/40 backdrop-blur-sm ring-1 ring-white/10 ring-inset p-4 shadow-[0_14px_28px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.05)]">
 		            <div
 		              className={[
-		                "mb-5 rounded-2xl px-4 py-3 text-[13px] shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]",
+		                "mb-5 rounded-[26px] px-4 py-3 text-[13px] shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]",
 		                sheetAccentControlCardClass,
 		              ].join(" ")}
 		            >
@@ -4569,7 +4569,7 @@ export default function WalletDashboardUsdSwapModal({
 		                <button
 		                  type="button"
 		                  onClick={() => setTechDetailsOpen((v) => !v)}
-		                  className="w-full flex items-center justify-between gap-3 rounded-2xl bg-white/5 ring-1 ring-white/10 px-4 py-3 text-left"
+		                  className="w-full flex items-center justify-between gap-3 rounded-[26px] bg-white/5 ring-1 ring-white/10 px-4 py-3 text-left"
 		                  aria-expanded={techDetailsOpen}
 		                >
 				                  <span className="text-[13px] font-semibold text-white/65">

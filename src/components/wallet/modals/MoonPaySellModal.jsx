@@ -1643,7 +1643,7 @@ const MoonPaySellModal = ({
               onClick={() => setOpDetailsOpen(false)}
             />
             <div
-              className="relative w-full max-h-full bg-elevated rounded-t-[22px] xcannes-sheet-fade-border-violet shadow-2xl"
+	              className="relative w-full max-h-full bg-elevated rounded-t-[26px] xcannes-sheet-fade-border-violet shadow-2xl"
               style={{
                 transform: `translateY(${sheetDragY}px)`,
                 opacity: sheetDragY ? Math.max(0, Math.min(1, 1 - sheetDragY / 420)) : undefined,
@@ -1662,7 +1662,7 @@ const MoonPaySellModal = ({
               >
                 <span className="block w-36 h-1.5 rounded-full bg-white/80" />
               </div>
-              <div className="px-6 pt-5 pb-8 max-h-[inherit] overflow-y-auto rounded-t-[22px]">
+	              <div className="px-6 pt-5 pb-8 max-h-[inherit] overflow-y-auto rounded-t-[26px]">
               <div className="flex justify-center mb-4 md:hidden">
                 <span className="block w-12 h-1.5 rounded-full bg-white/15" aria-hidden />
               </div>
@@ -1702,7 +1702,7 @@ const MoonPaySellModal = ({
               </div>
 
               {/* Summary */}
-              <div className="mb-5 rounded-2xl bg-black/40 backdrop-blur-sm ring-1 ring-white/10 ring-inset p-4 shadow-[0_14px_28px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.05)]">
+	              <div className="mb-5 rounded-[26px] bg-black/40 backdrop-blur-sm ring-1 ring-white/10 ring-inset p-4 shadow-[0_14px_28px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.05)]">
 	                <div className="space-y-1.5">
 	                  <p className="text-[13px] font-medium leading-snug text-white/85">
 	                    {t(
@@ -1728,18 +1728,18 @@ const MoonPaySellModal = ({
                     </span>
                   </span>
                 </div>
-		                <div className="mt-3">
-		                  <span className="inline-flex rounded-2xl bg-white/5 ring-1 ring-white/10 px-3 py-1 text-[11px] text-white/70">
-		                    {t("ui_op_details_summary_auto_conversion", "Conversion automatique")}
-		                  </span>
-		                </div>
+			                <div className="mt-3">
+			                  <span className="inline-flex rounded-[26px] bg-white/5 ring-1 ring-white/10 px-3 py-1 text-[11px] text-white/70">
+			                    {t("ui_op_details_summary_auto_conversion", "Conversion automatique")}
+			                  </span>
+			                </div>
               </div>
 
               {/* Flow */}
-              <div className="rounded-2xl bg-black/40 backdrop-blur-sm ring-1 ring-white/10 ring-inset p-4 shadow-[0_14px_28px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.05)]">
+	              <div className="rounded-[26px] bg-black/40 backdrop-blur-sm ring-1 ring-white/10 ring-inset p-4 shadow-[0_14px_28px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.05)]">
 	                <div
 	                  className={[
-	                    "mb-5 rounded-2xl px-4 py-3 text-[13px] shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]",
+		                    "mb-5 rounded-[26px] px-4 py-3 text-[13px] shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]",
 	                    sheetAccentControlCardClass,
 	                  ].join(" ")}
 	                >
@@ -1830,7 +1830,7 @@ const MoonPaySellModal = ({
                     <button
                       type="button"
                       onClick={() => setTechDetailsOpen((v) => !v)}
-                      className="w-full flex items-center justify-between gap-3 rounded-2xl bg-white/5 ring-1 ring-white/10 px-4 py-3 text-left"
+                      className="w-full flex items-center justify-between gap-3 rounded-[26px] bg-white/5 ring-1 ring-white/10 px-4 py-3 text-left"
                       aria-expanded={techDetailsOpen}
                     >
 	                      <span className="text-[13px] font-semibold text-white/65">
@@ -1915,7 +1915,7 @@ const MoonPaySellModal = ({
             className="absolute inset-0 bg-black/70 backdrop-blur-sm"
             onClick={() => setOpDetailsOpen(false)}
           />
-          <div className="relative w-full max-h-full bg-elevated rounded-t-[22px] xcannes-sheet-fade-border-violet shadow-2xl">
+	          <div className="relative w-full max-h-full bg-elevated rounded-t-[26px] xcannes-sheet-fade-border-violet shadow-2xl">
             {/* Bottom indicator – mobile only */}
             <div
               className="md:hidden pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-[max(env(safe-area-inset-bottom),10px)] z-20"
@@ -1923,7 +1923,7 @@ const MoonPaySellModal = ({
             >
               <span className="block w-36 h-1.5 rounded-full bg-white/80" />
             </div>
-            <div className="px-6 pt-5 pb-8 max-h-[inherit] overflow-y-auto rounded-t-[22px]">
+	            <div className="px-6 pt-5 pb-8 max-h-[inherit] overflow-y-auto rounded-t-[26px]">
             <div className="md:hidden flex justify-center mb-4">
               <span className="block w-12 h-1.5 rounded-full bg-white/15" aria-hidden />
             </div>
@@ -1962,7 +1962,7 @@ const MoonPaySellModal = ({
             </div>
 
             {/* Summary */}
-            <div className="mb-5 rounded-2xl bg-black/40 backdrop-blur-sm ring-1 ring-white/10 ring-inset p-4 shadow-[0_14px_28px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.05)]">
+	            <div className="mb-5 rounded-[26px] bg-black/40 backdrop-blur-sm ring-1 ring-white/10 ring-inset p-4 shadow-[0_14px_28px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.05)]">
 	              <div className="space-y-1.5">
 	                <p className="text-[13px] font-medium leading-snug text-white/85">
 	                  {t(
@@ -1989,17 +1989,17 @@ const MoonPaySellModal = ({
                 </span>
               </div>
 	            <div className="mt-3">
-	              <span className="inline-flex rounded-2xl bg-white/5 ring-1 ring-white/10 px-3 py-1 text-[11px] text-white/70">
+	              <span className="inline-flex rounded-[26px] bg-white/5 ring-1 ring-white/10 px-3 py-1 text-[11px] text-white/70">
 	                {t("ui_op_details_summary_auto_conversion", "Conversion automatique")}
 	              </span>
 	            </div>
             </div>
 
             {/* Flow */}
-	            <div className="rounded-2xl bg-black/40 backdrop-blur-sm ring-1 ring-white/10 ring-inset p-4 shadow-[0_14px_28px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.05)]">
+	            <div className="rounded-[26px] bg-black/40 backdrop-blur-sm ring-1 ring-white/10 ring-inset p-4 shadow-[0_14px_28px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.05)]">
 	              <div
 	                className={[
-	                  "mb-5 rounded-2xl px-4 py-3 text-[13px] shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]",
+	                  "mb-5 rounded-[26px] px-4 py-3 text-[13px] shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]",
 	                  sheetAccentControlCardClass,
 	                ].join(" ")}
 	              >
@@ -2090,7 +2090,7 @@ const MoonPaySellModal = ({
                   <button
                     type="button"
                     onClick={() => setTechDetailsOpen((v) => !v)}
-                    className="w-full flex items-center justify-between gap-3 rounded-2xl bg-white/5 ring-1 ring-white/10 px-4 py-3 text-left"
+                    className="w-full flex items-center justify-between gap-3 rounded-[26px] bg-white/5 ring-1 ring-white/10 px-4 py-3 text-left"
                     aria-expanded={techDetailsOpen}
                   >
 	                    <span className="text-[13px] font-semibold text-white/65">
