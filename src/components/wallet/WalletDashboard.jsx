@@ -819,28 +819,31 @@ export default function WalletDashboard({
                     {!recentActivityMessage ? (
                       activitySkeletonExpired ? (
                       /* ── Message vide après 5s ── */
-                      <div
-                        className="mx-0 mb-0 px-4 py-[9px] animate-fade-in recent-activity-fade-border rounded-[16px] overflow-hidden"
-                        style={{ boxShadow: 'inset 0 -16px 20px rgba(0,0,0,0.88)' }}
-                      >
-                        <div className="flex items-center gap-2 min-h-[52px] lg:min-h-[38px]">
-                          <svg className="w-4 h-4 shrink-0 text-white/20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                            <circle cx="12" cy="12" r="9" />
-                            <polyline points="12 7 12 12 15.5 14.5" />
-                          </svg>
-                          <span className="text-[13px] text-white/30">
-                            {t('ui_no_recent_activity', 'Aucune transaction détectée pour le moment')}
-                          </span>
-                        </div>
-                      </div>
+	                      <div
+	                        className="relative mx-0 mb-0 px-4 py-[9px] animate-fade-in recent-activity-fade-border rounded-[16px] lg:rounded-[14px] overflow-hidden shadow-[inset_0_-16px_20px_rgba(0,0,0,0.88)] lg:shadow-[inset_0_16px_20px_rgba(0,0,0,0.80)]"
+	                      >
+	                        <div className="pointer-events-none absolute inset-x-0 top-0 h-[56px] hidden lg:block bg-gradient-to-b from-black/55 to-transparent" aria-hidden />
+	                        <div className="relative z-10">
+	                        <div className="flex items-center gap-2 min-h-[52px] lg:min-h-[38px]">
+	                          <svg className="w-4 h-4 shrink-0 text-white/20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+	                            <circle cx="12" cy="12" r="9" />
+	                            <polyline points="12 7 12 12 15.5 14.5" />
+	                          </svg>
+	                          <span className="text-[13px] text-white/30">
+	                            {t('ui_no_recent_activity', 'Aucune transaction détectée pour le moment')}
+	                          </span>
+	                        </div>
+	                        </div>
+	                      </div>
                       ) : (
                       /* ── Skeleton pendant le chargement ── */
-                      <div
-                        className="mx-0 mb-0 px-4 py-[9px] recent-activity-fade-border rounded-[16px] overflow-hidden"
-                        style={{ boxShadow: 'inset 0 -16px 20px rgba(0,0,0,0.88)' }}
-                      >
-                        {/* Mobile : deux lignes skeleton */}
-                        <div className="lg:hidden flex flex-col justify-center gap-[5px] min-h-[52px]">
+	                      <div
+	                        className="relative mx-0 mb-0 px-4 py-[9px] recent-activity-fade-border rounded-[16px] lg:rounded-[14px] overflow-hidden shadow-[inset_0_-16px_20px_rgba(0,0,0,0.88)] lg:shadow-[inset_0_16px_20px_rgba(0,0,0,0.80)]"
+	                      >
+	                        <div className="pointer-events-none absolute inset-x-0 top-0 h-[56px] hidden lg:block bg-gradient-to-b from-black/55 to-transparent" aria-hidden />
+	                        <div className="relative z-10">
+	                        {/* Mobile : deux lignes skeleton */}
+	                        <div className="lg:hidden flex flex-col justify-center gap-[5px] min-h-[52px]">
                           <div className="flex items-center justify-between gap-2">
                             <div className="flex items-center gap-1.5">
                               <div className="h-4 w-4 rounded-full bg-white/[0.07] animate-pulse shrink-0" />
@@ -852,8 +855,9 @@ export default function WalletDashboard({
                             <div className="h-3 w-36 rounded bg-white/[0.07] animate-pulse" />
                             <div className="flex items-center gap-1">
                               <div className="h-2.5 w-10 rounded bg-white/[0.07] animate-pulse" />
-                            </div>
-                          </div>
+	                        </div>
+	                        </div>
+	                      </div>
                         </div>
                         {/* Desktop : une ligne skeleton */}
                         <div className="hidden lg:flex items-center gap-3 min-h-[38px]">
@@ -880,12 +884,13 @@ export default function WalletDashboard({
                       className="w-full text-left focus:outline-none animate-fade-in"
                     >
                       {/* Mini-card activité récente */}
-                      <div
-                        className="mx-0 mb-0 px-4 py-[9px] transition-colors recent-activity-fade-border rounded-[16px] overflow-hidden"
-                        style={{ boxShadow: 'inset 0 -16px 20px rgba(0,0,0,0.88)' }}
-                      >
-                        {/* Mobile : deux lignes */}
-                        <div className="lg:hidden flex flex-col justify-center gap-[2px] min-h-[52px]">
+	                      <div
+	                        className="relative mx-0 mb-0 px-4 py-[9px] transition-colors recent-activity-fade-border rounded-[16px] lg:rounded-[14px] overflow-hidden shadow-[inset_0_-16px_20px_rgba(0,0,0,0.88)] lg:shadow-[inset_0_16px_20px_rgba(0,0,0,0.80)]"
+	                      >
+	                        <div className="pointer-events-none absolute inset-x-0 top-0 h-[56px] hidden lg:block bg-gradient-to-b from-black/55 to-transparent" aria-hidden />
+	                        <div className="relative z-10">
+	                        {/* Mobile : deux lignes */}
+	                        <div className="lg:hidden flex flex-col justify-center gap-[2px] min-h-[52px]">
                           {/* Ligne 1 : icône + type (secondaire) + date */}
                           <div className="flex items-center justify-between gap-2">
                             <div className="flex items-center gap-1.5 min-w-0">
@@ -933,7 +938,7 @@ export default function WalletDashboard({
                         </div>
 
                         {/* Desktop : une seule ligne */}
-                        <div className="hidden lg:flex items-center gap-3 min-h-[38px]">
+	                        <div className="hidden lg:flex items-center gap-3 min-h-[38px]">
                           <div
                             className={[
                               "shrink-0 flex items-center justify-center opacity-70",
@@ -967,8 +972,9 @@ export default function WalletDashboard({
                             <svg className="w-[13px] h-[13px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                               <polyline points="9 18 15 12 9 6" />
                             </svg>
-                          </div>
-                        </div>
+	                        </div>
+	                        </div>
+	                      </div>
                       </div>
                     </button>
                     )}
