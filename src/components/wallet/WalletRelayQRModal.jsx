@@ -93,14 +93,44 @@ export default function WalletRelayQRModal() {
   const isSigned = qrModalData.status === "signed";
   const isSendSign =
     !isConnect && String(qrModalData?.action || "").trim().toLowerCase() === "wallet:send";
+  const isConvertSign =
+    !isConnect && String(qrModalData?.action || "").trim().toLowerCase() === "wallet:convert";
   const relayProgressDetails = qrModalData?.progressDetails || null;
   const relayAmountLabel = String(relayProgressDetails?.amountLabel || "").trim();
   const relayBeneficiaryLabel = String(relayProgressDetails?.beneficiaryLabel || "").trim();
   const relayBeneficiaryAddress = String(relayProgressDetails?.beneficiaryAddress || "").trim();
   const relayMemo = String(relayProgressDetails?.memo || "").trim();
+  const relayFromLabel = String(relayProgressDetails?.fromLabel || "").trim();
+  const relayToLabel = String(relayProgressDetails?.toLabel || "").trim();
 
   const relayParsedAmount = (() => {
     const raw = String(relayAmountLabel || "").trim();
+    if (!raw) return { amount: "", currency: "" };
+    const parts = raw.split(/\s+/);
+    if (parts.length < 2) return { amount: raw, currency: "" };
+    const currencyCandidate = parts[parts.length - 1];
+    const amountPart = parts.slice(0, -1).join(" ");
+    if (/^[A-Z]{2,10}$/u.test(currencyCandidate)) {
+      return { amount: amountPart, currency: currencyCandidate };
+    }
+    return { amount: raw, currency: "" };
+  })();
+
+  const relayParsedFrom = (() => {
+    const raw = String(relayFromLabel || "").trim();
+    if (!raw) return { amount: "", currency: "" };
+    const parts = raw.split(/\s+/);
+    if (parts.length < 2) return { amount: raw, currency: "" };
+    const currencyCandidate = parts[parts.length - 1];
+    const amountPart = parts.slice(0, -1).join(" ");
+    if (/^[A-Z]{2,10}$/u.test(currencyCandidate)) {
+      return { amount: amountPart, currency: currencyCandidate };
+    }
+    return { amount: raw, currency: "" };
+  })();
+
+  const relayParsedTo = (() => {
+    const raw = String(relayToLabel || "").trim();
     if (!raw) return { amount: "", currency: "" };
     const parts = raw.split(/\s+/);
     if (parts.length < 2) return { amount: raw, currency: "" };
@@ -123,6 +153,8 @@ export default function WalletRelayQRModal() {
     ? t("wallet_relay_title_connect", "Connecter votre wallet")
     : isSendSign
       ? "Validez votre envoi sur l’APP XCANNES"
+      : isConvertSign
+        ? "Signer la conversion"
       : t("wallet_relay_title_sign", "Signer la transaction");
 
   const subtitleText = isMobile
@@ -131,6 +163,8 @@ export default function WalletRelayQRModal() {
       ? t("wallet_relay_desc_desktop_connect", "Scannez ce QR code avec votre wallet XCANNES.")
       : isSendSign
         ? "Scannez ce QR code pour valider la transaction"
+        : isConvertSign
+          ? "Confirmer la conversion avec l’app XCANNES"
         : t("wallet_relay_desc_desktop_sign", "Confirmez la transaction dans votre wallet.");
 
   return (
@@ -252,6 +286,30 @@ export default function WalletRelayQRModal() {
                   </div>
                 </>
               ) : null}
+            </div>
+          </div>
+        ) : null}
+
+        {/* Conversion summary (desktop only) */}
+        {!isMobile && isConvertSign && !isSigned ? (
+          <div className="mb-6 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-left">
+            <div className="grid grid-cols-[160px_minmax(0,1fr)] gap-x-4 gap-y-2 text-sm items-center">
+              <div className="text-white/45 whitespace-nowrap">{t("ui_base_currency", "Devise base")}</div>
+              <div className="text-white/80 font-semibold text-right justify-self-end">
+                {relayParsedFrom.currency || "—"}
+              </div>
+              <div className="text-white/45 whitespace-nowrap">{t("ui_amount_sent", "Montant envoyé")}</div>
+              <div className="text-white/90 font-semibold tabular-nums text-right justify-self-end">
+                {relayParsedFrom.amount || (relayFromLabel || "—")}
+              </div>
+              <div className="text-white/45 whitespace-nowrap">{t("ui_quote_currency", "Devise quote")}</div>
+              <div className="text-white/80 font-semibold text-right justify-self-end">
+                {relayParsedTo.currency || "—"}
+              </div>
+              <div className="text-white/45 whitespace-nowrap">{t("ui_amount_received", "Montant reçu")}</div>
+              <div className="text-white/90 font-semibold tabular-nums text-right justify-self-end">
+                {relayParsedTo.amount || (relayToLabel || "—")}
+              </div>
             </div>
           </div>
         ) : null}

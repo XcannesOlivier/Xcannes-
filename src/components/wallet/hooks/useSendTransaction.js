@@ -843,6 +843,7 @@ export function useSendTransaction({
         amountLabel,
         beneficiaryLabel: beneficiaryLabel || null,
         beneficiaryAddress: dest,
+        memo: sendPaymentRequest?.memo || null,
         moonpayReturnUrl: isMoonpaySell
           ? String(moonpaySellRequest?.returnUrl || "").trim()
           : "",
