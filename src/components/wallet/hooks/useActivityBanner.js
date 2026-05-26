@@ -1,6 +1,14 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useWalletRecentActivityBanner } from './useWalletRecentActivityBanner';
 
+const RECENT_ACTIVITY_CACHE_VERSION = 1;
+const RECENT_ACTIVITY_CACHE_MAX_STALE_MS = 24 * 60 * 60 * 1000; // 24h
+
+function recentActivityCacheKey(address) {
+  const addr = String(address || '').trim();
+  return addr ? `xcannes_wallet_recent_activity:${addr}` : '';
+}
+
 /**
  * Encapsulates all "recent activity banner" state, effects and derived values.
  *
@@ -31,6 +39,31 @@ export function useActivityBanner({ backendWalletAddress, rlusdPerUnitRates, sav
     setActivityTooltipOpen(false);
   }, [backendWalletAddress]);
 
+  // SWR hydration: show last known activity immediately from localStorage.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (!backendWalletAddress) return;
+    try {
+      const key = recentActivityCacheKey(backendWalletAddress);
+      if (!key) return;
+      const raw = window.localStorage.getItem(key);
+      if (!raw) return;
+      const parsed = JSON.parse(raw);
+      if (!parsed || parsed.v !== RECENT_ACTIVITY_CACHE_VERSION) return;
+      const ageMs = Date.now() - Number(parsed.ts || 0);
+      if (!Number.isFinite(ageMs) || ageMs < 0 || ageMs > RECENT_ACTIVITY_CACHE_MAX_STALE_MS) return;
+
+      const message = String(parsed.message || '').trim();
+      if (!message) return;
+      setRecentActivityMessage(message);
+      setRecentActivityCreatedAt(String(parsed.createdAt || '').trim());
+      setRecentActivityKind(String(parsed.kind || '').trim());
+      setRecentActivityMovement(parsed.movement || null);
+    } catch {
+      // ignore cache hydration errors
+    }
+  }, [backendWalletAddress]);
+
   // Close tooltip on click / touch outside the trigger element
   useEffect(() => {
     if (!activityTooltipOpen) return;
@@ -57,7 +90,26 @@ export function useActivityBanner({ backendWalletAddress, rlusdPerUnitRates, sav
     setRecentActivityCreatedAt(String(movement?.createdAt || '').trim());
     setRecentActivityKind(String(movement?.kind || '').trim());
     setRecentActivityMovement(movement || null);
-  }, []);
+
+    try {
+      if (typeof window === 'undefined' || !backendWalletAddress) return;
+      const key = recentActivityCacheKey(backendWalletAddress);
+      if (!key) return;
+      window.localStorage.setItem(
+        key,
+        JSON.stringify({
+          v: RECENT_ACTIVITY_CACHE_VERSION,
+          ts: Date.now(),
+          message: text,
+          createdAt: String(movement?.createdAt || '').trim(),
+          kind: String(movement?.kind || '').trim(),
+          movement: movement || null,
+        }),
+      );
+    } catch {
+      // ignore storage errors
+    }
+  }, [backendWalletAddress]);
 
   useWalletRecentActivityBanner({
     backendWalletAddress,
