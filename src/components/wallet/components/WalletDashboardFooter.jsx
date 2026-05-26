@@ -42,12 +42,11 @@ export default function WalletDashboardFooter({ onScan, addCurrencySlot, onHisto
   const { t } = useTranslation("common");
 
   return (
-    <div className="mt-[2px] shrink-0 z-20 bg-transparent md:bg-elevated md:[--bg-elevated:#090c0d] border-t-0 md:mt-auto md:border-t md:border-white/10 lg:border-t lg:border-white/[0.04] lg:border-r lg:border-r-white/5">
+    <div className="mt-0 shrink-0 z-20 bg-transparent md:bg-elevated md:[--bg-elevated:#090c0d] border-t-0 md:mt-auto md:border-t md:border-white/10 lg:border-t lg:border-white/[0.04] lg:border-r lg:border-r-white/5">
       {/* Mobile footer — barre flat 3 boutons */}
       <div
         className="relative md:hidden shrink-0"
         style={{
-          paddingTop: "6px",
           paddingBottom: "max(6px, env(safe-area-inset-bottom))",
         }}
       >
@@ -55,7 +54,7 @@ export default function WalletDashboardFooter({ onScan, addCurrencySlot, onHisto
         <div className="pointer-events-none absolute inset-x-0 bottom-full h-[64px] bg-gradient-to-t from-[#0d1012]/90 to-transparent" />
 
         {/* Barre footer */}
-        <div className="relative z-10 h-[58px] flex items-center gap-2 px-3 bg-gradient-to-b from-black/60 via-[#0e1214] to-[#0e1214] shadow-[inset_0_18px_30px_rgba(0,0,0,0.55)] before:content-[''] before:absolute before:inset-x-0 before:top-0 before:h-[0.5px] before:bg-white/[0.10]">
+        <div className="relative z-10 h-[58px] flex items-center gap-2 px-3 bg-gradient-to-b from-black/60 via-[#0e1214] to-[#0e1214] shadow-[inset_0_18px_30px_rgba(0,0,0,0.55)] before:content-[''] before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-white/[0.10]">
 
           {/* Gauche : + Devise */}
           <div className="flex-1 flex items-center justify-center h-full min-w-0">
