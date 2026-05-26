@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
 import { useTranslation } from "next-i18next";
@@ -1650,7 +1650,7 @@ export default function WalletDashboardUsdSwapModal({
     }
   };
 
-  const refreshExchange = async () => {
+  const refreshExchange = useCallback(async () => {
     if (!exchangeId) return;
     setExchangeRefreshing(true);
     setApiError("");
@@ -1668,7 +1668,21 @@ export default function WalletDashboardUsdSwapModal({
     } finally {
       setExchangeRefreshing(false);
     }
-  };
+  }, [exchangeId]);
+
+  useEffect(() => {
+    if (!open) return;
+    if (step !== "deposit") return;
+    if (!exchangeId) return;
+    if (depositAddress) return;
+    if (exchangeRefreshing) return;
+
+    const timer = window.setTimeout(() => {
+      refreshExchange();
+    }, 900);
+
+    return () => window.clearTimeout(timer);
+  }, [depositAddress, exchangeId, exchangeRefreshing, open, refreshExchange, step]);
 
   const handleExecuteOutboundSwapAndDeposit = async () => {
     if (!signTransaction || !preparedSwap?.txjson) {
@@ -2332,6 +2346,30 @@ export default function WalletDashboardUsdSwapModal({
                           className="shrink-0 rounded-lg bg-white/10 hover:bg-white/15 text-white/80 text-xs font-semibold px-3 py-2"
                         >
                           {t("ui_copy", "Copier")}
+                        </button>
+                      </div>
+                    ) : exchangeId ? (
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <div className="text-white/60 text-xs">
+                            {t("ui_usd_swap_deposit_address", "Adresse de dépôt")}
+                          </div>
+                          <div className="text-white/70 text-sm">
+                            {exchangeRefreshing
+                              ? t("ui_usd_swap_refreshing", "Rafraîchissement…")
+                              : t(
+                                  "ui_usd_swap_deposit_address_pending",
+                                  "Génération de l’adresse SimpleSwap…",
+                                )}
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={refreshExchange}
+                          disabled={exchangeRefreshing}
+                          className="shrink-0 rounded-lg bg-white/10 hover:bg-white/15 disabled:opacity-60 text-white/80 text-xs font-semibold px-3 py-2"
+                        >
+                          {t("ui_refresh", "Rafraîchir")}
                         </button>
                       </div>
                     ) : null}
