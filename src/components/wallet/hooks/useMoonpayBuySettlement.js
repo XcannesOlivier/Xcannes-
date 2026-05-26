@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { apiUrl } from '@/lib/runtimeConfig';
 import xcannesApi from '@/lib/xcannesApi';
+import { fetchWalletStatementJson } from '@/lib/walletStatementFetch';
 import { readMoonpayBuyResumeState, saveMoonpayBuyResumeState } from '../moonpayClientUtils';
 import { resolveIncomingXrpAmount, findIncomingXrpMovement } from '../utils/movementUtils';
 
@@ -79,8 +80,9 @@ export function useMoonpayBuySettlement({ wallet, isConnected, activeAction, set
         params.set('address', String(wallet || ''));
         params.set('limit', '10');
         params.set('source', 'onchain');
-        const response = await fetch(apiUrl(`/wallet/statement?${params.toString()}`));
-        const data = await response.json().catch(() => ({}));
+        const { response, data } = await fetchWalletStatementJson(
+          apiUrl(`/wallet/statement?${params.toString()}`),
+        );
         if (!response.ok) return;
 
         const movements = Array.isArray(data?.movements) ? data.movements : [];

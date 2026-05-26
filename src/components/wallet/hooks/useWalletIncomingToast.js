@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { apiUrl } from "@/lib/runtimeConfig";
+import { fetchWalletStatementJson } from "@/lib/walletStatementFetch";
 
 /**
  * useWalletIncomingToast — Polls /wallet/statement every 12s to detect
@@ -36,12 +37,11 @@ export function useWalletIncomingToast({
         params.set("address", backendWalletAddress);
         params.set("limit", "5");
         params.set("source", "onchain");
-        const res = await fetch(
+        const { response, data } = await fetchWalletStatementJson(
           apiUrl(`/wallet/statement?${params.toString()}`),
         );
-        const data = await res.json().catch(() => ({}));
-        if (res.status === 429) {
-          const header = Number(res.headers?.get("Retry-After"));
+        if (response.status === 429) {
+          const header = Number(response.headers?.get("Retry-After"));
           const retryAfter = Number.isFinite(header)
             ? header
             : Number(data?.retryAfter);
@@ -49,7 +49,7 @@ export function useWalletIncomingToast({
           rateLimitedUntilRef.current = Date.now() + waitSec * 1000;
           return;
         }
-        if (!res.ok) return;
+        if (!response.ok) return;
 
         const movements = Array.isArray(data?.movements) ? data.movements : [];
         const incoming = movements.find(

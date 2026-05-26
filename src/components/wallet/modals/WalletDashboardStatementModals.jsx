@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "next-i18next";
 import { apiUrl } from "@/lib/runtimeConfig";
+import { fetchWalletStatementJson } from "@/lib/walletStatementFetch";
 import {
   getCachedStatement,
   peekCachedStatement,
@@ -123,14 +124,13 @@ export default function WalletDashboardStatementModals({
           ? null
           : getCachedStatement(cacheKey, cacheTtlMs != null ? { ttlMs: cacheTtlMs } : undefined);
       if (cached) return cached;
-      const res = await fetch(url.toString());
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
+      const { response, data } = await fetchWalletStatementJson(url.toString());
+      if (!response.ok) {
         throw new Error(
           data?.error ||
             t("ui_statement_request_failed_4c2b1a7d9e", {
               defaultValue: "Statement request failed ({{status}}).",
-              status: res.status,
+              status: response.status,
             }),
         );
       }

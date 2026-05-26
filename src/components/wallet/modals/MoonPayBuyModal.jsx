@@ -7,6 +7,7 @@ import { CRYPTO_ICONS } from '@/utils/marketConstants';
 import { useModalTransition } from '@/hooks/useModalTransition';
 import xcannesApi from '@/lib/xcannesApi';
 import { apiUrl } from '@/lib/runtimeConfig';
+import { fetchWalletStatementJson } from '@/lib/walletStatementFetch';
 import { getCurrencyFlag, formatAmountWithSymbol } from '../walletDashboardConfig';
 import { getCurrencyDescription } from '@/utils/currencyDescriptions';
 import { modalSelectButtonCls, modalSelectListCls } from './walletModalTokens';
@@ -1238,8 +1239,9 @@ const MoonPayBuyModal = ({
         params.set('address', String(walletAddress || ''));
         params.set('limit', '10');
         params.set('source', 'onchain');
-        const response = await fetch(apiUrl(`/wallet/statement?${params.toString()}`));
-        const data = await response.json().catch(() => ({}));
+        const { response, data } = await fetchWalletStatementJson(
+          apiUrl(`/wallet/statement?${params.toString()}`),
+        );
         if (!response.ok) return;
 
         const movements = Array.isArray(data?.movements) ? data.movements : [];

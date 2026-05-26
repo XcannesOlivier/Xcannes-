@@ -20,6 +20,7 @@ import {
   setCachedStatement,
 } from "@/lib/walletStatementCache";
 import { peekCachedBalance, setCachedBalance } from "@/lib/walletBalanceCache";
+import { fetchWalletStatementJson } from "@/lib/walletStatementFetch";
 import { decodeXrplCurrencyCode } from "@/utils/xrpl";
 
 export function useWalletCore({ logPrefix = "Wallet" } = {}) {
@@ -126,9 +127,8 @@ export function useWalletCore({ logPrefix = "Wallet" } = {}) {
       params.set("includeRaw", "true");
       params.set("source", "onchain");
       const url = apiUrl(`/wallet/statement?${params.toString()}`);
-      const res = await fetch(url);
-      const data = await res.json().catch(() => ({}));
-      if (res.ok) {
+      const { response, data } = await fetchWalletStatementJson(url);
+      if (response.ok) {
         setCachedStatement(url, data);
         const rawlessParams = new URLSearchParams(params);
         rawlessParams.delete("includeRaw");
@@ -224,9 +224,8 @@ export function useWalletCore({ logPrefix = "Wallet" } = {}) {
         }
       })();
       try {
-        const res = await fetch(fetchUrl);
-        const data = await res.json().catch(() => ({}));
-        if (res.ok) setCachedStatement(url, data);
+        const { response, data } = await fetchWalletStatementJson(fetchUrl);
+        if (response.ok) setCachedStatement(url, data);
       } catch {
         /* best-effort */
       }

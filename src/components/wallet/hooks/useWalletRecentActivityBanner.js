@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { apiUrl } from "@/lib/runtimeConfig";
+import { fetchWalletStatementJson } from "@/lib/walletStatementFetch";
 import { USD_STABLECOINS } from "../walletDashboardConfig";
 import {
   normalizeMovementKind as normalizeKind,
@@ -110,10 +111,11 @@ export function useWalletRecentActivityBanner({
         params.set("address", backendWalletAddress);
         params.set("limit", "10");
         params.set("source", "onchain");
-        const res = await fetch(apiUrl(`/wallet/statement?${params.toString()}`));
-        const data = await res.json().catch(() => ({}));
-        if (res.status === 429) {
-          const header = Number(res.headers?.get("Retry-After"));
+        const { response, data } = await fetchWalletStatementJson(
+          apiUrl(`/wallet/statement?${params.toString()}`),
+        );
+        if (response.status === 429) {
+          const header = Number(response.headers?.get("Retry-After"));
           const retryAfter = Number.isFinite(header)
             ? header
             : Number(data?.retryAfter);
@@ -121,7 +123,7 @@ export function useWalletRecentActivityBanner({
           rateLimitedUntilRef.current = Date.now() + waitSec * 1000;
           return;
         }
-        if (!res.ok) return;
+        if (!response.ok) return;
 
         const movements = Array.isArray(data?.movements) ? data.movements : [];
         const visible = movements.filter(isVisibleMovement);
