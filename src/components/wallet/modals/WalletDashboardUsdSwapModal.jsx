@@ -1003,6 +1003,28 @@ export default function WalletDashboardUsdSwapModal({
     return Number.isFinite(value) && value > 0 ? value : null;
   }, [receiveAmountExact]);
 
+  const sendFundsTitle = useMemo(() => {
+    if (direction !== SWAP_DIRECTIONS.STABLE_TO_RLUSD) {
+      return t("ui_send_your_funds", "Envoyer vos stablecoins");
+    }
+    const asset = String(partnerFromTicker || "").trim();
+    const network = String(partnerFromNetwork || "").trim();
+    if (asset && network) {
+      return t("ui_send_your_asset_network", {
+        defaultValue: "Envoyer vos {{asset}} {{network}}",
+        asset,
+        network,
+      });
+    }
+    if (asset) {
+      return t("ui_send_your_asset", {
+        defaultValue: "Envoyer vos {{asset}}",
+        asset,
+      });
+    }
+    return t("ui_send_your_funds", "Envoyer vos stablecoins");
+  }, [direction, partnerFromNetwork, partnerFromTicker, t]);
+
   const resetState = (prefill = "") => {
     setStep("form");
     setSearch("");
@@ -2292,12 +2314,12 @@ export default function WalletDashboardUsdSwapModal({
                     </svg>
                   </button>
                 </div>
-                <div className="text-center pt-1">
-                  <div className="text-white font-semibold text-2xl leading-tight">
-                    {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
-                      ? t("ui_execute_swap_and_send", "Swap XRPL puis dépôt partenaire")
-                      : t("ui_send_your_funds", "Envoyer vos stablecoins")}
-                  </div>
+	                <div className="text-center pt-1">
+	                  <div className="text-white font-semibold text-2xl leading-tight">
+	                    {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
+	                      ? t("ui_execute_swap_and_send", "Swap XRPL puis dépôt partenaire")
+	                      : sendFundsTitle}
+	                  </div>
                   <div className="mt-2 text-sm text-white/60 max-w-sm mx-auto">
                     {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
                       ? t(
