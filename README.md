@@ -17,6 +17,7 @@ Ouvrir `http://localhost:2500`.
 - Node.js `>= 18`
 - Un backend XCANNES disponible (repo : `XcannesOlivier/Backend-xcannes`)
 
+
 ## Variables d’environnement
 
 Le template est `./.env.local.example` (ne pas committer `./.env.local`).
