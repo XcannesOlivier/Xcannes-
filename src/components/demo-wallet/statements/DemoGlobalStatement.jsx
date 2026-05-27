@@ -592,6 +592,11 @@ export default function DemoGlobalStatement({
       wrapperClass: "items-stretch justify-stretch p-0",
       panelClass: "w-full h-full rounded-xl border-l border-white/10",
     },
+    "inline-mobile": {
+      backdropClass: "",
+      wrapperClass: "items-stretch justify-stretch p-0",
+      panelClass: "w-full h-full rounded-none border-0",
+    },
   };
 
   const resolvedLayout = inline

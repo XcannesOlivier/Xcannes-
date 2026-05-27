@@ -479,137 +479,139 @@ export default function DemoWalletDashboard({
   }, [shouldLockBodyScroll]);
 
   return (
-    <div
-      className={[
-        "bg-xcannes-surface-demo h-full min-h-0 overflow-hidden flex flex-col",
-        "demo-wallet-tooltip-scope",
-      ].join(" ")}
-    >
-      <DemoWalletHeader
-        locale={locale}
-        displayAmount={displayTotal}
-        displayCurrency={displayCurrency}
-        totalInRlusd={usdTotal}
-        walletContextLabel={walletContextLabel}
-        wallet={wallet}
-        onOpenInfo={() => setWalletInfoOpen(true)}
-        preferredCurrency={preferredCurrency}
-        topCurrencies={topCurrencies}
-        fawazCurrencies={fawazCurrencies}
-        fawazLoading={fawazLoading}
-        onLoadFawazCurrencies={loadFawazCurrencies}
-        onPreferredCurrencyChange={setPreferredCurrency}
-        walletHeaderToast={walletHeaderToast}
-        handleCopyWalletAddress={handleCopyWalletAddress}
-        walletAddresses={walletAddresses}
-        activeWalletId={activeWalletId}
-        onSwitchWallet={setActiveWalletId}
-        handleRefreshWallet={handleRefreshWallet}
-        isRefreshing={isRefreshing}
-      />
+    <div className="w-full h-full min-h-0 flex justify-center demo-wallet-tooltip-scope">
+      <div className="w-full max-w-[410px] h-full min-h-0">
+        <div className="bg-xcannes-surface-demo h-full min-h-0 overflow-hidden flex flex-col rounded-[28px] ring-1 ring-white/[0.06] shadow-[0_20px_60px_rgba(0,0,0,0.55)] relative">
+          <DemoWalletHeader
+            locale={locale}
+            displayAmount={displayTotal}
+            displayCurrency={displayCurrency}
+            totalInRlusd={usdTotal}
+            walletContextLabel={walletContextLabel}
+            wallet={wallet}
+            onOpenInfo={() => setWalletInfoOpen(true)}
+            preferredCurrency={preferredCurrency}
+            topCurrencies={topCurrencies}
+            fawazCurrencies={fawazCurrencies}
+            fawazLoading={fawazLoading}
+            onLoadFawazCurrencies={loadFawazCurrencies}
+            onPreferredCurrencyChange={setPreferredCurrency}
+            walletHeaderToast={walletHeaderToast}
+            handleCopyWalletAddress={handleCopyWalletAddress}
+            walletAddresses={walletAddresses}
+            activeWalletId={activeWalletId}
+            onSwitchWallet={setActiveWalletId}
+            handleRefreshWallet={handleRefreshWallet}
+            isRefreshing={isRefreshing}
+          />
 
-      <DemoWalletActionBar
-        setSendTab={setSendTab}
-        setActiveAction={setActiveAction}
-        setCashModalTab={setCashModalTab}
-      />
+          <DemoWalletActionBar
+            setSendTab={setSendTab}
+            setActiveAction={setActiveAction}
+            setCashModalTab={setCashModalTab}
+          />
 
-      <DemoWalletTokenList
-        locale={locale}
-        tokens={tokens}
-        augmentedTokens={augmentedTokens}
-        renderDemoTokenIcon={renderDemoTokenIcon}
-        getDemoCurrencyLabel={getDemoCurrencyLabel}
-        recentActivity={recentActivity}
-        setSelectedStatementToken={setSelectedStatementToken}
-        setShowGlobalStatement={setShowGlobalStatement}
-        setShowCurrencyStatement={setShowCurrencyStatement}
-      />
+          <DemoWalletTokenList
+            locale={locale}
+            tokens={tokens}
+            augmentedTokens={augmentedTokens}
+            renderDemoTokenIcon={renderDemoTokenIcon}
+            getDemoCurrencyLabel={getDemoCurrencyLabel}
+            recentActivity={recentActivity}
+            setSelectedStatementToken={setSelectedStatementToken}
+            setShowGlobalStatement={setShowGlobalStatement}
+            setShowCurrencyStatement={setShowCurrencyStatement}
+          />
 
-      <DemoWalletFooter
-        onAddCurrency={() => setWalletInfoOpen(true)}
-        onScan={() => setQrScannerOpen(true)}
-        onHistory={() => setShowGlobalStatement(true)}
-      />
+          <DemoWalletFooter
+            onAddCurrency={() => setWalletInfoOpen(true)}
+            onScan={() => setQrScannerOpen(true)}
+            onHistory={() => setShowGlobalStatement(true)}
+          />
 
-      <DemoWalletModals
-        walletInfoOpen={walletInfoOpen}
-        setWalletInfoOpen={setWalletInfoOpen}
-        activeAction={activeAction}
-        setActiveAction={setActiveAction}
-        hasPayreq={hasPayreq}
-        setSendPaymentRequest={setSendPaymentRequest}
-        renderWalletMeta={renderWalletMeta}
-        renderWalletMetaNoAddress={renderWalletMetaNoAddress}
-        selectableTokens={selectableTokens}
-        selectedSendToken={selectedSendToken}
-        sendFxInfo={sendFxInfo}
-        setSendAssetKey={setSendAssetKey}
-        sendAmount={sendAmount}
-        setSendAmount={setSendAmount}
-        selectLabelByAssetKey={selectLabelByAssetKey}
-        selectLabelRightByAssetKey={selectLabelRightByAssetKey}
-        selectIconByAssetKey={selectIconByAssetKey}
-        selectLabelMobileByAssetKey={selectLabelMobileByAssetKey}
-        demoSavedAddresses={demoSavedAddresses}
-        sendDestination={sendDestination}
-        setSendDestination={setSendDestination}
-        handlePaymentRequestScan={handlePaymentRequestScan}
-        handleSendSubmit={handleSendSubmit}
-        sendProcessing={sendProcessing}
-        sendPaymentRequest={sendPaymentRequest}
-        wallet={wallet}
-        requestAmount={requestAmount}
-        setRequestAmount={setRequestAmount}
-        requestCurrency={requestCurrency}
-        setRequestCurrency={setRequestCurrency}
-        allocationSummary={allocationSummary}
-        requestMemo={requestMemo}
-        setRequestMemo={setRequestMemo}
-        rlusdPerUnitRates={rlusdPerUnitRates}
-        rlusdPerUnitSources={rlusdPerUnitSources}
-        currencyLinesSummary={currencyLinesSummary}
-        currencyLines={currencyLines}
-        swapCurrencyOptions={swapCurrencyOptions}
-        convertBaseCurrency={convertBaseCurrency}
-        setConvertBaseCurrency={setConvertBaseCurrency}
-        convertQuoteCurrency={convertQuoteCurrency}
-        setConvertQuoteCurrency={setConvertQuoteCurrency}
-        convertAmount={convertAmount}
-        setConvertAmount={setConvertAmount}
-        convertPreview={convertPreview}
-        handleDemoConvert={handleDemoConvert}
-        convertProcessing={convertProcessing}
-        walletContextLabel={walletContextLabel}
-        isWalletLabelLocked={isWalletLabelLocked}
-        preferredCurrency={preferredCurrency}
-        handleDemoBuy={handleDemoBuy}
-        handleDemoSell={handleDemoSell}
-        cashModalTab={cashModalTab}
-        setCashModalTab={setCashModalTab}
-        previewGlobalMovements={previewGlobalMovements}
-        previewCurrencyTransactions={previewCurrencyTransactions}
-        effectiveUsdPerUnitRates={effectiveUsdPerUnitRates}
-        highlightTransactionId={highlightTransactionId}
-        showGlobalStatement={showGlobalStatement}
-        setShowGlobalStatement={setShowGlobalStatement}
-        showCurrencyStatement={showCurrencyStatement}
-        setShowCurrencyStatement={setShowCurrencyStatement}
-        selectedStatementToken={selectedStatementToken}
-        setSelectedStatementToken={setSelectedStatementToken}
-        statementBalance={statementBalance}
-        usdTotal={usdTotal}
-        globalStatementTokens={globalStatementTokens}
-        qrScannerOpen={qrScannerOpen}
-        handleDemoQrScan={handleDemoQrScan}
-        setQrScannerOpen={setQrScannerOpen}
-        onOpenSendAfterScan={() => {
-          openSendAfterScanRef.current = true;
-        }}
-        showDemoMobileScannerQr={showDemoMobileScannerQr}
-        isDesktop={isDesktop}
-        demoScannerQrSize={demoScannerQrSize}
-      />
+          <div className="absolute inset-0 z-[10000] pointer-events-none">
+            <DemoWalletModals
+              inline
+              walletInfoOpen={walletInfoOpen}
+              setWalletInfoOpen={setWalletInfoOpen}
+              activeAction={activeAction}
+              setActiveAction={setActiveAction}
+              hasPayreq={hasPayreq}
+              setSendPaymentRequest={setSendPaymentRequest}
+              renderWalletMeta={renderWalletMeta}
+              renderWalletMetaNoAddress={renderWalletMetaNoAddress}
+              selectableTokens={selectableTokens}
+              selectedSendToken={selectedSendToken}
+              sendFxInfo={sendFxInfo}
+              setSendAssetKey={setSendAssetKey}
+              sendAmount={sendAmount}
+              setSendAmount={setSendAmount}
+              selectLabelByAssetKey={selectLabelByAssetKey}
+              selectLabelRightByAssetKey={selectLabelRightByAssetKey}
+              selectIconByAssetKey={selectIconByAssetKey}
+              selectLabelMobileByAssetKey={selectLabelMobileByAssetKey}
+              demoSavedAddresses={demoSavedAddresses}
+              sendDestination={sendDestination}
+              setSendDestination={setSendDestination}
+              handlePaymentRequestScan={handlePaymentRequestScan}
+              handleSendSubmit={handleSendSubmit}
+              sendProcessing={sendProcessing}
+              sendPaymentRequest={sendPaymentRequest}
+              wallet={wallet}
+              requestAmount={requestAmount}
+              setRequestAmount={setRequestAmount}
+              requestCurrency={requestCurrency}
+              setRequestCurrency={setRequestCurrency}
+              allocationSummary={allocationSummary}
+              requestMemo={requestMemo}
+              setRequestMemo={setRequestMemo}
+              rlusdPerUnitRates={rlusdPerUnitRates}
+              rlusdPerUnitSources={rlusdPerUnitSources}
+              currencyLinesSummary={currencyLinesSummary}
+              currencyLines={currencyLines}
+              swapCurrencyOptions={swapCurrencyOptions}
+              convertBaseCurrency={convertBaseCurrency}
+              setConvertBaseCurrency={setConvertBaseCurrency}
+              convertQuoteCurrency={convertQuoteCurrency}
+              setConvertQuoteCurrency={setConvertQuoteCurrency}
+              convertAmount={convertAmount}
+              setConvertAmount={setConvertAmount}
+              convertPreview={convertPreview}
+              handleDemoConvert={handleDemoConvert}
+              convertProcessing={convertProcessing}
+              walletContextLabel={walletContextLabel}
+              isWalletLabelLocked={isWalletLabelLocked}
+              preferredCurrency={preferredCurrency}
+              handleDemoBuy={handleDemoBuy}
+              handleDemoSell={handleDemoSell}
+              cashModalTab={cashModalTab}
+              setCashModalTab={setCashModalTab}
+              previewGlobalMovements={previewGlobalMovements}
+              previewCurrencyTransactions={previewCurrencyTransactions}
+              effectiveUsdPerUnitRates={effectiveUsdPerUnitRates}
+              highlightTransactionId={highlightTransactionId}
+              showGlobalStatement={showGlobalStatement}
+              setShowGlobalStatement={setShowGlobalStatement}
+              showCurrencyStatement={showCurrencyStatement}
+              setShowCurrencyStatement={setShowCurrencyStatement}
+              selectedStatementToken={selectedStatementToken}
+              setSelectedStatementToken={setSelectedStatementToken}
+              statementBalance={statementBalance}
+              usdTotal={usdTotal}
+              globalStatementTokens={globalStatementTokens}
+              qrScannerOpen={qrScannerOpen}
+              handleDemoQrScan={handleDemoQrScan}
+              setQrScannerOpen={setQrScannerOpen}
+              onOpenSendAfterScan={() => {
+                openSendAfterScanRef.current = true;
+              }}
+              showDemoMobileScannerQr={showDemoMobileScannerQr}
+              isDesktop={isDesktop}
+              demoScannerQrSize={demoScannerQrSize}
+            />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

@@ -19,6 +19,7 @@ import { QRCodeCanvas } from "qrcode.react";
 import { DEMO_FAUX_PAYREQ_EXAMPLE } from "../utils/demoWalletHelpers";
 
 export default function DemoWalletModals({
+  inline = false,
   // Info modal
   walletInfoOpen,
   setWalletInfoOpen,
@@ -121,7 +122,7 @@ export default function DemoWalletModals({
           setActiveAction(null);
           setQrScannerOpen(true);
         }}
-        inline={false}
+        inline={inline}
       />
 
       <DemoWalletInfoModal
@@ -129,6 +130,7 @@ export default function DemoWalletModals({
         onClose={() => setWalletInfoOpen(false)}
         isPreviewMode={true}
         noticeVariant="demo"
+        inline={inline}
       />
 
       <DemoWalletDashboardSendModal
@@ -157,6 +159,7 @@ export default function DemoWalletModals({
         handleSendSubmit={handleSendSubmit}
         sendProcessing={sendProcessing}
         enableSaveAddress={true}
+        inline={inline}
       />
 
       <DemoWalletDashboardPayreqModal
@@ -176,6 +179,7 @@ export default function DemoWalletModals({
         handleSendSubmit={handleSendSubmit}
         savedAddresses={demoSavedAddresses}
         enableSaveAddress={true}
+        inline={inline}
       />
 
       <DemoWalletDashboardReceiveModal
@@ -204,6 +208,7 @@ export default function DemoWalletModals({
         augmentedTokens={selectableTokens}
         requestMemo={requestMemo}
         setRequestMemo={setRequestMemo}
+        inline={inline}
       />
 
       <DemoWalletDashboardSwapModal
@@ -229,6 +234,7 @@ export default function DemoWalletModals({
         handleDemoConvert={handleDemoConvert}
         convertProcessing={convertProcessing}
         rlusdPerUnitRates={rlusdPerUnitRates}
+        inline={inline}
       />
 
       <DemoWalletDashboardCashModal
@@ -252,6 +258,7 @@ export default function DemoWalletModals({
         selectIconByCurrency={selectIconByAssetKey}
         selectLabelMobileByCurrency={selectLabelMobileByAssetKey}
         walletAddress={wallet || ""}
+        inline={inline}
       />
 
       <DemoWalletDashboardStatementModals
@@ -275,6 +282,7 @@ export default function DemoWalletModals({
         statementBalance={statementBalance}
         statementTotalBalanceUsd={usdTotal}
         globalStatementTokens={globalStatementTokens}
+        inline={inline}
       />
 
       <DemoQRScanner
@@ -284,6 +292,7 @@ export default function DemoWalletModals({
         enableCamera={!showDemoMobileScannerQr}
         showStaticImage={showDemoMobileScannerQr}
         hideWhenUnavailable={isDesktop}
+        inline={inline}
         staticContent={
           showDemoMobileScannerQr ? (
             <QRCodeCanvas

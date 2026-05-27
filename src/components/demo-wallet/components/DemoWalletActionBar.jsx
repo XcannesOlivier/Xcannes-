@@ -19,8 +19,8 @@ export default function DemoWalletActionBar({
   const cashEnabled = MOONPAY_UI_ENABLED || TOPPER_UI_ENABLED;
 
   return (
-    <div className="relative px-3 pt-[10px] pb-1.5 space-y-2">
-      <div className="grid grid-cols-4 gap-2 relative z-[1]">
+    <div className="relative px-3 pt-[24px] pb-0 space-y-2">
+      <div className="grid grid-cols-4 gap-2 sm:gap-3 relative z-[1]">
         <div className={CARD_CLASS}>
           <button
             type="button"

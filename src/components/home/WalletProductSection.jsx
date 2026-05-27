@@ -51,9 +51,9 @@ export default function WalletProductSection() {
         {/* Wallet demo – sticky, reste derrière */}
         <div className="sticky top-0 z-[1] bg-xcannes-surface-demo">
           <div className="px-4 sm:px-6 pt-8 pb-4">
-            <div className="relative max-w-7xl mx-auto">
-              <div className="bg-black/15 overflow-hidden rounded-md">
-                <div className="h-[680px] md:h-[720px] overflow-hidden">
+            <div className="relative max-w-7xl mx-auto flex justify-center">
+              <div className="w-full max-w-[440px]">
+                <div className="h-[680px] md:h-[720px]">
                   <DemoWalletDashboard
                     defaultWalletId="A"
                     allowBackgroundScrollOnMobile
@@ -85,9 +85,9 @@ export default function WalletProductSection() {
               <WalletEssentialsCards variant="home" />
             </div>
 
-            <div className="bg-black/15 overflow-hidden rounded-md">
-              <div className="lg:pl-10">
-                <div className="h-[720px] overflow-hidden">
+            <div className="flex justify-center">
+              <div className="w-full max-w-[440px]">
+                <div className="h-[720px]">
                   <DemoWalletDashboard
                     defaultWalletId="A"
                     allowBackgroundScrollOnMobile

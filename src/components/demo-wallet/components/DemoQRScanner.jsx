@@ -14,6 +14,7 @@ export default function DemoQRScanner({
   onScan,
   onClose,
   embedded = false,
+  inline = false,
   edgeToEdge = false,
   showClose = true,
   hideTitle = false,
@@ -582,7 +583,7 @@ export default function DemoQRScanner({
 
   const content = (
     <div
-      className={`fixed inset-0 z-[10100] flex items-center justify-center p-4 bg-black/95 ${
+      className={`${inline ? "absolute" : "fixed"} inset-0 z-[10100] flex items-center justify-center p-4 bg-black/95 ${
         isClosing ? "wallet-modal-backdrop-out" : "wallet-modal-backdrop-in"
       }`}
     >
@@ -592,8 +593,7 @@ export default function DemoQRScanner({
   );
 
   if (hideScannerCard) return null;
+  if (inline) return content;
   // Utiliser createPortal pour rendre dans document.body
-  return typeof document !== "undefined"
-    ? createPortal(content, document.body)
-    : null;
+  return typeof document !== "undefined" ? createPortal(content, document.body) : null;
 }

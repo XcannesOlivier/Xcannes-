@@ -96,7 +96,7 @@ export default function DemoWalletTokenList({
           className="w-full"
         >
           <div
-            className="mx-0 mb-[18px] px-4 py-[9px] rounded-[16px] transition-colors"
+            className="mx-0 mb-0 px-4 py-[9px] rounded-[16px] transition-colors"
             style={{
               background: "transparent",
               border: "1px solid rgba(255,255,255,0.02)",
@@ -179,7 +179,7 @@ export default function DemoWalletTokenList({
     <div className="flex-1 flex flex-col min-h-0">
       <div className="flex-1 min-h-0 flex flex-col">
         <div
-          className="flex items-center gap-2 mb-2 px-3 pt-2 bg-[linear-gradient(to_bottom,transparent_0%,#060809_calc(100%-8px),#060809_100%)] justify-between"
+          className="flex items-center gap-2 mb-0 px-3 pt-0 bg-[linear-gradient(to_bottom,transparent_0%,#060809_calc(100%-8px),#060809_100%)] justify-between"
           aria-live="polite"
         >
           <div className="w-full">{headerTitle}</div>

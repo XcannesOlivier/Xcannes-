@@ -27,6 +27,7 @@ export default function DemoWalletDashboardStatementModals({
   statementBalance = null,
   statementTotalBalanceUsd = null,
   globalStatementTokens = null,
+  inline = false,
 }) {
   const { t } = useTranslation("common");
   const rlusdBalance = useMemo(() => {
@@ -72,7 +73,8 @@ export default function DemoWalletDashboardStatementModals({
           noticeVariant={noticeVariant}
           period="December 2025"
           isFullPage={isFullPageView}
-          variant="dex-mobile"
+          variant={inline ? "inline-mobile" : "dex-mobile"}
+          inline={inline}
           usdRates={usdRates}
           totalBalanceOverride={statementTotalBalanceUsd}
           movements={previewMovements}
@@ -105,7 +107,8 @@ export default function DemoWalletDashboardStatementModals({
           isPreviewMode={isPreviewMode}
           noticeVariant={noticeVariant}
           isFullPage={isFullPageView}
-          variant="dex-mobile"
+          variant={inline ? "inline-mobile" : "dex-mobile"}
+          inline={inline}
           usdRates={usdRates}
           rlusdBalance={rlusdBalance}
           transactions={previewTransactions}
