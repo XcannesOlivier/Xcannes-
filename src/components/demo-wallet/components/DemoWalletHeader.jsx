@@ -220,21 +220,24 @@ export default function DemoWalletHeader({
           </div>
         </div>
 
-        <div className="text-[22px] text-white/55 mb-1">
+        <div className="text-[22px] text-white/55 mb-1 text-center w-full">
           {t("ui_total_balance_label_a91b6b8c1e", "Solde total")}
         </div>
         <p
-          className="text-6xl font-sans font-bold text-white tabular-nums tracking-tight leading-none"
+          className="text-6xl font-sans font-bold text-white tabular-nums tracking-tight leading-none text-center w-full"
           title={t("demo_tt_balance", "Total converti en USD (démo).")}
         >
           {formatMoney(locale, displayAmount, displayCurrency)}
         </p>
+        <div className="text-[14px] text-white/55 mt-1 text-center w-full">
+          {t("ui_digital_currencies_label_demo", "Devises numériques")}
+        </div>
         {Number.isFinite(totalInRlusd) &&
         totalInRlusd > 0 &&
         displayCurrency &&
         displayCurrency !== "USD" &&
         displayCurrency !== "RLUSD" ? (
-          <div className="text-[11px] text-white/50 mt-0.5 mb-1 inline-flex items-center gap-2">
+          <div className="text-[11px] text-white/50 mt-1 mb-1 inline-flex items-center justify-center gap-2 text-center w-full">
             <span>
               {totalInRlusd.toLocaleString("en", {
                 minimumFractionDigits: 2,
