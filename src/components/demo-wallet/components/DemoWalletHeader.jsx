@@ -39,8 +39,8 @@ export default function DemoWalletHeader({
   const resolvedWalletLabel =
     String(walletContextLabel || "").trim() || t("nav_wallet", "Wallet");
   const shortWalletLabel =
-    resolvedWalletLabel.length > 11
-      ? `${resolvedWalletLabel.slice(0, 11)}…`
+    resolvedWalletLabel.length > 13
+      ? `${resolvedWalletLabel.slice(0, 13)}…`
       : resolvedWalletLabel;
 
   useEffect(() => {
@@ -58,21 +58,21 @@ export default function DemoWalletHeader({
   }, [isSwitcherOpen]);
 
   return (
-    <div className="panel-header flex flex-col shrink-0 bg-[#111518] shadow-[inset_0_16px_28px_rgba(255,255,255,0.03),inset_0_-46px_70px_rgba(0,0,0,0.55)] px-3 pt-3 pb-2">
-      <div className="flex flex-col items-center gap-2">
-        <div className="w-full mb-1 px-1 flex justify-start">
+    <div className="panel-header flex flex-col shrink-0 bg-[#111518] shadow-[inset_0_16px_28px_rgba(255,255,255,0.03),inset_0_-46px_70px_rgba(0,0,0,0.55)] px-4 pt-4 pb-3">
+      <div className="flex flex-col items-center gap-3">
+        <div className="w-full mb-2 flex justify-start">
           <div className="relative flex items-center gap-2.5 w-full">
             <div
               className={[
-                "flex-none min-w-0 rounded-[12px] px-2 py-1.5 relative z-[41] transition-all duration-150",
+                "flex-none min-w-0 rounded-[14px] px-3 py-2 relative z-[41] transition-all duration-150",
                 "bg-[#0d1214] border border-white/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]",
                 isSwitcherOpen
-                  ? "w-[260px] border-l border-r border-t border-white/20 rounded-b-none"
-                  : "max-w-[260px]",
+                  ? "w-[280px] border-l border-r border-t border-white/20 rounded-b-none"
+                  : "max-w-[280px]",
               ].join(" ")}
               ref={switcherRef}
             >
-              <div className="flex items-start justify-between gap-1.5">
+              <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0 flex-1">
                   <button
                     type="button"
@@ -93,8 +93,26 @@ export default function DemoWalletHeader({
                         title={t("demo_xrpl_indicator", "XRPL (démo)")}
                         aria-label={t("demo_xrpl_indicator", "XRPL (démo)")}
                       />
-                      <span className="text-[17px] font-semibold text-white/85 truncate">
-                        {shortWalletLabel}
+                      <span className="min-w-0 flex items-center gap-2">
+                        <span className="text-[18px] font-semibold text-white/85 truncate">
+                          {shortWalletLabel}
+                        </span>
+                        <svg
+                          className={`w-4 h-4 shrink-0 transition-transform ${
+                            isSwitcherOpen ? "rotate-180" : ""
+                          } ${hasMultipleWallets ? "text-white/55" : "text-white/30"}`}
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                          aria-hidden
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M19 9l-7 7-7-7"
+                          />
+                        </svg>
                       </span>
                     </div>
 
@@ -122,7 +140,7 @@ export default function DemoWalletHeader({
                   ) : null}
 
                   {hasMultipleWallets && isSwitcherOpen ? (
-                    <div className="absolute z-50 -left-px top-full mt-0 w-[260px] rounded-b-[12px] bg-[#0d1214] border-l border-r border-b border-white/20 shadow-[0_12px_48px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.04)] max-h-[70vh] overflow-y-auto overflow-x-hidden">
+                    <div className="absolute z-50 -left-px top-full mt-0 w-[280px] rounded-b-[14px] bg-[#0d1214] border-l border-r border-b border-white/20 shadow-[0_12px_48px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.04)] max-h-[70vh] overflow-y-auto overflow-x-hidden">
                       {(walletAddresses || []).map((w) => {
                         const id = String(w?.id || "").toUpperCase();
                         const isActive =
@@ -182,31 +200,6 @@ export default function DemoWalletHeader({
                     </div>
                   ) : null}
                 </div>
-
-                {hasMultipleWallets ? (
-                  <button
-                    type="button"
-                    onClick={() => setIsSwitcherOpen((v) => !v)}
-                    className="p-1 bg-transparent border border-transparent hover:bg-transparent text-white/60 hover:text-white rounded-md transition-all active:scale-95"
-                    aria-label={t("ui_switch_wallet", "Changer de wallet")}
-                  >
-                    <svg
-                      className={`w-4 h-4 transition-transform ${
-                        isSwitcherOpen ? "rotate-180" : ""
-                      }`}
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M19 9l-7 7-7-7"
-                      />
-                    </svg>
-                  </button>
-                ) : null}
               </div>
             </div>
 
@@ -227,7 +220,7 @@ export default function DemoWalletHeader({
           </div>
         </div>
 
-        <div className="text-[21px] text-white/55 mb-0.5">
+        <div className="text-[22px] text-white/55 mb-1">
           {t("ui_total_balance_label_a91b6b8c1e", "Solde total")}
         </div>
         <p
