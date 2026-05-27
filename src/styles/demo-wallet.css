@@ -43,10 +43,10 @@
 .demo-wallet-demo-scope {
   color: var(--dw-text);
 }
-.demo-wallet-demo-scope .text-white\\/55 {
+.demo-wallet-demo-scope .text-white\/55 {
   color: var(--dw-text-secondary) !important;
 }
-.demo-wallet-demo-scope .text-white\\/45 {
+.demo-wallet-demo-scope .text-white\/45 {
   color: var(--dw-text-muted) !important;
 }
 
