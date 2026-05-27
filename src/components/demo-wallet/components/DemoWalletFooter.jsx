@@ -53,7 +53,7 @@ export default function DemoWalletFooter({
   const { t } = useTranslation("common");
 
   return (
-    <div className="mt-[2px] shrink-0 z-20 bg-transparent border-t-0">
+    <div className="mt-[2px] shrink-0 z-30 bg-transparent border-t-0 sticky bottom-0">
       <div
         className="relative shrink-0"
         style={{ paddingBottom: "max(4px, env(safe-area-inset-bottom))" }}
@@ -61,20 +61,17 @@ export default function DemoWalletFooter({
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[120px] bg-gradient-to-t from-[#0d1012] via-[#0d1012]/70 to-transparent" />
         <div className="pointer-events-none absolute inset-x-0 bottom-full h-[64px] bg-gradient-to-t from-[#0d1012]/90 to-transparent" />
 
-        <div className="relative z-10 mx-4 mb-1 h-[46px] flex items-center rounded-[30px] bg-[#0e1214] ring-1 ring-white/[0.02] ring-inset shadow-[0_2px_16px_rgba(0,0,0,0.35),0_1px_3px_rgba(0,0,0,0.2)]">
+        <div className="relative z-10 mx-4 mb-1 h-[52px] flex items-center overflow-visible rounded-[32px] bg-[#0b0f11] ring-1 ring-white/[0.03] ring-inset shadow-[0_10px_30px_rgba(0,0,0,0.55),0_2px_8px_rgba(0,0,0,0.28)]">
           <div className="flex-1 flex items-center justify-center h-full min-w-0">
             {onAddCurrency ? (
               <button
                 type="button"
                 onClick={onAddCurrency}
-                className="w-full h-[46px] flex flex-col items-center justify-center gap-[2px] pb-[7px] transition-colors rounded-l-[30px] px-3 group"
-                aria-label={t("ui_add_currency", "Ajouter")}
+                className="w-full h-[52px] flex flex-col items-center justify-center gap-[2px] pb-[5px] transition-colors rounded-l-[32px] px-3 group"
+                aria-label={t("ui_add_currency_demo", "+ Devises")}
               >
-                <span className="text-[18px] font-light leading-none text-white/75 group-hover:text-white/90 transition-colors">
-                  +
-                </span>
-                <span className="text-[14px] font-normal tracking-wide leading-none text-white/55 group-hover:text-white/75 transition-colors">
-                  {t("ui_add_currency", "Ajouter")}
+                <span className="text-[14px] font-medium tracking-wide leading-none text-white/75 group-hover:text-white/90 transition-colors">
+                  {t("ui_add_currency_demo", "+ Devises")}
                 </span>
               </button>
             ) : null}
@@ -85,7 +82,7 @@ export default function DemoWalletFooter({
               <button
                 type="button"
                 onClick={onScan}
-                className="flex h-[44px] w-[110px] items-center justify-center rounded-[20px] text-white transition-transform duration-150 hover:scale-[1.02] active:scale-[0.97] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#39d57c]/20"
+                className="flex h-[54px] w-[136px] -mt-4 items-center justify-center rounded-[26px] text-white transition-transform duration-150 hover:scale-[1.02] active:scale-[0.97] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#39d57c]/20 shadow-[0_18px_42px_rgba(0,0,0,0.55)]"
                 style={scanButtonStyle}
                 aria-label={t("ui_scan_qr_code_12fa63d927", "Scan QR Code")}
               >
@@ -99,7 +96,7 @@ export default function DemoWalletFooter({
               <button
                 type="button"
                 onClick={onHistory}
-                className="w-full h-[46px] flex flex-col items-center justify-center gap-[2px] pb-[7px] transition-colors rounded-r-[30px] px-3 group"
+                className="w-full h-[52px] flex flex-col items-center justify-center gap-[2px] pb-[5px] transition-colors rounded-r-[32px] px-3 group"
                 aria-label={t(
                   "ui_open_statement",
                   "Ouvrir le relevé des transactions",

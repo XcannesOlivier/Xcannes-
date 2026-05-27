@@ -1,6 +1,7 @@
 import "@/styles/globals.css";
 import "@/styles/animations.css";
 import "@/styles/wallet-actions.css";
+import "@/styles/demo-wallet.css";
 import { appWithTranslation } from "next-i18next";
 import nextI18NextConfig from "../../next-i18next.config";
 import { NativeWalletProvider } from "@/context/NativeWalletContext";

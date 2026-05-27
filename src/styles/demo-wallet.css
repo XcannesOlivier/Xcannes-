@@ -1,0 +1,60 @@
+/* Demo wallet only: keep real wallet untouched.
+   Scope: `.demo-wallet-demo-scope` is applied only on DemoWalletDashboard. */
+
+.demo-wallet-demo-scope {
+  --dw-bg: #060809; /* noir/gris très foncé */
+  --dw-surface: #0b0f10; /* surface principale */
+  --dw-surface-2: #0d1214; /* cartes / barres */
+  --dw-header: #111518;
+  --dw-text: rgba(255, 255, 255, 0.92);
+  --dw-text-secondary: rgba(255, 255, 255, 0.62);
+  --dw-text-muted: rgba(255, 255, 255, 0.42);
+  --dw-accent: #16a34a; /* vert */
+  color-scheme: dark;
+}
+
+/* Force the demo wallet to stay on dark mobile palette even when embedded in
+   pages that may change tokens elsewhere. */
+.demo-wallet-demo-scope .bg-xcannes-surface-demo {
+  background:
+    radial-gradient(ellipse at top, rgba(255, 255, 255, 0.045), transparent 62%),
+    radial-gradient(
+      ellipse at bottom,
+      rgba(22, 163, 74, 0.06),
+      transparent 58%
+    ),
+    var(--dw-bg) !important;
+}
+
+.demo-wallet-demo-scope .panel-header {
+  background: var(--dw-header) !important;
+}
+
+/* Softer cards / elevated surfaces in demo wallet */
+.demo-wallet-demo-scope .bg-elevated {
+  background-color: var(--dw-surface-2);
+}
+
+.demo-wallet-demo-scope .wallet-modal-panel {
+  background-color: var(--dw-bg) !important;
+}
+
+/* Slightly softer typography defaults when not explicitly set */
+.demo-wallet-demo-scope {
+  color: var(--dw-text);
+}
+.demo-wallet-demo-scope .text-white\\/55 {
+  color: var(--dw-text-secondary) !important;
+}
+.demo-wallet-demo-scope .text-white\\/45 {
+  color: var(--dw-text-muted) !important;
+}
+
+/* Action buttons: keep same layout but soften visuals a bit */
+.demo-wallet-demo-scope .wallet-action-btn {
+  background: rgba(255, 255, 255, 0.02);
+  border-color: rgba(255, 255, 255, 0.05);
+}
+.demo-wallet-demo-scope .wallet-action-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+}

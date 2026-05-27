@@ -479,7 +479,7 @@ export default function DemoWalletDashboard({
   }, [shouldLockBodyScroll]);
 
   return (
-    <div className="w-full h-full min-h-0 flex justify-center demo-wallet-tooltip-scope">
+    <div className="w-full h-full min-h-0 flex justify-center demo-wallet-tooltip-scope demo-wallet-demo-scope">
       <div className="w-full max-w-[410px] h-full min-h-0">
         <div className="bg-xcannes-surface-demo h-full min-h-0 overflow-hidden flex flex-col rounded-[28px] ring-1 ring-white/[0.06] shadow-[0_20px_60px_rgba(0,0,0,0.55)] relative">
           <DemoWalletHeader

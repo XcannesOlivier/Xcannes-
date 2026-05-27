@@ -164,7 +164,7 @@ export default function DemoWalletTokenList({
   );
 
   const listClassName =
-    "flex-1 min-h-0 px-3 pt-[2px] pb-[50px] overflow-y-auto overscroll-contain rounded-2xl bg-transparent";
+    "flex-1 min-h-0 px-3 pt-[6px] pb-[78px] overflow-y-auto overscroll-contain rounded-2xl bg-transparent";
 
   const rowSurfaceClass = [
     "bg-elevated",
@@ -179,7 +179,7 @@ export default function DemoWalletTokenList({
     <div className="flex-1 flex flex-col min-h-0">
       <div className="flex-1 min-h-0 flex flex-col">
         <div
-          className="flex items-center gap-2 mb-0 px-3 pt-0 bg-[linear-gradient(to_bottom,transparent_0%,#060809_calc(100%-8px),#060809_100%)] justify-between"
+          className="flex items-center gap-2 mb-0 px-3 pt-1 bg-[linear-gradient(to_bottom,transparent_0%,#060809_calc(100%-8px),#060809_100%)] justify-between"
           aria-live="polite"
         >
           <div className="w-full">{headerTitle}</div>

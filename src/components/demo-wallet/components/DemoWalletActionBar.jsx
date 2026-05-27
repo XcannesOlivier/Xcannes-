@@ -8,7 +8,11 @@ import { useTranslation } from "next-i18next";
 import { MOONPAY_UI_ENABLED, TOPPER_UI_ENABLED } from "@/utils/featureFlags";
 
 const CARD_CLASS =
-  "rounded-[16px] bg-gradient-to-b from-[#101415] to-[#0d1214] ring-1 ring-white/[0.04] ring-inset shadow-[-3px_3px_10px_2px_rgba(255,255,255,0.03),0_2px_8px_rgba(0,0,0,0.35),inset_0_-10px_14px_rgba(0,0,0,0.7)]";
+  "rounded-[22px] bg-gradient-to-b from-[#101415] to-[#0d1214] ring-1 ring-white/[0.04] ring-inset shadow-[-3px_3px_10px_2px_rgba(255,255,255,0.04),0_6px_14px_rgba(0,0,0,0.50),inset_0_-14px_20px_rgba(0,0,0,0.78)]";
+
+const BTN_CLASS =
+  "wallet-action-btn group w-full !rounded-[22px] !py-3.5 !px-2 !gap-2 min-h-[92px]";
+const ICON_CLASS = "wallet-action-icon !w-[44px] !h-[44px] !rounded-[16px]";
 
 export default function DemoWalletActionBar({
   setSendTab,
@@ -19,7 +23,7 @@ export default function DemoWalletActionBar({
   const cashEnabled = MOONPAY_UI_ENABLED || TOPPER_UI_ENABLED;
 
   return (
-    <div className="relative px-3 pt-[24px] pb-0 space-y-2">
+    <div className="relative px-3 pt-[24px] pb-2 space-y-2">
       <div className="grid grid-cols-4 gap-2 sm:gap-3 relative z-[1]">
         <div className={CARD_CLASS}>
           <button
@@ -29,11 +33,11 @@ export default function DemoWalletActionBar({
               setActiveAction("sendChoice");
             }}
             title={t("demo_tt_send", "Envoyer un paiement dans la devise choisie.")}
-            className="wallet-action-btn wallet-action-send group w-full"
+            className={`${BTN_CLASS} wallet-action-send`}
           >
-            <div className="wallet-action-icon">
+            <div className={`${ICON_CLASS} !text-white`}>
               <svg
-                className="w-[22px] h-[22px]"
+                className="w-[24px] h-[24px]"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -56,11 +60,11 @@ export default function DemoWalletActionBar({
             type="button"
             onClick={() => setActiveAction("receive")}
             title={t("demo_tt_receive", "Recevoir des fonds ou créer une demande.")}
-            className="wallet-action-btn wallet-action-receive group w-full"
+            className={`${BTN_CLASS} wallet-action-receive`}
           >
-            <div className="wallet-action-icon">
+            <div className={`${ICON_CLASS} !text-[#16A34A]`}>
               <svg
-                className="w-[22px] h-[22px]"
+                className="w-[24px] h-[24px]"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -83,11 +87,11 @@ export default function DemoWalletActionBar({
             type="button"
             onClick={() => setActiveAction("swap")}
             title={t("demo_tt_convert", "Convertir entre devises internes (démo).")}
-            className="wallet-action-btn wallet-action-swap group w-full"
+            className={`${BTN_CLASS} wallet-action-swap`}
           >
-            <div className="wallet-action-icon">
+            <div className={`${ICON_CLASS} !text-[#16A34A]`}>
               <svg
-                className="w-[22px] h-[22px]"
+                className="w-[24px] h-[24px]"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -126,18 +130,18 @@ export default function DemoWalletActionBar({
                   })
             }
             className={[
-              "wallet-action-btn wallet-action-buysell group w-full",
+              `${BTN_CLASS} wallet-action-buysell`,
               !cashEnabled ? "opacity-40 cursor-not-allowed" : "",
             ].join(" ")}
           >
-            <div className="wallet-action-icon">
-              <svg className="w-[22px] h-[22px]" viewBox="0 0 24 24" fill="none">
+            <div className={`${ICON_CLASS} !text-[#16A34A]`}>
+              <svg className="w-[24px] h-[24px]" viewBox="0 0 24 24" fill="none">
                 <text
                   x="12"
                   y="17"
                   textAnchor="middle"
                   fill="currentColor"
-                  fontSize="18"
+                  fontSize="19"
                   fontWeight="700"
                   fontFamily="system-ui, sans-serif"
                 >
