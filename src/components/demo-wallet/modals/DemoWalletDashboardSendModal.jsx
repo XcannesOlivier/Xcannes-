@@ -7,6 +7,7 @@ import DemoQRScanner from "../components/DemoQRScanner";
 import { createPortal } from "react-dom";
 import { useTranslation } from "next-i18next";
 import { useModalTransition } from "@/hooks/useModalTransition";
+import { useModalDragToClose } from "@/components/wallet/hooks/useModalDragToClose";
 import { formatAmountWithSymbol } from "../demoWalletDashboardConfig";
 import {
   greenActionBtnBase,
@@ -81,6 +82,7 @@ export default function DemoWalletDashboardSendModal({
   const [showSavedPicker, setShowSavedPicker] = useState(false);
   const [selectedSavedLabel, setSelectedSavedLabel] = useState("");
   const [sendAssetDropdownOpen, setSendAssetDropdownOpen] = useState(false);
+  const [showFullPayreqAddress, setShowFullPayreqAddress] = useState(false);
   const savedPickerRef = useRef(null);
   const savedMenuRef = useRef(null);
   const destinationInputRef = useRef(null);
@@ -161,6 +163,9 @@ export default function DemoWalletDashboardSendModal({
       : null;
   const requestBeneficiaryLabel = sendPaymentRequest?.beneficiaryLabel
     ? String(sendPaymentRequest.beneficiaryLabel)
+    : "";
+  const requestMemo = sendPaymentRequest?.memo
+    ? String(sendPaymentRequest.memo)
     : "";
   const requestDestination = String(
     sendPaymentRequest?.to || normalizedDestination || "",
@@ -494,16 +499,32 @@ export default function DemoWalletDashboardSendModal({
     enabled: shouldAnimate,
   });
 
+  const {
+    dragging: overlayDragging,
+    translateY: overlayTranslateY,
+    overlayRef,
+    closeRequestedRef,
+    maybeStartDrag: maybeStartOverlayDrag,
+    handlePointerMove: handleOverlayPointerMove,
+    handlePointerEnd: handleOverlayPointerEnd,
+  } = useModalDragToClose({
+    open,
+    inline,
+    onClose,
+    scrollContainerRef,
+    extraGuard: () => scanActive || sendAssetDropdownOpen,
+  });
+
   if (!shouldRender) return null;
 
   const wrapperClass = inline
     ? "relative w-full h-full flex"
-    : "fixed inset-0 z-[10001] flex items-end justify-center pointer-events-none";
+    : "fixed inset-0 z-[10001] flex items-end md:items-center justify-center md:px-4 pointer-events-none";
   const panelClass = [
-    "relative w-full wallet-modal-panel wallet-send-modal wallet-modal-no-top-highlight-mobile p-4 pt-0 space-y-4 flex flex-col pointer-events-auto pb-[env(safe-area-inset-bottom)] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-26px_46px_rgba(0,0,0,0.55)]",
+    "relative w-full wallet-modal-panel wallet-send-modal wallet-modal-no-top-highlight-mobile border-white/10 md:border lg:border-0 p-4 md:p-5 pt-0 md:pt-0 space-y-4 flex flex-col pointer-events-auto pb-[env(safe-area-inset-bottom)] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-26px_46px_rgba(0,0,0,0.55)]",
     inline
       ? "h-full max-h-none rounded-xl"
-      : "h-screen rounded-none",
+      : "h-screen md:h-auto md:max-w-lg md:max-h-[100vh] rounded-none md:rounded-2xl",
     noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-elevated",
     noticeVariant === "demo" ? "demo-wallet-tooltip-scope" : "",
     inline ? "wallet-inline-zoom-in" : "",
@@ -514,173 +535,99 @@ export default function DemoWalletDashboardSendModal({
       : "",
   ].join(" ");
 
+  const backdropAnimClass = closeRequestedRef.current
+    ? ""
+    : isClosing
+    ? "wallet-modal-backdrop-out"
+    : "wallet-modal-backdrop-in";
+
   const payreqFinalStep = hasPaymentRequest ? (
-    <div className="space-y-4">
-      {/* 1) Recipient input */}
-      <div className="space-y-2">
-        <label className="block text-base text-white/60">
-          {t("ui_send_to_label", "Destinataire")}
-        </label>
-        <div className="relative">
-          <input
-            type="text"
-            value={requestDestination}
-            readOnly
-            className="w-full bg-[#101415] ring-1 ring-white/15 ring-inset rounded-[20px] shadow-[0_4px_12px_rgba(0,0,0,0.4)] px-4 pr-24 py-3 text-base text-white/90 outline-none truncate focus:outline-none"
-          />
-          <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
-            <button
-              type="button"
-              onClick={handlePasteFromClipboard}
-              className="p-2 rounded-lg hover:bg-white/5 transition-colors text-white/60"
-              title={t("ui_paste", "Coller")}
-            >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M9 5h6a2 2 0 012 2v12a2 2 0 01-2 2H9a2 2 0 01-2-2V7a2 2 0 012-2z"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M9 3h6v2H9V3z"
-                />
-              </svg>
-            </button>
-            <button
-              type="button"
-              onClick={handleScanQrUpload}
-              className="p-2 rounded-lg hover:bg-white/5 transition-colors text-white/60"
-              title={t(
-                "ui_or_upload_a_qr_image_works_e_df6baa8039",
-                "Charger une image qrcode",
-              )}
-            >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M12 4v12m0 0l-3-3m3 3l3-3"
-                />
-              </svg>
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setScanActive(true);
-                setScanKey((prev) => prev + 1);
-                setCameraUnavailable(false);
-              }}
-              className="p-2 rounded-lg hover:bg-white/5 transition-colors text-white/60"
-              title={t("ui_scan_qr_code_12fa63d927", "Scan QR Code")}
-            >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"
-                />
-              </svg>
-            </button>
+    <div className="space-y-6">
+      {/* Title + subtitle */}
+      <div className="text-center space-y-2 pt-1">
+        <h3 className="text-[26px] md:text-[28px] font-semibold text-white/95 tracking-tight">
+          {t("ui_payreq_summary_title", "Résumé de la demande")}
+        </h3>
+        <p className="text-[14px] md:text-[15px] text-white/60 max-w-[34ch] mx-auto leading-relaxed">
+          {t("ui_payreq_summary_subtitle", "Vérifiez les détails avant de confirmer le paiement.")}
+        </p>
+        <div className="mt-[40px] flex justify-center">
+          <div className="rounded-[20px] px-4 py-3 bg-elevated ring-1 ring-white/10 ring-inset shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)]">
+            <div className="text-[11px] text-white/45 text-center">
+              {t("moonpay_from_account", "Compte source")}
+            </div>
+            <div className="mt-1 flex justify-center">
+              {renderWalletMeta?.("text-center [&_.font-mono]:hidden")}
+            </div>
           </div>
-        </div>
-        <div className="text-xs text-white/45 space-y-0.5">
-          <div className="text-white/70 font-semibold">
-            {requestBeneficiaryLabel || t("ui_wallet_unknown", "Unknown wallet")}
-          </div>
-          <div className="font-mono">{requestDestinationLabel}</div>
-          <div className="text-white/50">{t("ui_valid_address", "Adresse valide")}</div>
         </div>
       </div>
 
-      {/* 2) Divider */}
-      <div className="h-px bg-white/5 my-2" />
-
-      {/* 3) Summary */}
-      <div className="space-y-2">
-        <div className="text-xs uppercase tracking-wide text-white/60 font-semibold">
-          {t("ui_summary", "Résumé")}
+      {/* Summary lines – flat, no box */}
+      <div className="space-y-4">
+        <div className="flex items-baseline justify-between gap-4">
+          <span className="text-[15px] text-white/50">{t("ui_payreq_requested_by_label", "Demandé par")}</span>
+          <span className="text-[22px] font-semibold text-white truncate text-right">
+            {requestBeneficiaryLabel || t("ui_wallet_unknown", "Unknown wallet")}
+          </span>
         </div>
-        <div className="text-[11px] text-white/45">
-          {t(
-            "ui_verify_before_sending",
-            "Vérifiez les informations avant d’envoyer",
-          )}
+        <div className="flex items-baseline justify-between gap-4">
+          <span className="text-[15px] text-white/50">{t("ui_address", "Adresse")}</span>
+          <button
+            type="button"
+            onClick={() => setShowFullPayreqAddress((prev) => !prev)}
+            className="font-mono text-[15px] text-white/70 text-right underline decoration-white/25 underline-offset-2 hover:decoration-white/60 transition-colors truncate max-w-[60%]"
+            title={t("ui_toggle_full_account_number", "Afficher/masquer l'adresse complète")}
+          >
+            {showFullPayreqAddress ? requestDestination : requestDestinationLabel}
+          </button>
         </div>
-        <div className="rounded-[14px] p-4 space-y-3 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
-          <div className="space-y-0.5">
-            <div className="text-[11px] text-white/45">
-              {t("ui_beneficiary_label", "Destinataire")}
-            </div>
-            <div className="text-sm font-semibold text-white/90">
-              {requestBeneficiaryLabel || t("ui_wallet_unknown", "Unknown wallet")}
-            </div>
-          </div>
-          <div className="space-y-0.5">
-            <div className="text-[11px] text-white/45">
-              {t("ui_address", "Adresse")}
-            </div>
-            <div className="font-mono text-xs text-white/80">
-              {requestDestinationLabel}
-            </div>
-          </div>
-          <div className="flex items-start justify-between gap-4">
-            <div className="space-y-0.5">
-              <div className="text-[11px] text-white/45">
-                {t("ui_currency_label", "Devise")}
-              </div>
-              <div className="text-sm text-white/90">
-                {requestCurrencyCode || "—"}
-              </div>
-            </div>
-            <div className="text-right space-y-0.5">
-              <div className="text-[11px] text-white/45">
-                {t("ui_amount_52cea2dd3d", "Montant")}
-              </div>
-              <div className="text-lg font-semibold text-white/95">
-                {requestAmountLabel || "—"}
-              </div>
-            </div>
-          </div>
+        <div className="flex items-baseline justify-between gap-4">
+          <span className="text-[15px] text-white/50">{t("ui_currency_label", "Devise")}</span>
+          <span className="text-[17px] text-white/90">{requestCurrencyCode || confirmCurrencyCode || "—"}</span>
         </div>
-        {canSaveDestination ? (
-          <div className="rounded-lg ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] px-3 py-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
-            <label className="flex items-center gap-2 text-xs text-white/60">
-              <input
-                type="checkbox"
-                checked={saveNewAddress}
-                onChange={(e) => setSaveNewAddress(e.target.checked)}
-                className="accent-xcannes-green"
-              />
-              {t(
-                "ui_save_this_address_fr",
-                "Enregistrer cette adresse",
-              )}
-            </label>
+        {requestMemo ? (
+          <div className="flex items-baseline justify-between gap-4">
+            <span className="text-[15px] text-white/50">{t("ui_memo_label", "Motif")}</span>
+            <span className="text-[15px] text-white/80 text-right max-w-[60%] break-words">{requestMemo}</span>
           </div>
         ) : null}
+        <div className="flex items-baseline justify-between gap-4">
+          <span className="text-[20px] text-white/90">{t("ui_total_to_send_label", "Total à envoyer")}</span>
+          <span className="text-3xl font-semibold text-white">{requestAmountLabel || "—"}</span>
+        </div>
       </div>
+
+      {canSaveDestination ? (
+        <div className="rounded-lg bg-gradient-to-b from-white/[0.08] to-white/[0.03] px-3 py-2 space-y-2 ring-1 ring-white/10 ring-inset shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
+          <label className="flex items-center gap-2 text-[11px] text-white/60">
+            <input
+              type="checkbox"
+              checked={saveNewAddress}
+              onChange={(e) => setSaveNewAddress(e.target.checked)}
+              className="accent-xcannes-green"
+            />
+            {t("ui_save_this_address_7ef65aa11c", "Save this address?")}
+          </label>
+          {saveNewAddress ? (
+            <div className="space-y-1">
+              <div className="text-[11px] text-white/60">
+                {t("ui_label_optional_3b6a3c454c", "Label (optional)")}
+              </div>
+              <input
+                type="text"
+                value={saveNewAddressLabel}
+                onChange={(e) => setSaveNewAddressLabel(e.target.value)}
+                placeholder={t("ui_e_g_exchange_friend_11008b5e9e", "e.g., Exchange, Friend, ...")}
+                className="w-full bg-black/40 ring-1 ring-white/15 ring-inset rounded-lg px-3 py-2 text-xs text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/80"
+              />
+            </div>
+          ) : null}
+        </div>
+      ) : null}
     </div>
   ) : null;
+
 
   const saveAddressBlock = canSaveDestination ? (
     <div className="rounded-lg bg-gradient-to-b from-white/[0.08] to-white/[0.03] px-3 py-2 space-y-2 ring-1 ring-white/10 ring-inset shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
@@ -1172,7 +1119,19 @@ export default function DemoWalletDashboardSendModal({
     </div>
   ) : null;
 
-  const sendButtonDisabled = sendProcessing || !canManualSend;
+  const ctaEnabledBg = hasPaymentRequest
+    ? "linear-gradient(180deg, rgba(245, 166, 35, 1) 0%, rgba(217, 140, 15, 1) 100%)"
+    : "linear-gradient(180deg, rgba(44, 185, 103, 1) 0%, rgba(14, 103, 58, 1) 100%)";
+  const ctaDisabledBg = hasPaymentRequest
+    ? "linear-gradient(180deg, rgba(245, 166, 35, 0.34) 0%, rgba(217, 140, 15, 0.34) 100%)"
+    : "linear-gradient(180deg, rgba(44, 185, 103, 0.34) 0%, rgba(14, 103, 58, 0.34) 100%)";
+  const ctaRingClass = hasPaymentRequest ? "ring-[#f5a623]/30" : "ring-xcannes-green/30";
+
+  const sendButtonDisabled =
+    sendProcessing ||
+    !canManualSend ||
+    submitStatus === "processing" ||
+    submitStatus === "success";
   const sendButtonLabel = sendProcessing
     ? t("ui_sending_3b8c1a7d5e", "Sending...")
     : t("ui_send_504b64a87b", "Envoyer");
@@ -1187,82 +1146,92 @@ export default function DemoWalletDashboardSendModal({
           <div className="mt-1 text-orange-200/80">{submitError}</div>
         </div>
       ) : null}
+      {/* Bouton mobile */}
       <button
         type="button"
         onClick={(e) => {
           e.stopPropagation();
           handleManualSend();
         }}
-        disabled={
-          sendButtonDisabled ||
-          submitStatus === "processing" ||
-          submitStatus === "success"
-        }
+        disabled={sendButtonDisabled}
         className={[
-          "w-full h-14 rounded-[20px] text-lg font-semibold transition-all duration-200 tracking-[-0.01em]",
+          "md:hidden w-full h-[52px] flex items-center justify-center rounded-[14px] text-[22px] font-semibold transition-all duration-200 tracking-[-0.01em]",
           sendButtonDisabled
             ? sendProcessing
               ? "opacity-45 cursor-not-allowed"
-              : "bg-xcannes-green/[0.07] text-xcannes-green/60 cursor-not-allowed ring-[0.5px] ring-xcannes-green/40 ring-inset"
+              : `text-white/90 cursor-not-allowed ring-[0.5px] ${ctaRingClass} ring-inset`
             : "text-white hover:scale-[1.01] active:scale-[0.98]",
         ].join(" ")}
-        style={
-          sendButtonDisabled
-            ? sendProcessing
-              ? {
-                  background:
-                    "linear-gradient(180deg, rgba(34,154,86,0.65) 0%, rgba(14,103,58,0.65) 100%)",
-                  color: "rgba(255,255,255,0.4)",
-                }
-              : undefined
-            : {
-                background:
-                  "linear-gradient(180deg, rgba(34,154,86,1) 0%, rgba(14,103,58,1) 100%)",
-                boxShadow:
-                  "0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)",
-              }
-        }
+        style={{
+          background: sendButtonDisabled ? ctaDisabledBg : ctaEnabledBg,
+          boxShadow: sendButtonDisabled
+            ? "0 12px 24px rgba(0,0,0,0.44), 0 5px 12px rgba(0,0,0,0.24), inset 0 1px 0 rgba(255,255,255,0.12), inset 0 -10px 16px rgba(0,0,0,0.24)"
+            : "0 22px 42px rgba(0,0,0,0.78), 0 10px 22px rgba(0,0,0,0.55), 0 4px 10px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -16px 26px rgba(0,0,0,0.55), inset 0 12px 22px rgba(0,0,0,0.18)",
+          ...(sendProcessing ? { background: ctaDisabledBg, color: "rgba(255,255,255,0.4)" } : null),
+        }}
       >
         {submitStatus === "success" ? (
           <span className="inline-flex items-center justify-center gap-2 text-white/90">
             <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-white/10 ring-1 ring-white/15 ring-inset">
-              <svg
-                className="w-3.5 h-3.5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M5 13l4 4L19 7"
-                />
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
               </svg>
             </span>
             {t("ui_done", "Terminé")}
           </span>
         ) : sendButtonDisabled && !sendProcessing ? (
-          <span className="inline-flex items-center gap-1.5 text-white/20">
-            <span className="text-[14px] md:text-[16px]">
-              {t("ui_send_fill_cta", "Choisissez la devise et le montant")}
-            </span>
+          <span className="inline-flex items-center gap-1.5 text-white/85">
+            <span className="text-[13px]">{t("ui_send_fill_cta", "Choisissez la devise et le montant")}</span>
             <span className="inline-flex items-end gap-[3px] mb-[-1px]">
-              <span className="send-modal-dot" style={{ animationDelay: "0s" }}>
-                ·
-              </span>
-              <span
-                className="send-modal-dot"
-                style={{ animationDelay: "0.6s" }}
-              >
-                ·
-              </span>
-              <span
-                className="send-modal-dot"
-                style={{ animationDelay: "1.2s" }}
-              >
-                ·
-              </span>
+              <span className="send-modal-dot" style={{ animationDelay: "0s" }}>·</span>
+              <span className="send-modal-dot" style={{ animationDelay: "0.6s" }}>·</span>
+              <span className="send-modal-dot" style={{ animationDelay: "1.2s" }}>·</span>
+            </span>
+          </span>
+        ) : (
+          sendButtonLabel
+        )}
+      </button>
+      {/* Bouton desktop */}
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          handleManualSend();
+        }}
+        disabled={sendButtonDisabled}
+        className={[
+          "hidden md:flex items-center justify-center w-full h-[56px] rounded-[14px] text-[24px] font-semibold transition-all duration-200 tracking-[-0.01em]",
+          sendButtonDisabled
+            ? sendProcessing
+              ? "opacity-45 cursor-not-allowed"
+              : `text-white/90 cursor-not-allowed ring-[0.5px] ${ctaRingClass} ring-inset`
+            : "text-white hover:scale-[1.01] active:scale-[0.98]",
+        ].join(" ")}
+        style={{
+          background: sendButtonDisabled ? ctaDisabledBg : ctaEnabledBg,
+          boxShadow: sendButtonDisabled
+            ? "0 12px 24px rgba(0,0,0,0.44), 0 5px 12px rgba(0,0,0,0.24), inset 0 1px 0 rgba(255,255,255,0.12), inset 0 -10px 16px rgba(0,0,0,0.24)"
+            : "0 22px 42px rgba(0,0,0,0.78), 0 10px 22px rgba(0,0,0,0.55), 0 4px 10px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -16px 26px rgba(0,0,0,0.55), inset 0 12px 22px rgba(0,0,0,0.18)",
+          ...(sendProcessing ? { background: ctaDisabledBg, color: "rgba(255,255,255,0.4)" } : null),
+        }}
+      >
+        {submitStatus === "success" ? (
+          <span className="inline-flex items-center justify-center gap-2 text-white/90">
+            <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-white/10 ring-1 ring-white/15 ring-inset">
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+            </span>
+            {t("ui_done", "Terminé")}
+          </span>
+        ) : sendButtonDisabled && !sendProcessing ? (
+          <span className="inline-flex items-center gap-1.5 text-white/85">
+            <span className="text-[16px]">{t("ui_send_fill_cta", "Choisissez la devise et le montant")}</span>
+            <span className="inline-flex items-end gap-[3px] mb-[-1px]">
+              <span className="send-modal-dot" style={{ animationDelay: "0s" }}>·</span>
+              <span className="send-modal-dot" style={{ animationDelay: "0.6s" }}>·</span>
+              <span className="send-modal-dot" style={{ animationDelay: "1.2s" }}>·</span>
             </span>
           </span>
         ) : (
@@ -1367,94 +1336,161 @@ export default function DemoWalletDashboardSendModal({
       {/* Backdrop */}
       {!inline ? (
         <div
-          className={`fixed inset-0 z-[10000] bg-black/80 ${
-            isClosing ? "wallet-modal-backdrop-out" : "wallet-modal-backdrop-in"
-          }`}
+          className={`fixed inset-0 z-[10000] bg-black/80 md:backdrop-blur-sm ${backdropAnimClass}`}
           onClick={onClose}
+          style={
+            overlayTranslateY > 0
+              ? { opacity: Math.max(0, Math.min(1, 1 - overlayTranslateY / 420)) }
+              : undefined
+          }
         />
       ) : null}
 
       {/* Modale */}
       <div className={wrapperClass}>
         <div
-          className={panelClass}
-          style={{ WebkitOverflowScrolling: "touch" }}
-          onClick={(e) => {
-            if (!inline) e.stopPropagation();
+          ref={overlayRef}
+          className={inline ? "w-full h-full flex" : "pointer-events-auto w-full"}
+          style={{
+            transform: `translateY(${Math.max(0, overlayTranslateY)}px)`,
+            transition: overlayDragging
+              ? "none"
+              : "transform 220ms cubic-bezier(0.2,0,0,1)",
+            opacity: overlayTranslateY > 0 ? Math.max(0, Math.min(1, 1 - overlayTranslateY / 420)) : undefined,
+            willChange: overlayTranslateY ? "transform" : undefined,
+            touchAction: inline ? undefined : "none",
           }}
+          onPointerMove={handleOverlayPointerMove}
+          onPointerUp={handleOverlayPointerEnd}
+          onPointerCancel={handleOverlayPointerEnd}
         >
-          {!inline ? (
-            <div className="flex justify-center pt-0 pb-0 touch-none" aria-hidden>
-              <span className="block w-12 h-1.5 rounded-full bg-white/20" />
-            </div>
-          ) : null}
           <div
-            className={`flex items-start justify-between gap-3 relative z-[65] touch-none ${
-              hasPaymentRequest ? "mb-[110px]" : "mb-[54px]"
-            }`}
+            className={panelClass}
+            onClick={(e) => {
+              if (!inline) e.stopPropagation();
+            }}
+            onPointerDown={(event) => {
+              if (inline) return;
+              if (scrollContainerRef.current?.contains(event.target)) return;
+              maybeStartOverlayDrag(event, "fixed");
+            }}
           >
-            <div className="flex min-w-0 flex-col gap-1.5 w-full">
-              <div className="flex flex-wrap items-center gap-2">
-                {noticeVariant === "demo" ? (
-                  <span className="inline-flex items-center text-white/80 text-sm font-semibold px-2 py-1 leading-none">
-                    {t("demo_notice_title", "Mode démo")}
-                  </span>
-                ) : null}
-              </div>
+            {/* Ambient glow */}
+            <div className="pointer-events-none absolute inset-0" aria-hidden>
+              <div
+                className={`absolute inset-0 md:hidden ${
+                  hasPaymentRequest
+                    ? "bg-[radial-gradient(700px_circle_at_100%_50%,rgba(245,166,35,0.07),transparent_60%)]"
+                    : "bg-[radial-gradient(700px_circle_at_100%_50%,rgba(0,255,150,0.07),transparent_60%)]"
+                }`}
+              />
+              <div
+                className={`absolute inset-0 hidden md:block ${
+                  hasPaymentRequest
+                    ? "bg-[radial-gradient(1000px_circle_at_100%_50%,rgba(245,166,35,0.07),transparent_60%)]"
+                    : "bg-[radial-gradient(1000px_circle_at_100%_50%,rgba(0,255,150,0.07),transparent_60%)]"
+                }`}
+              />
             </div>
-          </div>
-          <div
-            ref={scrollContainerRef}
-            className="flex-1 overflow-y-auto -mx-4 px-4"
-          >
-            <div className="flex flex-col gap-3">
-              {hasPaymentRequest ? (
-                payreqFinalStep
-              ) : (
-                <>
-                  {manualForm}
-                  {inlineSummary}
-                </>
-              )}
-              {scannerModal}
-            </div>
-          </div>
-          {inline &&
-          savedPickerMenu &&
-          savedMenuStyle &&
-          typeof document !== "undefined"
-            ? createPortal(
+            <div className="relative z-10 flex flex-col flex-1 min-h-0">
+              {!inline ? (
                 <div
-                  style={{
-                    position: "fixed",
-                    left: savedMenuStyle.left,
-                    top: savedMenuStyle.top,
-                    width: savedMenuStyle.width,
-                    zIndex: 12050,
+                  className="md:hidden flex justify-center pt-0 pb-0 touch-none"
+                  aria-hidden
+                  onPointerDown={(event) => {
+                    maybeStartOverlayDrag(event, "fixed");
                   }}
                 >
-                  {savedPickerMenu}
-                </div>,
-                document.body,
-              )
-            : null}
-          {sendActions}
-          <input
-            id={scanQrFileInputId}
-            type="file"
-            accept="image/*"
-            className="sr-only"
-            onChange={(e) => {
-              const file = e.target.files?.[0] || null;
-              e.target.value = "";
-              handleManualQrFile(file);
-            }}
-          />
-          <div
-            id={manualQrReaderIdRef.current}
-            className="hidden"
-            aria-hidden
-          />
+                  <span className="block w-12 h-1.5 rounded-full bg-white/20" />
+                </div>
+              ) : null}
+              {/* Bottom bar – mobile only */}
+              <div
+                className="md:hidden pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-[max(env(safe-area-inset-bottom),10px)] z-20"
+                aria-hidden
+              >
+                <span className="block w-36 h-1.5 rounded-full bg-white/80" />
+              </div>
+              <div
+                className={`flex items-start justify-between gap-3 relative z-[65] touch-none ${
+                  hasPaymentRequest ? "mb-[110px] md:mb-[140px]" : "mb-[54px] md:mb-[60px]"
+                }`}
+                onPointerDown={(event) => {
+                  maybeStartOverlayDrag(event, "fixed");
+                }}
+              >
+                <div className="flex min-w-0 flex-col gap-1.5 w-full">
+                  <div className="flex flex-wrap items-center gap-2">
+                    {noticeVariant === "demo" ? (
+                      <span className="inline-flex items-center text-white/80 text-sm md:text-base font-semibold px-2 py-1 leading-none">
+                        {t("demo_notice_title", "Mode démo")}
+                      </span>
+                    ) : null}
+                  </div>
+                </div>
+              </div>
+              <div
+                ref={scrollContainerRef}
+                className="flex-1 overflow-y-auto -mx-4 px-4 md:-mx-5 md:px-5"
+                style={{ touchAction: "pan-y" }}
+                onPointerDown={(event) => {
+                  maybeStartOverlayDrag(event, hasPaymentRequest ? "fixed" : "list");
+                }}
+              >
+                <div className="flex flex-col gap-3">
+                  {hasPaymentRequest ? (
+                    payreqFinalStep
+                  ) : (
+                    <>
+                      {manualForm}
+                      {inlineSummary}
+                    </>
+                  )}
+                  {scannerModal}
+                  {sendActions}
+                </div>
+              </div>
+              {/* Bottom bar – desktop only (inline) */}
+              <div className="hidden md:flex pointer-events-none justify-center pt-2 pb-4" aria-hidden>
+                <span className="block w-[120px] h-[4px] rounded-full bg-white/10" />
+              </div>
+            </div>
+            {inline &&
+            savedPickerMenu &&
+            savedMenuStyle &&
+            typeof document !== "undefined"
+              ? createPortal(
+                  <div
+                    style={{
+                      position: "fixed",
+                      left: savedMenuStyle.left,
+                      top: savedMenuStyle.top,
+                      width: savedMenuStyle.width,
+                      zIndex: 12050,
+                    }}
+                  >
+                    {savedPickerMenu}
+                  </div>,
+                  document.body,
+                )
+              : null}
+            <input
+              id={scanQrFileInputId}
+              type="file"
+              accept="image/*"
+              className="sr-only"
+              onChange={(e) => {
+                const file = e.target.files?.[0] || null;
+                e.target.value = "";
+                handleManualQrFile(file);
+              }}
+            />
+            <div
+              id={manualQrReaderIdRef.current}
+              className="hidden"
+              aria-hidden
+            />
+          </div>
         </div>
       </div>
     </>
