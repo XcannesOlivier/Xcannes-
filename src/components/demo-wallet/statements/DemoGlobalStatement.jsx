@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
 import { useTranslation } from "next-i18next";
@@ -563,310 +563,647 @@ export default function DemoGlobalStatement({
     return flags[code] || "💱";
   };
 
+  const [txFilter, setTxFilter] = useState("all");
+  const [accountDropdownOpen, setAccountDropdownOpen] = useState(false);
+  const [accountAddressExpanded, setAccountAddressExpanded] = useState(false);
+  const [accountCopyNotice, setAccountCopyNotice] = useState("");
+  const [detailTx, setDetailTx] = useState(null);
+  const [detailOpen, setDetailOpen] = useState(false);
+  const accountDropdownRef = useRef(null);
+  const accountCopyNoticeTimerRef = useRef(null);
+
+  useEffect(() => {
+    if (!accountDropdownOpen) return;
+    const handler = (e) => {
+      if (accountDropdownRef.current && !accountDropdownRef.current.contains(e.target)) {
+        setAccountDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [accountDropdownOpen]);
+
+  const openMovementDetails = useCallback((m) => {
+    setDetailTx(m);
+    setDetailOpen(true);
+  }, []);
+
+  const closeMovementDetails = useCallback(() => {
+    setDetailOpen(false);
+    setTimeout(() => setDetailTx(null), 200);
+  }, []);
+
   const STATEMENT_LAYOUTS = {
     full: {
-      backdropClass: "bg-black/80",
-      wrapperClass: "items-stretch justify-center px-0",
+      backdropClass: "bg-black/80 md:backdrop-blur-sm",
+      wrapperClass: "items-stretch justify-center px-0 md:items-center md:px-4",
       panelClass:
-        "w-full h-[100dvh] max-h-[100dvh] rounded-none border-0",
-    },
-    "dex-desktop": {
-      backdropClass: "bg-black/75",
-      wrapperClass: "items-center justify-center px-3",
-      panelClass:
-        "max-w-4xl rounded-2xl max-h-[90vh]",
-    },
-    "dex-mobile": {
-      backdropClass: "bg-black/90",
-      wrapperClass: "items-stretch justify-center px-0",
-      panelClass: "w-full h-[100dvh] max-h-[100dvh] rounded-none border-0",
-    },
-    default: {
-      backdropClass: "bg-black/80",
-      wrapperClass: "items-center justify-center px-4",
-      panelClass:
-        "max-w-5xl rounded-2xl max-h-[92vh]",
+        "w-full xcannes-fullscreen-safe md:h-auto rounded-none border-0 md:max-w-5xl md:rounded-2xl md:max-h-[92vh] lg:max-w-6xl",
     },
     "inline-desktop": {
       backdropClass: "",
       wrapperClass: "items-stretch justify-stretch p-0",
-      panelClass: "w-full h-full rounded-xl border-l border-white/10",
-    },
-    "inline-mobile": {
-      backdropClass: "",
-      wrapperClass: "items-stretch justify-stretch p-0",
-      panelClass: "w-full h-full rounded-none border-0",
+      panelClass: "w-full h-full rounded-xl",
     },
   };
 
-  const resolvedLayout = inline
-    ? STATEMENT_LAYOUTS[variant] || STATEMENT_LAYOUTS["inline-desktop"]
-    : STATEMENT_LAYOUTS["dex-mobile"];
+  const resolvedLayout =
+    STATEMENT_LAYOUTS[variant] || STATEMENT_LAYOUTS.full;
   const wrapperBaseClass = inline
     ? "relative w-full h-full flex"
     : "fixed inset-0 z-[10200] flex";
-
   const modalBgClass =
     noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-elevated";
-  const content = (
-    <div
-      className={`${wrapperBaseClass} ${resolvedLayout.wrapperClass} ${
-        inline
-          ? ""
-          : `${resolvedLayout.backdropClass} ${
-              isClosing
-                ? "wallet-modal-backdrop-out"
-                : "wallet-modal-backdrop-in"
-            }`
-      }`}
-      onClick={(e) => {
-        if (inline) return;
-        // Fermer uniquement si on clique sur le backdrop (pas sur le modal)
-        if (e.target === e.currentTarget) {
-          onClose?.();
-        }
-      }}
-    >
-      <div
-        className={`relative w-full wallet-modal-panel ${modalBgClass} flex flex-col overflow-hidden z-[10201] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-26px_46px_rgba(0,0,0,0.55)] ${
-          resolvedLayout.panelClass
-        } ${inline ? "wallet-inline-zoom-in" : isClosing ? "wallet-modal-lift-out" : "wallet-modal-lift-in"}`}
-      >
-        {/* Header */}
-        <div
-          className="relative flex-shrink-0 bg-[#111518] shadow-[inset_0_16px_28px_rgba(255,255,255,0.03),inset_0_-46px_70px_rgba(0,0,0,0.55)] px-4 py-4 before:content-[''] before:absolute before:left-0 before:right-0 before:bottom-0 before:h-px before:bg-white/10"
-        >
-          <div className="flex justify-center -mt-1 pt-1 pb-2" aria-hidden>
-            <span className="block w-12 h-1.5 rounded-full bg-white/20" />
-          </div>
-          <div className="flex justify-center">
-            <div className="min-w-0 flex flex-col items-center justify-center text-center">
-              <div className="flex items-center justify-center flex-wrap">
-                <h2 className="text-[30px] font-bold text-white/95 tracking-tight leading-tight text-center">
-                  {t(
-                    "ui_global_statement_13e29aa8aa",
-                    "Historique de vos dernières transactions",
-                  )}
-                </h2>
-                {noticeVariant === "demo" ? (
-                  <span className="ml-2 inline-flex items-center text-white/80 text-sm font-semibold px-2 py-0.5 leading-none">
-                    {t("demo_notice_title", "Mode démo")}
-                  </span>
-                ) : null}
+
+  const transactionDetailModal =
+    detailOpen && detailTx && typeof document !== "undefined"
+      ? createPortal(
+          <div className="fixed inset-0 z-[10400] flex items-end md:items-center justify-center">
+            <div
+              className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+              onClick={closeMovementDetails}
+            />
+            <div
+              className={`relative w-full md:max-w-lg rounded-t-2xl md:rounded-2xl ${modalBgClass} flex flex-col overflow-hidden shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-26px_46px_rgba(0,0,0,0.55)] wallet-modal-lift-in`}
+            >
+              <div className="flex-shrink-0 bg-[#111518] px-5 py-4 flex items-center justify-between">
+                <div>
+                  <div className="text-[15px] font-semibold text-white/95">
+                    {(() => {
+                      const k = String(detailTx?.kind || "").toUpperCase();
+                      if (k === "CONVERSION") return t("ui_conversion", "Conversion");
+                      if (k.includes("_OUT")) return t("statement_xrpl_mobile_out", "Envoyé");
+                      if (k.includes("_IN")) return t("statement_xrpl_mobile_in", "Reçu");
+                      return t("ui_transaction", "Transaction");
+                    })()}
+                  </div>
+                  <div className="text-[11px] text-white/50 mt-0.5">
+                    {detailTx?.createdAt
+                      ? new Date(detailTx.createdAt).toLocaleString(locale)
+                      : ""}
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={closeMovementDetails}
+                  className="shrink-0 p-1.5 rounded-lg text-white/50 hover:text-white hover:bg-white/10 transition-colors"
+                  aria-label={t("ui_close", "Fermer")}
+                >
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    strokeWidth={2}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
               </div>
-              <p className="mt-2 text-[14px] text-white/60 max-w-[52ch] leading-relaxed">
-                {t(
-                  "ui_global_statement_subtitle_recent_20",
-                  "Consultez vos transactions récentes et ouvrez-en une pour voir les détails.",
-                )}
-              </p>
-              <div className="mt-3 flex flex-col items-center gap-1 min-w-0">
-                <span className="text-sm text-white font-semibold">
-                  {walletLabel || t("nav_wallet", "Wallet")}
-                </span>
-                {walletAddress ? (
-                  <span className="text-xs text-white/60 font-mono break-all">
-                    {walletAddress}
-                  </span>
-                ) : null}
+              <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
+                {(() => {
+                  const k = String(detailTx?.kind || "").toUpperCase();
+                  const isConversion = k === "CONVERSION";
+                  const isPaymentOut = k.includes("_OUT");
+                  const isPaymentIn = k.includes("_IN");
+                  const isDebit = isPaymentOut || k.includes("FEE");
+                  const displayAmount = Number(detailTx?.displayAmount);
+                  const amount =
+                    Number.isFinite(displayAmount) && displayAmount
+                      ? displayAmount
+                      : Number(detailTx?.amountRlusd || 0);
+                  const currency = String(
+                    detailTx?.displayCurrencyCode || "RLUSD",
+                  ).trim();
+                  const from = String(
+                    detailTx?.fromCurrencyCode || "",
+                  ).toUpperCase();
+                  const to = String(
+                    detailTx?.toCurrencyCode || "",
+                  ).toUpperCase();
+
+                  return (
+                    <>
+                      {!isConversion ? (
+                        <div className="rounded-[14px] p-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03]">
+                          <div className="text-xs text-white/50">
+                            {t("ui_amount_label_2c7a1d9b5e", "Montant")}
+                          </div>
+                          <div
+                            className={`mt-1 text-2xl font-bold font-mono ${
+                              isDebit ? "text-red-400" : "text-xcannes-green"
+                            }`}
+                          >
+                            {isDebit ? "−" : "+"}
+                            {Number.isFinite(amount)
+                              ? `${amount.toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${currency}`
+                              : "—"}
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="rounded-[14px] p-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03]">
+                          <div className="text-xs text-white/50">
+                            {t("ui_conversion", "Conversion")}
+                          </div>
+                          <div className="mt-1 text-xl font-bold text-white/90">
+                            {from} → {to}
+                          </div>
+                        </div>
+                      )}
+                      {detailTx?.txHash ? (
+                        <div>
+                          <div className="text-xs text-white/50 mb-1">
+                            {t("ui_tx_hash_label_2b7c1a9d5e", "Tx hash")}
+                          </div>
+                          <div className="text-xs font-mono text-white/70 break-all">
+                            {detailTx.txHash}
+                          </div>
+                        </div>
+                      ) : null}
+                      {detailTx?.counterparty &&
+                      detailTx.counterparty.toUpperCase() !== "XCANNES" ? (
+                        <div>
+                          <div className="text-xs text-white/50 mb-1">
+                            {isPaymentOut
+                              ? t("ui_recipient_label", "Destinataire")
+                              : t("ui_sender_label", "Expéditeur")}
+                          </div>
+                          <div className="text-xs font-mono text-white/70 break-all">
+                            {detailTx.counterparty}
+                          </div>
+                        </div>
+                      ) : null}
+                      {detailTx?.note ? (
+                        <div>
+                          <div className="text-xs text-white/50 mb-1">
+                            {t("ui_note_label", "Note")}
+                          </div>
+                          <div className="text-sm text-white/80">
+                            {detailTx.note}
+                          </div>
+                        </div>
+                      ) : null}
+                    </>
+                  );
+                })()}
               </div>
             </div>
-            {/* close via swipe/backdrop */}
+          </div>,
+          document.body,
+        )
+      : null;
+
+  const content = (
+    <div className={`${wrapperBaseClass} ${resolvedLayout.wrapperClass}`}>
+      {!inline ? (
+        <div
+          className={[
+            "absolute inset-0 z-[10200]",
+            resolvedLayout.backdropClass,
+            isClosing ? "wallet-modal-backdrop-out" : "wallet-modal-backdrop-in",
+          ].join(" ")}
+          onClick={onClose}
+        />
+      ) : null}
+
+      <div
+        className={`relative w-full wallet-modal-panel wallet-modal-no-top-highlight-mobile ${modalBgClass} flex flex-col overflow-hidden ${inline ? "z-[1]" : "z-[10201]"} shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-26px_46px_rgba(0,0,0,0.55)] ${resolvedLayout.panelClass} ${inline ? "wallet-inline-zoom-in" : isClosing ? "wallet-modal-lift-out" : "wallet-modal-lift-in"}`}
+      >
+        {/* Header + Filtres */}
+        <div className="relative flex-shrink-0 bg-[#111518] shadow-[inset_0_70px_100px_rgba(0,0,0,0.75)]">
+          <div className="px-4 md:px-5 py-4">
+            {!inline ? (
+              <div
+                className="md:hidden flex justify-center -mt-1 pt-1 pb-2"
+                aria-hidden
+              >
+                <span className="block w-12 h-1.5 rounded-full bg-white/20" />
+              </div>
+            ) : null}
+            <div className="flex justify-start">
+              <div className="min-w-0 flex flex-col items-start justify-center text-left gap-3">
+                <div className="flex items-center justify-start gap-3">
+                  <svg
+                    width="34"
+                    height="34"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.3"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="shrink-0 text-white/70"
+                    aria-hidden="true"
+                  >
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h8" strokeWidth="1.1" />
+                    <polyline points="14 2 14 8 20 8" strokeWidth="1.1" />
+                    <circle cx="18" cy="17" r="4" strokeWidth="1.1" />
+                    <polyline points="18 15 18 17 19.5 18.5" />
+                    <line x1="8" y1="13" x2="12" y2="13" />
+                    <line x1="8" y1="9" x2="10" y2="9" />
+                    <line x1="8" y1="17" x2="11" y2="17" />
+                  </svg>
+                  <h2 className="text-[28px] md:text-[32px] font-semibold text-white/95 tracking-tight text-left">
+                    {t(
+                      "ui_global_statement_13e29aa8aa",
+                      "Historique de vos dernières transactions",
+                    )}
+                  </h2>
+                  {noticeVariant === "demo" ? (
+                    <span className="ml-2 inline-flex items-center text-white/80 text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
+                      {t("demo_notice_title", "Mode démo")}
+                    </span>
+                  ) : null}
+                </div>
+                <p className="mt-2 text-[13px] md:text-[15px] text-white/50 max-w-[46ch] md:max-w-[60ch] leading-relaxed">
+                  {t(
+                    "ui_global_statement_subtitle_recent_20",
+                    "Consultez vos transactions récentes et ouvrez-en une pour voir les détails.",
+                  )}
+                </p>
+              </div>
+            </div>
           </div>
 
-          <div className="mt-4 rounded-[14px] p-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
-            <div className="text-xs text-white/60">
-              {t("ui_total_assets_label_fr", "Total des actifs")}
-            </div>
-            <div className="mt-1 text-3xl font-semibold text-white/95">
-              ≈ {formatAmountWithSymbol(locale, totalBalance, "USD")}
-            </div>
-            <div className="mt-1 text-xs text-white/50">
-              {sortedTokens.length} {t("ui_currencies_wallet_lines_f4", "devises")}
+          {/* Filtres */}
+          <div className="px-4 md:px-6 pt-6 md:pt-7 pb-2 md:pb-3 flex flex-row items-stretch md:items-center gap-2">
+            <div className="flex flex-1 items-center rounded-[16px] p-1 ring-1 ring-white/[0.05] ring-inset bg-gradient-to-b from-[#101415] to-[#0d1214]">
+              {[
+                { key: "all", label: t("ui_all_0c90d41d71", "Tout") },
+                { key: "credit", label: t("ui_credits_b8166276a0", "Entrées") },
+                { key: "debit", label: t("ui_debits_38c870b18f", "Sorties") },
+                {
+                  key: "conversion",
+                  label: t("ui_conversions_b604b5ef8b", "Conversions"),
+                },
+              ].map((item) => (
+                <button
+                  key={item.key}
+                  type="button"
+                  onClick={() => setTxFilter(item.key)}
+                  className={`px-3 py-3 flex-1 text-center rounded-[12px] text-sm font-medium transition-colors whitespace-nowrap ${
+                    txFilter === item.key
+                      ? item.key === "all"
+                        ? "bg-[#14191c] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.12),inset_0_-14px_18px_rgba(0,0,0,0.6)]"
+                        : item.key === "credit"
+                          ? "bg-green-500/15 text-green-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]"
+                          : item.key === "debit"
+                            ? "bg-red-500/15 text-red-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]"
+                            : "bg-blue-500/15 text-blue-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]"
+                      : item.key === "all"
+                        ? "text-white/60 hover:text-white/80 bg-[#111518] hover:bg-[#0d1114]"
+                        : item.key === "credit"
+                          ? "text-white/60 hover:text-green-300 bg-[#111518] hover:bg-green-500/15"
+                          : item.key === "debit"
+                            ? "text-white/60 hover:text-red-300 bg-[#111518] hover:bg-red-500/15"
+                            : "text-white/60 hover:text-blue-300 bg-[#111518] hover:bg-blue-500/15"
+                  }`}
+                >
+                  {item.label}
+                </button>
+              ))}
             </div>
           </div>
         </div>
+        {/* fin conteneur header+filtres */}
 
-        {/* Content */}
-        <div className="flex-1 min-h-0 overflow-y-auto px-4 py-4 flex flex-col gap-4">
-          {/* Controls */}
-          <div className="grid grid-cols-1 gap-3 items-end">
-            <div>
-              <div className="text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
-                {t("ui_statement_period_4674b18f25", "Période")}
+        {/* Content - Zone scrollable */}
+        <div className="flex-1 min-h-0 overflow-y-auto px-4 md:px-5 pt-4 md:pt-6 pb-6 md:pb-6 flex flex-col gap-4 bg-gradient-to-b from-[#101415] to-[#0d1214] border-t border-white/[0.10] md:border-white/[0.06]">
+          <div className="space-y-2">
+            {movementsLoading ? (
+              <div className="rounded-[20px] px-3 py-3 ring-1 ring-white/10 ring-inset bg-white/5 text-sm text-white/70">
+                {t("ui_loading_1386baebe9", "Loading…")}
               </div>
-              <DemoStatementMonthSelect
-                value={selectedMonth}
-                onChange={(nextValue) => {
-                  if (nextValue === "archives") {
-                    setSelectedMonth("archives");
-                    return;
-                  }
-                  const parsed = Number.parseInt(nextValue, 10);
-                  setSelectedMonth(Number.isFinite(parsed) ? parsed : 0);
-                }}
-                options={availableMonths}
-                menuClassName={modalBgClass}
-              />
-            </div>
+            ) : movementsError ? (
+              <div className="rounded-[20px] px-3 py-3 ring-1 ring-red-500/20 ring-inset bg-red-500/10 text-sm text-red-200">
+                {String(movementsError)}
+              </div>
+            ) : !movements || movements.length === 0 ? (
+              <div className="rounded-[20px] px-3 py-3 ring-1 ring-white/10 ring-inset bg-white/5 text-sm text-white/70">
+                {t(
+                  "ui_no_transactions_yet_2c7a1d9b5e",
+                  "Aucune transaction pour le moment",
+                )}
+              </div>
+            ) : (
+              <div className="space-y-1.5">
+                {movements
+                  .filter((m) => {
+                    if (txFilter === "all") return true;
+                    const k = String(m?.kind || "").toUpperCase();
+                    if (txFilter === "conversion") return k === "CONVERSION";
+                    if (txFilter === "credit")
+                      return k.includes("_IN") || k === "RECONCILE";
+                    if (txFilter === "debit")
+                      return k.includes("_OUT") || k.includes("FEE");
+                    return true;
+                  })
+                  .map((m, idx) => {
+                    const k = String(m?.kind || "").toUpperCase();
+                    const isConversion = k === "CONVERSION";
+                    const isPaymentOut = k.includes("_OUT");
+                    const isPaymentIn = k.includes("_IN");
+                    const isDebit = isPaymentOut || k.includes("FEE");
+                    const isCredit = isPaymentIn || k === "RECONCILE";
+                    const uiType = isDebit
+                      ? "debit"
+                      : isCredit
+                        ? "credit"
+                        : "neutral";
+                    const sign = isDebit ? "−" : isCredit ? "+" : "";
+                    const isLatest = idx === 0;
+                    const from = String(
+                      m?.fromCurrencyCode || "",
+                    ).toUpperCase();
+                    const to = String(m?.toCurrencyCode || "").toUpperCase();
+                    const displayAmount = Number(m?.displayAmount);
+                    const amount =
+                      Number.isFinite(displayAmount) && displayAmount
+                        ? displayAmount
+                        : Number(m?.amountRlusd || 0);
+                    const currency = String(
+                      m?.displayCurrencyCode || "RLUSD",
+                    ).trim();
+                    const createdAt = m?.createdAt
+                      ? new Date(m.createdAt)
+                      : null;
+                    const when =
+                      createdAt && Number.isFinite(createdAt.getTime())
+                        ? createdAt.toLocaleString(locale)
+                        : "";
+                    const rowCounterparty = String(
+                      m?.counterparty || "",
+                    ).trim();
+                    const rowCounterpartyLabel = (() => {
+                      if (
+                        !rowCounterparty ||
+                        rowCounterparty.toUpperCase() === "XCANNES"
+                      )
+                        return "";
+                      if (rowCounterparty.length > 30)
+                        return `${rowCounterparty.slice(0, 8)}…${rowCounterparty.slice(-6)}`;
+                      return rowCounterparty;
+                    })();
+                    const key =
+                      m?.movementId ||
+                      m?.id ||
+                      `${m?.txHash || "nohash"}-${m?.kind || ""}-${m?.createdAt || ""}-${idx}`;
 
-            <div>
-              <div className="text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
-                {t("ui_sort_label", "Tri")}
+                    return (
+                      <button
+                        key={key}
+                        type="button"
+                        onClick={() => openMovementDetails(m)}
+                        className={[
+                          "w-full text-left rounded-[20px] px-3 transition-colors duration-150",
+                          isLatest
+                            ? "py-3 ring-1 ring-inset bg-[#101415] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-14px_22px_rgba(0,0,0,0.5)] ring-white/10 transform-gpu scale-[1.04] origin-center drop-shadow-[0_10px_18px_rgba(0,0,0,0.55)] transition-transform duration-150"
+                            : "py-2 ring-1 ring-inset ring-white/[0.06] bg-[#101415] shadow-[inset_0_-14px_18px_rgba(0,0,0,0.8)]",
+                        ].join(" ")}
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <div className="text-[15px] font-medium text-white/90 truncate">
+                              {isPaymentOut
+                                ? `${t("statement_xrpl_mobile_out", "Envoyé")}${
+                                    rowCounterpartyLabel
+                                      ? ` à ${rowCounterpartyLabel}`
+                                      : ""
+                                  }`
+                                : isPaymentIn
+                                  ? `${t("statement_xrpl_mobile_in", "Reçu")}${
+                                      rowCounterpartyLabel
+                                        ? ` de ${rowCounterpartyLabel}`
+                                        : ""
+                                    }`
+                                  : isConversion
+                                    ? `${t("ui_conversion", "Conversion")}${
+                                        from && to ? ` ${from} → ${to}` : ""
+                                      }`
+                                    : m?.note || k}
+                            </div>
+                            <div className="mt-0.5 text-[11px] text-white/45 truncate">
+                              {when || ""}
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-3 shrink-0">
+                            {!isConversion ? (
+                              <div className="text-right">
+                                <div
+                                  className={[
+                                    "text-[15px] font-semibold font-mono whitespace-nowrap",
+                                    uiType === "debit"
+                                      ? "text-red-400"
+                                      : uiType === "credit"
+                                        ? "text-xcannes-green"
+                                        : "text-white/90",
+                                  ].join(" ")}
+                                >
+                                  {sign}
+                                  {Number.isFinite(amount)
+                                    ? `${amount.toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${currency}`
+                                    : "—"}
+                                </div>
+                              </div>
+                            ) : null}
+
+                            <svg
+                              className="w-4 h-4 text-white/35"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                              strokeWidth={2}
+                              aria-hidden="true"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M9 5l7 7-7 7"
+                              />
+                            </svg>
+                          </div>
+                        </div>
+                      </button>
+                    );
+                  })}
               </div>
-              <div className="inline-flex rounded-[10px] ring-1 ring-white/10 ring-inset bg-white/5 p-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
-                <button
-                  type="button"
-                  onClick={() => setSortBy("balance")}
-                  className={[
-                    "px-3 py-1.5 rounded-[8px] text-xs font-semibold transition-colors duration-150",
-                    sortBy === "balance"
-                      ? "bg-white/10 text-white"
-                      : "text-white/60 hover:text-white/80 hover:bg-white/5",
-                  ].join(" ")}
-                >
-                  {t("ui_sort_balance_short", "Balance")}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setSortBy("name")}
-                  className={[
-                    "px-3 py-1.5 rounded-[8px] text-xs font-semibold transition-colors duration-150",
-                    sortBy === "name"
-                      ? "bg-white/10 text-white"
-                      : "text-white/60 hover:text-white/80 hover:bg-white/5",
-                  ].join(" ")}
-                >
-                  {t("ui_sort_name_short", "Nom")}
-                </button>
-              </div>
-            </div>
+            )}
           </div>
 
-          {/* Asset list */}
-          <div className="space-y-2">
-            {sortedTokens.map((token, idx) => {
-              const usdValue = getUsdValue(token);
-              const tokenCode = getDisplayCurrencyCode(token.currency);
-              const showConverted =
-                Number.isFinite(usdValue) &&
-                String(tokenCode || "").toUpperCase() !== "USD";
+          {movementsHasMore ? (
+            <button
+              type="button"
+              onClick={onLoadMoreMovements}
+              disabled={movementsLoadingMore}
+              className="w-full text-center text-sm text-white/50 hover:text-white/80 py-3 transition-colors disabled:opacity-40"
+            >
+              {movementsLoadingMore
+                ? t("ui_loading_1386baebe9", "Loading…")
+                : t("ui_load_more_8b3c1d2a9e", "Charger plus")}
+            </button>
+          ) : null}
+        </div>
 
-              return (
-                <button
-                  key={`${token.currency}-${idx}`}
-                  type="button"
-                  onClick={() => onViewCurrency?.(token)}
-                  disabled={!onViewCurrency}
-                  className="w-full text-left rounded-xl px-3 py-3 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.05),inset_0_-14px_22px_rgba(0,0,0,0.5)] hover:from-white/[0.10] hover:to-white/[0.04] transition-colors duration-150 disabled:opacity-70 disabled:cursor-default"
+        {/* Footer */}
+        <div className="shrink-0 px-4 md:px-6 py-1.5 md:py-3 pb-[max(2px,env(safe-area-inset-bottom))] md:pb-[max(12px,env(safe-area-inset-bottom))] border-t border-white/[0.10] md:border-white/[0.06] bg-[#111518] shadow-[inset_0_-46px_70px_rgba(0,0,0,0.55)] flex items-center justify-between gap-3">
+          {/* Compte actuel */}
+          <div className="flex items-center gap-3 min-w-0">
+            <div
+              className="relative w-auto min-w-[120px] max-w-[180px]"
+              ref={accountDropdownRef}
+            >
+              <button
+                type="button"
+                onClick={() => setAccountDropdownOpen((prev) => !prev)}
+                className="w-full inline-flex items-center justify-center gap-2 px-3 py-1.5 md:py-2 bg-transparent transition-all rounded-[10px]"
+                aria-haspopup="menu"
+                aria-expanded={accountDropdownOpen}
+                title={t("ui_current_account_plain", "Compte actuel")}
+              >
+                <span
+                  className="h-2.5 w-2.5 rounded-full bg-xcannes-green ring-4 ring-xcannes-green/20 shrink-0 animate-pulse"
+                  aria-hidden
+                />
+                <span className="text-white/95 text-sm font-semibold truncate min-w-0 flex-1 text-center">
+                  {walletLabel || t("nav_wallet", "Wallet")}
+                </span>
+                <svg
+                  className="w-4 h-4 text-white/45 shrink-0"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.7"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
                 >
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-3 min-w-0">
-                      {["RLUSD", "USD"].includes(
-                        String(token.currency || "").toUpperCase(),
-                      ) ? (
-                        <Image
-                          src={`/symbols/${String(token.currency || "").toLowerCase()}.png`}
-                          alt={tokenCode}
-                          width={28}
-                          height={28}
-                          className="flex-shrink-0 w-7 h-7 rounded-md"
-                        />
-                      ) : (
-                        <span className="text-2xl flex-shrink-0">
-                          {getCurrencyFlag(tokenCode)}
-                        </span>
+                  <path d="M2.5 12s3.5-7 9.5-7 9.5 7 9.5 7-3.5 7-9.5 7-9.5-7-9.5-7Z" />
+                  <circle cx="12" cy="12" r="2.6" />
+                  {accountDropdownOpen ? <path d="M4 20L20 4" /> : null}
+                </svg>
+              </button>
+              {accountDropdownOpen && walletAddress ? (
+                <div className="absolute bottom-full left-0 z-[200] w-full mb-1 rounded-[10px] ring-1 ring-white/20 ring-inset bg-elevated px-4 py-3 shadow-[0_-8px_18px_rgba(0,0,0,0.45)]">
+                  <p className="text-[13px] text-white/60 mb-2">
+                    {t("ui_account_address", "Adresse du compte")}
+                  </p>
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <button
+                      type="button"
+                      className={`min-w-0 flex-1 text-left text-xs text-white/55 font-mono font-light ${
+                        accountAddressExpanded
+                          ? "break-all whitespace-normal"
+                          : "truncate"
+                      }`}
+                      title={walletAddress}
+                      onClick={() =>
+                        setAccountAddressExpanded((prev) => !prev)
+                      }
+                      aria-label={t(
+                        "ui_toggle_wallet_address_truncation",
+                        "Afficher l'adresse complète",
                       )}
-
-                      <div className="min-w-0">
-                        <div className="text-[13px] font-medium text-white/90 truncate">
-                          {tokenCode}
-                        </div>
-                        {token.issuer ? (
-                          <div className="text-[11px] text-white/45 truncate mt-0.5 font-mono">
-                            {`${token.issuer.slice(0, 6)}...${token.issuer.slice(-4)}`}
-                          </div>
-                        ) : null}
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-3 shrink-0">
-                      <div className="text-right">
-                        <div className="text-[15px] font-semibold text-white/90 font-mono">
-                          {formatAmountWithSymbol(
-                            locale,
-                            token.value,
-                            token.currency,
-                            { minimumFractionDigits: 2, maximumFractionDigits: 2 },
-                          )}
-                        </div>
-                        {showConverted ? (
-                          <div className="text-[11px] text-white/45 font-mono mt-0.5">
-                            ≈ {formatAmountWithSymbol(locale, usdValue, "USD")}
-                          </div>
-                        ) : null}
-                      </div>
-
+                    >
+                      {accountAddressExpanded
+                        ? walletAddress
+                        : `${walletAddress.slice(0, 8)}…${walletAddress.slice(-6)}`}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        try {
+                          await navigator.clipboard?.writeText?.(
+                            walletAddress,
+                          );
+                          setAccountCopyNotice(
+                            t("ui_copied_address", "Adresse copiée"),
+                          );
+                          if (accountCopyNoticeTimerRef.current)
+                            clearTimeout(accountCopyNoticeTimerRef.current);
+                          accountCopyNoticeTimerRef.current =
+                            window.setTimeout(
+                              () => setAccountCopyNotice(""),
+                              3000,
+                            );
+                        } catch {
+                          /* ignore */
+                        }
+                      }}
+                      className="shrink-0 text-white/40 hover:text-white/70 transition-colors p-0.5"
+                      title={t("ui_copy_address", "Copier l'adresse")}
+                      aria-label={t("ui_copy_address", "Copier l'adresse")}
+                    >
                       <svg
-                        className="w-5 h-5 text-white/35"
+                        className="w-3.5 h-3.5"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
-                        strokeWidth={2}
-                        aria-hidden="true"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
                       >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M9 5l7 7-7 7"
-                        />
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                        <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
                       </svg>
-                    </div>
+                    </button>
                   </div>
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Watermark */}
-          <div className="hidden">
-            <div className="space-y-1">
-              {ledgerLastIndex != null ? (
-                <p className="text-[9px] text-white/30 font-mono px-2">
-                  {t("ui_ledger_index_label_0c2a1d9b5e", "Ledger index:")}{" "}
-                  {ledgerLastIndex}
-                </p>
+                  <div
+                    className={`mt-1.5 text-[11px] text-xcannes-green/85 transition-opacity duration-200 ${
+                      accountCopyNotice ? "opacity-100" : "opacity-0"
+                    }`}
+                    role="status"
+                    aria-live="polite"
+                  >
+                    {accountCopyNotice || " "}
+                  </div>
+                </div>
               ) : null}
             </div>
           </div>
+          {/* Bouton télécharger */}
+          <button
+            onClick={handleExportPdf}
+            disabled={exportFormat === "pdf"}
+            className="shrink-0 inline-flex items-center gap-2 px-4 py-1.5 md:py-2 rounded-[10px] text-sm font-medium transition-colors disabled:opacity-50 text-white/70 hover:text-white bg-transparent hover:bg-white/[0.04]"
+            aria-label={t("ui_export_pdf_9c8d16b4fe", "Télécharger")}
+          >
+            <ShareIcon
+              className={`w-4 h-4 ${exportFormat === "pdf" ? "opacity-40" : ""}`}
+            />
+            <span>
+              {exportFormat === "pdf"
+                ? t("ui_loading_1386baebe9", "Loading…")
+                : t("ui_export_pdf_9c8d16b4fe", "Télécharger")}
+            </span>
+          </button>
         </div>
 
-        {/* Footer Actions */}
-        <div className="relative px-4 py-3 pb-2 flex flex-row items-stretch gap-2 bg-[#111518] shadow-[inset_0_-16px_28px_rgba(255,255,255,0.03),inset_0_46px_70px_rgba(0,0,0,0.55)] before:content-[''] before:absolute before:left-0 before:right-0 before:top-0 before:h-px before:bg-white/10">
-          <div className="flex flex-1 items-center rounded-[16px] p-1 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-[#101415] to-[#0d1214] justify-end">
-            <button
-              onClick={handleExportPdf}
-              disabled={exportFormat === "pdf"}
-              className="shrink-0 px-2 py-2 text-white/60 hover:text-white transition-colors disabled:opacity-40"
-              aria-label={t("ui_export_pdf_9c8d16b4fe", "Télécharger")}
-            >
-              <ShareIcon
-                className={`w-5 h-5 ${exportFormat === "pdf" ? "opacity-40" : ""}`}
-              />
-            </button>
-          </div>
-        </div>
       </div>
     </div>
   );
 
   if (inline) {
-    return content;
+    return (
+      <>
+        {content}
+        {transactionDetailModal}
+      </>
+    );
   }
 
   if (typeof document === "undefined") {
     return null;
   }
 
-  return createPortal(content, document.body);
+  return (
+    <>
+      {createPortal(content, document.body)}
+      {transactionDetailModal}
+    </>
+  );
 }
