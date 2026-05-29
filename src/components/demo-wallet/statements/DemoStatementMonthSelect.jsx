@@ -7,10 +7,20 @@ export default function DemoStatementMonthSelect({
   onChange,
   options = [],
   menuClassName = "bg-elevated",
+  label = "",
+  labelClassName = "text-xs text-white/60 mb-1",
+  onOpenChange,
+  menuPosition = "bottom",
 }) {
   const [open, setOpen] = useState(false);
   const triggerRef = useRef(null);
   const menuRef = useRef(null);
+
+  const updateOpen = (next) => {
+    const val = typeof next === "function" ? next(open) : next;
+    setOpen(val);
+    onOpenChange?.(val);
+  };
 
   useEffect(() => {
     if (!open) return;
@@ -19,10 +29,11 @@ export default function DemoStatementMonthSelect({
       if (triggerRef.current && triggerRef.current.contains(event.target))
         return;
       setOpen(false);
+      onOpenChange?.(false);
     };
     document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
-  }, [open]);
+  }, [open, onOpenChange]);
 
   const selectedOption =
     options.find((option) => String(option?.value) === String(value)) ||
@@ -31,24 +42,31 @@ export default function DemoStatementMonthSelect({
 
   const handleSelect = (nextValue) => {
     onChange?.(nextValue);
-    setOpen(false);
+    updateOpen(false);
   };
 
   return (
-    <div className="relative">
+    <div className={`relative w-full ${open ? "z-50" : ""}`}>
+      {label ? (
+        <p className={labelClassName}>{label}</p>
+      ) : null}
       <button
         type="button"
         ref={triggerRef}
         onClick={(e) => {
           e.stopPropagation();
-          setOpen((prev) => !prev);
+          updateOpen((prev) => !prev);
         }}
         onKeyDown={(e) => {
-          if (e.key === "Escape") setOpen(false);
+          if (e.key === "Escape") updateOpen(false);
         }}
         aria-haspopup="listbox"
         aria-expanded={open}
-        className="statement-select w-full bg-white/5 border border-white/10 rounded-[10px] px-3 py-2.5 text-sm text-white cursor-pointer transition-colors duration-150 flex items-center justify-between gap-2 focus-visible:outline-none focus-visible:border-xcannes-green/60 focus-visible:ring-2 focus-visible:ring-xcannes-green/20"
+        className={`statement-select w-full ${menuClassName} ring-1 ring-inset px-3 py-1.5 text-sm text-white cursor-pointer transition-colors duration-150 flex items-center justify-between gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-xcannes-green/20 ${open
+          ? menuPosition === "top"
+            ? "rounded-b-[10px] rounded-t-none ring-white/10"
+            : "rounded-t-[10px] rounded-b-none ring-white/10"
+          : "rounded-[10px] ring-white/[0.06]"}`}
       >
         <span className="truncate min-w-0 flex-1">
           {selectedOption?.label || ""}
@@ -72,11 +90,16 @@ export default function DemoStatementMonthSelect({
         <div
           ref={menuRef}
           role="listbox"
-          className={`absolute z-50 mt-1 w-full max-h-60 overflow-y-auto rounded-[10px] border border-white/10 shadow-2xl ${menuClassName}`}
+          className={`absolute z-50 w-full max-h-[480px] overflow-y-auto shadow-[0_8px_32px_rgba(0,0,0,0.6),0_0_0_1px_rgba(255,255,255,0.06)] ${menuClassName} ${
+            menuPosition === "top"
+              ? "bottom-full mb-0 rounded-t-[10px] rounded-b-none border border-white/10 border-b-0"
+              : "mt-0 rounded-b-[10px] rounded-t-none border border-white/10 border-t-0"
+          }`}
           onClick={(e) => e.stopPropagation()}
         >
           {options.map((option) => {
             const isSelected = String(option?.value) === String(value);
+            if (isSelected) return null;
             return (
               <button
                 key={String(option?.value)}
@@ -84,7 +107,7 @@ export default function DemoStatementMonthSelect({
                 role="option"
                 aria-selected={isSelected}
                 onClick={() => handleSelect(option.value)}
-                className={`w-full px-3 py-2 text-sm text-left transition-colors ${
+                className={`w-full px-3 py-2 text-sm text-center transition-colors ${
                   isSelected
                     ? "bg-white/10 text-white"
                     : "text-white/80 hover:bg-white/5"
