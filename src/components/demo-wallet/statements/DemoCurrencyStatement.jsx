@@ -1394,6 +1394,35 @@ export default function DemoCurrencyStatement({
           document.body,
         )
       : null;
+  const [footerDropdownOpen, setFooterDropdownOpen] = useState(false);
+  const [footerAddressExpanded, setFooterAddressExpanded] = useState(false);
+  const [footerCopyNotice, setFooterCopyNotice] = useState("");
+  const footerDropdownRef = useRef(null);
+  const footerCopyNoticeTimerRef = useRef(null);
+
+  useEffect(() => {
+    if (!footerDropdownOpen) {
+      setFooterAddressExpanded(false);
+      setFooterCopyNotice("");
+    }
+  }, [footerDropdownOpen]);
+
+  useEffect(() => {
+    if (!footerDropdownOpen) return;
+    const handlePointerDown = (event) => {
+      const target = event?.target;
+      if (!target) return;
+      if (footerDropdownRef.current && footerDropdownRef.current.contains(target)) return;
+      setFooterDropdownOpen(false);
+    };
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("touchstart", handlePointerDown, { passive: true });
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("touchstart", handlePointerDown);
+    };
+  }, [footerDropdownOpen]);
+
   const content = (
     <div
       className={`${wrapperBaseClass} ${resolvedLayout.wrapperClass} ${
@@ -1420,14 +1449,15 @@ export default function DemoCurrencyStatement({
       >
         {/* Header avec Account Info intégré */}
         <div
-          className={`relative flex-shrink-0 bg-[#111518] shadow-[inset_0_16px_28px_rgba(255,255,255,0.03),inset_0_-46px_70px_rgba(0,0,0,0.55)] px-4 py-3 before:content-[''] before:absolute before:left-0 before:right-0 before:bottom-0 before:h-px before:bg-white/10`}
+          className="relative flex-shrink-0 bg-[#111518] shadow-[inset_0_16px_28px_rgba(255,255,255,0.03),inset_0_-46px_70px_rgba(0,0,0,0.55)] px-4 md:px-6 py-3 md:py-4"
         >
-          <div className="flex justify-center -mt-1 pt-1 pb-2" aria-hidden>
+          <div className="md:hidden flex justify-center -mt-1 pt-1 pb-2" aria-hidden>
             <span className="block w-12 h-1.5 rounded-full bg-white/20" />
           </div>
           <div className="flex items-start justify-between gap-3 mb-3 relative z-[65]">
-            <div className="flex flex-col items-center text-center gap-1 min-w-0 flex-1">
-              <div className="flex items-center justify-center gap-2 flex-wrap min-w-0">
+            <div className="flex flex-col items-start text-left gap-1 min-w-0 flex-1">
+              {/* Icône + nom sur une seule ligne */}
+              <div className="flex items-center justify-start gap-2 flex-wrap min-w-0">
                 {CRYPTO_ICONS?.[displayCurrency] ? (
                   isSvgIcon(CRYPTO_ICONS[displayCurrency]) ? (
                     // eslint-disable-next-line @next/next/no-img-element
@@ -1452,84 +1482,106 @@ export default function DemoCurrencyStatement({
                     {getCurrencyFlag(displayCurrency)}
                   </span>
                 )}
-                <h2 className="text-[30px] font-bold text-white/95 tracking-tight min-w-0 truncate">
+                <h2 className="text-[28px] md:text-[32px] font-semibold text-white/95 tracking-tight min-w-0 truncate">
                   {currencyDescription || displayCurrency}
                 </h2>
                 {noticeVariant === "demo" ? (
-                  <span className="inline-flex items-center text-white/80 text-sm font-semibold px-2 py-0.5 leading-none">
+                  <span className="inline-flex items-center text-white/80 text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
                     {t("demo_notice_title", "Mode démo")}
                   </span>
                 ) : null}
               </div>
-              <p className="mt-1 text-[13px] text-white/55 leading-relaxed">
+              <p className="mt-2 text-[13px] md:text-[15px] text-white/50 max-w-[46ch] md:max-w-[60ch] leading-relaxed">
                 {t(
                   "ui_currency_statement_subtitle_periods",
                   "Suivez le solde et les mouvements de cette devise.",
                 )}
               </p>
             </div>
-            {/* close via swipe/backdrop */}
           </div>
 
-          {/* Account Info dans le header */}
-          <div className="grid grid-cols-1 gap-3">
-            <div>
-              <p className="text-sm text-white font-semibold truncate">
-                {walletLabel || t("nav_wallet", "Wallet")}
+          {/* Sélecteur de période */}
+          <div className="flex justify-center px-4 md:px-6 mt-6 md:mt-7 mb-2 w-full">
+            <DemoStatementMonthSelect
+              value={selectedMonth}
+              onChange={(nextValue) => {
+                if (nextValue === "archives") {
+                  setSelectedMonth("archives");
+                  return;
+                }
+                const parsed = Number.parseInt(nextValue, 10);
+                setSelectedMonth(Number.isFinite(parsed) ? parsed : 0);
+              }}
+              options={availableMonths}
+              menuClassName={modalBgClass}
+              menuPosition="bottom"
+            />
+          </div>
+
+          {/* Balance */}
+          <div className="space-y-3">
+            <div className="flex flex-col items-center text-center gap-0.5 mt-3 mb-3 w-fit mx-auto px-8 py-4">
+              <p className="text-[24px] md:text-[26px] text-white/60">
+                {t("ui_balance_445d830d72", "Solde disponible")}
               </p>
-              {walletAddress ? (
-                <p className="text-[11px] text-white/60 font-mono break-all">
-                  {walletAddress}
+              <p className="text-4xl text-white font-bold">
+                {formatAmountWithSymbolLocal(balance)}
+              </p>
+              {estimatedUsd != null && Number.isFinite(estimatedUsd) ? (
+                <p className="text-[12px] text-white/50 mt-1 whitespace-nowrap">
+                  <span className="text-white/40 mr-1">{t("ui_digital_usd_label", "Équivalent USD numérique")}</span>
+                  ≈ {formatAmountWithSymbol(locale, estimatedUsd, "RLUSD", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
                 </p>
               ) : null}
-            </div>
-            <div>
-              <p className="text-[22px] text-white/85 font-medium mb-1 text-center">
-                {t("ui_statement_period_6dedec11d9", "Statement Period")}
-              </p>
-              {/* Month Selector - Version simplifiée */}
-              <DemoStatementMonthSelect
-                value={selectedMonth}
-                onChange={(nextValue) => {
-                  if (nextValue === "archives") {
-                    setSelectedMonth("archives");
-                    return;
-                  }
-                  const parsed = Number.parseInt(nextValue, 10);
-                  setSelectedMonth(Number.isFinite(parsed) ? parsed : 0);
-                }}
-                options={availableMonths}
-                menuClassName={modalBgClass}
-              />
-            </div>
-            <div>
-              <div className="flex items-start justify-between gap-3">
-                <div className="pl-1">
-                  <p className="text-[20px] text-white/60 mb-1">
-                    {t("ui_balance_445d830d72", "Balance")}
-                  </p>
-                  <p className="text-sm text-white font-semibold">
-                    {formatAmountWithSymbolLocal(balance)}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <p className="text-xs text-white/60 mb-1">
-                    {t("demo_indexed_stability_label_f4", "Stabilité Indexée")}
-                  </p>
-                  <p className="text-[11px] text-white/60">
-                    ≈ {formatUsdWithSymbol(estimatedUsd)}
-                  </p>
-                </div>
-              </div>
             </div>
           </div>
         </div>
 
-        {/* Content - Zone scrollable avec flex-1 pour prendre l'espace restant */}
-        <div className="flex-1 overflow-hidden px-4 py-4 flex flex-col gap-4 min-h-0 overscroll-contain">
+        {/* Filtres */}
+        <div className="px-4 md:px-6 pb-4 flex flex-row items-stretch md:items-center gap-2">
+          <div className="flex flex-1 items-center rounded-[16px] p-1 ring-1 ring-white/[0.05] ring-inset bg-gradient-to-b from-[#101415] to-[#0d1214]">
+            {[
+              { key: "all", label: stripCountSuffix(t("ui_all_0c90d41d71", "Tout")) },
+              { key: "credit", label: stripCountSuffix(t("ui_credits_b8166276a0", "Entrées")) },
+              { key: "debit", label: stripCountSuffix(t("ui_debits_38c870b18f", "Sorties")) },
+              { key: "conversion", label: stripCountSuffix(t("ui_conversions_b604b5ef8b", "Conversions")) },
+            ].map((item) => (
+              <button
+                key={item.key}
+                type="button"
+                onClick={() => setFilter(item.key)}
+                className={`px-3 py-3 flex-1 text-center rounded-[12px] text-sm font-medium transition-colors whitespace-nowrap ${
+                  filter === item.key
+                    ? item.key === "all"
+                      ? "bg-[#14191c] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.12),inset_0_-14px_18px_rgba(0,0,0,0.6)]"
+                      : item.key === "credit"
+                        ? "bg-green-500/15 text-green-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]"
+                        : item.key === "debit"
+                          ? "bg-red-500/15 text-red-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]"
+                          : "bg-blue-500/15 text-blue-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]"
+                    : item.key === "all"
+                      ? "text-white/60 hover:text-white/80 bg-[#111518] hover:bg-[#0d1114]"
+                      : item.key === "credit"
+                        ? "text-white/60 hover:text-green-300 bg-[#111518] hover:bg-green-500/15"
+                        : item.key === "debit"
+                          ? "text-white/60 hover:text-red-300 bg-[#111518] hover:bg-red-500/15"
+                          : "text-white/60 hover:text-blue-300 bg-[#111518] hover:bg-blue-500/15"
+                }`}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Content - Zone scrollable */}
+        <div className="px-0 py-4 md:py-6 flex flex-col gap-4 overscroll-contain bg-gradient-to-b from-[#101415] to-[#0d1214] border-t border-white/[0.10] md:border-white/[0.06] flex-1 min-h-0 overflow-hidden">
           {/* Archive Notice */}
           {selectedMonth === "archives" && (
-            <div className="bg-blue-500/10 rounded-lg p-3">
+            <div className="bg-blue-500/10 rounded-[20px] p-3 md:p-4 mx-4">
               <p className="text-sm text-blue-300 flex items-center gap-2">
                 <span className="text-xl">📁</span>
                 <span>
@@ -1543,174 +1595,190 @@ export default function DemoCurrencyStatement({
             </div>
           )}
 
-          {/* Filters */}
-          <div className="flex items-center justify-between gap-2 flex-wrap">
-            <div className="inline-flex items-center rounded-xl p-1 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
-              {[
-                {
-                  key: "all",
-                  label: stripCountSuffix(t("ui_all_0c90d41d71", "All")),
-                },
-                {
-                  key: "credit",
-                  label: stripCountSuffix(
-                    t("ui_credits_b8166276a0", "Credits"),
-                  ),
-                },
-                {
-                  key: "debit",
-                  label: stripCountSuffix(t("ui_debits_38c870b18f", "Debits")),
-                },
-                {
-                  key: "conversion",
-                  label: stripCountSuffix(
-                    t("ui_conversions_b604b5ef8b", "Conversions"),
-                  ),
-                },
-              ].map((item) => (
-                <button
-                  key={item.key}
-                  type="button"
-                  onClick={() => setFilter(item.key)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors whitespace-nowrap ${
-                    filter === item.key
-                      ? "bg-white/5 text-white"
-                      : "text-white/60 hover:text-white/80 hover:bg-white/5"
-                  }`}
-                >
-                  {item.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
           {/* Transactions Timeline */}
-          <div className="rounded-[14px] ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.05),inset_0_-18px_28px_rgba(0,0,0,0.55)] overflow-hidden flex flex-col min-h-0">
-            {error && (
-              <div className="bg-red-500/10 px-3 py-2 text-[11px] text-red-200">
-                {error}
+          {error && (
+            <div className="bg-red-500/10 px-3 py-2 text-[11px] text-red-200">
+              {error}
+            </div>
+          )}
+          <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden">
+            {loading ? (
+              <div className="py-14 text-center text-white/40 text-sm">
+                {t("ui_loading_948e39804b", "Loading…")}
+              </div>
+            ) : !timelineGroups || timelineGroups.length === 0 ? (
+              <div className="py-14 text-center text-white/40 text-sm">
+                {t(
+                  "ui_no_transactions_found_af217af8de",
+                  "No transactions found",
+                )}
+              </div>
+            ) : (
+              <div className="space-y-1 py-1">
+                {timelineGroups.map((group) => (
+                  <div key={group.key}>
+                    <div className="px-4 pt-1 pb-0.5 text-[11px] font-semibold text-white/50 tracking-wide">
+                      {group.label}
+                    </div>
+                    <div className="px-3 pb-1">
+                      {group.transactions.map((tx, idx) => {
+                        const transactionId =
+                          tx?.id || tx?.txHash || `${group.key}-${idx}`;
+                        const isHighlighted =
+                          highlightedTransactionId &&
+                          transactionId === highlightedTransactionId;
+                        return (
+                          <div key={transactionId}>
+                            <button
+                              type="button"
+                              ref={isHighlighted ? highlightRowRef : null}
+                              onClick={() => openTxDetails(tx)}
+                              className={[
+                                "w-full flex items-center gap-1.5 text-left px-3 py-2 rounded-[16px] bg-[#101415] ring-1 ring-inset ring-white/[0.06] shadow-[inset_0_-14px_18px_rgba(0,0,0,0.8)] transition-colors duration-150",
+                                isHighlighted
+                                  ? "text-white"
+                                  : "text-white/90 hover:text-white",
+                              ].join(" ")}
+                            >
+                              <div className="w-7 h-7 flex items-center justify-center text-white/85 flex-none">
+                                <span className="text-[15px] leading-none text-white/95">
+                                  {getTimelineIcon(tx)}
+                                </span>
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <div className="text-sm text-white/90 break-words overflow-hidden [display:-webkit-box] [-webkit-line-clamp:2] [-webkit-box-orient:vertical]">
+                                  {getTimelineLabel(tx)}
+                                </div>
+                              </div>
+                              <div className="flex-none max-w-[48%] flex items-center justify-end gap-2">
+                                <div
+                                  className={`text-right font-mono font-semibold whitespace-nowrap overflow-hidden text-ellipsis ${
+                                    tx?.type === "debit"
+                                      ? "text-red-400"
+                                      : "text-xcannes-green"
+                                  }`}
+                                >
+                                  {tx?.type === "debit" ? "−" : "+"}
+                                  {formatAmountWithSymbolLocal(tx?.amount)}
+                                </div>
+                                <span className="text-[16px] leading-none text-white/35">
+                                  ›
+                                </span>
+                              </div>
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
-            <div className="flex-1 min-h-0 overflow-y-auto">
-              {loading ? (
-                <div className="py-14 text-center text-white/40 text-sm">
-                  {t("ui_loading_948e39804b", "Loading…")}
-                </div>
-              ) : !timelineGroups || timelineGroups.length === 0 ? (
-                <div className="py-14 text-center text-white/40 text-sm">
-                  {t(
-                    "ui_no_transactions_found_af217af8de",
-                    "No transactions found",
-                  )}
-                </div>
-              ) : (
-                <div className="space-y-1 py-1">
-                  {timelineGroups.map((group) => (
-                    <div key={group.key}>
-                      <div className="px-4 pt-2 pb-1 text-[11px] font-semibold text-white/50 uppercase tracking-wide">
-                        {group.label}
-                      </div>
-                      <div className="pb-1">
-                        {group.transactions.map((tx, idx) => {
-                          const transactionId =
-                            tx?.id || tx?.txHash || `${group.key}-${idx}`;
-                          const isHighlighted =
-                            highlightedTransactionId &&
-                            transactionId === highlightedTransactionId;
-                          const isLast = idx === group.transactions.length - 1;
-                          return (
-                            <div key={transactionId}>
-                              <button
-                                type="button"
-                                ref={isHighlighted ? highlightRowRef : null}
-                                onClick={() => openTxDetails(tx)}
-                                className={[
-                                  "w-full flex items-center gap-1.5 text-left px-3 py-2 transition-colors duration-150",
-                                  isHighlighted
-                                    ? "text-white"
-                                    : "text-white/90 hover:text-white",
-                                ].join(" ")}
-                              >
-                                <div className="w-7 h-7 rounded-full bg-black/20 ring-1 ring-white/10 ring-inset flex items-center justify-center text-white/60 flex-none shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
-                                  <span className="text-[13px] leading-none text-white/85">
-                                    {getTimelineIcon(tx)}
-                                  </span>
-                                </div>
-                                <div className="min-w-0 flex-1">
-                                  <div className="text-sm text-white/90 break-words overflow-hidden [display:-webkit-box] [-webkit-line-clamp:2] [-webkit-box-orient:vertical]">
-                                    {getTimelineLabel(tx)}
-                                  </div>
-                                </div>
-                                <div className="flex-none max-w-[48%] flex items-center justify-end gap-2">
-                                  <div
-                                    className={`text-right font-mono font-semibold whitespace-nowrap overflow-hidden text-ellipsis ${
-                                      tx?.type === "debit"
-                                        ? "text-red-400"
-                                        : "text-xcannes-green"
-                                    }`}
-                                  >
-                                    {tx?.type === "debit" ? "−" : "+"}
-                                    {formatAmountWithSymbolLocal(tx?.amount)}
-                                  </div>
-                                  <span className="text-[14px] leading-none text-white/35">
-                                    ›
-                                  </span>
-                                </div>
-                              </button>
-                              {!isLast ? (
-                                <div className="h-px bg-white/10 ml-12 mr-3" />
-                              ) : null}
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
           </div>
 
           {hasMore && (
-            <button
-              type="button"
-              onClick={() => onLoadMore && onLoadMore()}
-              disabled={loadingMore}
-              className="w-full px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 bg-white/10 hover:bg-white/15 text-white/80"
-            >
-              {loadingMore
-                ? t("ui_loading_1386baebe9", "Loading…")
-                : t("ui_load_more_3f7a1c9d5b", "Load more")}
-            </button>
+            <div className="px-4">
+              <button
+                type="button"
+                onClick={() => onLoadMore && onLoadMore()}
+                disabled={loadingMore}
+                className="w-full px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 bg-white/10 hover:bg-white/15 text-white/80"
+              >
+                {loadingMore
+                  ? t("ui_loading_1386baebe9", "Loading…")
+                  : t("ui_load_more_3f7a1c9d5b", "Load more")}
+              </button>
+            </div>
           )}
+        </div>
 
-          {/* Watermark */}
-          <div className="hidden">
-            <div className="space-y-1">
-              {ledgerLastIndex != null ? (
-                <p className="text-xs text-white/30 font-mono">
-                  {t("ui_ledger_index_label_0c2a1d9b5e", "Ledger index:")}{" "}
-                  {ledgerLastIndex}
-                </p>
+        {/* Footer */}
+        <div className="shrink-0 px-4 md:px-6 py-1.5 md:py-3 pb-[max(2px,env(safe-area-inset-bottom))] md:pb-[max(12px,env(safe-area-inset-bottom))] border-t border-white/[0.10] md:border-white/[0.06] bg-[#111518] shadow-[inset_0_-46px_70px_rgba(0,0,0,0.55)] flex items-center justify-between gap-1 md:gap-2">
+          {/* Compte actuel */}
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="relative w-auto min-w-[120px] max-w-[180px]" ref={footerDropdownRef}>
+              <button
+                type="button"
+                onClick={() => setFooterDropdownOpen((prev) => !prev)}
+                className="w-full inline-flex items-center justify-center gap-0 px-1 md:px-3 py-1.5 md:py-2 bg-transparent transition-all rounded-[10px]"
+                aria-haspopup="menu"
+                aria-expanded={footerDropdownOpen}
+                title={t("ui_current_account_plain", "Compte actuel")}
+              >
+                <span className="h-2.5 w-2.5 rounded-full bg-xcannes-green ring-2 ring-xcannes-green/20 shrink-0 animate-pulse mr-1" aria-hidden />
+                <span className="text-white/95 text-sm font-semibold truncate min-w-0">
+                  {walletLabel || t("nav_wallet", "Wallet")}
+                </span>
+                <svg
+                  className="w-4 h-4 text-white/45 shrink-0 ml-1.5"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.7"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M2.5 12s3.5-7 9.5-7 9.5 7 9.5 7-3.5 7-9.5 7-9.5-7-9.5-7Z" />
+                  <circle cx="12" cy="12" r="2.6" />
+                  {footerDropdownOpen ? <path d="M4 20L20 4" /> : null}
+                </svg>
+              </button>
+              {footerDropdownOpen && walletAddress ? (
+                <div className="absolute bottom-full left-0 z-[200] w-full mb-1 rounded-[10px] ring-1 ring-white/20 ring-inset bg-elevated px-4 py-3 shadow-[0_-8px_18px_rgba(0,0,0,0.45)]">
+                  <p className="text-[13px] text-white/60 mb-2">{t("ui_account_address", "Adresse du compte")}</p>
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <button
+                      type="button"
+                      className={`min-w-0 flex-1 text-left text-xs text-white/55 font-mono font-light ${footerAddressExpanded ? "break-all whitespace-normal" : "truncate"}`}
+                      title={walletAddress}
+                      onClick={() => setFooterAddressExpanded((prev) => !prev)}
+                      aria-label={t("ui_toggle_wallet_address_truncation", "Afficher l'adresse complète")}
+                    >
+                      {footerAddressExpanded ? walletAddress : `${walletAddress.slice(0, 8)}…${walletAddress.slice(-6)}`}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        try {
+                          await navigator.clipboard?.writeText?.(walletAddress);
+                          setFooterCopyNotice(t("ui_copied_address", "Adresse copiée"));
+                          if (footerCopyNoticeTimerRef.current) clearTimeout(footerCopyNoticeTimerRef.current);
+                          footerCopyNoticeTimerRef.current = window.setTimeout(() => setFooterCopyNotice(""), 3000);
+                        } catch { /* ignore */ }
+                      }}
+                      className="shrink-0 text-white/40 hover:text-white/70 transition-colors p-0.5"
+                      title={t("ui_copy_address", "Copier l'adresse")}
+                      aria-label={t("ui_copy_address", "Copier l'adresse")}
+                    >
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                        <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
+                      </svg>
+                    </button>
+                  </div>
+                  <div
+                    className={`mt-1.5 text-[11px] text-xcannes-green/85 transition-opacity duration-200 ${footerCopyNotice ? "opacity-100" : "opacity-0"}`}
+                    role="status"
+                    aria-live="polite"
+                  >
+                    {footerCopyNotice || " "}
+                  </div>
+                </div>
               ) : null}
             </div>
           </div>
-        </div>
-
-        {/* Footer Actions */}
-        <div className="relative px-4 py-3 pb-2 flex flex-row items-stretch gap-2 bg-[#111518] shadow-[inset_0_-16px_28px_rgba(255,255,255,0.03),inset_0_46px_70px_rgba(0,0,0,0.55)] before:content-[''] before:absolute before:left-0 before:right-0 before:top-0 before:h-px before:bg-white/10">
-          <div className="flex flex-1 items-center rounded-[16px] p-1 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-[#101415] to-[#0d1214] justify-end">
-            <button
-              onClick={handleExportPdf}
-              disabled={exportFormat === "pdf"}
-              className="shrink-0 px-2 py-2 text-white/60 hover:text-white transition-colors disabled:opacity-40"
-              aria-label={t("ui_export_pdf_9c8d16b4fe", "Télécharger")}
-            >
-              <ShareIcon
-                className={`w-5 h-5 ${exportFormat === "pdf" ? "opacity-40" : ""}`}
-              />
-            </button>
-          </div>
+          {/* Bouton télécharger */}
+          <button
+            onClick={handleExportPdf}
+            disabled={exportFormat === "pdf"}
+            className="shrink-0 inline-flex items-center gap-2 px-4 py-1.5 md:py-2 rounded-[10px] text-sm font-medium transition-colors disabled:opacity-50 text-white/70 hover:text-white bg-transparent hover:bg-white/[0.04]"
+            aria-label={t("ui_export_pdf_9c8d16b4fe", "Télécharger")}
+            title={t("ui_export_pdf_9c8d16b4fe", "Télécharger")}
+          >
+            <ShareIcon className={`w-4 h-4 ${exportFormat === "pdf" ? "opacity-40" : ""}`} />
+            <span>{exportFormat === "pdf" ? t("ui_loading_1386baebe9", "Loading…") : t("ui_export_pdf_9c8d16b4fe", "Télécharger")}</span>
+          </button>
         </div>
       </div>
     </div>
