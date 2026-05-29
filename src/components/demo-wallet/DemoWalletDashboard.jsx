@@ -26,6 +26,7 @@ import { useDemoRates } from "./hooks/useDemoRates";
 import { useDemoActions } from "./hooks/useDemoActions";
 import { useDemoTokens, renderDemoTokenIcon, getDemoCurrencyLabel } from "./hooks/useDemoTokens";
 import { useDemoStatementData } from "./hooks/useDemoStatementData";
+import useIsDesktop from "./hooks/useIsDesktop";
 import { computeSpreadQuote } from "./utils/demoWalletSpread";
 import { usePreferredCurrency } from "@/components/wallet/hooks/usePreferredCurrency";
 import {
@@ -71,7 +72,7 @@ export default function DemoWalletDashboard({
   const [selectedStatementToken, setSelectedStatementToken] = useState(null);
   const [activitySkeletonExpired, setActivitySkeletonExpired] = useState(false);
   const [activityTooltipOpen, setActivityTooltipOpen] = useState(false);
-  const isDesktop = false;
+  const isDesktop = useIsDesktop();
 
   const activeWallet = state.wallets[activeWalletId];
   const isWalletLabelLocked = Boolean(activeWallet?.labelLocked);
