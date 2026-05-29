@@ -18,6 +18,7 @@ export default function DemoWalletTokenList({
   setSelectedStatementToken,
   setShowGlobalStatement,
   setShowCurrencyStatement,
+  headerTitle: headerTitleProp,
 }) {
   const { t } = useTranslation("common");
 
@@ -182,7 +183,7 @@ export default function DemoWalletTokenList({
           className="flex items-center gap-2 mb-0 px-3 pt-1 bg-[linear-gradient(to_bottom,transparent_0%,#060809_calc(100%-8px),#060809_100%)] justify-between"
           aria-live="polite"
         >
-          <div className="w-full">{headerTitle}</div>
+          <div className="w-full">{headerTitleProp !== undefined ? headerTitleProp : headerTitle}</div>
         </div>
 
         <div className={listClassName}>

@@ -69,6 +69,8 @@ export default function DemoWalletDashboard({
     loadFawazCurrencies,
   } = usePreferredCurrency();
   const [selectedStatementToken, setSelectedStatementToken] = useState(null);
+  const [activitySkeletonExpired, setActivitySkeletonExpired] = useState(false);
+  const [activityTooltipOpen, setActivityTooltipOpen] = useState(false);
   const isDesktop = false;
 
   const activeWallet = state.wallets[activeWalletId];
@@ -79,6 +81,7 @@ export default function DemoWalletDashboard({
   const wallet = getWalletAddress(state, activeWalletId);
   const refreshTimerRef = useRef(null);
   const prevActiveActionRef = useRef(activeAction);
+  const activityTooltipTriggerRef = useRef(null);
 
   const { walletHeaderToast, handleCopyWalletAddress } = useDemoWalletLabel({
     activeWalletId,
@@ -284,6 +287,20 @@ export default function DemoWalletDashboard({
     selectedStatementToken,
   });
 
+  useEffect(() => {
+    if (recentActivity) {
+      setActivitySkeletonExpired(false);
+      return;
+    }
+    setActivitySkeletonExpired(false);
+    const timer = setTimeout(() => setActivitySkeletonExpired(true), 5000);
+    return () => clearTimeout(timer);
+  }, [recentActivity]);
+
+  const recentActivityIcon = recentActivity?.icon || null;
+  const recentActivityLabel = recentActivity?.bannerLabel || null;
+  const recentActivityMessage = recentActivity?.message || recentActivity?.amount || null;
+
   const handleReset = useCallback(() => {
     setState(buildDefaultDemoState());
     setActiveWalletId(resolvedDefaultWalletId);
@@ -482,52 +499,222 @@ export default function DemoWalletDashboard({
     <div className="w-full h-full min-h-0 flex justify-center demo-wallet-tooltip-scope demo-wallet-demo-scope">
       <div className="w-full max-w-[410px] h-full min-h-0">
         <div className="bg-xcannes-surface-demo h-full min-h-0 overflow-hidden flex flex-col rounded-[28px] ring-1 ring-white/[0.06] shadow-[0_20px_60px_rgba(0,0,0,0.55)] relative">
-          <DemoWalletHeader
-            locale={locale}
-            displayAmount={displayTotal}
-            displayCurrency={displayCurrency}
-            totalInRlusd={usdTotal}
-            walletContextLabel={walletContextLabel}
-            wallet={wallet}
-            onOpenInfo={() => setWalletInfoOpen(true)}
-            preferredCurrency={preferredCurrency}
-            topCurrencies={topCurrencies}
-            fawazCurrencies={fawazCurrencies}
-            fawazLoading={fawazLoading}
-            onLoadFawazCurrencies={loadFawazCurrencies}
-            onPreferredCurrencyChange={setPreferredCurrency}
-            walletHeaderToast={walletHeaderToast}
-            handleCopyWalletAddress={handleCopyWalletAddress}
-            walletAddresses={walletAddresses}
-            activeWalletId={activeWalletId}
-            onSwitchWallet={setActiveWalletId}
-            handleRefreshWallet={handleRefreshWallet}
-            isRefreshing={isRefreshing}
-          />
+          <div className="flex flex-col min-h-0 relative">
+            {/* Header */}
+            <DemoWalletHeader
+              locale={locale}
+              displayAmount={displayTotal}
+              displayCurrency={displayCurrency}
+              totalInRlusd={usdTotal}
+              walletContextLabel={walletContextLabel}
+              wallet={wallet}
+              onOpenInfo={() => setWalletInfoOpen(true)}
+              preferredCurrency={preferredCurrency}
+              topCurrencies={topCurrencies}
+              fawazCurrencies={fawazCurrencies}
+              fawazLoading={fawazLoading}
+              onLoadFawazCurrencies={loadFawazCurrencies}
+              onPreferredCurrencyChange={setPreferredCurrency}
+              walletHeaderToast={walletHeaderToast}
+              handleCopyWalletAddress={handleCopyWalletAddress}
+              walletAddresses={walletAddresses}
+              activeWalletId={activeWalletId}
+              onSwitchWallet={setActiveWalletId}
+              handleRefreshWallet={handleRefreshWallet}
+              isRefreshing={isRefreshing}
+            />
 
-          <DemoWalletActionBar
-            setSendTab={setSendTab}
-            setActiveAction={setActiveAction}
-            setCashModalTab={setCashModalTab}
-          />
+            {/* Action bar — mobile */}
+            <div className="lg:hidden">
+              <DemoWalletActionBar
+                setSendTab={setSendTab}
+                setActiveAction={setActiveAction}
+                setCashModalTab={setCashModalTab}
+              />
+            </div>
 
-          <DemoWalletTokenList
-            locale={locale}
-            tokens={tokens}
-            augmentedTokens={augmentedTokens}
-            renderDemoTokenIcon={renderDemoTokenIcon}
-            getDemoCurrencyLabel={getDemoCurrencyLabel}
-            recentActivity={recentActivity}
-            setSelectedStatementToken={setSelectedStatementToken}
-            setShowGlobalStatement={setShowGlobalStatement}
-            setShowCurrencyStatement={setShowCurrencyStatement}
-          />
+            {/* Token list */}
+            <div className="relative flex-1 flex flex-col min-h-0">
+              <div className="flex-1 min-w-0 flex flex-col min-h-0">
+                <DemoWalletTokenList
+                  locale={locale}
+                  tokens={tokens}
+                  augmentedTokens={augmentedTokens}
+                  renderDemoTokenIcon={renderDemoTokenIcon}
+                  getDemoCurrencyLabel={getDemoCurrencyLabel}
+                  recentActivity={recentActivity}
+                  setSelectedStatementToken={setSelectedStatementToken}
+                  setShowGlobalStatement={setShowGlobalStatement}
+                  setShowCurrencyStatement={setShowCurrencyStatement}
+                  headerTitle={
+                    <div className="w-full flex flex-col gap-y-0">
+                      <div
+                        className="w-full min-w-0 overflow-visible relative"
+                        aria-live="polite"
+                      >
+                        {!recentActivity ? (
+                          activitySkeletonExpired ? (
+                            /* ── Message vide après 5s ── */
+                            <div className="relative mx-0 mb-0 px-4 py-[9px] animate-fade-in recent-activity-fade-border rounded-[16px] overflow-hidden shadow-[inset_0_-16px_20px_rgba(0,0,0,0.88)]">
+                              <div className="relative z-10">
+                                <div className="flex items-center gap-2 min-h-[52px]">
+                                  <svg className="w-4 h-4 shrink-0 text-white/20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                                    <circle cx="12" cy="12" r="9" />
+                                    <polyline points="12 7 12 12 15.5 14.5" />
+                                  </svg>
+                                  <span className="text-[13px] text-white/30">
+                                    {t('ui_no_recent_activity', 'Aucune transaction détectée pour le moment')}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          ) : (
+                            /* ── Skeleton pendant le chargement ── */
+                            <div className="relative mx-0 mb-0 px-4 py-[9px] recent-activity-fade-border rounded-[16px] overflow-hidden shadow-[inset_0_-16px_20px_rgba(0,0,0,0.88)]">
+                              <div className="relative z-10">
+                                <div className="flex flex-col justify-center gap-[5px] min-h-[52px]">
+                                  <div className="flex items-center justify-between gap-2">
+                                    <div className="flex items-center gap-1.5">
+                                      <div className="h-4 w-4 rounded-full bg-white/[0.07] animate-pulse shrink-0" />
+                                      <div className="h-2.5 w-20 rounded bg-white/[0.07] animate-pulse" />
+                                    </div>
+                                    <div className="h-2.5 w-12 rounded bg-white/[0.07] animate-pulse" />
+                                  </div>
+                                  <div className="flex items-center justify-between gap-2">
+                                    <div className="h-3 w-36 rounded bg-white/[0.07] animate-pulse" />
+                                    <div className="flex items-center gap-1">
+                                      <div className="h-2.5 w-10 rounded bg-white/[0.07] animate-pulse" />
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          )
+                        ) : (
+                          <button
+                            type="button"
+                            ref={activityTooltipTriggerRef}
+                            title={
+                              recentActivity.date || recentActivity.time
+                                ? `${recentActivity.date || ''} ${recentActivity.time || ''} — ${recentActivityLabel || ''}`
+                                : recentActivityLabel || ''
+                            }
+                            onClick={() => {
+                              setActivityTooltipOpen(false);
+                              setShowGlobalStatement(true);
+                            }}
+                            onMouseEnter={() => setActivityTooltipOpen(true)}
+                            onMouseLeave={() => setActivityTooltipOpen(false)}
+                            onBlur={() => setActivityTooltipOpen(false)}
+                            className="w-full text-left focus:outline-none animate-fade-in"
+                          >
+                            <div className="relative mx-0 mb-0 px-4 py-[9px] transition-colors recent-activity-fade-border rounded-[16px] overflow-hidden shadow-[inset_0_-16px_20px_rgba(0,0,0,0.88)]">
+                              <div className="relative z-10">
+                                <div className="flex flex-col justify-center gap-[2px] min-h-[52px]">
+                                  {/* Ligne 1 : icône + type + date */}
+                                  <div className="flex items-center justify-between gap-2">
+                                    <div className="flex items-center gap-1.5 min-w-0">
+                                      <div
+                                        className={[
+                                          "shrink-0 flex items-center justify-center opacity-70",
+                                          recentActivityIcon === "receive" ? "text-xcannes-green"
+                                            : recentActivityIcon === "send" ? "text-red-400"
+                                            : "text-xcannes-green",
+                                        ].join(" ")}
+                                        aria-hidden
+                                      >
+                                        {recentActivityIcon === "send" ? (
+                                          <svg className="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                                            <path d="M7 17L17 7" /><path d="M7 7h10v10" />
+                                          </svg>
+                                        ) : recentActivityIcon === "receive" ? (
+                                          <svg className="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                                            <path d="M7 7l10 10" /><path d="M17 7v10H7" />
+                                          </svg>
+                                        ) : (
+                                          <svg className="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                                            <polyline points="17 1 21 5 17 9" /><path d="M3 11V9a4 4 0 0 1 4-4h14" />
+                                            <polyline points="7 23 3 19 7 15" /><path d="M21 13v2a4 4 0 0 1-4 4H3" />
+                                          </svg>
+                                        )}
+                                      </div>
+                                      <span className="text-[13px] text-white/55 truncate">{recentActivityLabel}</span>
+                                    </div>
+                                    {recentActivity.date ? (
+                                      <span className="shrink-0 text-[12px] text-white/35 whitespace-nowrap">{recentActivity.date}</span>
+                                    ) : null}
+                                  </div>
+                                  {/* Ligne 2 : montant + heure + chevron */}
+                                  <div className="flex items-center justify-between gap-2">
+                                    <span className="min-w-0 truncate text-[14px] text-white/75 font-medium">
+                                      {recentActivityIcon === "convert" ? (
+                                        <>{recentActivityMessage}</>
+                                      ) : recentActivityIcon === "receive" ? (
+                                        <span className="text-xcannes-green">+ {recentActivity.amount}</span>
+                                      ) : recentActivityIcon === "send" ? (
+                                        <span className="text-red-400">− {recentActivity.amount}</span>
+                                      ) : recentActivityMessage}
+                                    </span>
+                                    <div className="shrink-0 flex items-center gap-1">
+                                      {recentActivity.time ? (
+                                        <span className="text-[12px] text-white/35 whitespace-nowrap">{recentActivity.time}</span>
+                                      ) : null}
+                                      <svg className="w-[14px] h-[14px] text-white/30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                                        <polyline points="9 18 15 12 9 6" />
+                                      </svg>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </button>
+                        )}
+                        {activityTooltipOpen && recentActivity ? (
+                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50 w-max max-w-[260px] bg-[#1e2628] text-white/85 text-[11px] leading-snug rounded-lg px-3 py-2 shadow-xl ring-1 ring-white/10 pointer-events-none">
+                            {recentActivity.date ? (
+                              <div className="text-white/60 text-[11px] mb-1">
+                                <span>{recentActivity.date}{recentActivity.time ? ` — ${recentActivity.time}` : ''}</span>
+                              </div>
+                            ) : null}
+                            <div>
+                              <span className="text-[14px] text-white/85 font-semibold">
+                                {recentActivityIcon === "convert" ? (
+                                  recentActivityMessage
+                                ) : recentActivityIcon === "receive" ? (
+                                  <span className="text-[#16A34A]">+ {recentActivity.amount}</span>
+                                ) : recentActivityIcon === "send" ? (
+                                  <span className="text-red-300">− {recentActivity.amount}</span>
+                                ) : recentActivityMessage}
+                              </span>
+                            </div>
+                            <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#1e2628]" />
+                          </div>
+                        ) : null}
+                      </div>
+                      {/* "Mes devises" — md→lg */}
+                      <div className="hidden md:flex lg:hidden items-center justify-between gap-x-2">
+                        <span className="pl-0.5 text-[13px] font-medium text-white/30 tracking-wide uppercase">
+                          {t('ui_my_currencies', 'Mes devises')}
+                        </span>
+                      </div>
+                      {/* "Mes devises" — lg+ */}
+                      <div className="hidden lg:flex items-center justify-between gap-2 px-0.5 pb-1 border-b border-white/[0.06]">
+                        <span className="text-[12px] font-semibold text-white/40 tracking-widest">{t('ui_my_currencies', 'Mes devises')}</span>
+                      </div>
+                    </div>
+                  }
+                />
+              </div>
+            </div>
 
-          <DemoWalletFooter
-            onAddCurrency={() => setWalletInfoOpen(true)}
-            onScan={() => setQrScannerOpen(true)}
-            onHistory={() => setShowGlobalStatement(true)}
-          />
+            <div className="lg:mr-[229px]">
+              <DemoWalletFooter
+                onAddCurrency={() => setWalletInfoOpen(true)}
+                onScan={() => setQrScannerOpen(true)}
+                onHistory={() => setShowGlobalStatement(true)}
+              />
+            </div>
+          </div>
 
           <div className="absolute inset-0 z-[10000] pointer-events-none">
             <DemoWalletModals
