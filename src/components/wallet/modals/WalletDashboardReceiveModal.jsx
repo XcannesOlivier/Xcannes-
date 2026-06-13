@@ -1556,7 +1556,7 @@ export default function WalletDashboardReceiveModal({
                                       ) : null}
 
                                       {addressesVisible ? (
-                                        <div className="h-px w-full bg-white/10 mb-1.5" aria-hidden />
+                                        <div className="h-px w-full bg-xcannes-green/40 mb-1.5 transition-colors duration-200" aria-hidden />
                                       ) : null}
 
                                       <div className="flex items-center justify-between gap-2">
@@ -1571,7 +1571,7 @@ export default function WalletDashboardReceiveModal({
                                         </button>
                                         <button
                                           type="button"
-                                          className="shrink-0 rounded-md bg-white/[0.06] p-1 text-white/35 hover:bg-white/[0.10] hover:text-white/55 transition-colors"
+                                          className={`shrink-0 rounded-md bg-white/[0.06] p-1 transition-colors duration-200 ${addressesVisible ? 'text-xcannes-green hover:text-xcannes-green/80' : 'text-white/35 hover:bg-white/[0.10] hover:text-white/55'}`}
                                           onClick={toggleAll}
                                           aria-label={addressesVisible
                                             ? t('ui_hide_wallet_addresses', 'Masquer les adresses')
@@ -1586,7 +1586,7 @@ export default function WalletDashboardReceiveModal({
                               </div>
 
                               <div className="px-3">
-                                <div className="h-px w-full bg-white/10" aria-hidden />
+                                <div className={`h-px w-full transition-colors duration-200 ${Object.keys(shareAddressModes || {}).length > 0 ? 'bg-xcannes-green/40' : 'bg-white/10'}`} aria-hidden />
                               </div>
 
                               <div className="px-3 pt-1.5">
