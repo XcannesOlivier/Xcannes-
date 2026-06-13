@@ -469,6 +469,11 @@ body.wallet-page {
   100% { transform: scale(1.8); opacity: 0; }
 }
 
+@keyframes wallet-dot-pulse {
+  0%, 100% { transform: scale(1);    opacity: 1; }
+  50%       { transform: scale(0.7);  opacity: 0.2; }
+}
+
 .wallet-dot-wrapper {
   position: relative;
   display: inline-flex;

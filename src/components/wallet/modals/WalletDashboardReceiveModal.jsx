@@ -1469,7 +1469,7 @@ export default function WalletDashboardReceiveModal({
 		                            {t('ui_receive_account_info_label', 'Choisissez le compte')}
 	                          </span>
 	                          <div className="flex items-center gap-2">
-	                            <span className="h-3 w-3 rounded-full bg-xcannes-green ring-4 ring-xcannes-green/20 shrink-0 animate-pulse" aria-hidden />
+	                            <span className="h-2.5 w-2.5 rounded-full bg-xcannes-green ring-4 ring-xcannes-green/20 shrink-0" style={{animation:'wallet-dot-pulse 2s ease-in-out infinite'}} aria-hidden />
 	                            <span className="text-white/95 text-[14px] md:text-[15px] font-semibold">
 	                              {activeWalletLabel || t('nav_wallet', 'Wallet')}
 	                            </span>
