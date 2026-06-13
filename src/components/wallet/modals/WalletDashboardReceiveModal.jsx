@@ -1489,7 +1489,7 @@ export default function WalletDashboardReceiveModal({
                               role="menu"
                             >
                               {/* Addresses toggle (single eye) */}
-                              <div className="px-3 pt-2 pb-1.5">
+                              <div className="px-3 pt-0 pb-1.5">
                                 {(() => {
                                   const addressesVisible = Object.keys(shareAddressModes || {}).length > 0;
                                   const allAddresses = Array.from(
