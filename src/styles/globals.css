@@ -439,6 +439,44 @@ body.wallet-page {
   }
 }
 
+/* ── One-shot shimmer sweep (triggered after QR border draw) ── */
+@keyframes shimmer-once-sweep {
+  0%   { transform: translateX(120%); opacity: 0; }
+  8%   { opacity: 1; }
+  92%  { opacity: 1; }
+  100% { transform: translateX(-120%); opacity: 0; }
+}
+
+.shimmer-once {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer-once::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 15%,
+    rgba(255, 255, 255, 0.18) 50%,
+    transparent 85%
+  );
+  transform: translateX(120%);
+  animation: shimmer-once-sweep 0.85s ease-in-out forwards;
+  animation-delay: 3.35s;
+  pointer-events: none;
+  z-index: 10;
+  border-radius: inherit;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shimmer-once::before {
+    animation: none;
+    display: none;
+  }
+}
+
 @keyframes wallet-switch-shimmer {
   0%   { background-position: -200% center; }
   100% { background-position: 200% center; }
