@@ -367,6 +367,64 @@ body.wallet-page {
   animation: wallet-selector-open 280ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
+/* ── QR border draw animation ── */
+@keyframes qr-border-right {
+  from {
+    -webkit-mask-image: conic-gradient(from 0deg, white 0deg, transparent 0deg);
+    mask-image: conic-gradient(from 0deg, white 0deg, transparent 0deg);
+  }
+  to {
+    -webkit-mask-image: conic-gradient(from 0deg, white 180deg, transparent 180deg);
+    mask-image: conic-gradient(from 0deg, white 180deg, transparent 180deg);
+  }
+}
+
+@keyframes qr-border-left {
+  from {
+    -webkit-mask-image: conic-gradient(from 180deg, white 0deg, transparent 0deg);
+    mask-image: conic-gradient(from 180deg, white 0deg, transparent 0deg);
+  }
+  to {
+    -webkit-mask-image: conic-gradient(from 180deg, white 180deg, transparent 180deg);
+    mask-image: conic-gradient(from 180deg, white 180deg, transparent 180deg);
+  }
+}
+
+.qr-border-animated {
+  position: relative;
+}
+
+.qr-border-animated::before,
+.qr-border-animated::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  pointer-events: none;
+  animation-duration: 1.4s;
+  animation-delay: 0.3s;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  animation-fill-mode: both;
+}
+
+.qr-border-animated::before {
+  animation-name: qr-border-right;
+}
+
+.qr-border-animated::after {
+  animation-name: qr-border-left;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .qr-border-animated::before,
+  .qr-border-animated::after {
+    animation: none;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+}
+
 @keyframes wallet-switch-shimmer {
   0%   { background-position: -200% center; }
   100% { background-position: 200% center; }
