@@ -1517,26 +1517,8 @@ export default function WalletDashboardReceiveModal({
 
                                   return (
                                     <>
-                                      <div className="flex items-center justify-between gap-2">
-                                        <button
-                                          type="button"
-                                          className="min-w-0 flex-1 text-left text-[13px] md:text-[14px] text-white/40 hover:text-white/60 transition-colors"
-                                          onClick={toggleAll}
-                                        >
-                                          {t('ui_view_wallet_addresses', 'Voir les adresses')}
-                                        </button>
-                                        <button
-                                          type="button"
-                                          className="shrink-0 rounded-md bg-white/[0.06] p-1 text-white/35 hover:bg-white/[0.10] hover:text-white/55 transition-colors"
-                                          onClick={toggleAll}
-                                          aria-label={t('ui_view_wallet_addresses', 'Voir les adresses')}
-                                        >
-                                          <EyeIcon className="h-4 w-4" slashed={addressesVisible} />
-                                        </button>
-                                      </div>
-
                                       {addressesVisible ? (
-                                        <div className="mt-1 flex items-start gap-2">
+                                        <div className="mb-1.5 flex items-start gap-2">
                                           <button
                                             type="button"
                                             className={`min-w-0 flex-1 text-left font-mono font-light text-[13px] md:text-[14px] leading-snug text-white/70 ${
@@ -1572,6 +1554,24 @@ export default function WalletDashboardReceiveModal({
                                           </button>
                                         </div>
                                       ) : null}
+
+                                      <div className="flex items-center justify-between gap-2">
+                                        <button
+                                          type="button"
+                                          className="min-w-0 flex-1 text-left text-[13px] md:text-[14px] text-white/40 hover:text-white/60 transition-colors"
+                                          onClick={toggleAll}
+                                        >
+                                          {t('ui_view_wallet_addresses', 'Voir les adresses')}
+                                        </button>
+                                        <button
+                                          type="button"
+                                          className="shrink-0 rounded-md bg-white/[0.06] p-1 text-white/35 hover:bg-white/[0.10] hover:text-white/55 transition-colors"
+                                          onClick={toggleAll}
+                                          aria-label={t('ui_view_wallet_addresses', 'Voir les adresses')}
+                                        >
+                                          <EyeIcon className="h-4 w-4" slashed={addressesVisible} />
+                                        </button>
+                                      </div>
                                     </>
                                   );
                                 })()}
