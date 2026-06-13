@@ -1555,6 +1555,10 @@ export default function WalletDashboardReceiveModal({
                                         </div>
                                       ) : null}
 
+                                      {addressesVisible ? (
+                                        <div className="h-px w-full bg-white/10 mb-1.5" aria-hidden />
+                                      ) : null}
+
                                       <div className="flex items-center justify-between gap-2">
                                         <button
                                           type="button"
