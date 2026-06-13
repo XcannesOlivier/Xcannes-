@@ -416,8 +416,8 @@ export default function WalletDashboardReceiveModal({
 
 	  const accountDropdownOpenPillClassName = "rounded-3xl rounded-b-none before:content-[''] before:absolute before:inset-0 before:rounded-3xl before:rounded-b-none before:border before:border-white/25 before:border-b-0 before:pointer-events-none";
 	  const accountDropdownMenuClassName = inline
-      ? 'bg-[#0f1314] box-border !mt-0 !max-h-[300px] overflow-y-auto overscroll-contain touch-pan-y border border-white/25 border-t-0 rounded-b-[20px] shadow-[0_0_0_1px_rgba(0,0,0,0.5),-6px_10px_20px_rgba(0,0,0,0.40),6px_10px_20px_rgba(0,0,0,0.40),0_14px_32px_rgba(0,0,0,0.45)] !z-[10020]'
-      : 'bg-[#0f1314] box-border !mt-0 !max-h-[300px] overflow-y-auto overscroll-contain touch-pan-y border border-white/25 border-t-0 rounded-b-[20px] shadow-[0_0_0_1px_rgba(0,0,0,0.9),-12px_20px_40px_rgba(0,0,0,0.85),12px_20px_40px_rgba(0,0,0,0.85),0_28px_70px_rgba(0,0,0,0.90)] !z-[10020]';
+      ? 'bg-[#0f1314] box-border !mt-0 flex flex-col border border-white/25 border-t-0 rounded-b-[20px] shadow-[0_0_0_1px_rgba(0,0,0,0.5),-6px_10px_20px_rgba(0,0,0,0.40),6px_10px_20px_rgba(0,0,0,0.40),0_14px_32px_rgba(0,0,0,0.45)] !z-[10020]'
+      : 'bg-[#0f1314] box-border !mt-0 flex flex-col border border-white/25 border-t-0 rounded-b-[20px] shadow-[0_0_0_1px_rgba(0,0,0,0.9),-12px_20px_40px_rgba(0,0,0,0.85),12px_20px_40px_rgba(0,0,0,0.85),0_28px_70px_rgba(0,0,0,0.90)] !z-[10020]';
 
   const isFxRequest = useMemo(() => {
     if (!selectedRequestToken?.isTrustlineOnly) return false;
@@ -1609,7 +1609,9 @@ export default function WalletDashboardReceiveModal({
                                 </div>
                               </div>
 
-                              {(shareWalletOptions || [])
+                              {/* ── Scrollable wallet list ── */}
+                              <div className="overflow-y-auto overscroll-contain touch-pan-y max-h-[180px]">
+                                {(shareWalletOptions || [])
                                 .filter((opt) => opt?.value && opt.value !== wallet)
                                 .map((opt, idx) => {
                                   const addr = opt.value;
@@ -1688,6 +1690,7 @@ export default function WalletDashboardReceiveModal({
                                     </div>
                                   );
                                 })}
+                              </div>{/* end scrollable list */}
                             </div>
                           ) : null}
 	                      </div>
