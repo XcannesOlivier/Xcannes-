@@ -367,48 +367,18 @@ body.wallet-page {
   animation: wallet-selector-open 280ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
-/* ── QR border draw animation ── */
-@keyframes qr-border-right {
-  0% {
-    -webkit-mask-image: conic-gradient(from 0deg, white 0deg, transparent 0deg);
-    mask-image: conic-gradient(from 0deg, white 0deg, transparent 0deg);
-    border-color: rgba(255, 255, 255, 0.50);
-  }
-  65% {
-    -webkit-mask-image: conic-gradient(from 0deg, white 180deg, transparent 180deg);
-    mask-image: conic-gradient(from 0deg, white 180deg, transparent 180deg);
-    border-color: rgba(255, 255, 255, 0.50);
-  }
-  100% {
-    -webkit-mask-image: conic-gradient(from 0deg, white 180deg, transparent 180deg);
-    mask-image: conic-gradient(from 0deg, white 180deg, transparent 180deg);
-    border-color: rgba(255, 255, 255, 0.08);
-  }
-}
-
-@keyframes qr-border-left {
-  0% {
-    -webkit-mask-image: conic-gradient(from 180deg, white 0deg, transparent 0deg);
-    mask-image: conic-gradient(from 180deg, white 0deg, transparent 0deg);
-    border-color: rgba(255, 255, 255, 0.50);
-  }
-  65% {
-    -webkit-mask-image: conic-gradient(from 180deg, white 180deg, transparent 180deg);
-    mask-image: conic-gradient(from 180deg, white 180deg, transparent 180deg);
-    border-color: rgba(255, 255, 255, 0.50);
-  }
-  100% {
-    -webkit-mask-image: conic-gradient(from 180deg, white 180deg, transparent 180deg);
-    mask-image: conic-gradient(from 180deg, white 180deg, transparent 180deg);
-    border-color: rgba(255, 255, 255, 0.08);
-  }
+/* ── QR border comet animation ── */
+@keyframes qr-comet-spin {
+  from { transform: rotate(0deg);   opacity: 1; }
+  88%  { transform: rotate(360deg); opacity: 1; }
+  to   { transform: rotate(360deg); opacity: 0; }
 }
 
 .qr-border-animated {
   position: relative;
 }
 
-.qr-border-animated::before,
+/* Permanent static border */
 .qr-border-animated::after {
   content: '';
   position: absolute;
@@ -416,27 +386,43 @@ body.wallet-page {
   border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   pointer-events: none;
-  animation-duration: 2.8s;
+}
+
+/* Traveling comet — masked to border area only */
+.qr-border-animated::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  padding: 1px;
+  background: conic-gradient(
+    from -90deg,
+    transparent     0deg,
+    transparent   335deg,
+    rgba(255,255,255,0.10) 343deg,
+    rgba(255,255,255,0.55) 353deg,
+    white         358deg,
+    transparent   361deg
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: destination-out;
+  mask-composite: exclude;
+  pointer-events: none;
+  transform-origin: center center;
+  opacity: 0;
+  animation: qr-comet-spin 3s linear forwards;
   animation-delay: 0.5s;
-  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   animation-fill-mode: both;
 }
 
-.qr-border-animated::before {
-  animation-name: qr-border-right;
-}
-
-.qr-border-animated::after {
-  animation-name: qr-border-left;
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .qr-border-animated::before,
-  .qr-border-animated::after {
-    animation: none;
-    -webkit-mask-image: none;
-    mask-image: none;
-  }
+  .qr-border-animated::before { animation: none; display: none; }
+  .qr-border-animated::after  { border-color: rgba(255,255,255,0.08); }
 }
 
 /* ── One-shot shimmer sweep (triggered after QR border draw) ── */
@@ -487,8 +473,8 @@ body.wallet-page {
 
 @keyframes wallet-dot-halo {
   0%   { transform: scale(1);   opacity: 0.55; }
-  70%  { transform: scale(2.6); opacity: 0; }
-  100% { transform: scale(2.6); opacity: 0; }
+  70%  { transform: scale(1.8); opacity: 0; }
+  100% { transform: scale(1.8); opacity: 0; }
 }
 
 .wallet-dot-wrapper {
