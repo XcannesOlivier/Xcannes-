@@ -415,7 +415,9 @@ export default function WalletDashboardReceiveModal({
     }, [shortAddress, walletOptions]);
 
 	  const accountDropdownOpenPillClassName = "rounded-3xl rounded-b-none before:content-[''] before:absolute before:inset-0 before:rounded-3xl before:rounded-b-none before:border before:border-white/25 before:border-b-0 before:pointer-events-none";
-	  const accountDropdownMenuClassName = 'bg-[#0f1314] box-border !mt-0 !max-h-[300px] overflow-y-auto overscroll-contain touch-pan-y border border-white/25 border-t-0 rounded-b-[20px] shadow-[0_0_0_1px_rgba(0,0,0,0.9),-12px_20px_40px_rgba(0,0,0,0.85),12px_20px_40px_rgba(0,0,0,0.85),0_28px_70px_rgba(0,0,0,0.90)] !z-[10020]';
+	  const accountDropdownMenuClassName = inline
+      ? 'bg-[#0f1314] box-border !mt-0 !max-h-[300px] overflow-y-auto overscroll-contain touch-pan-y border border-white/25 border-t-0 rounded-b-[20px] shadow-[0_0_0_1px_rgba(0,0,0,0.5),-6px_10px_20px_rgba(0,0,0,0.40),6px_10px_20px_rgba(0,0,0,0.40),0_14px_32px_rgba(0,0,0,0.45)] !z-[10020]'
+      : 'bg-[#0f1314] box-border !mt-0 !max-h-[300px] overflow-y-auto overscroll-contain touch-pan-y border border-white/25 border-t-0 rounded-b-[20px] shadow-[0_0_0_1px_rgba(0,0,0,0.9),-12px_20px_40px_rgba(0,0,0,0.85),12px_20px_40px_rgba(0,0,0,0.85),0_28px_70px_rgba(0,0,0,0.90)] !z-[10020]';
 
   const isFxRequest = useMemo(() => {
     if (!selectedRequestToken?.isTrustlineOnly) return false;
@@ -1459,7 +1461,7 @@ export default function WalletDashboardReceiveModal({
                           <button
                             type="button"
                             onClick={hasMultipleWallets ? () => setShareWalletDropdownOpen((prev) => !prev) : undefined}
-                            className={`relative flex w-fit flex-col items-center gap-1 ${shareWalletDropdownOpen ? 'bg-[#0f1314]' : 'bg-[#232829]'} px-6 py-2 ${shareWalletDropdownOpen ? accountDropdownOpenPillClassName : 'rounded-[28px]'} ${shareWalletDropdownOpen ? 'ring-0' : 'ring-1 ring-white/[0.08]'} ring-inset ${hasMultipleWallets ? 'cursor-pointer' : ''} ${shareWalletDropdownOpen ? 'shadow-[0_0_0_1px_rgba(0,0,0,0.9),-12px_-16px_32px_rgba(0,0,0,0.85),12px_-16px_32px_rgba(0,0,0,0.85),0_-8px_24px_rgba(0,0,0,0.80)]' : ''}`}
+                            className={`relative flex w-fit flex-col items-center gap-1 ${shareWalletDropdownOpen ? 'bg-[#0f1314]' : 'bg-[#232829]'} px-6 py-2 ${shareWalletDropdownOpen ? accountDropdownOpenPillClassName : 'rounded-[28px]'} ${shareWalletDropdownOpen ? 'ring-0' : 'ring-1 ring-white/[0.08]'} ring-inset ${hasMultipleWallets ? 'cursor-pointer' : ''} ${shareWalletDropdownOpen ? (inline ? 'shadow-[0_0_0_1px_rgba(0,0,0,0.5),-6px_-8px_16px_rgba(0,0,0,0.40),6px_-8px_16px_rgba(0,0,0,0.40),0_-4px_12px_rgba(0,0,0,0.38)]' : 'shadow-[0_0_0_1px_rgba(0,0,0,0.9),-12px_-16px_32px_rgba(0,0,0,0.85),12px_-16px_32px_rgba(0,0,0,0.85),0_-8px_24px_rgba(0,0,0,0.80)]') : ''}`}
                             aria-haspopup={hasMultipleWallets ? 'menu' : undefined}
                             aria-expanded={hasMultipleWallets ? shareWalletDropdownOpen : undefined}
                           >
