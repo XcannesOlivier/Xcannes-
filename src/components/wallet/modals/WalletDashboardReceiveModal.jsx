@@ -1461,7 +1461,7 @@ export default function WalletDashboardReceiveModal({
                           <button
                             type="button"
                             onClick={hasMultipleWallets ? () => setShareWalletDropdownOpen((prev) => !prev) : undefined}
-                            className={`shimmer-once relative flex w-fit flex-col items-center gap-1 ${shareWalletDropdownOpen ? 'bg-[#0f1314]' : 'bg-[#232829]'} px-6 py-2 ${shareWalletDropdownOpen ? accountDropdownOpenPillClassName : 'rounded-[28px]'} ${shareWalletDropdownOpen ? 'ring-0' : 'ring-1 ring-white/[0.08]'} ring-inset ${hasMultipleWallets ? 'cursor-pointer' : ''} ${shareWalletDropdownOpen ? (inline ? 'shadow-[0_0_0_1px_rgba(0,0,0,0.75),-14px_-18px_36px_rgba(0,0,0,0.70),14px_-18px_36px_rgba(0,0,0,0.70),0_-10px_28px_rgba(0,0,0,0.68)]' : 'shadow-[0_0_0_1px_rgba(0,0,0,0.9),-12px_-16px_32px_rgba(0,0,0,0.85),12px_-16px_32px_rgba(0,0,0,0.85),0_-8px_24px_rgba(0,0,0,0.80)]') : ''}`}
+                            className={`shimmer-seq shimmer-seq-3 relative flex w-fit flex-col items-center gap-1 ${shareWalletDropdownOpen ? 'bg-[#0f1314]' : 'bg-[#232829]'} px-6 py-2 ${shareWalletDropdownOpen ? accountDropdownOpenPillClassName : 'rounded-[28px]'} ${shareWalletDropdownOpen ? 'ring-0' : 'ring-1 ring-white/[0.08]'} ring-inset ${hasMultipleWallets ? 'cursor-pointer' : ''} ${shareWalletDropdownOpen ? (inline ? 'shadow-[0_0_0_1px_rgba(0,0,0,0.75),-14px_-18px_36px_rgba(0,0,0,0.70),14px_-18px_36px_rgba(0,0,0,0.70),0_-10px_28px_rgba(0,0,0,0.68)]' : 'shadow-[0_0_0_1px_rgba(0,0,0,0.9),-12px_-16px_32px_rgba(0,0,0,0.85),12px_-16px_32px_rgba(0,0,0,0.85),0_-8px_24px_rgba(0,0,0,0.80)]') : ''}`}
                             aria-haspopup={hasMultipleWallets ? 'menu' : undefined}
                             aria-expanded={hasMultipleWallets ? shareWalletDropdownOpen : undefined}
                           >
@@ -1469,7 +1469,7 @@ export default function WalletDashboardReceiveModal({
 		                            {t('ui_receive_account_info_label', 'Choisissez le compte')}
 	                          </span>
 	                          <div className="flex items-center gap-2">
-	                            <span className="wallet-dot-wrapper" aria-hidden><span className="wallet-dot-core" /></span>
+	                            <span className="h-3 w-3 rounded-full bg-xcannes-green ring-4 ring-xcannes-green/20 shrink-0 animate-pulse" aria-hidden />
 	                            <span className="text-white/95 text-[14px] md:text-[15px] font-semibold">
 	                              {activeWalletLabel || t('nav_wallet', 'Wallet')}
 	                            </span>
@@ -1736,7 +1736,7 @@ export default function WalletDashboardReceiveModal({
 	                          await handleCopyQr(false);
 	                        }}
 	                        className={[
-	                          'shimmer-once w-full h-11 rounded-[20px] bg-[#232829] ring-1 ring-white/10 ring-inset text-white/85 text-xs font-semibold mt-6 md:mt-[50px]',
+									'shimmer-seq shimmer-seq-2 w-full h-11 rounded-[20px] bg-[#232829] ring-1 ring-white/10 ring-inset text-white/85 text-xs font-semibold mt-6 md:mt-[50px]',
 	                          'shadow-[0_4px_12px_rgba(0,0,0,0.4)] hover:ring-white/20 hover:bg-white/[0.04] transition-all duration-[140ms] active:scale-[0.99]',
 	                        ].join(' ')}
 	                      >
@@ -1748,7 +1748,7 @@ export default function WalletDashboardReceiveModal({
 	                          e.stopPropagation();
 	                          await handleShareQr(false);
 	                        }}
-                          className="shimmer-once w-full h-11 rounded-[20px] bg-[#232829] text-white text-[17px] font-bold tracking-wide py-2 px-6 transition-all duration-[140ms] inline-flex items-center justify-center gap-2.5 hover:bg-white/[0.04] scale-[1.04] active:scale-[0.98] mt-6 md:mt-[50px]"
+                          className="shimmer-seq shimmer-seq-1 w-full h-11 rounded-[20px] bg-[#232829] text-white text-[17px] font-bold tracking-wide py-2 px-6 transition-all duration-[140ms] inline-flex items-center justify-center gap-2.5 hover:bg-white/[0.04] scale-[1.04] active:scale-[0.98] mt-6 md:mt-[50px]"
                           style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(255,255,255,0.10), inset 0 1px 0 rgba(255,255,255,0.06), inset 0 -8px 16px rgba(0,0,0,0.25)' }}
 	                      >
 	                        <ShareIcon className="w-5 h-5" />

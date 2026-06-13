@@ -367,18 +367,27 @@ body.wallet-page {
   animation: wallet-selector-open 280ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
-/* ── QR border comet animation ── */
-@keyframes qr-comet-spin {
-  from { transform: rotate(0deg);   opacity: 1; }
-  88%  { transform: rotate(360deg); opacity: 1; }
-  to   { transform: rotate(360deg); opacity: 0; }
+/* ── QR block + sequential shimmer sweep ── */
+@keyframes shimmer-btop {
+  0%   { transform: translateY(120%); opacity: 0; }
+  8%   { opacity: 1; }
+  92%  { opacity: 1; }
+  100% { transform: translateY(-120%); opacity: 0; }
 }
 
+@keyframes shimmer-rl {
+  0%   { transform: translateX(120%); opacity: 0; }
+  8%   { opacity: 1; }
+  92%  { opacity: 1; }
+  100% { transform: translateX(-120%); opacity: 0; }
+}
+
+/* QR block — static border */
 .qr-border-animated {
   position: relative;
+  overflow: hidden;
 }
 
-/* Permanent static border */
 .qr-border-animated::after {
   content: '';
   position: absolute;
@@ -386,59 +395,39 @@ body.wallet-page {
   border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   pointer-events: none;
+  z-index: 2;
 }
 
-/* Traveling comet — masked to border area only */
+/* QR block — bottom-to-top shimmer (step 1) */
 .qr-border-animated::before {
   content: '';
   position: absolute;
   inset: 0;
-  border-radius: 20px;
-  padding: 1px;
-  background: conic-gradient(
-    from -90deg,
-    transparent     0deg,
-    transparent   335deg,
-    rgba(255,255,255,0.10) 343deg,
-    rgba(255,255,255,0.55) 353deg,
-    white         358deg,
-    transparent   361deg
+  background: linear-gradient(
+    0deg,
+    transparent 15%,
+    rgba(255, 255, 255, 0.16) 50%,
+    transparent 85%
   );
-  -webkit-mask:
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
-  mask:
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
-  -webkit-mask-composite: destination-out;
-  mask-composite: exclude;
+  transform: translateY(120%);
+  animation: shimmer-btop 0.9s ease-in-out forwards;
+  animation-delay: 0.3s;
   pointer-events: none;
-  transform-origin: center center;
-  opacity: 0;
-  animation: qr-comet-spin 3s linear forwards;
-  animation-delay: 0.5s;
-  animation-fill-mode: both;
+  z-index: 10;
+  border-radius: 20px;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .qr-border-animated::before { animation: none; display: none; }
-  .qr-border-animated::after  { border-color: rgba(255,255,255,0.08); }
 }
 
-/* ── One-shot shimmer sweep (triggered after QR border draw) ── */
-@keyframes shimmer-once-sweep {
-  0%   { transform: translateX(120%); opacity: 0; }
-  8%   { opacity: 1; }
-  92%  { opacity: 1; }
-  100% { transform: translateX(-120%); opacity: 0; }
-}
-
-.shimmer-once {
+/* Sequential shimmer — shared base */
+.shimmer-seq {
   position: relative;
   overflow: hidden;
 }
 
-.shimmer-once::before {
+.shimmer-seq::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -449,18 +438,21 @@ body.wallet-page {
     transparent 85%
   );
   transform: translateX(120%);
-  animation: shimmer-once-sweep 0.85s ease-in-out forwards;
-  animation-delay: 3.35s;
+  animation: shimmer-rl 0.85s ease-in-out forwards;
   pointer-events: none;
   z-index: 10;
   border-radius: inherit;
 }
 
+/* step 2 — Télécharger  (starts after QR sweep: 0.3+0.9+0.15=1.35s) */
+.shimmer-seq-1::before { animation-delay: 1.35s; }
+/* step 3 — Copier l'adresse */
+.shimmer-seq-2::before { animation-delay: 2.3s; }
+/* step 4 — Choisissez le compte */
+.shimmer-seq-3::before { animation-delay: 3.25s; }
+
 @media (prefers-reduced-motion: reduce) {
-  .shimmer-once::before {
-    animation: none;
-    display: none;
-  }
+  .shimmer-seq::before { animation: none; display: none; }
 }
 
 /* ── Voyant vert — battement + halo ── */
