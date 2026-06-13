@@ -1336,7 +1336,7 @@ export default function WalletDashboardReceiveModal({
             ) : null}
             {receiveView !== 'choice' ? (
               <div
-                className={`relative z-[66] ${receiveView === 'request_qr' ? 'pt-0' : 'pt-2'} md:pt-0 pb-3 flex flex-col items-center text-center`}
+                className={`relative z-[66] ${receiveView === 'request_qr' ? 'pt-0' : 'pt-2'} md:pt-0 pb-3 flex flex-col ${receiveView === 'share' ? 'items-start text-left md:items-center md:text-center' : 'items-center text-center'}`}
                 onPointerDown={event => {
                   if (!disableSwipeToClose) maybeStartOverlayDrag(event, 'fixed');
                 }}
