@@ -369,24 +369,38 @@ body.wallet-page {
 
 /* ── QR border draw animation ── */
 @keyframes qr-border-right {
-  from {
+  0% {
     -webkit-mask-image: conic-gradient(from 0deg, white 0deg, transparent 0deg);
     mask-image: conic-gradient(from 0deg, white 0deg, transparent 0deg);
+    border-color: rgba(255, 255, 255, 0.50);
   }
-  to {
+  65% {
     -webkit-mask-image: conic-gradient(from 0deg, white 180deg, transparent 180deg);
     mask-image: conic-gradient(from 0deg, white 180deg, transparent 180deg);
+    border-color: rgba(255, 255, 255, 0.50);
+  }
+  100% {
+    -webkit-mask-image: conic-gradient(from 0deg, white 180deg, transparent 180deg);
+    mask-image: conic-gradient(from 0deg, white 180deg, transparent 180deg);
+    border-color: rgba(255, 255, 255, 0.08);
   }
 }
 
 @keyframes qr-border-left {
-  from {
+  0% {
     -webkit-mask-image: conic-gradient(from 180deg, white 0deg, transparent 0deg);
     mask-image: conic-gradient(from 180deg, white 0deg, transparent 0deg);
+    border-color: rgba(255, 255, 255, 0.50);
   }
-  to {
+  65% {
     -webkit-mask-image: conic-gradient(from 180deg, white 180deg, transparent 180deg);
     mask-image: conic-gradient(from 180deg, white 180deg, transparent 180deg);
+    border-color: rgba(255, 255, 255, 0.50);
+  }
+  100% {
+    -webkit-mask-image: conic-gradient(from 180deg, white 180deg, transparent 180deg);
+    mask-image: conic-gradient(from 180deg, white 180deg, transparent 180deg);
+    border-color: rgba(255, 255, 255, 0.08);
   }
 }
 
@@ -402,8 +416,8 @@ body.wallet-page {
   border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   pointer-events: none;
-  animation-duration: 1.4s;
-  animation-delay: 0.3s;
+  animation-duration: 2.8s;
+  animation-delay: 0.5s;
   animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   animation-fill-mode: both;
 }
