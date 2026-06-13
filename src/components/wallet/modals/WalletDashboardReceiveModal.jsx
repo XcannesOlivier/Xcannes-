@@ -1520,7 +1520,7 @@ export default function WalletDashboardReceiveModal({
                                   return (
                                     <>
                                       {addressesVisible ? (
-                                        <div className="mb-1.5 flex items-start gap-2">
+                                        <div className="mb-3 flex items-start gap-2">
                                           <button
                                             type="button"
                                             className={`min-w-0 flex-1 text-left font-mono font-light text-[13px] md:text-[14px] leading-snug text-white/70 ${
