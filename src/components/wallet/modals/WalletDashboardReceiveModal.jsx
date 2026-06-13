@@ -1728,7 +1728,7 @@ export default function WalletDashboardReceiveModal({
 	                    </div>
 
 	                    {/* ── Actions ── */}
-	                    <div className="grid grid-cols-2 gap-3">
+	                    <div className="grid grid-cols-2 gap-5">
 	                      <button
 	                        type="button"
 	                        onClick={async e => {
@@ -1736,7 +1736,7 @@ export default function WalletDashboardReceiveModal({
 	                          await handleCopyQr(false);
 	                        }}
 	                        className={[
-									'shimmer-seq shimmer-seq-2 w-full h-11 rounded-[20px] bg-[#232829] ring-1 ring-white/10 ring-inset text-white/85 text-xs font-semibold mt-6 md:mt-[50px]',
+									'shimmer-seq shimmer-seq-2 w-full h-11 rounded-[20px] bg-[#232829] ring-1 ring-white/10 ring-inset text-white/85 text-xs font-semibold mt-6 md:mt-[50px] px-2',
 	                          'shadow-[0_4px_12px_rgba(0,0,0,0.4)] hover:ring-white/20 hover:bg-white/[0.04] transition-all duration-[140ms] active:scale-[0.99]',
 	                        ].join(' ')}
 	                      >
@@ -1748,7 +1748,7 @@ export default function WalletDashboardReceiveModal({
 	                          e.stopPropagation();
 	                          await handleShareQr(false);
 	                        }}
-                          className="shimmer-seq shimmer-seq-1 w-full h-11 rounded-[20px] bg-[#232829] text-white text-[17px] font-bold tracking-wide py-2 px-6 transition-all duration-[140ms] inline-flex items-center justify-center gap-2.5 hover:bg-white/[0.04] scale-[1.04] active:scale-[0.98] mt-6 md:mt-[50px]"
+                          className="shimmer-seq shimmer-seq-1 w-full h-11 rounded-[20px] bg-[#232829] text-white text-[17px] font-bold tracking-wide py-2 px-3 transition-all duration-[140ms] inline-flex items-center justify-center gap-1.5 hover:bg-white/[0.04] scale-[1.04] active:scale-[0.98] mt-6 md:mt-[50px]"
                           style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(255,255,255,0.10), inset 0 1px 0 rgba(255,255,255,0.06), inset 0 -8px 16px rgba(0,0,0,0.25)' }}
 	                      >
 	                        <ShareIcon className="w-5 h-5" />
