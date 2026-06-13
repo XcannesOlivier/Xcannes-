@@ -414,7 +414,7 @@ export default function WalletDashboardReceiveModal({
       }));
     }, [shortAddress, walletOptions]);
 
-	  const accountDropdownOpenPillClassName = "rounded-3xl rounded-b-none before:content-[''] before:absolute before:inset-0 before:rounded-3xl before:rounded-b-none before:border before:border-white/25 before:border-b-0 before:pointer-events-none";
+	  const accountDropdownOpenPillClassName = "rounded-3xl rounded-b-none after:content-[''] after:absolute after:inset-0 after:rounded-3xl after:rounded-b-none after:border after:border-white/25 after:border-b-0 after:pointer-events-none after:z-[1]";
 	  const accountDropdownMenuClassName = inline
       ? 'bg-[#0f1314] box-border !mt-0 flex flex-col border border-white/25 border-t-0 rounded-b-[20px] shadow-[0_0_0_1px_rgba(0,0,0,0.75),-14px_22px_42px_rgba(0,0,0,0.72),14px_22px_42px_rgba(0,0,0,0.72),0_28px_56px_rgba(0,0,0,0.78)] !z-[10020]'
       : 'bg-[#0f1314] box-border !mt-0 flex flex-col border border-white/25 border-t-0 rounded-b-[20px] shadow-[0_0_0_1px_rgba(0,0,0,0.9),-12px_20px_40px_rgba(0,0,0,0.85),12px_20px_40px_rgba(0,0,0,0.85),0_28px_70px_rgba(0,0,0,0.90)] !z-[10020]';
@@ -1610,7 +1610,7 @@ export default function WalletDashboardReceiveModal({
                               </div>
 
                               {/* ── Scrollable wallet list ── */}
-                              <div className="overflow-y-auto overscroll-contain touch-pan-y max-h-[180px]">
+                              <div className="overflow-y-auto overscroll-contain touch-pan-y max-h-[220px]">
                                 {(shareWalletOptions || [])
                                 .filter((opt) => opt?.value && opt.value !== wallet)
                                 .map((opt, idx) => {
