@@ -1604,7 +1604,7 @@ export default function WalletDashboardReceiveModal({
                               </div>
 
                               <div className="px-3 pt-2 pb-1">
-                                <div className="text-[13px] md:text-[14px] text-white/60">
+                                <div className="wallet-switch-label text-[13px] md:text-[14px]">
                                   {t('ui_switch_wallet', 'Changer de compte')}
                                 </div>
                               </div>

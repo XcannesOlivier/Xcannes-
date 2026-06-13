@@ -367,6 +367,28 @@ body.wallet-page {
   animation: wallet-selector-open 280ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
+@keyframes wallet-switch-shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.wallet-switch-label {
+  font-weight: 300;
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0.38) 0%,
+    rgba(255,255,255,0.38) 38%,
+    rgba(255,255,255,0.72) 50%,
+    rgba(255,255,255,0.38) 62%,
+    rgba(255,255,255,0.38) 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: wallet-switch-shimmer 4s linear infinite;
+}
+
 .wallet-convert-modal :where(*) {
   border-width: 0 !important;
 }
