@@ -1483,7 +1483,7 @@ export default function WalletDashboardReceiveModal({
 
                           {shareWalletDropdownOpen && hasMultipleWallets ? (
                             <div
-                              className={`wallet-receive-account-menu absolute left-0 right-0 top-full -mt-px ${accountDropdownMenuClassName}`}
+                              className={`wallet-receive-account-menu absolute left-0 right-0 top-full -mt-[2px] ${accountDropdownMenuClassName}`}
                               onMouseDown={(e) => e.stopPropagation()}
                               onClick={(e) => e.stopPropagation()}
                               role="menu"

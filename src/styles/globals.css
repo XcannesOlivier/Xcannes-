@@ -352,6 +352,19 @@ body.wallet-page {
   border-top-width: 0 !important;
 }
 
+/* Raccord pill→dropdown : bande de fond qui recouvre le joint */
+.wallet-receive-account-menu::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background-color: #0f1314;
+  z-index: 1;
+  pointer-events: none;
+}
+
 @keyframes wallet-selector-open {
   0%   { transform: scale(1); }
   60%  { transform: scale(1.40); }
