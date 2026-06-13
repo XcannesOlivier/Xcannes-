@@ -1564,7 +1564,7 @@ export default function WalletDashboardReceiveModal({
                                       <div className="flex items-center justify-between gap-2">
                                         <button
                                           type="button"
-                                          className="min-w-0 flex-1 text-left text-[13px] md:text-[14px] text-white/40 hover:text-white/60 transition-colors"
+                                          className={`min-w-0 flex-1 text-left text-[13px] md:text-[14px] transition-colors duration-200 ${addressesVisible ? 'text-xcannes-green hover:text-xcannes-green/80' : 'text-white/40 hover:text-white/60'}`}
                                           onClick={toggleAll}
                                         >
                                           {addressesVisible
