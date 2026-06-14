@@ -546,6 +546,22 @@ body.wallet-page {
   animation: wallet-switch-shimmer 4s linear infinite;
 }
 
+.wallet-request-amount-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0.70) 0%,
+    rgba(255,255,255,0.70) 30%,
+    rgba(255,255,255,1.00) 50%,
+    rgba(255,255,255,0.70) 70%,
+    rgba(255,255,255,0.70) 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: wallet-switch-shimmer 3.5s linear infinite;
+}
+
 .wallet-convert-modal :where(*) {
   border-width: 0 !important;
 }
