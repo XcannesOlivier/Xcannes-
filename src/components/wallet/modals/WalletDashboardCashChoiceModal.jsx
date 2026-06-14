@@ -260,7 +260,7 @@ export default function WalletDashboardCashChoiceModal({
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center justify-between gap-2">
-                            <p className="text-[18px] md:text-[19px] text-white font-semibold truncate">
+                            <p className="text-[19px] md:text-[20px] text-white font-medium truncate">
                               {t('ui_funds_increase_balances_title', 'Ajouter des fonds')}
                             </p>
                             <svg className="w-5 h-5 text-white/45" viewBox="0 0 24 24" fill="none" aria-hidden>
@@ -290,7 +290,7 @@ export default function WalletDashboardCashChoiceModal({
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center justify-between gap-2">
-                            <p className="text-[18px] md:text-[19px] text-white font-semibold truncate">
+                            <p className="text-[19px] md:text-[20px] text-white font-medium truncate">
                               {isDesktop
                                 ? t('ui_funds_withdraw_title', 'Transférer vers la banque')
                                 : t('ui_funds_withdraw_title_mobile', 'Transférer vers la banque')}
@@ -336,7 +336,7 @@ export default function WalletDashboardCashChoiceModal({
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center justify-between gap-2">
-                            <p className="text-[18px] md:text-[19px] text-white font-semibold truncate">
+                            <p className="text-[19px] md:text-[20px] text-white font-medium truncate">
                               {t('ui_funds_swap_out_title', 'Vendre vos stablecoins')}
                             </p>
                             <svg className="w-5 h-5 text-white/45" viewBox="0 0 24 24" fill="none" aria-hidden>
@@ -417,7 +417,7 @@ export default function WalletDashboardCashChoiceModal({
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center justify-between gap-2">
-                            <p className="text-[18px] md:text-[19px] text-white font-semibold truncate">
+                            <p className="text-[19px] md:text-[20px] text-white font-medium truncate">
                               {t('ui_funds_swap_in_title', 'Acheter des stablecoins')}
                             </p>
                             <svg className="w-5 h-5 text-white/45" viewBox="0 0 24 24" fill="none" aria-hidden>
@@ -459,7 +459,7 @@ export default function WalletDashboardCashChoiceModal({
 
 		                    {/* Liquidity note: 14px gap on mobile */}
 		                    <div className="mt-[14px] md:mt-4">
-		                      <p className="px-2 w-full md:max-w-[520px] mx-auto text-center text-[11px] md:text-[12px] text-white/65 leading-snug">
+		                      <p className="px-2 w-full md:max-w-[520px] mx-auto text-center text-[12px] md:text-[13px] font-light text-white/65 leading-snug">
 		                        {stablecoinLiquidityNote}
 		                      </p>
 		                    </div>
