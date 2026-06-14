@@ -1336,7 +1336,7 @@ export default function WalletDashboardReceiveModal({
             ) : null}
             {receiveView !== 'choice' ? (
               <div
-                className={`relative z-[66] ${receiveView === 'request_qr' ? 'pt-0' : 'pt-2'} md:pt-0 pb-3 flex flex-col ${receiveView === 'share' ? 'items-start text-left md:items-center md:text-center' : 'items-center text-center'}`}
+                className={`relative z-[66] ${receiveView === 'request_qr' ? 'pt-0' : 'pt-2'} md:pt-0 pb-3 flex flex-col ${receiveView === 'share' || receiveView === 'request' || receiveView === 'request_qr' ? 'items-start text-left md:items-center md:text-center' : 'items-center text-center'}`}
                 onPointerDown={event => {
                   if (!disableSwipeToClose) maybeStartOverlayDrag(event, 'fixed');
                 }}
@@ -1351,7 +1351,7 @@ export default function WalletDashboardReceiveModal({
                   </span>
                 ) : null}
 
-                <p className={`max-w-[34ch] text-white/60 ${receiveView === 'share' ? 'mt-1 md:mt-2 leading-snug md:leading-relaxed text-[18px] md:text-[19px] font-light' : 'mt-2 leading-relaxed text-[14px] md:text-[15px]'}`}>
+                <p className={`max-w-[34ch] text-white/60 ${receiveView === 'share' ? 'mt-1 md:mt-2 leading-snug md:leading-relaxed text-[18px] md:text-[19px] font-light' : receiveView === 'request' ? 'mt-1 md:mt-2 leading-snug md:leading-relaxed text-[14px] md:text-[15px]' : 'mt-2 leading-relaxed text-[14px] md:text-[15px]'}`}>
                   {headerSubtitle}
                 </p>
               </div>
