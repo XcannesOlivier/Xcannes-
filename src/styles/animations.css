@@ -330,9 +330,9 @@
 
 /* Subtle upward drift — value transmission feeling */
 @keyframes requestQrGlowDriftUp {
-  0%   { opacity: 0.80; transform: translateY(0px); }
-  50%  { opacity: 1;    transform: translateY(-14px); }
-  100% { opacity: 0.80; transform: translateY(0px); }
+  0%   { opacity: 0.80; }
+  50%  { opacity: 1;    }
+  100% { opacity: 0.80; }
 }
 
 .request-qr-glow-a {
@@ -345,7 +345,7 @@
 }
 .request-qr-glow-up {
   animation: requestQrGlowDriftUp 18s ease-in-out infinite;
-  will-change: transform, opacity;
+  will-change: opacity;
 }
 
 /* Amount brightness breathe */
