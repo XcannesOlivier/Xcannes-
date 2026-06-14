@@ -559,7 +559,7 @@ body.wallet-page {
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  animation: wallet-switch-shimmer 3.5s linear infinite;
+  animation: wallet-switch-shimmer 6s linear infinite;
 }
 
 .wallet-convert-modal :where(*) {
