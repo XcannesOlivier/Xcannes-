@@ -1331,7 +1331,7 @@ export default function WalletDashboardReceiveModal({
                   if (!disableSwipeToClose) maybeStartOverlayDrag(event, 'fixed');
                 }}
               >
-                <span className="block w-12 h-1.5 rounded-full bg-white/20" />
+                <span className={`block w-12 h-1.5 rounded-full ${receiveView === 'request' ? 'bg-white/[0.13]' : 'bg-white/20'}`} />
               </div>
             ) : null}
             {receiveView !== 'choice' ? (
@@ -2306,7 +2306,7 @@ export default function WalletDashboardReceiveModal({
                 className="md:hidden pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-[max(env(safe-area-inset-bottom),10px)] z-20"
                 aria-hidden
               >
-                <span className="block w-36 h-1.5 rounded-full bg-white/80" />
+                <span className="block w-36 h-1.5 rounded-full bg-white/50" />
               </div>
             ) : null}
             {/* Bottom bar – desktop only (visual balance) – Comment souhaitez-vous recevoir ? */}
