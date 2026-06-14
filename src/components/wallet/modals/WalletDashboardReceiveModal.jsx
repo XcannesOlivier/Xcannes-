@@ -2178,11 +2178,11 @@ export default function WalletDashboardReceiveModal({
 	              {receiveView === 'request_qr' ? (
 	                <>
 	                  {/* Glow ambre — vue request_qr (Demande générée) */}
-	                  <div className="pointer-events-none absolute inset-0 z-[-1]" aria-hidden>
+	                  <div className="pointer-events-none absolute inset-0 z-[-1] overflow-hidden" aria-hidden>
 	                    <div className="absolute inset-0 bg-[radial-gradient(400px_circle_at_88%_0%,rgba(255,255,255,0.07),transparent_50%)]" />
-	                    <div className="absolute inset-0 md:hidden bg-[radial-gradient(900px_circle_at_100%_75%,rgba(245,166,35,0.30),transparent_60%)]" />
-	                    <div className="absolute inset-0 hidden md:block bg-[radial-gradient(1300px_circle_at_100%_75%,rgba(245,166,35,0.30),transparent_60%)]" />
-	                    <div className="absolute inset-0 bg-[radial-gradient(700px_circle_at_0%_100%,rgba(245,166,35,0.20),transparent_65%)]" />
+	                    <div className="request-qr-glow-a absolute inset-0 md:hidden bg-[radial-gradient(900px_circle_at_100%_75%,rgba(245,166,35,0.30),transparent_60%)]" />
+	                    <div className="request-qr-glow-a absolute inset-0 hidden md:block bg-[radial-gradient(1300px_circle_at_100%_75%,rgba(245,166,35,0.30),transparent_60%)]" />
+	                    <div className="request-qr-glow-b request-qr-glow-up absolute inset-0 bg-[radial-gradient(700px_circle_at_0%_100%,rgba(245,166,35,0.20),transparent_65%)]" />
 	                  </div>
 		                  {/* SECTION 3 — REQUEST QR */}
 		                  <div className="space-y-5 pt-2 relative z-[2]">
@@ -2204,7 +2204,8 @@ export default function WalletDashboardReceiveModal({
 				                    {hasGeneratedRequest ? (
 					                      <>
 					                        {/* ── QR Code (primary action — first) ── */}
-					                        <div className="qr-border-animated shimmer-seq shimmer-seq-1 w-full flex flex-col items-center bg-[#232829] rounded-[20px] pt-5 pb-2 md:pt-8 md:pb-5 shadow-[0_2px_0_rgba(255,255,255,0.04)_inset,0_-2px_0_rgba(0,0,0,0.6)_inset,12px_36px_52px_rgba(0,0,0,0.68),-14px_14px_38px_rgba(0,0,0,0.42),0_64px_30px_-20px_rgba(0,0,0,0.6),8px_-10px_22px_rgba(0,0,0,0.28)]">
+					                        <div className="qr-border-animated shimmer-seq shimmer-seq-1 relative overflow-hidden w-full flex flex-col items-center bg-[#232829] rounded-[20px] pt-5 pb-2 md:pt-8 md:pb-5 shadow-[0_2px_0_rgba(255,255,255,0.04)_inset,0_-2px_0_rgba(0,0,0,0.6)_inset,12px_36px_52px_rgba(0,0,0,0.68),-14px_14px_38px_rgba(0,0,0,0.42),0_64px_30px_-20px_rgba(0,0,0,0.6),8px_-10px_22px_rgba(0,0,0,0.28)]">
+					                          <span aria-hidden className="request-qr-glass" />
 				                          <div
 				                            ref={requestQrContainerRef}
 				                            className="w-[240px] md:w-[260px] aspect-square rounded-none p-3 cursor-pointer border-[20px] border-black"
@@ -2236,13 +2237,14 @@ export default function WalletDashboardReceiveModal({
 
 					                        {/* ── Amount (standalone, centered) ── */}
 					                        <div className="relative z-10 text-center !mt-2 md:!mt-5">
-					                          <div className="wallet-request-amount-shimmer text-[40px] md:text-[48px] font-bold tracking-tight leading-none">
+					                          <div className="request-qr-amount-breathe wallet-request-amount-shimmer text-[40px] md:text-[48px] font-bold tracking-tight leading-none">
 					                            {requestDisplayAmountLabel}
 					                          </div>
 					                        </div>
 
 					                        {/* ── Details (date, message) ── */}
-					                        <div className="shimmer-seq shimmer-seq-5 !mt-1.5 md:!mt-5 flex flex-col gap-1 px-3 py-2 rounded-[14px] bg-[#232829] ring-1 ring-white/15 ring-inset">
+					                        <div className="shimmer-seq shimmer-seq-5 relative overflow-hidden !mt-1.5 md:!mt-5 flex flex-col gap-1 px-3 py-2 rounded-[14px] bg-[#232829] ring-1 ring-white/15 ring-inset">
+					                          <span aria-hidden className="request-qr-glass-details" />
 					                          <div className="flex items-center justify-between">
 					                            <span className="text-[13px] text-white/70 font-medium">{t('ui_date_time_label', 'Date & Heure')}</span>
 					                            <span className="text-[13px] text-white/95 font-medium">

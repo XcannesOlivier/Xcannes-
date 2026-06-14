@@ -314,6 +314,115 @@
   }
 }
 
+/* ====== REQUEST_QR VIEW: VALUE TRANSMISSION AMBIENT ====== */
+
+/* Amber halo drift — originates from amount area, drifts upward */
+@keyframes requestQrGlowDriftA {
+  0%   { opacity: 0.60; transform: scale(1); }
+  30%  { opacity: 1;    transform: scale(1.14); }
+  60%  { opacity: 0.45; transform: scale(0.90); }
+  80%  { opacity: 0.92; transform: scale(1.11); }
+  100% { opacity: 0.60; transform: scale(1); }
+}
+@keyframes requestQrGlowDriftB {
+  0%   { opacity: 0.45; transform: scale(1); }
+  25%  { opacity: 0.88; transform: scale(1.12); }
+  55%  { opacity: 0.42; transform: scale(0.92); }
+  75%  { opacity: 0.82; transform: scale(1.09); }
+  100% { opacity: 0.45; transform: scale(1); }
+}
+
+/* Subtle upward drift — value transmission feeling */
+@keyframes requestQrGlowDriftUp {
+  0%   { opacity: 0.80; transform: translateY(0px); }
+  50%  { opacity: 1;    transform: translateY(-14px); }
+  100% { opacity: 0.80; transform: translateY(0px); }
+}
+
+.request-qr-glow-a {
+  animation: requestQrGlowDriftA 13s ease-in-out infinite;
+  will-change: transform, opacity;
+  transform-origin: 80% 75%;
+}
+.request-qr-glow-b {
+  animation: requestQrGlowDriftB 17s ease-in-out infinite reverse;
+  will-change: transform, opacity;
+  transform-origin: 20% 100%;
+}
+.request-qr-glow-up {
+  animation: requestQrGlowDriftUp 18s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+/* Amount brightness breathe */
+@keyframes requestQrAmountBreathe {
+  0%   { filter: brightness(1); }
+  50%  { filter: brightness(1.18); }
+  100% { filter: brightness(1); }
+}
+.request-qr-amount-breathe {
+  animation: requestQrAmountBreathe 6s ease-in-out infinite;
+}
+
+/* Glass sweep — QR card (amber tint) */
+@keyframes requestQrGlassSweep {
+  0%    { transform: translateX(-180%) skewX(-14deg); opacity: 0; }
+  1%    { opacity: 0; }
+  3%    { opacity: 1; }
+  6.5%  { opacity: 0; }
+  8%    { transform: translateX(280%) skewX(-14deg); }
+  100%  { transform: translateX(280%) skewX(-14deg); opacity: 0; }
+}
+.request-qr-glass {
+  position: absolute;
+  top: -10%;
+  left: 0;
+  width: 34%;
+  height: 120%;
+  filter: blur(9px);
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(245, 166, 35, 0.03) 20%,
+    rgba(255, 255, 255, 0.11) 50%,
+    rgba(245, 166, 35, 0.03) 80%,
+    transparent 100%
+  );
+  animation: requestQrGlassSweep 26s ease-in-out infinite;
+  animation-delay: -6s;
+}
+.request-qr-glass-details {
+  position: absolute;
+  top: -10%;
+  left: 0;
+  width: 34%;
+  height: 120%;
+  filter: blur(9px);
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(245, 166, 35, 0.03) 20%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(245, 166, 35, 0.03) 80%,
+    transparent 100%
+  );
+  animation: requestQrGlassSweep 26s ease-in-out infinite;
+  animation-delay: -19s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .request-qr-glow-a,
+  .request-qr-glow-b,
+  .request-qr-glow-up,
+  .request-qr-amount-breathe,
+  .request-qr-glass,
+  .request-qr-glass-details {
+    animation: none;
+  }
+}
+
 /* ====== RECEIVE CHOICE CARDS: ENERGY FLOW BORDER ====== */
 
 @property --border-flow-green {
