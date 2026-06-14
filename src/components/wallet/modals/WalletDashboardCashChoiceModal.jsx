@@ -227,7 +227,7 @@ export default function WalletDashboardCashChoiceModal({
                   </div>
                 ) : null}
 		                <div className="pt-6 md:pt-[100px] pb-3 flex flex-col items-center text-center px-4">
-	                    <h3 className="mt-1 md:mt-0 text-[30px] md:text-[32px] font-semibold text-white/95 tracking-tight">
+	                    <h3 className="mt-1 md:mt-0 text-[30px] md:text-[34px] font-light text-white/80 md:text-white tracking-tight">
 	                      {t('ui_funds_manage_title', 'Gérer vos fonds')}
 	                    </h3>
                     {noticeVariant === 'demo' ? (
@@ -235,7 +235,7 @@ export default function WalletDashboardCashChoiceModal({
                         {t('demo_notice_title', 'Mode démo')}
                       </span>
                     ) : null}
-                    <p className="mt-2 text-[14px] md:text-[15px] text-white/60 max-w-[34ch] leading-relaxed">
+                    <p className="mt-2 text-[19px] md:text-[20px] font-light text-white/50 max-w-[34ch] leading-relaxed">
                       {t('ui_funds_manage_subtitle', 'Ajoutez, retirez ou transférez vos fonds facilement.')}
                     </p>
                     

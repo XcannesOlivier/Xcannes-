@@ -736,10 +736,10 @@ export default function WalletDashboardSendChoiceModal({
                   className="pt-[40px] md:pt-[66px] pb-3 flex flex-col items-center text-center"
                   onPointerDown={event => { maybeStartOverlayDrag(event, 'fixed'); }}
                 >
-                  <h3 className="mt-1 px-6 text-[28px] md:text-[32px] font-semibold text-white/95 tracking-tight">
+                  <h3 className="mt-1 px-6 text-[30px] md:text-[34px] font-light text-white/80 md:text-white tracking-tight">
                     {t('ui_send_choice_subtitle', "Comment souhaitez-vous envoyer de l'argent ?")}
                   </h3>
-                  <p className="mt-2 text-[13px] md:text-[15px] text-white/50 max-w-[34ch] leading-relaxed">
+                  <p className="mt-2 text-[19px] md:text-[20px] font-light text-white/50 max-w-[34ch] leading-relaxed">
                     {t('ui_send_choice_hint', 'Choisissez le type d’envoi qui correspond à votre besoin.')}
                   </p>
                   {/* Wallet meta pill */}
