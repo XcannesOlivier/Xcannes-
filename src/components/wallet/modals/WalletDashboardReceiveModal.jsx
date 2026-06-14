@@ -2020,7 +2020,7 @@ export default function WalletDashboardReceiveModal({
                             const currencyUpper = String(token.currency || '').toUpperCase();
                             const _fullName = getCurrencyDescription(currencyUpper) || selectLabelByCurrency?.[token.currency] || selectLabelByCurrency?.[currencyUpper] || token.currency;
                             const labelLeftText = _fullName.length > 15 ? _fullName.slice(0, 15) + '…' : _fullName;
-                            const labelLeft = <span className="md:text-[1.12em]">{labelLeftText}</span>;
+                            const labelLeft = <span className="font-light md:text-[1.12em]">{labelLeftText}</span>;
                               const labelRightRaw =
                               selectLabelRightByCurrency?.[token.currency] ||
                               selectLabelRightByCurrency?.[currencyUpper] ||
@@ -2031,7 +2031,7 @@ export default function WalletDashboardReceiveModal({
                               const labelRight =
                                 !requestCurrencyDropdownOpen && isSelected
                                   ? (
-                                    <span className="inline-flex items-center gap-1 text-[10px] md:text-[11px] text-white/38 tracking-[0.01em]">
+                                    <span className="inline-flex items-center gap-1 text-[10px] md:text-[11px] text-white/38 tracking-[0.01em] font-light">
                                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true" className="opacity-80">
                                         <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6Z" stroke="currentColor" strokeWidth="1.7"/>
                                         <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.7"/>
@@ -2069,7 +2069,7 @@ export default function WalletDashboardReceiveModal({
                                   : 'bg-[#101415] max-h-[420px] overflow-y-auto overscroll-contain touch-pan-y !border-white/10 !ring-1 !ring-white/10 ring-inset rounded-b-[14px]'
 		                          }
                               openButtonClassName="!bg-white/10 !border !border-white/10 !border-b-0 !rounded-b-none !ring-1 !ring-white/10 !shadow-[0_8px_18px_rgba(0,0,0,0.45)]"
-                              buttonClassName={`wallet-request-currency-reveal bg-gradient-to-b from-[#101415] to-[#0d1214] ring-1 ring-white/[0.07] ring-inset rounded-[14px] px-3.5 py-1.5 md:py-2 text-xl md:text-2xl text-white outline-none focus:outline-none cursor-pointer transition-all duration-150 shadow-[0_2px_8px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.06)]`}
+                              buttonClassName={`wallet-request-currency-reveal [&_path]:[stroke-width:1.2] bg-gradient-to-b from-[#101415] to-[#0d1214] ring-1 ring-white/[0.07] ring-inset rounded-[14px] px-3.5 py-1.5 md:py-2 text-xl md:text-2xl text-white outline-none focus:outline-none cursor-pointer transition-all duration-150 shadow-[0_2px_8px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.06)]`}
                               selectClassName={`xcannes-select w-full ring-1 ring-white/10 ring-inset rounded-[14px] px-3.5 py-1.5 md:py-2 text-xl md:text-2xl text-white focus:outline-none transition-colors duration-150 ${
 			                            noticeVariant === 'demo' ? 'bg-xcannes-surface-demo' : 'bg-white/[0.02]'
 			                          }`}
@@ -2078,7 +2078,7 @@ export default function WalletDashboardReceiveModal({
 	
 		                      {/* Amount */}
 					                      <div className="pt-4">
-					                        <label className="block text-[13px] tracking-normal font-medium text-white/55 mb-2">
+					                        <label className="block text-[13px] tracking-normal font-light text-white/75 mb-2">
 					                          {t('ui_amount_7668986206', 'Montant')}
 					                        </label>
                                   <div className="relative z-[2] bg-[#111518] rounded-[18px]">
@@ -2105,7 +2105,7 @@ export default function WalletDashboardReceiveModal({
 				                          onChange={e => setRequestMemo(e.target.value.slice(0, 40))}
 				                          maxLength={40}
 				                          placeholder={t('ui_request_memo_placeholder', 'Motif de la demande')}
-				                          className={`w-full ring-1 ring-white/10 ring-inset rounded-[12px] px-3.5 py-2 text-base text-white placeholder:text-white/25 focus:outline-none transition-colors duration-150 ${
+				                          className={`w-full ring-1 ring-white/10 ring-inset rounded-[12px] px-3.5 py-2 text-base font-light text-white placeholder:text-white/25 focus:outline-none transition-colors duration-150 ${
 				                            noticeVariant === 'demo' ? 'bg-xcannes-surface-demo' : 'bg-[#101415]'
 				                          }`}
 				                        />
