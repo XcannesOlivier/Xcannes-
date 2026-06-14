@@ -2185,10 +2185,10 @@ export default function WalletDashboardReceiveModal({
 	                    <div className="request-qr-glow-b request-qr-glow-up absolute inset-0 bg-[radial-gradient(700px_circle_at_0%_100%,rgba(245,166,35,0.20),transparent_65%)]" />
 	                  </div>
 		                  {/* SECTION 3 — REQUEST QR */}
-		                  <div className="space-y-5 pt-2 relative z-[2]">
+		                  <div className="space-y-5 pt-[18px] relative z-[2]">
 
 	                    {/* ── Static wallet pill (style "Depuis le compte") ── */}
-	                    <div className="flex justify-center pt-1 pb-1">
+	                    <div className="flex justify-center pt-1 pb-1 md:mb-[10px]">
 	                      <div className="shimmer-seq shimmer-seq-4 inline-flex flex-col items-center gap-1 bg-[#232829] px-6 py-2 rounded-[28px] ring-1 ring-white/[0.08] ring-inset">
 	                        <span className="text-white/70 text-[14px] md:text-[15px] font-medium tracking-wide">
 		                          {t('ui_receive_receiving_account_label', 'Compte de réception')}
