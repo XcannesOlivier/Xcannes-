@@ -1312,13 +1312,13 @@ export default function WalletDashboardReceiveModal({
               {receiveView === 'request' || receiveView === 'request_qr' ? (
                 !hasGeneratedRequest ? (
                   <>
-                    <div className="absolute inset-0 md:hidden bg-[radial-gradient(700px_circle_at_100%_50%,rgba(245,166,35,0.32),transparent_60%)]" />
-                    <div className="absolute inset-0 hidden md:block bg-[radial-gradient(1000px_circle_at_100%_50%,rgba(245,166,35,0.32),transparent_60%)]" />
+                    <div className="request-glow-drift absolute inset-0 md:hidden bg-[radial-gradient(700px_circle_at_100%_50%,rgba(245,166,35,0.32),transparent_60%)]" />
+                    <div className="request-glow-drift absolute inset-0 hidden md:block bg-[radial-gradient(1000px_circle_at_100%_50%,rgba(245,166,35,0.32),transparent_60%)]" />
                   </>
                 ) : (
                   <>
-                    <div className="absolute inset-0 md:hidden bg-[radial-gradient(900px_circle_at_100%_75%,rgba(245,166,35,0.30),transparent_60%)]" />
-                    <div className="absolute inset-0 hidden md:block bg-[radial-gradient(1300px_circle_at_100%_75%,rgba(245,166,35,0.30),transparent_60%)]" />
+                    <div className="request-glow-drift-alt absolute inset-0 md:hidden bg-[radial-gradient(900px_circle_at_100%_75%,rgba(245,166,35,0.30),transparent_60%)]" />
+                    <div className="request-glow-drift-alt absolute inset-0 hidden md:block bg-[radial-gradient(1300px_circle_at_100%_75%,rgba(245,166,35,0.30),transparent_60%)]" />
                   </>
                 )
               ) : null}
