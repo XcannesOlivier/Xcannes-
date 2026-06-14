@@ -1308,7 +1308,7 @@ export default function WalletDashboardReceiveModal({
             }}
           >
             {/* Ambient glow */}
-            <div className="pointer-events-none absolute inset-0" aria-hidden>
+            <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
               {receiveView === 'request' || receiveView === 'request_qr' ? (
                 !hasGeneratedRequest ? (
                   <>
