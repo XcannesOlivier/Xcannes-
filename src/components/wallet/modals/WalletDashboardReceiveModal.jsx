@@ -1445,11 +1445,11 @@ export default function WalletDashboardReceiveModal({
                 <>
                   {/* Glow vert — vue share (Coordonnées de réception) */}
                   <div className="pointer-events-none absolute inset-0 z-[-1]" aria-hidden>
-                    <div className="absolute inset-0 md:hidden bg-[radial-gradient(700px_circle_at_100%_50%,rgba(0,255,150,0.07),transparent_60%)]" />
-                    <div className="absolute inset-0 hidden md:block bg-[radial-gradient(1000px_circle_at_100%_50%,rgba(0,255,150,0.07),transparent_60%)]" />
-                    <div className="absolute inset-0 md:hidden bg-[radial-gradient(900px_circle_at_100%_75%,rgba(0,255,150,0.06),transparent_60%)]" />
-                    <div className="absolute inset-0 hidden md:block bg-[radial-gradient(1300px_circle_at_100%_75%,rgba(0,255,150,0.06),transparent_60%)]" />
-                    <div className="absolute inset-0 bg-[radial-gradient(700px_circle_at_0%_100%,rgba(0,255,150,0.04),transparent_65%)]" />
+                    <div className="absolute inset-0 md:hidden bg-[radial-gradient(700px_circle_at_100%_50%,rgba(0,255,150,0.13),transparent_60%)]" />
+                    <div className="absolute inset-0 hidden md:block bg-[radial-gradient(1000px_circle_at_100%_50%,rgba(0,255,150,0.13),transparent_60%)]" />
+                    <div className="absolute inset-0 md:hidden bg-[radial-gradient(900px_circle_at_100%_75%,rgba(0,255,150,0.11),transparent_60%)]" />
+                    <div className="absolute inset-0 hidden md:block bg-[radial-gradient(1300px_circle_at_100%_75%,rgba(0,255,150,0.11),transparent_60%)]" />
+                    <div className="absolute inset-0 bg-[radial-gradient(700px_circle_at_0%_100%,rgba(0,255,150,0.08),transparent_65%)]" />
                   </div>
 	                  {/* SECTION 1 — RECEIVE FUNDS */}
 	                  <div className="space-y-5 pt-2 relative z-[2]">
@@ -2315,8 +2315,8 @@ export default function WalletDashboardReceiveModal({
             ) : null}
             {/* Bottom bar – desktop only (visual balance) – Votre adresse de compte */}
             {receiveView === 'share' ? (
-              <div className="hidden md:flex pointer-events-none justify-center pt-2 pb-2" aria-hidden>
-                <span className="block w-[120px] h-[4px] rounded-full bg-white/10" />
+              <div className="hidden md:flex pointer-events-none justify-center pt-2 pb-2 relative z-10" aria-hidden>
+                <span className="block w-[120px] h-[4px] rounded-full bg-white/35" />
               </div>
             ) : null}
             {/* Bottom bar – mobile only – Votre adresse de compte */}
