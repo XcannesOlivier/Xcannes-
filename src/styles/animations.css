@@ -283,7 +283,7 @@
   -webkit-mask-composite: destination-out;
   mask-composite: exclude;
   padding: 1px;
-  animation: borderFlowGreen 10s linear infinite;
+  animation: borderFlowGreen 12s linear infinite;
   pointer-events: none;
   z-index: 31;
 }
@@ -312,7 +312,7 @@
   -webkit-mask-composite: destination-out;
   mask-composite: exclude;
   padding: 1px;
-  animation: borderFlowOrange 12s linear infinite;
+  animation: borderFlowOrange 15s linear infinite;
   animation-delay: -5s;
   pointer-events: none;
   z-index: 31;
