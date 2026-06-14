@@ -1779,7 +1779,11 @@ export default function WalletDashboardReceiveModal({
 	                          </span>
 	                          <div className="flex items-center gap-2">
 	                            <span className="h-2.5 w-2.5 rounded-full bg-[#f5a623] ring-4 ring-[#f5a623]/20 shrink-0" style={{animation:'wallet-dot-pulse 3.5s ease-in-out infinite'}} aria-hidden />
-	                            <span className="text-white/80 md:text-white/95 text-[14px] md:text-[15px] font-medium"> fill="none" stroke="currentColor" viewBox="0 0 24 24">
+	                            <span className="text-white/80 md:text-white/95 text-[14px] md:text-[15px] font-medium">
+	                              {activeWalletLabel || t('nav_wallet', 'Wallet')}
+	                            </span>
+	                            {hasMultipleWallets && (
+	                              <svg className={`w-3 h-3 text-white/50 transition-transform duration-150 ${requestWalletDropdownOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
 	                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
 	                              </svg>
 	                            )}
