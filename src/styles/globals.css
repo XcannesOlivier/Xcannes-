@@ -529,6 +529,22 @@ body.wallet-page {
   100% { background-position: 200% center; }
 }
 
+.wallet-amount-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0.82) 0%,
+    rgba(255,255,255,0.82) 35%,
+    rgba(255,255,255,1.00) 50%,
+    rgba(255,255,255,0.82) 65%,
+    rgba(255,255,255,0.82) 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: wallet-switch-shimmer 4s linear infinite;
+}
+
 .wallet-switch-label {
   font-weight: 300;
   background: linear-gradient(
