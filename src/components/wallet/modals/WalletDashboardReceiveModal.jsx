@@ -1382,6 +1382,9 @@ export default function WalletDashboardReceiveModal({
                         switchReceiveView('share');
                       }}
                     >
+                      <span aria-hidden className="pointer-events-none absolute inset-0 rounded-[20px] overflow-hidden z-[29]">
+                        <span className="receive-choice-glass receive-choice-glass-green" />
+                      </span>
                       <div className="flex items-center gap-3">
                         <div className="w-13 h-13 rounded-[16px] bg-transparent flex items-center justify-center flex-shrink-0 text-xcannes-green">
                           <ShareAddressIcon className="w-12 h-12" />
@@ -1414,6 +1417,9 @@ export default function WalletDashboardReceiveModal({
                         switchReceiveView('request');
                       }}
                     >
+                      <span aria-hidden className="pointer-events-none absolute inset-0 rounded-[20px] overflow-hidden z-[29]">
+                        <span className="receive-choice-glass receive-choice-glass-orange" />
+                      </span>
                       <div className="flex items-center gap-3">
                         <div className="w-13 h-13 rounded-[16px] bg-transparent flex items-center justify-center flex-shrink-0 text-[#f5a623]">
                           <RequestIcon className="w-12 h-12" />

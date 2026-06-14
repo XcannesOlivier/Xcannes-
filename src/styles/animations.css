@@ -318,9 +318,74 @@
   z-index: 31;
 }
 
+/* Active state — energy flow intensification */
+.xcannes-receivechoice-fade-border-green::before {
+  transition: filter 400ms ease-out;
+}
+.xcannes-receivechoice-fade-border-green:active::before {
+  filter: brightness(1.6) saturate(1.4);
+}
+.xcannes-receivechoice-fade-border-orange::before {
+  transition: filter 400ms ease-out;
+}
+.xcannes-receivechoice-fade-border-orange:active::before {
+  filter: brightness(1.6) saturate(1.4);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .xcannes-receivechoice-fade-border-green::before,
   .xcannes-receivechoice-fade-border-orange::before {
+    animation: none;
+  }
+}
+
+/* Glass reflection sweep */
+@keyframes receiveChoiceGlassSweep {
+  0%    { transform: translateX(-160%) skewX(-18deg); opacity: 0; }
+  1%    { opacity: 0; }
+  2.5%  { opacity: 1; }
+  5.5%  { opacity: 0; }
+  7%    { transform: translateX(260%) skewX(-18deg); }
+  100%  { transform: translateX(260%) skewX(-18deg); opacity: 0; }
+}
+
+.receive-choice-glass {
+  position: absolute;
+  top: -20%;
+  left: 0;
+  width: 32%;
+  height: 140%;
+  filter: blur(8px);
+  animation: receiveChoiceGlassSweep 30s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.receive-choice-glass-green {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(0, 255, 150, 0.025) 25%,
+    rgba(255, 255, 255, 0.09) 50%,
+    rgba(0, 255, 150, 0.025) 75%,
+    transparent 100%
+  );
+  animation-delay: -3s;
+}
+
+.receive-choice-glass-orange {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(245, 166, 35, 0.03) 25%,
+    rgba(255, 255, 255, 0.09) 50%,
+    rgba(245, 166, 35, 0.03) 75%,
+    transparent 100%
+  );
+  animation-delay: -18s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .receive-choice-glass {
     animation: none;
   }
 }
