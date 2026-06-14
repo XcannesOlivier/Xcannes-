@@ -562,6 +562,66 @@
   }
 }
 
+/* ====== REQUEST AMOUNT ZOOM PULSE ====== */
+
+@keyframes requestAmountZoomPulse {
+  0%   { transform: scale(1);     }
+  35%  { transform: scale(1.022); }
+  65%  { transform: scale(0.999); }
+  100% { transform: scale(1);     }
+}
+
+.wallet-request-amount-zoom {
+  animation: requestAmountZoomPulse 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) 0.25s 1 both;
+  transform-origin: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wallet-request-amount-zoom { animation: none; }
+}
+
+/* ====== REQUEST MEMO SHIMMER ====== */
+
+.wallet-request-memo-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.wallet-request-memo-shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.10) 50%,
+    transparent 70%
+  );
+  transform: translateX(-110%);
+  animation: walletAmountShimmer 0.85s cubic-bezier(0.4, 0, 0.2, 1) 0.9s 1 forwards;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wallet-request-memo-shimmer::after { animation: none; }
+}
+
+/* ====== REQUEST CURRENCY SELECTOR REVEAL ====== */
+
+@keyframes requestCurrencyReveal {
+  0%   { opacity: 0; transform: translateX(-8px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+
+.wallet-request-currency-reveal {
+  animation: requestCurrencyReveal 0.38s ease-out 0.1s 1 both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wallet-request-currency-reveal { animation: none; }
+}
+
 /* ====== IMPORT BUTTON GLOW PULSE (desktop) ====== */
 
 @keyframes importBtnGlowPulse {
