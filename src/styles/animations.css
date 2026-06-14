@@ -241,29 +241,27 @@
 
 /* 1. Living green energy halo — drifts slowly behind QR card */
 @keyframes shareGlowDriftA {
-  0%   { opacity: 0.55; transform: scale(1); }
-  30%  { opacity: 1;    transform: scale(1.18); }
-  60%  { opacity: 0.40; transform: scale(0.88); }
-  80%  { opacity: 0.95; transform: scale(1.13); }
-  100% { opacity: 0.55; transform: scale(1); }
+  0%   { opacity: 0.55; }
+  30%  { opacity: 1; }
+  60%  { opacity: 0.40; }
+  80%  { opacity: 0.95; }
+  100% { opacity: 0.55; }
 }
 @keyframes shareGlowDriftB {
-  0%   { opacity: 0.40; transform: scale(1); }
-  25%  { opacity: 0.90; transform: scale(1.14); }
-  55%  { opacity: 0.45; transform: scale(0.90); }
-  75%  { opacity: 0.85; transform: scale(1.12); }
-  100% { opacity: 0.40; transform: scale(1); }
+  0%   { opacity: 0.40; }
+  25%  { opacity: 0.90; }
+  55%  { opacity: 0.45; }
+  75%  { opacity: 0.85; }
+  100% { opacity: 0.40; }
 }
 
 .share-glow-halo-a {
   animation: shareGlowDriftA 16s ease-in-out infinite;
-  will-change: transform, opacity;
-  transform-origin: 80% 50%;
+  will-change: opacity;
 }
 .share-glow-halo-b {
   animation: shareGlowDriftB 20s ease-in-out infinite reverse;
-  will-change: transform, opacity;
-  transform-origin: 70% 70%;
+  will-change: opacity;
 }
 
 /* 2. Background breathing */
