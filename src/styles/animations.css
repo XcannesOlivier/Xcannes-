@@ -237,6 +237,94 @@
   }
 }
 
+/* ====== RECEIVE CHOICE CARDS: ENERGY FLOW BORDER ====== */
+
+@property --border-flow-green {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@property --border-flow-orange {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes borderFlowGreen {
+  to { --border-flow-green: 360deg; }
+}
+
+@keyframes borderFlowOrange {
+  to { --border-flow-orange: 360deg; }
+}
+
+.xcannes-receivechoice-fade-border-green::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 21px;
+  background: conic-gradient(
+    from var(--border-flow-green),
+    transparent 0%,
+    transparent 68%,
+    rgba(0, 255, 150, 0.04) 74%,
+    rgba(0, 255, 150, 0.18) 80%,
+    rgba(0, 255, 150, 0.32) 84%,
+    rgba(190, 255, 225, 0.50) 86.5%,
+    rgba(0, 255, 150, 0.32) 89%,
+    rgba(0, 255, 150, 0.14) 93%,
+    rgba(0, 255, 150, 0.03) 97%,
+    transparent 100%
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: destination-out;
+  mask-composite: exclude;
+  padding: 1px;
+  animation: borderFlowGreen 10s linear infinite;
+  pointer-events: none;
+  z-index: 31;
+}
+
+.xcannes-receivechoice-fade-border-orange::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 21px;
+  background: conic-gradient(
+    from var(--border-flow-orange),
+    transparent 0%,
+    transparent 68%,
+    rgba(245, 166, 35, 0.04) 74%,
+    rgba(245, 166, 35, 0.18) 80%,
+    rgba(245, 166, 35, 0.32) 84%,
+    rgba(255, 215, 140, 0.50) 86.5%,
+    rgba(245, 166, 35, 0.32) 89%,
+    rgba(245, 166, 35, 0.14) 93%,
+    rgba(245, 166, 35, 0.03) 97%,
+    transparent 100%
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: destination-out;
+  mask-composite: exclude;
+  padding: 1px;
+  animation: borderFlowOrange 12s linear infinite;
+  animation-delay: -5s;
+  pointer-events: none;
+  z-index: 31;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .xcannes-receivechoice-fade-border-green::before,
+  .xcannes-receivechoice-fade-border-orange::before {
+    animation: none;
+  }
+}
+
 /* ====== WALLET DEMO MODALS (ESSENTIALS) ====== */
 
 @keyframes essentialsModalLiftIn {
