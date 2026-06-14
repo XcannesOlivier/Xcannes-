@@ -1774,7 +1774,7 @@ export default function WalletDashboardReceiveModal({
                               aria-haspopup={hasMultipleWallets ? 'menu' : undefined}
                               aria-expanded={hasMultipleWallets ? requestWalletDropdownOpen : undefined}
                             >
-	                          <span className="text-white/70 text-[14px] md:text-[15px] font-medium tracking-wide">
+	                          <span className="text-white/70 text-[14px] md:text-[15px] font-light tracking-wide">
 		                            {t('ui_receive_receiving_account_label', 'Compte de réception')}
 	                          </span>
 	                          <div className="flex items-center gap-2">
@@ -2007,7 +2007,7 @@ export default function WalletDashboardReceiveModal({
 
 		                      {/* Currency */}
 			                      <div className="pt-2">
-			                        <div className="flex items-center justify-between mb-2 px-3.5">
+		                        <div className="flex items-center justify-between mb-2">
 			                          <label className="block text-[11px] tracking-[0.22em] text-white/45">
 			                            {t('ui_currency_1ed55673be', 'Devise')}
 			                          </label>
@@ -2137,7 +2137,7 @@ export default function WalletDashboardReceiveModal({
                         >
                           {generateButtonDisabled
                             ? <span className="inline-flex items-center gap-1.5 text-white/85">
-                                <span className="text-[14px] md:text-[16px]">{t('ui_complete_request_cta', 'Compléter votre demande')}</span>
+                                <span className="text-[14px] md:text-[16px] font-light">{t('ui_complete_request_cta', 'Compléter votre demande')}</span>
                                 <span className="inline-flex items-end gap-[3px] mb-[-1px]">
                                   <span className="receive-req-dot" style={{ animationDelay: '0s' }}>·</span>
                                   <span className="receive-req-dot" style={{ animationDelay: '0.6s' }}>·</span>
