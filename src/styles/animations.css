@@ -185,19 +185,19 @@
 }
 
 .receive-choice-title-in {
-  animation: receiveChoiceFromRight 360ms cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  animation: receiveChoiceFromRight 520ms cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
 }
 .receive-choice-subtitle-in {
-  animation: receiveChoiceFromLeft 360ms cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
-  animation-delay: 60ms;
+  animation: receiveChoiceFromLeft 520ms cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  animation-delay: 80ms;
 }
 .receive-choice-card-1-in {
-  animation: receiveChoiceFromBottom 360ms cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
-  animation-delay: 130ms;
+  animation: receiveChoiceFromBottom 500ms cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  animation-delay: 180ms;
 }
 .receive-choice-card-2-in {
-  animation: receiveChoiceFromBottom 360ms cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
-  animation-delay: 210ms;
+  animation: receiveChoiceFromBottom 500ms cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  animation-delay: 290ms;
 }
 
 @media (prefers-reduced-motion: reduce) {
