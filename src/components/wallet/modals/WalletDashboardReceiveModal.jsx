@@ -1388,15 +1388,15 @@ export default function WalletDashboardReceiveModal({
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between gap-2">
-                            <div className="text-[18px] md:text-[19px] font-semibold text-white truncate">
+                            <div className="text-[19px] md:text-[20px] font-light text-white truncate">
                               {t('ui_receive_choice_share_title', 'Partager votre adresse')}
                             </div>
                             <svg className="w-7 h-7 md:w-8 md:h-8 text-xcannes-green/90 flex-shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden>
-                              <path d="M7 18L13 12L7 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                              <path d="M13 18L19 12L13 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                              <path d="M7 18L13 12L7 6" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" />
+                              <path d="M13 18L19 12L13 6" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" />
                             </svg>
                           </div>
-                          <div className="mt-1 text-[15px] md:text-sm leading-snug text-white/60">
+                          <div className="mt-1 text-[16px] md:text-[15px] leading-snug text-white/60">
                             {t(
                               'ui_receive_choice_share_desc',
                               'Affichez votre QR code et votre adresse de réception.',
@@ -1420,15 +1420,15 @@ export default function WalletDashboardReceiveModal({
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between gap-2">
-                            <div className="text-[18px] md:text-[19px] font-semibold text-white truncate">
+                            <div className="text-[19px] md:text-[20px] font-light text-white truncate">
                               {t('ui_receive_choice_request_title', 'Demander un paiement')}
                             </div>
                             <svg className="w-7 h-7 md:w-8 md:h-8 text-[#f5a623]/90 flex-shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden>
-                              <path d="M7 18L13 12L7 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                              <path d="M13 18L19 12L13 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                              <path d="M7 18L13 12L7 6" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" />
+                              <path d="M13 18L19 12L13 6" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" />
                             </svg>
                           </div>
-                          <div className="mt-1 text-[15px] md:text-sm leading-snug text-white/60">
+                          <div className="mt-1 text-[16px] md:text-[15px] leading-snug text-white/60">
                             {t(
                               'ui_receive_choice_request_desc',
 	                              'Créez une demande avec un montant, une devise et un message facultatif.',
