@@ -212,22 +212,20 @@
 /* ====== REQUEST AMBIENT GLOW DRIFT ====== */
 
 @keyframes requestGlowDrift {
-  0%   { opacity: 0.7;  transform: scale(1); }
-  25%  { opacity: 1;    transform: scale(1.12); }
-  55%  { opacity: 0.55; transform: scale(0.92); }
-  80%  { opacity: 1;    transform: scale(1.10); }
-  100% { opacity: 0.7;  transform: scale(1); }
+  0%   { opacity: 0.7;  }
+  25%  { opacity: 1;    }
+  55%  { opacity: 0.55; }
+  80%  { opacity: 1;    }
+  100% { opacity: 0.7;  }
 }
 
 .request-glow-drift {
   animation: requestGlowDrift 14s ease-in-out infinite;
-  will-change: transform, opacity;
-  transform-origin: 100% 50%;
+  will-change: opacity;
 }
 .request-glow-drift-alt {
   animation: requestGlowDrift 18s ease-in-out infinite reverse;
-  will-change: transform, opacity;
-  transform-origin: 100% 75%;
+  will-change: opacity;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -316,18 +314,18 @@
 
 /* Amber halo drift — originates from amount area, drifts upward */
 @keyframes requestQrGlowDriftA {
-  0%   { opacity: 0.60; transform: scale(1); }
-  30%  { opacity: 1;    transform: scale(1.14); }
-  60%  { opacity: 0.45; transform: scale(0.90); }
-  80%  { opacity: 0.92; transform: scale(1.11); }
-  100% { opacity: 0.60; transform: scale(1); }
+  0%   { opacity: 0.60; }
+  30%  { opacity: 1;    }
+  60%  { opacity: 0.45; }
+  80%  { opacity: 0.92; }
+  100% { opacity: 0.60; }
 }
 @keyframes requestQrGlowDriftB {
-  0%   { opacity: 0.45; transform: scale(1); }
-  25%  { opacity: 0.88; transform: scale(1.12); }
-  55%  { opacity: 0.42; transform: scale(0.92); }
-  75%  { opacity: 0.82; transform: scale(1.09); }
-  100% { opacity: 0.45; transform: scale(1); }
+  0%   { opacity: 0.45; }
+  25%  { opacity: 0.88; }
+  55%  { opacity: 0.42; }
+  75%  { opacity: 0.82; }
+  100% { opacity: 0.45; }
 }
 
 /* Subtle upward drift — value transmission feeling */
@@ -339,13 +337,11 @@
 
 .request-qr-glow-a {
   animation: requestQrGlowDriftA 13s ease-in-out infinite;
-  will-change: transform, opacity;
-  transform-origin: 80% 75%;
+  will-change: opacity;
 }
 .request-qr-glow-b {
   animation: requestQrGlowDriftB 17s ease-in-out infinite reverse;
-  will-change: transform, opacity;
-  transform-origin: 20% 100%;
+  will-change: opacity;
 }
 .request-qr-glow-up {
   animation: requestQrGlowDriftUp 18s ease-in-out infinite;
