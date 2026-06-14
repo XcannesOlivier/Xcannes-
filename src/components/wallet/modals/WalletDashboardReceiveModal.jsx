@@ -1351,7 +1351,7 @@ export default function WalletDashboardReceiveModal({
                   </span>
                 ) : null}
 
-                <p className={`max-w-[34ch] text-white/60 ${receiveView === 'share' ? 'mt-1 md:mt-2 leading-snug md:leading-relaxed text-[18px] md:text-[19px] font-light' : receiveView === 'request' ? 'mt-1 md:mt-2 leading-snug md:leading-relaxed text-[18px] md:text-[19px] font-light' : 'mt-2 leading-relaxed text-[18px] md:text-[19px]'}`}>
+                <p className={`max-w-[34ch] text-white/60 ${receiveView === 'share' ? 'mt-1 md:mt-2 leading-snug md:leading-relaxed text-[18px] md:text-[19px] font-light' : receiveView === 'request' ? 'mt-1 md:mt-2 leading-snug md:leading-relaxed text-[18px] md:text-[19px] font-light' : 'mt-1 md:mt-2 leading-snug md:leading-relaxed text-[18px] md:text-[19px] font-light'}`}>
                   {headerSubtitle}
                 </p>
               </div>
@@ -2286,7 +2286,7 @@ export default function WalletDashboardReceiveModal({
             {/* Bottom bar – desktop only (visual balance) – Demander un paiement */}
             {receiveView === 'request' ? (
               <div className="hidden md:flex pointer-events-none justify-center pt-2 pb-4" aria-hidden>
-                <span className="block w-[120px] h-[4px] rounded-full bg-white/10" />
+                <span className="block w-[120px] h-[4px] rounded-full bg-white/80" />
               </div>
             ) : null}
             {/* Bottom bar – mobile only – Demander un paiement */}
@@ -2301,7 +2301,7 @@ export default function WalletDashboardReceiveModal({
             {/* Bottom bar – desktop only (visual balance) – Comment souhaitez-vous recevoir ? */}
             {receiveView === 'choice' ? (
               <div className="hidden md:flex pointer-events-none justify-center pt-2 pb-4" aria-hidden>
-                <span className="block w-[120px] h-[4px] rounded-full bg-white/10" />
+                <span className="block w-[120px] h-[4px] rounded-full bg-white/80" />
               </div>
             ) : null}
             {/* Bottom bar – mobile only – Comment souhaitez-vous recevoir ? */}
@@ -2331,7 +2331,7 @@ export default function WalletDashboardReceiveModal({
             {/* Bottom bar – desktop only (visual balance) – Demande prête */}
             {receiveView === 'request_qr' ? (
               <div className="hidden md:flex pointer-events-none justify-center pt-10 pb-4 relative z-[5]" aria-hidden>
-                <span className="block w-[120px] h-[4px] rounded-full bg-white/30" />
+                <span className="block w-[120px] h-[4px] rounded-full bg-white/80" />
               </div>
             ) : null}
             {/* Bottom bar – mobile only – Demande prête */}
