@@ -1770,7 +1770,7 @@ export default function WalletDashboardReceiveModal({
                             <button
                               type="button"
                               onClick={hasMultipleWallets ? () => setRequestWalletDropdownOpen((prev) => !prev) : undefined}
-                              className={`relative flex w-fit flex-col items-center gap-1 ${requestWalletDropdownOpen ? 'bg-[#0f1314]' : 'bg-[#232829]'} px-6 py-2 ${requestWalletDropdownOpen ? accountDropdownOpenPillClassName : 'rounded-[28px]'} ${requestWalletDropdownOpen ? 'ring-0' : 'ring-1 ring-white/[0.08]'} ring-inset ${hasMultipleWallets ? 'cursor-pointer' : ''} ${requestWalletDropdownOpen ? (inline ? 'shadow-[0_0_0_1px_rgba(0,0,0,0.75),-14px_-18px_36px_rgba(0,0,0,0.70),14px_-18px_36px_rgba(0,0,0,0.70),0_-10px_28px_rgba(0,0,0,0.68)]' : 'shadow-[0_0_0_1px_rgba(0,0,0,0.9),-12px_-16px_32px_rgba(0,0,0,0.85),12px_-16px_32px_rgba(0,0,0,0.85),0_-8px_24px_rgba(0,0,0,0.80)]') : ''}`}
+                              className={`relative flex w-fit flex-col items-center gap-1 bg-[#0f1314] px-6 py-2 ${requestWalletDropdownOpen ? accountDropdownOpenPillClassName : 'rounded-[28px]'} ${requestWalletDropdownOpen ? 'ring-0' : 'ring-1 ring-white/[0.08]'} ring-inset ${hasMultipleWallets ? 'cursor-pointer' : ''} ${requestWalletDropdownOpen ? (inline ? 'shadow-[0_0_0_1px_rgba(0,0,0,0.75),-14px_-18px_36px_rgba(0,0,0,0.70),14px_-18px_36px_rgba(0,0,0,0.70),0_-10px_28px_rgba(0,0,0,0.68)]' : 'shadow-[0_0_0_1px_rgba(0,0,0,0.9),-12px_-16px_32px_rgba(0,0,0,0.85),12px_-16px_32px_rgba(0,0,0,0.85),0_-8px_24px_rgba(0,0,0,0.80)]') : ''}`}
                               aria-haspopup={hasMultipleWallets ? 'menu' : undefined}
                               aria-expanded={hasMultipleWallets ? requestWalletDropdownOpen : undefined}
                             >
@@ -1867,13 +1867,13 @@ export default function WalletDashboardReceiveModal({
                                         ) : null}
 
                                         {addressesVisible ? (
-                                          <div className="h-px w-full bg-xcannes-green/40 mb-1.5 transition-colors duration-200" aria-hidden />
+                                          <div className="h-px w-full bg-[#f5a623]/40 mb-1.5 transition-colors duration-200" aria-hidden />
                                         ) : null}
 
                                         <div className="flex items-center justify-between gap-2">
                                           <button
                                             type="button"
-                                            className={`min-w-0 flex-1 text-left text-[13px] md:text-[14px] transition-colors duration-200 ${addressesVisible ? 'text-xcannes-green hover:text-xcannes-green/80' : 'text-white/40 hover:text-white/60'}`}
+                                            className={`min-w-0 flex-1 text-left text-[13px] md:text-[14px] transition-colors duration-200 ${addressesVisible ? 'text-[#f5a623] hover:text-[#f5a623]/80' : 'text-white/40 hover:text-white/60'}`}
                                             onClick={toggleAll}
                                           >
                                             {addressesVisible
@@ -1882,7 +1882,7 @@ export default function WalletDashboardReceiveModal({
                                           </button>
                                           <button
                                             type="button"
-                                            className={`shrink-0 rounded-md bg-white/[0.06] p-1 transition-colors duration-200 ${addressesVisible ? 'text-xcannes-green hover:text-xcannes-green/80' : 'text-white/35 hover:bg-white/[0.10] hover:text-white/55'}`}
+                                            className={`shrink-0 rounded-md bg-white/[0.06] p-1 transition-colors duration-200 ${addressesVisible ? 'text-[#f5a623] hover:text-[#f5a623]/80' : 'text-white/35 hover:bg-white/[0.10] hover:text-white/55'}`}
                                             onClick={toggleAll}
                                             aria-label={addressesVisible
                                               ? t('ui_hide_wallet_addresses', 'Masquer les adresses')
@@ -1897,12 +1897,12 @@ export default function WalletDashboardReceiveModal({
                                 </div>
 
                                 <div className="px-3">
-                                  <div className={`h-px w-full transition-colors duration-200 ${Object.keys(requestAddressModes || {}).length > 0 ? 'bg-xcannes-green/40' : 'bg-white/10'}`} aria-hidden />
+                                  <div className={`h-px w-full transition-colors duration-200 ${Object.keys(requestAddressModes || {}).length > 0 ? 'bg-[#f5a623]/40' : 'bg-white/10'}`} aria-hidden />
                                 </div>
 
                                 <div className="px-3 pt-1.5">
                                   <div
-                                    className={`text-[11px] md:text-[12px] text-xcannes-green/80 transition-opacity duration-200 ${
+                                    className={`text-[11px] md:text-[12px] text-[#f5a623]/80 transition-opacity duration-200 ${
                                       requestDropdownToast ? 'opacity-100' : 'opacity-0'
                                     }`}
                                     role="status"
