@@ -1458,7 +1458,7 @@ export default function WalletDashboardReceiveModal({
                     <div className="share-glow-breathe absolute inset-0 bg-[radial-gradient(700px_circle_at_0%_100%,rgba(0,255,150,0.08),transparent_65%)]" />
                   </div>
 	                  {/* SECTION 1 — RECEIVE FUNDS */}
-	                  <div className="space-y-5 pt-2 relative z-[2]">
+	                  <div className="space-y-5 pt-2 md:pt-[32px] relative z-[2]">
 
 	                    {/* ── Centered wallet pill (style "Depuis le compte") ── */}
                       <div className="flex justify-center pt-1 pb-1 relative z-[85]">
@@ -1471,7 +1471,7 @@ export default function WalletDashboardReceiveModal({
                             aria-haspopup={hasMultipleWallets ? 'menu' : undefined}
                             aria-expanded={hasMultipleWallets ? shareWalletDropdownOpen : undefined}
                           >
-	                          <span className="text-white/70 text-[14px] md:text-[15px] font-medium tracking-wide">
+	                          <span className="text-white/70 text-[14px] md:text-[15px] font-light tracking-wide">
 		                            {t('ui_receive_account_info_label', 'Choisissez le compte')}
 	                          </span>
 	                          <div className="flex items-center gap-2">
@@ -2335,7 +2335,7 @@ export default function WalletDashboardReceiveModal({
             ) : null}
             {/* Bottom bar – desktop only (visual balance) – Votre adresse de compte */}
             {receiveView === 'share' ? (
-              <div className="hidden md:flex pointer-events-none justify-center pt-2 pb-2 relative z-10" aria-hidden>
+              <div className="hidden md:flex pointer-events-none justify-center pt-2 pb-0 relative z-10" aria-hidden>
                 <span className="block w-[120px] h-[4px] rounded-full bg-white/80" />
               </div>
             ) : null}
