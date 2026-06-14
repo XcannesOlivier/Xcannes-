@@ -127,7 +127,7 @@ export default function WalletDashboardActionRow({ onAction, vertical = false })
             </svg>
 	          </div>
 	          <span className="wallet-action-label !text-[15px] md:!text-[18px] !font-normal">
-	            {t("ui_receive_127eab0703", "Recevoir")}}
+	            {t("ui_receive_127eab0703", "Recevoir")}
 	          </span>
 	        </button>
 	        </div>
