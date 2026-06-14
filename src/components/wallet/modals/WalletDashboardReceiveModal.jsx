@@ -1365,10 +1365,10 @@ export default function WalletDashboardReceiveModal({
                       maybeStartOverlayDrag(event, 'fixed');
                     }}
                   >
-                    <h3 className="mt-1 text-[30px] md:text-[34px] font-light text-white/80 md:text-white tracking-tight">
+                    <h3 className="receive-choice-title-in mt-1 text-[30px] md:text-[34px] font-light text-white/80 md:text-white tracking-tight">
                       {t('ui_receive_choice_decision_title', 'Comment souhaitez-vous recevoir ?')}
                     </h3>
-                    <p className="mt-1 md:mt-2 leading-snug md:leading-relaxed text-[19px] md:text-[20px] font-light text-white/50 max-w-[34ch]">
+                    <p className="receive-choice-subtitle-in mt-1 md:mt-2 leading-snug md:leading-relaxed text-[19px] md:text-[20px] font-light text-white/50 max-w-[34ch]">
                       {t('ui_receive_choice_decision_subtitle', 'Partagez vos coordonnées de réception ou créez une demande de paiement.')}
                     </p>
                   </div>
@@ -1376,7 +1376,7 @@ export default function WalletDashboardReceiveModal({
                   <div className="flex-1 min-h-0 flex flex-col justify-center gap-8 md:gap-10 pt-[10px] pb-6">
                     <button
                       type="button"
-                      className={choiceCardGreenClassName}
+                      className={`${choiceCardGreenClassName} receive-choice-card-1-in`}
                       onClick={e => {
                         e.stopPropagation();
                         switchReceiveView('share');
@@ -1408,7 +1408,7 @@ export default function WalletDashboardReceiveModal({
 
                     <button
                       type="button"
-                      className={choiceCardNeutralClassName}
+                      className={`${choiceCardNeutralClassName} receive-choice-card-2-in`}
                       onClick={e => {
                         e.stopPropagation();
                         switchReceiveView('request');
