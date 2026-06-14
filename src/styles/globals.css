@@ -463,6 +463,10 @@ body.wallet-page {
 .shimmer-seq-2::before { animation-delay: 2.3s; }
 /* step 4 — Choisissez le compte */
 .shimmer-seq-3::before { animation-delay: 3.25s; }
+/* step 5 */
+.shimmer-seq-4::before { animation-delay: 4.20s; }
+/* step 6 */
+.shimmer-seq-5::before { animation-delay: 5.15s; }
 
 @media (prefers-reduced-motion: reduce) {
   .shimmer-seq::before { animation: none; display: none; }

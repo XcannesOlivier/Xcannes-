@@ -2171,7 +2171,7 @@ export default function WalletDashboardReceiveModal({
 
 	                    {/* ── Static wallet pill (style "Depuis le compte") ── */}
 	                    <div className="flex justify-center pt-1 pb-1">
-	                      <div className="inline-flex flex-col items-center gap-1 bg-[#232829] px-6 py-2 rounded-3xl ring-1 ring-white/15 ring-inset">
+	                      <div className="shimmer-seq shimmer-seq-4 inline-flex flex-col items-center gap-1 bg-[#232829] px-6 py-2 rounded-[28px] ring-1 ring-white/[0.08] ring-inset">
 	                        <span className="text-white/70 text-[14px] md:text-[15px] font-medium tracking-wide">
 		                          {t('ui_receive_receiving_account_label', 'Compte de réception')}
 	                        </span>
@@ -2186,7 +2186,7 @@ export default function WalletDashboardReceiveModal({
 				                    {hasGeneratedRequest ? (
 					                      <>
 					                        {/* ── QR Code (primary action — first) ── */}
-					                        <div className="w-full flex flex-col items-center bg-[#232829] rounded-[20px] pt-5 pb-2 md:pt-8 md:pb-5 shadow-[0_2px_0_rgba(255,255,255,0.04)_inset,0_-2px_0_rgba(0,0,0,0.6)_inset,12px_36px_52px_rgba(0,0,0,0.68),-14px_14px_38px_rgba(0,0,0,0.42),0_64px_30px_-20px_rgba(0,0,0,0.6),8px_-10px_22px_rgba(0,0,0,0.28)]">
+					                        <div className="qr-border-animated shimmer-seq shimmer-seq-1 w-full flex flex-col items-center bg-[#232829] rounded-[20px] pt-5 pb-2 md:pt-8 md:pb-5 shadow-[0_2px_0_rgba(255,255,255,0.04)_inset,0_-2px_0_rgba(0,0,0,0.6)_inset,12px_36px_52px_rgba(0,0,0,0.68),-14px_14px_38px_rgba(0,0,0,0.42),0_64px_30px_-20px_rgba(0,0,0,0.6),8px_-10px_22px_rgba(0,0,0,0.28)]">
 				                          <div
 				                            ref={requestQrContainerRef}
 				                            className="w-[240px] md:w-[260px] aspect-square rounded-none p-3 cursor-pointer border-[20px] border-black"
@@ -2224,7 +2224,7 @@ export default function WalletDashboardReceiveModal({
 					                        </div>
 
 					                        {/* ── Details (date, message) ── */}
-					                        <div className="!mt-1.5 md:!mt-5 flex flex-col gap-1 px-3 py-2 rounded-[14px] bg-[#232829] ring-1 ring-white/15 ring-inset">
+					                        <div className="shimmer-seq shimmer-seq-5 !mt-1.5 md:!mt-5 flex flex-col gap-1 px-3 py-2 rounded-[14px] bg-[#232829] ring-1 ring-white/15 ring-inset">
 					                          <div className="flex items-center justify-between">
 					                            <span className="text-[13px] text-white/70 font-medium">{t('ui_date_time_label', 'Date & Heure')}</span>
 					                            <span className="text-[13px] text-white/95 font-medium">
@@ -2252,7 +2252,7 @@ export default function WalletDashboardReceiveModal({
 	                              await handleCopyQr(true);
 	                            }}
 	                            className={[
-	                              'w-full h-11 rounded-[20px] bg-[#232829] ring-1 ring-white/10 ring-inset text-white/85 text-xs font-semibold',
+	                              'shimmer-seq shimmer-seq-3 w-full h-11 rounded-[20px] bg-[#232829] ring-1 ring-white/10 ring-inset text-white/85 text-xs font-semibold',
 	                              'shadow-[0_4px_12px_rgba(0,0,0,0.4)] hover:ring-white/20 hover:bg-white/[0.04] transition-all duration-[140ms] active:scale-[0.99]',
 	                            ].join(' ')}
 	                          >
@@ -2264,7 +2264,7 @@ export default function WalletDashboardReceiveModal({
 	                              e.stopPropagation();
 	                              await handleShareQr(true);
 	                            }}
-                              className="w-full h-11 rounded-[20px] bg-[#232829] text-white text-[17px] font-bold tracking-wide py-2 px-6 transition-all duration-[140ms] inline-flex items-center justify-center gap-2.5 hover:bg-white/[0.04] scale-[1.04] active:scale-[0.98]"
+                              className="shimmer-seq shimmer-seq-2 w-full h-11 rounded-[20px] bg-[#232829] text-white text-[17px] font-bold tracking-wide py-2 px-6 transition-all duration-[140ms] inline-flex items-center justify-center gap-2.5 hover:bg-white/[0.04] scale-[1.04] active:scale-[0.98]"
                               style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(255,255,255,0.10), inset 0 1px 0 rgba(255,255,255,0.06), inset 0 -8px 16px rgba(0,0,0,0.25)' }}
 	                          >
 	                            <ShareIcon className="w-5 h-5" />
