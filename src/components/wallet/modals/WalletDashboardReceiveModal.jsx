@@ -1351,7 +1351,7 @@ export default function WalletDashboardReceiveModal({
                   </span>
                 ) : null}
 
-                <p className={`max-w-[34ch] ${receiveView === 'share' ? 'mt-1 md:mt-2 leading-snug md:leading-relaxed text-[18px] md:text-[19px] font-light text-white/60' : receiveView === 'request' ? 'mt-1 md:mt-2 leading-snug md:leading-relaxed text-[19px] md:text-[20px] font-light text-white/50' : 'mt-1 md:mt-2 leading-snug md:leading-relaxed text-[18px] md:text-[19px] font-light text-white/60'}`}>
+                <p className={`max-w-[34ch] ${receiveView === 'share' ? 'mt-1 md:mt-2 leading-snug md:leading-relaxed text-[19px] md:text-[20px] font-light text-white/50' : receiveView === 'request' || receiveView === 'request_qr' ? 'mt-1 md:mt-2 leading-snug md:leading-relaxed text-[19px] md:text-[20px] font-light text-white/50' : 'mt-1 md:mt-2 leading-snug md:leading-relaxed text-[18px] md:text-[19px] font-light text-white/60'}`}>
                   {headerSubtitle}
                 </p>
               </div>
@@ -1365,10 +1365,10 @@ export default function WalletDashboardReceiveModal({
                       maybeStartOverlayDrag(event, 'fixed');
                     }}
                   >
-                    <h3 className="mt-1 text-[30px] md:text-[32px] font-medium text-white/95 tracking-tight">
+                    <h3 className="mt-1 text-[30px] md:text-[34px] font-light text-white/80 md:text-white tracking-tight">
                       {t('ui_receive_choice_decision_title', 'Comment souhaitez-vous recevoir ?')}
                     </h3>
-                    <p className="mt-2 text-[14px] md:text-[15px] text-white/60 max-w-[34ch] leading-relaxed">
+                    <p className="mt-1 md:mt-2 leading-snug md:leading-relaxed text-[19px] md:text-[20px] font-light text-white/50 max-w-[34ch]">
                       {t('ui_receive_choice_decision_subtitle', 'Partagez vos coordonnées de réception ou créez une demande de paiement.')}
                     </p>
                   </div>
