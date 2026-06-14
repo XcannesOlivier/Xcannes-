@@ -1451,11 +1451,11 @@ export default function WalletDashboardReceiveModal({
                 <>
                   {/* Glow vert — vue share (Coordonnées de réception) */}
                   <div className="pointer-events-none absolute inset-0 z-[-1]" aria-hidden>
-                    <div className="absolute inset-0 md:hidden bg-[radial-gradient(700px_circle_at_100%_50%,rgba(0,255,150,0.13),transparent_60%)]" />
-                    <div className="absolute inset-0 hidden md:block bg-[radial-gradient(1000px_circle_at_100%_50%,rgba(0,255,150,0.13),transparent_60%)]" />
-                    <div className="absolute inset-0 md:hidden bg-[radial-gradient(900px_circle_at_100%_75%,rgba(0,255,150,0.11),transparent_60%)]" />
-                    <div className="absolute inset-0 hidden md:block bg-[radial-gradient(1300px_circle_at_100%_75%,rgba(0,255,150,0.11),transparent_60%)]" />
-                    <div className="absolute inset-0 bg-[radial-gradient(700px_circle_at_0%_100%,rgba(0,255,150,0.08),transparent_65%)]" />
+                    <div className="share-glow-breathe share-glow-halo-a absolute inset-0 md:hidden bg-[radial-gradient(700px_circle_at_100%_50%,rgba(0,255,150,0.13),transparent_60%)]" />
+                    <div className="share-glow-breathe share-glow-halo-a absolute inset-0 hidden md:block bg-[radial-gradient(1000px_circle_at_100%_50%,rgba(0,255,150,0.13),transparent_60%)]" />
+                    <div className="share-glow-halo-b absolute inset-0 md:hidden bg-[radial-gradient(900px_circle_at_100%_75%,rgba(0,255,150,0.11),transparent_60%)]" />
+                    <div className="share-glow-halo-b absolute inset-0 hidden md:block bg-[radial-gradient(1300px_circle_at_100%_75%,rgba(0,255,150,0.11),transparent_60%)]" />
+                    <div className="share-glow-breathe absolute inset-0 bg-[radial-gradient(700px_circle_at_0%_100%,rgba(0,255,150,0.08),transparent_65%)]" />
                   </div>
 	                  {/* SECTION 1 — RECEIVE FUNDS */}
 	                  <div className="space-y-5 pt-2 relative z-[2]">
@@ -1703,7 +1703,8 @@ export default function WalletDashboardReceiveModal({
 	                    </div>
 
 	                    {/* ── QR Code ── */}
-	                    <div className="qr-border-animated w-full flex flex-col items-center bg-[#232829] rounded-[20px] pt-10 pb-3 md:pt-20 md:pb-10 shadow-[0_2px_0_rgba(255,255,255,0.04)_inset,0_-2px_0_rgba(0,0,0,0.6)_inset,-10px_28px_55px_rgba(0,0,0,0.72),18px_10px_42px_rgba(0,0,0,0.38),2px_60px_36px_-16px_rgba(0,0,0,0.65),-6px_-14px_28px_rgba(0,0,0,0.22)]">
+	                    <div className="qr-border-animated relative overflow-hidden w-full flex flex-col items-center bg-[#232829] rounded-[20px] pt-10 pb-3 md:pt-20 md:pb-10 shadow-[0_2px_0_rgba(255,255,255,0.04)_inset,0_-2px_0_rgba(0,0,0,0.6)_inset,-10px_28px_55px_rgba(0,0,0,0.72),18px_10px_42px_rgba(0,0,0,0.38),2px_60px_36px_-16px_rgba(0,0,0,0.65),-6px_-14px_28px_rgba(0,0,0,0.22)]">
+	                      <span aria-hidden className="share-qr-glass" />
 	                        <div
 	                          ref={receiveQrContainerRef}
 	                          className="w-[280px] md:w-[260px] aspect-square rounded-none p-3 cursor-pointer border-[20px] border-black"
