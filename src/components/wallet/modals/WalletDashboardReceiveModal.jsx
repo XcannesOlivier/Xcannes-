@@ -1351,7 +1351,7 @@ export default function WalletDashboardReceiveModal({
                   </span>
                 ) : null}
 
-                <p className={`max-w-[34ch] text-white/60 ${receiveView === 'share' ? 'mt-1 md:mt-2 leading-snug md:leading-relaxed text-[18px] md:text-[19px] font-light' : receiveView === 'request' ? 'mt-1 md:mt-2 leading-snug md:leading-relaxed text-[18px] md:text-[19px] font-light' : 'mt-1 md:mt-2 leading-snug md:leading-relaxed text-[18px] md:text-[19px] font-light'}`}>
+                <p className={`max-w-[34ch] ${receiveView === 'share' ? 'mt-1 md:mt-2 leading-snug md:leading-relaxed text-[18px] md:text-[19px] font-light text-white/60' : receiveView === 'request' ? 'mt-1 md:mt-2 leading-snug md:leading-relaxed text-[19px] md:text-[20px] font-light text-white/50' : 'mt-1 md:mt-2 leading-snug md:leading-relaxed text-[18px] md:text-[19px] font-light text-white/60'}`}>
                   {headerSubtitle}
                 </p>
               </div>
