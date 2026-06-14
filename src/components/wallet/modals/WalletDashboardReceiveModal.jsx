@@ -2316,7 +2316,7 @@ export default function WalletDashboardReceiveModal({
             {/* Bottom bar – desktop only (visual balance) – Votre adresse de compte */}
             {receiveView === 'share' ? (
               <div className="hidden md:flex pointer-events-none justify-center pt-2 pb-2 relative z-10" aria-hidden>
-                <span className="block w-[120px] h-[4px] rounded-full bg-white/35" />
+                <span className="block w-[120px] h-[4px] rounded-full bg-white/80" />
               </div>
             ) : null}
             {/* Bottom bar – mobile only – Votre adresse de compte */}
