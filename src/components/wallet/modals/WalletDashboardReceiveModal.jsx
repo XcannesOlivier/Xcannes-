@@ -1396,7 +1396,7 @@ export default function WalletDashboardReceiveModal({
                               <path d="M13 18L19 12L13 6" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" />
                             </svg>
                           </div>
-                          <div className="mt-1 text-[16px] md:text-[15px] leading-snug text-white/60">
+                          <div className="mt-1 text-[17px] md:text-[16px] font-light leading-snug text-white/60">
                             {t(
                               'ui_receive_choice_share_desc',
                               'Affichez votre QR code et votre adresse de réception.',
@@ -1428,7 +1428,7 @@ export default function WalletDashboardReceiveModal({
                               <path d="M13 18L19 12L13 6" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" />
                             </svg>
                           </div>
-                          <div className="mt-1 text-[16px] md:text-[15px] leading-snug text-white/60">
+                          <div className="mt-1 text-[17px] md:text-[16px] font-light leading-snug text-white/60">
                             {t(
                               'ui_receive_choice_request_desc',
 	                              'Créez une demande avec un montant, une devise et un message facultatif.',
