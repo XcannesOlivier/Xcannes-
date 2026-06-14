@@ -1341,7 +1341,7 @@ export default function WalletDashboardReceiveModal({
                   if (!disableSwipeToClose) maybeStartOverlayDrag(event, 'fixed');
                 }}
               >
-                <h2 className={`${receiveView === 'request' ? 'mt-[46px] md:mt-[70px]' : receiveView === 'request_qr' ? 'mt-4 md:mt-[25px]' : receiveView === 'share' ? 'mt-[10px] md:mt-[36px]' : 'mt-[19px] md:mt-[70px]'} text-[30px] md:text-[34px] font-semibold text-white/95 tracking-tight`}>
+                <h2 className={`${receiveView === 'request' ? 'mt-[46px] md:mt-[70px]' : receiveView === 'request_qr' ? 'mt-4 md:mt-[25px]' : receiveView === 'share' ? 'mt-[10px] md:mt-[36px]' : 'mt-[19px] md:mt-[70px]'} text-[30px] md:text-[34px] font-light text-white tracking-tight`}>
                   {headerTitle}
                 </h2>
 
