@@ -1769,7 +1769,7 @@ export default function WalletDashboardReceiveModal({
 	                  {receiveView === 'request' ? (
 		                <>
 		                  {/* SECTION 2 — CREATE REQUEST */}
-                      <div className="flex flex-col gap-2 pt-[18px] flex-1">
+                      <div className="flex flex-col gap-2 pt-[32px] flex-1">
 	                    {/* ── Centered wallet pill (style "Choisissez le compte") ── */}
                         <div className="flex justify-center pt-1 pb-[15px] relative z-[85]">
 	                      <div className={`relative wallet-account-selector-wrapper ${requestWalletDropdownOpen ? 'is-open' : ''}`} ref={requestWalletDropdownRef}>
@@ -2190,12 +2190,12 @@ export default function WalletDashboardReceiveModal({
 	                    {/* ── Static wallet pill (style "Depuis le compte") ── */}
 	                    <div className="flex justify-center pt-1 pb-1 md:mb-[10px]">
 	                      <div className="shimmer-seq shimmer-seq-4 inline-flex flex-col items-center gap-1 bg-[#232829] px-6 py-2 rounded-[28px] ring-1 ring-white/[0.08] ring-inset">
-	                        <span className="text-white/70 text-[14px] md:text-[15px] font-medium tracking-wide">
+	                        <span className="text-white/70 text-[14px] md:text-[15px] font-light tracking-wide">
 		                          {t('ui_receive_receiving_account_label', 'Compte de réception')}
 	                        </span>
 	                        <div className="flex items-center gap-2">
-	                          <span className="h-3 w-3 rounded-full bg-[#f5a623] ring-4 ring-[#f5a623]/20 shrink-0 animate-pulse" aria-hidden />
-	                          <span className="text-white/95 text-[14px] md:text-[15px] font-semibold">
+	                          <span className="h-2.5 w-2.5 rounded-full bg-[#f5a623] ring-4 ring-[#f5a623]/20 shrink-0" style={{animation:'wallet-dot-pulse 3.5s ease-in-out infinite'}} aria-hidden />
+	                          <span className="text-white/80 md:text-white/95 text-[14px] md:text-[15px] font-medium">
 	                            {activeWalletLabel || t('nav_wallet', 'Wallet')}
 	                          </span>
 	                        </div>
@@ -2305,8 +2305,8 @@ export default function WalletDashboardReceiveModal({
             </div>
             {/* Bottom bar – desktop only (visual balance) – Demander un paiement */}
             {receiveView === 'request' ? (
-              <div className="hidden md:flex pointer-events-none justify-center pt-2 pb-4" aria-hidden>
-                <span className="block w-[120px] h-[4px] rounded-full bg-white/80" />
+              <div className="hidden md:flex pointer-events-none justify-center pt-2 pb-0" aria-hidden>
+                <span className="block w-[120px] h-[4px] rounded-full bg-white/60" />
               </div>
             ) : null}
             {/* Bottom bar – mobile only – Demander un paiement */}
