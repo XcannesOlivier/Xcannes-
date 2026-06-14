@@ -2218,7 +2218,7 @@ export default function WalletDashboardReceiveModal({
 
 					                        {/* ── Amount (standalone, centered) ── */}
 					                        <div className="text-center !mt-2 md:!mt-5">
-					                          <div className="wallet-amount-shimmer text-[40px] md:text-[48px] font-bold tracking-tight leading-none">
+					                          <div className="text-white text-[40px] md:text-[48px] font-bold tracking-tight leading-none">
 					                            {requestDisplayAmountLabel}
 					                          </div>
 					                        </div>
