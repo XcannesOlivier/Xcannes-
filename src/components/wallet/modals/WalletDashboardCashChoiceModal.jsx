@@ -235,7 +235,7 @@ export default function WalletDashboardCashChoiceModal({
                         {t('demo_notice_title', 'Mode démo')}
                       </span>
                     ) : null}
-                    <p className="mt-2 text-[19px] md:text-[20px] font-light text-white/50 max-w-[34ch] leading-relaxed">
+                    <p className="mt-2 text-[19px] md:text-[20px] font-light text-white/50 max-w-[34ch] leading-tight">
                       {t('ui_funds_manage_subtitle', 'Ajoutez, retirez ou transférez vos fonds facilement.')}
                     </p>
                     
