@@ -1469,7 +1469,7 @@ export default function WalletDashboardReceiveModal({
 		                            {t('ui_receive_account_info_label', 'Choisissez le compte')}
 	                          </span>
 	                          <div className="flex items-center gap-2">
-	                            <span className="h-2.5 w-2.5 rounded-full bg-xcannes-green ring-4 ring-xcannes-green/20 shrink-0" style={{animation:'wallet-dot-pulse 2s ease-in-out infinite'}} aria-hidden />
+	                            <span className="h-2.5 w-2.5 rounded-full bg-xcannes-green ring-4 ring-xcannes-green/20 shrink-0" style={{animation:'wallet-dot-pulse 3.5s ease-in-out infinite'}} aria-hidden />
 	                            <span className="text-white/95 text-[14px] md:text-[15px] font-semibold">
 	                              {activeWalletLabel || t('nav_wallet', 'Wallet')}
 	                            </span>
@@ -1765,12 +1765,12 @@ export default function WalletDashboardReceiveModal({
                       <div className="flex flex-col gap-2 pt-2 flex-1">
 	                    {/* ── Centered wallet pill (style "Choisissez le compte") ── */}
                         <div className="flex justify-center pt-1 pb-1 relative z-[85]">
-	                      <div className="relative" ref={requestWalletDropdownRef}>
+	                      <div className={`relative wallet-account-selector-wrapper ${requestWalletDropdownOpen ? 'is-open' : ''}`} ref={requestWalletDropdownRef}>
 	                        {/* Visible pill */}
                             <button
                               type="button"
                               onClick={hasMultipleWallets ? () => setRequestWalletDropdownOpen((prev) => !prev) : undefined}
-                              className={`relative flex w-fit flex-col items-center gap-1 bg-[#0f1314] px-6 py-2 ${requestWalletDropdownOpen ? accountDropdownOpenPillClassName : 'rounded-[28px]'} ${requestWalletDropdownOpen ? 'ring-0' : 'ring-1 ring-white/25 ring-inset'} ${hasMultipleWallets ? 'cursor-pointer' : ''}`}
+                              className={`relative flex w-fit flex-col items-center gap-1 ${requestWalletDropdownOpen ? 'bg-[#0f1314]' : 'bg-[#232829]'} px-6 py-2 ${requestWalletDropdownOpen ? accountDropdownOpenPillClassName : 'rounded-[28px]'} ${requestWalletDropdownOpen ? 'ring-0' : 'ring-1 ring-white/[0.08]'} ring-inset ${hasMultipleWallets ? 'cursor-pointer' : ''} ${requestWalletDropdownOpen ? (inline ? 'shadow-[0_0_0_1px_rgba(0,0,0,0.75),-14px_-18px_36px_rgba(0,0,0,0.70),14px_-18px_36px_rgba(0,0,0,0.70),0_-10px_28px_rgba(0,0,0,0.68)]' : 'shadow-[0_0_0_1px_rgba(0,0,0,0.9),-12px_-16px_32px_rgba(0,0,0,0.85),12px_-16px_32px_rgba(0,0,0,0.85),0_-8px_24px_rgba(0,0,0,0.80)]') : ''}`}
                               aria-haspopup={hasMultipleWallets ? 'menu' : undefined}
                               aria-expanded={hasMultipleWallets ? requestWalletDropdownOpen : undefined}
                             >
@@ -1778,7 +1778,7 @@ export default function WalletDashboardReceiveModal({
 		                            {t('ui_receive_receiving_account_label', 'Compte de réception')}
 	                          </span>
 	                          <div className="flex items-center gap-2">
-	                            <span className="h-3 w-3 rounded-full bg-[#f5a623] ring-4 ring-[#f5a623]/20 shrink-0 animate-pulse" aria-hidden />
+	                            <span className="h-2.5 w-2.5 rounded-full bg-[#f5a623] ring-4 ring-[#f5a623]/20 shrink-0" style={{animation:'wallet-dot-pulse 3.5s ease-in-out infinite'}} aria-hidden />
 	                            <span className="text-white/95 text-[14px] md:text-[15px] font-semibold">
 	                              {activeWalletLabel || t('nav_wallet', 'Wallet')}
 	                            </span>
@@ -1792,12 +1792,13 @@ export default function WalletDashboardReceiveModal({
 
                             {requestWalletDropdownOpen && hasMultipleWallets ? (
                               <div
-                                className={`wallet-receive-account-menu absolute left-0 right-0 top-full -mt-px ${accountDropdownMenuClassName}`}
+                                className={`wallet-receive-account-menu absolute left-0 right-0 top-full -mt-[2px] ${accountDropdownMenuClassName}`}
                                 onMouseDown={(e) => e.stopPropagation()}
                                 onClick={(e) => e.stopPropagation()}
                                 role="menu"
                               >
-                                <div className="px-3 pt-2 pb-1.5">
+                                {/* Addresses toggle (single eye) */}
+                                <div className="px-3 pt-0 pb-1.5">
                                   {(() => {
                                     const addressesVisible = Object.keys(requestAddressModes || {}).length > 0;
                                     const allAddresses = Array.from(
@@ -1827,26 +1828,8 @@ export default function WalletDashboardReceiveModal({
 
                                     return (
                                       <>
-                                        <div className="flex items-center justify-between gap-2">
-                                          <button
-                                            type="button"
-                                            className="min-w-0 flex-1 text-left text-[13px] md:text-[14px] text-white/40 hover:text-white/60 transition-colors"
-                                            onClick={toggleAll}
-                                          >
-                                            {t('ui_view_wallet_addresses', 'Voir les adresses')}
-                                          </button>
-                                          <button
-                                            type="button"
-                                            className="shrink-0 rounded-md bg-white/[0.06] p-1 text-white/35 hover:bg-white/[0.10] hover:text-white/55 transition-colors"
-                                            onClick={toggleAll}
-                                            aria-label={t('ui_view_wallet_addresses', 'Voir les adresses')}
-                                          >
-                                            <EyeIcon className="h-4 w-4" slashed={addressesVisible} />
-                                          </button>
-                                        </div>
-
                                         {addressesVisible ? (
-                                          <div className="mt-1 flex items-start gap-2">
+                                          <div className="mb-3 flex items-start gap-2">
                                             <button
                                               type="button"
                                               className={`min-w-0 flex-1 text-left font-mono font-light text-[13px] md:text-[14px] leading-snug text-white/70 ${
@@ -1865,7 +1848,6 @@ export default function WalletDashboardReceiveModal({
                                             >
                                               {displayAddress}
                                             </button>
-
                                             <button
                                               type="button"
                                               className="shrink-0 rounded-md p-1 text-white/45 hover:text-white/80 transition-colors"
@@ -1883,13 +1865,39 @@ export default function WalletDashboardReceiveModal({
                                             </button>
                                           </div>
                                         ) : null}
+
+                                        {addressesVisible ? (
+                                          <div className="h-px w-full bg-xcannes-green/40 mb-1.5 transition-colors duration-200" aria-hidden />
+                                        ) : null}
+
+                                        <div className="flex items-center justify-between gap-2">
+                                          <button
+                                            type="button"
+                                            className={`min-w-0 flex-1 text-left text-[13px] md:text-[14px] transition-colors duration-200 ${addressesVisible ? 'text-xcannes-green hover:text-xcannes-green/80' : 'text-white/40 hover:text-white/60'}`}
+                                            onClick={toggleAll}
+                                          >
+                                            {addressesVisible
+                                              ? t('ui_hide_wallet_addresses', 'Masquer les adresses')
+                                              : t('ui_view_wallet_addresses', 'Voir les adresses')}
+                                          </button>
+                                          <button
+                                            type="button"
+                                            className={`shrink-0 rounded-md bg-white/[0.06] p-1 transition-colors duration-200 ${addressesVisible ? 'text-xcannes-green hover:text-xcannes-green/80' : 'text-white/35 hover:bg-white/[0.10] hover:text-white/55'}`}
+                                            onClick={toggleAll}
+                                            aria-label={addressesVisible
+                                              ? t('ui_hide_wallet_addresses', 'Masquer les adresses')
+                                              : t('ui_view_wallet_addresses', 'Voir les adresses')}
+                                          >
+                                            <EyeIcon className="h-4 w-4" slashed={addressesVisible} />
+                                          </button>
+                                        </div>
                                       </>
                                     );
                                   })()}
                                 </div>
 
                                 <div className="px-3">
-                                  <div className="h-px w-full bg-white/10" aria-hidden />
+                                  <div className={`h-px w-full transition-colors duration-200 ${Object.keys(requestAddressModes || {}).length > 0 ? 'bg-xcannes-green/40' : 'bg-white/10'}`} aria-hidden />
                                 </div>
 
                                 <div className="px-3 pt-1.5">
@@ -1905,90 +1913,93 @@ export default function WalletDashboardReceiveModal({
                                 </div>
 
                                 <div className="px-3 pt-2 pb-1">
-                                  <div className="text-[13px] md:text-[14px] text-white/60">
+                                  <div className="wallet-switch-label text-[13px] md:text-[14px]">
                                     {t('ui_switch_wallet', 'Changer de compte')}
                                   </div>
                                 </div>
 
-                                {(shareWalletOptions || [])
-                                  .filter((opt) => opt?.value && opt.value !== wallet)
-                                  .map((opt, idx) => {
-                                    const addr = opt.value;
-                                    const displayName = opt.label || `Compte ${idx + 1}`;
-                                    const addressesVisible = Object.keys(requestAddressModes || {}).length > 0;
-                                    const mode = requestAddressModes?.[addr] || 'truncated';
-                                    const displayAddress =
-                                      mode === 'full'
-                                        ? addr
-                                        : `${addr.slice(0, 8)}…${addr.slice(-6)}`;
+                                {/* ── Scrollable wallet list ── */}
+                                <div className="overflow-y-auto overscroll-contain touch-pan-y max-h-[220px]">
+                                  {(shareWalletOptions || [])
+                                    .filter((opt) => opt?.value && opt.value !== wallet)
+                                    .map((opt, idx) => {
+                                      const addr = opt.value;
+                                      const displayName = opt.label || `Compte ${idx + 1}`;
+                                      const addressesVisible = Object.keys(requestAddressModes || {}).length > 0;
+                                      const mode = requestAddressModes?.[addr] || 'truncated';
+                                      const displayAddress =
+                                        mode === 'full'
+                                          ? addr
+                                          : `${addr.slice(0, 8)}…${addr.slice(-6)}`;
 
-                                    return (
-                                      <div
-                                        key={addr}
-                                        className="w-full text-left px-3 py-2.5 flex items-center gap-2 transition-colors duration-150 hover:bg-white/[0.06]"
-                                        role="menuitem"
-                                        tabIndex={0}
-                                        onClick={() => {
-                                          onSwitchWallet?.(addr);
-                                          setRequestWalletDropdownOpen(false);
-                                        }}
-                                        onKeyDown={(e) => {
-                                          if (e.key !== 'Enter' && e.key !== ' ') return;
-                                          e.preventDefault();
-                                          onSwitchWallet?.(addr);
-                                          setRequestWalletDropdownOpen(false);
-                                        }}
-                                      >
-                                        <span className="h-2 w-2 rounded-full shrink-0 transition-colors duration-150 bg-white/20 opacity-0" />
-                                        <div className="min-w-0 flex-1">
-                                          <div className="flex items-center justify-between gap-2 min-w-0">
-                                            <div className="text-[16px] md:text-[17px] font-medium truncate text-white/80 min-w-0">
-                                              {displayName}
+                                      return (
+                                        <div
+                                          key={addr}
+                                          className="w-full text-left px-3 py-2.5 flex items-center gap-2 transition-colors duration-150 hover:bg-white/[0.06]"
+                                          role="menuitem"
+                                          tabIndex={0}
+                                          onClick={() => {
+                                            onSwitchWallet?.(addr);
+                                            setRequestWalletDropdownOpen(false);
+                                          }}
+                                          onKeyDown={(e) => {
+                                            if (e.key !== 'Enter' && e.key !== ' ') return;
+                                            e.preventDefault();
+                                            onSwitchWallet?.(addr);
+                                            setRequestWalletDropdownOpen(false);
+                                          }}
+                                        >
+                                          <span className="h-2 w-2 rounded-full shrink-0 transition-colors duration-150 bg-white/20 opacity-0" />
+                                          <div className="min-w-0 flex-1">
+                                            <div className="flex items-center justify-between gap-2 min-w-0">
+                                              <div className="text-[16px] md:text-[17px] font-medium truncate text-white/80 min-w-0">
+                                                {displayName}
+                                              </div>
                                             </div>
+
+                                            {!addressesVisible ? null : (
+                                              <div className="mt-0.5 flex items-start gap-2">
+                                                <button
+                                                  type="button"
+                                                  className={`min-w-0 flex-1 text-left font-mono font-light text-[13px] md:text-[14px] leading-snug text-white/70 ${
+                                                    mode === 'full' ? 'whitespace-normal break-all' : 'truncate'
+                                                  }`}
+                                                  title={addr}
+                                                  onClick={(e) => {
+                                                    e.preventDefault();
+                                                    e.stopPropagation();
+                                                    setRequestAddressModes((prev) => ({
+                                                      ...(prev || {}),
+                                                      [addr]: prev?.[addr] === 'full' ? 'truncated' : 'full',
+                                                    }));
+                                                  }}
+                                                >
+                                                  {displayAddress}
+                                                </button>
+                                                <button
+                                                  type="button"
+                                                  className="shrink-0 rounded-md p-1 text-white/45 hover:text-white/80 transition-colors"
+                                                  onClick={async (e) => {
+                                                    e.preventDefault();
+                                                    e.stopPropagation();
+                                                    try {
+                                                      await navigator.clipboard?.writeText?.(addr);
+                                                      showRequestDropdownToast(t('ui_address_copied', 'Adresse copiée'));
+                                                    } catch {
+                                                      /* ignore */
+                                                    }
+                                                  }}
+                                                  aria-label={t('ui_copy_wallet_address', "Copier l'adresse du wallet")}
+                                                >
+                                                  <CopyIcon className="h-4 w-4" />
+                                                </button>
+                                              </div>
+                                            )}
                                           </div>
-
-                                          {!addressesVisible ? null : (
-                                            <div className="mt-0.5 flex items-start gap-2">
-                                              <button
-                                                type="button"
-                                                className={`min-w-0 flex-1 text-left font-mono font-light text-[13px] md:text-[14px] leading-snug text-white/70 ${
-                                                  mode === 'full' ? 'whitespace-normal break-all' : 'truncate'
-                                                }`}
-                                                title={addr}
-                                                onClick={(e) => {
-                                                  e.preventDefault();
-                                                  e.stopPropagation();
-                                                  setRequestAddressModes((prev) => ({
-                                                    ...(prev || {}),
-                                                    [addr]: prev?.[addr] === 'full' ? 'truncated' : 'full',
-                                                  }));
-                                                }}
-                                              >
-                                                {displayAddress}
-                                              </button>
-                                              <button
-                                                type="button"
-                                                className="shrink-0 rounded-md p-1 text-white/45 hover:text-white/80 transition-colors"
-                                                onClick={async (e) => {
-                                                  e.preventDefault();
-                                                  e.stopPropagation();
-                                                  try {
-                                                    await navigator.clipboard?.writeText?.(addr);
-                                                    showRequestDropdownToast(t('ui_address_copied', 'Adresse copiée'));
-                                                  } catch {
-                                                    /* ignore */
-                                                  }
-                                                }}
-                                                aria-label={t('ui_copy_wallet_address', "Copier l'adresse du wallet")}
-                                              >
-                                                <CopyIcon className="h-4 w-4" />
-                                              </button>
-                                            </div>
-                                          )}
                                         </div>
-                                      </div>
-                                    );
-                                  })}
+                                      );
+                                    })}
+                                </div>
                               </div>
                             ) : null}
 	                      </div>
