@@ -241,29 +241,29 @@
 
 /* 1. Living green energy halo — drifts slowly behind QR card */
 @keyframes shareGlowDriftA {
-  0%   { opacity: 0.70; transform: scale(1)    translate(0px,  0px); }
-  30%  { opacity: 0.95; transform: scale(1.08) translate(-12px, 8px); }
-  60%  { opacity: 0.60; transform: scale(0.94) translate( 8px,-10px); }
-  80%  { opacity: 0.88; transform: scale(1.05) translate(-6px, 12px); }
-  100% { opacity: 0.70; transform: scale(1)    translate(0px,  0px); }
+  0%   { opacity: 0.70; transform: scale(1); }
+  30%  { opacity: 1;    transform: scale(1.10); }
+  60%  { opacity: 0.55; transform: scale(0.93); }
+  80%  { opacity: 0.90; transform: scale(1.07); }
+  100% { opacity: 0.70; transform: scale(1); }
 }
 @keyframes shareGlowDriftB {
-  0%   { opacity: 0.55; transform: scale(1)    translate(0px, 0px); }
-  25%  { opacity: 0.80; transform: scale(1.06) translate(10px,-6px); }
-  55%  { opacity: 0.65; transform: scale(0.96) translate(-8px, 8px); }
-  75%  { opacity: 0.82; transform: scale(1.04) translate( 6px,-4px); }
-  100% { opacity: 0.55; transform: scale(1)    translate(0px, 0px); }
+  0%   { opacity: 0.55; transform: scale(1); }
+  25%  { opacity: 0.85; transform: scale(1.08); }
+  55%  { opacity: 0.60; transform: scale(0.95); }
+  75%  { opacity: 0.80; transform: scale(1.06); }
+  100% { opacity: 0.55; transform: scale(1); }
 }
 
 .share-glow-halo-a {
   animation: shareGlowDriftA 16s ease-in-out infinite;
   will-change: transform, opacity;
-  transform-origin: 60% 50%;
+  transform-origin: 80% 50%;
 }
 .share-glow-halo-b {
   animation: shareGlowDriftB 20s ease-in-out infinite reverse;
   will-change: transform, opacity;
-  transform-origin: 40% 60%;
+  transform-origin: 70% 70%;
 }
 
 /* 2. Background breathing */

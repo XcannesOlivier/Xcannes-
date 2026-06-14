@@ -1450,7 +1450,7 @@ export default function WalletDashboardReceiveModal({
               {receiveView === 'share' ? (
                 <>
                   {/* Glow vert — vue share (Coordonnées de réception) */}
-                  <div className="pointer-events-none absolute inset-0 z-[-1]" aria-hidden>
+                  <div className="pointer-events-none absolute inset-0 z-[-1] overflow-hidden" aria-hidden>
                     <div className="share-glow-breathe share-glow-halo-a absolute inset-0 md:hidden bg-[radial-gradient(700px_circle_at_100%_50%,rgba(0,255,150,0.13),transparent_60%)]" />
                     <div className="share-glow-breathe share-glow-halo-a absolute inset-0 hidden md:block bg-[radial-gradient(1000px_circle_at_100%_50%,rgba(0,255,150,0.13),transparent_60%)]" />
                     <div className="share-glow-halo-b absolute inset-0 md:hidden bg-[radial-gradient(900px_circle_at_100%_75%,rgba(0,255,150,0.11),transparent_60%)]" />
