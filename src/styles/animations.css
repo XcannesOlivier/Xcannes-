@@ -241,18 +241,18 @@
 
 /* 1. Living green energy halo — drifts slowly behind QR card */
 @keyframes shareGlowDriftA {
-  0%   { opacity: 0.70; transform: scale(1); }
-  30%  { opacity: 1;    transform: scale(1.10); }
-  60%  { opacity: 0.55; transform: scale(0.93); }
-  80%  { opacity: 0.90; transform: scale(1.07); }
-  100% { opacity: 0.70; transform: scale(1); }
+  0%   { opacity: 0.55; transform: scale(1); }
+  30%  { opacity: 1;    transform: scale(1.18); }
+  60%  { opacity: 0.40; transform: scale(0.88); }
+  80%  { opacity: 0.95; transform: scale(1.13); }
+  100% { opacity: 0.55; transform: scale(1); }
 }
 @keyframes shareGlowDriftB {
-  0%   { opacity: 0.55; transform: scale(1); }
-  25%  { opacity: 0.85; transform: scale(1.08); }
-  55%  { opacity: 0.60; transform: scale(0.95); }
-  75%  { opacity: 0.80; transform: scale(1.06); }
-  100% { opacity: 0.55; transform: scale(1); }
+  0%   { opacity: 0.40; transform: scale(1); }
+  25%  { opacity: 0.90; transform: scale(1.14); }
+  55%  { opacity: 0.45; transform: scale(0.90); }
+  75%  { opacity: 0.85; transform: scale(1.12); }
+  100% { opacity: 0.40; transform: scale(1); }
 }
 
 .share-glow-halo-a {
@@ -269,7 +269,7 @@
 /* 2. Background breathing */
 @keyframes shareBackgroundBreathe {
   0%   { opacity: 1; }
-  50%  { opacity: 0.82; }
+  50%  { opacity: 0.60; }
   100% { opacity: 1; }
 }
 .share-glow-breathe {
@@ -289,19 +289,19 @@
   position: absolute;
   top: -10%;
   left: 0;
-  width: 28%;
+  width: 36%;
   height: 120%;
-  filter: blur(10px);
+  filter: blur(8px);
   pointer-events: none;
   background: linear-gradient(
     90deg,
     transparent 0%,
-    rgba(0, 255, 150, 0.02) 20%,
-    rgba(255, 255, 255, 0.07) 50%,
-    rgba(0, 255, 150, 0.02) 80%,
+    rgba(0, 255, 150, 0.04) 20%,
+    rgba(255, 255, 255, 0.13) 50%,
+    rgba(0, 255, 150, 0.04) 80%,
     transparent 100%
   );
-  animation: shareQrGlassSweep 32s ease-in-out infinite;
+  animation: shareQrGlassSweep 28s ease-in-out infinite;
   animation-delay: -8s;
 }
 
