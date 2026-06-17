@@ -968,10 +968,10 @@ export default function WalletDashboardSendModal({
         {/* ── Devise + Montant (séparés) – masqués en mode payreq ── */}
         {!hasPaymentRequest && (
         <div className={`transition-opacity duration-300 space-y-4 ${hasDestination ? 'opacity-100' : 'opacity-30 pointer-events-none select-none'}`}>
-          <h3 className="relative z-[50] text-[30px] md:text-[34px] font-bold text-white/95 tracking-tight text-center leading-snug">
+          <h3 className="relative z-[50] text-[30px] md:text-[34px] font-light text-white/80 md:text-white tracking-tight text-center leading-snug">
             {t("ui_send_modal_title", "Montant à envoyer")}
           </h3>
-          <p className="relative z-[50] text-[14px] md:text-[15px] text-white/55 text-center leading-relaxed -mt-2">
+          <p className="relative z-[50] text-[19px] md:text-[20px] font-light text-white/50 text-center leading-tight -mt-2">
             {t("ui_send_devise_hint", "Choisissez la devise, saisissez le montant, puis vérifiez avant l’envoi.")}
           </p>
 	          <div className="flex justify-center relative z-[65]">
@@ -1151,10 +1151,10 @@ export default function WalletDashboardSendModal({
     <div className="space-y-6">
       {/* Title + subtitle */}
       <div className="text-center space-y-2 pt-1">
-        <h3 className="text-[26px] md:text-[28px] font-semibold text-white/95 tracking-tight">
+        <h3 className="text-[30px] md:text-[34px] font-light text-white/80 md:text-white tracking-tight">
 	          {t("ui_payreq_summary_title", "Résumé de la demande")}
         </h3>
-        <p className="text-[14px] md:text-[15px] text-white/60 max-w-[34ch] mx-auto leading-relaxed">
+        <p className="text-[19px] md:text-[20px] font-light text-white/50 max-w-[34ch] mx-auto leading-tight">
 	          {t("ui_payreq_summary_subtitle", "Vérifiez les détails avant de confirmer le paiement.")}
         </p>
         <div className="mt-[40px] flex justify-center">

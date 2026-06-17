@@ -959,7 +959,7 @@ export default function WalletDashboardSendChoiceModal({
                 ) : null}
                 <div className={`px-5 ${pendingDestination.address ? 'pt-[3px] md:pt-[34px]' : 'pt-[10px] md:pt-[60px]'} pb-5 flex flex-col flex-1 min-h-0 overflow-y-auto overscroll-contain`}>
                 {/* Title + subtitle */}
-                <div className="flex flex-col mb-[40px]">
+                <div className="flex flex-col items-center text-center md:items-start md:text-left mb-[40px]">
                   <h3 className="mt-1 text-[30px] md:text-[34px] font-light text-white/80 md:text-white tracking-tight">
                     {t('ui_send_choose_recipient_title', 'Envoyer à un destinataire')}
                   </h3>
@@ -1381,7 +1381,7 @@ export default function WalletDashboardSendChoiceModal({
 		                ) : null}
 		                <div className="px-5 pt-[70px] md:pt-[90px] pb-5 flex flex-col flex-1 min-h-0 overflow-y-auto overscroll-contain">
 		                {/* Title + subtitle */}
-		                <div className="flex flex-col mb-[40px]">
+		                <div className="flex flex-col items-center text-center md:items-start md:text-left mb-[40px]">
                   <h3 className="mt-1 text-[30px] md:text-[34px] font-light text-white/80 md:text-white tracking-tight">
 		                    {t('ui_send_pay_request_title', 'Renseigner une demande ')}
                   </h3>
