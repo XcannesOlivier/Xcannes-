@@ -1142,7 +1142,7 @@ export default function WalletDashboardSendChoiceModal({
                           <span className="text-[13px] truncate text-white/85">{scannedDisplay}</span>
                         </div>
                       ) : (
-                        <p className="text-[11px] md:text-[13px] text-white/40 mt-0.5">{t('ui_scan_card_hint', 'Utilisez la caméra pour scanner une adresse')}</p>
+                        <p className="text-[12px] md:text-[14px] font-light text-white/50 mt-0.5">{t('ui_scan_card_hint', 'Utilisez la caméra pour scanner une adresse')}</p>
                       )}
                     </div>
                     <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">
@@ -1173,7 +1173,7 @@ export default function WalletDashboardSendChoiceModal({
                         <p className="text-[15px] font-light text-white/80 whitespace-nowrap overflow-hidden text-ellipsis">
                           {t('ui_manual_entry_title', 'Entrer une adresse manuellement')}
                         </p>
-                        <p className="text-[11px] md:text-[13px] text-white/40 mt-0.5">
+                        <p className="text-[12px] md:text-[14px] font-light text-white/50 mt-0.5">
                           {t('ui_manual_entry_hint', 'Coller ou saisir une adresse de compte')}
                         </p>
                       </div>
@@ -1252,7 +1252,7 @@ export default function WalletDashboardSendChoiceModal({
                           <span className="text-[13px] truncate text-white/85">{importedDisplay}</span>
                         </div>
                       ) : (
-                        <p className="text-[11px] md:text-[13px] text-white/40 mt-0.5">{t('ui_import_card_hint', 'Depuis une image ou un fichier')}</p>
+                        <p className="text-[12px] md:text-[14px] font-light text-white/50 mt-0.5">{t('ui_import_card_hint', 'Depuis une image ou un fichier')}</p>
                       )}
                     </div>
                     <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">
@@ -1312,7 +1312,7 @@ export default function WalletDashboardSendChoiceModal({
                   >
                     {pendingDestination.address
                       ? <span>{t('ui_continue', 'Continuer')}</span>
-                      : <span className="inline-flex items-center gap-1.5 text-white/85">
+                      : <span className="inline-flex items-center gap-1.5 text-white/85 font-light">
                           <span className="text-[14px] md:text-[16px]">{t('ui_fill_recipient_address', "Renseigner l'adresse du destinataire")}</span>
                           <span className="inline-flex items-end gap-[3px] mb-[-1px]">
                             <span className="send-dot" style={{ animationDelay: '0s' }}>·</span>
@@ -1421,7 +1421,7 @@ export default function WalletDashboardSendChoiceModal({
                           <span className="text-[13px] truncate text-white/85">{payreqScannedDisplay}</span>
                         </div>
                       ) : (
-                        <p className="text-[11px] md:text-[13px] text-white/40 mt-0.5">{t('ui_scan_payreq_hint', 'Utilisez la caméra pour scanner une demande de paiement')}</p>
+                        <p className="text-[12px] md:text-[14px] font-light text-white/50 mt-0.5">{t('ui_scan_payreq_hint', 'Utilisez la caméra pour scanner une demande de paiement')}</p>
                       )}
                     </div>
                     <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">
@@ -1452,7 +1452,7 @@ export default function WalletDashboardSendChoiceModal({
                         <p className="text-[15px] font-light text-white/80 whitespace-nowrap overflow-hidden text-ellipsis">
                           {t('ui_paste_payreq_title', 'Saisir une demande de paiement')}
                         </p>
-                        <p className="text-[11px] md:text-[13px] text-white/40 mt-0.5">
+                        <p className="text-[12px] md:text-[14px] font-light text-white/50 mt-0.5">
                           {t('ui_paste_payreq_hint', 'Coller ou saisir une demande de paiement')}
                         </p>
                       </div>
@@ -1527,7 +1527,7 @@ export default function WalletDashboardSendChoiceModal({
                           <span className="text-[13px] truncate text-white/85">{payreqImportedDisplay}</span>
                         </div>
                       ) : (
-                        <p className="text-[11px] md:text-[13px] text-white/40 mt-0.5">{t('ui_import_payreq_hint', 'Importez une image ou un fichier contenant un QR code')}</p>
+                        <p className="text-[12px] md:text-[14px] font-light text-white/50 mt-0.5">{t('ui_import_payreq_hint', 'Importez une image ou un fichier contenant un QR code')}</p>
                       )}
                     </div>
                     <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">
@@ -1588,7 +1588,7 @@ export default function WalletDashboardSendChoiceModal({
 	                              </svg>
 	                              <span>{t('ui_qr_decode_failed_short', 'QR illisible. Réessayez avec une image plus nette.')}</span>
 	                            </span>
-	                          : <span className="inline-flex items-center gap-1.5 text-white/85">
+	                          : <span className="inline-flex items-center gap-1.5 text-white/85 font-light">
 	                          <span className="text-[14px] md:text-[16px]">{t('ui_fill_payreq', 'Renseignez la demande de paiement')}</span>
 	                          <span className="inline-flex items-end gap-[3px] mb-[-1px]">
 	                            <span className="payreq-cta-dot" style={{ animationDelay: '0s' }}>·</span>
