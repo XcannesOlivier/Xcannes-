@@ -963,19 +963,8 @@ export default function WalletDashboardSendChoiceModal({
                   <h3 className="mt-1 text-[30px] md:text-[34px] font-light text-white/80 md:text-white tracking-tight">
                     {t('ui_send_choose_recipient_title', 'Envoyer à un destinataire')}
                   </h3>
-                  <p className="mt-2 text-[19px] md:text-[20px] font-light text-white/50 max-w-[56ch] leading-tight">
-                    <span className="block">
-                      {t(
-                        "ui_send_choose_recipient_hint_line_1",
-                        "Choisissez une adresse enregistrée,",
-                      )}
-                    </span>
-                    <span className="block">
-                      {t(
-                        "ui_send_choose_recipient_hint_line_2",
-                        "scannez un QR code ou saisissez-la manuellement.",
-                      )}
-                    </span>
+                  <p className="mt-px md:mt-0 text-[19px] md:text-[20px] font-light text-white/50 max-w-[34ch] md:max-w-[68ch] leading-[22.5px] md:leading-[24px]">
+                    {t("ui_send_choose_recipient_hint_line_1", "Choisissez une adresse enregistrée,")}{" "}{t("ui_send_choose_recipient_hint_line_2", "scannez un QR code ou saisissez-la manuellement.")}
                   </p>
                   {/* Wallet meta pill */}
                   <div className="mt-6 flex justify-center px-4 w-full">
@@ -1396,7 +1385,7 @@ export default function WalletDashboardSendChoiceModal({
                   <h3 className="mt-1 text-[30px] md:text-[34px] font-light text-white/80 md:text-white tracking-tight">
 		                    {t('ui_send_pay_request_title', 'Renseigner une demande ')}
                   </h3>
-                  <p className="mt-2 text-[19px] md:text-[20px] font-light text-white/50 max-w-[34ch] leading-tight">
+                  <p className="mt-px md:mt-0 text-[19px] md:text-[20px] font-light text-white/50 max-w-[34ch] md:max-w-[68ch] leading-[22.5px] md:leading-[24px]">
                     {t('ui_send_pay_request_hint', 'Scannez, importez un QR code ou saisissez une demande de paiement.')}
                   </p>
                   {/* Wallet meta pill */}
