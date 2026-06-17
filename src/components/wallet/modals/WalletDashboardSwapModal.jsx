@@ -629,7 +629,7 @@ export default function WalletDashboardSwapModal({
                 <div className="flex min-w-0 flex-col gap-1.5 w-full relative z-[65]">
                   <div className="flex flex-wrap items-center gap-2">
                     {noticeVariant === "demo" ? (
-                      <span className="inline-flex items-center text-white/80 text-sm md:text-base font-semibold px-2 py-1 leading-none">
+                      <span className="inline-flex items-center text-white/80 text-sm md:text-base font-light px-2 py-1 leading-none">
                         {t("demo_notice_title", "Mode démo")}
                       </span>
                     ) : null}
@@ -639,25 +639,25 @@ export default function WalletDashboardSwapModal({
             <div className="wallet-tab-unfold-in">
               <div className="flex flex-col gap-4">
                 {/* ── Title / subtitle ── */}
-	                <div className="text-center relative z-[70]">
-                  <h3 className="text-[30px] md:text-[34px] font-semibold text-white/95 tracking-tight">
+	                <div className="text-center md:text-left relative z-[70]">
+                  <h3 className="text-[30px] md:text-[34px] font-light text-white/80 md:text-white tracking-tight">
                     {t("ui_convert_title_main", "Convertissez vos devises")}
                   </h3>
-                  <p className="mt-2 text-[14px] md:text-[15px] text-white/80 max-w-[34ch] mx-auto leading-relaxed">
+                  <p className="mt-2 text-[19px] md:text-[20px] font-light text-white/50 max-w-[34ch] mx-auto md:mx-0 leading-tight">
                     {t("ui_convert_subtitle_main", "Choisissez les devises et le montant à convertir.")}
                   </p>
-	                  <div className="mt-2 flex justify-center relative z-[75]">
+	                  <div className="mt-2 flex justify-center md:justify-start relative z-[75]">
                     {renderWalletMeta?.({
                       variant: "pill",
                       className: "w-full flex justify-center wallet-meta--plus-4 wallet-meta--desktop-gap relative z-[120]",
                       prefix: t("moonpay_from_account", "Compte source"),
 	                      labelWrap: false,
 	                      pillClassName:
-	                        "bg-transparent px-5 py-1 gap-4 xcannes-fade-border-y",
+	                        "bg-transparent px-5 py-1 gap-4 xcannes-fade-border-y rounded-[20px]",
 	                      prefixClassName:
-	                        "!text-white/45 text-[12px] md:text-[13px] font-normal tracking-wide mr-4",
+	                        "!text-white/45 text-[12px] md:text-[13px] font-light tracking-wide mr-4",
                       labelClassName:
-                        "!text-white/90 text-[14px] md:text-[15px] font-semibold",
+                        "!text-white/90 text-[14px] md:text-[15px] font-light",
                       dotClassName: "!h-2.5 !w-2.5 ring-xcannes-green/20 self-center",
                     })}
                   </div>
@@ -666,7 +666,7 @@ export default function WalletDashboardSwapModal({
                 <div className="space-y-3">
 	                  <div className={`relative ${quoteDropdownOpen ? "z-[70]" : "z-[65]"}`}>
                     <div className="flex items-center justify-between mb-2 relative z-[50]">
-                      <div className="text-[13px] tracking-normal font-medium text-white/55">
+                      <div className="text-[13px] tracking-normal font-light text-white/55">
                         {t("ui_convert_from_label", "Vous convertissez")}
                       </div>
                     </div>
@@ -684,7 +684,7 @@ export default function WalletDashboardSwapModal({
                         const labelRight =
                           !baseDropdownOpen && isSelected
                             ? (
-                              <span className="inline-flex items-center gap-[3px] text-[10px] text-white/30 tracking-normal font-normal">
+                              <span className="inline-flex items-center gap-[3px] text-[10px] text-white/30 tracking-normal font-light">
                                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" aria-hidden="true" className="opacity-50 shrink-0">
                                   <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6Z" stroke="currentColor" strokeWidth="1.5"/>
                                   <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.5"/>
@@ -750,8 +750,8 @@ export default function WalletDashboardSwapModal({
   			                        convertBaseCurrency ||
   			                        "USD"
   			                      }
-  			                      tokenClassName="text-white/70 drop-shadow-sm text-2xl md:text-3xl font-semibold"
-                            containerClassName="pt-5 pb-5 rounded-[18px] bg-[#111518] ring-1 ring-white/10 ring-inset transition-all duration-200 shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30)] focus-within:ring-white/25 focus-within:shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30),0_0_0_1px_rgba(255,255,255,0.10),0_0_24px_rgba(255,255,255,0.06)] wallet-amount-shimmer [&_input]:!text-4xl [&_input]:md:!text-5xl [&_input]:font-bold [&_input]:placeholder:text-white/35"
+  			                      tokenClassName="text-white/70 drop-shadow-sm text-2xl md:text-3xl font-light"
+                            containerClassName="pt-5 pb-5 rounded-[18px] bg-[#111518] ring-1 ring-white/10 ring-inset transition-all duration-200 shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30)] focus-within:ring-white/25 focus-within:shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30),0_0_0_1px_rgba(255,255,255,0.10),0_0_24px_rgba(255,255,255,0.06)] wallet-amount-shimmer [&_input]:!text-4xl [&_input]:md:!text-5xl [&_input]:font-light [&_input]:placeholder:text-white/35"
   			                    />
                             <button
                               type="button"
@@ -794,7 +794,7 @@ export default function WalletDashboardSwapModal({
 
                   <div className={quoteDropdownOpen ? "relative z-[65]" : "relative"}>
                     <div className={`flex items-center justify-between mb-2 relative ${quoteDropdownOpen ? "z-[65]" : "z-[41]"}`}>
-                      <div className="text-[13px] tracking-normal font-medium text-white/55">
+                      <div className="text-[13px] tracking-normal font-light text-white/55">
                         {t("ui_convert_to_label", "Vous recevez")}
                       </div>
                     </div>
@@ -812,7 +812,7 @@ export default function WalletDashboardSwapModal({
                         const labelRight =
                           !quoteDropdownOpen && isSelected
                             ? (
-                              <span className="inline-flex items-center gap-[3px] text-[10px] text-white/30 tracking-normal font-normal">
+                              <span className="inline-flex items-center gap-[3px] text-[10px] text-white/30 tracking-normal font-light">
                                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" aria-hidden="true" className="opacity-50 shrink-0">
                                   <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6Z" stroke="currentColor" strokeWidth="1.5"/>
                                   <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.5"/>
@@ -827,7 +827,7 @@ export default function WalletDashboardSwapModal({
                           "the {{currency}} line will be created automatically.",
                         ).replace("{{currency}}", code);
                         const labelWithHint = isNewLine ? (
-                          <>{labelLeft} <span className="text-[11px] text-white/35 font-normal">{newLineHint}</span></>
+                          <>{labelLeft} <span className="text-[11px] text-white/35 font-light">{newLineHint}</span></>
                         ) : labelLeft;
                         return {
                           value: code,
@@ -866,7 +866,7 @@ export default function WalletDashboardSwapModal({
                                 "ui_choose_new_currency_plus_account",
                                 "+ Ajouter une devise au compte",
                               )}
-                              buttonClassName="w-full inline-flex items-center justify-center text-[12.5px] md:text-[13px] leading-tight text-white/50 font-normal rounded-[8px] px-3 py-1.5 hover:text-white/75 transition-colors"
+                              buttonClassName="w-full inline-flex items-center justify-center text-[12.5px] md:text-[13px] leading-tight text-white/50 font-light rounded-[8px] px-3 py-1.5 hover:text-white/75 transition-colors"
                               fullscreenPortalTarget={inline ? modalPanelRef.current : null}
                               placeholder={t(
                                 "ui_search_all_currencies_c5d6e7f8",
@@ -887,11 +887,11 @@ export default function WalletDashboardSwapModal({
                     <div className="rounded-[16px] overflow-hidden">
                       {/* Rows: Frais + Taux — note technique discrète */}
                       <div className="flex flex-col gap-0.5 px-6 pt-2 pb-2">
-                        <span className="text-[11px] md:text-[12.5px] text-white/40 font-normal tabular-nums">
+                        <span className="text-[11px] md:text-[12.5px] text-white/40 font-light tabular-nums">
                           {t("statement_conversion_fee_label", "Frais")} —{" "}
                           {formatAmountWithSymbol(locale, Number(previewMeta?.spreadFeeRlusd || 0), "USD", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </span>
-                        <span className="text-[11px] md:text-[12.5px] text-white/40 font-normal tabular-nums">
+                        <span className="text-[11px] md:text-[12.5px] text-white/40 font-light tabular-nums">
                           {t("ui_exchange_rate_label", "Taux de change")} —{" "}
                           {Number.isFinite(Number(previewMeta?.unitRate)) && previewMeta?.unitRate > 0 && baseCode && quoteCode
                             ? `1 ${getDisplayCurrencyCode(baseCode)} = ${Number(previewMeta.unitRate).toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 4 })} ${getDisplayCurrencyCode(quoteCode)}`
@@ -908,9 +908,9 @@ export default function WalletDashboardSwapModal({
                         className="flex items-center justify-between px-4 pt-4 pb-4 mt-0.5 mx-1 mb-1 rounded-[12px]"
                       >
                         <div className="flex flex-col gap-0.5">
-                          <span className="text-[15px] md:text-[16px] text-white/45 font-normal tracking-[0.02em]">{t("ui_total_received_label", "Total reçu")}</span>
+                          <span className="text-[15px] md:text-[16px] text-white/45 font-light tracking-[0.02em]">{t("ui_total_received_label", "Total reçu")}</span>
                         </div>
-                        <span className="text-3xl md:text-4xl text-white font-bold tracking-tight">
+                        <span className="text-3xl md:text-4xl text-white font-light tracking-tight">
                           {quoteCode
                             ? formatAmountWithSymbolLocal(
                                 Number.isFinite(previewAmount) && previewAmount > 0 ? previewAmount : 0,
@@ -951,7 +951,7 @@ export default function WalletDashboardSwapModal({
                       }}
                       disabled={convertButtonDisabled}
                       className={[
-                        "w-full h-[52px] md:h-[56px] flex items-center justify-center rounded-[14px] text-[22px] md:text-[24px] font-semibold transition-all duration-200 tracking-[-0.01em]",
+                        "w-full h-[52px] md:h-[56px] flex items-center justify-center rounded-[14px] text-[22px] md:text-[24px] font-light transition-all duration-200 tracking-[-0.01em]",
                         convertButtonDisabled
                           ? "text-white/90 cursor-not-allowed ring-[0.5px] ring-xcannes-green/30 ring-inset"
                           : "text-white hover:scale-[1.01] active:scale-[0.98]",
