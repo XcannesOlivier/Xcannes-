@@ -1002,7 +1002,7 @@ export default function WalletDashboardSendChoiceModal({
                         </div>
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="text-[15px] font-light text-white/80 whitespace-nowrap overflow-hidden text-ellipsis">
+                        <p className="text-[15px] font-light text-white/95 whitespace-nowrap overflow-hidden text-ellipsis">
                           {t('ui_saved_recipient_title', 'Destinataire enregistré')}
                         </p>
                         <div className="relative xcannes-irregular-green-border mt-2 flex items-center justify-between rounded-xl pl-3 pr-2.5 py-2 bg-black/60 shadow-[inset_0_-30px_30px_-20px_rgba(0,0,0,0.92)]">
@@ -1014,7 +1014,7 @@ export default function WalletDashboardSendChoiceModal({
                       </div>
                     </button>
                     <div
-                      className={`absolute left-0 right-0 top-full mt-1.5 z-[100] xcannes-irregular-green-border rounded-xl overflow-hidden bg-black shadow-[inset_0_-30px_30px_-20px_rgba(0,0,0,0.92)] transition-all duration-200 origin-top ${showQuickscanSavedPicker ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-95 pointer-events-none'}`}
+                      className={`absolute left-0 right-0 top-full mt-1.5 z-[100] rounded-xl overflow-hidden bg-black shadow-[inset_0_-30px_30px_-20px_rgba(0,0,0,0.92)] transition-all duration-200 origin-top ${showQuickscanSavedPicker ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-95 pointer-events-none'}`}
                     >
                       <div className="px-4 py-2.5 border-b border-white/[0.04]">
                         <div className="flex items-center justify-between gap-2">
@@ -1136,7 +1136,7 @@ export default function WalletDashboardSendChoiceModal({
                       </div>
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="text-[15px] font-light text-white/80 whitespace-nowrap overflow-hidden text-ellipsis">{t('ui_scan_card_title', 'Scanner un QR code')}</p>
+                      <p className="text-[15px] font-light text-white/95 whitespace-nowrap overflow-hidden text-ellipsis">{t('ui_scan_card_title', 'Scanner un QR code')}</p>
                       {scannedDisplay ? (
                         <div className="flex items-center mt-1.5 bg-black/80 ring-1 ring-white/10 ring-inset rounded-xl pl-3 pr-3 py-2">
                           <span className="text-[13px] truncate text-white/85">{scannedDisplay}</span>
@@ -1170,7 +1170,7 @@ export default function WalletDashboardSendChoiceModal({
                         </div>
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="text-[15px] font-light text-white/80 whitespace-nowrap overflow-hidden text-ellipsis">
+                        <p className="text-[15px] font-light text-white/95 whitespace-nowrap overflow-hidden text-ellipsis">
                           {t('ui_manual_entry_title', 'Entrer une adresse manuellement')}
                         </p>
                         <p className="text-[12px] md:text-[14px] font-light text-white/50 mt-0.5">
@@ -1246,7 +1246,7 @@ export default function WalletDashboardSendChoiceModal({
                       </div>
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="text-[15px] font-light text-white/80 whitespace-nowrap overflow-hidden text-ellipsis">{t('ui_import_card_title', 'Importer un QR code')}</p>
+                      <p className="text-[15px] font-light text-white/95 whitespace-nowrap overflow-hidden text-ellipsis">{t('ui_import_card_title', 'Importer un QR code')}</p>
                       {importedDisplay ? (
                         <div className="flex items-center mt-1.5 bg-black/80 ring-1 ring-white/10 ring-inset rounded-xl pl-3 pr-3 py-2">
                           <span className="text-[13px] truncate text-white/85">{importedDisplay}</span>
@@ -1415,7 +1415,7 @@ export default function WalletDashboardSendChoiceModal({
                       </div>
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="text-[15px] font-light text-white/80 whitespace-nowrap overflow-hidden text-ellipsis">{t('ui_scan_card_title', 'Scanner un QR code')}</p>
+                      <p className="text-[15px] font-light text-white/95 whitespace-nowrap overflow-hidden text-ellipsis">{t('ui_scan_card_title', 'Scanner un QR code')}</p>
                       {payreqScannedDisplay ? (
                         <div className="flex items-center mt-1.5 bg-black/80 ring-1 ring-white/10 ring-inset rounded-xl pl-3 pr-3 py-2">
                           <span className="text-[13px] truncate text-white/85">{payreqScannedDisplay}</span>
@@ -1449,7 +1449,7 @@ export default function WalletDashboardSendChoiceModal({
                         </div>
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="text-[15px] font-light text-white/80 whitespace-nowrap overflow-hidden text-ellipsis">
+                        <p className="text-[15px] font-light text-white/95 whitespace-nowrap overflow-hidden text-ellipsis">
                           {t('ui_paste_payreq_title', 'Saisir une demande de paiement')}
                         </p>
                         <p className="text-[12px] md:text-[14px] font-light text-white/50 mt-0.5">
@@ -1521,7 +1521,7 @@ export default function WalletDashboardSendChoiceModal({
                       </div>
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="text-[15px] font-light text-white/80 whitespace-nowrap overflow-hidden text-ellipsis">{t('ui_import_card_title', 'Importer un QR code')}</p>
+                      <p className="text-[15px] font-light text-white/95 whitespace-nowrap overflow-hidden text-ellipsis">{t('ui_import_card_title', 'Importer un QR code')}</p>
                       {payreqImportedDisplay ? (
                         <div className="flex items-center mt-1.5 bg-black/80 ring-1 ring-white/10 ring-inset rounded-xl pl-3 pr-3 py-2">
                           <span className="text-[13px] truncate text-white/85">{payreqImportedDisplay}</span>
