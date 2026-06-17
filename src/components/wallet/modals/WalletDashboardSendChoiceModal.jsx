@@ -960,10 +960,10 @@ export default function WalletDashboardSendChoiceModal({
                 <div className={`px-5 ${pendingDestination.address ? 'pt-[12px] md:pt-[24px]' : 'pt-[30px] md:pt-[60px]'} pb-5 flex flex-col flex-1 min-h-0 overflow-y-auto overscroll-contain`}>
                 {/* Title + subtitle (centered) */}
                 <div className="flex flex-col items-center text-center mb-[40px]">
-                  <h3 className="mt-1 text-[28px] md:text-[32px] font-semibold text-white/95 tracking-tight">
+                  <h3 className="mt-1 text-[30px] md:text-[34px] font-light text-white/80 md:text-white tracking-tight">
                     {t('ui_send_choose_recipient_title', 'Envoyer à un destinataire')}
                   </h3>
-                  <p className="mt-2 text-[13px] md:text-[15px] text-white/50 max-w-[56ch] leading-relaxed">
+                  <p className="mt-2 text-[19px] md:text-[20px] font-light text-white/50 max-w-[56ch] leading-tight">
                     <span className="block">
                       {t(
                         "ui_send_choose_recipient_hint_line_1",
@@ -1393,10 +1393,10 @@ export default function WalletDashboardSendChoiceModal({
 		                <div className="px-5 pt-[70px] md:pt-[90px] pb-5 flex flex-col flex-1 min-h-0 overflow-y-auto overscroll-contain">
 		                {/* Title + subtitle (centered) */}
 		                <div className="flex flex-col items-center text-center mb-[40px]">
-                  <h3 className="mt-1 text-[28px] md:text-[32px] font-semibold text-white/95 tracking-tight">
+                  <h3 className="mt-1 text-[30px] md:text-[34px] font-light text-white/80 md:text-white tracking-tight">
 		                    {t('ui_send_pay_request_title', 'Renseigner une demande ')}
                   </h3>
-                  <p className="mt-2 text-[13px] md:text-[15px] text-white/50 max-w-[34ch] leading-relaxed">
+                  <p className="mt-2 text-[19px] md:text-[20px] font-light text-white/50 max-w-[34ch] leading-tight">
                     {t('ui_send_pay_request_hint', 'Scannez, importez un QR code ou saisissez une demande de paiement.')}
                   </p>
                   {/* Wallet meta pill */}
