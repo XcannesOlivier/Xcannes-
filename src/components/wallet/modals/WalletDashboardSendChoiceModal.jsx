@@ -957,7 +957,7 @@ export default function WalletDashboardSendChoiceModal({
                     <span className="block w-36 h-1.5 rounded-full bg-white/80" />
                   </div>
                 ) : null}
-                <div className={`px-5 ${pendingDestination.address ? 'pt-[6px] md:pt-[34px]' : 'pt-[15px] md:pt-[60px]'} pb-5 flex flex-col flex-1 min-h-0 overflow-y-auto overscroll-contain`}>
+                <div className={`px-5 ${pendingDestination.address ? 'pt-[3px] md:pt-[34px]' : 'pt-[10px] md:pt-[60px]'} pb-5 flex flex-col flex-1 min-h-0 overflow-y-auto overscroll-contain`}>
                 {/* Title + subtitle */}
                 <div className="flex flex-col mb-[40px]">
                   <h3 className="mt-1 text-[30px] md:text-[34px] font-light text-white/80 md:text-white tracking-tight">
@@ -1274,19 +1274,19 @@ export default function WalletDashboardSendChoiceModal({
                     const addrShort = addr.length > 24 ? `${addr.slice(0, 12)}…${addr.slice(-8)}` : addr;
                     return (
                       <div className="mb-2 px-0 py-0 bg-transparent border-0 ring-0 flex items-center gap-2 min-w-0">
-                        <span className="flex-shrink-0 text-[11px] uppercase tracking-wide text-white/45">
+                        <span className="flex-shrink-0 text-[11px] tracking-wide text-white/45 font-light">
                           {t('ui_recipient_label', 'Destinataire')}
                         </span>
                         <span className="text-white/20">·</span>
                         <div className="min-w-0 flex-1 flex items-center gap-2 overflow-hidden">
                           {showLabel ? (
                             <>
-                              <span className="min-w-0 truncate text-[13px] text-white/90">{label}</span>
+                              <span className="min-w-0 truncate text-[13px] text-white/90 font-light">{label}</span>
                               <span className="flex-shrink-0 text-white/30">·</span>
-                              <span className="flex-shrink-0 font-mono text-[12px] text-white/70">{addrShort}</span>
+                              <span className="flex-shrink-0 font-mono text-[12px] text-white/70 font-light">{addrShort}</span>
                             </>
                           ) : (
-                            <span className="min-w-0 truncate font-mono text-[12px] text-white/80">{addrShort}</span>
+                            <span className="min-w-0 truncate font-mono text-[12px] text-white/80 font-light">{addrShort}</span>
                           )}
                         </div>
                       </div>
