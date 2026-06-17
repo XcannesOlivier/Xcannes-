@@ -739,9 +739,6 @@ export default function WalletDashboardSendChoiceModal({
                   <h3 className="mt-1 px-6 text-[30px] md:text-[34px] font-light text-white/80 md:text-white tracking-tight">
                     {t('ui_send_choice_subtitle', "Comment souhaitez-vous envoyer de l'argent ?")}
                   </h3>
-                  <p className="mt-2 text-[19px] md:text-[20px] font-light text-white/50 max-w-[34ch] leading-tight text-left md:text-center px-4 md:px-0">
-                    {t('ui_send_choice_hint', 'Choisissez le type d’envoi qui correspond à votre besoin.')}
-                  </p>
                   {/* Wallet meta pill */}
                   <div className="mt-[40px] flex justify-center px-4 w-full">
 	                    {renderWalletMeta?.({
@@ -964,7 +961,8 @@ export default function WalletDashboardSendChoiceModal({
                     {t('ui_send_choose_recipient_title', 'Envoyer à un destinataire')}
                   </h3>
                   <p className="mt-px md:mt-0 text-[19px] md:text-[20px] font-light text-white/50 max-w-[34ch] md:max-w-[68ch] leading-[22.5px] md:leading-[24px]">
-                    {t("ui_send_choose_recipient_hint_line_1", "Choisissez une adresse enregistrée,")}{" "}{t("ui_send_choose_recipient_hint_line_2", "scannez un QR code ou saisissez-la manuellement.")}
+                    <span className="md:hidden">{t("ui_send_choose_recipient_hint_mobile", "Choisissez une adresse enregistrée ou scannez un QR code.")}</span>
+                    <span className="hidden md:inline">{t("ui_send_choose_recipient_hint_line_1", "Choisissez une adresse enregistrée,")}{" "}{t("ui_send_choose_recipient_hint_line_2", "scannez un QR code ou saisissez-la manuellement.")}</span>
                   </p>
                   {/* Wallet meta pill */}
                   <div className="mt-6 flex justify-center px-4 w-full">
