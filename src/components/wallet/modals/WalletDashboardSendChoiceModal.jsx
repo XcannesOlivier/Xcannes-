@@ -803,17 +803,17 @@ export default function WalletDashboardSendChoiceModal({
                         <div className="self-stretch w-px opacity-90 bg-[linear-gradient(to_bottom,transparent_0%,rgba(0,255,150,0.22)_50%,transparent_100%)]" aria-hidden />
                         <div className="min-w-0">
                           <div className="flex items-start justify-between gap-2">
-                            <p className="text-[18px] md:text-[22px] text-white font-semibold tracking-tight truncate md:whitespace-normal md:break-words">
+                            <p className="text-[18px] md:text-[22px] text-white font-light tracking-tight truncate md:whitespace-normal md:break-words">
                               {t('ui_send_simple_title', 'Envoi simple')}
                             </p>
                           </div>
-                          <p className="mt-1 text-[12px] md:text-[15px] leading-snug text-white/50">
+                          <p className="mt-1 text-[14px] md:text-[17px] font-light leading-snug text-white/50">
                             {t('ui_send_simple_hint_long', 'Saisissez une adresse, choisissez la devise et indiquez le montant.')}
                           </p>
 	                          <div className="mt-3 flex flex-wrap items-center gap-2">
-	                            <Badge className="bg-transparent ring-[0.3px] ring-xcannes-green/70">{t('ui_send_choice_simple_badge_steps', '4 étapes')}</Badge>
+	                            <Badge className="bg-transparent ring-[0.3px] ring-xcannes-green/70 font-light">{t('ui_send_choice_simple_badge_steps', '4 étapes')}</Badge>
 	                            <span className="w-1 h-1 rounded-full bg-xcannes-green/80" aria-hidden />
-	                            <span className="inline-flex items-center text-[10px] md:text-[11px] text-white/65">
+	                            <span className="inline-flex items-center text-[10px] md:text-[11px] text-white/65 font-light">
 	                              {t('ui_send_choice_simple_badge_secure', 'Rapide & sécurisé')}
 	                            </span>
 	                          </div>
@@ -840,7 +840,7 @@ export default function WalletDashboardSendChoiceModal({
                       <div className="absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-xcannes-green/45 to-transparent" aria-hidden />
                       <span className="inline-flex items-center gap-2">
                         <OpenFlowIcon className="w-[38px] h-[28px] text-xcannes-green/85" />
-                        <span className="text-white">{t('ui_open_flow', 'Voir les étapes')}</span>
+                        <span className="text-[14px] font-light text-white">{t('ui_open_flow', 'Voir les étapes')}</span>
                       </span>
 	                    </button>
 	                  </div>
@@ -866,17 +866,17 @@ export default function WalletDashboardSendChoiceModal({
                         <div className="self-stretch w-px opacity-90 bg-[linear-gradient(to_bottom,transparent_0%,rgba(245,166,35,0.22)_50%,transparent_100%)]" aria-hidden />
                         <div className="min-w-0">
                           <div className="flex items-start justify-between gap-2">
-                            <p className="text-[18px] md:text-[22px] text-white font-semibold tracking-tight truncate md:whitespace-normal md:break-words">
+                            <p className="text-[18px] md:text-[22px] text-white font-light tracking-tight truncate md:whitespace-normal md:break-words">
                               {t('ui_send_choice_pay_request_title', 'Payer une demande')}
                             </p>
                           </div>
-                          <p className="mt-1 text-[12px] md:text-[15px] leading-snug text-white/50">
+                          <p className="mt-1 text-[14px] md:text-[17px] font-light leading-snug text-white/50">
                             {t('ui_send_pay_request_hint', 'Scannez, importez un QR code ou saisissez une demande de paiement.')}
                           </p>
 	                          <div className="mt-3 flex flex-wrap items-center gap-2">
-	                            <Badge className="bg-transparent ring-[0.3px] ring-[#f5a623]/60">{t('ui_send_choice_payreq_badge_modes', 'QR, import, saisie')}</Badge>
+	                            <Badge className="bg-transparent ring-[0.3px] ring-[#f5a623]/60 font-light">{t('ui_send_choice_payreq_badge_modes', 'QR, import, saisie')}</Badge>
 	                            <span className="w-1 h-1 rounded-full bg-[#f5a623]/80" aria-hidden />
-	                            <span className="inline-flex items-center text-[10px] md:text-[11px] text-white/65">
+	                            <span className="inline-flex items-center text-[10px] md:text-[11px] text-white/65 font-light">
 	                              {t('ui_send_choice_payreq_badge_flexible', 'Flexible & pratique')}
 	                            </span>
 	                          </div>
@@ -903,7 +903,7 @@ export default function WalletDashboardSendChoiceModal({
                       <div className="absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-[#f5a623]/40 to-transparent" aria-hidden />
                       <span className="inline-flex items-center gap-2">
                         <OpenFlowIcon className="w-[38px] h-[28px] text-[#f5a623]/85" />
-                        <span className="text-white">{t('ui_open_flow', 'Voir les étapes')}</span>
+                        <span className="text-[14px] font-light text-white">{t('ui_open_flow', 'Voir les étapes')}</span>
                       </span>
 	                    </button>
 	                  </div>
@@ -1000,7 +1000,7 @@ export default function WalletDashboardSendChoiceModal({
                         </div>
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="text-[15px] font-light text-white/95 whitespace-nowrap overflow-hidden text-ellipsis">
+                        <p className="text-[15px] font-light text-white whitespace-nowrap overflow-hidden text-ellipsis">
                           {t('ui_saved_recipient_title', 'Destinataire enregistré')}
                         </p>
                         <div className="relative xcannes-irregular-green-border mt-2 flex items-center justify-between rounded-xl pl-3 pr-2.5 py-2 bg-black/60 shadow-[inset_0_-30px_30px_-20px_rgba(0,0,0,0.92)]">
@@ -1134,7 +1134,7 @@ export default function WalletDashboardSendChoiceModal({
                       </div>
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="text-[15px] font-light text-white/95 whitespace-nowrap overflow-hidden text-ellipsis">{t('ui_scan_card_title', 'Scanner un QR code')}</p>
+                      <p className="text-[15px] font-light text-white whitespace-nowrap overflow-hidden text-ellipsis">{t('ui_scan_card_title', 'Scanner un QR code')}</p>
                       {scannedDisplay ? (
                         <div className="flex items-center mt-1.5 bg-black/80 ring-1 ring-white/10 ring-inset rounded-xl pl-3 pr-3 py-2">
                           <span className="text-[13px] truncate text-white/85">{scannedDisplay}</span>
@@ -1168,7 +1168,7 @@ export default function WalletDashboardSendChoiceModal({
                         </div>
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="text-[15px] font-light text-white/95 whitespace-nowrap overflow-hidden text-ellipsis">
+                        <p className="text-[15px] font-light text-white whitespace-nowrap overflow-hidden text-ellipsis">
                           {t('ui_manual_entry_title', 'Entrer une adresse manuellement')}
                         </p>
                         <p className="text-[12px] md:text-[14px] font-light text-white/50 mt-0.5">
@@ -1244,7 +1244,7 @@ export default function WalletDashboardSendChoiceModal({
                       </div>
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="text-[15px] font-light text-white/95 whitespace-nowrap overflow-hidden text-ellipsis">{t('ui_import_card_title', 'Importer un QR code')}</p>
+                      <p className="text-[15px] font-light text-white whitespace-nowrap overflow-hidden text-ellipsis">{t('ui_import_card_title', 'Importer un QR code')}</p>
                       {importedDisplay ? (
                         <div className="flex items-center mt-1.5 bg-black/80 ring-1 ring-white/10 ring-inset rounded-xl pl-3 pr-3 py-2">
                           <span className="text-[13px] truncate text-white/85">{importedDisplay}</span>
@@ -1413,7 +1413,7 @@ export default function WalletDashboardSendChoiceModal({
                       </div>
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="text-[15px] font-light text-white/95 whitespace-nowrap overflow-hidden text-ellipsis">{t('ui_scan_card_title', 'Scanner un QR code')}</p>
+                      <p className="text-[15px] font-light text-white whitespace-nowrap overflow-hidden text-ellipsis">{t('ui_scan_card_title', 'Scanner un QR code')}</p>
                       {payreqScannedDisplay ? (
                         <div className="flex items-center mt-1.5 bg-black/80 ring-1 ring-white/10 ring-inset rounded-xl pl-3 pr-3 py-2">
                           <span className="text-[13px] truncate text-white/85">{payreqScannedDisplay}</span>
@@ -1447,7 +1447,7 @@ export default function WalletDashboardSendChoiceModal({
                         </div>
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="text-[15px] font-light text-white/95 whitespace-nowrap overflow-hidden text-ellipsis">
+                        <p className="text-[15px] font-light text-white whitespace-nowrap overflow-hidden text-ellipsis">
                           {t('ui_paste_payreq_title', 'Saisir une demande de paiement')}
                         </p>
                         <p className="text-[12px] md:text-[14px] font-light text-white/50 mt-0.5">
@@ -1519,7 +1519,7 @@ export default function WalletDashboardSendChoiceModal({
                       </div>
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="text-[15px] font-light text-white/95 whitespace-nowrap overflow-hidden text-ellipsis">{t('ui_import_card_title', 'Importer un QR code')}</p>
+                      <p className="text-[15px] font-light text-white whitespace-nowrap overflow-hidden text-ellipsis">{t('ui_import_card_title', 'Importer un QR code')}</p>
                       {payreqImportedDisplay ? (
                         <div className="flex items-center mt-1.5 bg-black/80 ring-1 ring-white/10 ring-inset rounded-xl pl-3 pr-3 py-2">
                           <span className="text-[13px] truncate text-white/85">{payreqImportedDisplay}</span>
@@ -1645,7 +1645,7 @@ export default function WalletDashboardSendChoiceModal({
 	                    <div className="md:hidden flex justify-center" aria-hidden>
 	                      <span className="block w-12 h-1.5 rounded-full bg-white/15" />
 	                    </div>
-	                    <div className="mt-3 text-[19px] md:text-[21px] leading-tight text-white/95 font-bold text-center tracking-tight">
+	                    <div className="mt-3 text-[19px] md:text-[21px] leading-tight text-white/95 font-light text-center tracking-tight">
 	                      {flowSheet === 'simple'
 	                        ? t('ui_send_simple_title', 'Envoi simple')
 	                        : t('ui_send_choice_pay_request_title', 'Payer une demande')}
@@ -1727,25 +1727,25 @@ export default function WalletDashboardSendChoiceModal({
 	                return (
 	                  <div key={idx} className="rounded-[14px] bg-white/[0.05] px-4 py-4">
 	                    <div className="flex items-start gap-3.5">
-	                      <div className={`mt-[1px] w-9 h-9 flex-none shrink-0 rounded-full ring-inset flex items-center justify-center text-[14px] font-bold leading-none ${numberClass}`}>
+	                      <div className={`mt-[1px] w-9 h-9 flex-none shrink-0 rounded-full ring-inset flex items-center justify-center text-[14px] font-light leading-none ${numberClass}`}>
 	                        {idx + 1}
 	                      </div>
 	                      <div className="min-w-0">
-	                        <div className="text-[13px] md:text-[14px] leading-snug text-white/90 font-semibold">
+	                        <div className="text-[13px] md:text-[14px] leading-snug text-white/90 font-light">
 	                          {step.title}
 	                        </div>
-	                        <div className="mt-1 text-[12px] md:text-[13px] leading-relaxed text-white/60">
+	                        <div className="mt-1 text-[12px] md:text-[13px] leading-relaxed text-white/60 font-light">
 	                          {step.desc}
 	                        </div>
 	                        {step.details?.length ? (
-	                          <ul className="mt-2.5 space-y-1.5 list-disc pl-4 text-[12px] md:text-[13px] text-white/50">
+	                          <ul className="mt-2.5 space-y-1.5 list-disc pl-4 text-[12px] md:text-[13px] text-white/50 font-light">
 	                            {step.details.map((d, j) => (
 	                              <li key={j}>{d}</li>
 	                            ))}
 	                          </ul>
 	                        ) : null}
 	                        {step.note ? (
-	                          <div className="mt-2.5 text-[12px] md:text-[13px] leading-relaxed text-white/45">
+	                          <div className="mt-2.5 text-[12px] md:text-[13px] leading-relaxed text-white/45 font-light">
 	                            {step.note}
 	                          </div>
 	                        ) : null}
