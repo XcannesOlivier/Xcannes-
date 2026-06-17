@@ -957,7 +957,7 @@ export default function WalletDashboardSendChoiceModal({
                     <span className="block w-36 h-1.5 rounded-full bg-white/80" />
                   </div>
                 ) : null}
-                <div className={`px-5 ${pendingDestination.address ? 'pt-[12px] md:pt-[24px]' : 'pt-[30px] md:pt-[60px]'} pb-5 flex flex-col flex-1 min-h-0 overflow-y-auto overscroll-contain`}>
+                <div className={`px-5 ${pendingDestination.address ? 'pt-[6px] md:pt-[34px]' : 'pt-[15px] md:pt-[60px]'} pb-5 flex flex-col flex-1 min-h-0 overflow-y-auto overscroll-contain`}>
                 {/* Title + subtitle */}
                 <div className="flex flex-col mb-[40px]">
                   <h3 className="mt-1 text-[30px] md:text-[34px] font-light text-white/80 md:text-white tracking-tight">
@@ -1296,7 +1296,7 @@ export default function WalletDashboardSendChoiceModal({
                     type="button"
                     disabled={!pendingDestination.address}
                     onClick={() => { if (pendingDestination.address) { setSendDestination?.(pendingDestination.address); setSendDestinationLabel?.(pendingDestination.label); onChooseSimpleSend?.(); } }}
-                    className={`w-full h-[52px] md:h-[56px] flex items-center justify-center rounded-[14px] text-[22px] md:text-[24px] font-semibold transition-all duration-200 ${
+                    className={`w-full h-[52px] md:h-[56px] flex items-center justify-center rounded-[14px] text-[22px] md:text-[24px] font-light transition-all duration-200 ${
                       pendingDestination.address
                         ? 'text-white hover:scale-[1.01] active:scale-[0.98]'
                         : 'text-white/90 cursor-not-allowed ring-[0.5px] ring-xcannes-green/30 ring-inset'
@@ -1554,7 +1554,7 @@ export default function WalletDashboardSendChoiceModal({
 	                        onChoosePayRequest?.();
 	                      }
 	                    }}
-	                    className={`w-full h-[52px] md:h-[56px] flex items-center justify-center rounded-[14px] text-[17px] md:text-[16px] font-semibold transition-all duration-200 ${
+	                    className={`w-full h-[52px] md:h-[56px] flex items-center justify-center rounded-[14px] text-[17px] md:text-[16px] font-light transition-all duration-200 ${
 	                      pendingPayreq
 	                        ? 'text-white hover:scale-[1.01] active:scale-[0.98]'
 	                        : 'text-white/90 cursor-not-allowed ring-[0.5px] ring-[#f5a623]/30 ring-inset'
