@@ -776,11 +776,6 @@ export default function WalletDashboard({
             allowedCurrencyCodes={activeFiatCurrencyCodes}
           />
 
-          {/* Action row: Send / Receive / Exchange / Buy — mobile only */}
-          <div className="lg:hidden">
-            <WalletDashboardActionRow onAction={handleAction} />
-          </div>
-
           {/* Reconciliation banner (external RLUSD spend detected) */}
           <ReconciliationBanner
             visible={reconciliation.visible}
@@ -806,12 +801,21 @@ export default function WalletDashboard({
 
           {/* Token list */}
           <div className="relative flex-1 flex flex-col lg:flex-row min-h-0">
+            {/* Action row: absolute overlay on mobile only — tokens scroll behind */}
+            <div className="lg:hidden absolute top-0 left-0 right-0 z-20 pointer-events-none">
+              <div className="pointer-events-auto">
+                <WalletDashboardActionRow onAction={handleAction} />
+              </div>
+            </div>
             <div className="flex-1 min-w-0 flex flex-col min-h-0 pb-[20px] md:pb-0">
             <WalletDashboardTokenList
               tokens={tokenListTokens}
               renderTokenRow={renderTokenRow}
               headerTitle={
-                <div className="w-full flex flex-col gap-y-0">
+                <>
+                  {/* Spacer mobile : pousse la carte sous l'ActionRow flottant (≈88px) */}
+                  <div className="md:hidden h-[92px] shrink-0" aria-hidden />
+                  <div className="w-full flex flex-col gap-y-0 sticky top-[92px] md:top-0 z-[10] bg-transparent">
                   <div
                     className="w-full min-w-0 overflow-visible relative"
                     aria-live="polite"
@@ -1102,6 +1106,7 @@ export default function WalletDashboard({
                     <span className="text-[12px] text-white/25 tracking-wide">Solde par devise</span>
                   </div>
                 </div>
+              </>
               }
               className="relative z-[1] touch-pan-y"
               style={{ WebkitOverflowScrolling: 'touch' }}
