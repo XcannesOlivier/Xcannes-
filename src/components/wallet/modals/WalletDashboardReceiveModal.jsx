@@ -1341,7 +1341,7 @@ export default function WalletDashboardReceiveModal({
                   if (!disableSwipeToClose) maybeStartOverlayDrag(event, 'fixed');
                 }}
               >
-                <h2 className={`${receiveView === 'request' ? 'mt-[23px] md:mt-[70px]' : receiveView === 'request_qr' ? 'mt-4 md:mt-[25px]' : receiveView === 'share' ? 'mt-[10px] md:mt-[36px]' : 'mt-[19px] md:mt-[70px]'} text-[30px] md:text-[34px] font-light text-white/80 md:text-white tracking-tight`}>
+                <h2 className={`${receiveView === 'request' ? 'mt-[23px] md:mt-[70px]' : receiveView === 'request_qr' ? 'mt-4 md:mt-[25px]' : receiveView === 'share' ? 'mt-[10px] md:mt-[36px]' : 'mt-[19px] md:mt-[70px]'} text-[30px] md:text-[34px] font-light text-white tracking-tight`}>
                   {headerTitle}
                 </h2>
 
@@ -1365,7 +1365,7 @@ export default function WalletDashboardReceiveModal({
                       maybeStartOverlayDrag(event, 'fixed');
                     }}
                   >
-                    <h3 className="receive-choice-title-in mt-1 text-[30px] md:text-[34px] font-light text-white/80 md:text-white tracking-tight">
+                    <h3 className="receive-choice-title-in mt-1 text-[30px] md:text-[34px] font-light text-white tracking-tight">
                       {t('ui_receive_choice_decision_title', 'Comment souhaitez-vous recevoir ?')}
                     </h3>
                     <p className="receive-choice-subtitle-in mt-1 md:mt-2 leading-snug md:leading-relaxed text-[19px] md:text-[20px] font-light text-white/50 max-w-[34ch]">
@@ -1476,7 +1476,7 @@ export default function WalletDashboardReceiveModal({
 	                          </span>
 	                          <div className="flex items-center gap-2">
 	                            <span className="h-2.5 w-2.5 rounded-full bg-xcannes-green ring-4 ring-xcannes-green/20 shrink-0" style={{animation:'wallet-dot-pulse 3.5s ease-in-out infinite'}} aria-hidden />
-	                            <span className="text-white/95 text-[14px] md:text-[15px] font-semibold">
+	                            <span className="text-white text-[14px] md:text-[15px] font-semibold">
 	                              {activeWalletLabel || t('nav_wallet', 'Wallet')}
 	                            </span>
 	                            {hasMultipleWallets && (
@@ -1755,7 +1755,7 @@ export default function WalletDashboardReceiveModal({
 	                          e.stopPropagation();
 	                          await handleShareQr(false);
 	                        }}
-                          className="shimmer-seq shimmer-seq-1 w-full h-11 rounded-[20px] bg-[#232829] text-white text-[17px] font-bold tracking-wide py-2 px-3 transition-all duration-[140ms] inline-flex items-center justify-center gap-1.5 hover:bg-white/[0.04] scale-[1.04] active:scale-[0.98] mt-6 md:mt-[50px]"
+                          className="shimmer-seq shimmer-seq-1 w-full h-11 rounded-[20px] bg-[#232829] text-white text-[17px] font-light tracking-wide py-2 px-3 transition-all duration-[140ms] inline-flex items-center justify-center gap-1.5 hover:bg-white/[0.04] scale-[1.04] active:scale-[0.98] mt-6 md:mt-[50px]"
                           style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(255,255,255,0.10), inset 0 1px 0 rgba(255,255,255,0.06), inset 0 -8px 16px rgba(0,0,0,0.25)' }}
 	                      >
 	                        <ShareIcon className="w-5 h-5" />
@@ -1786,7 +1786,7 @@ export default function WalletDashboardReceiveModal({
 	                          </span>
 	                          <div className="flex items-center gap-2">
 	                            <span className="h-2.5 w-2.5 rounded-full bg-[#f5a623] ring-4 ring-[#f5a623]/20 shrink-0" style={{animation:'wallet-dot-pulse 3.5s ease-in-out infinite'}} aria-hidden />
-	                            <span className="text-white/80 md:text-white/95 text-[14px] md:text-[15px] font-medium">
+	                            <span className="text-white text-[14px] md:text-[15px] font-medium">
 	                              {activeWalletLabel || t('nav_wallet', 'Wallet')}
 	                            </span>
 	                            {hasMultipleWallets && (
@@ -2076,7 +2076,7 @@ export default function WalletDashboardReceiveModal({
                                   : 'bg-[#101415] max-h-[420px] overflow-y-auto overscroll-contain touch-pan-y !border-white/10 !ring-1 !ring-white/10 ring-inset rounded-b-[14px]'
 		                          }
                               openButtonClassName="!bg-white/10 !border !border-white/10 !border-b-0 !rounded-b-none !ring-1 !ring-white/10 !shadow-[0_8px_18px_rgba(0,0,0,0.45)]"
-                              buttonClassName={`wallet-request-currency-reveal [&_path]:[stroke-width:1.2] bg-gradient-to-b from-[#101415] to-[#0d1214] ring-1 ring-white/[0.07] ring-inset rounded-[14px] px-3.5 py-1.5 md:py-2 text-xl md:text-2xl text-white/80 md:text-white outline-none focus:outline-none cursor-pointer transition-all duration-150 shadow-[0_2px_8px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.06)]`}
+                              buttonClassName={`wallet-request-currency-reveal [&_path]:[stroke-width:1.2] bg-gradient-to-b from-[#101415] to-[#0d1214] ring-1 ring-white/[0.07] ring-inset rounded-[14px] px-3.5 py-1.5 md:py-2 text-xl md:text-2xl text-white outline-none focus:outline-none cursor-pointer transition-all duration-150 shadow-[0_2px_8px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.06)]`}
                               selectClassName={`xcannes-select w-full ring-1 ring-white/10 ring-inset rounded-[14px] px-3.5 py-1.5 md:py-2 text-xl md:text-2xl text-white focus:outline-none transition-colors duration-150 ${
 			                            noticeVariant === 'demo' ? 'bg-xcannes-surface-demo' : 'bg-white/[0.02]'
 			                          }`}
@@ -2195,7 +2195,7 @@ export default function WalletDashboardReceiveModal({
 	                        </span>
 	                        <div className="flex items-center gap-2">
 	                          <span className="h-2.5 w-2.5 rounded-full bg-[#f5a623] ring-4 ring-[#f5a623]/20 shrink-0" style={{animation:'wallet-dot-pulse 3.5s ease-in-out infinite'}} aria-hidden />
-	                          <span className="text-white/80 md:text-white/95 text-[14px] md:text-[15px] font-medium">
+	                          <span className="text-white text-[14px] md:text-[15px] font-medium">
 	                            {activeWalletLabel || t('nav_wallet', 'Wallet')}
 	                          </span>
 	                        </div>
@@ -2237,7 +2237,7 @@ export default function WalletDashboardReceiveModal({
 
 					                        {/* ── Amount (standalone, centered) ── */}
 					                        <div className="relative z-10 text-center !mt-2 md:!mt-5">
-					                          <div className="request-qr-amount-breathe wallet-request-amount-shimmer text-[40px] md:text-[48px] font-bold tracking-tight leading-none">
+					                          <div className="request-qr-amount-breathe wallet-request-amount-shimmer text-[40px] md:text-[48px] font-light tracking-tight leading-none text-white">
 					                            {requestDisplayAmountLabel}
 					                          </div>
 					                        </div>
@@ -2284,7 +2284,7 @@ export default function WalletDashboardReceiveModal({
 	                              e.stopPropagation();
 	                              await handleShareQr(true);
 	                            }}
-                              className="shimmer-seq shimmer-seq-2 w-full h-11 rounded-[20px] bg-[#232829] text-white text-[17px] font-bold tracking-wide py-2 px-6 transition-all duration-[140ms] inline-flex items-center justify-center gap-2.5 hover:bg-white/[0.04] scale-[1.04] active:scale-[0.98]"
+                              className="shimmer-seq shimmer-seq-2 w-full h-11 rounded-[20px] bg-[#232829] text-white text-[17px] font-light tracking-wide py-2 px-6 transition-all duration-[140ms] inline-flex items-center justify-center gap-2.5 hover:bg-white/[0.04] scale-[1.04] active:scale-[0.98]"
                               style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(255,255,255,0.10), inset 0 1px 0 rgba(255,255,255,0.06), inset 0 -8px 16px rgba(0,0,0,0.25)' }}
 	                          >
 	                            <ShareIcon className="w-5 h-5" />
