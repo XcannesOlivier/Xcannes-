@@ -1514,7 +1514,7 @@ export default function GlobalStatement({
                   <line x1="8" y1="9" x2="10" y2="9" />
                   <line x1="8" y1="17" x2="11" y2="17" />
                 </svg>
-                <h2 className="text-[28px] md:text-[32px] font-semibold text-white/95 tracking-tight text-left">
+                <h2 className="text-[30px] md:text-[34px] font-light text-white/80 md:text-white tracking-tight text-left">
                   {globalTitle}
                 </h2>
                 {noticeVariant === "demo" ? (
@@ -1523,7 +1523,7 @@ export default function GlobalStatement({
                   </span>
                 ) : null}
               </div>
-              <p className="mt-2 text-[13px] md:text-[15px] text-white/50 max-w-[46ch] md:max-w-[60ch] leading-relaxed">
+              <p className="mt-2 text-[19px] md:text-[20px] font-light text-white/50 max-w-[46ch] md:max-w-[60ch] leading-relaxed">
                 {t(
                   "ui_global_statement_subtitle_recent_20",
                   "Consultez vos transactions récentes et ouvrez-en une pour voir les détails.",

@@ -528,7 +528,7 @@ export default function WalletCurrencySelector({
             onClick={(e) => e.stopPropagation()}
             onFocus={(e) => e.stopPropagation()}
             placeholder={t("ui_search_currency_045b7c357f", "Rechercher une devise…")}
-            className="w-full rounded-lg bg-white/5 ring-1 ring-white/10 ring-inset px-2.5 py-2 text-[15px] text-white/85 placeholder:text-white/35 outline-none focus:ring-1 focus:ring-white/20" />
+            className="w-full rounded-lg bg-white/5 ring-1 ring-white/10 ring-inset px-2.5 py-2 text-[15px] font-light text-white/85 placeholder:text-white/35 outline-none focus:ring-1 focus:ring-white/20" />
 
           </div>
           <div className="flex-1 min-h-0 overflow-y-auto">
@@ -623,11 +623,11 @@ export default function WalletCurrencySelector({
                           <line x1="12" y1="8" x2="12" y2="16" />
                           <line x1="8" y1="12" x2="16" y2="12" />
                         </svg>
-                        <div className="text-white/95 font-semibold text-[28px] md:text-[32px] tracking-tight">
+                        <div className="text-white/80 md:text-white font-light text-[30px] md:text-[34px] tracking-tight">
                           {t("ui_select_currency_title", "Ajouter une devise")}
                         </div>
                       </div>
-                      <div className="mt-2 text-[13px] md:text-[15px] text-white/50 leading-relaxed max-w-[46ch] md:max-w-[60ch]">
+                      <div className="mt-2 text-[19px] md:text-[20px] font-light text-white/50 leading-relaxed max-w-[46ch] md:max-w-[60ch]">
                         {t(
                           "ui_select_currency_subtitle_add_currency",
                           "Une transaction validera l’ajout, aucun montant minimum requis.",
@@ -666,7 +666,7 @@ export default function WalletCurrencySelector({
                         onClick={(e) => e.stopPropagation()}
                         onFocus={(e) => e.stopPropagation()}
                         placeholder={t("ui_search_currency_045b7c357f", "Rechercher une devise…")}
-                        className="w-full pl-11 pr-4 py-3 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-1 focus:ring-white/25 transition-all duration-150"
+                        className="w-full pl-11 pr-4 py-3 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white font-light focus:outline-none focus:ring-1 focus:ring-white/25 transition-all duration-150"
                       />
                     </div>
                   </div>
@@ -708,7 +708,7 @@ export default function WalletCurrencySelector({
                         >
                           <span className="text-lg">{getFlag(c.code)}</span>
                           <div className="min-w-0 flex-1 flex items-center gap-2">
-                            <span className="text-sm font-semibold font-mono whitespace-nowrap">
+                            <span className="text-sm font-light font-mono whitespace-nowrap">
                               {c.code}
                             </span>
                             <span className="text-sm text-white/55 truncate">
@@ -716,7 +716,7 @@ export default function WalletCurrencySelector({
                             </span>
                           </div>
                           {active ? (
-                            <span className="text-xcannes-green font-semibold text-xs">✓</span>
+                            <span className="text-xcannes-green font-light text-xs">✓</span>
                           ) : null}
                         </button>
                       );
@@ -731,7 +731,7 @@ export default function WalletCurrencySelector({
 	                        {t("ui_current_account", "Compte actuel")}
 	                      </span>
 	                      <span className="h-2.5 w-2.5 rounded-full bg-xcannes-green shrink-0 animate-pulse" aria-hidden />
-	                      <span className="text-white/90 font-semibold">{walletLabel}</span>
+	                      <span className="text-white/90 font-light">{walletLabel}</span>
 	                    </span>
 	                  ) : (
 	                    <span className="text-[15px] font-light text-white/55">{t("ui_search_results", "Sélectionnez une devise.")}</span>
