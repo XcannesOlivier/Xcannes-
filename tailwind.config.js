@@ -40,7 +40,7 @@ module.exports = {
         "xcannes-pink-weight": "#be185d",
         "xcannes-btn-green": "#15803d",
         "xcannes-btn-green-hover": "#166534",
-        "xcannes-surface-demo": "#0b0f10",
+        "xcannes-surface-demo": "#111518",
         "xcannes-accent-green": "#22C55E",
       },
       animation: {

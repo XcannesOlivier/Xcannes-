@@ -12,53 +12,7 @@
  * 5. Better accessibility (focus-visible, keyboard support)
  */
 
-/* ── Header live background: glow radial lié à la position du scroll ── */
-.panel-header::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(
-    ellipse 55% 120% at var(--scroll-glow-x, 50%) var(--scroll-glow-y, -10%),
-    rgba(255, 255, 255, 0.028) 0%,
-    rgba(255, 255, 255, 0.008) 40%,
-    transparent 70%
-  );
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 250ms ease, background 80ms linear;
-  z-index: 0;
-}
 
-.panel-header[data-scrolled="true"]::before {
-  opacity: 1;
-}
-
-/* Gradients d'arête — apparaissent au scroll */
-.header-edge-grad {
-  opacity: 0;
-  transition: opacity 350ms ease;
-}
-
-.panel-header[data-scrolled="true"] .header-edge-grad {
-  opacity: 1;
-}
-
-/* ── Header bottom border on scroll \u2014 mobile only ── */
-@media (max-width: 767px) {
-  .panel-header::after {
-    content: '';
-    position: absolute;
-    inset-x: 0;
-    bottom: 0;
-    height: 1px;
-    background: rgba(255, 255, 255, 0);
-    transition: background 350ms ease;
-  }
-
-  .panel-header[data-scrolled="true"]::after {
-    background: rgba(255, 255, 255, 0.09);
-  }
-}
 
 /* Base button style - compact, tool-like, responsive */
 .wallet-action-btn {

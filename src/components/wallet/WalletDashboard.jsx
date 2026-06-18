@@ -800,14 +800,6 @@ export default function WalletDashboard({
             scrollTop={tokenListScrollTop}
           />
 
-          {/* Gradient fondu sous le header — mobile only, disparaît au scroll */}
-          <div
-            className={`md:hidden pointer-events-none h-0 relative z-[15] overflow-visible`}
-            aria-hidden
-          >
-            <div className={`absolute inset-x-0 top-0 h-[90px] bg-gradient-to-b from-[#111518]/85 via-[#111518]/25 to-transparent transition-opacity duration-300 ${tokenListScrolled ? 'opacity-0' : 'opacity-100'}`} />
-          </div>
-
           {/* Reconciliation banner (external RLUSD spend detected) */}
           <ReconciliationBanner
             visible={reconciliation.visible}

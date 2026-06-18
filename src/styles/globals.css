@@ -264,12 +264,12 @@ body.wallet-page .header-nav-link.header-nav-link-compact.is-animating {
   color: #ffffff;
 }
 
-/* Wallet page: align surfaces with home (#0b0f10) */
+/* Wallet page: align surfaces with header (#111518) */
 body.wallet-page {
-  background-color: #0b0f10 !important;
-  --bg-base: #0b0f10;
-  --bg-elevated: #0b0f10;
-  --bg-subtle: #0e1314;
+  background-color: #111518 !important;
+  --bg-base: #111518;
+  --bg-elevated: #111518;
+  --bg-subtle: #141a1d;
 }
 
 @media (max-width: 767px) {

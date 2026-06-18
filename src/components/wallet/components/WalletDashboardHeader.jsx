@@ -321,12 +321,8 @@ export default function WalletDashboardHeader({
       className="panel-header relative flex flex-col shrink-0 bg-[#111518] shadow-[inset_0_16px_28px_rgba(255,255,255,0.03),inset_0_-46px_70px_rgba(0,0,0,0.55)] px-3 pt-3 pb-2 md:px-5 md:pt-2 md:pb-2"
       data-scrolling={isScrolling}
       data-scrolled={isScrolled}
-      style={{ '--scroll-glow-x': `${Math.min(80, Math.max(20, 50 + (scrollTop % 320 - 160) * 0.19))}%`, '--scroll-glow-y': `${Math.min(60, Math.max(-20, -10 + (scrollTop % 200) * 0.18))}%` }}
+      style={undefined}
     >
-      {/* Gradients d'arête — apparaissent au scroll */}
-      <div className="header-edge-grad pointer-events-none absolute inset-y-0 left-0 w-12 bg-gradient-to-r from-white/[0.03] to-transparent z-[1]" aria-hidden />
-      <div className="header-edge-grad pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-white/[0.03] to-transparent z-[1]" aria-hidden />
-      <div className="header-edge-grad pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-white/[0.03] to-transparent z-[1]" aria-hidden />
       {/* Titres discrets en haut */}
       <div className="flex items-center justify-between mb-0 md:mb-1">
         <div className="flex items-center gap-3 min-w-0">
