@@ -19,8 +19,8 @@
   inset: 0;
   background: radial-gradient(
     ellipse 55% 120% at var(--scroll-glow-x, 50%) var(--scroll-glow-y, -10%),
-    rgba(255, 255, 255, 0.055) 0%,
-    rgba(255, 255, 255, 0.018) 40%,
+    rgba(255, 255, 255, 0.028) 0%,
+    rgba(255, 255, 255, 0.008) 40%,
     transparent 70%
   );
   opacity: 0;
@@ -30,6 +30,16 @@
 }
 
 .panel-header[data-scrolled="true"]::before {
+  opacity: 1;
+}
+
+/* Gradients d'arête — apparaissent au scroll */
+.header-edge-grad {
+  opacity: 0;
+  transition: opacity 350ms ease;
+}
+
+.panel-header[data-scrolled="true"] .header-edge-grad {
   opacity: 1;
 }
 
