@@ -736,7 +736,7 @@ export default function WalletDashboardSendChoiceModal({
                   className="pt-[40px] md:pt-[66px] pb-3 flex flex-col items-center text-center"
                   onPointerDown={event => { maybeStartOverlayDrag(event, 'fixed'); }}
                 >
-                  <h3 className="mt-1 px-6 text-[30px] md:text-[34px] font-light text-white/80 md:text-white tracking-tight">
+                  <h3 className="mt-1 px-6 text-[30px] md:text-[34px] font-light text-white tracking-tight">
                     {t('ui_send_choice_subtitle', "Comment souhaitez-vous envoyer de l'argent ?")}
                   </h3>
                   {/* Wallet meta pill */}
@@ -747,6 +747,7 @@ export default function WalletDashboardSendChoiceModal({
 	                      prefix: t("moonpay_from_account", "Compte source"),
 	                      pillClassName:
 	                        "bg-elevated-40 xcannes-fade-border-y shadow-none rounded-[20px]",
+	                      labelClassName: "!text-white",
 	                    })}
 	                  </div>
                 </div>
