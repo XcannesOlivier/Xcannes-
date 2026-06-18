@@ -3,11 +3,14 @@
  * Design Philosophy: Clarity, trust, precision, responsiveness
  * Inspired by: Binance, Kraken, TradingView
  * No gradients, no emojis, no marketing patterns
- * 
+ *
  * Improvements:
  * 1. Increased clickable area with pseudo-element (better mobile UX)
  * 2. Buy/Sell as primary action (stronger visual weight)
  * 3. Enhanced hover/active states (fast, discreet feedback)
+ * 4. Improved color semantics (low saturation, professional)
+ * 5. Better accessibility (focus-visible, keyboard support)
+ */
 
 /* ── Header scroll spinner ── */
 @keyframes wallet-header-spin {
@@ -33,9 +36,6 @@
   animation-play-state: running;
   opacity: 1;
 }
- * 4. Improved color semantics (low saturation, professional)
- * 5. Better accessibility (focus-visible, keyboard support)
- */
 
 /* Base button style - compact, tool-like, responsive */
 .wallet-action-btn {
