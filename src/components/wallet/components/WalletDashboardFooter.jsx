@@ -43,18 +43,15 @@ export default function WalletDashboardFooter({ onScan, addCurrencySlot, onHisto
 
   return (
     <div className="mt-0 shrink-0 z-20 bg-transparent md:bg-elevated md:[--bg-elevated:#090c0d] border-t-0 md:mt-auto md:border-t md:border-white/10 lg:border-t lg:border-white/[0.04] lg:border-r lg:border-r-white/5">
-      {/* Mobile footer — barre flat 3 boutons */}
+      {/* Mobile footer — boutons flottants */}
       <div
-        className="relative md:hidden shrink-0"
+        className="md:hidden fixed bottom-0 left-0 right-0 z-30 pointer-events-none"
         style={{
-          paddingBottom: "max(6px, env(safe-area-inset-bottom))",
+          paddingBottom: "max(10px, env(safe-area-inset-bottom))",
         }}
       >
-        {/* Gradient au-dessus du footer — sépare du contenu */}
-        <div className="pointer-events-none absolute inset-x-0 bottom-full h-[64px] bg-gradient-to-t from-transparent to-transparent" />
-
         {/* Barre footer */}
-        <div className="relative z-10 h-[58px] flex items-center gap-2 px-3 bg-transparent">
+        <div className="relative pointer-events-auto h-[62px] flex items-center gap-2 px-3">
 
           {/* Gauche : + Devise */}
           <div className="flex-1 flex items-center justify-center h-full min-w-0">
