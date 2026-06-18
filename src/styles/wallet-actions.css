@@ -23,7 +23,7 @@
   box-shadow:
     inset 0 16px 28px rgba(255, 255, 255, 0.03),
     inset 0 -46px 70px rgba(0, 0, 0, 0.55),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.11);
+    inset 0 -1px 0 rgba(255, 255, 255, 0.22);
 }
 
 /* Base button style - compact, tool-like, responsive */
@@ -60,9 +60,16 @@
   border: 1px solid transparent;
   background-image:
     linear-gradient(180deg, #101415, #0d1214),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.00));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.00));
   background-origin: padding-box, border-box;
   background-clip: padding-box, border-box;
+  transition: background-image 400ms ease;
+}
+
+[data-scrolled="true"] .scanner-btn-fade-border {
+  background-image:
+    linear-gradient(180deg, #101415, #0d1214),
+    linear-gradient(180deg, rgba(57, 213, 124, 0.55), rgba(57, 213, 124, 0.00));
 }
 
 /* Subtle white fade border for the "recent activity" banner. */
