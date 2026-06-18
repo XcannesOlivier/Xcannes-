@@ -353,3 +353,24 @@
     opacity: 0.5;
   }
 }
+
+/* ── Activity card: slide-left on scroll-down (mobile only) ── */
+.activity-card-slide {
+  transition: transform 380ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (max-width: 767px) {
+  [data-activity-hidden="true"] .activity-card-slide {
+    transform: translateX(-100%);
+  }
+}
+
+/* Tab handle: fades in when card is slid away */
+.activity-card-tab {
+  opacity: 0;
+  transition: opacity 380ms ease 60ms;
+}
+
+[data-activity-hidden="true"] .activity-card-tab {
+  opacity: 1;
+}

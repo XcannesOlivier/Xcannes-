@@ -128,6 +128,19 @@ export default function WalletDashboard({
   const [selectedStatementToken, setSelectedStatementToken] = useState(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [tokenListScrolled, setTokenListScrolled] = useState(false);
+  const [activityCardHidden, setActivityCardHidden] = useState(false);
+  const tokenListScrollTopRef = useRef(0);
+  const handleTokenListScroll = useCallback((e) => {
+    const st = e.target.scrollTop;
+    const prev = tokenListScrollTopRef.current;
+    setTokenListScrolled(st > 2);
+    if (st > prev && st > 20) {
+      setActivityCardHidden(true);
+    } else if (st <= prev) {
+      setActivityCardHidden(false);
+    }
+    tokenListScrollTopRef.current = st;
+  }, []);
   const [activitySkeletonExpired, setActivitySkeletonExpired] = useState(false);
   const desktopDefaultActionSetRef = useRef(false);
 
@@ -816,7 +829,10 @@ export default function WalletDashboard({
                 <>
                   {/* Spacer mobile : pousse la carte sous l'ActionRow flottant (≈88px) */}
                   <div className="md:hidden h-[92px] shrink-0" aria-hidden />
-                  <div className="w-full flex flex-col gap-y-0 sticky top-[92px] md:top-0 z-[10] bg-transparent">
+                  <div className="w-full flex flex-col gap-y-0 sticky top-[92px] md:top-0 z-[10] bg-transparent relative" data-activity-hidden={activityCardHidden}>
+                  {/* Mobile: clip container so card slides out without creating horizontal scroll */}
+                  <div className="overflow-x-hidden md:overflow-x-visible">
+                  <div className="activity-card-slide">
                   <div
                     className="w-full min-w-0 overflow-visible relative"
                     aria-live="polite"
@@ -1106,10 +1122,16 @@ export default function WalletDashboard({
                     </span>
                     <span className="text-[12px] text-white/25 tracking-wide">Solde par devise</span>
                   </div>
+                  </div>{/* /activity-card-slide */}
+                  </div>{/* /overflow-x-hidden clip */}
+                  {/* Onglet gauche visible quand la carte est masquée — mobile only */}
+                  <div className="activity-card-tab md:hidden absolute left-0 top-0 bottom-0 w-8 flex items-center justify-center z-20 pointer-events-none">
+                    <div className="w-[3px] h-9 rounded-full bg-white/25 shadow-[0_0_8px_rgba(255,255,255,0.08)]" />
+                  </div>
                 </div>
               </>
               }
-              onScroll={(e) => setTokenListScrolled(e.target.scrollTop > 2)}
+              onScroll={handleTokenListScroll}
               className="relative z-[1] touch-pan-y"
               style={{ WebkitOverflowScrolling: 'touch' }}
             />
