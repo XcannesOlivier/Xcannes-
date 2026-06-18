@@ -83,6 +83,7 @@ export default function WalletDashboardHeader({
   allowedCurrencyCodes,
   isScrolling = false,
   isScrolled = false,
+  scrollTop = 0,
 }) {
   const { t } = useTranslation("common");
   const [isSwitcherOpen, setIsSwitcherOpen] = useState(false);
@@ -320,6 +321,7 @@ export default function WalletDashboardHeader({
       className="panel-header relative flex flex-col shrink-0 bg-[#111518] shadow-[inset_0_16px_28px_rgba(255,255,255,0.03),inset_0_-46px_70px_rgba(0,0,0,0.55)] px-3 pt-3 pb-2 md:px-5 md:pt-2 md:pb-2"
       data-scrolling={isScrolling}
       data-scrolled={isScrolled}
+      style={{ '--scroll-glow-x': `${Math.min(80, Math.max(20, 50 + (scrollTop % 320 - 160) * 0.19))}%`, '--scroll-glow-y': `${Math.min(60, Math.max(-20, -10 + (scrollTop % 200) * 0.18))}%` }}
     >
       {/* Titres discrets en haut */}
       <div className="flex items-center justify-between mb-0 md:mb-1">
@@ -746,8 +748,7 @@ export default function WalletDashboardHeader({
           />
         )}
       </div>
-      {/* Gradient fondu bas du header — mobile only */}
-      <div className="wallet-header-fade md:hidden pointer-events-none absolute inset-x-0 bottom-0 translate-y-full h-[110px] bg-gradient-to-b from-[#111518]/90 via-[#111518]/30 to-transparent z-10" aria-hidden />
+      {/* Gradient fondu bas du header — déplacé dans WalletDashboard */}
     </div>
   );
 }

@@ -12,35 +12,25 @@
  * 5. Better accessibility (focus-visible, keyboard support)
  */
 
-/* ── Header live background on scroll ── */
-@keyframes wallet-header-shimmer {
-  0%   { background-position: -200% center; }
-  100% { background-position: 300% center; }
-}
-
+/* ── Header live background: glow radial lié à la position du scroll ── */
 .panel-header::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    105deg,
-    transparent 30%,
-    rgba(255, 255, 255, 0.04) 48%,
-    rgba(255, 255, 255, 0.07) 50%,
-    rgba(255, 255, 255, 0.04) 52%,
+  background: radial-gradient(
+    ellipse 55% 120% at var(--scroll-glow-x, 50%) var(--scroll-glow-y, -10%),
+    rgba(255, 255, 255, 0.055) 0%,
+    rgba(255, 255, 255, 0.018) 40%,
     transparent 70%
   );
-  background-size: 200% 100%;
-  background-position: -200% center;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 200ms ease;
+  transition: opacity 250ms ease, background 80ms linear;
   z-index: 0;
 }
 
-.panel-header[data-scrolling="true"]::before {
+.panel-header[data-scrolled="true"]::before {
   opacity: 1;
-  animation: wallet-header-shimmer 0.7s linear infinite;
 }
 
 /* ── Header bottom border on scroll \u2014 mobile only ── */
@@ -58,15 +48,7 @@
   .panel-header[data-scrolled="true"]::after {
     background: rgba(255, 255, 255, 0.09);
   }
-  /* Gradient fondu bas du header — disparaît au scroll */
-  .wallet-header-fade {
-    opacity: 1;
-    transition: opacity 300ms ease;
-  }
-
-  .panel-header[data-scrolled="true"] .wallet-header-fade {
-    opacity: 0;
-  }}
+}
 
 /* Base button style - compact, tool-like, responsive */
 .wallet-action-btn {

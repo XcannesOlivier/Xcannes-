@@ -132,10 +132,12 @@ export default function WalletDashboard({
   const tokenListScrollTopRef = useRef(0);
   const scrollingTimerRef = useRef(null);
   const [isScrolling, setIsScrolling] = useState(false);
+  const [tokenListScrollTop, setTokenListScrollTop] = useState(0);
   const handleTokenListScroll = useCallback((e) => {
     const st = e.target.scrollTop;
     const prev = tokenListScrollTopRef.current;
     setTokenListScrolled(st > 2);
+    setTokenListScrollTop(st);
     if (st > prev && st > 20) {
       setActivityCardHidden(true);
     } else if (st <= prev) {
@@ -795,7 +797,16 @@ export default function WalletDashboard({
             allowedCurrencyCodes={activeFiatCurrencyCodes}
             isScrolling={isScrolling}
             isScrolled={tokenListScrolled}
+            scrollTop={tokenListScrollTop}
           />
+
+          {/* Gradient fondu sous le header — mobile only, disparaît au scroll */}
+          <div
+            className={`md:hidden pointer-events-none h-0 relative z-[15] overflow-visible`}
+            aria-hidden
+          >
+            <div className={`absolute inset-x-0 top-0 h-[90px] bg-gradient-to-b from-[#111518]/85 via-[#111518]/25 to-transparent transition-opacity duration-300 ${tokenListScrolled ? 'opacity-0' : 'opacity-100'}`} />
+          </div>
 
           {/* Reconciliation banner (external RLUSD spend detected) */}
           <ReconciliationBanner
