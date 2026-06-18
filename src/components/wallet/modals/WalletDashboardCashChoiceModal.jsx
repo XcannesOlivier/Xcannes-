@@ -227,7 +227,7 @@ export default function WalletDashboardCashChoiceModal({
                   </div>
                 ) : null}
 		                <div className="pt-6 md:pt-[100px] pb-3 flex flex-col items-center text-center px-4">
-	                    <h3 className="mt-1 md:mt-0 text-[30px] md:text-[34px] font-light text-white/80 md:text-white tracking-tight">
+                        <h3 className="mt-1 md:mt-0 text-[30px] md:text-[34px] font-light text-white tracking-tight">
 	                      {t('ui_funds_manage_title', 'Gérer vos fonds')}
 	                    </h3>
                     {noticeVariant === 'demo' ? (
@@ -260,7 +260,7 @@ export default function WalletDashboardCashChoiceModal({
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center justify-between gap-2">
-                            <p className="text-[20px] md:text-[21px] text-white/90 font-light truncate">
+                            <p className="text-[20px] md:text-[21px] text-white font-light truncate">
                               {t('ui_funds_increase_balances_title', 'Ajouter des fonds')}
                             </p>
                             <svg className="w-5 h-5 text-white/45" viewBox="0 0 24 24" fill="none" aria-hidden>
@@ -276,7 +276,7 @@ export default function WalletDashboardCashChoiceModal({
                           <p className="mt-1 text-[15px] md:text-sm leading-snug text-white/45 flex items-center gap-1.5">
                             <span>{t('ui_funds_add_hint_account', 'À votre compte')}</span>
                             <span className="h-2 w-2 rounded-full bg-xcannes-green shrink-0 animate-pulse" aria-hidden />
-                            <span className="text-white/90 font-semibold">{walletLabel || 'XCANNES'}</span>
+                            <span className="text-white font-light">{walletLabel || 'XCANNES'}</span>
                           </p>
                         </div>
                       </div>
@@ -290,7 +290,7 @@ export default function WalletDashboardCashChoiceModal({
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center justify-between gap-2">
-                            <p className="text-[20px] md:text-[21px] text-white/90 font-light truncate">
+                            <p className="text-[20px] md:text-[21px] text-white font-light truncate">
                               {isDesktop
                                 ? t('ui_funds_withdraw_title', 'Transférer vers la banque')
                                 : t('ui_funds_withdraw_title_mobile', 'Transférer vers la banque')}
@@ -336,7 +336,7 @@ export default function WalletDashboardCashChoiceModal({
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center justify-between gap-2">
-                            <p className="text-[20px] md:text-[21px] text-white/90 font-light truncate">
+                            <p className="text-[20px] md:text-[21px] text-white font-light truncate">
                               {t('ui_funds_swap_out_title', 'Vendre vos stablecoins')}
                             </p>
                             <svg className="w-5 h-5 text-white/45" viewBox="0 0 24 24" fill="none" aria-hidden>
@@ -417,7 +417,7 @@ export default function WalletDashboardCashChoiceModal({
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center justify-between gap-2">
-                            <p className="text-[20px] md:text-[21px] text-white/90 font-light truncate">
+                            <p className="text-[20px] md:text-[21px] text-white font-light truncate">
                               {t('ui_funds_swap_in_title', 'Acheter des stablecoins')}
                             </p>
                             <svg className="w-5 h-5 text-white/45" viewBox="0 0 24 24" fill="none" aria-hidden>
