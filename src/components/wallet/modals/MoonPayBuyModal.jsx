@@ -1463,12 +1463,12 @@ const MoonPayBuyModal = ({
           {/* Title + Wallet pill */}
           {wizardStep === 1 ? (
 		          <div className={`relative z-[120] px-4 ${hasValidTargetAmount && !conversionMissing ? 'pt-[16px]' : 'pt-[40px]'} md:pt-[90px] pb-4 text-center`}>
-	              <h3 className="text-[30px] md:text-[34px] font-semibold text-white/95 tracking-tight mb-2">
+	              <h3 className="text-[30px] md:text-[34px] font-light text-white/80 md:text-white tracking-tight">
 	                {resolvedTitleOverride || t('ui_funds_add_title', 'Ajouter des fonds')}
 	              </h3>
               {!demoMode && !useSimpleSwapPartner ? (
                 <div className="mb-6 flex flex-col items-center">
-                  <p className="mt-2 text-[14px] md:text-[15px] text-white/80 max-w-[34ch] mx-auto leading-relaxed text-center">
+                  <p className="mt-2 text-[19px] md:text-[20px] font-light text-white/50 max-w-[34ch] mx-auto leading-snug md:leading-relaxed text-center">
                     {t('moonpay_buy_payment_methods_list', 'Payez par carte, Apple Pay, Google Pay ou virement bancaire.')}
                   </p>
                 </div>
