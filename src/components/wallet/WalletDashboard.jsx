@@ -1187,7 +1187,7 @@ export default function WalletDashboard({
                   triggerLabel={
                     <span className="flex flex-row items-center gap-1.5">
                       <span className="text-[22px] font-light leading-none text-white/75 group-hover:text-white/90 transition-colors">+</span>
-                      <span className="text-[14px] font-normal tracking-wide leading-none text-white/55 group-hover:text-white/75 transition-colors">Devises</span>
+                      <span className="text-[14px] font-light tracking-wide leading-none text-white/55 group-hover:text-white/75 transition-colors">Devises</span>
                     </span>
                   }
                   buttonClassName="w-full h-[40px] flex flex-row items-center justify-center gap-1.5 transition-colors px-3 group rounded-[16px] bg-gradient-to-b from-[#101415] to-[#0d1214] ring-1 ring-white/[0.04] ring-inset shadow-[-3px_3px_10px_2px_rgba(255,255,255,0.008),0_2px_8px_rgba(0,0,0,0.35),inset_0_-14px_18px_rgba(0,0,0,0.82)]"

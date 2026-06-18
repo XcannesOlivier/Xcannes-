@@ -124,7 +124,7 @@ export default function WalletDashboardTokenRow({
         >
           <div className={`flex items-center ${iconTextGapClass} min-w-0`}>
             <div
-              className={`${iconSizeClass} ${iconRadiusClass} ${iconEdgeSpacingClass} flex items-center justify-center font-semibold text-primary overflow-hidden leading-none flex-shrink-0`}
+              className={`${iconSizeClass} ${iconRadiusClass} ${iconEdgeSpacingClass} flex items-center justify-center font-light text-primary overflow-hidden leading-none flex-shrink-0`}
             >
               {renderTokenIcon(token)}
             </div>
@@ -146,7 +146,7 @@ export default function WalletDashboardTokenRow({
                 ? new Intl.NumberFormat(locale || "en", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(displayValue)
                 : "0.00"}
               {" "}
-              <span className="text-xs md:text-sm font-normal text-white/45 md:text-white/50">{displayCode}</span>
+              <span className="text-xs md:text-sm font-light text-white/45 md:text-white/50">{displayCode}</span>
               <svg className="w-2.5 h-2.5 shrink-0 text-white/18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                 <polyline points="9 18 15 12 9 6" />
               </svg>

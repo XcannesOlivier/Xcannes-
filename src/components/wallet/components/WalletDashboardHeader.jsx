@@ -374,7 +374,7 @@ export default function WalletDashboardHeader({
                           aria-label={xrplConnectionIndicator.label}
                         />
 
-	                        <span className="text-[17px] md:text-[19px] font-semibold text-white/85 truncate">
+	                        <span className="text-[17px] md:text-[19px] font-light text-white/85 truncate">
 	                          {activeWalletLabel.length > 11 ? activeWalletLabel.slice(0, 11) + '…' : activeWalletLabel}
 	                        </span>
                       </div>
@@ -585,7 +585,7 @@ export default function WalletDashboardHeader({
 		                              <div className="min-w-0 flex-1">
                                     <div className="flex items-center justify-between gap-2 min-w-0">
     		                                <div
-    		                                  className="text-[16px] md:text-[17px] font-medium truncate text-white/80 min-w-0"
+    		                                  className="text-[16px] md:text-[17px] font-light truncate text-white/80 min-w-0"
     		                                >
     		                                  {displayName}
     		                                </div>
@@ -710,7 +710,7 @@ export default function WalletDashboardHeader({
           {t("ui_total_balance_label_a91b6b8c1e", "Solde total")}
         </div>
         <p
-          className="text-6xl md:text-6xl lg:text-7xl font-sans font-bold text-white tabular-nums tracking-tight leading-none transition-opacity duration-[180ms]"
+          className="text-6xl md:text-6xl lg:text-7xl font-sans font-light text-white tabular-nums tracking-tight leading-none transition-opacity duration-[180ms]"
           style={{ opacity: balanceFading ? 0 : 1 }}
         >
           {shownLabel}

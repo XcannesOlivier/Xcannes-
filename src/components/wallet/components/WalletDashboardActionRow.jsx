@@ -34,7 +34,7 @@ export default function WalletDashboardActionRow({ onAction, vertical = false })
                 <line x1="12" y1="19" x2="12" y2="5" /><polyline points="5 12 12 5 19 12" />
               </svg>
             </div>
-            <span className="wallet-action-label !text-[15px] !font-medium">{t("ui_send_bee4f9e2f5", "Envoyer")}</span>
+            <span className="wallet-action-label !text-[15px] !font-light">{t("ui_send_bee4f9e2f5", "Envoyer")}</span>
           </button>
         </div>
         <div className={`flex-1 ${CARD_CLASS}`}>
@@ -44,7 +44,7 @@ export default function WalletDashboardActionRow({ onAction, vertical = false })
                 <line x1="12" y1="5" x2="12" y2="19" /><polyline points="19 12 12 19 5 12" />
               </svg>
             </div>
-            <span className="wallet-action-label !text-[15px] !font-normal">{t("ui_receive_127eab0703", "Recevoir")}</span>
+            <span className="wallet-action-label !text-[15px] !font-light">{t("ui_receive_127eab0703", "Recevoir")}</span>
           </button>
         </div>
         <div className={`flex-1 ${CARD_CLASS}`}>
@@ -54,7 +54,7 @@ export default function WalletDashboardActionRow({ onAction, vertical = false })
                 <polyline points="17 1 21 5 17 9" /><path d="M3 11V9a4 4 0 0 1 4-4h14" /><polyline points="7 23 3 19 7 15" /><path d="M21 13v2a4 4 0 0 1-4 4H3" />
               </svg>
             </div>
-            <span className="wallet-action-label !text-[15px] !font-normal">{t("ui_convert_e0fbc97f15", "Convertir")}</span>
+            <span className="wallet-action-label !text-[15px] !font-light">{t("ui_convert_e0fbc97f15", "Convertir")}</span>
           </button>
         </div>
         <div className={`flex-1 ${CARD_CLASS}`}>
@@ -64,7 +64,7 @@ export default function WalletDashboardActionRow({ onAction, vertical = false })
                 <text x="12" y="17" textAnchor="middle" fill="currentColor" fontSize="18" fontWeight="700" fontFamily="system-ui, sans-serif">+/−</text>
               </svg>
             </div>
-            <span className="wallet-action-label !text-[15px] !font-normal !leading-tight -mt-1 text-center"><span className="block">Banque</span></span>
+            <span className="wallet-action-label !text-[15px] !font-light !leading-tight -mt-1 text-center"><span className="block">Banque</span></span>
           </button>
         </div>
       </div>
@@ -98,7 +98,7 @@ export default function WalletDashboardActionRow({ onAction, vertical = false })
               <polyline points="5 12 12 5 19 12"></polyline>
             </svg>
 	          </div>
-	          <span className="wallet-action-label !text-[16px] md:!text-[18px] !font-medium">
+	          <span className="wallet-action-label !text-[16px] md:!text-[18px] !font-light">
 	            {t("ui_send_bee4f9e2f5", "Envoyer")}
 	          </span>
 	        </button>
@@ -126,7 +126,7 @@ export default function WalletDashboardActionRow({ onAction, vertical = false })
               <polyline points="19 12 12 19 5 12"></polyline>
             </svg>
 	          </div>
-	          <span className="wallet-action-label !text-[15px] md:!text-[18px] !font-normal">
+	          <span className="wallet-action-label !text-[15px] md:!text-[18px] !font-light">
 	            {t("ui_receive_127eab0703", "Recevoir")}
 	          </span>
 	        </button>
@@ -156,7 +156,7 @@ export default function WalletDashboardActionRow({ onAction, vertical = false })
               <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
             </svg>
 	          </div>
-	          <span className="wallet-action-label !text-[15px] md:!text-[18px] !font-normal">
+	          <span className="wallet-action-label !text-[15px] md:!text-[18px] !font-light">
 	            {t("ui_convert_e0fbc97f15", "Convertir")}
 	          </span>
 	        </button>
@@ -204,7 +204,7 @@ export default function WalletDashboardActionRow({ onAction, vertical = false })
               </text>
             </svg>
 	          </div>
-	          <span className="wallet-action-label !text-[15px] md:!text-[18px] !font-normal">Banque</span>
+	          <span className="wallet-action-label !text-[15px] md:!text-[18px] !font-light">Banque</span>
 	        </button>
 	        </div>
       </div>

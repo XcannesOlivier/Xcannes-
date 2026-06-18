@@ -29,7 +29,7 @@ function ScanIcon() {
         fill="currentColor"
         stroke="none"
         fontSize="19"
-        fontWeight="400"
+        fontWeight="300"
         fontFamily="system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif"
       >
         Scanner
@@ -97,7 +97,7 @@ export default function WalletDashboardFooter({ onScan, addCurrencySlot, onHisto
                   <circle cx="12" cy="12" r="9" />
                   <polyline points="12 7 12 12 15.5 14.5" />
                 </svg>
-                <span className="text-[14px] font-normal tracking-wide leading-none text-white/55 group-hover:text-white/75 transition-colors">Historique</span>
+                <span className="text-[14px] font-light tracking-wide leading-none text-white/55 group-hover:text-white/75 transition-colors">Historique</span>
               </button>
             ) : null}
           </div>
@@ -106,7 +106,7 @@ export default function WalletDashboardFooter({ onScan, addCurrencySlot, onHisto
 
       {/* Desktop footer */}
       <div className="hidden min-h-[52px] items-center justify-center px-5 py-4 md:flex md:min-h-[36px] md:px-4 md:py-2 md:bg-[#111518] md:shadow-[inset_0_-16px_28px_rgba(255,255,255,0.03),inset_0_46px_70px_rgba(0,0,0,0.55)]">
-        <span className="font-orbitron text-xl font-semibold uppercase leading-none tracking-[0.24em] text-white/80">
+        <span className="font-orbitron text-xl font-light uppercase leading-none tracking-[0.24em] text-white/80">
           {t(BRAND_KEY, "XCANNES")}
         </span>
         <span className="mx-3 text-[13px] font-light text-white/30">|</span>
