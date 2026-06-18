@@ -140,7 +140,7 @@ export default function WalletDashboardTokenRow({
             </div>
           </div>
           <div className="flex-1" />
-          <div className="text-right text-lg md:text-xl text-white/65 md:text-white/70 shrink-0 leading-tight">
+          <div className="text-right text-lg md:text-xl text-white shrink-0 leading-tight">
             <div className="font-mono flex items-center gap-1.5">
               {Number.isFinite(displayValue)
                 ? new Intl.NumberFormat(locale || "en", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(displayValue)

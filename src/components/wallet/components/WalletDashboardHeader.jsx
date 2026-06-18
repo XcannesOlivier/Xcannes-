@@ -374,7 +374,7 @@ export default function WalletDashboardHeader({
                           aria-label={xrplConnectionIndicator.label}
                         />
 
-	                        <span className="text-[17px] md:text-[19px] font-light text-white/85 truncate">
+	                        <span className="text-[17px] md:text-[19px] font-light text-white truncate">
 	                          {activeWalletLabel.length > 11 ? activeWalletLabel.slice(0, 11) + '…' : activeWalletLabel}
 	                        </span>
                       </div>
