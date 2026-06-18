@@ -806,7 +806,7 @@ export default function WalletDashboard({
 
           {/* Token list */}
           <div className="relative flex-1 flex flex-col lg:flex-row min-h-0">
-            <div className="flex-1 min-w-0 flex flex-col min-h-0 pb-[82px] md:pb-0">
+            <div className="flex-1 min-w-0 flex flex-col min-h-0 pb-[20px] md:pb-0">
             <WalletDashboardTokenList
               tokens={tokenListTokens}
               renderTokenRow={renderTokenRow}

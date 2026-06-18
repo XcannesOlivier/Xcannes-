@@ -50,8 +50,10 @@ export default function WalletDashboardFooter({ onScan, addCurrencySlot, onHisto
           paddingBottom: "max(10px, env(safe-area-inset-bottom))",
         }}
       >
+        {/* Gradient fondu au-dessus des boutons */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-full h-[56px] bg-gradient-to-t from-[#0b0e10]/70 to-transparent" />
         {/* Barre footer */}
-        <div className="relative pointer-events-auto h-[62px] flex items-center gap-2 px-3">
+        <div className="relative pointer-events-auto h-[62px] flex items-center gap-2 px-3 bg-[#0b0e10]/60 backdrop-blur-[12px]">
 
           {/* Gauche : + Devise */}
           <div className="flex-1 flex items-center justify-center h-full min-w-0">
