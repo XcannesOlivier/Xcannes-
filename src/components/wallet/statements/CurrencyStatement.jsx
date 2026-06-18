@@ -1682,7 +1682,7 @@ export default function CurrencyStatement({
                 <div className="space-y-1 py-1">
                   {timelineGroups.map((group) => (
                     <div key={group.key}>
-                      <div className="px-4 pt-1 pb-0.5 text-[11px] font-semibold text-white/50 tracking-wide">
+                      <div className="px-4 pt-1 pb-0.5 text-[11px] font-light text-white/50 tracking-wide">
                         {group.label}
                       </div>
                       <div className="px-3 pb-1">
@@ -1712,13 +1712,13 @@ export default function CurrencyStatement({
                                   </span>
                                 </div>
                                 <div className="min-w-0 flex-1">
-                                  <div className="text-sm text-white/90 break-words overflow-hidden [display:-webkit-box] [-webkit-line-clamp:2] [-webkit-box-orient:vertical]">
+                                  <div className="text-sm font-light text-white/90 break-words overflow-hidden [display:-webkit-box] [-webkit-line-clamp:2] [-webkit-box-orient:vertical]">
                                     {getTimelineLabel(tx)}
                                   </div>
                                 </div>
                                 <div className="flex-none max-w-[48%] flex items-center justify-end gap-2">
                                   <div
-                                    className={`text-right font-mono font-semibold whitespace-nowrap overflow-hidden text-ellipsis ${
+                                    className={`text-right font-mono font-light whitespace-nowrap overflow-hidden text-ellipsis ${
                                       tx?.type === "debit"
                                         ? "text-red-400"
                                         : "text-xcannes-green"

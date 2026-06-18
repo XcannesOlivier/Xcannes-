@@ -1660,7 +1660,7 @@ export default function GlobalStatement({
 		                    >
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
-                          <div className="text-[15px] font-medium text-white/90 truncate">
+                          <div className="text-[15px] font-light text-white/90 truncate">
                             {isPaymentOut
                               ? `${t("statement_xrpl_mobile_out", "Envoyé")} ${rowCounterpartyLabel ? `à ${rowCounterpartyLabel}` : ""}`
                               : isPaymentIn
@@ -1697,7 +1697,7 @@ export default function GlobalStatement({
                                   <>
                                     <div
 	                                      className={[
-	                                        "text-[15px] font-semibold font-mono whitespace-nowrap",
+	                                        "text-[15px] font-light font-mono whitespace-nowrap",
 		                                        uiType === "debit"
 		                                          ? "text-red-400"
 		                                          : uiType === "credit"
