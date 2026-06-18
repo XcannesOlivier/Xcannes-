@@ -66,10 +66,10 @@ export default function WalletDashboardTokenRow({
   const hasCryptoIcon = Boolean(displayCode && CRYPTO_ICONS?.[displayCode]);
   const isFlagIcon = isDisplayOverride || (isLineCurrency && !hasCryptoIcon);
   const iconSizeClass = isFlagIcon
-    ? "w-[28px] h-[28px] text-xl leading-none opacity-60"
+    ? "w-[34px] h-[34px] md:w-[28px] md:h-[28px] text-2xl md:text-xl leading-none opacity-60"
     : isLineCurrency
-      ? "w-[28px] h-[28px] text-xl leading-none opacity-60"
-      : "w-[26px] h-[26px] text-lg leading-none";
+      ? "w-[34px] h-[34px] md:w-[28px] md:h-[28px] text-2xl md:text-xl leading-none opacity-60"
+      : "w-[32px] h-[32px] md:w-[26px] md:h-[26px] text-xl md:text-lg leading-none";
   const iconRadiusClass = isNativeAsset ? "rounded-lg" : "";
   const iconEdgeSpacingClass = isNativeAsset ? "ml-1" : "";
   const iconTextGapClass = isNativeAsset ? "gap-3" : "gap-2";

@@ -321,8 +321,6 @@ export default function WalletDashboardHeader({
       data-scrolling={isScrolling}
       data-scrolled={isScrolled}
     >
-      {/* Spinner cercle décoratif — tourne pendant le scroll */}
-      <div className="wallet-header-spinner pointer-events-none absolute right-4 top-3 w-[38px] h-[38px] rounded-full" aria-hidden />
       {/* Titres discrets en haut */}
       <div className="flex items-center justify-between mb-0 md:mb-1">
         <div className="flex items-center gap-3 min-w-0">
@@ -749,7 +747,7 @@ export default function WalletDashboardHeader({
         )}
       </div>
       {/* Gradient fondu bas du header — mobile only */}
-      <div className={`md:hidden pointer-events-none absolute inset-x-0 bottom-0 translate-y-full h-[110px] bg-gradient-to-b from-[#111518]/90 via-[#111518]/30 to-transparent z-10 transition-opacity duration-300 ${isScrolled ? 'opacity-0' : 'opacity-100'}`} aria-hidden />
+      <div className="wallet-header-fade md:hidden pointer-events-none absolute inset-x-0 bottom-0 translate-y-full h-[110px] bg-gradient-to-b from-[#111518]/90 via-[#111518]/30 to-transparent z-10" aria-hidden />
     </div>
   );
 }
