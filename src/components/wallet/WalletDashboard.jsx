@@ -851,7 +851,7 @@ export default function WalletDashboard({
                       activitySkeletonExpired ? (
                       /* ── Message vide après 5s ── */
 	                      <div
-	                        className="relative mx-0 mb-0 px-4 py-[9px] animate-fade-in recent-activity-fade-border overflow-hidden shadow-[inset_0_-14px_14px_-4px_rgba(0,0,0,0.82)] lg:shadow-[inset_0_16px_20px_rgba(0,0,0,0.80)]"
+	                        className="relative mx-0 mb-0 px-4 py-[9px] animate-fade-in recent-activity-fade-border overflow-hidden lg:shadow-[inset_0_16px_20px_rgba(0,0,0,0.80)]"
 	                      >
 	                        <div className="pointer-events-none absolute inset-x-0 top-0 h-[56px] hidden lg:block bg-gradient-to-b from-black/55 to-transparent" aria-hidden />
 	                        <div className="relative z-10">
@@ -869,7 +869,7 @@ export default function WalletDashboard({
                       ) : (
                       /* ── Skeleton pendant le chargement ── */
 	                      <div
-	                        className="relative mx-0 mb-0 px-4 py-[9px] recent-activity-fade-border overflow-hidden shadow-[inset_0_-14px_14px_-4px_rgba(0,0,0,0.82)] lg:shadow-[inset_0_16px_20px_rgba(0,0,0,0.80)]"
+	                        className="relative mx-0 mb-0 px-4 py-[9px] recent-activity-fade-border overflow-hidden lg:shadow-[inset_0_16px_20px_rgba(0,0,0,0.80)]"
 	                      >
 	                        <div className="pointer-events-none absolute inset-x-0 top-0 h-[56px] hidden lg:block bg-gradient-to-b from-black/55 to-transparent" aria-hidden />
 	                        <div className="relative z-10">
@@ -916,7 +916,7 @@ export default function WalletDashboard({
                     >
                       {/* Mini-card activité récente */}
 	                      <div
-	                        className="relative mx-0 mb-0 px-4 py-[9px] transition-colors recent-activity-fade-border overflow-hidden shadow-[inset_0_-14px_14px_-4px_rgba(0,0,0,0.82)] lg:shadow-[inset_0_16px_20px_rgba(0,0,0,0.80)]"
+	                        className="relative mx-0 mb-0 px-4 py-[9px] transition-colors recent-activity-fade-border overflow-hidden lg:shadow-[inset_0_16px_20px_rgba(0,0,0,0.80)]"
 	                      >
 	                        <div className="pointer-events-none absolute inset-x-0 top-0 h-[56px] hidden lg:block bg-gradient-to-b from-black/55 to-transparent" aria-hidden />
 	                        <div className="relative z-10">
@@ -948,7 +948,7 @@ export default function WalletDashboard({
                           </div>
                           {/* Ligne 2 : montant principal + heure + chevron */}
                           <div className="flex items-center justify-between gap-2">
-                            <span className="min-w-0 truncate text-[14px] text-white/75 font-medium">
+                            <span className="min-w-0 truncate text-[14px] text-white/75 font-light">
                               {recentActivityMessageParts.isConversion ? (
                                 <>{String(recentActivityMessageParts.left || "").replace(/^Vous avez converti\s+/i, "").trim()}{" "}{recentActivityMessageParts.arrow}{" "}{recentActivityMessageParts.right}</>
                               ) : recentActivityIcon === "receive" && recentActivityReceiveParts ? (
@@ -984,7 +984,7 @@ export default function WalletDashboard({
                           <span className="shrink-0 text-[12px] text-white/40 whitespace-nowrap">
                             {recentActivityLabel}
                           </span>
-                          <span className="flex-1 min-w-0 truncate text-[13px] text-white/70 font-medium">
+                          <span className="flex-1 min-w-0 truncate text-[13px] text-white/70 font-light">
                             {recentActivityMessageParts.isConversion ? (
                               <>{String(recentActivityMessageParts.left || "").replace(/^Vous avez converti\s+/i, "").trim()}{" "}{recentActivityMessageParts.arrow}{" "}{recentActivityMessageParts.right}</>
                             ) : recentActivityIcon === "receive" && recentActivityReceiveParts ? (
@@ -1017,18 +1017,18 @@ export default function WalletDashboard({
                           </div>
                         ) : null}
                         <div>
-                          <span className="md:hidden text-[13px] text-white/65 font-semibold">
+                          <span className="md:hidden text-[13px] text-white/65 font-light">
                             {recentActivityMessageParts.isConversion ? (
                               <>
                                 {recentActivityMessageParts.left} {recentActivityMessageParts.arrow}{' '}
-                                <span className="text-[14px] text-white/90 font-semibold">
+                                <span className="text-[14px] text-white/90 font-light">
                                   {recentActivityMessageParts.right}
                                 </span>
                               </>
                             ) : recentActivityIcon === "receive" && recentActivityReceiveParts ? (
                               <>
                                 {recentActivityReceiveParts.prefix}{" "}
-                                <span className="text-[14px] text-[#16A34A] font-semibold">
+                                <span className="text-[14px] text-[#16A34A] font-light">
                                   + {recentActivityReceiveParts.amount} {recentActivityReceiveParts.currency}
                                 </span>
                                 {recentActivityReceiveParts.suffix}
@@ -1036,7 +1036,7 @@ export default function WalletDashboard({
                             ) : recentActivityIcon === "send" && recentActivitySendParts ? (
                               <>
                                 {recentActivitySendParts.prefix}{" "}
-                                <span className="text-[14px] text-red-300 font-semibold">
+                                <span className="text-[14px] text-red-300 font-light">
                                   - {recentActivitySendParts.amount} {recentActivitySendParts.currency}
                                 </span>
                                 {recentActivitySendParts.suffix}
@@ -1045,18 +1045,18 @@ export default function WalletDashboard({
                               recentActivityMessageParts.text
                             )}
                           </span>
-                          <span className="hidden md:inline text-[14px] text-white/85 font-semibold">
+                          <span className="hidden md:inline text-[14px] text-white/85 font-light">
                             {recentActivityMessageParts.isConversion ? (
                               <>
                                 {recentActivityMessageParts.left} {recentActivityMessageParts.arrow}{" "}
-                                <span className="text-[16px] text-white/90 font-semibold">
+                                <span className="text-[16px] text-white/90 font-light">
                                   {recentActivityMessageParts.right}
                                 </span>
                               </>
                             ) : recentActivityIcon === "receive" && recentActivityReceiveParts ? (
                               <>
                                 {recentActivityReceiveParts.prefix}{" "}
-                                <span className="text-[15px] text-[#16A34A] font-semibold">
+                                <span className="text-[15px] text-[#16A34A] font-light">
                                   + {recentActivityReceiveParts.amount} {recentActivityReceiveParts.currency}
                                 </span>
                                 {recentActivityReceiveParts.suffix}
@@ -1064,7 +1064,7 @@ export default function WalletDashboard({
                             ) : recentActivityIcon === "send" && recentActivitySendParts ? (
                               <>
                                 {recentActivitySendParts.prefix}{" "}
-                                <span className="text-[15px] text-red-300 font-semibold">
+                                <span className="text-[15px] text-red-300 font-light">
                                   - {recentActivitySendParts.amount} {recentActivitySendParts.currency}
                                 </span>
                                 {recentActivitySendParts.suffix}
@@ -1080,7 +1080,7 @@ export default function WalletDashboard({
                   </div>
                   {/* Barre md→lg : boutons Ajouter / Historique */}
                   <div className="hidden md:flex lg:hidden items-center justify-between gap-x-2">
-                    <span className="pl-0.5 text-[13px] font-medium text-white/30 tracking-wide uppercase">
+                    <span className="pl-0.5 text-[13px] font-light text-white/30 tracking-wide uppercase">
                       Mes devises
                     </span>
                     <div className="flex items-center gap-x-2">
@@ -1126,7 +1126,7 @@ export default function WalletDashboard({
                   </div>
                   {/* Header desktop : 3 colonnes */}
                   <div className="hidden lg:flex items-center justify-between gap-2 px-0.5 pb-1 border-b border-white/[0.06]">
-                    <span className="text-[12px] font-semibold text-white/40 tracking-widest">Mes devises</span>
+                    <span className="text-[12px] font-light text-white/40 tracking-widest">Mes devises</span>
                     <span className="text-[12px] text-white/25">
                       {(tokenListTokens || []).length > 0 ? `${(tokenListTokens || []).length} devise${(tokenListTokens || []).length > 1 ? 's' : ''}` : ''}
                     </span>

@@ -318,7 +318,7 @@ export default function WalletDashboardHeader({
 
   return (
     <div
-      className="panel-header relative flex flex-col shrink-0 bg-[#0b0f10] shadow-[inset_0_16px_28px_rgba(255,255,255,0.03),inset_0_-46px_70px_rgba(0,0,0,0.55)] px-3 pt-3 pb-2 md:px-5 md:pt-2 md:pb-2"
+      className="panel-header relative flex flex-col shrink-0 bg-[#0b0f10] shadow-[inset_0_16px_28px_rgba(255,255,255,0.03)] px-3 pt-3 pb-2 md:px-5 md:pt-2 md:pb-2"
       data-scrolling={isScrolling}
       data-scrolled={isScrolled}
       style={undefined}
