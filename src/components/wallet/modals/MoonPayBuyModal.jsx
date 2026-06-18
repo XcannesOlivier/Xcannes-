@@ -1495,7 +1495,7 @@ const MoonPayBuyModal = ({
           {/* Currency selector */}
           {wizardStep === 1 ? (
 		            <div className="relative z-[120] mt-7">
-              <div className="text-[13px] tracking-normal font-medium text-white/55 mb-2">
+              <div className="text-[13px] tracking-normal font-light text-white/55 mb-2">
                 {t('moonpay_buy_receive_currency_label', 'Devise à recevoir')}
               </div>
 	              <ModalSelect
@@ -1533,7 +1533,7 @@ const MoonPayBuyModal = ({
                 showMobileOptionRight={true}
                 iconClassName="text-3xl leading-none"
                 optionIconClassName="text-2xl leading-none opacity-60"
-                optionClassName="py-2 md:py-2.5 !text-base md:!text-lg !text-white/60"
+                optionClassName="py-2 md:py-2.5 !text-base md:!text-lg !font-light !text-white/60"
                 menuHeader={t('ui_your_balances_header', 'Vos soldes')}
 	                backdropClassName=""
                 buttonClassName={modalSelectButtonCls}
@@ -1546,7 +1546,7 @@ const MoonPayBuyModal = ({
 
           {wizardStep === 1 ? (
             <div className="mt-6">
-              <div className="text-[13px] tracking-normal font-medium text-white/55 mb-2">
+              <div className="text-[13px] tracking-normal font-light text-white/55 mb-2">
                 {t('moonpay_buy_selected_asset_amount', 'Montant')}
               </div>
               <div className="relative z-[2] bg-[#111518] rounded-[18px] p-0">
@@ -1565,11 +1565,11 @@ const MoonPayBuyModal = ({
                   inputMode="decimal"
                   readOnly={wizardStep !== 1}
                   className={[
-                    'xcannes-no-number-spin flex-1 min-w-0 bg-transparent text-white text-4xl md:text-5xl font-bold placeholder:text-white/35 focus:outline-none transition-all duration-150',
+                    'xcannes-no-number-spin flex-1 min-w-0 bg-transparent text-white text-4xl md:text-5xl font-light placeholder:text-white/35 focus:outline-none transition-all duration-150',
                     wizardStep !== 1 ? 'cursor-default opacity-95' : '',
                   ].join(' ')}
                 />
-                <span className="shrink-0 text-white/70 drop-shadow-sm text-2xl md:text-3xl font-semibold">
+                <span className="shrink-0 text-white/70 drop-shadow-sm text-2xl md:text-3xl font-light">
                   {String(currency || '').toUpperCase()}
                 </span>
               </div>
@@ -1582,7 +1582,7 @@ const MoonPayBuyModal = ({
 
             {hasValidTargetAmount && !conversionMissing ? (
               <div className="mt-4 flex flex-col gap-2 animate-fade-in">
-                <p className="text-[13px] text-white/45 leading-snug">
+                <p className="text-[13px] font-light text-white/45 leading-snug">
                   {t('ui_buy_summary_line', {
                     defaultValue: 'Votre compte sera crédité de {{amount}} {{currency}}.',
                     amount: new Intl.NumberFormat(locale, { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(targetAmountValue),
@@ -1592,7 +1592,7 @@ const MoonPayBuyModal = ({
                 <button
                   type="button"
                   onClick={() => setOpDetailsOpen(true)}
-                  className={['text-[13px] font-medium underline underline-offset-[3px] decoration-1 transition-opacity hover:opacity-75', accentText80].join(' ')}
+                  className={['text-[13px] font-light underline underline-offset-[3px] decoration-1 transition-opacity hover:opacity-75', accentText80].join(' ')}
                 >
                   {t('ui_op_details_link', 'Détails de l\'opération')}
                 </button>
@@ -1637,7 +1637,7 @@ const MoonPayBuyModal = ({
             }}
             disabled={continueDisabled}
             className={[
-              "md:hidden mt-7 w-full h-[52px] md:h-[56px] flex items-center justify-center rounded-[14px] text-[22px] md:text-[24px] font-semibold transition-all duration-200 tracking-[-0.01em]",
+              "md:hidden mt-7 w-full h-[52px] md:h-[56px] flex items-center justify-center rounded-[14px] text-[22px] md:text-[24px] font-light transition-all duration-200 tracking-[-0.01em]",
               continueDisabled
                 ? "text-white/90 cursor-not-allowed ring-[0.5px] ring-xcannes-green/30 ring-inset"
                 : "text-white hover:scale-[1.01] active:scale-[0.98]",
@@ -1663,7 +1663,7 @@ const MoonPayBuyModal = ({
             onClick={handleContinue}
             disabled={continueDisabled}
             className={[
-              "hidden md:flex mt-7 items-center justify-center w-full h-[52px] md:h-[56px] rounded-[14px] text-[22px] md:text-[24px] font-semibold transition-all duration-200 tracking-[-0.01em]",
+              "hidden md:flex mt-7 items-center justify-center w-full h-[52px] md:h-[56px] rounded-[14px] text-[22px] md:text-[24px] font-light transition-all duration-200 tracking-[-0.01em]",
               continueDisabled
                 ? "text-white/90 cursor-not-allowed ring-[0.5px] ring-xcannes-green/30 ring-inset"
                 : "text-white hover:scale-[1.01] active:scale-[0.98]",
@@ -1696,7 +1696,7 @@ const MoonPayBuyModal = ({
             }
           `}</style>
 		          {!demoMode && !useSimpleSwapPartner ? (
-		            <div className="text-center text-[12px] md:text-[13px] text-white/50 mt-5 leading-relaxed">
+		            <div className="text-center text-[12px] md:text-[13px] font-light text-white/50 mt-5 leading-relaxed">
 		              <p>{t('moonpay_info_buy_live_3c8a1d6b2f', 'Paiement traité de manière sécurisée par MoonPay ou Topper.')}</p>
 		              <p>{t('moonpay_buy_partner_location_note_cta', 'La conversion est effectuée automatiquement si nécessaire.')}</p>
 		            </div>
@@ -1940,7 +1940,7 @@ const MoonPayBuyModal = ({
 	                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" className="h-[40px] w-[40px]" aria-hidden="true"><path strokeWidth="0.5" d="M2 7a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7z" /><path strokeWidth="0.7" d="M2 10h20" /></svg>
                   </span>
                   <div className="min-w-0">
-                    <h2 className="text-white font-semibold text-lg leading-tight">
+                    <h2 className="text-white font-light text-lg leading-tight">
                       {t("ui_op_details_buy_header_title", "Paiement sécurisé")}
                     </h2>
                     <p className="mt-1 text-[13px] leading-snug text-white/55">
@@ -1976,7 +1976,7 @@ const MoonPayBuyModal = ({
                   <span className="text-[12px] text-white/55">
                     {t("ui_op_details_summary_processing", "Traitement")}
                   </span>
-                  <span className="inline-flex items-center gap-2 text-white/80 font-medium text-[13px]">
+                  <span className="inline-flex items-center gap-2 text-white/80 font-light text-[13px]">
                     <span className="inline-flex items-center rounded-full bg-white/5 ring-1 ring-white/10 px-2.5 py-1">
                       {partnerName}
                     </span>
@@ -2057,7 +2057,7 @@ const MoonPayBuyModal = ({
 			                  {/* Text column (independent heights) */}
 			                  <div className="min-w-0 space-y-9 py-[2px]">
 			                    <div>
-			                      <div className="text-white/90 font-semibold">
+			                      <div className="text-white/90 font-light">
 			                        {t("ui_op_flow_step1_title", "Vous confirmez le paiement")}
 			                      </div>
 			                      <div className="mt-1 text-white/55">
@@ -2069,7 +2069,7 @@ const MoonPayBuyModal = ({
 			                      </div>
 			                    </div>
 			                    <div>
-			                      <div className="text-white/90 font-semibold">
+			                      <div className="text-white/90 font-light">
 			                        {t("ui_op_flow_step2_title", {
 			                          defaultValue: "{{partner}} traite l’opération",
 			                          partner: partnerName,
@@ -2083,7 +2083,7 @@ const MoonPayBuyModal = ({
 			                      </div>
 			                    </div>
 			                    <div>
-			                      <div className="text-white/90 font-semibold">
+			                      <div className="text-white/90 font-light">
 			                        {t("ui_op_flow_step3_title", "Votre compte XCANNES est crédité")}
 			                      </div>
 			                      <div className="mt-1 text-white/55">
@@ -2104,7 +2104,7 @@ const MoonPayBuyModal = ({
                       className="w-full flex items-center justify-between gap-3 rounded-[26px] bg-white/5 ring-1 ring-white/10 px-4 py-3 text-left"
                       aria-expanded={techDetailsOpen}
                     >
-	                      <span className="text-[13px] font-semibold text-white/65">
+	                      <span className="text-[13px] font-light text-white/65">
 		                        {t(
 		                          "ui_op_details_buy_tech_network_title",
 		                          "Détails techniques du réseau (XRP)",
@@ -2252,7 +2252,7 @@ const MoonPayBuyModal = ({
 	                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" className="h-[40px] w-[40px]" aria-hidden="true"><path strokeWidth="0.7" d="M2 7a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7z" /><path strokeWidth="0.9" d="M2 10h20" /></svg>
                 </span>
                 <div className="min-w-0">
-                  <h2 className="text-white font-semibold text-lg leading-tight">
+                  <h2 className="text-white font-light text-lg leading-tight">
                     {t("ui_op_details_buy_header_title", "Paiement sécurisé")}
                   </h2>
                   <p className="mt-1 text-[13px] leading-snug text-white/55">
@@ -2288,7 +2288,7 @@ const MoonPayBuyModal = ({
                 <span className="text-[12px] text-white/55">
                   {t("ui_op_details_summary_processing", "Traitement")}
                 </span>
-                <span className="inline-flex items-center gap-2 text-white/80 font-medium text-[13px]">
+                <span className="inline-flex items-center gap-2 text-white/80 font-light text-[13px]">
                   <span className="inline-flex items-center rounded-full bg-white/5 ring-1 ring-white/10 px-2.5 py-1">
                     {partnerName}
                   </span>
@@ -2369,7 +2369,7 @@ const MoonPayBuyModal = ({
 			                {/* Text column (independent heights) */}
 			                <div className="min-w-0 space-y-9 py-[2px]">
 			                  <div>
-			                    <div className="text-white/90 font-semibold">
+			                    <div className="text-white/90 font-light">
 			                      {t("ui_op_flow_step1_title", "Vous confirmez le paiement")}
 			                    </div>
 			                    <div className="mt-1 text-white/55">
@@ -2381,7 +2381,7 @@ const MoonPayBuyModal = ({
 			                    </div>
 			                  </div>
 			                  <div>
-			                    <div className="text-white/90 font-semibold">
+			                    <div className="text-white/90 font-light">
 			                      {t("ui_op_flow_step2_title", {
 			                        defaultValue: "{{partner}} traite l’opération",
 			                        partner: partnerName,
@@ -2395,7 +2395,7 @@ const MoonPayBuyModal = ({
 			                    </div>
 			                  </div>
 			                  <div>
-			                    <div className="text-white/90 font-semibold">
+			                    <div className="text-white/90 font-light">
 			                      {t("ui_op_flow_step3_title", "Votre compte XCANNES est crédité")}
 			                    </div>
 			                    <div className="mt-1 text-white/55">
@@ -2416,7 +2416,7 @@ const MoonPayBuyModal = ({
                     className="w-full flex items-center justify-between gap-3 rounded-[26px] bg-white/5 ring-1 ring-white/10 px-4 py-3 text-left"
                     aria-expanded={techDetailsOpen}
                   >
-	                    <span className="text-[13px] font-semibold text-white/65">
+	                    <span className="text-[13px] font-light text-white/65">
 		                      {t(
 		                        "ui_op_details_buy_tech_network_title",
 		                        "Détails techniques du réseau (XRP)",
