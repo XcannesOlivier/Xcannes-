@@ -968,7 +968,7 @@ export default function WalletDashboardSendModal({
         {/* ── Devise + Montant (séparés) – masqués en mode payreq ── */}
         {!hasPaymentRequest && (
         <div className={`transition-opacity duration-300 space-y-4 ${hasDestination ? 'opacity-100' : 'opacity-30 pointer-events-none select-none'}`}>
-          <h3 className="relative z-[50] text-[30px] md:text-[34px] font-light text-white/80 md:text-white tracking-tight text-center leading-snug">
+          <h3 className="relative z-[50] text-[30px] md:text-[34px] font-light text-white tracking-tight text-center leading-snug">
             {t("ui_send_modal_title", "Montant à envoyer")}
           </h3>
           <p className="relative z-[50] text-[19px] md:text-[20px] font-light text-white/50 text-center leading-tight -mt-2">
@@ -980,6 +980,7 @@ export default function WalletDashboardSendModal({
 	              className: "flex justify-center relative z-[85]",
 		            prefix: t("moonpay_from_account", "Compte source"),
 	              pillClassName: "bg-elevated-40 xcannes-fade-border-y shadow-none rounded-[20px]",
+	              labelClassName: "!text-white",
 	            })}
 	          </div>
           <div>
@@ -1096,7 +1097,7 @@ export default function WalletDashboardSendModal({
                     selectedSendToken.currency
                   : "USD"
               }
-              tokenClassName="text-white/70 drop-shadow-sm text-2xl md:text-3xl font-light"
+              tokenClassName="text-white drop-shadow-sm text-2xl md:text-3xl font-light"
               containerClassName="pt-5 pb-5 rounded-[18px] bg-[#111518] ring-1 ring-white/10 ring-inset transition-all duration-200 shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30)] focus-within:ring-white/25 focus-within:shadow-[0_4px_18px_rgba(0,0,0,0.6),inset_0_16px_28px_rgba(255,255,255,0.08),inset_0_-14px_24px_rgba(0,0,0,0.30),0_0_0_1px_rgba(255,255,255,0.10),0_0_24px_rgba(255,255,255,0.06)] wallet-amount-shimmer [&_input]:!text-4xl [&_input]:md:!text-5xl [&_input]:font-light [&_input]:placeholder:text-white/35"
             />
             </div>
@@ -1113,7 +1114,7 @@ export default function WalletDashboardSendModal({
         <div className="flex flex-col gap-1 px-6 pt-3 pb-2">
           <span className="text-[13px] md:text-[14px] text-white/45 font-normal">
             {t("ui_beneficiary_label", "Destinataire")} —{" "}
-            <span className="text-white/85 font-semibold">
+            <span className="text-white font-light">
               {resolvedDestinationLabel || t("ui_wallet_unknown", "Unknown wallet")}
             </span>
           </span>
@@ -1138,7 +1139,7 @@ export default function WalletDashboardSendModal({
 	          <span className="text-[15px] md:text-[16px] text-white/45 font-normal tracking-[0.02em]">
 	            {t("ui_total_to_send_label", "Total à envoyer")}
 	          </span>
-          <span className={"text-3xl md:text-4xl font-bold tracking-tight " + (summaryAmount > 0 ? "text-white" : "text-white/75")}>
+          <span className={"text-3xl md:text-4xl font-light tracking-tight " + (summaryAmount > 0 ? "text-white" : "text-white/75")}>
             {confirmAmountLabel || '0'}
           </span>
         </div>

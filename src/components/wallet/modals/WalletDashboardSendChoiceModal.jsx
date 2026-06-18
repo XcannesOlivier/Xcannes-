@@ -958,7 +958,7 @@ export default function WalletDashboardSendChoiceModal({
                 <div className={`px-5 ${pendingDestination.address ? 'pt-[3px] md:pt-[34px]' : 'pt-[10px] md:pt-[60px]'} pb-5 flex flex-col flex-1 min-h-0 overflow-y-auto overscroll-contain`}>
                 {/* Title + subtitle */}
                 <div className="flex flex-col items-center text-center md:items-start md:text-left mb-[40px]">
-                  <h3 className="mt-1 text-[30px] md:text-[34px] font-light text-white/80 md:text-white tracking-tight">
+                  <h3 className="mt-1 text-[30px] md:text-[34px] font-light text-white tracking-tight">
                     {t('ui_send_choose_recipient_title', 'Envoyer à un destinataire')}
                   </h3>
                   <p className="mt-px md:mt-0 text-[19px] md:text-[20px] font-light text-white/50 max-w-[34ch] md:max-w-[68ch] leading-[22.5px] md:leading-[24px]">
@@ -972,6 +972,7 @@ export default function WalletDashboardSendChoiceModal({
 	                      className: 'flex justify-center',
 	                      prefix: t('moonpay_from_account', 'Compte source'),
 	                      pillClassName: 'bg-elevated-40 xcannes-fade-border-y shadow-none rounded-[20px]',
+	                      labelClassName: '!text-white',
 	                    })}
 	                  </div>
                 </div>
@@ -1381,7 +1382,7 @@ export default function WalletDashboardSendChoiceModal({
 		                <div className="px-5 pt-[70px] md:pt-[90px] pb-5 flex flex-col flex-1 min-h-0 overflow-y-auto overscroll-contain">
 		                {/* Title + subtitle */}
 		                <div className="flex flex-col items-center text-center md:items-start md:text-left mb-[40px]">
-                  <h3 className="mt-1 text-[30px] md:text-[34px] font-light text-white/80 md:text-white tracking-tight">
+                  <h3 className="mt-1 text-[30px] md:text-[34px] font-light text-white tracking-tight">
 		                    {t('ui_send_pay_request_title', 'Renseigner une demande ')}
                   </h3>
                   <p className="mt-px md:mt-0 text-[19px] md:text-[20px] font-light text-white/50 max-w-[34ch] md:max-w-[68ch] leading-[22.5px] md:leading-[24px]">
@@ -1395,6 +1396,7 @@ export default function WalletDashboardSendChoiceModal({
 		                      prefix: t('moonpay_from_account', 'Compte source'),
 		                      pillClassName: 'bg-elevated-40 xcannes-fade-border-y shadow-none rounded-[20px]',
 		                      dotClassName: '!bg-[#f5a623] ring-[#f5a623]/20',
+		                      labelClassName: '!text-white',
 		                    })}
 		                  </div>
                 </div>
