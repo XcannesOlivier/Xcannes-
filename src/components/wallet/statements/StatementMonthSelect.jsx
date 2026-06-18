@@ -62,7 +62,7 @@ export default function StatementMonthSelect({
         }}
         aria-haspopup="listbox"
         aria-expanded={open}
-        className={`statement-select w-full ${menuClassName} ring-1 ring-inset px-3 py-1.5 text-sm text-white cursor-pointer transition-colors duration-150 flex items-center justify-between gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-xcannes-green/20 ${open
+        className={`statement-select w-full ${menuClassName} ring-1 ring-inset px-3 py-1.5 text-sm font-light text-white cursor-pointer transition-colors duration-150 flex items-center justify-between gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-xcannes-green/20 ${open
           ? menuPosition === "top"
             ? "rounded-b-[10px] rounded-t-none ring-white/10"
             : "rounded-t-[10px] rounded-b-none ring-white/10"
@@ -107,7 +107,7 @@ export default function StatementMonthSelect({
                 role="option"
                 aria-selected={isSelected}
                 onClick={() => handleSelect(option.value)}
-                className={`w-full px-3 py-2 text-sm text-center transition-colors ${
+                className={`w-full px-3 py-2 text-sm font-light text-center transition-colors ${
                   isSelected
                     ? "bg-white/10 text-white"
                     : "text-white/80 hover:bg-white/5"
