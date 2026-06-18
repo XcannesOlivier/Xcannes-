@@ -82,6 +82,7 @@ export default function WalletDashboardHeader({
   onPreferredCurrencyChange,
   allowedCurrencyCodes,
   isScrolling = false,
+  isScrolled = false,
 }) {
   const { t } = useTranslation("common");
   const [isSwitcherOpen, setIsSwitcherOpen] = useState(false);
@@ -318,6 +319,7 @@ export default function WalletDashboardHeader({
     <div
       className="panel-header relative flex flex-col shrink-0 bg-[#111518] shadow-[inset_0_16px_28px_rgba(255,255,255,0.03),inset_0_-46px_70px_rgba(0,0,0,0.55)] px-3 pt-3 pb-2 md:px-5 md:pt-2 md:pb-2"
       data-scrolling={isScrolling}
+      data-scrolled={isScrolled}
     >
       {/* Spinner cercle décoratif — tourne pendant le scroll */}
       <div className="wallet-header-spinner pointer-events-none absolute right-4 top-3 w-[38px] h-[38px] rounded-full" aria-hidden />
@@ -747,7 +749,7 @@ export default function WalletDashboardHeader({
         )}
       </div>
       {/* Gradient fondu bas du header — mobile only */}
-      <div className="md:hidden pointer-events-none absolute inset-x-0 bottom-0 translate-y-full h-[52px] bg-gradient-to-b from-[#111518]/75 to-transparent z-10" aria-hidden />
+      <div className={`md:hidden pointer-events-none absolute inset-x-0 bottom-0 translate-y-full h-[110px] bg-gradient-to-b from-[#111518]/90 via-[#111518]/30 to-transparent z-10 transition-opacity duration-300 ${isScrolled ? 'opacity-0' : 'opacity-100'}`} aria-hidden />
     </div>
   );
 }

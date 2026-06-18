@@ -794,6 +794,7 @@ export default function WalletDashboard({
             onPreferredCurrencyChange={setPreferredCurrency}
             allowedCurrencyCodes={activeFiatCurrencyCodes}
             isScrolling={isScrolling}
+            isScrolled={tokenListScrolled}
           />
 
           {/* Reconciliation banner (external RLUSD spend detected) */}
@@ -847,7 +848,7 @@ export default function WalletDashboard({
                       activitySkeletonExpired ? (
                       /* ── Message vide après 5s ── */
 	                      <div
-	                        className="relative mx-0 mb-0 px-4 py-[9px] animate-fade-in recent-activity-fade-border rounded-[16px] lg:rounded-[14px] overflow-hidden shadow-[inset_0_-16px_20px_rgba(0,0,0,0.88)] lg:shadow-[inset_0_16px_20px_rgba(0,0,0,0.80)]"
+	                        className="relative mx-0 mb-0 px-4 py-[9px] animate-fade-in recent-activity-fade-border overflow-hidden shadow-[inset_0_-14px_14px_-4px_rgba(0,0,0,0.82)] lg:shadow-[inset_0_16px_20px_rgba(0,0,0,0.80)]"
 	                      >
 	                        <div className="pointer-events-none absolute inset-x-0 top-0 h-[56px] hidden lg:block bg-gradient-to-b from-black/55 to-transparent" aria-hidden />
 	                        <div className="relative z-10">
@@ -865,7 +866,7 @@ export default function WalletDashboard({
                       ) : (
                       /* ── Skeleton pendant le chargement ── */
 	                      <div
-	                        className="relative mx-0 mb-0 px-4 py-[9px] recent-activity-fade-border rounded-[16px] lg:rounded-[14px] overflow-hidden shadow-[inset_0_-16px_20px_rgba(0,0,0,0.88)] lg:shadow-[inset_0_16px_20px_rgba(0,0,0,0.80)]"
+	                        className="relative mx-0 mb-0 px-4 py-[9px] recent-activity-fade-border overflow-hidden shadow-[inset_0_-14px_14px_-4px_rgba(0,0,0,0.82)] lg:shadow-[inset_0_16px_20px_rgba(0,0,0,0.80)]"
 	                      >
 	                        <div className="pointer-events-none absolute inset-x-0 top-0 h-[56px] hidden lg:block bg-gradient-to-b from-black/55 to-transparent" aria-hidden />
 	                        <div className="relative z-10">
@@ -912,7 +913,7 @@ export default function WalletDashboard({
                     >
                       {/* Mini-card activité récente */}
 	                      <div
-	                        className="relative mx-0 mb-0 px-4 py-[9px] transition-colors recent-activity-fade-border rounded-[16px] lg:rounded-[14px] overflow-hidden shadow-[inset_0_-16px_20px_rgba(0,0,0,0.88)] lg:shadow-[inset_0_16px_20px_rgba(0,0,0,0.80)]"
+	                        className="relative mx-0 mb-0 px-4 py-[9px] transition-colors recent-activity-fade-border overflow-hidden shadow-[inset_0_-14px_14px_-4px_rgba(0,0,0,0.82)] lg:shadow-[inset_0_16px_20px_rgba(0,0,0,0.80)]"
 	                      >
 	                        <div className="pointer-events-none absolute inset-x-0 top-0 h-[56px] hidden lg:block bg-gradient-to-b from-black/55 to-transparent" aria-hidden />
 	                        <div className="relative z-10">

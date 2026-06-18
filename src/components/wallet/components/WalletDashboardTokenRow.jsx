@@ -122,7 +122,7 @@ export default function WalletDashboardTokenRow({
         <div
           className={`flex items-center gap-3 rounded-[14px] px-3.5 py-2 md:py-3 transition-colors cursor-pointer ${rowSurfaceClass} ${tokenRowClass}`}
         >
-          <div className={`flex items-center ${iconTextGapClass} min-w-0`}>
+          <div className={`flex items-center ${iconTextGapClass} min-w-0 flex-1`}>
             <div
               className={`${iconSizeClass} ${iconRadiusClass} ${iconEdgeSpacingClass} flex items-center justify-center font-light text-primary overflow-hidden leading-none flex-shrink-0`}
             >
@@ -137,20 +137,35 @@ export default function WalletDashboardTokenRow({
                   <span className="hidden md:inline">{currencyLabel}</span>
                 </span>
               </div>
+              {/* Montant + code — mobile uniquement, sous le nom */}
+              <div className="md:hidden flex items-baseline gap-1 mt-0.5">
+                <span className="text-base font-mono text-white leading-tight">
+                  {Number.isFinite(displayValue)
+                    ? new Intl.NumberFormat(locale || "en", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(displayValue)
+                    : "0.00"}
+                </span>
+                <span className="text-xs font-light text-white/45">{displayCode}</span>
+              </div>
             </div>
           </div>
-          <div className="flex-1" />
-          <div className="text-right text-lg md:text-xl text-white shrink-0 leading-tight">
+          {/* Desktop : montant + code + chevron */}
+          <div className="hidden md:flex text-right text-xl text-white shrink-0 leading-tight">
             <div className="font-mono flex items-center gap-1.5">
               {Number.isFinite(displayValue)
                 ? new Intl.NumberFormat(locale || "en", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(displayValue)
                 : "0.00"}
               {" "}
-              <span className="text-xs md:text-sm font-light text-white/45 md:text-white/50">{displayCode}</span>
+              <span className="text-sm font-light text-white/50">{displayCode}</span>
               <svg className="w-2.5 h-2.5 shrink-0 text-white/18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                 <polyline points="9 18 15 12 9 6" />
               </svg>
             </div>
+          </div>
+          {/* Mobile : chevron seul à droite */}
+          <div className="md:hidden shrink-0">
+            <svg className="w-2.5 h-2.5 text-white/18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
           </div>
         </div>
       </div>
