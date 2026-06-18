@@ -1242,14 +1242,14 @@ const MoonPaySellModal = ({
 
           {/* Title + Wallet pill */}
           {wizardStep === 1 ? (
-		          <div className={`relative z-[66] px-4 ${hasValidAmount && !conversionMissing ? 'pt-[16px]' : 'pt-[40px]'} md:pt-[90px] pb-4 text-center md:text-left`}>
+		          <div className={`relative z-[66] px-4 md:px-0 ${hasValidAmount && !conversionMissing ? 'pt-[16px]' : 'pt-[40px]'} md:pt-[90px] pb-4 text-center md:text-left`}>
             <h3 className="text-[30px] md:text-[34px] font-light text-white/80 md:text-white tracking-tight">
               {resolvedSelectCryptoTitleOverride ||
                 t("moonpay_sell_withdraw_title_prefix", "Transférer vers la banque")}
             </h3>
             {isBankSellFlow ? (
               <div className="mb-4 flex flex-col items-center md:items-start">
-	                <p className="mt-2 text-[19px] md:text-[20px] font-light text-white/50 max-w-[34ch] mx-auto md:mx-0 leading-snug md:leading-relaxed">
+	                <p className="mt-2 text-[19px] md:text-[20px] font-light text-white/50 max-w-[34ch] md:max-w-[68ch] mx-auto md:mx-0 leading-snug md:leading-relaxed">
 	                  {t(
 	                    "moonpay_sell_bank_methods_full",
 	                    "Recevez vos fonds par virement bancaire, carte ou PayPal selon votre pays.",
