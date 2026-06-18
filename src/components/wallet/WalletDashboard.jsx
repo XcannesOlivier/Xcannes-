@@ -130,6 +130,8 @@ export default function WalletDashboard({
   const [tokenListScrolled, setTokenListScrolled] = useState(false);
   const [activityCardHidden, setActivityCardHidden] = useState(false);
   const tokenListScrollTopRef = useRef(0);
+  const scrollingTimerRef = useRef(null);
+  const [isScrolling, setIsScrolling] = useState(false);
   const handleTokenListScroll = useCallback((e) => {
     const st = e.target.scrollTop;
     const prev = tokenListScrollTopRef.current;
@@ -140,6 +142,9 @@ export default function WalletDashboard({
       setActivityCardHidden(false);
     }
     tokenListScrollTopRef.current = st;
+    setIsScrolling(true);
+    if (scrollingTimerRef.current) clearTimeout(scrollingTimerRef.current);
+    scrollingTimerRef.current = setTimeout(() => setIsScrolling(false), 180);
   }, []);
   const [activitySkeletonExpired, setActivitySkeletonExpired] = useState(false);
   const desktopDefaultActionSetRef = useRef(false);
@@ -788,6 +793,7 @@ export default function WalletDashboard({
             onLoadFawazCurrencies={prefLoadFawazCurrencies}
             onPreferredCurrencyChange={setPreferredCurrency}
             allowedCurrencyCodes={activeFiatCurrencyCodes}
+            isScrolling={isScrolling}
           />
 
           {/* Reconciliation banner (external RLUSD spend detected) */}
@@ -1124,10 +1130,6 @@ export default function WalletDashboard({
                   </div>
                   </div>{/* /activity-card-slide */}
                   </div>{/* /overflow-x-hidden clip */}
-                  {/* Onglet gauche visible quand la carte est masquée — mobile only */}
-                  <div className="activity-card-tab md:hidden absolute left-0 top-0 bottom-0 w-8 flex items-center justify-center z-20 pointer-events-none">
-                    <div className="w-[3px] h-9 rounded-full bg-white/25 shadow-[0_0_8px_rgba(255,255,255,0.08)]" />
-                  </div>
                 </div>
               </>
               }
@@ -1200,6 +1202,7 @@ export default function WalletDashboard({
 
           <div className="lg:mr-[229px]">
           <WalletDashboardFooter
+            scrolled={tokenListScrolled}
             onScan={
               !isDesktopPanel
                 ? () => {
@@ -1219,7 +1222,7 @@ export default function WalletDashboard({
                       <span className="text-[14px] font-light tracking-wide leading-none text-white/55 group-hover:text-white/75 transition-colors">Devises</span>
                     </span>
                   }
-                  buttonClassName="w-full h-[40px] flex flex-row items-center justify-center gap-1.5 transition-colors px-3 group rounded-[16px] bg-gradient-to-b from-[#101415] to-[#0d1214] ring-1 ring-white/[0.04] ring-inset shadow-[-3px_3px_10px_2px_rgba(255,255,255,0.008),0_2px_8px_rgba(0,0,0,0.35),inset_0_-14px_18px_rgba(0,0,0,0.82)]"
+                  buttonClassName="wallet-footer-btn w-full h-[40px] flex flex-row items-center justify-center gap-1.5 transition-colors px-3 group rounded-[16px] bg-gradient-to-b from-[#101415] to-[#0d1214] ring-1 ring-white/[0.04] ring-inset shadow-[-3px_3px_10px_2px_rgba(255,255,255,0.008),0_2px_8px_rgba(0,0,0,0.35),inset_0_-14px_18px_rgba(0,0,0,0.82)]"
                   buttonStyle={undefined}
                   placeholder={t('ui_search_all_currencies_c5d6e7f8', 'Search currency...')}
                   excludeCodes={['USD', 'RLUSD', 'XRP']}
