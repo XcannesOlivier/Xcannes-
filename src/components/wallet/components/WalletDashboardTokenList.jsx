@@ -9,6 +9,7 @@ export default function WalletDashboardTokenList({
   headerActionLabel = "",
   onHeaderAction,
   disableInternalScroll = false,
+  onScroll,
 }) {
   const hasHeader = Boolean(headerTitle || headerActionLabel);
   const listClassName = [
@@ -29,7 +30,7 @@ export default function WalletDashboardTokenList({
       className={`flex-1 min-h-0 flex flex-col max-h-none ${className}`}
       style={style}
     >
-      <div className={listClassName}>
+      <div className={listClassName} onScroll={onScroll}>
         {(headerTitle || headerActionLabel) && (
           <div
             className={`flex items-center gap-2 mb-0 md:mb-1 pt-0 bg-transparent ${

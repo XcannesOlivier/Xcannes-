@@ -127,6 +127,7 @@ export default function WalletDashboard({
   const [desktopSettingsPage, setDesktopSettingsPage] = useState(null);
   const [selectedStatementToken, setSelectedStatementToken] = useState(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [tokenListScrolled, setTokenListScrolled] = useState(false);
   const [activitySkeletonExpired, setActivitySkeletonExpired] = useState(false);
   const desktopDefaultActionSetRef = useRef(false);
 
@@ -802,7 +803,7 @@ export default function WalletDashboard({
           {/* Token list */}
           <div className="relative flex-1 flex flex-col lg:flex-row min-h-0">
             {/* Action row: absolute overlay on mobile only — tokens scroll behind */}
-            <div className="lg:hidden absolute top-0 left-0 right-0 z-20 pointer-events-none">
+            <div className="lg:hidden absolute top-0 left-0 right-0 z-20 pointer-events-none" data-scrolled={tokenListScrolled}>
               <div className="pointer-events-auto">
                 <WalletDashboardActionRow onAction={handleAction} />
               </div>
@@ -1108,6 +1109,7 @@ export default function WalletDashboard({
                 </div>
               </>
               }
+              onScroll={(e) => setTokenListScrolled(e.target.scrollTop > 2)}
               className="relative z-[1] touch-pan-y"
               style={{ WebkitOverflowScrolling: 'touch' }}
             />

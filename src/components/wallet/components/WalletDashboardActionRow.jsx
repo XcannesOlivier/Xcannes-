@@ -76,7 +76,7 @@ export default function WalletDashboardActionRow({ onAction, vertical = false })
       className="relative px-3 pt-[24px] pb-0 md:py-2 space-y-2 md:space-y-3"
     >
       <div className="grid grid-cols-4 gap-2 sm:gap-3 relative z-[1]">
-        <div className="rounded-[16px] bg-gradient-to-b from-[#101415] to-[#0d1214] ring-1 ring-white/[0.04] ring-inset shadow-[-3px_3px_10px_2px_rgba(255,255,255,0.03),0_4px_12px_rgba(0,0,0,0.50),inset_0_-12px_18px_rgba(0,0,0,0.75)] md:shadow-[-3px_3px_10px_2px_rgba(255,255,255,0.06),0_4px_12px_rgba(0,0,0,0.50),inset_0_-12px_18px_rgba(0,0,0,0.75)]">
+        <div className="wallet-action-grid-card rounded-[16px] bg-gradient-to-b from-[#101415] to-[#0d1214] ring-1 ring-white/[0.04] ring-inset shadow-[-3px_3px_10px_2px_rgba(255,255,255,0.03),0_4px_12px_rgba(0,0,0,0.50),inset_0_-12px_18px_rgba(0,0,0,0.75)] md:shadow-[-3px_3px_10px_2px_rgba(255,255,255,0.06),0_4px_12px_rgba(0,0,0,0.50),inset_0_-12px_18px_rgba(0,0,0,0.75)]">
         <button
           type="button"
           onClick={() => onAction("sendChoice")}
@@ -104,7 +104,7 @@ export default function WalletDashboardActionRow({ onAction, vertical = false })
 	        </button>
 	        </div>
 
-        <div className="rounded-[16px] bg-gradient-to-b from-[#101415] to-[#0d1214] ring-1 ring-white/[0.04] ring-inset shadow-[-3px_3px_10px_2px_rgba(255,255,255,0.03),0_4px_12px_rgba(0,0,0,0.50),inset_0_-12px_18px_rgba(0,0,0,0.75)] md:shadow-[-3px_3px_10px_2px_rgba(255,255,255,0.06),0_4px_12px_rgba(0,0,0,0.50),inset_0_-12px_18px_rgba(0,0,0,0.75)]">
+        <div className="wallet-action-grid-card rounded-[16px] bg-gradient-to-b from-[#101415] to-[#0d1214] ring-1 ring-white/[0.04] ring-inset shadow-[-3px_3px_10px_2px_rgba(255,255,255,0.03),0_4px_12px_rgba(0,0,0,0.50),inset_0_-12px_18px_rgba(0,0,0,0.75)] md:shadow-[-3px_3px_10px_2px_rgba(255,255,255,0.06),0_4px_12px_rgba(0,0,0,0.50),inset_0_-12px_18px_rgba(0,0,0,0.75)]">
         <button
           type="button"
           onClick={() => onAction("receive")}
@@ -132,7 +132,7 @@ export default function WalletDashboardActionRow({ onAction, vertical = false })
 	        </button>
 	        </div>
 
-        <div className="rounded-[16px] bg-gradient-to-b from-[#101415] to-[#0d1214] ring-1 ring-white/[0.04] ring-inset shadow-[-3px_3px_10px_2px_rgba(255,255,255,0.03),0_4px_12px_rgba(0,0,0,0.50),inset_0_-12px_18px_rgba(0,0,0,0.75)] md:shadow-[-3px_3px_10px_2px_rgba(255,255,255,0.06),0_4px_12px_rgba(0,0,0,0.50),inset_0_-12px_18px_rgba(0,0,0,0.75)]">
+        <div className="wallet-action-grid-card rounded-[16px] bg-gradient-to-b from-[#101415] to-[#0d1214] ring-1 ring-white/[0.04] ring-inset shadow-[-3px_3px_10px_2px_rgba(255,255,255,0.03),0_4px_12px_rgba(0,0,0,0.50),inset_0_-12px_18px_rgba(0,0,0,0.75)] md:shadow-[-3px_3px_10px_2px_rgba(255,255,255,0.06),0_4px_12px_rgba(0,0,0,0.50),inset_0_-12px_18px_rgba(0,0,0,0.75)]">
         <button
           type="button"
           onClick={() => onAction("swap")}
@@ -162,7 +162,7 @@ export default function WalletDashboardActionRow({ onAction, vertical = false })
 	        </button>
 	        </div>
 
-        <div className="rounded-[16px] bg-gradient-to-b from-[#101415] to-[#0d1214] ring-1 ring-white/[0.04] ring-inset shadow-[-3px_3px_10px_2px_rgba(255,255,255,0.03),0_4px_12px_rgba(0,0,0,0.50),inset_0_-12px_18px_rgba(0,0,0,0.75)] md:shadow-[-3px_3px_10px_2px_rgba(255,255,255,0.06),0_4px_12px_rgba(0,0,0,0.50),inset_0_-12px_18px_rgba(0,0,0,0.75)]">
+        <div className="wallet-action-grid-card rounded-[16px] bg-gradient-to-b from-[#101415] to-[#0d1214] ring-1 ring-white/[0.04] ring-inset shadow-[-3px_3px_10px_2px_rgba(255,255,255,0.03),0_4px_12px_rgba(0,0,0,0.50),inset_0_-12px_18px_rgba(0,0,0,0.75)] md:shadow-[-3px_3px_10px_2px_rgba(255,255,255,0.06),0_4px_12px_rgba(0,0,0,0.50),inset_0_-12px_18px_rgba(0,0,0,0.75)]">
         <button
           type="button"
           onClick={() => {
