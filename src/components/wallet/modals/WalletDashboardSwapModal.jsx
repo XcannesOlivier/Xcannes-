@@ -640,7 +640,7 @@ export default function WalletDashboardSwapModal({
               <div className="flex flex-col gap-4">
                 {/* ── Title / subtitle ── */}
 	                <div className="text-center md:text-left relative z-[70]">
-                  <h3 className="text-[30px] md:text-[34px] font-light text-white/80 md:text-white tracking-tight">
+                  <h3 className="text-[30px] md:text-[34px] font-light text-white tracking-tight">
                     {t("ui_convert_title_main", "Convertissez vos devises")}
                   </h3>
                   <p className="mt-2 text-[19px] md:text-[20px] font-light text-white/50 max-w-[34ch] mx-auto md:mx-0 leading-tight">
@@ -657,7 +657,7 @@ export default function WalletDashboardSwapModal({
 	                      prefixClassName:
 	                        "!text-white/45 text-[12px] md:text-[13px] font-light tracking-wide mr-4",
                       labelClassName:
-                        "!text-white/90 text-[14px] md:text-[15px] font-light",
+                        "!text-white text-[14px] md:text-[15px] font-light",
                       dotClassName: "!h-2.5 !w-2.5 ring-xcannes-green/20 self-center",
                     })}
                   </div>

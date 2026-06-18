@@ -1152,7 +1152,7 @@ export default function WalletDashboardSendModal({
     <div className="space-y-6">
       {/* Title + subtitle */}
       <div className="text-center space-y-2 pt-1">
-        <h3 className="text-[30px] md:text-[34px] font-light text-white/80 md:text-white tracking-tight">
+        <h3 className="text-[30px] md:text-[34px] font-light text-white tracking-tight">
 	          {t("ui_payreq_summary_title", "Résumé de la demande")}
         </h3>
         <p className="text-[19px] md:text-[20px] font-light text-white/50 max-w-[34ch] mx-auto leading-tight">
@@ -1164,6 +1164,7 @@ export default function WalletDashboardSendModal({
             className: "flex justify-center",
             prefix: t("moonpay_from_account", "Compte source"),
             pillClassName: "bg-elevated-40 xcannes-fade-border-y shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)] rounded-[20px]",
+            labelClassName: "!text-white",
           })}
         </div>
       </div>
@@ -1198,7 +1199,7 @@ export default function WalletDashboardSendModal({
           </div>
         ) : null}
         <div className="flex items-baseline justify-between gap-4">
-	          <span className="text-[20px] text-white/90">{t("ui_total_to_send_label", "Total à envoyer")}</span>
+	          <span className="text-[20px] text-white">{t("ui_total_to_send_label", "Total à envoyer")}</span>
           <span className="text-3xl font-light text-white">{requestAmountLabel || "—"}</span>
         </div>
       </div>
