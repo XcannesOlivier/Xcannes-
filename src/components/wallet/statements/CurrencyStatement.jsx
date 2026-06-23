@@ -1524,12 +1524,6 @@ export default function CurrencyStatement({
                 </span>
               ) : null}
                 </div>
-              <p className="mt-2 text-[19px] md:text-[20px] font-light text-white/50 max-w-[46ch] md:max-w-[60ch] leading-relaxed">
-                {t(
-                  "ui_currency_statement_subtitle_periods",
-                  "Suivez le solde et les mouvements de cette devise.",
-                )}
-              </p>
 	              </div>
               {/* close via swipe/backdrop */}
 	          </div>

@@ -1480,7 +1480,7 @@ export default function WalletDashboardSendModal({
               <span className="block w-12 h-1.5 rounded-full bg-white/20" />
             </div>
             {/* Titre */}
-            <p className="w-full text-center text-sm text-white/45 px-6 pt-4 pb-0">
+            <p className="w-full text-center text-[19px] md:text-[20px] font-light text-white/50 px-6 pt-4 pb-0 leading-snug">
               Scannez une adresse, une demande de paiement ou un QR de connexion.
             </p>
             <div className="flex-1 w-full">
