@@ -122,32 +122,45 @@ export default function WalletDashboardTokenRow({
         <div
           className={`flex items-center gap-3 rounded-[14px] px-3.5 py-2.5 transition-colors cursor-pointer ${rowSurfaceClass} ${tokenRowClass}`}
         >
-          <div className={`flex items-center gap-3 min-w-0 flex-1`}>
-            <div
-              className={`${iconSizeClass} ${iconRadiusClass} ${iconEdgeSpacingClass} flex items-center justify-center font-light text-primary overflow-hidden leading-none flex-shrink-0`}
-            >
-              {renderTokenIcon(token)}
-            </div>
-            <div className="min-w-0 flex flex-col justify-center">
-              <div className="flex items-center gap-2 min-w-0">
-                <span className="text-xl text-white/70 truncate leading-tight">
-                  {currencyLabel.length > 22 ? currencyLabel.slice(0, 22) + '…' : currencyLabel}
-                </span>
-              </div>
-              {/* Montant + code — sous le nom, mobile et desktop */}
-              <div className="flex items-center gap-1.5 mt-[3px]">
-                <span className="text-lg font-mono text-white/90 leading-tight">
-                  {Number.isFinite(displayValue)
-                    ? new Intl.NumberFormat(locale || "en", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(displayValue)
-                    : "0.00"}
-                </span>
-                <span className="text-sm font-light text-white/50">{displayCode}</span>
-              </div>
+          {/* Icône — identique mobile et desktop */}
+          <div
+            className={`${iconSizeClass} ${iconRadiusClass} ${iconEdgeSpacingClass} flex items-center justify-center font-light text-primary overflow-hidden leading-none flex-shrink-0`}
+          >
+            {renderTokenIcon(token)}
+          </div>
+
+          {/* ── Mobile : nom + montant empilés ── */}
+          <div className="md:hidden min-w-0 flex flex-col justify-center flex-1">
+            <span className="text-xl text-white/70 truncate leading-tight">
+              {currencyLabel.length > 22 ? currencyLabel.slice(0, 22) + '…' : currencyLabel}
+            </span>
+            <div className="flex items-center gap-1.5 mt-[3px]">
+              <span className="text-lg font-mono text-white/90 leading-tight">
+                {Number.isFinite(displayValue)
+                  ? new Intl.NumberFormat(locale || "en", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(displayValue)
+                  : "0.00"}
+              </span>
+              <span className="text-sm font-light text-white/50">{displayCode}</span>
             </div>
           </div>
-          {/* "+" à droite — mobile et desktop */}
-          <div className="shrink-0">
+          <div className="md:hidden shrink-0">
             <span className="text-base font-light text-white/30 leading-none" aria-hidden>+</span>
+          </div>
+
+          {/* ── Desktop : une seule ligne — nom | montant+code | "+" ── */}
+          <div className="hidden md:flex items-center gap-3 flex-1 min-w-0">
+            <span className="text-xl text-white/70 truncate leading-tight flex-1">
+              {currencyLabel}
+            </span>
+            <div className="flex items-center gap-1.5 shrink-0">
+              <span className="text-lg font-mono text-white/90 leading-tight">
+                {Number.isFinite(displayValue)
+                  ? new Intl.NumberFormat(locale || "en", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(displayValue)
+                  : "0.00"}
+              </span>
+              <span className="text-sm font-light text-white/50">{displayCode}</span>
+            </div>
+            <span className="text-base font-light text-white/30 leading-none shrink-0" aria-hidden>+</span>
           </div>
         </div>
       </div>
