@@ -25,9 +25,9 @@ function renderTokenIcon(token) {
       <Image
         src={CRYPTO_ICONS[code]}
         alt={code}
-        width={32}
-        height={32}
-        className="w-7 h-7 sm:w-8 sm:h-8 object-cover"
+        width={44}
+        height={44}
+        className="w-10 h-10 md:w-8 md:h-8 object-cover"
       />
     );
   }
@@ -66,10 +66,10 @@ export default function WalletDashboardTokenRow({
   const hasCryptoIcon = Boolean(displayCode && CRYPTO_ICONS?.[displayCode]);
   const isFlagIcon = isDisplayOverride || (isLineCurrency && !hasCryptoIcon);
   const iconSizeClass = isFlagIcon
-    ? "w-[34px] h-[34px] md:w-[28px] md:h-[28px] text-2xl md:text-xl leading-none opacity-60"
+    ? "w-[44px] h-[44px] md:w-[28px] md:h-[28px] text-3xl md:text-xl leading-none opacity-60"
     : isLineCurrency
-      ? "w-[34px] h-[34px] md:w-[28px] md:h-[28px] text-2xl md:text-xl leading-none opacity-60"
-      : "w-[32px] h-[32px] md:w-[26px] md:h-[26px] text-xl md:text-lg leading-none";
+      ? "w-[44px] h-[44px] md:w-[28px] md:h-[28px] text-3xl md:text-xl leading-none opacity-60"
+      : "w-[42px] h-[42px] md:w-[26px] md:h-[26px] text-2xl md:text-lg leading-none";
   const iconRadiusClass = isNativeAsset ? "rounded-lg" : "";
   const iconEdgeSpacingClass = isNativeAsset ? "ml-1" : "";
   const iconTextGapClass = isNativeAsset ? "gap-3" : "gap-2";
@@ -120,7 +120,7 @@ export default function WalletDashboardTokenRow({
         className="w-full text-left"
       >
         <div
-          className={`flex items-center gap-3 rounded-[14px] px-3.5 py-2 md:py-3 transition-colors cursor-pointer ${rowSurfaceClass} ${tokenRowClass}`}
+          className={`flex items-center gap-3 rounded-[14px] px-3.5 py-2.5 md:py-3 transition-colors cursor-pointer ${rowSurfaceClass} ${tokenRowClass}`}
         >
           <div className={`flex items-center ${iconTextGapClass} min-w-0 flex-1`}>
             <div
@@ -129,8 +129,8 @@ export default function WalletDashboardTokenRow({
               {renderTokenIcon(token)}
             </div>
             <div className="min-w-0">
-              <div className="flex items-baseline gap-2 min-w-0">
-                <span className="text-lg md:text-2xl text-white/55 md:text-white/70 truncate leading-tight">
+              <div className="flex items-center gap-2 min-w-0">
+                <span className="text-xl md:text-2xl text-white/65 md:text-white/70 truncate leading-tight">
                   <span className="md:hidden">
                     {currencyLabel.length > 15 ? currencyLabel.slice(0, 15) + '…' : currencyLabel}
                   </span>
@@ -138,13 +138,13 @@ export default function WalletDashboardTokenRow({
                 </span>
               </div>
               {/* Montant + code — mobile uniquement, sous le nom */}
-              <div className="md:hidden flex items-baseline gap-1 mt-0.5">
-                <span className="text-base font-mono text-white leading-tight">
+              <div className="md:hidden flex items-center gap-1.5 mt-1">
+                <span className="text-lg font-mono text-white leading-tight">
                   {Number.isFinite(displayValue)
                     ? new Intl.NumberFormat(locale || "en", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(displayValue)
                     : "0.00"}
                 </span>
-                <span className="text-xs font-light text-white/45">{displayCode}</span>
+                <span className="text-sm font-light text-white/50">{displayCode}</span>
               </div>
             </div>
           </div>
