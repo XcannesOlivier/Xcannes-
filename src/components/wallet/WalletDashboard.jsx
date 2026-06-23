@@ -851,9 +851,8 @@ export default function WalletDashboard({
                       activitySkeletonExpired ? (
                       /* ── Message vide après 5s ── */
 	                      <div
-	                        className="relative mx-0 mb-0 px-4 py-[9px] animate-fade-in recent-activity-fade-border overflow-hidden lg:shadow-[inset_0_16px_20px_rgba(0,0,0,0.80)]"
+	                        className="relative mx-0 mb-0 px-4 py-[9px] animate-fade-in recent-activity-fade-border overflow-hidden"
 	                      >
-	                        <div className="pointer-events-none absolute inset-x-0 top-0 h-[56px] hidden lg:block bg-gradient-to-b from-black/55 to-transparent" aria-hidden />
 	                        <div className="relative z-10">
 	                        <div className="flex items-center gap-2 min-h-[52px] lg:min-h-[38px]">
 	                          <svg className="w-4 h-4 shrink-0 text-white/20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
@@ -869,9 +868,8 @@ export default function WalletDashboard({
                       ) : (
                       /* ── Skeleton pendant le chargement ── */
 	                      <div
-	                        className="relative mx-0 mb-0 px-4 py-[9px] recent-activity-fade-border overflow-hidden lg:shadow-[inset_0_16px_20px_rgba(0,0,0,0.80)]"
+	                        className="relative mx-0 mb-0 px-4 py-[9px] recent-activity-fade-border overflow-hidden"
 	                      >
-	                        <div className="pointer-events-none absolute inset-x-0 top-0 h-[56px] hidden lg:block bg-gradient-to-b from-black/55 to-transparent" aria-hidden />
 	                        <div className="relative z-10">
 	                        {/* Mobile : deux lignes skeleton */}
 	                        <div className="lg:hidden flex flex-col justify-center gap-[5px] min-h-[52px]">
@@ -916,9 +914,8 @@ export default function WalletDashboard({
                     >
                       {/* Mini-card activité récente */}
 	                      <div
-	                        className="relative mx-0 mb-0 px-4 py-[9px] transition-colors recent-activity-fade-border overflow-hidden lg:shadow-[inset_0_16px_20px_rgba(0,0,0,0.80)]"
+	                        className="relative mx-0 mb-0 px-4 py-[9px] transition-colors recent-activity-fade-border overflow-hidden"
 	                      >
-	                        <div className="pointer-events-none absolute inset-x-0 top-0 h-[56px] hidden lg:block bg-gradient-to-b from-black/55 to-transparent" aria-hidden />
 	                        <div className="relative z-10">
 	                        {/* Mobile : deux lignes */}
 	                        <div className="lg:hidden flex flex-col justify-center gap-[2px] min-h-[52px]">
