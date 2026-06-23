@@ -51,7 +51,7 @@ export default function WalletDashboardFooter({ onScan, addCurrencySlot, onHisto
         }}
       >
         {/* Barre footer */}
-        <div className="relative pointer-events-auto h-[62px] flex items-center gap-2 px-3 bg-transparent" data-scrolled={scrolled}>
+        <div className="relative pointer-events-auto h-[62px] flex items-center gap-2 px-3 bg-[#0b0f10]" data-scrolled={scrolled}>
 
           {/* Gauche : + Devise */}
           <div className="flex-1 flex items-center justify-center h-full min-w-0">
