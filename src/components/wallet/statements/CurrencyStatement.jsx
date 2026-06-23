@@ -1527,6 +1527,7 @@ export default function CurrencyStatement({
 	              </div>
               {/* close via swipe/backdrop */}
 	          </div>
+	        </div>{/* /header */}
 
         {/* Balance + USD estimé */}
         {!isXrpNetworkView ? (
@@ -1609,7 +1610,7 @@ export default function CurrencyStatement({
                   <svg className="w-4 h-4 text-white/45 shrink-0 ml-1.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                     <path d="M2.5 12s3.5-7 9.5-7 9.5 7 9.5 7-3.5 7-9.5 7-9.5-7-9.5-7Z" />
                     <circle cx="12" cy="12" r="2.6" />
-                    {footerDropdownOpen ? <path d="M4 20L20 4" /> : null}
+                    {footerDropdownOpen && <path d="M4 20 L20 4" />}
                   </svg>
                 </button>
                 {footerDropdownOpen && walletAddress ? (
