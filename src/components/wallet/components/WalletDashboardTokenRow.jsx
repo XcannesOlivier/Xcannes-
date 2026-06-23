@@ -27,7 +27,7 @@ function renderTokenIcon(token) {
         alt={code}
         width={52}
         height={52}
-        className="w-12 h-12 md:w-8 md:h-8 object-cover"
+        className="w-12 h-12 object-cover"
       />
     );
   }
@@ -66,10 +66,10 @@ export default function WalletDashboardTokenRow({
   const hasCryptoIcon = Boolean(displayCode && CRYPTO_ICONS?.[displayCode]);
   const isFlagIcon = isDisplayOverride || (isLineCurrency && !hasCryptoIcon);
   const iconSizeClass = isFlagIcon
-    ? "w-[52px] h-[52px] md:w-[28px] md:h-[28px] text-4xl md:text-xl leading-none opacity-65"
+    ? "w-[52px] h-[52px] text-4xl leading-none opacity-65"
     : isLineCurrency
-      ? "w-[52px] h-[52px] md:w-[28px] md:h-[28px] text-4xl md:text-xl leading-none opacity-65"
-      : "w-[50px] h-[50px] md:w-[26px] md:h-[26px] text-3xl md:text-lg leading-none";
+      ? "w-[52px] h-[52px] text-4xl leading-none opacity-65"
+      : "w-[50px] h-[50px] text-3xl leading-none";
   const iconRadiusClass = isNativeAsset ? "rounded-lg" : "";
   const iconEdgeSpacingClass = isNativeAsset ? "ml-1" : "";
   const iconTextGapClass = isNativeAsset ? "gap-3" : "gap-2";
@@ -120,7 +120,7 @@ export default function WalletDashboardTokenRow({
         className="w-full text-left"
       >
         <div
-          className={`flex items-center gap-3 rounded-[14px] px-3.5 py-2.5 md:py-3 transition-colors cursor-pointer ${rowSurfaceClass} ${tokenRowClass}`}
+          className={`flex items-center gap-3 rounded-[14px] px-3.5 py-2.5 transition-colors cursor-pointer ${rowSurfaceClass} ${tokenRowClass}`}
         >
           <div className={`flex items-center gap-3 min-w-0 flex-1`}>
             <div
@@ -130,15 +130,12 @@ export default function WalletDashboardTokenRow({
             </div>
             <div className="min-w-0 flex flex-col justify-center">
               <div className="flex items-center gap-2 min-w-0">
-                <span className="text-xl md:text-2xl text-white/70 md:text-white/70 truncate leading-tight">
-                  <span className="md:hidden">
-                    {currencyLabel.length > 22 ? currencyLabel.slice(0, 22) + '…' : currencyLabel}
-                  </span>
-                  <span className="hidden md:inline">{currencyLabel}</span>
+                <span className="text-xl text-white/70 truncate leading-tight">
+                  {currencyLabel.length > 22 ? currencyLabel.slice(0, 22) + '…' : currencyLabel}
                 </span>
               </div>
-              {/* Montant + code — mobile uniquement, sous le nom */}
-              <div className="md:hidden flex items-center gap-1.5 mt-[3px]">
+              {/* Montant + code — sous le nom, mobile et desktop */}
+              <div className="flex items-center gap-1.5 mt-[3px]">
                 <span className="text-lg font-mono text-white/90 leading-tight">
                   {Number.isFinite(displayValue)
                     ? new Intl.NumberFormat(locale || "en", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(displayValue)
@@ -148,19 +145,8 @@ export default function WalletDashboardTokenRow({
               </div>
             </div>
           </div>
-          {/* Desktop : montant + code + "+" */}
-          <div className="hidden md:flex text-right text-xl text-white shrink-0 leading-tight">
-            <div className="font-mono flex items-center gap-1.5">
-              {Number.isFinite(displayValue)
-                ? new Intl.NumberFormat(locale || "en", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(displayValue)
-                : "0.00"}
-              {" "}
-              <span className="text-sm font-light text-white/50">{displayCode}</span>
-              <span className="text-base font-light text-white/30 leading-none" aria-hidden>+</span>
-            </div>
-          </div>
-          {/* Mobile : "+" seul à droite */}
-          <div className="md:hidden shrink-0">
+          {/* "+" à droite — mobile et desktop */}
+          <div className="shrink-0">
             <span className="text-base font-light text-white/30 leading-none" aria-hidden>+</span>
           </div>
         </div>
