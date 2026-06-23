@@ -392,3 +392,22 @@
     transform: translateX(-100%);
   }
 }
+
+/* ── Activity card: fade + collapse on scroll-down (desktop) ── */
+@media (min-width: 768px) {
+  .activity-card-slide {
+    transition:
+      opacity 300ms ease,
+      max-height 350ms cubic-bezier(0.4, 0, 0.2, 1),
+      transform 300ms ease;
+    max-height: 120px;
+    overflow: hidden;
+    opacity: 1;
+  }
+
+  [data-activity-hidden="true"] .activity-card-slide {
+    max-height: 0;
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
