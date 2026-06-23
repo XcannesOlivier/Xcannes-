@@ -15,7 +15,7 @@ export default function WalletDashboardTokenList({
   const listClassName = [
     "flex-1 min-h-0 px-3",
     hasHeader ? "pt-0" : "pt-1.5",
-    "pb-[50px] md:pb-[4px] rounded-2xl bg-transparent",
+    "pb-[50px] md:pb-[60px] rounded-2xl bg-transparent",
     !disableInternalScroll && "overflow-y-auto overscroll-contain",
   ]
     .filter(Boolean)
