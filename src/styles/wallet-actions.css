@@ -85,9 +85,6 @@
 
 /* ── Scroll-reveal border on mobile action cards ── */
 .wallet-action-grid-card {
-  outline: 1.5px solid rgba(255, 255, 255, 0);
-  outline-offset: -1px;
-  transition: outline-color 400ms ease;
   position: relative;
 }
 
@@ -101,10 +98,6 @@
   transition: opacity 400ms ease;
   pointer-events: none;
   z-index: 0;
-}
-
-[data-scrolled="true"] .wallet-action-grid-card {
-  outline-color: rgba(255, 255, 255, 0.11);
 }
 
 [data-scrolled="true"] .wallet-action-grid-card::before {
