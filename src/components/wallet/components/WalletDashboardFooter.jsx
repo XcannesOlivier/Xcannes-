@@ -64,7 +64,7 @@ export default function WalletDashboardFooter({ onScan, addCurrencySlot, onHisto
               <button
                 type="button"
                 onClick={onScan}
-                className="wallet-footer-btn flex h-[46px] w-[130px] items-center justify-center rounded-[16px] text-xcannes-green transition-transform duration-150 hover:scale-[1.02] active:scale-[0.97] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#39d57c]/20 bg-gradient-to-b from-[#101415] to-[#0d1214] ring-1 ring-white/[0.04] ring-inset shadow-[-3px_3px_10px_2px_rgba(255,255,255,0.015),0_2px_8px_rgba(0,0,0,0.35),inset_0_-16px_20px_rgba(0,0,0,0.88)] scanner-btn-fade-border"
+                className="wallet-footer-btn flex h-[46px] w-[130px] items-center justify-center rounded-[16px] text-xcannes-green transition-transform duration-150 hover:scale-[1.02] active:scale-[0.97] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#39d57c]/20 bg-gradient-to-b from-[#101415] to-[#0d1214] shadow-[-3px_3px_10px_2px_rgba(255,255,255,0.015),0_2px_8px_rgba(0,0,0,0.35),inset_0_-16px_20px_rgba(0,0,0,0.88)] scanner-btn-fade-border"
                 aria-label={t(SCAN_LABEL_KEY, "Scan QR Code")}
               >
                 <ScanIcon />
@@ -78,7 +78,7 @@ export default function WalletDashboardFooter({ onScan, addCurrencySlot, onHisto
               <button
                 type="button"
                 onClick={onHistory}
-                className="wallet-footer-btn w-full h-[40px] flex flex-row items-center justify-center gap-1.5 transition-colors px-1.5 group rounded-[16px] bg-gradient-to-b from-[#101415] to-[#0d1214] ring-1 ring-white/[0.04] ring-inset shadow-[-3px_3px_10px_2px_rgba(255,255,255,0.008),0_2px_8px_rgba(0,0,0,0.35),inset_0_-14px_18px_rgba(0,0,0,0.82)]"
+                className="wallet-footer-btn w-full h-[40px] flex flex-row items-center justify-center gap-1.5 transition-colors px-1.5 group rounded-[16px] bg-gradient-to-b from-[#101415] to-[#0d1214] shadow-[-3px_3px_10px_2px_rgba(255,255,255,0.008),0_2px_8px_rgba(0,0,0,0.35),inset_0_-14px_18px_rgba(0,0,0,0.82)]"
                 aria-label={t("ui_open_statement", "Ouvrir le relevé des transactions")}
               >
                 <svg

@@ -106,9 +106,6 @@
 
 /* ── Scroll-reveal border + darken on mobile footer buttons ── */
 .wallet-footer-btn {
-  outline: 1.5px solid rgba(255, 255, 255, 0.04);
-  outline-offset: -1px;
-  transition: outline-color 400ms ease;
   position: relative;
 }
 
@@ -122,10 +119,6 @@
   transition: opacity 400ms ease;
   pointer-events: none;
   z-index: 0;
-}
-
-[data-scrolled="true"] .wallet-footer-btn {
-  outline-color: rgba(255, 255, 255, 0.18);
 }
 
 [data-scrolled="true"] .wallet-footer-btn::before {
