@@ -148,7 +148,7 @@ export default function WalletDashboardTokenRow({
               </div>
             </div>
           </div>
-          {/* Desktop : montant + code + chevron */}
+          {/* Desktop : montant + code + "+" */}
           <div className="hidden md:flex text-right text-xl text-white shrink-0 leading-tight">
             <div className="font-mono flex items-center gap-1.5">
               {Number.isFinite(displayValue)
@@ -156,16 +156,12 @@ export default function WalletDashboardTokenRow({
                 : "0.00"}
               {" "}
               <span className="text-sm font-light text-white/50">{displayCode}</span>
-              <svg className="w-2.5 h-2.5 shrink-0 text-white/18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                <polyline points="9 18 15 12 9 6" />
-              </svg>
+              <span className="text-base font-light text-white/30 leading-none" aria-hidden>+</span>
             </div>
           </div>
-          {/* Mobile : chevron seul à droite */}
+          {/* Mobile : "+" seul à droite */}
           <div className="md:hidden shrink-0">
-            <svg className="w-2.5 h-2.5 text-white/18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-              <polyline points="9 18 15 12 9 6" />
-            </svg>
+            <span className="text-base font-light text-white/30 leading-none" aria-hidden>+</span>
           </div>
         </div>
       </div>
