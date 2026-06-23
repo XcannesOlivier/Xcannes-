@@ -132,7 +132,7 @@ export default function WalletDashboardTokenRow({
               <div className="flex items-center gap-2 min-w-0">
                 <span className="text-xl md:text-2xl text-white/70 md:text-white/70 truncate leading-tight">
                   <span className="md:hidden">
-                    {currencyLabel.length > 15 ? currencyLabel.slice(0, 15) + '…' : currencyLabel}
+                    {currencyLabel.length > 22 ? currencyLabel.slice(0, 22) + '…' : currencyLabel}
                   </span>
                   <span className="hidden md:inline">{currencyLabel}</span>
                 </span>
