@@ -1528,55 +1528,30 @@ export default function CurrencyStatement({
               {/* close via swipe/backdrop */}
 	          </div>
 
-          {/* Sélecteur de période */}
-          {!isXrpNetworkView ? (
-            <div className="flex justify-center px-4 md:px-6 mt-6 md:mt-7 mb-2 w-full">
-              <StatementMonthSelect
-                value={selectedMonth}
-                onOpenChange={setPeriodDropdownOpen}
-                onChange={(nextValue) => {
-                  if (nextValue === "archives") {
-                    setSelectedMonth("archives");
-                    return;
-                  }
-                  const parsed = Number.parseInt(nextValue, 10);
-                  setSelectedMonth(Number.isFinite(parsed) ? parsed : 0);
-                }}
-                options={availableMonths}
-                menuClassName={modalBgClass}
-                menuPosition="bottom"
-              />
-            </div>
-          ) : null}
-
-          {/* Account Info dans le header */}
-          <div className="space-y-3">
-            {/* Balance + USD estimé */}
-            {!isXrpNetworkView ? (
-              <div className="flex flex-col items-center text-center gap-0.5 mt-3 mb-3 w-fit mx-auto px-8 py-4">
-                <p className="text-[24px] md:text-[26px] text-white/60">
-                  {t("ui_balance_445d830d72", "Solde disponible")}
-                </p>
-                <p className="text-4xl text-white font-bold">
-                  {formatAmountWithSymbolLocal(balance)}
-                </p>
-                {estimatedUsd != null && Number.isFinite(estimatedUsd) ? (
-                  <p className="text-[12px] text-white/50 mt-1 whitespace-nowrap">
-	                    <span className="text-white/40 mr-1">{t("ui_digital_usd_label", "Équivalent USD numérique")}</span>
-                    ≈ {formatAmountWithSymbol(locale, estimatedUsd, "RLUSD", {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
-                  </p>
-                ) : null}
-              </div>
+        {/* Balance + USD estimé */}
+        {!isXrpNetworkView ? (
+          <div className="flex flex-col items-center text-center gap-0.5 mt-3 mb-3 w-fit mx-auto px-8 py-4">
+            <p className="text-[24px] md:text-[26px] text-white/60">
+              {t("ui_balance_445d830d72", "Solde disponible")}
+            </p>
+            <p className="text-4xl text-white font-bold">
+              {formatAmountWithSymbolLocal(balance)}
+            </p>
+            {estimatedUsd != null && Number.isFinite(estimatedUsd) ? (
+              <p className="text-[12px] text-white/50 mt-1 whitespace-nowrap">
+                <span className="text-white/40 mr-1">{t("ui_digital_usd_label", "Équivalent USD numérique")}</span>
+                ≈ {formatAmountWithSymbol(locale, estimatedUsd, "RLUSD", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
+              </p>
             ) : null}
           </div>
-        </div>
+        ) : null}
 
         {/* Filtres */}
         {!isXrpNetworkView ? (
-          <div className="px-4 md:px-6 pb-4 flex flex-row items-stretch md:items-center gap-2">
+          <div className="px-4 md:px-6 pb-2 flex flex-row items-stretch md:items-center gap-2">
             <div className="flex flex-1 items-center rounded-[16px] p-1 ring-1 ring-white/[0.05] ring-inset bg-gradient-to-b from-[#101415] to-[#0d1214]">
               {[
                 { key: "all", label: stripCountSuffix(t("ui_all_0c90d41d71", "Tout")) },
@@ -1609,6 +1584,108 @@ export default function CurrencyStatement({
                   {item.label}
                 </button>
               ))}
+            </div>
+          </div>
+        ) : null}
+
+        {/* Barre : compte | sélecteur de période | télécharger */}
+        {!isXrpNetworkView ? (
+          <div className="flex items-center gap-2 px-4 md:px-6 mt-2 mb-4 w-full">
+            {/* Gauche : label compte avec dropdown adresse */}
+            <div className="flex items-center gap-2 min-w-0 flex-1">
+              <div className="relative w-auto min-w-[120px] max-w-[200px]" ref={footerDropdownRef}>
+                <button
+                  type="button"
+                  onClick={() => setFooterDropdownOpen((prev) => !prev)}
+                  className="w-full inline-flex items-center justify-center gap-0 px-1 md:px-2 py-1.5 bg-transparent transition-all rounded-[10px]"
+                  aria-haspopup="menu"
+                  aria-expanded={footerDropdownOpen}
+                  title={t("ui_current_account_plain", "Compte actuel")}
+                >
+                  <span className="h-2.5 w-2.5 rounded-full bg-xcannes-green ring-2 ring-xcannes-green/20 shrink-0 animate-pulse mr-1" aria-hidden />
+                  <span className="text-white/95 text-sm font-semibold truncate min-w-0">
+                    {walletLabel || t("nav_wallet", "Wallet")}
+                  </span>
+                  <svg className="w-4 h-4 text-white/45 shrink-0 ml-1.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M2.5 12s3.5-7 9.5-7 9.5 7 9.5 7-3.5 7-9.5 7-9.5-7-9.5-7Z" />
+                    <circle cx="12" cy="12" r="2.6" />
+                    {footerDropdownOpen ? <path d="M4 20L20 4" /> : null}
+                  </svg>
+                </button>
+                {footerDropdownOpen && walletAddress ? (
+                  <div className="absolute top-full left-0 z-[200] w-full mt-1 rounded-[10px] ring-1 ring-white/20 ring-inset bg-elevated px-4 py-3 shadow-[0_8px_18px_rgba(0,0,0,0.45)]">
+                    <p className="text-[13px] text-white/60 mb-2">{t("ui_account_address", "Adresse du compte")}</p>
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <button
+                        type="button"
+                        className={`min-w-0 flex-1 text-left text-xs text-white/55 font-mono font-light ${footerAddressExpanded ? "break-all whitespace-normal" : "truncate"}`}
+                        title={walletAddress}
+                        onClick={() => setFooterAddressExpanded((prev) => !prev)}
+                        aria-label={t("ui_toggle_wallet_address_truncation", "Afficher l'adresse complète")}
+                      >
+                        {footerAddressExpanded ? walletAddress : `${walletAddress.slice(0, 8)}…${walletAddress.slice(-6)}`}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          try {
+                            await navigator.clipboard?.writeText?.(walletAddress);
+                            setFooterCopyNotice(t("ui_copied_address", "Adresse copiée"));
+                            if (footerCopyNoticeTimerRef.current) clearTimeout(footerCopyNoticeTimerRef.current);
+                            footerCopyNoticeTimerRef.current = window.setTimeout(() => setFooterCopyNotice(""), 3000);
+                          } catch { /* ignore */ }
+                        }}
+                        className="shrink-0 text-white/40 hover:text-white/70 transition-colors p-0.5"
+                        title={t("ui_copy_address", "Copier l'adresse")}
+                        aria-label={t("ui_copy_address", "Copier l'adresse")}
+                      >
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                          <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
+                        </svg>
+                      </button>
+                    </div>
+                    <div
+                      className={`mt-1.5 text-[11px] text-xcannes-green/85 transition-opacity duration-200 ${footerCopyNotice ? "opacity-100" : "opacity-0"}`}
+                      role="status"
+                      aria-live="polite"
+                    >
+                      {footerCopyNotice || " "}
+                    </div>
+                  </div>
+                ) : null}
+              </div>
+            </div>
+            {/* Centre : sélecteur de période */}
+            <div className="shrink-0">
+              <StatementMonthSelect
+                value={selectedMonth}
+                onOpenChange={setPeriodDropdownOpen}
+                onChange={(nextValue) => {
+                  if (nextValue === "archives") {
+                    setSelectedMonth("archives");
+                    return;
+                  }
+                  const parsed = Number.parseInt(nextValue, 10);
+                  setSelectedMonth(Number.isFinite(parsed) ? parsed : 0);
+                }}
+                options={availableMonths}
+                menuClassName={modalBgClass}
+                menuPosition="bottom"
+              />
+            </div>
+            {/* Droite : bouton télécharger */}
+            <div className="flex items-center justify-end flex-1">
+              <button
+                onClick={handleExportPdf}
+                disabled={exportFormat === "pdf"}
+                className="shrink-0 inline-flex items-center gap-2 px-4 py-1.5 md:py-2 rounded-[10px] text-sm font-medium transition-colors disabled:opacity-50 text-white/70 hover:text-white bg-transparent hover:bg-white/[0.04]"
+                aria-label={t("ui_export_pdf_9c8d16b4fe", "Télécharger")}
+                title={t("ui_export_pdf_9c8d16b4fe", "Télécharger")}
+              >
+                <ShareIcon className={`w-4 h-4 ${exportFormat === "pdf" ? "opacity-40" : ""}`} />
+                <span>{exportFormat === "pdf" ? t("ui_loading_1386baebe9", "Loading…") : t("ui_export_pdf_9c8d16b4fe", "Télécharger")}</span>
+              </button>
             </div>
           </div>
         ) : null}
@@ -1741,93 +1818,7 @@ export default function CurrencyStatement({
         </div>
 
         {/* Footer */}
-        <div className="shrink-0 px-4 md:px-6 py-1.5 md:py-3 pb-[max(2px,env(safe-area-inset-bottom))] md:pb-[max(12px,env(safe-area-inset-bottom))] border-t border-white/[0.10] md:border-white/[0.06] bg-[#111518] shadow-[inset_0_-46px_70px_rgba(0,0,0,0.55)] flex items-center justify-between gap-1 md:gap-2">
-          {/* Compte actuel */}
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="relative w-auto min-w-[120px] max-w-[180px]" ref={footerDropdownRef}>
-              <button
-                type="button"
-                onClick={() => setFooterDropdownOpen((prev) => !prev)}
-                className="w-full inline-flex items-center justify-center gap-0 px-1 md:px-3 py-1.5 md:py-2 bg-transparent transition-all rounded-[10px]"
-                aria-haspopup="menu"
-                aria-expanded={footerDropdownOpen}
-                title={t("ui_current_account_plain", "Compte actuel")}
-              >
-                <span className="h-2.5 w-2.5 rounded-full bg-xcannes-green ring-2 ring-xcannes-green/20 shrink-0 animate-pulse mr-1" aria-hidden />
-                <span className="text-white/95 text-sm font-semibold truncate min-w-0">
-                  {walletLabel || t("nav_wallet", "Wallet")}
-                </span>
-                <svg
-                  className="w-4 h-4 text-white/45 shrink-0 ml-1.5"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.7"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
-                >
-                  <path d="M2.5 12s3.5-7 9.5-7 9.5 7 9.5 7-3.5 7-9.5 7-9.5-7-9.5-7Z" />
-                  <circle cx="12" cy="12" r="2.6" />
-                  {footerDropdownOpen ? <path d="M4 20L20 4" /> : null}
-                </svg>
-              </button>
-              {footerDropdownOpen && walletAddress ? (
-                <div className="absolute bottom-full left-0 z-[200] w-full mb-1 rounded-[10px] ring-1 ring-white/20 ring-inset bg-elevated px-4 py-3 shadow-[0_-8px_18px_rgba(0,0,0,0.45)]">
-                  <p className="text-[13px] text-white/60 mb-2">{t("ui_account_address", "Adresse du compte")}</p>
-                  <div className="flex items-center gap-1.5 min-w-0">
-                    <button
-                      type="button"
-                      className={`min-w-0 flex-1 text-left text-xs text-white/55 font-mono font-light ${footerAddressExpanded ? "break-all whitespace-normal" : "truncate"}`}
-                      title={walletAddress}
-                      onClick={() => setFooterAddressExpanded((prev) => !prev)}
-                      aria-label={t("ui_toggle_wallet_address_truncation", "Afficher l'adresse complète")}
-                    >
-                      {footerAddressExpanded ? walletAddress : `${walletAddress.slice(0, 8)}…${walletAddress.slice(-6)}`}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={async () => {
-                        try {
-                          await navigator.clipboard?.writeText?.(walletAddress);
-                          setFooterCopyNotice(t("ui_copied_address", "Adresse copiée"));
-                          if (footerCopyNoticeTimerRef.current) clearTimeout(footerCopyNoticeTimerRef.current);
-                          footerCopyNoticeTimerRef.current = window.setTimeout(() => setFooterCopyNotice(""), 3000);
-                        } catch { /* ignore */ }
-                      }}
-                      className="shrink-0 text-white/40 hover:text-white/70 transition-colors p-0.5"
-                      title={t("ui_copy_address", "Copier l'adresse")}
-                      aria-label={t("ui_copy_address", "Copier l'adresse")}
-                    >
-                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-                        <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
-                      </svg>
-                    </button>
-                  </div>
-                  <div
-                    className={`mt-1.5 text-[11px] text-xcannes-green/85 transition-opacity duration-200 ${footerCopyNotice ? "opacity-100" : "opacity-0"}`}
-                    role="status"
-                    aria-live="polite"
-                  >
-                    {footerCopyNotice || " "}
-                  </div>
-                </div>
-              ) : null}
-            </div>
-          </div>
-          {/* Bouton télécharger */}
-          <button
-            onClick={handleExportPdf}
-            disabled={exportFormat === "pdf"}
-            className="shrink-0 inline-flex items-center gap-2 px-4 py-1.5 md:py-2 rounded-[10px] text-sm font-medium transition-colors disabled:opacity-50 text-white/70 hover:text-white bg-transparent hover:bg-white/[0.04]"
-            aria-label={t("ui_export_pdf_9c8d16b4fe", "Télécharger")}
-            title={t("ui_export_pdf_9c8d16b4fe", "Télécharger")}
-          >
-            <ShareIcon className={`w-4 h-4 ${exportFormat === "pdf" ? "opacity-40" : ""}`} />
-            <span>{exportFormat === "pdf" ? t("ui_loading_1386baebe9", "Loading…") : t("ui_export_pdf_9c8d16b4fe", "Télécharger")}</span>
-          </button>
-        </div>
+        <div className="shrink-0 pb-[max(2px,env(safe-area-inset-bottom))] md:pb-[max(12px,env(safe-area-inset-bottom))]" />
         {/* Bottom indicator removed */}
 
       </div>
