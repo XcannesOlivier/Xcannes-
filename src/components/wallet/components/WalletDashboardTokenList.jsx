@@ -57,10 +57,10 @@ export default function WalletDashboardTokenList({
             ) : null}
           </div>
         )}
-        <div className="space-y-[2px] md:hidden">
+        <div className="space-y-2 md:hidden">
           {tokens.map(renderTokenRow)}
         </div>
-        <div className="hidden md:flex md:flex-col md:space-y-[2px]">
+        <div className="hidden md:flex md:flex-col md:space-y-2">
           {tokens.map(renderTokenRow)}
         </div>
       </div>
