@@ -716,7 +716,7 @@ export default function WalletDashboardHeader({
           {t("ui_total_balance_label_a91b6b8c1e", "Solde total")}
         </div>
         <p
-          className="text-6xl md:text-6xl lg:text-7xl font-sans font-light text-white tabular-nums tracking-tight leading-none transition-opacity duration-[180ms]"
+          className="text-6xl md:text-6xl lg:text-7xl font-sans font-medium text-white tabular-nums tracking-tight leading-none transition-opacity duration-[180ms]"
           style={{ opacity: balanceFading ? 0 : 1 }}
         >
           {shownLabel}
