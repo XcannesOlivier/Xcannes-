@@ -697,10 +697,10 @@ export default function WalletDashboardHeader({
               <div className="hidden lg:flex items-center">
                 <Link
                   href="/"
-                  className="flex items-center gap-1.5 text-[19px] text-white/45 hover:text-white/80 transition-colors px-5 py-1.5 rounded-lg"
+                  className="flex items-center gap-1.5 text-[17px] text-white/45 hover:text-white/80 transition-colors px-5 py-1.5 rounded-lg"
                   title="Retour à l'accueil"
                 >
-                  <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                  <svg className="w-[18px] h-[18px] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                     <path d="M12 2v6" />
                     <path d="M6.8 6.8a8 8 0 1 0 10.4 0" />
                   </svg>
