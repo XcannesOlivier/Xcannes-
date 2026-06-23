@@ -120,7 +120,7 @@ export default function WalletDashboardTokenRow({
         className="w-full text-left"
       >
         <div
-          className={`flex items-center gap-3 rounded-[14px] px-3.5 py-2.5 transition-colors cursor-pointer ${rowSurfaceClass} ${tokenRowClass}`}
+          className={`flex items-center gap-3 md:gap-6 rounded-[14px] px-3.5 py-2.5 transition-colors cursor-pointer ${rowSurfaceClass} ${tokenRowClass}`}
         >
           {/* Icône — identique mobile et desktop */}
           <div
@@ -149,18 +149,18 @@ export default function WalletDashboardTokenRow({
 
           {/* ── Desktop : une seule ligne — nom | montant+code | "+" ── */}
           <div className="hidden md:flex items-center gap-3 flex-1 min-w-0">
-            <span className="text-xl text-white/70 truncate leading-tight flex-1">
+            <span className="text-2xl text-white/70 truncate leading-tight flex-1">
               {currencyLabel}
             </span>
-            <div className="flex items-center gap-1.5 shrink-0">
-              <span className="text-lg font-mono text-white/90 leading-tight">
+            <div className="flex items-center gap-4 shrink-0">
+              <span className="text-2xl font-mono text-white/90 leading-tight">
                 {Number.isFinite(displayValue)
                   ? new Intl.NumberFormat(locale || "en", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(displayValue)
                   : "0.00"}
               </span>
-              <span className="text-sm font-light text-white/50">{displayCode}</span>
+              <span className="text-base font-light text-white/50">{displayCode}</span>
             </div>
-            <span className="text-base font-light text-white/30 leading-none shrink-0" aria-hidden>+</span>
+            <span className="text-lg font-light text-white/30 leading-none shrink-0 ml-2" aria-hidden>+</span>
           </div>
         </div>
       </div>
