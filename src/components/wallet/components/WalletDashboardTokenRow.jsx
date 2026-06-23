@@ -91,11 +91,11 @@ export default function WalletDashboardTokenRow({
   // fond elevated + voile blanc léger + ombres internes.
   const rowSurfaceClass = [
     "bg-elevated",
-    "border border-white/[0.03]",
+    "border border-white/[0.03] border-b-0",
     "bg-white/[0.035]",
     "bg-[linear-gradient(to_bottom,rgba(255,255,255,0.04),rgba(255,255,255,0)_85%)]",
-    "[@media(hover:hover)]:hover:bg-none [@media(hover:hover)]:hover:border-white/[0.05]",
-    touched ? "!bg-none !border-white/[0.05]" : "",
+    "[@media(hover:hover)]:hover:bg-none [@media(hover:hover)]:hover:border-b [@media(hover:hover)]:hover:border-white/[0.05]",
+    touched ? "!bg-none !border !border-white/[0.05]" : "",
     "transition-colors duration-150",
   ].join(" ");
 
