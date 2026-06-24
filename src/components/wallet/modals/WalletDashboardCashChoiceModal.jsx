@@ -334,7 +334,7 @@ export default function WalletDashboardCashChoiceModal({
                             </div>
                             <p className="mt-1 text-[15px] md:text-sm leading-snug text-white/45 flex items-center gap-1.5">
                               <span>{t('ui_funds_add_hint_account', 'À votre compte')}</span>
-                              <span className="h-2 w-2 rounded-full bg-xcannes-green shrink-0 animate-pulse" aria-hidden />
+                              <span className="h-2.5 w-2.5 rounded-full bg-xcannes-green ring-4 ring-xcannes-green/20 shrink-0 wallet-dot-active" aria-hidden />
                               <span className="text-white font-light">{walletLabel || 'XCANNES'}</span>
                             </p>
                           </div>
