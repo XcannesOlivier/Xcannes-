@@ -417,27 +417,44 @@ export default function WalletDashboardSendChoiceModal({
   }, [payreqPasteValue, isPayreqSelfSend]);
 
   // ── Icons ────────────────────────────────────────────────────
+  // Envoi simple — two nodes connected by an arrow (direct transfer)
   const QuickScanIcon = () => (
     <svg viewBox="0 0 48 48" className="w-9 h-9 md:w-10 md:h-10" fill="none" aria-hidden>
-      <rect x="10" y="10" width="12" height="12" rx="2" className="stroke-xcannes-green/70" strokeWidth="1.5" fill="none" />
-      <rect x="13" y="13" width="6" height="6" rx="1" className="fill-xcannes-green/50" />
-      <rect x="26" y="10" width="12" height="12" rx="2" className="stroke-white/50" strokeWidth="1.5" fill="none" />
-      <rect x="29" y="13" width="6" height="6" rx="1" className="fill-white/30" />
-      <rect x="10" y="26" width="12" height="12" rx="2" className="stroke-white/50" strokeWidth="1.5" fill="none" />
-      <rect x="13" y="29" width="6" height="6" rx="1" className="fill-white/30" />
-      <path d="M26 30h4m4 0h4" className="stroke-xcannes-green/60" strokeWidth="1.5" strokeLinecap="round" />
-      <path d="M26 36h12" className="stroke-white/30" strokeWidth="1.5" strokeLinecap="round" />
+      {/* Source node */}
+      <circle cx="10" cy="24" r="4" className="stroke-xcannes-green/70" strokeWidth="1.6" fill="none" />
+      <circle cx="10" cy="24" r="1.6" className="fill-xcannes-green/55" />
+      {/* Arrow shaft */}
+      <line x1="15" y1="24" x2="31" y2="24" className="stroke-xcannes-green/60" strokeWidth="1.6" strokeLinecap="round" />
+      {/* Arrow head */}
+      <path d="M27 19.5L32.5 24L27 28.5" className="stroke-xcannes-green/90" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+      {/* Destination node */}
+      <circle cx="38" cy="24" r="4" className="stroke-xcannes-green/45" strokeWidth="1.6" fill="none" />
+      <circle cx="38" cy="24" r="1.6" className="fill-xcannes-green/30" />
+      {/* Speed lines above */}
+      <line x1="18" y1="18" x2="24" y2="18" className="stroke-xcannes-green/30" strokeWidth="1.3" strokeLinecap="round" />
+      <line x1="21" y1="14.5" x2="26" y2="14.5" className="stroke-xcannes-green/18" strokeWidth="1.1" strokeLinecap="round" />
     </svg>
   );
 
+  // Payer une demande — QR code frame with a scan corner indicator
   const PayRequestIcon = () => (
     <svg viewBox="0 0 48 48" className="w-9 h-9 md:w-10 md:h-10" fill="none" aria-hidden>
-      <rect x="10" y="12" width="28" height="24" rx="5" className="fill-white/5 stroke-white/40" strokeWidth="1.5" />
-      <path d="M16 22h16" className="stroke-white/50" strokeWidth="1.5" strokeLinecap="round" />
-      <path d="M16 28h10" className="stroke-white/35" strokeWidth="1.5" strokeLinecap="round" />
-      <circle cx="34" cy="30" r="6" className="fill-[#f5a623]/15 stroke-[#f5a623]/60" strokeWidth="1.4" />
-      <path d="M34 27v6m-2-4c0-.7.9-1.2 2-1.2s2 .5 2 1.2-.9 1.2-2 1.2-2 .5-2 1.2.9 1.2 2 1.2 2-.5 2-1.2"
-        className="stroke-[#f5a623]/90" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+      {/* QR corner brackets */}
+      {/* Top-left */}
+      <path d="M10 18V11h7" className="stroke-[#f5a623]/80" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      {/* Top-right */}
+      <path d="M38 18V11h-7" className="stroke-[#f5a623]/80" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      {/* Bottom-left */}
+      <path d="M10 30v7h7" className="stroke-[#f5a623]/80" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      {/* Bottom-right */}
+      <path d="M38 30v7h-7" className="stroke-[#f5a623]/55" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      {/* Inner QR dots — minimal grid hint */}
+      <rect x="17" y="17" width="4" height="4" rx="1" className="fill-[#f5a623]/50" />
+      <rect x="27" y="17" width="4" height="4" rx="1" className="fill-[#f5a623]/35" />
+      <rect x="17" y="27" width="4" height="4" rx="1" className="fill-[#f5a623]/35" />
+      {/* Center checkmark / confirm dot */}
+      <circle cx="29.5" cy="29.5" r="3.5" className="fill-[#f5a623]/15 stroke-[#f5a623]/60" strokeWidth="1.3" />
+      <path d="M27.8 29.5l1.2 1.4 2.2-2.2" className="stroke-[#f5a623]/90" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 
