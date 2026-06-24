@@ -72,7 +72,7 @@ export function useWalletMeta({
                 {effectivePrefix}
               </span>
               <div className="flex items-center gap-2">
-                <span className={["h-3 w-3 rounded-full bg-xcannes-green ring-4 ring-xcannes-green/20 shrink-0 animate-pulse", options?.dotClassName || ""].filter(Boolean).join(" ")} aria-hidden />
+                <span className={["h-2.5 w-2.5 rounded-full bg-xcannes-green ring-4 ring-xcannes-green/20 shrink-0 wallet-dot-active", options?.dotClassName || ""].filter(Boolean).join(" ")} aria-hidden />
                 <span className={["text-white/95 text-[14px] font-semibold", options?.labelClassName || ""].filter(Boolean).join(" ")}>
                   {resolvedLabel || "Wallet"}
                 </span>
