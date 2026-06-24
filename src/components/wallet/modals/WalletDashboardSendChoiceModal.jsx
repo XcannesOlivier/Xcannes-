@@ -809,6 +809,12 @@ export default function WalletDashboardSendChoiceModal({
                   >
                     <div className="pointer-events-none absolute inset-0" aria-hidden>
                       <div className="xcannes-sendchoice-border-fade-green z-10" />
+                      {/* Ambient halo — breathing glow */}
+                      <div className="sc-halo-green absolute -inset-8 rounded-full blur-[60px] bg-[radial-gradient(ellipse_at_30%_50%,rgba(0,255,150,1)_0%,transparent_65%)]" />
+                      {/* Border shimmer sweep */}
+                      <div className="absolute inset-0 overflow-hidden rounded-[18px] z-20">
+                        <div className="sc-shimmer-green absolute top-0 left-0 w-1/3 h-full bg-[linear-gradient(105deg,transparent_0%,rgba(0,255,150,0.18)_45%,rgba(255,255,255,0.10)_50%,rgba(0,255,150,0.18)_55%,transparent_100%)]" />
+                      </div>
                       <div className="absolute inset-0 bg-[radial-gradient(190px_190px_at_-8%_18%,rgba(0,255,150,0.55)_0%,rgba(0,255,150,0.22)_22%,rgba(0,255,150,0.08)_38%,transparent_62%)]" />
                       <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] via-transparent to-black/40" />
                     </div>
@@ -892,6 +898,12 @@ export default function WalletDashboardSendChoiceModal({
                   >
                     <div className="pointer-events-none absolute inset-0" aria-hidden>
                       <div className="xcannes-sendchoice-border-fade-amber z-10" />
+                      {/* Ambient halo — breathing glow */}
+                      <div className="sc-halo-amber absolute -inset-8 rounded-full blur-[60px] bg-[radial-gradient(ellipse_at_30%_50%,rgba(245,166,35,1)_0%,transparent_65%)]" />
+                      {/* Border shimmer sweep */}
+                      <div className="absolute inset-0 overflow-hidden rounded-[18px] z-20">
+                        <div className="sc-shimmer-amber absolute top-0 left-0 w-1/3 h-full bg-[linear-gradient(105deg,transparent_0%,rgba(245,166,35,0.16)_45%,rgba(255,255,255,0.09)_50%,rgba(245,166,35,0.16)_55%,transparent_100%)]" />
+                      </div>
                       <div className="absolute inset-0 bg-[radial-gradient(190px_190px_at_-8%_18%,rgba(245,166,35,0.46)_0%,rgba(245,166,35,0.20)_22%,rgba(245,166,35,0.08)_38%,transparent_62%)]" />
                       <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] via-transparent to-black/40" />
                     </div>
