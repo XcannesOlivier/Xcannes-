@@ -1497,25 +1497,25 @@ export default function CurrencyStatement({
 	                  <img
                     src={CRYPTO_ICONS[displayCurrency]}
                     alt={displayCurrency}
-                    width={32}
-                    height={32}
-                      className="flex-shrink-0 w-8 h-8 rounded-md"
+                    width={24}
+                    height={24}
+                      className="flex-shrink-0 w-6 h-6 rounded-md"
                   />
                 ) : (
                   <Image
                     src={CRYPTO_ICONS[displayCurrency]}
                     alt={displayCurrency}
-                    width={32}
-                    height={32}
-                      className="flex-shrink-0 w-8 h-8 rounded-md"
+                    width={24}
+                    height={24}
+                      className="flex-shrink-0 w-6 h-6 rounded-md"
                   />
                 )
               ) : (
-                  <span className="text-3xl flex-shrink-0 leading-none">
+                  <span className="text-2xl flex-shrink-0 leading-none">
                   {getCurrencyFlag(displayCurrency)}
                 </span>
               )}
-              <h2 className="text-[30px] md:text-[34px] font-light text-white/80 md:text-white tracking-tight min-w-0 truncate">
+              <h2 className="text-[22px] md:text-[26px] font-light text-white/80 md:text-white tracking-tight min-w-0 truncate">
                 {headerTitle}
               </h2>
               {noticeVariant === "demo" ? (
@@ -1694,7 +1694,7 @@ export default function CurrencyStatement({
         {/* Content - Zone scrollable */}
         <div
           className={[
-            "px-0 py-4 md:py-6 flex flex-col gap-4 overscroll-contain bg-transparent border-t border-white/[0.10] md:border-white/[0.06]",
+            "px-0 py-4 md:py-6 flex flex-col gap-4 overscroll-contain bg-transparent",
             isXrpNetworkView ? "flex-none" : "flex-1 min-h-0",
             isXrpNetworkView
               ? "overflow-visible"
@@ -1757,7 +1757,7 @@ export default function CurrencyStatement({
                       <div className="px-4 pt-1 pb-0.5 text-[11px] font-light text-white/50 tracking-wide">
                         {group.label}
                       </div>
-                      <div className="px-3 pb-1">
+                      <div className="px-3 pb-1 flex flex-col gap-1.5">
                         {group.transactions.map((tx, idx) => {
                           const transactionId =
                             tx?.id || tx?.txHash || `${group.key}-${idx}`;
