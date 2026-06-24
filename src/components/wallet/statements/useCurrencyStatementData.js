@@ -116,14 +116,47 @@ export default function useCurrencyStatementData({
   }, [selectedMonth, selectedMonthKey, statementMonthKeys]);
 
   /* ── period transactions (for the selected month) ──────── */
+  const MIN_TX_COUNT = 10;
+
   const periodTransactions = useMemo(() => {
     if (!selectedMonthKeys.length) return [];
-    const keySet = new Set(selectedMonthKeys);
-    return baseTransactions.filter((tx) => {
+
+    // Archives: pas d'extension
+    if (selectedMonth === "archives") {
+      const keySet = new Set(selectedMonthKeys);
+      return baseTransactions.filter((tx) => {
+        const key = getMonthKeyFromTransaction(tx);
+        return key && keySet.has(key);
+      });
+    }
+
+    // Mois normal : étendre aux mois précédents si < MIN_TX_COUNT transactions
+    const allMonths = statementMonthKeys; // trié desc (plus récent en premier)
+    const selectedIdx = selectedMonthKey ? allMonths.indexOf(selectedMonthKey) : -1;
+    const includedKeys = new Set(selectedMonthKeys);
+
+    let result = baseTransactions.filter((tx) => {
       const key = getMonthKeyFromTransaction(tx);
-      return key && keySet.has(key);
+      return key && includedKeys.has(key);
     });
-  }, [baseTransactions, selectedMonthKeys]);
+
+    let nextIdx = selectedIdx + 1;
+    while (result.length < MIN_TX_COUNT && nextIdx < allMonths.length && nextIdx < 12) {
+      includedKeys.add(allMonths[nextIdx]);
+      result = baseTransactions.filter((tx) => {
+        const key = getMonthKeyFromTransaction(tx);
+        return key && includedKeys.has(key);
+      });
+      nextIdx++;
+    }
+
+    // Trier du plus récent au plus ancien
+    return [...result].sort((a, b) => {
+      const da = new Date(a?.createdAt || a?.date || 0).getTime();
+      const db = new Date(b?.createdAt || b?.date || 0).getTime();
+      return db - da;
+    });
+  }, [baseTransactions, selectedMonthKeys, selectedMonthKey, selectedMonth, statementMonthKeys]);
 
   /* ── auto-fallback to last active month ──────────────────
    * If the user selects a month with zero transactions, we automatically
