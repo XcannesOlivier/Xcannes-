@@ -51,7 +51,7 @@ export default function WalletDashboardCashChoiceModal({
     if (prefersReduced) return;
 
     // Card accent colors: [green, white, gold, gold-light]
-    const COLORS = ['rgba(0,255,150,0.75)', 'rgba(200,220,255,0.60)', 'rgba(245,196,35,0.70)', 'rgba(245,196,35,0.55)'];
+    const COLORS = ['rgba(255,255,255,0.90)', 'rgba(255,255,255,0.90)', 'rgba(255,255,255,0.90)', 'rgba(255,255,255,0.90)'];
     let alive = true;
 
     const fire = () => {
@@ -63,7 +63,7 @@ export default function WalletDashboardCashChoiceModal({
       const left = edge === 1 ? 100 : edge === 3 ? 0 : pct;
       const size = 3 + Math.random() * 2.5;
       setSparkle({ cardIdx, top, left, color: COLORS[cardIdx], size, key: Date.now() });
-      setTimeout(() => { if (alive) setSparkle(null); }, 550);
+      setTimeout(() => { if (alive) setSparkle(null); }, 950);
       // Schedule next
       sparkleTimerRef.current = setTimeout(fire, 2200 + Math.random() * 2800);
     };
