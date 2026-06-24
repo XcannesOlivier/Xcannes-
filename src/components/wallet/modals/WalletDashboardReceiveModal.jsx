@@ -1475,7 +1475,7 @@ export default function WalletDashboardReceiveModal({
 		                            {t('ui_receive_account_info_label', 'Choisissez le compte')}
 	                          </span>
 	                          <div className="flex items-center gap-2">
-	                            <span className="h-2.5 w-2.5 rounded-full bg-xcannes-green ring-4 ring-xcannes-green/20 shrink-0" style={{animation:'wallet-dot-pulse 3.5s ease-in-out infinite'}} aria-hidden />
+	                            <span className="h-2.5 w-2.5 rounded-full bg-xcannes-green ring-4 ring-xcannes-green/20 shrink-0 wallet-dot-active"  aria-hidden />
 	                            <span className="text-white text-[14px] md:text-[15px] font-semibold">
 	                              {activeWalletLabel || t('nav_wallet', 'Wallet')}
 	                            </span>
@@ -1785,7 +1785,7 @@ export default function WalletDashboardReceiveModal({
 		                            {t('ui_receive_receiving_account_label', 'Compte de réception')}
 	                          </span>
 	                          <div className="flex items-center gap-2">
-	                            <span className="h-2.5 w-2.5 rounded-full bg-[#f5a623] ring-4 ring-[#f5a623]/20 shrink-0" style={{animation:'wallet-dot-pulse 3.5s ease-in-out infinite'}} aria-hidden />
+	                            <span className="h-2.5 w-2.5 rounded-full bg-[#f5a623] ring-4 ring-[#f5a623]/20 shrink-0 wallet-dot-active"  aria-hidden />
 	                            <span className="text-white text-[14px] md:text-[15px] font-medium">
 	                              {activeWalletLabel || t('nav_wallet', 'Wallet')}
 	                            </span>
@@ -2194,7 +2194,7 @@ export default function WalletDashboardReceiveModal({
 		                          {t('ui_receive_receiving_account_label', 'Compte de réception')}
 	                        </span>
 	                        <div className="flex items-center gap-2">
-	                          <span className="h-2.5 w-2.5 rounded-full bg-[#f5a623] ring-4 ring-[#f5a623]/20 shrink-0" style={{animation:'wallet-dot-pulse 3.5s ease-in-out infinite'}} aria-hidden />
+	                          <span className="h-2.5 w-2.5 rounded-full bg-[#f5a623] ring-4 ring-[#f5a623]/20 shrink-0 wallet-dot-active"  aria-hidden />
 	                          <span className="text-white text-[14px] md:text-[15px] font-medium">
 	                            {activeWalletLabel || t('nav_wallet', 'Wallet')}
 	                          </span>

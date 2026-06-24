@@ -491,6 +491,11 @@ body.wallet-page {
   50%       { transform: scale(0.7);  opacity: 0.2; }
 }
 
+.wallet-dot-active {
+  animation: wallet-dot-pulse 3.5s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
 .wallet-dot-wrapper {
   position: relative;
   display: inline-flex;

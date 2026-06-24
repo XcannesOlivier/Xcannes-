@@ -46,13 +46,13 @@ export default function WalletActiveLabel({
       ) : null}
       <span
         className={[
-          "h-2 w-2 rounded-full ring-4 ring-xcannes-green/20 bg-xcannes-green shrink-0",
+          "h-2 w-2 rounded-full ring-4 ring-xcannes-green/20 bg-xcannes-green shrink-0 wallet-dot-active",
           dotAlignClass,
           dotClassName,
         ]
           .filter(Boolean)
           .join(" ")}
-        style={dotStyle ?? { animation: 'wallet-dot-pulse 3.5s ease-in-out infinite' }}
+        style={dotStyle}
         aria-hidden="true"
       />
       <span
