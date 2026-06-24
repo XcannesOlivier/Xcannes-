@@ -1515,7 +1515,7 @@ export default function GlobalStatement({
                 ) : null}
               </div>
               {/* Wallet label + bouton télécharger */}
-              <div className="flex items-center justify-between gap-3">
+              <div className="w-full flex items-center justify-between">
                 <div className="relative min-w-0 max-w-[220px]" ref={accountDropdownRef}>
                   <button
                     type="button"
