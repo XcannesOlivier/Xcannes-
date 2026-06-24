@@ -923,16 +923,21 @@ export default function WalletDashboard({
 	                        <div className="relative z-10">
 	                        {/* Mobile : deux lignes */}
 	                        <div className="lg:hidden flex flex-col justify-center gap-[4px] min-h-[52px]">
-	                          {/* Ligne 1 : "Dernière transaction" + date */}
+	                          {/* Ligne 1 : "Dernière transaction" + date + heure */}
                           <div className="flex items-center justify-between gap-2">
 	                            <span className="text-[11px] font-light uppercase tracking-wider text-white/30">
 	                              {t('ui_last_transaction_title', 'Dernière transaction')}
 	                            </span>
-	                            {recentActivityWhen?.date ? (
-	                              <span className="shrink-0 text-[12px] text-white/35 whitespace-nowrap">{recentActivityWhen.date}</span>
-	                            ) : null}
+	                            <div className="shrink-0 flex items-center gap-1.5">
+	                              {recentActivityWhen?.date ? (
+	                                <span className="text-[12px] text-white/35 whitespace-nowrap">{recentActivityWhen.date}</span>
+	                              ) : null}
+	                              {recentActivityWhen?.time ? (
+	                                <span className="text-[12px] text-white/35 whitespace-nowrap">{recentActivityWhen.time}</span>
+	                              ) : null}
+	                            </div>
 	                          </div>
-	                          {/* Ligne 2 : icône + type d'opération + montant + heure + chevron */}
+	                          {/* Ligne 2 : icône + type d'opération + montant + chevron */}
 	                          <div className="flex items-center justify-between gap-2">
 	                            <div className="flex items-center gap-1.5 min-w-0">
 	                              <div
@@ -962,9 +967,6 @@ export default function WalletDashboard({
 	                                  <span className="text-red-400">−{recentActivitySendParts.amount} {recentActivitySendParts.currency}</span>
 	                                ) : null}
 	                              </span>
-	                              {recentActivityWhen?.time ? (
-	                                <span className="text-[12px] text-white/35 whitespace-nowrap">{recentActivityWhen.time}</span>
-	                              ) : null}
 	                              <svg className="w-[13px] h-[13px] text-white/30 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
 	                                <polyline points="9 18 15 12 9 6" />
 	                              </svg>
@@ -973,38 +975,47 @@ export default function WalletDashboard({
 	                        </div>
 
                         {/* Desktop : une seule ligne */}
-	                        <div className="hidden lg:flex items-center gap-3 min-h-[38px]">
-                          <div
-                            className={[
-                              "shrink-0 flex items-center justify-center opacity-70",
-                              recentActivityIcon === "receive" ? "text-xcannes-green"
-                                : recentActivityIcon === "send" ? "text-red-400"
-                                : "text-xcannes-green",
-                            ].join(" ")}
-                            aria-hidden
-                          >
-                            <ActivityIconSvg icon={recentActivityIcon} size={16} />
+	                        <div className="hidden lg:flex items-center justify-between gap-3 min-h-[38px]">
+                          {/* Gauche : titre */}
+                          <span className="shrink-0 text-[11px] font-light uppercase tracking-wider text-white/30 whitespace-nowrap">
+                            {t('ui_last_transaction_title', 'Dernière transaction')}
+                          </span>
+                          {/* Centre : icône + type + montant */}
+                          <div className="flex items-center gap-2 min-w-0 flex-1 justify-center">
+                            <div
+                              className={[
+                                "shrink-0 flex items-center justify-center opacity-70",
+                                recentActivityIcon === "receive" ? "text-xcannes-green"
+                                  : recentActivityIcon === "send" ? "text-red-400"
+                                  : "text-xcannes-green",
+                              ].join(" ")}
+                              aria-hidden
+                            >
+                              <ActivityIconSvg icon={recentActivityIcon} size={14} />
+                            </div>
+                            <span className="shrink-0 text-[13px] font-light text-white/60 whitespace-nowrap">
+                              {recentActivityShortLabel}
+                            </span>
+                            <span className="text-white/20 text-[11px]">·</span>
+                            <span className="text-[13px] font-light whitespace-nowrap">
+                              {recentActivityMessageParts.isConversion ? (
+                                <span className="text-white/65">{recentActivityMessageParts.left}{" "}{recentActivityMessageParts.arrow}{" "}{recentActivityMessageParts.right}</span>
+                              ) : recentActivityIcon === "receive" && recentActivityReceiveParts ? (
+                                <span className="text-xcannes-green">+{recentActivityReceiveParts.amount} {recentActivityReceiveParts.currency}</span>
+                              ) : recentActivityIcon === "send" && recentActivitySendParts ? (
+                                <span className="text-red-400">−{recentActivitySendParts.amount} {recentActivitySendParts.currency}</span>
+                              ) : <span className="text-white/65">{recentActivityMessage}</span>}
+                            </span>
                           </div>
-                          <span className="shrink-0 text-[12px] text-white/40 whitespace-nowrap">
-                            {recentActivityLabel}
-                          </span>
-                          <span className="flex-1 min-w-0 truncate text-[13px] text-white/70 font-light">
-                            {recentActivityMessageParts.isConversion ? (
-                              <>{String(recentActivityMessageParts.left || "").replace(/^Vous avez converti\s+/i, "").trim()}{" "}{recentActivityMessageParts.arrow}{" "}{recentActivityMessageParts.right}</>
-                            ) : recentActivityIcon === "receive" && recentActivityReceiveParts ? (
-                              <span className="text-xcannes-green">+ {recentActivityReceiveParts.amount} {recentActivityReceiveParts.currency}</span>
-                            ) : recentActivityIcon === "send" && recentActivitySendParts ? (
-                              <span className="text-red-400">- {recentActivitySendParts.amount} {recentActivitySendParts.currency}</span>
-                            ) : recentActivityMessage}
-                          </span>
-                          <div className="shrink-0 flex items-center gap-2 text-white/30">
+                          {/* Droite : date + heure + chevron */}
+                          <div className="shrink-0 flex items-center gap-1.5 text-white/35">
                             {recentActivityWhen?.date ? (
                               <span className="text-[12px] whitespace-nowrap">{recentActivityWhen.date}</span>
                             ) : null}
                             {recentActivityWhen?.time ? (
                               <span className="text-[12px] whitespace-nowrap">{recentActivityWhen.time}</span>
                             ) : null}
-                            <svg className="w-[13px] h-[13px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                            <svg className="w-[13px] h-[13px] text-white/30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                               <polyline points="9 18 15 12 9 6" />
                             </svg>
 	                        </div>
