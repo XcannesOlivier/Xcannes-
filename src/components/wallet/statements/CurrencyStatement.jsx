@@ -1442,7 +1442,7 @@ export default function CurrencyStatement({
 
       <div
         ref={overlayRef}
-        className={`relative w-full wallet-modal-panel wallet-modal-no-top-highlight-mobile ${modalBgClass} flex flex-col min-h-0 ${statementPanelOverflowClass} ${inline ? "z-[1]" : "z-[10201]"} shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-26px_46px_rgba(0,0,0,0.55)] ${
+        className={`relative w-full wallet-modal-panel wallet-modal-no-top-highlight-mobile ${modalBgClass} flex flex-col min-h-0 ${statementPanelOverflowClass} ${inline ? "z-[1]" : "z-[10201]"} shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] ${
           resolvedLayout.panelClass
         } ${inline ? "wallet-inline-zoom-in" : liftAnimClass}`}
         style={{
@@ -1464,7 +1464,7 @@ export default function CurrencyStatement({
       >
 	        {/* Header avec Account Info intégré */}
 	        <div
-	          className={`relative flex-shrink-0 bg-elevated shadow-[inset_0_16px_28px_rgba(255,255,255,0.03),inset_0_-46px_70px_rgba(0,0,0,0.55)] px-4 md:px-6 py-3 md:py-4`}
+	          className={`relative flex-shrink-0 bg-elevated px-4 md:px-6 py-3 md:py-4`}
             onPointerDown={(event) => {
               maybeStartOverlayDrag(event, "fixed");
             }}
@@ -1553,7 +1553,7 @@ export default function CurrencyStatement({
         {/* Filtres */}
         {!isXrpNetworkView ? (
           <div className="px-4 md:px-6 pb-2 flex flex-row items-stretch md:items-center gap-2">
-            <div className="flex flex-1 items-center rounded-[16px] p-1 ring-1 ring-white/[0.05] ring-inset bg-gradient-to-b from-[#101415] to-[#0d1214]">
+            <div className="flex flex-1 items-center rounded-[16px] p-1 ring-1 ring-white/[0.05] ring-inset bg-transparent">
               {[
                 { key: "all", label: stripCountSuffix(t("ui_all_0c90d41d71", "Tout")) },
                 { key: "credit", label: stripCountSuffix(t("ui_credits_b8166276a0", "Entrées")) },
@@ -1772,7 +1772,7 @@ export default function CurrencyStatement({
                                 ref={isHighlighted ? highlightRowRef : null}
                                 onClick={() => openTxDetails(tx)}
                                 className={[
-                                  "w-full flex items-center gap-1.5 text-left px-3 py-2 rounded-[16px] bg-transparent ring-1 ring-inset ring-white/[0.06] shadow-[inset_0_-14px_18px_rgba(0,0,0,0.8)] transition-colors duration-150",
+                                  "w-full flex items-center gap-1.5 text-left px-3 py-2 rounded-[16px] bg-transparent ring-1 ring-inset ring-white/[0.06] transition-colors duration-150",
                                   isHighlighted
                                     ? "text-white"
                                     : "text-white/90 hover:text-white",
