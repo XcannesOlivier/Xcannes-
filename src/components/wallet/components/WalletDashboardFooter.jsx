@@ -9,8 +9,8 @@ const TAGLINE_KEY = "ui_global_usd_wallet_202f7e48be";
 function ScanIcon() {
   return (
     <svg
-      viewBox="0 0 96 32"
-      className="h-7 w-[80px]"
+      viewBox="0 0 32 32"
+      className="h-5 w-5"
       fill="none"
       stroke="currentColor"
       strokeWidth="1.5"
@@ -19,21 +19,8 @@ function ScanIcon() {
       <path
         strokeLinecap="butt"
         strokeLinejoin="miter"
-        d="M2.5 11.5V2.5H10.5M85.5 2.5H93.5V11.5M10.5 29.5H2.5V20.5M93.5 20.5V29.5H85.5"
+        d="M2.5 10V2.5H10M22 2.5H29.5V10M10 29.5H2.5V22M29.5 22V29.5H22"
       />
-      <text
-        x="48"
-        y="16"
-        textAnchor="middle"
-        dominantBaseline="middle"
-        fill="currentColor"
-        stroke="none"
-        fontSize="19"
-        fontWeight="300"
-        fontFamily="system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif"
-      >
-        Scanner
-      </text>
     </svg>
   );
 }
@@ -67,10 +54,11 @@ export default function WalletDashboardFooter({ onScan, addCurrencySlot, onHisto
               <button
                 type="button"
                 onClick={onScan}
-                className="w-full h-full flex items-center justify-center text-xcannes-green transition-opacity duration-150 hover:opacity-75 active:opacity-50 focus-visible:outline-none"
+                className="w-full h-full flex flex-col items-center justify-center gap-[3px] text-white/75 transition-opacity duration-150 hover:opacity-75 active:opacity-50 focus-visible:outline-none group"
                 aria-label={t(SCAN_LABEL_KEY, "Scan QR Code")}
               >
                 <ScanIcon />
+                <span className="text-[14px] font-light tracking-wide leading-none text-white/55 group-hover:text-white/75 transition-colors">Scanner</span>
               </button>
             </div>
           ) : null}
@@ -84,11 +72,11 @@ export default function WalletDashboardFooter({ onScan, addCurrencySlot, onHisto
               <button
                 type="button"
                 onClick={onHistory}
-                className="w-full h-full flex flex-row items-center justify-center gap-1.5 transition-opacity hover:opacity-75 active:opacity-50 focus-visible:outline-none px-1.5 group"
+                className="w-full h-full flex flex-col items-center justify-center gap-[3px] transition-opacity hover:opacity-75 active:opacity-50 focus-visible:outline-none px-1.5 group"
                 aria-label={t("ui_open_statement", "Ouvrir le relevé des transactions")}
               >
                 <svg
-                  className="w-[20px] h-[20px] shrink-0 text-white/75 group-hover:text-white/90 transition-colors"
+                  className="w-5 h-5 shrink-0 text-white/75 group-hover:text-white/90 transition-colors"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
