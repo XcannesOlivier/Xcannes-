@@ -1588,6 +1588,85 @@ export default function GlobalStatement({
           </div>
           </div>
 
+        {/* Monthly summary stats */}
+        {(() => {
+          const monthAgo = new Date();
+          monthAgo.setMonth(monthAgo.getMonth() - 1);
+          const monthMovements = (movements || []).filter((m) => {
+            const d = m?.createdAt ? new Date(m.createdAt) : null;
+            return d && Number.isFinite(d.getTime()) && d >= monthAgo;
+          });
+          let sumIn = 0, cntIn = 0, sumOut = 0, cntOut = 0, cntConv = 0;
+          monthMovements.forEach((m) => {
+            const uiT = getMovementUiType(m);
+            const isConv = normalizeKind(m?.kind) === "CONVERSION";
+            const amt = Math.abs(Number(m?.amountRlusd) || 0);
+            if (isConv) { cntConv++; }
+            else if (uiT === "credit") { sumIn += amt; cntIn++; }
+            else if (uiT === "debit") { sumOut += amt; cntOut++; }
+          });
+          const total = cntIn + cntOut + cntConv;
+          const fmt = (n) => n.toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+          return (
+            <div className="px-4 md:px-6 pt-3 pb-1">
+              <div className="grid grid-cols-2 gap-2 rounded-[18px] ring-1 ring-white/[0.06] ring-inset bg-white/[0.025] px-4 py-3">
+                {/* Entrées */}
+                <div className="flex items-center gap-2.5">
+                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-emerald-500/10 shrink-0">
+                    <svg className="w-4 h-4 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                      <line x1="12" y1="19" x2="12" y2="5" /><polyline points="5 12 12 5 19 12" />
+                    </svg>
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-[11px] text-white/40 font-light">{t("ui_credits_b8166276a0", "Entrées")}</div>
+                    <div className="text-[14px] font-medium text-emerald-400 leading-tight">+{fmt(sumIn)} $</div>
+                    <div className="text-[10px] text-white/30">{cntIn} transaction{cntIn !== 1 ? "s" : ""}</div>
+                  </div>
+                </div>
+                {/* Sorties */}
+                <div className="flex items-center gap-2.5">
+                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-red-500/10 shrink-0">
+                    <svg className="w-4 h-4 text-red-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                      <line x1="12" y1="5" x2="12" y2="19" /><polyline points="19 12 12 19 5 12" />
+                    </svg>
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-[11px] text-white/40 font-light">{t("ui_debits_38c870b18f", "Sorties")}</div>
+                    <div className="text-[14px] font-medium text-red-400 leading-tight">-{fmt(sumOut)} $</div>
+                    <div className="text-[10px] text-white/30">{cntOut} transaction{cntOut !== 1 ? "s" : ""}</div>
+                  </div>
+                </div>
+                {/* Conversions */}
+                <div className="flex items-center gap-2.5">
+                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-500/10 shrink-0">
+                    <svg className="w-4 h-4 text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                      <path d="M17 1l4 4-4 4" /><path d="M3 11V9a4 4 0 014-4h14" /><path d="M7 23l-4-4 4-4" /><path d="M21 13v2a4 4 0 01-4 4H3" />
+                    </svg>
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-[11px] text-white/40 font-light">{t("ui_conversions_b604b5ef8b", "Conversions")}</div>
+                    <div className="text-[14px] font-medium text-blue-400 leading-tight">{cntConv} conversion{cntConv !== 1 ? "s" : ""}</div>
+                    <div className="text-[10px] text-white/30">{cntConv} transaction{cntConv !== 1 ? "s" : ""}</div>
+                  </div>
+                </div>
+                {/* Total */}
+                <div className="flex items-center gap-2.5">
+                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-white/[0.06] shrink-0">
+                    <svg className="w-4 h-4 text-white/50" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                      <rect x="3" y="3" width="18" height="18" rx="3" /><path d="M9 9h6M9 12h6M9 15h4" />
+                    </svg>
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-[11px] text-white/40 font-light">Total</div>
+                    <div className="text-[14px] font-medium text-white/75 leading-tight">{total} transaction{total !== 1 ? "s" : ""}</div>
+                    <div className="text-[10px] text-white/30">ce mois-ci</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
+
         {/* Filtres */}
         <div className="px-4 md:px-6 pt-6 md:pt-7 pb-2 md:pb-3 flex flex-row items-stretch md:items-center gap-2">
           <div className="flex flex-1 items-center rounded-[16px] p-1 ring-1 ring-white/[0.05] ring-inset bg-gradient-to-b from-[#101415] to-[#0d1214]">
