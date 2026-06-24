@@ -197,6 +197,15 @@ export function useActivityBanner({ backendWalletAddress, rlusdPerUnitRates, sav
           ? t('ui_recent_send_banner', 'Envoi récent')
           : t('ui_recent_activity_banner', 'Activité récente');
 
+  const recentActivityShortLabel =
+    recentActivityIcon === 'convert'
+      ? t('ui_activity_convert_short', 'Conversion')
+      : recentActivityIcon === 'receive'
+        ? t('ui_activity_receive_short', 'Réception')
+        : recentActivityIcon === 'send'
+          ? t('ui_activity_send_short', 'Envoi')
+          : t('ui_activity_short', 'Activité');
+
   return {
     recentActivityMessage,
     recentActivityMovement,
@@ -214,5 +223,6 @@ export function useActivityBanner({ backendWalletAddress, rlusdPerUnitRates, sav
     recentActivitySendParts,
     recentActivityIcon,
     recentActivityLabel,
+    recentActivityShortLabel,
   };
 }

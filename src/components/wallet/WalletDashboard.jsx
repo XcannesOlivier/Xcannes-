@@ -408,6 +408,7 @@ export default function WalletDashboard({
     recentActivitySendParts,
     recentActivityIcon,
     recentActivityLabel,
+    recentActivityShortLabel,
   } = useActivityBanner({
     backendWalletAddress,
     rlusdPerUnitRates,
@@ -873,21 +874,24 @@ export default function WalletDashboard({
 	                        <div className="relative z-10">
 	                        {/* Mobile : deux lignes skeleton */}
 	                        <div className="lg:hidden flex flex-col justify-center gap-[5px] min-h-[52px]">
-                          <div className="flex items-center justify-between gap-2">
-                            <div className="flex items-center gap-1.5">
-                              <div className="h-4 w-4 rounded-full bg-white/[0.07] animate-pulse shrink-0" />
-                              <div className="h-2.5 w-20 rounded bg-white/[0.07] animate-pulse" />
-                            </div>
-                            <div className="h-2.5 w-12 rounded bg-white/[0.07] animate-pulse" />
-                          </div>
-                          <div className="flex items-center justify-between gap-2">
-                            <div className="h-3 w-36 rounded bg-white/[0.07] animate-pulse" />
-                            <div className="flex items-center gap-1">
-                              <div className="h-2.5 w-10 rounded bg-white/[0.07] animate-pulse" />
+	                          {/* Ligne 1 : titre + date */}
+	                          <div className="flex items-center justify-between gap-2">
+	                            <div className="h-2 w-28 rounded bg-white/[0.07] animate-pulse" />
+	                            <div className="h-2.5 w-12 rounded bg-white/[0.07] animate-pulse" />
+	                          </div>
+	                          {/* Ligne 2 : type + montant + heure */}
+	                          <div className="flex items-center justify-between gap-2">
+	                            <div className="flex items-center gap-1.5">
+	                              <div className="h-4 w-4 rounded-full bg-white/[0.07] animate-pulse shrink-0" />
+	                              <div className="h-2.5 w-16 rounded bg-white/[0.07] animate-pulse" />
+	                            </div>
+	                            <div className="flex items-center gap-1">
+	                              <div className="h-2.5 w-14 rounded bg-white/[0.07] animate-pulse" />
+	                              <div className="h-2.5 w-10 rounded bg-white/[0.07] animate-pulse" />
 	                        </div>
 	                        </div>
 	                      </div>
-                        </div>
+	                        </div>
                         {/* Desktop : une ligne skeleton */}
                         <div className="hidden lg:flex items-center gap-3 min-h-[38px]">
                           <div className="h-4 w-4 rounded-full bg-white/[0.07] animate-pulse shrink-0" />
@@ -918,52 +922,55 @@ export default function WalletDashboard({
 	                      >
 	                        <div className="relative z-10">
 	                        {/* Mobile : deux lignes */}
-	                        <div className="lg:hidden flex flex-col justify-center gap-[2px] min-h-[52px]">
-                          {/* Ligne 1 : icône + type (secondaire) + date */}
+	                        <div className="lg:hidden flex flex-col justify-center gap-[4px] min-h-[52px]">
+	                          {/* Ligne 1 : "Dernière transaction" + date */}
                           <div className="flex items-center justify-between gap-2">
-                            <div className="flex items-center gap-1.5 min-w-0">
-                              <div
-                                className={[
-                                  "shrink-0 flex items-center justify-center opacity-70",
-                                  recentActivityIcon === "receive"
-                                    ? "text-xcannes-green"
-                                    : recentActivityIcon === "send"
-                                      ? "text-red-400"
-                                      : "text-xcannes-green",
-                                ].join(" ")}
-                                aria-hidden
-                              >
-                                <ActivityIconSvg icon={recentActivityIcon} size={18} />
-                              </div>
-                              <span className="text-[13px] text-white/55 truncate">
-                                {recentActivityLabel}
-                              </span>
-                            </div>
-                            {recentActivityWhen?.date ? (
-                              <span className="shrink-0 text-[12px] text-white/35 whitespace-nowrap">{recentActivityWhen.date}</span>
-                            ) : null}
-                          </div>
-                          {/* Ligne 2 : montant principal + heure + chevron */}
-                          <div className="flex items-center justify-between gap-2">
-                            <span className="min-w-0 truncate text-[14px] text-white/75 font-light">
-                              {recentActivityMessageParts.isConversion ? (
-                                <>{String(recentActivityMessageParts.left || "").replace(/^Vous avez converti\s+/i, "").trim()}{" "}{recentActivityMessageParts.arrow}{" "}{recentActivityMessageParts.right}</>
-                              ) : recentActivityIcon === "receive" && recentActivityReceiveParts ? (
-                                <span className="text-xcannes-green">+ {recentActivityReceiveParts.amount} {recentActivityReceiveParts.currency}</span>
-                              ) : recentActivityIcon === "send" && recentActivitySendParts ? (
-                                <span className="text-red-400">- {recentActivitySendParts.amount} {recentActivitySendParts.currency}</span>
-                              ) : recentActivityMessage}
-                            </span>
-                            <div className="shrink-0 flex items-center gap-1">
-                              {recentActivityWhen?.time ? (
-                                <span className="text-[12px] text-white/35 whitespace-nowrap">{recentActivityWhen.time}</span>
-                              ) : null}
-                              <svg className="w-[14px] h-[14px] text-white/30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                                <polyline points="9 18 15 12 9 6" />
-                              </svg>
-                            </div>
-                          </div>
-                        </div>
+	                            <span className="text-[11px] font-light uppercase tracking-wider text-white/30">
+	                              {t('ui_last_transaction_title', 'Dernière transaction')}
+	                            </span>
+	                            {recentActivityWhen?.date ? (
+	                              <span className="shrink-0 text-[12px] text-white/35 whitespace-nowrap">{recentActivityWhen.date}</span>
+	                            ) : null}
+	                          </div>
+	                          {/* Ligne 2 : icône + type d'opération + montant + heure + chevron */}
+	                          <div className="flex items-center justify-between gap-2">
+	                            <div className="flex items-center gap-1.5 min-w-0">
+	                              <div
+	                                className={[
+	                                  "shrink-0 flex items-center justify-center opacity-70",
+	                                  recentActivityIcon === "receive"
+	                                    ? "text-xcannes-green"
+	                                    : recentActivityIcon === "send"
+	                                      ? "text-red-400"
+	                                      : "text-xcannes-green",
+	                                ].join(" ")}
+	                                aria-hidden
+	                              >
+	                                <ActivityIconSvg icon={recentActivityIcon} size={16} />
+	                              </div>
+	                              <span className="text-[14px] font-light text-white/70 truncate">
+	                                {recentActivityShortLabel}
+	                              </span>
+	                            </div>
+	                            <div className="shrink-0 flex items-center gap-1.5">
+	                              <span className="text-[14px] font-light whitespace-nowrap">
+	                                {recentActivityMessageParts.isConversion ? (
+	                                  <span className="text-white/65">{recentActivityMessageParts.left}{" "}{recentActivityMessageParts.arrow}{" "}{recentActivityMessageParts.right}</span>
+	                                ) : recentActivityIcon === "receive" && recentActivityReceiveParts ? (
+	                                  <span className="text-xcannes-green">+{recentActivityReceiveParts.amount} {recentActivityReceiveParts.currency}</span>
+	                                ) : recentActivityIcon === "send" && recentActivitySendParts ? (
+	                                  <span className="text-red-400">−{recentActivitySendParts.amount} {recentActivitySendParts.currency}</span>
+	                                ) : null}
+	                              </span>
+	                              {recentActivityWhen?.time ? (
+	                                <span className="text-[12px] text-white/35 whitespace-nowrap">{recentActivityWhen.time}</span>
+	                              ) : null}
+	                              <svg className="w-[13px] h-[13px] text-white/30 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+	                                <polyline points="9 18 15 12 9 6" />
+	                              </svg>
+	                            </div>
+	                          </div>
+	                        </div>
 
                         {/* Desktop : une seule ligne */}
 	                        <div className="hidden lg:flex items-center gap-3 min-h-[38px]">
