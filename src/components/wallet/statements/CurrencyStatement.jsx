@@ -1780,10 +1780,14 @@ export default function CurrencyStatement({
                                     : "text-white/90 hover:text-white",
                                 ].join(" ")}
                               >
-                                <div className="w-7 h-7 flex items-center justify-center text-white/85 flex-none">
-                                  <span className="text-[15px] leading-none text-white/95">
-                                    {getTimelineIcon(tx)}
-                                  </span>
+                                <div className={`w-7 h-7 flex items-center justify-center flex-none text-[15px] leading-none ${
+                                  tx?.category === "exchange"
+                                    ? "text-blue-300"
+                                    : tx?.type === "credit"
+                                      ? "text-green-300"
+                                      : "text-red-300"
+                                }`}>
+                                  {getTimelineIcon(tx)}
                                 </div>
                                 <div className="min-w-0 flex-1">
                                   <div className="text-sm font-light text-white/90 break-words overflow-hidden [display:-webkit-box] [-webkit-line-clamp:2] [-webkit-box-orient:vertical]">
