@@ -1505,15 +1505,6 @@ export default function GlobalStatement({
           <div className="flex justify-start">
             <div className="min-w-0 flex flex-col items-start justify-center text-left gap-3">
               <div className="flex items-center justify-start gap-3">
-                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-white/70" aria-hidden="true">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h8" strokeWidth="1.1" />
-                  <polyline points="14 2 14 8 20 8" strokeWidth="1.1" />
-                  <circle cx="18" cy="17" r="4" strokeWidth="1.1" />
-                  <polyline points="18 15 18 17 19.5 18.5" />
-                  <line x1="8" y1="13" x2="12" y2="13" />
-                  <line x1="8" y1="9" x2="10" y2="9" />
-                  <line x1="8" y1="17" x2="11" y2="17" />
-                </svg>
                 <h2 className="text-[30px] md:text-[34px] font-light text-white/80 md:text-white tracking-tight text-left">
                   {globalTitle}
                 </h2>
@@ -1523,13 +1514,77 @@ export default function GlobalStatement({
                   </span>
                 ) : null}
               </div>
-              <p className="mt-2 text-[19px] md:text-[20px] font-light text-white/50 max-w-[46ch] md:max-w-[60ch] leading-relaxed">
-                {t(
-                  "ui_global_statement_subtitle_recent_20",
-                  "Consultez vos transactions récentes et ouvrez-en une pour voir les détails.",
-                )}
-              </p>
-            </div>  {/* close via swipe/backdrop */}
+              {/* Wallet label + bouton télécharger */}
+              <div className="flex items-center gap-3 flex-wrap">
+                <div className="relative w-auto min-w-[120px] max-w-[220px]" ref={accountDropdownRef}>
+                  <button
+                    type="button"
+                    onClick={() => setAccountDropdownOpen((prev) => !prev)}
+                    className="w-full inline-flex items-center gap-2 px-3 py-1.5 bg-transparent transition-all rounded-[10px]"
+                    aria-haspopup="menu"
+                    aria-expanded={accountDropdownOpen}
+                    title={t("ui_current_account_plain", "Compte actuel")}
+                  >
+                    <span className="h-2 w-2 rounded-full bg-xcannes-green ring-4 ring-xcannes-green/20 shrink-0 animate-pulse" aria-hidden />
+                    <span className="text-white/70 text-sm font-light truncate min-w-0 flex-1 text-left">
+                      {walletLabel || t("nav_wallet", "Wallet")}
+                    </span>
+                    <svg className="w-3.5 h-3.5 text-white/35 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <path d="M2.5 12s3.5-7 9.5-7 9.5 7 9.5 7-3.5 7-9.5 7-9.5-7-9.5-7Z" />
+                      <circle cx="12" cy="12" r="2.6" />
+                      {accountDropdownOpen ? <path d="M4 20L20 4" /> : null}
+                    </svg>
+                  </button>
+                  {accountDropdownOpen && walletAddress ? (
+                    <div className="absolute top-full left-0 z-[200] w-full mt-1 rounded-[10px] ring-1 ring-white/20 ring-inset bg-elevated px-4 py-3 shadow-[0_8px_18px_rgba(0,0,0,0.45)]">
+                      <p className="text-[13px] text-white/60 mb-2">{t("ui_account_address", "Adresse du compte")}</p>
+                      <div className="flex items-center gap-1.5 min-w-0">
+                        <button
+                          type="button"
+                          className={`min-w-0 flex-1 text-left text-xs text-white/55 font-mono font-light ${accountAddressExpanded ? "break-all whitespace-normal" : "truncate"}`}
+                          title={walletAddress}
+                          onClick={() => setAccountAddressExpanded((prev) => !prev)}
+                          aria-label={t("ui_toggle_wallet_address_truncation", "Afficher l'adresse complète")}
+                        >
+                          {accountAddressExpanded ? walletAddress : `${walletAddress.slice(0, 8)}…${walletAddress.slice(-6)}`}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            try {
+                              await navigator.clipboard?.writeText?.(walletAddress);
+                              setAccountCopyNotice(t("ui_copied_address", "Adresse copiée"));
+                              if (accountCopyNoticeTimerRef.current) clearTimeout(accountCopyNoticeTimerRef.current);
+                              accountCopyNoticeTimerRef.current = window.setTimeout(() => setAccountCopyNotice(""), 3000);
+                            } catch { /* ignore */ }
+                          }}
+                          className="shrink-0 text-white/40 hover:text-white/70 transition-colors p-0.5"
+                          title={t("ui_copy_address", "Copier l'adresse")}
+                          aria-label={t("ui_copy_address", "Copier l'adresse")}
+                        >
+                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                            <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
+                          </svg>
+                        </button>
+                      </div>
+                      <div className={`mt-1.5 text-[11px] text-xcannes-green/85 transition-opacity duration-200 ${accountCopyNotice ? "opacity-100" : "opacity-0"}`} role="status" aria-live="polite">
+                        {accountCopyNotice || " "}
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
+                <button
+                  onClick={handleExportPdf}
+                  disabled={exportFormat === "pdf"}
+                  className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[10px] text-sm font-light transition-colors disabled:opacity-50 text-white/50 hover:text-white/80 bg-transparent hover:bg-white/[0.04]"
+                  aria-label={t("ui_export_pdf_9c8d16b4fe", "Télécharger")}
+                >
+                  <ShareIcon className={`w-3.5 h-3.5 ${exportFormat === "pdf" ? "opacity-40" : ""}`} />
+                  <span>{exportFormat === "pdf" ? t("ui_loading_1386baebe9", "Loading…") : t("ui_export_pdf_9c8d16b4fe", "Télécharger")}</span>
+                </button>
+              </div>
+            </div>
           </div>
           </div>
 
@@ -1752,90 +1807,16 @@ export default function GlobalStatement({
           </div>
         </div>
 
-        {/* Footer */}
-	        <div className="shrink-0 px-4 md:px-6 py-1.5 md:py-3 pb-[max(2px,env(safe-area-inset-bottom))] md:pb-[max(12px,env(safe-area-inset-bottom))] border-t border-white/[0.10] md:border-white/[0.06] bg-[#111518] shadow-[inset_0_-46px_70px_rgba(0,0,0,0.55)] flex items-center justify-between gap-3">
-          {/* Compte actuel */}
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="relative w-auto min-w-[120px] max-w-[180px]" ref={accountDropdownRef}>
-              <button
-                type="button"
-                onClick={() => setAccountDropdownOpen((prev) => !prev)}
-                className={`w-full inline-flex items-center justify-center gap-2 px-3 py-1.5 md:py-2 bg-transparent transition-all rounded-[10px]`}
-                aria-haspopup="menu"
-                aria-expanded={accountDropdownOpen}
-                title={t("ui_current_account_plain", "Compte actuel")}
-              >
-                <span className="h-2.5 w-2.5 rounded-full bg-xcannes-green ring-4 ring-xcannes-green/20 shrink-0 animate-pulse" aria-hidden />
-                <span className="text-white/95 text-sm font-semibold truncate min-w-0 flex-1 text-center">
-                  {walletLabel || t("nav_wallet", "Wallet")}
-                </span>
-                <svg
-                  className="w-4 h-4 text-white/45 shrink-0"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.7"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
-                >
-                  <path d="M2.5 12s3.5-7 9.5-7 9.5 7 9.5 7-3.5 7-9.5 7-9.5-7-9.5-7Z" />
-                  <circle cx="12" cy="12" r="2.6" />
-                  {accountDropdownOpen ? <path d="M4 20L20 4" /> : null}
-                </svg>
-              </button>
-              {accountDropdownOpen && walletAddress ? (
-                <div className="absolute bottom-full left-0 z-[200] w-full mb-1 rounded-[10px] ring-1 ring-white/20 ring-inset bg-elevated px-4 py-3 shadow-[0_-8px_18px_rgba(0,0,0,0.45)]">
-                  <p className="text-[13px] text-white/60 mb-2">{t("ui_account_address", "Adresse du compte")}</p>
-                  <div className="flex items-center gap-1.5 min-w-0">
-                    <button
-                      type="button"
-                      className={`min-w-0 flex-1 text-left text-xs text-white/55 font-mono font-light ${accountAddressExpanded ? "break-all whitespace-normal" : "truncate"}`}
-                      title={walletAddress}
-                      onClick={() => setAccountAddressExpanded((prev) => !prev)}
-                      aria-label={t("ui_toggle_wallet_address_truncation", "Afficher l'adresse complète")}
-                    >
-                      {accountAddressExpanded ? walletAddress : `${walletAddress.slice(0, 8)}…${walletAddress.slice(-6)}`}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={async () => {
-                        try {
-                          await navigator.clipboard?.writeText?.(walletAddress);
-                          setAccountCopyNotice(t("ui_copied_address", "Adresse copiée"));
-                          if (accountCopyNoticeTimerRef.current) clearTimeout(accountCopyNoticeTimerRef.current);
-                          accountCopyNoticeTimerRef.current = window.setTimeout(() => setAccountCopyNotice(""), 3000);
-                        } catch { /* ignore */ }
-                      }}
-                      className="shrink-0 text-white/40 hover:text-white/70 transition-colors p-0.5"
-                      title={t("ui_copy_address", "Copier l'adresse")}
-                      aria-label={t("ui_copy_address", "Copier l'adresse")}
-                    >
-                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-                        <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
-                      </svg>
-                    </button>
-                  </div>
-                  <div className={`mt-1.5 text-[11px] text-xcannes-green/85 transition-opacity duration-200 ${accountCopyNotice ? "opacity-100" : "opacity-0"}`} role="status" aria-live="polite">
-                    {accountCopyNotice || " "}
-                  </div>
-                </div>
-              ) : null}
-            </div>
+        {/* Bottom bar – mobile */}
+        {!inline ? (
+          <div className="md:hidden pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-[max(env(safe-area-inset-bottom),10px)] z-20" aria-hidden>
+            <span className="block w-36 h-1.5 rounded-full bg-white/80" />
           </div>
-          {/* Bouton télécharger */}
-          <button
-            onClick={handleExportPdf}
-            disabled={exportFormat === "pdf"}
-            className="shrink-0 inline-flex items-center gap-2 px-4 py-1.5 md:py-2 rounded-[10px] text-sm font-medium transition-colors disabled:opacity-50 text-white/70 hover:text-white bg-transparent hover:bg-white/[0.04]"
-            aria-label={t("ui_export_pdf_9c8d16b4fe", "Télécharger")}
-          >
-            <ShareIcon className={`w-4 h-4 ${exportFormat === "pdf" ? "opacity-40" : ""}`} />
-            <span>{exportFormat === "pdf" ? t("ui_loading_1386baebe9", "Loading…") : t("ui_export_pdf_9c8d16b4fe", "Télécharger")}</span>
-          </button>
+        ) : null}
+        {/* Bottom bar – desktop */}
+        <div className="hidden md:flex pointer-events-none justify-center pt-6 pb-4" aria-hidden>
+          <span className="block w-[120px] h-[4px] rounded-full bg-white/10" />
         </div>
-        {/* Bottom indicator removed */}
 
       </div>
     </div>
