@@ -42,6 +42,41 @@ export default function WalletDashboardCashChoiceModal({
   const [animKey, setAnimKey] = useState(0);
   useEffect(() => { if (open) setAnimKey(k => k + 1); }, [open]);
 
+  // ── Sparkle border animation ─────────────────────────────────
+  const [sparkle, setSparkle] = useState(null);
+  const sparkleTimerRef = useRef(null);
+  useEffect(() => {
+    if (!open) { setSparkle(null); return; }
+    const prefersReduced = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReduced) return;
+
+    // Card accent colors: [green, white, gold, gold-light]
+    const COLORS = ['rgba(0,255,150,0.75)', 'rgba(200,220,255,0.60)', 'rgba(245,196,35,0.70)', 'rgba(245,196,35,0.55)'];
+    let alive = true;
+
+    const fire = () => {
+      if (!alive) return;
+      const cardIdx = Math.floor(Math.random() * 4);
+      const edge = Math.floor(Math.random() * 4); // 0=top,1=right,2=bottom,3=left
+      const pct = 12 + Math.random() * 76;
+      const top = edge === 0 ? 0 : edge === 2 ? 100 : pct;
+      const left = edge === 1 ? 100 : edge === 3 ? 0 : pct;
+      const size = 3 + Math.random() * 2.5;
+      setSparkle({ cardIdx, top, left, color: COLORS[cardIdx], size, key: Date.now() });
+      setTimeout(() => { if (alive) setSparkle(null); }, 550);
+      // Schedule next
+      sparkleTimerRef.current = setTimeout(fire, 2200 + Math.random() * 2800);
+    };
+
+    // Wait for entrance animation to finish, then start
+    sparkleTimerRef.current = setTimeout(fire, 1500 + Math.random() * 500);
+    return () => {
+      alive = false;
+      clearTimeout(sparkleTimerRef.current);
+      setSparkle(null);
+    };
+  }, [open]);
+
   const FundsCardAddIcon = () => (
     <svg viewBox="0 0 48 48" className="w-11 h-11" fill="none" aria-hidden>
       <rect
@@ -124,6 +159,32 @@ export default function WalletDashboardCashChoiceModal({
       <div className="h-px flex-1 bg-white/10" aria-hidden />
     </div>
   );
+
+  // Sparkle dot — 4-branch star rendered as inline SVG
+  const SparkleEl = ({ color, size }) => {
+    const s = size * 4;
+    return (
+      <svg
+        width={s} height={s} viewBox="0 0 24 24" fill="none"
+        className="cc-sparkle absolute"
+        style={{
+          transform: 'translate(-50%, -50%)',
+          filter: `blur(0.4px) drop-shadow(0 0 ${size * 1.5}px ${color})`,
+          pointerEvents: 'none',
+        }}
+        aria-hidden
+      >
+        {/* 4-branch star */}
+        <path d="M12 2L13.2 10.8L22 12L13.2 13.2L12 22L10.8 13.2L2 12L10.8 10.8Z" fill={color} />
+      </svg>
+    );
+  };
+
+  // Wrapper that overlays the sparkle on a card by index
+  const CardSpark = ({ idx }) =>
+    sparkle?.cardIdx === idx ? (
+      <SparkleEl key={sparkle.key} color={sparkle.color} size={sparkle.size} />
+    ) : null;
 
   // Match the "Convert" action button background (wallet-actions.css).
   const cardClassName =
@@ -256,196 +317,193 @@ export default function WalletDashboardCashChoiceModal({
 			                  <div className="space-y-4">
 			                    {sectionHeader(t('ui_funds_section_agent', 'Compte bancaire'), 240)}
 
-                    <button key={`card1-${animKey}`} type="button" onClick={onChooseBuy} className={`cc-enter ${cardClassName}`} style={{ animationDelay: '330ms' }}>
-                      <div className="flex items-center gap-3">
-                        <div key={`icon1-${animKey}`} className="w-11 h-11 rounded-[16px] bg-transparent flex items-center justify-center flex-shrink-0 cc-enter" style={{ animationDelay: '380ms' }}>
-                          <FundsCardAddIcon />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center justify-between gap-2">
-                            <p key={`label1-${animKey}`} className="text-[20px] md:text-[21px] text-white font-light truncate cc-enter" style={{ animationDelay: '400ms' }}>
-                              {t('ui_funds_increase_balances_title', 'Ajouter des fonds')}
-                            </p>
-                            <svg key={`chev1-${animKey}`} className="w-5 h-5 text-white/45 cc-enter" style={{ animationDelay: '460ms' }} viewBox="0 0 24 24" fill="none" aria-hidden>
-                              <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                            </svg>
+                    <div className="relative">
+                      <button key={`card1-${animKey}`} type="button" onClick={onChooseBuy} className={`cc-enter ${cardClassName}`} style={{ animationDelay: '330ms' }}>
+                        <div className="flex items-center gap-3">
+                          <div key={`icon1-${animKey}`} className="w-11 h-11 rounded-[16px] bg-transparent flex items-center justify-center flex-shrink-0 cc-enter" style={{ animationDelay: '380ms' }}>
+                            <FundsCardAddIcon />
                           </div>
-                          <p className="mt-1 text-[15px] md:text-sm leading-snug text-white/45 flex items-center gap-1.5">
-                            <span>{t('ui_funds_add_hint_account', 'À votre compte')}</span>
-                            <span className="h-2 w-2 rounded-full bg-xcannes-green shrink-0 animate-pulse" aria-hidden />
-                            <span className="text-white font-light">{walletLabel || 'XCANNES'}</span>
-                          </p>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center justify-between gap-2">
+                              <p key={`label1-${animKey}`} className="text-[20px] md:text-[21px] text-white font-light truncate cc-enter" style={{ animationDelay: '400ms' }}>
+                                {t('ui_funds_increase_balances_title', 'Ajouter des fonds')}
+                              </p>
+                              <svg key={`chev1-${animKey}`} className="w-5 h-5 text-white/45 cc-enter" style={{ animationDelay: '460ms' }} viewBox="0 0 24 24" fill="none" aria-hidden>
+                                <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                              </svg>
+                            </div>
+                            <p className="mt-1 text-[15px] md:text-sm leading-snug text-white/45 flex items-center gap-1.5">
+                              <span>{t('ui_funds_add_hint_account', 'À votre compte')}</span>
+                              <span className="h-2 w-2 rounded-full bg-xcannes-green shrink-0 animate-pulse" aria-hidden />
+                              <span className="text-white font-light">{walletLabel || 'XCANNES'}</span>
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    </button>
+                      </button>
+                      {sparkle?.cardIdx === 0 ? (
+                        <div key={sparkle.key} className="pointer-events-none absolute z-10" style={{ top: `${sparkle.top}%`, left: `${sparkle.left}%` }}>
+                          <SparkleEl color={sparkle.color} size={sparkle.size} />
+                        </div>
+                      ) : null}
+                    </div>
                     <div className="mb-5" />
 
-                    <button key={`card2-${animKey}`} type="button" onClick={onChooseSell} className={`cc-enter ${cardClassName}`} style={{ animationDelay: '430ms' }}>
-                      <div className="flex items-center gap-3">
-                        <div key={`icon2-${animKey}`} className="w-11 h-11 rounded-[16px] bg-transparent flex items-center justify-center flex-shrink-0 cc-enter" style={{ animationDelay: '480ms' }}>
-                          <FundsCardBankIcon />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center justify-between gap-2">
-                            <p key={`label2-${animKey}`} className="text-[20px] md:text-[21px] text-white font-light truncate cc-enter" style={{ animationDelay: '500ms' }}>
-                              {isDesktop
-                                ? t('ui_funds_withdraw_title', 'Transférer vers la banque')
-                                : t('ui_funds_withdraw_title_mobile', 'Transférer vers la banque')}
-                            </p>
-                            <svg key={`chev2-${animKey}`} className="w-5 h-5 text-white/45 cc-enter" style={{ animationDelay: '560ms' }} viewBox="0 0 24 24" fill="none" aria-hidden>
-                              <path
-                                d="M9 18L15 12L9 6"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                            </svg>
+                    <div className="relative">
+                      <button key={`card2-${animKey}`} type="button" onClick={onChooseSell} className={`cc-enter ${cardClassName}`} style={{ animationDelay: '430ms' }}>
+                        <div className="flex items-center gap-3">
+                          <div key={`icon2-${animKey}`} className="w-11 h-11 rounded-[16px] bg-transparent flex items-center justify-center flex-shrink-0 cc-enter" style={{ animationDelay: '480ms' }}>
+                            <FundsCardBankIcon />
                           </div>
-                          <p className="mt-1 text-[15px] md:text-sm leading-snug text-white/50">
-                            {(() => {
-                              const text = String(withdrawHintText || '');
-                              const prefix = 'Vers votre ';
-                              if (text.startsWith(prefix)) {
-                                return (
-                                  <>
-                                    <span className="text-white/60">Vers votre </span>
-                                    {highlightWithdraw(text.slice(prefix.length))}
-                                  </>
-                                );
-                              }
-                              return highlightWithdraw(withdrawHintText);
-                            })()}
-                          </p>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center justify-between gap-2">
+                              <p key={`label2-${animKey}`} className="text-[20px] md:text-[21px] text-white font-light truncate cc-enter" style={{ animationDelay: '500ms' }}>
+                                {isDesktop
+                                  ? t('ui_funds_withdraw_title', 'Transférer vers la banque')
+                                  : t('ui_funds_withdraw_title_mobile', 'Transférer vers la banque')}
+                              </p>
+                              <svg key={`chev2-${animKey}`} className="w-5 h-5 text-white/45 cc-enter" style={{ animationDelay: '560ms' }} viewBox="0 0 24 24" fill="none" aria-hidden>
+                                <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                              </svg>
+                            </div>
+                            <p className="mt-1 text-[15px] md:text-sm leading-snug text-white/50">
+                              {(() => {
+                                const text = String(withdrawHintText || '');
+                                const prefix = 'Vers votre ';
+                                if (text.startsWith(prefix)) {
+                                  return (
+                                    <>
+                                      <span className="text-white/60">Vers votre </span>
+                                      {highlightWithdraw(text.slice(prefix.length))}
+                                    </>
+                                  );
+                                }
+                                return highlightWithdraw(withdrawHintText);
+                              })()}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-			                    </button>
+                      </button>
+                      {sparkle?.cardIdx === 1 ? (
+                        <div key={sparkle.key} className="pointer-events-none absolute z-10" style={{ top: `${sparkle.top}%`, left: `${sparkle.left}%` }}>
+                          <SparkleEl color={sparkle.color} size={sparkle.size} />
+                        </div>
+                      ) : null}
+                    </div>
 			                  </div>
 
 			                  <div>
 			                    <div className="space-y-4">
 			                      {sectionHeader(t('ui_funds_section_digital_dollars', 'Stablecoins en USD'), 620)}
 
-                    <button key={`card3-${animKey}`} type="button" onClick={onChooseUsdSwapOut} className={`cc-enter ${cardClassName}`} style={{ animationDelay: '700ms' }}>
-                      <div className="flex items-center gap-3">
-                        <div key={`icon3-${animKey}`} className="w-11 h-11 rounded-[16px] bg-transparent flex items-center justify-center flex-shrink-0 cc-enter" style={{ animationDelay: '750ms' }}>
-                          <FundsCardWalletIcon />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center justify-between gap-2">
-                            <p key={`label3-${animKey}`} className="text-[20px] md:text-[21px] text-white font-light truncate cc-enter" style={{ animationDelay: '770ms' }}>
-                              {t('ui_funds_swap_out_title', 'Vendre vos stablecoins')}
-                            </p>
-                            <svg key={`chev3-${animKey}`} className="w-5 h-5 text-white/45 cc-enter" style={{ animationDelay: '830ms' }} viewBox="0 0 24 24" fill="none" aria-hidden>
-                              <path
-                                d="M9 18L15 12L9 6"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                            </svg>
+                    <div className="relative">
+                      <button key={`card3-${animKey}`} type="button" onClick={onChooseUsdSwapOut} className={`cc-enter ${cardClassName}`} style={{ animationDelay: '700ms' }}>
+                        <div className="flex items-center gap-3">
+                          <div key={`icon3-${animKey}`} className="w-11 h-11 rounded-[16px] bg-transparent flex items-center justify-center flex-shrink-0 cc-enter" style={{ animationDelay: '750ms' }}>
+                            <FundsCardWalletIcon />
                           </div>
-                          <p className="mt-1 text-[15px] md:text-sm leading-snug text-white/50">
-                            {String(swapOutHintText || '')
-                              .split('\n')
-                              .map((line, lineIdx, lines) => {
-                                const text = String(line || '');
-                                const renderSwapOutHint = (value) => {
-                                  const input = String(value || "");
-                                  if (!input) return input;
-                                  const brandParts = input.split(/(xcannes)/i);
-                                  return brandParts.flatMap((brandPart, brandIdx) => {
-                                    if (/^xcannes$/i.test(brandPart)) {
-                                      return (
-                                        <span
-                                          key={`${lineIdx}-brand-${brandIdx}`}
-                                          className="uppercase text-[0.9em]"
-                                        >
-                                          XCANNES
-                                        </span>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center justify-between gap-2">
+                              <p key={`label3-${animKey}`} className="text-[20px] md:text-[21px] text-white font-light truncate cc-enter" style={{ animationDelay: '770ms' }}>
+                                {t('ui_funds_swap_out_title', 'Vendre vos stablecoins')}
+                              </p>
+                              <svg key={`chev3-${animKey}`} className="w-5 h-5 text-white/45 cc-enter" style={{ animationDelay: '830ms' }} viewBox="0 0 24 24" fill="none" aria-hidden>
+                                <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                              </svg>
+                            </div>
+                            <p className="mt-1 text-[15px] md:text-sm leading-snug text-white/50">
+                              {String(swapOutHintText || '')
+                                .split('\n')
+                                .map((line, lineIdx, lines) => {
+                                  const text = String(line || '');
+                                  const renderSwapOutHint = (value) => {
+                                    const input = String(value || "");
+                                    if (!input) return input;
+                                    const brandParts = input.split(/(xcannes)/i);
+                                    return brandParts.flatMap((brandPart, brandIdx) => {
+                                      if (/^xcannes$/i.test(brandPart)) {
+                                        return (<span key={`${lineIdx}-brand-${brandIdx}`} className="uppercase text-[0.9em]">XCANNES</span>);
+                                      }
+                                      const parts = String(brandPart || "").split(/(stablecoins?\s+USD)/i);
+                                      return parts.map((part, idx) =>
+                                        /^stablecoins?\s+usd$/i.test(part) || /USDC|USDT|RLUSD/i.test(part) ? (
+                                          <span key={`${lineIdx}-${brandIdx}-${idx}-${part}`} className="text-xcannes-green/90">{part}</span>
+                                        ) : (
+                                          <span key={`${lineIdx}-${brandIdx}-${idx}-${part}`}>{part}</span>
+                                        ),
                                       );
-                                    }
-                                    const parts = String(brandPart || "").split(
-                                      /(stablecoins?\s+USD)/i,
-                                    );
-                                    return parts.map((part, idx) =>
-                                      /^stablecoins?\s+usd$/i.test(part) ||
-                                      /USDC|USDT|RLUSD/i.test(part) ? (
-                                        <span
-                                          key={`${lineIdx}-${brandIdx}-${idx}-${part}`}
-                                          className="text-xcannes-green/90"
-                                        >
-                                          {part}
-                                        </span>
-                                      ) : (
-                                        <span key={`${lineIdx}-${brandIdx}-${idx}-${part}`}>
-                                          {part}
-                                        </span>
-                                      ),
-                                    );
-                                  });
-                                };
-                                const openIdx = text.indexOf('(');
-                                const closeIdx = text.lastIndexOf(')');
-                                const hasParens = openIdx >= 0 && closeIdx > openIdx;
-                                const before = hasParens ? text.slice(0, openIdx) : text;
-                                const parens = hasParens ? text.slice(openIdx, closeIdx + 1) : '';
-                                const after = hasParens ? text.slice(closeIdx + 1) : '';
-                                return (
-                                  <span key={`${lineIdx}-${text}`}>
-                                    {renderSwapOutHint(before)}
-                                    {parens ? <span className="text-xcannes-green/90">{parens}</span> : null}
-                                    {renderSwapOutHint(after)}
-                                    {lineIdx < lines.length - 1 ? <br /> : null}
-                                  </span>
-                                );
-                              })}
-                          </p>
+                                    });
+                                  };
+                                  const openIdx = text.indexOf('(');
+                                  const closeIdx = text.lastIndexOf(')');
+                                  const hasParens = openIdx >= 0 && closeIdx > openIdx;
+                                  const before = hasParens ? text.slice(0, openIdx) : text;
+                                  const parens = hasParens ? text.slice(openIdx, closeIdx + 1) : '';
+                                  const after = hasParens ? text.slice(closeIdx + 1) : '';
+                                  return (
+                                    <span key={`${lineIdx}-${text}`}>
+                                      {renderSwapOutHint(before)}
+                                      {parens ? <span className="text-xcannes-green/90">{parens}</span> : null}
+                                      {renderSwapOutHint(after)}
+                                      {lineIdx < lines.length - 1 ? <br /> : null}
+                                    </span>
+                                  );
+                                })}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    </button>
+                      </button>
+                      {sparkle?.cardIdx === 2 ? (
+                        <div key={sparkle.key} className="pointer-events-none absolute z-10" style={{ top: `${sparkle.top}%`, left: `${sparkle.left}%` }}>
+                          <SparkleEl color={sparkle.color} size={sparkle.size} />
+                        </div>
+                      ) : null}
+                    </div>
                     <div className="mb-5" />
 
-                    <button key={`card4-${animKey}`} type="button" onClick={onChooseUsdSwapIn} className={`cc-enter ${cardClassName}`} style={{ animationDelay: '800ms' }}>
-                      <div className="flex items-center gap-3">
-                        <div key={`icon4-${animKey}`} className="w-11 h-11 rounded-[16px] bg-transparent flex items-center justify-center flex-shrink-0 cc-enter" style={{ animationDelay: '850ms' }}>
-                          <FundsCardSendIcon />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center justify-between gap-2">
-                            <p key={`label4-${animKey}`} className="text-[20px] md:text-[21px] text-white font-light truncate cc-enter" style={{ animationDelay: '870ms' }}>
-                              {t('ui_funds_swap_in_title', 'Acheter des stablecoins')}
-                            </p>
-                            <svg key={`chev4-${animKey}`} className="w-5 h-5 text-white/45 cc-enter" style={{ animationDelay: '930ms' }} viewBox="0 0 24 24" fill="none" aria-hidden>
-                              <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                            </svg>
+                    <div className="relative">
+                      <button key={`card4-${animKey}`} type="button" onClick={onChooseUsdSwapIn} className={`cc-enter ${cardClassName}`} style={{ animationDelay: '800ms' }}>
+                        <div className="flex items-center gap-3">
+                          <div key={`icon4-${animKey}`} className="w-11 h-11 rounded-[16px] bg-transparent flex items-center justify-center flex-shrink-0 cc-enter" style={{ animationDelay: '850ms' }}>
+                            <FundsCardSendIcon />
                           </div>
-                          <p className="mt-1 text-[15px] md:text-sm leading-snug text-white/50">
-                            {String(swapInHintText || '')
-                              .split('\n')
-                              .map((line, lineIdx, lines) => {
-                                const input = String(line || '');
-                                const parts = input.split(/(stablecoins?\s+USD|wallet)/i);
-                                return (
-                                  <span key={`${lineIdx}-${input}`}>
-                                    {parts.map((part, idx) =>
-                                      /^stablecoins?\s+usd$/i.test(part) || /^wallet$/i.test(part) ? (
-                                        <span key={`${lineIdx}-${idx}-${part}`} className="text-xcannes-green/90">
-                                          {part}
-                                        </span>
-                                      ) : (
-                                        <span key={`${lineIdx}-${idx}-${part}`}>{part}</span>
-                                      ),
-                                    )}
-                                    {lineIdx < lines.length - 1 ? <br /> : null}
-                                  </span>
-                                );
-                              })}
-                          </p>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center justify-between gap-2">
+                              <p key={`label4-${animKey}`} className="text-[20px] md:text-[21px] text-white font-light truncate cc-enter" style={{ animationDelay: '870ms' }}>
+                                {t('ui_funds_swap_in_title', 'Acheter des stablecoins')}
+                              </p>
+                              <svg key={`chev4-${animKey}`} className="w-5 h-5 text-white/45 cc-enter" style={{ animationDelay: '930ms' }} viewBox="0 0 24 24" fill="none" aria-hidden>
+                                <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                              </svg>
+                            </div>
+                            <p className="mt-1 text-[15px] md:text-sm leading-snug text-white/50">
+                              {String(swapInHintText || '')
+                                .split('\n')
+                                .map((line, lineIdx, lines) => {
+                                  const input = String(line || '');
+                                  const parts = input.split(/(stablecoins?\s+USD|wallet)/i);
+                                  return (
+                                    <span key={`${lineIdx}-${input}`}>
+                                      {parts.map((part, idx) =>
+                                        /^stablecoins?\s+usd$/i.test(part) || /^wallet$/i.test(part) ? (
+                                          <span key={`${lineIdx}-${idx}-${part}`} className="text-xcannes-green/90">{part}</span>
+                                        ) : (
+                                          <span key={`${lineIdx}-${idx}-${part}`}>{part}</span>
+                                        ),
+                                      )}
+                                      {lineIdx < lines.length - 1 ? <br /> : null}
+                                    </span>
+                                  );
+                                })}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-			                    </button>
+                      </button>
+                      {sparkle?.cardIdx === 3 ? (
+                        <div key={sparkle.key} className="pointer-events-none absolute z-10" style={{ top: `${sparkle.top}%`, left: `${sparkle.left}%` }}>
+                          <SparkleEl color={sparkle.color} size={sparkle.size} />
+                        </div>
+                      ) : null}
+                    </div>
 		                    </div>
 
 		                    {/* Liquidity note: 14px gap on mobile */}
