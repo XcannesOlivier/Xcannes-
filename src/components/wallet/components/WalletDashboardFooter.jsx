@@ -51,20 +51,23 @@ export default function WalletDashboardFooter({ onScan, addCurrencySlot, onHisto
         }}
       >
         {/* Barre footer */}
-        <div className="relative pointer-events-auto h-[62px] flex items-center gap-2 px-3 bg-[#0b0f10]" data-scrolled={scrolled}>
+        <div className="relative pointer-events-auto h-[62px] flex items-center bg-[#0b0f10]" data-scrolled={scrolled}>
 
           {/* Gauche : + Devise */}
           <div className="flex-1 flex items-center justify-center h-full min-w-0">
             {addCurrencySlot ?? null}
           </div>
 
+          {/* Séparateur */}
+          {onScan ? <div className="w-px h-6 bg-white/[0.08] shrink-0" aria-hidden /> : null}
+
           {/* Centre : Scanner */}
           {onScan ? (
-            <div className="shrink-0 flex items-center justify-center">
+            <div className="flex-1 flex items-center justify-center h-full">
               <button
                 type="button"
                 onClick={onScan}
-                className="wallet-footer-btn flex h-[46px] w-[130px] items-center justify-center rounded-[16px] text-xcannes-green transition-transform duration-150 hover:scale-[1.02] active:scale-[0.97] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#39d57c]/20 bg-gradient-to-b from-[#101415] to-[#0d1214] shadow-[-3px_3px_10px_2px_rgba(255,255,255,0.015),0_2px_8px_rgba(0,0,0,0.35),inset_0_-16px_20px_rgba(0,0,0,0.88)] scanner-btn-fade-border"
+                className="w-full h-full flex items-center justify-center text-xcannes-green transition-opacity duration-150 hover:opacity-75 active:opacity-50 focus-visible:outline-none"
                 aria-label={t(SCAN_LABEL_KEY, "Scan QR Code")}
               >
                 <ScanIcon />
@@ -72,13 +75,16 @@ export default function WalletDashboardFooter({ onScan, addCurrencySlot, onHisto
             </div>
           ) : null}
 
-          {/* Droite : Historique */}
+          {/* Séparateur */}
+          {onHistory ? <div className="w-px h-6 bg-white/[0.08] shrink-0" aria-hidden /> : null}
+
+          {/* Droite : Activité */}
           <div className="flex-1 flex items-center justify-center h-full min-w-0">
             {onHistory ? (
               <button
                 type="button"
                 onClick={onHistory}
-                className="wallet-footer-btn w-full h-[40px] flex flex-row items-center justify-center gap-1.5 transition-colors px-1.5 group rounded-[16px] bg-gradient-to-b from-[#101415] to-[#0d1214] shadow-[-3px_3px_10px_2px_rgba(255,255,255,0.008),0_2px_8px_rgba(0,0,0,0.35),inset_0_-14px_18px_rgba(0,0,0,0.82)]"
+                className="w-full h-full flex flex-row items-center justify-center gap-1.5 transition-opacity hover:opacity-75 active:opacity-50 focus-visible:outline-none px-1.5 group"
                 aria-label={t("ui_open_statement", "Ouvrir le relevé des transactions")}
               >
                 <svg

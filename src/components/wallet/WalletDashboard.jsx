@@ -1215,7 +1215,7 @@ export default function WalletDashboard({
                       <span className="text-[14px] font-light tracking-wide leading-none text-white/55 group-hover:text-white/75 transition-colors">Devises</span>
                     </span>
                   }
-                  buttonClassName="wallet-footer-btn w-full h-[40px] flex flex-row items-center justify-center gap-1.5 transition-colors px-3 group rounded-[16px] bg-gradient-to-b from-[#101415] to-[#0d1214] shadow-[-3px_3px_10px_2px_rgba(255,255,255,0.008),0_2px_8px_rgba(0,0,0,0.35),inset_0_-14px_18px_rgba(0,0,0,0.82)]"
+                  buttonClassName="w-full h-full flex flex-row items-center justify-center gap-1.5 transition-opacity hover:opacity-75 active:opacity-50 focus-visible:outline-none px-3 group"
                   buttonStyle={undefined}
                   placeholder={t('ui_search_all_currencies_c5d6e7f8', 'Search currency...')}
                   excludeCodes={['USD', 'RLUSD', 'XRP']}
