@@ -1502,8 +1502,8 @@ export default function GlobalStatement({
               <span className="block w-12 h-1.5 rounded-full bg-white/20" />
             </div>
           ) : null}
-          <div className="flex justify-start">
-            <div className="min-w-0 flex flex-col items-start justify-center text-left gap-3">
+          <div className="flex justify-start w-full">
+            <div className="w-full flex flex-col items-start justify-center text-left gap-3">
               <div className="flex items-center justify-start gap-3">
                 <h2 className="text-[30px] md:text-[34px] font-light text-white/80 md:text-white tracking-tight text-left">
                   {globalTitle}
