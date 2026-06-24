@@ -1653,14 +1653,57 @@ export default function GlobalStatement({
 		              </div>
             ) : (
               <div className="space-y-1.5">
-                {recentMovements.filter((m) => {
-                  if (txFilter === "all") return true;
-                  const uiT = getMovementUiType(m);
-                  if (txFilter === "conversion") return normalizeKind(m?.kind) === "CONVERSION";
-                  if (txFilter === "credit") return uiT === "credit";
-                  if (txFilter === "debit") return uiT === "debit";
-                  return true;
-                }).map((m, idx) => {
+                {(() => {
+                  const now = new Date();
+                  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                  const weekStart = new Date(todayStart);
+                  weekStart.setDate(todayStart.getDate() - todayStart.getDay());
+                  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+                  const getGroup = (m) => {
+                    const d = m?.createdAt ? new Date(m.createdAt) : null;
+                    if (!d || !Number.isFinite(d.getTime())) return "earlier";
+                    if (d >= todayStart) return "today";
+                    if (d >= weekStart) return "week";
+                    if (d >= monthStart) return "month";
+                    return "earlier";
+                  };
+
+                  const groupLabels = {
+                    today: "Aujourd'hui",
+                    week: "Cette semaine",
+                    month: "Ce mois-ci",
+                    earlier: "Plus ancien",
+                  };
+                  const groupOrder = ["today", "week", "month", "earlier"];
+
+                  const filtered = recentMovements.filter((m) => {
+                    if (txFilter === "all") return true;
+                    const uiT = getMovementUiType(m);
+                    if (txFilter === "conversion") return normalizeKind(m?.kind) === "CONVERSION";
+                    if (txFilter === "credit") return uiT === "credit";
+                    if (txFilter === "debit") return uiT === "debit";
+                    return true;
+                  });
+
+                  const grouped = {};
+                  filtered.forEach((m) => {
+                    const g = getGroup(m);
+                    if (!grouped[g]) grouped[g] = [];
+                    grouped[g].push(m);
+                  });
+
+                  let globalIdx = 0;
+                  return groupOrder.flatMap((groupKey) => {
+                    const items = grouped[groupKey];
+                    if (!items || items.length === 0) return [];
+                    return [
+                      <div key={`group-${groupKey}`} className="px-1 pt-2 pb-1 text-[11px] font-medium tracking-wide text-white/35 uppercase">
+                        {groupLabels[groupKey]}
+                      </div>,
+                      ...items.map((m) => {
+                        const idx = globalIdx++;
+                        return (() => {
                   const isConversion = normalizeKind(m?.kind) === "CONVERSION";
                   const isPaymentOut =
                     normalizeKind(m?.kind) === "PAYMENT_OUT" ||
@@ -1801,7 +1844,11 @@ export default function GlobalStatement({
                       </div>
                     </button>
                   );
-                })}
+                        })();
+                      }),
+                    ];
+                  });
+                })()}
               </div>
             )}
           </div>
