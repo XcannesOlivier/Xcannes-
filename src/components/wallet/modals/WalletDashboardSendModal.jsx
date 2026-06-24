@@ -1164,6 +1164,7 @@ export default function WalletDashboardSendModal({
             className: "flex justify-center",
             prefix: t("moonpay_from_account", "Compte source"),
             pillClassName: "bg-elevated-40 xcannes-fade-border-y shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,255,255,0.12)] rounded-[20px]",
+            dotClassName: '!bg-[#f5a623] ring-[#f5a623]/20',
             labelClassName: "!text-white",
           })}
         </div>

@@ -1480,7 +1480,7 @@ const MoonPayBuyModal = ({
                   </span>
                   <div className="flex items-center gap-2">
                     <span
-                      className={['h-3 w-3 rounded-full ring-4 shrink-0 animate-pulse', accentRing25Bg].join(' ')}
+                      className={['h-2.5 w-2.5 rounded-full ring-4 shrink-0 wallet-dot-active', accentRing25Bg].join(' ')}
                       aria-hidden
                     />
                     <span className="text-white/95 text-[17px] md:text-[18px] font-semibold">

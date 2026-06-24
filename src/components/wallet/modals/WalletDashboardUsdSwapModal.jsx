@@ -614,9 +614,9 @@ export default function WalletDashboardUsdSwapModal({
       return (
         <>
           {"Depuis le compte "}
-          <span className="inline-flex items-center gap-1.5 whitespace-nowrap align-middle">
+          <span className="inline-flex items-center gap-2 whitespace-nowrap align-middle ml-1">
             <span
-              className={`w-1.5 h-1.5 rounded-full ring-2 shrink-0 animate-pulse ${accentPulseDot}`}
+              className={`w-2.5 h-2.5 rounded-full ring-4 shrink-0 wallet-dot-active ${accentPulseDot}`}
               aria-hidden
             />
             <span className="font-medium text-white/90">{buyWalletLabel}</span>
@@ -634,9 +634,9 @@ export default function WalletDashboardUsdSwapModal({
     return (
       <>
         {baseNoPunct}{" "}
-        <span className="inline-flex items-center gap-1.5 whitespace-nowrap align-middle">
+        <span className="inline-flex items-center gap-2 whitespace-nowrap align-middle ml-1">
           <span
-            className={`w-1.5 h-1.5 rounded-full ring-2 shrink-0 animate-pulse ${accentPulseDot}`}
+            className={`w-2.5 h-2.5 rounded-full ring-4 shrink-0 wallet-dot-active ${accentPulseDot}`}
             aria-hidden
           />
           <span className="font-medium text-white/90">{rawWalletLabel}</span>
@@ -4027,7 +4027,7 @@ export default function WalletDashboardUsdSwapModal({
 	                        {String(walletLabel || "").trim() ? (
 	                          <div className="flex items-center gap-2 mb-1">
 	                            <span
-	                              className={`h-3 w-3 rounded-full ring-4 shrink-0 animate-pulse ${accentPulseDot}`}
+	                              className={`h-2.5 w-2.5 rounded-full ring-4 shrink-0 wallet-dot-active ${accentPulseDot}`}
 	                              aria-hidden
 	                            />
 	                            <p className="min-w-0 text-[16px] md:text-[17px] text-white font-semibold truncate">
