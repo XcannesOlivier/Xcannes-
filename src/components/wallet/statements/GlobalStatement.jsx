@@ -1515,8 +1515,8 @@ export default function GlobalStatement({
                 ) : null}
               </div>
               {/* Wallet label + bouton télécharger */}
-              <div className="flex items-center gap-3 flex-wrap">
-                <div className="relative w-auto min-w-[120px] max-w-[220px]" ref={accountDropdownRef}>
+              <div className="flex items-center justify-between gap-3">
+                <div className="relative min-w-0 max-w-[220px]" ref={accountDropdownRef}>
                   <button
                     type="button"
                     onClick={() => setAccountDropdownOpen((prev) => !prev)}
@@ -1596,17 +1596,15 @@ export default function GlobalStatement({
             const d = m?.createdAt ? new Date(m.createdAt) : null;
             return d && Number.isFinite(d.getTime()) && d >= monthAgo;
           });
-          let sumIn = 0, cntIn = 0, sumOut = 0, cntOut = 0, cntConv = 0;
+          let cntIn = 0, cntOut = 0, cntConv = 0;
           monthMovements.forEach((m) => {
             const uiT = getMovementUiType(m);
             const isConv = normalizeKind(m?.kind) === "CONVERSION";
-            const amt = Math.abs(Number(m?.amountRlusd) || 0);
             if (isConv) { cntConv++; }
-            else if (uiT === "credit") { sumIn += amt; cntIn++; }
-            else if (uiT === "debit") { sumOut += amt; cntOut++; }
+            else if (uiT === "credit") { cntIn++; }
+            else if (uiT === "debit") { cntOut++; }
           });
           const total = cntIn + cntOut + cntConv;
-          const fmt = (n) => n.toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
           return (
             <div className="px-4 md:px-6 pt-3 pb-1">
               <div className="grid grid-cols-2 gap-2 rounded-[18px] ring-1 ring-white/[0.06] ring-inset bg-white/[0.025] px-4 py-3">
@@ -1619,8 +1617,7 @@ export default function GlobalStatement({
                   </div>
                   <div className="min-w-0">
                     <div className="text-[11px] text-white/40 font-light">{t("ui_credits_b8166276a0", "Entrées")}</div>
-                    <div className="text-[14px] font-medium text-emerald-400 leading-tight">+{fmt(sumIn)} $</div>
-                    <div className="text-[10px] text-white/30">{cntIn} transaction{cntIn !== 1 ? "s" : ""}</div>
+                    <div className="text-[13px] font-medium text-emerald-400 leading-tight">{cntIn} transaction{cntIn !== 1 ? "s" : ""}</div>
                   </div>
                 </div>
                 {/* Sorties */}
@@ -1632,8 +1629,7 @@ export default function GlobalStatement({
                   </div>
                   <div className="min-w-0">
                     <div className="text-[11px] text-white/40 font-light">{t("ui_debits_38c870b18f", "Sorties")}</div>
-                    <div className="text-[14px] font-medium text-red-400 leading-tight">-{fmt(sumOut)} $</div>
-                    <div className="text-[10px] text-white/30">{cntOut} transaction{cntOut !== 1 ? "s" : ""}</div>
+                    <div className="text-[13px] font-medium text-red-400 leading-tight">{cntOut} transaction{cntOut !== 1 ? "s" : ""}</div>
                   </div>
                 </div>
                 {/* Conversions */}
@@ -1645,8 +1641,7 @@ export default function GlobalStatement({
                   </div>
                   <div className="min-w-0">
                     <div className="text-[11px] text-white/40 font-light">{t("ui_conversions_b604b5ef8b", "Conversions")}</div>
-                    <div className="text-[14px] font-medium text-blue-400 leading-tight">{cntConv} conversion{cntConv !== 1 ? "s" : ""}</div>
-                    <div className="text-[10px] text-white/30">{cntConv} transaction{cntConv !== 1 ? "s" : ""}</div>
+                    <div className="text-[13px] font-medium text-blue-400 leading-tight">{cntConv} transaction{cntConv !== 1 ? "s" : ""}</div>
                   </div>
                 </div>
                 {/* Total */}
@@ -1829,13 +1824,21 @@ export default function GlobalStatement({
 	                      type="button"
 	                      onClick={() => openMovementDetails(m)}
 		                        className={[
-		                          "w-full text-left rounded-[20px] px-3 transition-colors duration-150",
-		                          isLatest
-		                            ? "py-3 ring-1 ring-inset bg-transparent ring-white/10 transform-gpu scale-[1.04] origin-center transition-transform duration-150"
-		                            : "py-2 ring-1 ring-inset ring-white/[0.06] bg-transparent",
+		                          "w-full text-left rounded-[16px] px-3 py-2 transition-colors duration-150 ring-1 ring-inset ring-white/[0.06] bg-transparent",
 		                        ].join(" ")}
 		                    >
-                      <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-center gap-2.5">
+                        {/* Type icon */}
+                        <div className={`flex-none flex items-center justify-center w-7 h-7 text-[17px] leading-none ${
+                          isConversion
+                            ? "text-blue-400"
+                            : uiType === "credit"
+                              ? "text-emerald-400"
+                              : "text-red-400"
+                        }`} aria-hidden>
+                          {isConversion ? "⇄" : uiType === "credit" ? "↓" : "↑"}
+                        </div>
+                        <div className="flex-1 min-w-0 flex items-start justify-between gap-3">
                         <div className="min-w-0">
                           <div className="text-[15px] font-light text-white/90 truncate">
                             {isPaymentOut
@@ -1919,6 +1922,7 @@ export default function GlobalStatement({
                               d="M9 5l7 7-7 7"
                             />
                           </svg>
+                        </div>
                         </div>
                       </div>
                     </button>
