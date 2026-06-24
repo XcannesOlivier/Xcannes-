@@ -1117,7 +1117,7 @@ export default function WalletDashboard({
                         <circle cx="12" cy="12" r="9" />
                         <polyline points="12 7 12 12 15.5 14.5" />
                       </svg>
-                      <span>{t('ui_consult_global_statement_desktop', "Voir l'historique")}</span>
+                      <span>{t('ui_consult_global_statement_desktop', "Voir l'activité")}</span>
                     </button>
                     </div>
                   </div>
@@ -1168,7 +1168,7 @@ export default function WalletDashboard({
                     <circle cx="12" cy="12" r="9" />
                     <polyline points="12 7 12 12 15.5 14.5" />
                   </svg>
-                  <span>{t('ui_consult_global_statement_desktop', "Voir l'historique")}</span>
+                  <span>{t('ui_consult_global_statement_desktop', "Voir l'activité")}</span>
                 </button>
                 <div className="border-t border-white/5 mt-1 pt-1">
                   <WalletSettingsDropdown
