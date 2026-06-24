@@ -39,6 +39,9 @@ export default function WalletDashboardCashChoiceModal({
     enabled: shouldAnimate,
   });
 
+  const [animKey, setAnimKey] = useState(0);
+  useEffect(() => { if (open) setAnimKey(k => k + 1); }, [open]);
+
   const FundsCardAddIcon = () => (
     <svg viewBox="0 0 48 48" className="w-11 h-11" fill="none" aria-hidden>
       <rect
@@ -115,8 +118,8 @@ export default function WalletDashboardCashChoiceModal({
     </svg>
   );
 
-  const sectionHeader = label => (
-    <div className="flex items-center gap-3 px-1">
+  const sectionHeader = (label, animDelay) => (
+    <div key={`sh-${label}-${animKey}`} className="cc-enter flex items-center gap-3 px-1" style={{ animationDelay: `${animDelay}ms` }}>
       <div className="text-[13px] tracking-[0.22em] text-white/45">{label}</div>
       <div className="h-px flex-1 bg-white/10" aria-hidden />
     </div>
@@ -222,12 +225,12 @@ export default function WalletDashboardCashChoiceModal({
 	                }}
 	              >
                 {!inline ? (
-                  <div className="md:hidden flex justify-center pt-3 pb-0" aria-hidden>
+                  <div key={`handle-${animKey}`} className="md:hidden flex justify-center pt-3 pb-0 cc-enter" style={{ animationDelay: '0ms' }} aria-hidden>
                     <span className="block w-12 h-1.5 rounded-full bg-white/20" />
                   </div>
                 ) : null}
 		                <div className="pt-6 md:pt-[100px] pb-3 flex flex-col items-center text-center px-4">
-                        <h3 className="mt-1 md:mt-0 text-[30px] md:text-[34px] font-light text-white tracking-tight">
+                        <h3 key={`title-${animKey}`} className="mt-1 md:mt-0 text-[30px] md:text-[34px] font-light text-white tracking-tight cc-enter" style={{ animationDelay: '80ms' }}>
 	                      {t('ui_funds_manage_title', 'Gérer vos fonds')}
 	                    </h3>
                     {noticeVariant === 'demo' ? (
@@ -235,7 +238,7 @@ export default function WalletDashboardCashChoiceModal({
                         {t('demo_notice_title', 'Mode démo')}
                       </span>
                     ) : null}
-                    <p className="mt-2 text-[19px] md:text-[20px] font-light text-white/50 max-w-[34ch] leading-tight">
+                    <p key={`subtitle-${animKey}`} className="mt-2 text-[19px] md:text-[20px] font-light text-white/50 max-w-[34ch] leading-tight cc-enter" style={{ animationDelay: '160ms' }}>
                       {t('ui_funds_manage_subtitle', 'Ajoutez, retirez ou transférez vos fonds facilement.')}
                     </p>
                     
@@ -251,26 +254,20 @@ export default function WalletDashboardCashChoiceModal({
               >
 		                <div className="flex flex-col gap-7 pb-2">
 			                  <div className="space-y-4">
-			                    {sectionHeader(t('ui_funds_section_agent', 'Compte bancaire'))}
+			                    {sectionHeader(t('ui_funds_section_agent', 'Compte bancaire'), 240)}
 
-                    <button type="button" onClick={onChooseBuy} className={cardClassName}>
+                    <button key={`card1-${animKey}`} type="button" onClick={onChooseBuy} className={`cc-enter ${cardClassName}`} style={{ animationDelay: '330ms' }}>
                       <div className="flex items-center gap-3">
-                        <div className="w-11 h-11 rounded-[16px] bg-transparent flex items-center justify-center flex-shrink-0">
+                        <div key={`icon1-${animKey}`} className="w-11 h-11 rounded-[16px] bg-transparent flex items-center justify-center flex-shrink-0 cc-enter" style={{ animationDelay: '380ms' }}>
                           <FundsCardAddIcon />
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center justify-between gap-2">
-                            <p className="text-[20px] md:text-[21px] text-white font-light truncate">
+                            <p key={`label1-${animKey}`} className="text-[20px] md:text-[21px] text-white font-light truncate cc-enter" style={{ animationDelay: '400ms' }}>
                               {t('ui_funds_increase_balances_title', 'Ajouter des fonds')}
                             </p>
-                            <svg className="w-5 h-5 text-white/45" viewBox="0 0 24 24" fill="none" aria-hidden>
-                              <path
-                                d="M9 18L15 12L9 6"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
+                            <svg key={`chev1-${animKey}`} className="w-5 h-5 text-white/45 cc-enter" style={{ animationDelay: '460ms' }} viewBox="0 0 24 24" fill="none" aria-hidden>
+                              <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                             </svg>
                           </div>
                           <p className="mt-1 text-[15px] md:text-sm leading-snug text-white/45 flex items-center gap-1.5">
@@ -283,19 +280,19 @@ export default function WalletDashboardCashChoiceModal({
                     </button>
                     <div className="mb-5" />
 
-                    <button type="button" onClick={onChooseSell} className={cardClassName}>
+                    <button key={`card2-${animKey}`} type="button" onClick={onChooseSell} className={`cc-enter ${cardClassName}`} style={{ animationDelay: '430ms' }}>
                       <div className="flex items-center gap-3">
-                        <div className="w-11 h-11 rounded-[16px] bg-transparent flex items-center justify-center flex-shrink-0">
+                        <div key={`icon2-${animKey}`} className="w-11 h-11 rounded-[16px] bg-transparent flex items-center justify-center flex-shrink-0 cc-enter" style={{ animationDelay: '480ms' }}>
                           <FundsCardBankIcon />
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center justify-between gap-2">
-                            <p className="text-[20px] md:text-[21px] text-white font-light truncate">
+                            <p key={`label2-${animKey}`} className="text-[20px] md:text-[21px] text-white font-light truncate cc-enter" style={{ animationDelay: '500ms' }}>
                               {isDesktop
                                 ? t('ui_funds_withdraw_title', 'Transférer vers la banque')
                                 : t('ui_funds_withdraw_title_mobile', 'Transférer vers la banque')}
                             </p>
-                            <svg className="w-5 h-5 text-white/45" viewBox="0 0 24 24" fill="none" aria-hidden>
+                            <svg key={`chev2-${animKey}`} className="w-5 h-5 text-white/45 cc-enter" style={{ animationDelay: '560ms' }} viewBox="0 0 24 24" fill="none" aria-hidden>
                               <path
                                 d="M9 18L15 12L9 6"
                                 stroke="currentColor"
@@ -327,19 +324,19 @@ export default function WalletDashboardCashChoiceModal({
 
 			                  <div>
 			                    <div className="space-y-4">
-			                      {sectionHeader(t('ui_funds_section_digital_dollars', 'Stablecoins en USD'))}
+			                      {sectionHeader(t('ui_funds_section_digital_dollars', 'Stablecoins en USD'), 620)}
 
-                    <button type="button" onClick={onChooseUsdSwapOut} className={cardClassName}>
+                    <button key={`card3-${animKey}`} type="button" onClick={onChooseUsdSwapOut} className={`cc-enter ${cardClassName}`} style={{ animationDelay: '700ms' }}>
                       <div className="flex items-center gap-3">
-                        <div className="w-11 h-11 rounded-[16px] bg-transparent flex items-center justify-center flex-shrink-0">
+                        <div key={`icon3-${animKey}`} className="w-11 h-11 rounded-[16px] bg-transparent flex items-center justify-center flex-shrink-0 cc-enter" style={{ animationDelay: '750ms' }}>
                           <FundsCardWalletIcon />
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center justify-between gap-2">
-                            <p className="text-[20px] md:text-[21px] text-white font-light truncate">
+                            <p key={`label3-${animKey}`} className="text-[20px] md:text-[21px] text-white font-light truncate cc-enter" style={{ animationDelay: '770ms' }}>
                               {t('ui_funds_swap_out_title', 'Vendre vos stablecoins')}
                             </p>
-                            <svg className="w-5 h-5 text-white/45" viewBox="0 0 24 24" fill="none" aria-hidden>
+                            <svg key={`chev3-${animKey}`} className="w-5 h-5 text-white/45 cc-enter" style={{ animationDelay: '830ms' }} viewBox="0 0 24 24" fill="none" aria-hidden>
                               <path
                                 d="M9 18L15 12L9 6"
                                 stroke="currentColor"
@@ -410,24 +407,18 @@ export default function WalletDashboardCashChoiceModal({
                     </button>
                     <div className="mb-5" />
 
-                    <button type="button" onClick={onChooseUsdSwapIn} className={cardClassName}>
+                    <button key={`card4-${animKey}`} type="button" onClick={onChooseUsdSwapIn} className={`cc-enter ${cardClassName}`} style={{ animationDelay: '800ms' }}>
                       <div className="flex items-center gap-3">
-                        <div className="w-11 h-11 rounded-[16px] bg-transparent flex items-center justify-center flex-shrink-0">
+                        <div key={`icon4-${animKey}`} className="w-11 h-11 rounded-[16px] bg-transparent flex items-center justify-center flex-shrink-0 cc-enter" style={{ animationDelay: '850ms' }}>
                           <FundsCardSendIcon />
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center justify-between gap-2">
-                            <p className="text-[20px] md:text-[21px] text-white font-light truncate">
+                            <p key={`label4-${animKey}`} className="text-[20px] md:text-[21px] text-white font-light truncate cc-enter" style={{ animationDelay: '870ms' }}>
                               {t('ui_funds_swap_in_title', 'Acheter des stablecoins')}
                             </p>
-                            <svg className="w-5 h-5 text-white/45" viewBox="0 0 24 24" fill="none" aria-hidden>
-                              <path
-                                d="M9 18L15 12L9 6"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
+                            <svg key={`chev4-${animKey}`} className="w-5 h-5 text-white/45 cc-enter" style={{ animationDelay: '930ms' }} viewBox="0 0 24 24" fill="none" aria-hidden>
+                              <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                             </svg>
                           </div>
                           <p className="mt-1 text-[15px] md:text-sm leading-snug text-white/50">
@@ -458,7 +449,7 @@ export default function WalletDashboardCashChoiceModal({
 		                    </div>
 
 		                    {/* Liquidity note: 14px gap on mobile */}
-		                    <div className="mt-[14px] md:mt-4">
+		                    <div key={`note-${animKey}`} className="mt-[14px] md:mt-4 cc-enter" style={{ animationDelay: '980ms' }}>
 		                      <p className="px-2 w-full md:max-w-[520px] mx-auto text-center text-[12px] md:text-[13px] font-light text-white/65 leading-snug">
 		                        {stablecoinLiquidityNote}
 		                      </p>
