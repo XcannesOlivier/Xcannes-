@@ -1553,7 +1553,7 @@ export default function CurrencyStatement({
 
           {/* Filtres */}
           <div className="flex flex-row items-stretch md:items-center">
-            <div className="flex flex-1 items-center rounded-b-[20px] p-1 ring-1 ring-white/[0.05] ring-inset bg-transparent">
+            <div className="flex flex-1 items-center p-1 border-t border-white/[0.07] rounded-t-[4px] bg-transparent">
               {[
                 { key: "all", label: stripCountSuffix(t("ui_all_0c90d41d71", "Tout")) },
                 { key: "credit", label: stripCountSuffix(t("ui_credits_b8166276a0", "Entrées")) },
