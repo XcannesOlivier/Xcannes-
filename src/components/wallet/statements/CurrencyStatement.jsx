@@ -1529,10 +1529,12 @@ export default function CurrencyStatement({
 	          </div>
 	        </div>{/* /header */}
 
-        {/* Balance + USD estimé */}
+        {/* Balance + Filtres — bloc commun */}
         {!isXrpNetworkView ? (
+          <div className="mx-4 md:mx-6 rounded-[20px] ring-1 ring-inset ring-white/[0.07]">
+          {/* Balance + USD estimé */}
           <div className="flex flex-col items-center text-center gap-0.5 mt-3 mb-3 w-fit mx-auto px-8 py-4">
-            <p className="text-[24px] md:text-[26px] text-white/60">
+            <p className="text-[18px] md:text-[20px] text-white/60">
               {t("ui_balance_445d830d72", "Solde disponible")}
             </p>
             <p className="text-4xl text-white font-bold">
@@ -1548,11 +1550,9 @@ export default function CurrencyStatement({
               </p>
             ) : null}
           </div>
-        ) : null}
 
-        {/* Filtres */}
-        {!isXrpNetworkView ? (
-          <div className="px-4 md:px-6 pb-2 flex flex-row items-stretch md:items-center gap-2">
+          {/* Filtres */}
+          <div className="px-2 pb-2 flex flex-row items-stretch md:items-center gap-2">
             <div className="flex flex-1 items-center rounded-[16px] p-1 ring-1 ring-white/[0.05] ring-inset bg-transparent">
               {[
                 { key: "all", label: stripCountSuffix(t("ui_all_0c90d41d71", "Tout")) },
@@ -1586,6 +1586,7 @@ export default function CurrencyStatement({
                 </button>
               ))}
             </div>
+          </div>
           </div>
         ) : null}
 
