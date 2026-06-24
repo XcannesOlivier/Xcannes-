@@ -658,7 +658,7 @@ export default function WalletDashboardSwapModal({
 	                        "!text-white/45 text-[12px] md:text-[13px] font-light tracking-wide mr-4",
                       labelClassName:
                         "!text-white text-[14px] md:text-[15px] font-light",
-                      dotClassName: "!h-2.5 !w-2.5 ring-xcannes-green/20 self-center",
+                      dotClassName: "self-center",
                     })}
                   </div>
                 </div>

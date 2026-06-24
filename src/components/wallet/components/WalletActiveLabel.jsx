@@ -7,6 +7,7 @@ export default function WalletActiveLabel({
   prefixClassName = "",
   labelClassName = "",
   dotClassName = "",
+  dotStyle = undefined,
   labelWrap = false,
 }) {
   const resolvedLabel = String(label || "").trim() || "Wallet";
@@ -45,12 +46,13 @@ export default function WalletActiveLabel({
       ) : null}
       <span
         className={[
-          "h-2 w-2 rounded-full ring-4 ring-xcannes-green/25 bg-xcannes-green shrink-0 animate-pulse",
+          "h-2 w-2 rounded-full ring-4 ring-xcannes-green/20 bg-xcannes-green shrink-0",
           dotAlignClass,
           dotClassName,
         ]
           .filter(Boolean)
           .join(" ")}
+        style={dotStyle ?? { animation: 'wallet-dot-pulse 3.5s ease-in-out infinite' }}
         aria-hidden="true"
       />
       <span

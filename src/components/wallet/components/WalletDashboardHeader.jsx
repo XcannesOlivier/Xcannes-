@@ -373,9 +373,8 @@ export default function WalletDashboardHeader({
                     >
                       <div className="flex items-center gap-2.5 min-w-0">
                         <span
-                          className={`h-2.5 w-2.5 rounded-full ring-[3px] shrink-0 ${xrplConnectionIndicator.dotClass} ${xrplConnectionIndicator.ringClass} ${
-                            xrplConnectionIndicator.pulse ? "animate-pulse" : ""
-                          }`}
+                          className={`h-2 w-2 rounded-full ring-4 shrink-0 ${xrplConnectionIndicator.dotClass} ${xrplConnectionIndicator.ringClass}`}
+                          style={xrplConnectionIndicator.pulse ? { animation: 'wallet-dot-pulse 3.5s ease-in-out infinite' } : undefined}
                           title={xrplConnectionIndicator.label}
                           aria-label={xrplConnectionIndicator.label}
                         />

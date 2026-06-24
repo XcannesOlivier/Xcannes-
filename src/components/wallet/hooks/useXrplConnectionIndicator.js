@@ -30,7 +30,7 @@ export function useXrplConnectionIndicator({
       return {
         label: "XRPL connected",
         dotClass: "bg-xcannes-green",
-        ringClass: "ring-xcannes-green/25",
+        ringClass: "ring-xcannes-green/20",
         pulse: true,
       };
     }
