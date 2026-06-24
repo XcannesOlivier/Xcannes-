@@ -1587,3 +1587,18 @@ body.header-hero-mode .home-content-wrapper {
     border-color: rgba(255, 255, 255, 0.10) !important;    /* border-white/10 */
   }
 }
+
+/* ── Send Choice staggered entrance animation ── */
+@keyframes scEnter {
+  from {
+    opacity: 0;
+    transform: translateY(-22px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.sc-enter {
+  animation: scEnter 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}

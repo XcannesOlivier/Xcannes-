@@ -66,6 +66,8 @@ export default function WalletDashboardSendChoiceModal({
 
   // ── Sub-modal state ──────────────────────────────────────────
   const [subModal, setSubModal] = useState(null); // 'quickscan' | 'payreq' | null
+  // Staggered entrance animation key — bumped each time modal opens
+  const [animKey, setAnimKey] = useState(0);
   const [flowSheet, setFlowSheet] = useState(null); // 'simple' | 'payreq' | null
   const flowSheetRef = useRef(null);
   const [flowSheetTranslateY, setFlowSheetTranslateY] = useState(0);
@@ -129,6 +131,9 @@ export default function WalletDashboardSendChoiceModal({
   }, [onQrScanResult, normalizedCurrentWallet]);
 
   useEffect(() => {
+    if (open) {
+      setAnimKey((k) => k + 1);
+    }
     if (!open) {
       setSubModal(null);
       setFlowSheet(null);
@@ -485,6 +490,9 @@ export default function WalletDashboardSendChoiceModal({
   const cardClassName =
     'relative overflow-hidden w-full text-left rounded-[18px] px-4 py-4 md:px-6 md:py-5 bg-white/[0.02] hover:bg-white/[0.035] active:bg-white/[0.03] transition-all duration-[140ms] ease-[cubic-bezier(0.4,0,0.2,1)] hover:-translate-y-px active:translate-y-0 active:scale-[0.99]';
 
+  // Helper: className + style for staggered entrance animation
+  const scStyle = (delayMs) => ({ animationDelay: `${delayMs}ms` });
+
   const accordionBtnClass =
     'flex items-center justify-center gap-2.5 w-full rounded-[20px] px-3 py-2.5 bg-white/[0.07] hover:bg-white/[0.10] active:bg-white/[0.04] transition-colors duration-100';
 
@@ -713,7 +721,9 @@ export default function WalletDashboardSendChoiceModal({
               {/* Drag handle (mobile) */}
               {!inline ? (
                 <div
-                  className="md:hidden flex justify-center pt-3 pb-0"
+                  key={`handle-${animKey}`}
+                  className="md:hidden flex justify-center pt-3 pb-0 sc-enter"
+                  style={scStyle(0)}
                   aria-hidden
                   onPointerDown={event => { maybeStartOverlayDrag(event, 'fixed'); }}
                 >
@@ -736,11 +746,19 @@ export default function WalletDashboardSendChoiceModal({
                   className="pt-[40px] md:pt-[66px] pb-3 flex flex-col items-center text-center"
                   onPointerDown={event => { maybeStartOverlayDrag(event, 'fixed'); }}
                 >
-                  <h3 className="mt-1 px-6 text-[30px] md:text-[34px] font-light text-white tracking-tight">
+                  <h3
+                    key={`title-${animKey}`}
+                    className="mt-1 px-6 text-[30px] md:text-[34px] font-light text-white tracking-tight sc-enter"
+                    style={scStyle(80)}
+                  >
                     {t('ui_send_choice_subtitle', "Comment souhaitez-vous envoyer de l'argent ?")}
                   </h3>
                   {/* Wallet meta pill */}
-                  <div className="mt-[40px] flex justify-center px-4 w-full">
+                  <div
+                    key={`pill-${animKey}`}
+                    className="mt-[40px] flex justify-center px-4 w-full sc-enter"
+                    style={scStyle(180)}
+                  >
 	                    {renderWalletMeta?.({
 	                      variant: "pill-column",
 	                      className: "flex justify-center",
@@ -784,7 +802,11 @@ export default function WalletDashboardSendChoiceModal({
                   />
 
                   {/* ── 1. Envoi simple ── */}
-                  <div className={`${cardClassName} xcannes-irregular-green-border xcannes-sendchoice-accent-green`}>
+                  <div
+                    key={`card1-${animKey}`}
+                    className={`${cardClassName} xcannes-irregular-green-border xcannes-sendchoice-accent-green sc-enter`}
+                    style={scStyle(280)}
+                  >
                     <div className="pointer-events-none absolute inset-0" aria-hidden>
                       <div className="xcannes-sendchoice-border-fade-green z-10" />
                       <div className="absolute inset-0 bg-[radial-gradient(190px_190px_at_-8%_18%,rgba(0,255,150,0.55)_0%,rgba(0,255,150,0.22)_22%,rgba(0,255,150,0.08)_38%,transparent_62%)]" />
@@ -796,13 +818,21 @@ export default function WalletDashboardSendChoiceModal({
 	                      className="relative w-full text-left"
 	                    >
                       <div className="grid grid-cols-[48px_1px_1fr_28px] md:grid-cols-[56px_1px_1fr_32px] gap-3 md:gap-4 items-start">
-                        <div className="relative self-center">
+                        <div
+                          key={`icon1-${animKey}`}
+                          className="relative self-center sc-enter"
+                          style={scStyle(350)}
+                        >
                           <div className="relative w-12 h-12 md:w-14 md:h-14 rounded-[16px] bg-[#0b0f10] xcannes-irregular-green-border-icon flex items-center justify-center">
                             <QuickScanIcon />
                           </div>
                         </div>
                         <div className="self-stretch w-px opacity-90 bg-[linear-gradient(to_bottom,transparent_0%,rgba(0,255,150,0.22)_50%,transparent_100%)]" aria-hidden />
-                        <div className="min-w-0">
+                        <div
+                          key={`text1-${animKey}`}
+                          className="min-w-0 sc-enter"
+                          style={scStyle(380)}
+                        >
                           <div className="flex items-start justify-between gap-2">
                             <p className="text-[18px] md:text-[22px] text-white font-light tracking-tight truncate md:whitespace-normal md:break-words">
                               {t('ui_send_simple_title', 'Envoi simple')}
@@ -811,7 +841,11 @@ export default function WalletDashboardSendChoiceModal({
                           <p className="mt-1 text-[14px] md:text-[17px] font-light leading-snug text-white/50">
                             {t('ui_send_simple_hint_long', 'Saisissez une adresse, choisissez la devise et indiquez le montant.')}
                           </p>
-	                          <div className="mt-3 flex flex-wrap items-center gap-2">
+	                          <div
+                              key={`badges1-${animKey}`}
+                              className="mt-3 flex flex-wrap items-center gap-2 sc-enter"
+                              style={scStyle(430)}
+                            >
 	                            <Badge className="bg-transparent ring-[0.3px] ring-xcannes-green/70 font-light">{t('ui_send_choice_simple_badge_steps', '4 étapes')}</Badge>
 	                            <span className="w-1 h-1 rounded-full bg-xcannes-green/80" aria-hidden />
 	                            <span className="inline-flex items-center text-[10px] md:text-[11px] text-white/65 font-light">
@@ -819,7 +853,11 @@ export default function WalletDashboardSendChoiceModal({
 	                            </span>
 	                          </div>
                         </div>
-                        <div className="self-center flex justify-end mr-2 md:mr-0">
+                        <div
+                          key={`arrow1-${animKey}`}
+                          className="self-center flex justify-end mr-2 md:mr-0 sc-enter"
+                          style={scStyle(480)}
+                        >
                           <svg className="w-7 h-7 md:w-8 md:h-8 text-xcannes-green/90 flex-shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden>
                             <path d="M7 18L13 12L7 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                             <path d="M13 18L19 12L13 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -847,7 +885,11 @@ export default function WalletDashboardSendChoiceModal({
 	                  </div>
 
                   {/* ── 2. Payer une demande ── */}
-                  <div className={`${cardClassName} xcannes-irregular-amber-border xcannes-sendchoice-accent-amber`}>
+                  <div
+                    key={`card2-${animKey}`}
+                    className={`${cardClassName} xcannes-irregular-amber-border xcannes-sendchoice-accent-amber sc-enter`}
+                    style={scStyle(440)}
+                  >
                     <div className="pointer-events-none absolute inset-0" aria-hidden>
                       <div className="xcannes-sendchoice-border-fade-amber z-10" />
                       <div className="absolute inset-0 bg-[radial-gradient(190px_190px_at_-8%_18%,rgba(245,166,35,0.46)_0%,rgba(245,166,35,0.20)_22%,rgba(245,166,35,0.08)_38%,transparent_62%)]" />
@@ -859,13 +901,21 @@ export default function WalletDashboardSendChoiceModal({
 	                      className="relative w-full text-left"
 	                    >
                       <div className="grid grid-cols-[48px_1px_1fr_28px] md:grid-cols-[56px_1px_1fr_32px] gap-3 md:gap-4 items-start">
-                        <div className="relative self-center">
+                        <div
+                          key={`icon2-${animKey}`}
+                          className="relative self-center sc-enter"
+                          style={scStyle(510)}
+                        >
                           <div className="relative w-12 h-12 md:w-14 md:h-14 rounded-[16px] bg-[#0b0f10] xcannes-irregular-amber-border-icon flex items-center justify-center">
                             <PayRequestIcon />
                           </div>
                         </div>
                         <div className="self-stretch w-px opacity-90 bg-[linear-gradient(to_bottom,transparent_0%,rgba(245,166,35,0.22)_50%,transparent_100%)]" aria-hidden />
-                        <div className="min-w-0">
+                        <div
+                          key={`text2-${animKey}`}
+                          className="min-w-0 sc-enter"
+                          style={scStyle(540)}
+                        >
                           <div className="flex items-start justify-between gap-2">
                             <p className="text-[18px] md:text-[22px] text-white font-light tracking-tight truncate md:whitespace-normal md:break-words">
                               {t('ui_send_choice_pay_request_title', 'Payer une demande')}
@@ -874,7 +924,11 @@ export default function WalletDashboardSendChoiceModal({
                           <p className="mt-1 text-[14px] md:text-[17px] font-light leading-snug text-white/50">
                             {t('ui_send_pay_request_hint', 'Scannez, importez un QR code ou saisissez une demande de paiement.')}
                           </p>
-	                          <div className="mt-3 flex flex-wrap items-center gap-2">
+	                          <div
+                              key={`badges2-${animKey}`}
+                              className="mt-3 flex flex-wrap items-center gap-2 sc-enter"
+                              style={scStyle(590)}
+                            >
 	                            <Badge className="bg-transparent ring-[0.3px] ring-[#f5a623]/60 font-light">{t('ui_send_choice_payreq_badge_modes', 'QR, import, saisie')}</Badge>
 	                            <span className="w-1 h-1 rounded-full bg-[#f5a623]/80" aria-hidden />
 	                            <span className="inline-flex items-center text-[10px] md:text-[11px] text-white/65 font-light">
@@ -882,7 +936,11 @@ export default function WalletDashboardSendChoiceModal({
 	                            </span>
 	                          </div>
                         </div>
-                        <div className="self-center flex justify-end mr-2 md:mr-0">
+                        <div
+                          key={`arrow2-${animKey}`}
+                          className="self-center flex justify-end mr-2 md:mr-0 sc-enter"
+                          style={scStyle(640)}
+                        >
                           <svg className="w-7 h-7 md:w-8 md:h-8 text-[#f5a623]/90 flex-shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden>
                             <path d="M7 18L13 12L7 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                             <path d="M13 18L19 12L13 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
