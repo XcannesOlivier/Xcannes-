@@ -840,7 +840,7 @@ export default function WalletDashboardSendChoiceModal({
 	                    >
                       <div className="absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-xcannes-green/45 to-transparent" aria-hidden />
                       <span className="inline-flex items-center gap-2">
-                        <OpenFlowIcon className="w-[38px] h-[28px] text-xcannes-green/85" />
+                        <span className="text-xcannes-green/85 text-[22px] font-light leading-none">+</span>
                         <span className="text-[14px] font-light text-white">{t('ui_open_flow', 'Voir les étapes')}</span>
                       </span>
 	                    </button>
@@ -903,7 +903,7 @@ export default function WalletDashboardSendChoiceModal({
 	                    >
                       <div className="absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-[#f5a623]/40 to-transparent" aria-hidden />
                       <span className="inline-flex items-center gap-2">
-                        <OpenFlowIcon className="w-[38px] h-[28px] text-[#f5a623]/85" />
+                        <span className="text-[#f5a623]/85 text-[22px] font-light leading-none">+</span>
                         <span className="text-[14px] font-light text-white">{t('ui_open_flow', 'Voir les étapes')}</span>
                       </span>
 	                    </button>

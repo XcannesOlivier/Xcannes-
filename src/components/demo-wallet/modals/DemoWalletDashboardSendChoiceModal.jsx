@@ -589,7 +589,7 @@ export default function DemoWalletDashboardSendChoiceModal({
                     <div className="relative mt-4 pt-3 flex items-center justify-between text-[13px] text-white/75 hover:text-white transition-colors duration-150">
                       <div className="absolute left-0 right-0 top-0 h-px bg-gradient-to-l from-xcannes-green/45 via-white/10 to-transparent" aria-hidden />
                       <span className="inline-flex items-center gap-2">
-                        <OpenFlowIcon className="w-[18px] h-[18px] text-xcannes-green/85" />
+                        <span className="text-xcannes-green/85 text-[22px] font-light leading-none">+</span>
                         <span className="text-white">{t("ui_open_flow", "Voir les étapes")}</span>
                       </span>
                     </div>
@@ -643,7 +643,7 @@ export default function DemoWalletDashboardSendChoiceModal({
                     <div className="relative mt-4 pt-3 flex items-center justify-between text-[13px] text-white/75 hover:text-white transition-colors duration-150">
                       <div className="absolute left-0 right-0 top-0 h-px bg-gradient-to-l from-[#f5a623]/42 via-white/10 to-transparent" aria-hidden />
                       <span className="inline-flex items-center gap-2">
-                        <OpenFlowIcon className="w-[18px] h-[18px] text-[#f5a623]/85" />
+                        <span className="text-[#f5a623]/85 text-[22px] font-light leading-none">+</span>
                         <span className="text-white">{t("ui_open_flow", "Voir les étapes")}</span>
                       </span>
                     </div>
