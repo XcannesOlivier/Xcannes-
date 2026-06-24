@@ -1464,7 +1464,7 @@ export default function CurrencyStatement({
       >
 	        {/* Header avec Account Info intégré */}
 	        <div
-	          className={`relative flex-shrink-0 bg-[#111518] shadow-[inset_0_16px_28px_rgba(255,255,255,0.03),inset_0_-46px_70px_rgba(0,0,0,0.55)] px-4 md:px-6 py-3 md:py-4`}
+	          className={`relative flex-shrink-0 bg-elevated shadow-[inset_0_16px_28px_rgba(255,255,255,0.03),inset_0_-46px_70px_rgba(0,0,0,0.55)] px-4 md:px-6 py-3 md:py-4`}
             onPointerDown={(event) => {
               maybeStartOverlayDrag(event, "fixed");
             }}
@@ -1694,7 +1694,7 @@ export default function CurrencyStatement({
         {/* Content - Zone scrollable */}
         <div
           className={[
-            "px-0 py-4 md:py-6 flex flex-col gap-4 overscroll-contain bg-gradient-to-b from-[#101415] to-[#0d1214] border-t border-white/[0.10] md:border-white/[0.06]",
+            "px-0 py-4 md:py-6 flex flex-col gap-4 overscroll-contain bg-transparent border-t border-white/[0.10] md:border-white/[0.06]",
             isXrpNetworkView ? "flex-none" : "flex-1 min-h-0",
             isXrpNetworkView
               ? "overflow-visible"
@@ -1772,7 +1772,7 @@ export default function CurrencyStatement({
                                 ref={isHighlighted ? highlightRowRef : null}
                                 onClick={() => openTxDetails(tx)}
                                 className={[
-                                  "w-full flex items-center gap-1.5 text-left px-3 py-2 rounded-[16px] bg-[#101415] ring-1 ring-inset ring-white/[0.06] shadow-[inset_0_-14px_18px_rgba(0,0,0,0.8)] transition-colors duration-150",
+                                  "w-full flex items-center gap-1.5 text-left px-3 py-2 rounded-[16px] bg-transparent ring-1 ring-inset ring-white/[0.06] shadow-[inset_0_-14px_18px_rgba(0,0,0,0.8)] transition-colors duration-150",
                                   isHighlighted
                                     ? "text-white"
                                     : "text-white/90 hover:text-white",
