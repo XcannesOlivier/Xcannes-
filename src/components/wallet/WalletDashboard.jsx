@@ -1163,7 +1163,7 @@ export default function WalletDashboard({
                       <span>Ajouter une devise</span>
                     </span>
                   }
-                  buttonClassName="w-full flex items-center gap-2 text-[13px] font-normal text-white/45 hover:text-white/80 transition-colors px-3 py-2 rounded-lg"
+                  buttonClassName="w-full flex items-center gap-2 text-base font-normal text-white/45 hover:text-white/80 transition-colors px-3 py-2 rounded-lg"
                   placeholder={t('ui_search_all_currencies_c5d6e7f8', 'Search currency...')}
                   excludeCodes={['USD', 'RLUSD', 'XRP']}
                   showQuickAdd={false}
@@ -1179,7 +1179,7 @@ export default function WalletDashboard({
                 <button
                   type="button"
                   onClick={handleOpenGlobalStatementPlain}
-                  className="w-full flex items-center gap-2 text-[13px] font-normal text-white/45 hover:text-white/80 transition-colors px-3 py-2 rounded-lg"
+                  className="w-full flex items-center gap-2 text-base font-normal text-white/45 hover:text-white/80 transition-colors px-3 py-2 rounded-lg"
                   aria-label={t('ui_open_statement', 'Ouvrir le relevé des transactions')}
                 >
                   <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
