@@ -1525,7 +1525,7 @@ export default function GlobalStatement({
                     aria-expanded={accountDropdownOpen}
                     title={t("ui_current_account_plain", "Compte actuel")}
                   >
-                    <span className="h-2 w-2 rounded-full bg-xcannes-green ring-4 ring-xcannes-green/20 shrink-0 animate-pulse" aria-hidden />
+                    <span className="h-2.5 w-2.5 rounded-full bg-xcannes-green ring-4 ring-xcannes-green/20 shrink-0 wallet-dot-active" aria-hidden />
                     <span className="text-white/70 text-sm font-light truncate min-w-0 flex-1 text-left">
                       {walletLabel || t("nav_wallet", "Wallet")}
                     </span>

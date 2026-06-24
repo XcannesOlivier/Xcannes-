@@ -1605,7 +1605,7 @@ export default function CurrencyStatement({
                   aria-expanded={footerDropdownOpen}
                   title={t("ui_current_account_plain", "Compte actuel")}
                 >
-                  <span className="h-2.5 w-2.5 rounded-full bg-xcannes-green ring-2 ring-xcannes-green/20 shrink-0 animate-pulse mr-1" aria-hidden />
+                  <span className="h-2.5 w-2.5 rounded-full bg-xcannes-green ring-4 ring-xcannes-green/20 shrink-0 wallet-dot-active mr-1" aria-hidden />
                   <span className="text-white/95 text-sm font-semibold truncate min-w-0">
                     {walletLabel || t("nav_wallet", "Wallet")}
                   </span>

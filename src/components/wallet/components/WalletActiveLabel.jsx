@@ -46,7 +46,7 @@ export default function WalletActiveLabel({
       ) : null}
       <span
         className={[
-          "h-2 w-2 rounded-full ring-4 ring-xcannes-green/20 bg-xcannes-green shrink-0 wallet-dot-active",
+          "h-2.5 w-2.5 rounded-full ring-4 ring-xcannes-green/20 bg-xcannes-green shrink-0 wallet-dot-active",
           dotAlignClass,
           dotClassName,
         ]
