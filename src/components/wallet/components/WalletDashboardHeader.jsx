@@ -101,6 +101,7 @@ export default function WalletDashboardHeader({
   const [shownLabel, setShownLabel] = useState(totalLabel);
   const [balanceFading, setBalanceFading] = useState(false);
   const prevLabelRef = useRef(totalLabel);
+  const balanceAnimRef = useRef(null);
   useEffect(() => {
     if (totalLabel === prevLabelRef.current) return;
     prevLabelRef.current = totalLabel;
@@ -111,6 +112,18 @@ export default function WalletDashboardHeader({
     }, 180);
     return () => clearTimeout(timer);
   }, [totalLabel]);
+
+  // ── Restart slide-from-left animation on wallet switch ────
+  const prevWalletRef = useRef(wallet);
+  useEffect(() => {
+    if (wallet === prevWalletRef.current) return;
+    prevWalletRef.current = wallet;
+    const el = balanceAnimRef.current;
+    if (!el) return;
+    el.classList.remove('animate-slide-from-left');
+    void el.offsetWidth; // force reflow to restart animation
+    el.classList.add('animate-slide-from-left');
+  }, [wallet]);
   const hasMultipleWallets = useMemo(() => {
     const set = new Set();
     for (const w of walletAddresses || []) {
@@ -722,7 +735,7 @@ export default function WalletDashboardHeader({
           </div>
         )}
 
-        <div key={wallet} className="animate-slide-from-left">
+        <div ref={balanceAnimRef} className="animate-slide-from-left">
         <div className="text-[21px] md:text-[27px] text-white/55 mb-0.5 md:mb-0">
           {t("ui_total_balance_label_a91b6b8c1e", "Solde total")}
         </div>
