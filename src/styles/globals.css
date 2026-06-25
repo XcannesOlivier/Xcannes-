@@ -491,9 +491,22 @@ body.wallet-page {
   50%       { transform: scale(0.7);  opacity: 0.2; }
 }
 
+/* 2-stop keyframe used on desktop with alternate direction — no loop boundary flash */
+@keyframes wallet-dot-pulse-alt {
+  0%   { transform: scale(1);   opacity: 1; }
+  100% { transform: scale(0.72); opacity: 0.2; }
+}
+
 .wallet-dot-active {
   animation: wallet-dot-pulse 3.5s ease-in-out infinite;
   will-change: transform, opacity;
+}
+
+/* Desktop: alternate avoids the 1-frame GPU compositing glitch at the loop boundary */
+@media (min-width: 768px) {
+  .wallet-dot-active {
+    animation: wallet-dot-pulse-alt 1.75s ease-in-out infinite alternate;
+  }
 }
 
 .wallet-dot-wrapper {
