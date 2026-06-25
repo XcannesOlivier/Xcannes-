@@ -202,6 +202,19 @@ export default function WalletCurrencySelector({
     };
   };
 
+  const getFooterAnimationStyle = () => {
+    if (!entryAnimationEnabled) return undefined;
+    return {
+      opacity: entryAnimateReady ? 1 : 0,
+      transform: `translate3d(0, ${entryAnimateReady ? 0 : 20}px, 0)`,
+      transitionProperty: "transform, opacity",
+      transitionDuration: "380ms",
+      transitionTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)",
+      transitionDelay: "120ms",
+      willChange: "transform, opacity",
+    };
+  };
+
   useEffect(() => {
     let cancelled = false;
     const load = async () => {
@@ -663,11 +676,17 @@ export default function WalletCurrencySelector({
                   <li key={c.code}>
                     <button
                       type="button"
+                      disabled={isAlreadyAdded}
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleSelect(c.code);
+                        if (!isAlreadyAdded) handleSelect(c.code);
                       }}
-                      className="w-full px-3 py-2 text-base text-white/80 bg-white/[0.03] hover:bg-white/[0.06] flex items-center gap-2 text-left active:scale-98">
+                      className={[
+                        "w-full px-3 py-2 text-base bg-white/[0.03] flex items-center gap-2 text-left",
+                        isAlreadyAdded
+                          ? "text-white/40 cursor-default"
+                          : "group text-white/80 hover:bg-white/[0.06] active:scale-98",
+                      ].join(" ")}>
                       <span className="text-lg">{getFlag(c.code)}</span>
                       <div className="min-w-0 flex-1 flex items-center gap-2">
                         <span className="font-mono text-[15px] md:text-[17px] whitespace-nowrap">{c.code}</span>
@@ -681,13 +700,12 @@ export default function WalletCurrencySelector({
                           <span>{t("ui_currency_already_added_short", "ajoutée")}</span>
                         </span>
                       ) : (
-                        <AddCurrencyLogo className="w-4 h-4 text-xcannes-green shrink-0" />
+                        <AddCurrencyLogo className="w-4 h-4 text-xcannes-green shrink-0 transition-transform duration-200 group-hover:scale-125" />
                       )}
                     </button>
                   </li>
                   );
                 })}
-              </ul>
             )}
           </div>
         </div>
@@ -854,15 +872,19 @@ export default function WalletCurrencySelector({
                         <button
                           key={c.code}
                           type="button"
+                          disabled={isAlreadyAdded}
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleSelect(c.code);
+                            if (!isAlreadyAdded) handleSelect(c.code);
                           }}
                           className={[
                             "w-full flex items-center gap-3 px-4 py-3 text-left border-b border-white/5 last:border-b-0 bg-white/[0.03]",
-                            active
-                              ? "bg-xcannes-green/10 text-white"
-                              : "hover:bg-white/[0.06] text-white/80",
+                            isAlreadyAdded
+                              ? "text-white/40 cursor-default"
+                              : [
+                                  "group",
+                                  active ? "bg-xcannes-green/10 text-white" : "hover:bg-white/[0.06] text-white/80",
+                                ].join(" "),
                           ].join(" ")}
                           style={getEntryAnimationStyle(index, "right")}
                         >
@@ -881,7 +903,7 @@ export default function WalletCurrencySelector({
                               <span>{t("ui_currency_already_added_short", "ajoutée")}</span>
                             </span>
                           ) : (
-                            <AddCurrencyLogo className="w-4 h-4 text-xcannes-green shrink-0" />
+                            <AddCurrencyLogo className="w-4 h-4 text-xcannes-green shrink-0 transition-transform duration-200 group-hover:scale-125" />
                           )}
                         </button>
                       );
@@ -889,7 +911,7 @@ export default function WalletCurrencySelector({
                   )}
                 </div>
 
-	                <div className="px-4 pt-3 pb-4 bg-transparent">
+	                <div className="px-4 pt-3 pb-4 bg-transparent" style={getFooterAnimationStyle()}>
 	                  {walletLabel ? (
 	                    <div className="w-full rounded-2xl ring-1 ring-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.05)_0%,rgba(255,255,255,0.02)_100%)] px-3.5 py-3">
 	                      <div className="flex items-center gap-3">
