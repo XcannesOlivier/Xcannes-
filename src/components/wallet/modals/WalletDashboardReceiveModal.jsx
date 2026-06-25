@@ -635,7 +635,7 @@ export default function WalletDashboardReceiveModal({
     const titleLinesArr = wrapText(titleText, titleFont).map(line => ({
       text: line,
       font: titleFont,
-      color: accentColor,
+      color: '#ffffff',
       lineHeight: titleLineHeight,
     }));
     const titleBlockHeight = titleLinesArr.reduce((sum, line) => sum + line.lineHeight, 0);
@@ -647,20 +647,24 @@ export default function WalletDashboardReceiveModal({
         : activeWalletLabel || fallbackWalletLabel,
     ).trim();
     const addressText = String(useRequest ? generatedRequest?.to || wallet || '' : wallet || '').trim();
-    const amountLine = useRequest ? `${requestDisplayAmountLabel} ${requestDisplayCurrency}`.trim() : '';
+    const amountLine = useRequest ? requestDisplayAmountLabel.trim() : '';
     const dateLine = useRequest ? requestDateLabel : '';
+    const memoLine = useRequest ? String(generatedRequest?.memo || '').trim() : '';
 
     if (labelText) {
-      addLines(labelText, labelFont, accentColor, Math.round(labelFontSize * 1.35));
+      addLines(labelText, labelFont, '#ffffff', Math.round(labelFontSize * 1.35));
     }
     if (addressText) {
       addLines(addressText, addressFont, '#ffffff', Math.round(addressFontSize * 1.35));
     }
     if (amountLine) {
-      addLines(amountLine, amountFont, accentColor, Math.round(amountFontSize * 1.35));
+      addLines(amountLine, amountFont, '#ffffff', Math.round(amountFontSize * 1.35));
+    }
+    if (memoLine) {
+      addLines(memoLine, metaFont, '#ffffff', Math.round(metaFontSize * 1.35));
     }
     if (dateLine) {
-      addLines(dateLine, metaFont, '#ffffff', Math.round(metaFontSize * 1.35));
+      addLines(dateLine, metaFont, 'rgba(255,255,255,0.55)', Math.round(metaFontSize * 1.35));
     }
 
     const textGap = textLines.length ? Math.round(labelFontSize * 0.8) : 0;
@@ -715,10 +719,21 @@ export default function WalletDashboardReceiveModal({
       let ty = Math.round(titleGap / 2);
       ctx.textAlign = 'center';
       ctx.textBaseline = 'top';
-      titleLinesArr.forEach(line => {
+      titleLinesArr.forEach((line, idx) => {
         ctx.font = line.font;
         ctx.fillStyle = line.color;
         ctx.fillText(line.text, exportWidth / 2, ty);
+        // Green dot to the right of the first title line only
+        if (idx === 0) {
+          const textW = ctx.measureText(line.text).width;
+          const dotRadius = Math.max(5, Math.round(titleFontSize * 0.22));
+          const dotX = exportWidth / 2 + textW / 2 + dotRadius + Math.round(titleFontSize * 0.18);
+          const dotY = ty + titleFontSize / 2;
+          ctx.beginPath();
+          ctx.arc(dotX, dotY, dotRadius, 0, Math.PI * 2);
+          ctx.fillStyle = accentColor;
+          ctx.fill();
+        }
         ty += line.lineHeight;
       });
     }
