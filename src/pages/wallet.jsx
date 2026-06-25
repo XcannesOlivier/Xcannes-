@@ -383,6 +383,25 @@ export default function Wallet() {
   // In embedded mode, don't redirect — wait for PWA to provide wallet via postMessage
   // Non-embedded, non-connected: show WalletConnectScreen (no redirect)
 
+  // Loading overlay for embedded mode: persists briefly after session is ready
+  // so the wallet can render underneath before the overlay fades out.
+  const [overlayVisible, setOverlayVisible] = useState(isEmbedded);
+  const [overlayFading, setOverlayFading] = useState(false);
+  const overlayTimerRef = useRef(null);
+
+  useEffect(() => {
+    if (!isEmbedded) return;
+    if (!isSessionReady) {
+      setOverlayVisible(true);
+      setOverlayFading(false);
+      return;
+    }
+    // Session just became ready — start fade-out
+    setOverlayFading(true);
+    overlayTimerRef.current = setTimeout(() => setOverlayVisible(false), 600);
+    return () => clearTimeout(overlayTimerRef.current);
+  }, [isEmbedded, isSessionReady]);
+
   // SEO head (shared across all visible states, hidden in embedded mode)
   const seoHead = !isEmbedded ? (
     <SEOHead
@@ -394,15 +413,7 @@ export default function Wallet() {
     />
   ) : null;
 
-  if (!isSessionReady) {
-    // In embedded mode, show a loading state while waiting for PWA init
-    if (isEmbedded) {
-      return (
-        <main className="min-h-[100svh] flex items-center justify-center bg-xcannes-surface-demo text-white">
-          <div className="animate-pulse text-white/40 text-sm">Chargement du wallet…</div>
-        </main>
-      );
-    }
+  if (!isSessionReady && !isEmbedded) {
     return null;
   }
 
@@ -500,6 +511,45 @@ export default function Wallet() {
           </div>
         </div>
       </main>
+
+      {/* Embedded loading overlay — fades out once session is ready */}
+      {isEmbedded && overlayVisible && (
+        <div
+          className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-xcannes-surface-demo text-white pointer-events-none"
+          style={{
+            transition: 'opacity 550ms cubic-bezier(0.4,0,0.2,1)',
+            opacity: overlayFading ? 0 : 1,
+          }}
+          aria-hidden="true"
+        >
+          <svg
+            className="w-10 h-10 mb-5"
+            viewBox="0 0 40 40"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden
+          >
+            <circle cx="20" cy="20" r="16" stroke="rgba(255,255,255,0.1)" strokeWidth="4" />
+            <circle
+              cx="20" cy="20" r="16"
+              stroke="#16a34a"
+              strokeWidth="4"
+              strokeLinecap="round"
+              strokeDasharray="60 44"
+              style={{ transformOrigin: 'center', animation: 'wallet-loading-spin 0.85s linear infinite' }}
+            />
+          </svg>
+          <span className="text-[15px] font-light text-white/50 tracking-wide">
+            Chargement du compte…
+          </span>
+          <style>{`
+            @keyframes wallet-loading-spin {
+              from { transform: rotate(0deg); }
+              to   { transform: rotate(360deg); }
+            }
+          `}</style>
+        </div>
+      )}
     </>
   );
 }
