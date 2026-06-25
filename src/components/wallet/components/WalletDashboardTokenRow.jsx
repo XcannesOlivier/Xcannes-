@@ -120,7 +120,7 @@ export default function WalletDashboardTokenRow({
         className="w-full text-left"
       >
         <div
-          className={`flex items-center gap-3 md:gap-6 rounded-[14px] px-3.5 py-2.5 transition-colors cursor-pointer ${rowSurfaceClass} ${tokenRowClass}`}
+          className={`flex items-center gap-3 md:gap-6 rounded-[14px] px-3.5 py-2 md:py-2.5 transition-colors cursor-pointer ${rowSurfaceClass} ${tokenRowClass}`}
         >
           {/* Icône — identique mobile et desktop */}
           <div
@@ -131,16 +131,16 @@ export default function WalletDashboardTokenRow({
 
           {/* ── Mobile : nom + montant empilés ── */}
           <div className="md:hidden min-w-0 flex flex-col justify-center flex-1">
-            <span className="text-xl text-white/70 truncate leading-tight">
+            <span className="text-[18px] text-white/70 truncate leading-tight">
               {currencyLabel.length > 22 ? currencyLabel.slice(0, 22) + '…' : currencyLabel}
             </span>
             <div className="flex items-center gap-1.5 mt-[3px]">
-              <span className="text-lg font-mono text-white/90 leading-tight">
+              <span className="text-[16px] font-mono text-white/90 leading-tight">
                 {Number.isFinite(displayValue)
                   ? new Intl.NumberFormat(locale || "en", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(displayValue)
                   : "0.00"}
               </span>
-              <span className="text-sm font-light text-white/50">{displayCode}</span>
+              <span className="text-[12px] font-light text-white/50">{displayCode}</span>
             </div>
           </div>
           <div className="md:hidden shrink-0">
