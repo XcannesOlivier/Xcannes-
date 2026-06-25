@@ -73,6 +73,10 @@ export default function WalletDashboardTokenRow({
   const iconRadiusClass = isNativeAsset ? "rounded-lg" : "";
   const iconEdgeSpacingClass = isNativeAsset ? "ml-1" : "";
   const iconTextGapClass = isNativeAsset ? "gap-3" : "gap-2";
+  // The Swiss flag (🇨🇭) is square (1:1) unlike most flags (3:2), so it appears
+  // smaller in the icon container. Scale it up to visually match the others.
+  const SQUARE_FLAG_CURRENCIES = new Set(["CHF"]);
+  const iconScaleClass = SQUARE_FLAG_CURRENCIES.has(displayCode) ? "scale-[1.35]" : "";
   const displayValue = rawValue;
 
   const currencyLabel =
@@ -124,7 +128,7 @@ export default function WalletDashboardTokenRow({
         >
           {/* Icône — identique mobile et desktop */}
           <div
-            className={`${iconSizeClass} ${iconRadiusClass} ${iconEdgeSpacingClass} flex items-center justify-center font-light text-primary overflow-hidden leading-none flex-shrink-0`}
+            className={`${iconSizeClass} ${iconRadiusClass} ${iconEdgeSpacingClass} ${iconScaleClass} flex items-center justify-center font-light text-primary overflow-hidden leading-none flex-shrink-0`}
           >
             {renderTokenIcon(token)}
           </div>
