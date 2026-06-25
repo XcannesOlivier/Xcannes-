@@ -728,7 +728,7 @@ export default function WalletCurrencySelector({
                                   handleSelect(c.code);
                                 }}
                                 className={[
-                                  "rounded-xl px-2 py-2 ring-1 transition-colors flex flex-col items-center text-center gap-0.5 min-h-[78px]",
+                                  "rounded-xl px-2 py-1.5 sm:py-2 ring-1 transition-colors flex flex-col items-center text-center gap-0.5 min-h-[64px] sm:min-h-[78px]",
                                   active
                                     ? "bg-xcannes-green/10 ring-xcannes-green/35 text-white"
                                     : "bg-white/[0.03] ring-white/10 text-white/80 hover:bg-white/[0.06] hover:ring-white/20",
