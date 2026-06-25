@@ -581,10 +581,10 @@ export default function WalletCurrencySelector({
             onClick={(e) => e.stopPropagation()}
             onFocus={(e) => e.stopPropagation()}
             placeholder={t("ui_search_currency_045b7c357f", "Rechercher une devise…")}
-            className="w-full rounded-3xl bg-transparent ring-1 ring-white/7 ring-inset px-2.5 py-1.5 text-[15px] font-light text-white/85 placeholder:text-white/35 outline-none focus:ring-1 focus:ring-white/15" />
+            className="w-full rounded-3xl bg-transparent ring-1 ring-white/[0.07] ring-inset px-2.5 py-1.5 text-[15px] font-light text-white/85 placeholder:text-white/35 outline-none focus:ring-1 focus:ring-white/15" />
 
           </div>
-          <div className="flex-1 min-h-0 overflow-y-auto">
+          <div className="flex-1 min-h-0 overflow-y-auto px-2">
             {loading ? (
               <div className="px-3 py-3 text-base text-muted flex items-center gap-2">
                 <div className="w-4 h-4 border-2 border-xcannes-green border-t-transparent rounded-full animate-spin" />
@@ -669,7 +669,7 @@ export default function WalletCurrencySelector({
                 onPointerCancel={handleOverlayPointerEnd}
               >
                 <div
-                  className="border-b border-white/10 touch-none"
+                  className="touch-none"
                   onPointerDown={(event) => {
                     maybeStartOverlayDrag(event, "fixed");
                   }}
@@ -750,7 +750,7 @@ export default function WalletCurrencySelector({
                                   "rounded-xl px-2 py-1.5 sm:py-2 ring-1 transition-colors flex flex-col items-center text-center gap-0.5 min-h-[64px] sm:min-h-[78px]",
                                   active
                                     ? "bg-xcannes-green/10 ring-xcannes-green/25 text-white"
-                                    : "bg-white/[0.03] ring-white/7 text-white/80 hover:bg-white/[0.06] hover:ring-white/15",
+                                    : "bg-white/[0.03] ring-white/[0.07] text-white/80 hover:bg-white/[0.06] hover:ring-white/15",
                                 ].join(" ")}
                               >
                                 <span className="text-xl leading-none">{getFlag(c.code)}</span>
@@ -769,7 +769,7 @@ export default function WalletCurrencySelector({
 
                 <div
                   ref={fullscreenListRef}
-                  className="flex-1 min-h-0 overflow-y-auto overscroll-contain touch-pan-y"
+                  className="flex-1 min-h-0 overflow-y-auto overscroll-contain touch-pan-y px-2"
                   onPointerDown={(event) => {
                     maybeStartOverlayDrag(event, "list");
                   }}
