@@ -839,7 +839,7 @@ export default function WalletDashboard({
           {/* Token list */}
           <div className="relative flex-1 flex flex-col lg:flex-row min-h-0">
             {/* Action row: absolute overlay on mobile only — bg masks tokens scrolling behind */}
-            <div className="lg:hidden absolute top-0 left-0 right-0 z-20 pointer-events-none bg-[#0b0f10]" data-scrolled={tokenListScrolled}>
+            <div className="lg:hidden absolute top-0 left-0 right-0 z-[8] pointer-events-none bg-[#0b0f10]" data-scrolled={tokenListScrolled}>
               <div className="pointer-events-auto">
                 <WalletDashboardActionRow onAction={handleAction} />
               </div>
