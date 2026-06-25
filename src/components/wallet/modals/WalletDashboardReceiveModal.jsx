@@ -727,19 +727,18 @@ export default function WalletDashboardReceiveModal({
         ctx.fillStyle = line.color;
         ctx.fillText(line.text, exportWidth / 2, ty);
 
-        // Dot placed just before the last word of the last title line
+        // Dot placed just after the last word of the last title line, centered on it
         if (idx === lastTitleIdx) {
           const words = line.text.split(' ');
           const lastWord = words[words.length - 1];
-          const prefixText = words.slice(0, -1).join(' ');
           const lineW = ctx.measureText(line.text).width;
-          const prefixW = prefixText ? ctx.measureText(prefixText + ' ').width : 0;
-          // x of left edge of last word
+          const lastWordW = ctx.measureText(lastWord).width;
+          // x of right edge of last word
           const lineLeft = exportWidth / 2 - lineW / 2;
-          const lastWordX = lineLeft + prefixW;
-          // dot centered vertically on the cap-height of the text
-          const dotX = lastWordX - dotRadius - Math.round(titleFontSize * 0.14);
-          const dotY = ty + titleFontSize * 0.5;
+          const lastWordRight = lineLeft + lineW;
+          const dotX = lastWordRight + dotRadius + Math.round(titleFontSize * 0.14);
+          // center on the cap-height of the last word: ~0.72 of fontSize from baseline, baseline at ty+fontSize
+          const dotY = ty + titleFontSize * 0.42;
           ctx.beginPath();
           ctx.arc(dotX, dotY, dotRadius, 0, Math.PI * 2);
           ctx.fillStyle = accentColor;
