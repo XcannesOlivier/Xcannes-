@@ -44,6 +44,7 @@ export default function WalletDashboardTokenRow({
   tokenRowClass = "",
   onClick,
   animationDelay = 0,
+  animReady = false,
 }) {
   const { i18n } = useTranslation("common");
   const locale = i18n?.language || "en";
@@ -113,7 +114,7 @@ export default function WalletDashboardTokenRow({
   };
 
   return (
-    <div className="w-full animate-slide-from-right" style={{ animationDelay: `${animationDelay}ms` }}>
+    <div className={`w-full${animReady ? ' animate-slide-from-right' : ''}`} style={animReady ? { animationDelay: `${animationDelay}ms` } : undefined}>
       <div
         key={token?.key}
         role="button"
