@@ -362,7 +362,7 @@ export default function WalletDashboardHeader({
           <div className="w-full mt-0 md:mt-0 mb-1 md:mb-0 px-1 md:px-2 flex justify-start md:justify-between">
 	            <div className="relative flex items-center gap-2.5 w-full md:w-full">
 
-	              <div className={`flex-none min-w-0 rounded-[12px] px-2 md:px-3 py-1.5 md:py-2 relative z-[41] transition-all duration-150 ${isSwitcherVisible ? 'w-[260px] border-l border-r border-t border-white/20 rounded-b-none' : 'max-w-[220px] md:max-w-[360px]'}`} ref={selectorContainerRef}>
+	              <div className={`flex-none min-w-0 rounded-[12px] px-2 md:px-3 py-1.5 md:py-2 relative z-[41] transition-all duration-150 ${isSwitcherVisible ? 'w-[260px] border-l border-r border-t border-white/[0.18] rounded-b-none bg-[#1a2428]' : 'max-w-[220px] md:max-w-[360px] bg-white/[0.05]'}`} ref={selectorContainerRef}>
 	                <div className="flex items-start justify-between gap-1.5" ref={switcherRef}>
                   <div className="min-w-0 flex-1">
                     {/* Wallet name + address — clickable when multi-wallet */}
@@ -395,7 +395,7 @@ export default function WalletDashboardHeader({
                     {/* Multi-wallet dropdown — smooth animated */}
                     {isSwitcherOpen && hasMultipleWallets && (
                       <div
-                        className={`absolute z-50 -left-px top-full mt-0 w-[260px] rounded-b-[12px] bg-[#0d1214] border-l border-r border-b border-white/20 shadow-[0_12px_48px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.04),inset_1px_0_0_rgba(255,255,255,0.03),inset_-1px_0_0_rgba(255,255,255,0.03)] max-h-[70vh] md:max-h-[340px] overflow-y-auto overflow-x-hidden origin-top transition-all duration-[100ms] ${
+                        className={`absolute z-50 -left-px top-full mt-0 w-[260px] rounded-b-[12px] bg-[#1a2428] border-l border-r border-b border-white/[0.18] shadow-[0_12px_48px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.06),inset_1px_0_0_rgba(255,255,255,0.04),inset_-1px_0_0_rgba(255,255,255,0.04)] max-h-[70vh] md:max-h-[340px] overflow-y-auto overflow-x-hidden origin-top transition-all duration-[100ms] ${
                           isSwitcherVisible
                             ? "opacity-100 scale-y-100 translate-y-0 ease-[cubic-bezier(0.16,1,0.3,1)]"
                             : "opacity-0 scale-y-[0.92] -translate-y-1 ease-[cubic-bezier(0.4,0,1,1)]"
