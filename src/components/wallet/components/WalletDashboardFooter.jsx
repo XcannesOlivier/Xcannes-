@@ -100,10 +100,6 @@ export default function WalletDashboardFooter({ onScan, addCurrencySlot, onHisto
         <span className="font-orbitron text-xl font-light uppercase leading-none tracking-[0.24em] text-white/80">
           {t(BRAND_KEY, "XCANNES")}
         </span>
-        <span className="mx-3 text-[13px] font-light text-white/30">|</span>
-        <span className="text-[16px] font-light italic text-white/40">
-          {t(TAGLINE_KEY, "Multi-currency wallet")}
-        </span>
       </div>
     </div>
   );
