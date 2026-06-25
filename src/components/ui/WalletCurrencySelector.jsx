@@ -584,7 +584,7 @@ export default function WalletCurrencySelector({
             className="w-full rounded-3xl bg-transparent ring-1 ring-white/[0.07] ring-inset px-2.5 py-1.5 text-[15px] font-light text-white/85 placeholder:text-white/35 outline-none focus:ring-1 focus:ring-white/15" />
 
           </div>
-          <div className="flex-1 min-h-0 overflow-y-auto px-2">
+          <div className="flex-1 min-h-0 overflow-y-auto px-4">
             {loading ? (
               <div className="px-3 py-3 text-base text-muted flex items-center gap-2">
                 <div className="w-4 h-4 border-2 border-xcannes-green border-t-transparent rounded-full animate-spin" />
@@ -688,7 +688,7 @@ export default function WalletCurrencySelector({
                           {t("ui_select_currency_title", "Ajouter une devise")}
                         </div>
                       </div>
-                      <div className="mt-2 text-[16px] md:text-[20px] font-light text-white/50 leading-relaxed max-w-[46ch] md:max-w-[60ch]">
+                      <div className="mt-2 text-[16px] md:text-[18px] font-light text-white/50 leading-relaxed max-w-none md:max-w-[60ch]">
                         {t(
                           "ui_select_currency_subtitle_add_currency",
                           "Choisissez une devise. Elle sera ajoutée automatiquement lors de votre première transaction.",
@@ -769,7 +769,7 @@ export default function WalletCurrencySelector({
 
                 <div
                   ref={fullscreenListRef}
-                  className="flex-1 min-h-0 overflow-y-auto overscroll-contain touch-pan-y px-2"
+                  className="flex-1 min-h-0 overflow-y-auto overscroll-contain touch-pan-y px-4"
                   onPointerDown={(event) => {
                     maybeStartOverlayDrag(event, "list");
                   }}
