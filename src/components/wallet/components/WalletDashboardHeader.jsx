@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useMemo, useCallback } from "react";
+import { createPortal } from "react-dom";
 import WalletConnectButton from "@/components/wallet/WalletConnectButton";
 import WalletSettingsDropdown from "@/components/wallet/components/WalletSettingsDropdown";
 import WalletSetupDropdown from "@/components/wallet/components/WalletSetupDropdown";
@@ -395,12 +396,15 @@ export default function WalletDashboardHeader({
                     {/* Multi-wallet dropdown — smooth animated */}
                     {isSwitcherOpen && hasMultipleWallets && (
                       <>
-                        {/* Backdrop blur — mobile only */}
-                        <div
-                          className={`fixed inset-0 z-[10] md:hidden backdrop-blur-[3px] transition-opacity duration-200 ${isSwitcherVisible ? "opacity-100" : "opacity-0"}`}
-                          onClick={closeSwitcher}
-                          aria-hidden="true"
-                        />
+                        {/* Backdrop blur — mobile only, portaled to body to avoid stacking context issues */}
+                        {typeof document !== "undefined" && createPortal(
+                          <div
+                            className={`fixed inset-0 z-[11] md:hidden backdrop-blur-[3px] transition-opacity duration-200 ${isSwitcherVisible ? "opacity-100" : "opacity-0"}`}
+                            onClick={closeSwitcher}
+                            aria-hidden="true"
+                          />,
+                          document.body
+                        )}
                       <div
                         className={`absolute z-50 -left-px top-full mt-0 w-[260px] rounded-b-[12px] bg-[#171B1C] border-l border-r border-b border-white/[0.18] shadow-[0_12px_48px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.06),inset_1px_0_0_rgba(255,255,255,0.04),inset_-1px_0_0_rgba(255,255,255,0.04)] max-h-[70vh] md:max-h-[340px] overflow-y-auto overflow-x-hidden origin-top transition-all duration-[100ms] ${
                           isSwitcherVisible
