@@ -926,7 +926,7 @@ export default function WalletCurrencySelector({
 	                        <div className="min-w-0 flex-1">
 	                          <div className="text-[11px] text-white/50">{t("ui_added_in_wallet", "Ajout dans")}</div>
 	                          <div className="mt-0.5 inline-flex items-center gap-2">
-	                            <span className="h-2.5 w-2.5 rounded-full bg-xcannes-green shrink-0 animate-pulse" aria-hidden />
+	                            <span className="h-2.5 w-2.5 rounded-full bg-xcannes-green shrink-0 wallet-dot-active" aria-hidden />
 	                            <span className="text-[22px] leading-none text-white/92 font-light truncate">{walletLabel}</span>
 	                          </div>
 	                        </div>
