@@ -88,12 +88,18 @@ export default function WalletCurrencySelector({
   fullscreen = false,
   closeSignal = undefined,
   walletLabel = null,
+  walletAddress = null,
+  addedCurrencyCodes = [],
 }) {
   const { t } = useTranslation("common");
   const [currencies, setCurrencies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
+  const [walletInfoOpen, setWalletInfoOpen] = useState(false);
+  const [walletAddressExpanded, setWalletAddressExpanded] = useState(false);
+  const [walletCopyNotice, setWalletCopyNotice] = useState("");
+  const walletCopyNoticeTimerRef = useRef(null);
   const popupRef = useRef(null);
   const triggerRef = useRef(null);
   const fullscreenBackdropRef = useRef(null);
@@ -156,6 +162,13 @@ export default function WalletCurrencySelector({
   const excludedSet = useMemo(() => {
     return new Set((excludeCodes || []).map(normalizeCode).filter(Boolean));
   }, [excludeCodes]);
+
+  const addedCurrencySet = useMemo(() => {
+    const dynamicCodes = (addedCurrencyCodes || [])
+      .map((code) => normalizeCode(code))
+      .filter(Boolean);
+    return new Set([...DEFAULT_WALLET_CURRENCIES, ...dynamicCodes]);
+  }, [addedCurrencyCodes]);
 
   useEffect(() => {
     let cancelled = false;
@@ -241,6 +254,13 @@ export default function WalletCurrencySelector({
 
   useEffect(() => {
     if (open) return;
+    setWalletInfoOpen(false);
+    setWalletAddressExpanded(false);
+    setWalletCopyNotice("");
+    if (walletCopyNoticeTimerRef.current) {
+      clearTimeout(walletCopyNoticeTimerRef.current);
+      walletCopyNoticeTimerRef.current = null;
+    }
     try {
       const listEl = fullscreenListRef.current;
       const meta = overlayDragMetaRef.current;
@@ -270,6 +290,14 @@ export default function WalletCurrencySelector({
       lockedOverflowY: "",
     };
   }, [open]);
+
+  useEffect(() => {
+    return () => {
+      if (walletCopyNoticeTimerRef.current) {
+        clearTimeout(walletCopyNoticeTimerRef.current);
+      }
+    };
+  }, []);
 
   const releaseOverlayScrollLock = () => {
     const meta = overlayDragMetaRef.current;
@@ -468,6 +496,7 @@ export default function WalletCurrencySelector({
       .filter(Boolean)
       .filter((item) => {
         if (excludedSet.has(item.code)) return false;
+        if (addedCurrencySet.has(item.code)) return false;
         if (seen.has(item.code)) return false;
         seen.add(item.code);
         return true;
@@ -477,7 +506,7 @@ export default function WalletCurrencySelector({
         const fromList = mergedCurrencies.find((c) => normalizeCode(c.code) === item.code);
         return fromList || item;
       });
-  }, [excludedSet, mergedCurrencies, normalizedQuickOptions]);
+  }, [addedCurrencySet, excludedSet, mergedCurrencies, normalizedQuickOptions]);
 
   const selected = useMemo(() => {
     if (!value) return null;
@@ -597,7 +626,7 @@ export default function WalletCurrencySelector({
             ) : (
               <ul className="divide-y divide-white/10">
                 {filtered.map((c) => {
-                  const isAlreadyAdded = DEFAULT_WALLET_CURRENCIES.has(normalizeCode(c.code));
+                  const isAlreadyAdded = addedCurrencySet.has(normalizeCode(c.code));
                   return (
                   <li key={c.code}>
                     <button
@@ -786,7 +815,7 @@ export default function WalletCurrencySelector({
                   ) : (
                     filtered.map((c) => {
                       const active = normalizeCode(c.code) === normalizeCode(value);
-                      const isAlreadyAdded = DEFAULT_WALLET_CURRENCIES.has(normalizeCode(c.code));
+                      const isAlreadyAdded = addedCurrencySet.has(normalizeCode(c.code));
                       return (
                         <button
                           key={c.code}
@@ -826,24 +855,80 @@ export default function WalletCurrencySelector({
 
 	                <div className="px-4 pt-3 pb-4 bg-transparent">
 	                  {walletLabel ? (
-	                    <div className="w-full rounded-2xl ring-1 ring-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.05)_0%,rgba(255,255,255,0.02)_100%)] px-3.5 py-3 flex items-center gap-3">
-	                      <div className="h-9 w-9 rounded-xl bg-xcannes-green/10 ring-1 ring-xcannes-green/25 text-xcannes-green flex items-center justify-center shrink-0">
-	                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className="w-[18px] h-[18px]" aria-hidden="true">
-	                          <rect x="3.5" y="4" width="13" height="16" rx="2.2" />
-	                          <path d="M8 9h4.8" />
-	                          <path d="M8 12h6.8" />
-	                        </svg>
-	                      </div>
-	                      <div className="min-w-0 flex-1">
-	                        <div className="text-[11px] text-white/50">{t("ui_added_in_wallet", "Ajout dans")}</div>
-	                        <div className="mt-0.5 inline-flex items-center gap-2">
-	                          <span className="h-2.5 w-2.5 rounded-full bg-xcannes-green shrink-0 animate-pulse" aria-hidden />
-	                          <span className="text-[22px] leading-none text-white/92 font-light truncate">{walletLabel}</span>
+	                    <div className="w-full rounded-2xl ring-1 ring-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.05)_0%,rgba(255,255,255,0.02)_100%)] px-3.5 py-3">
+	                      <div className="flex items-center gap-3">
+	                        <div className="h-9 w-9 rounded-xl bg-xcannes-green/10 ring-1 ring-xcannes-green/25 text-xcannes-green flex items-center justify-center shrink-0">
+	                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className="w-[18px] h-[18px]" aria-hidden="true">
+	                            <rect x="3.5" y="4" width="13" height="16" rx="2.2" />
+	                            <path d="M8 9h4.8" />
+	                            <path d="M8 12h6.8" />
+	                          </svg>
 	                        </div>
+	                        <div className="min-w-0 flex-1">
+	                          <div className="text-[11px] text-white/50">{t("ui_added_in_wallet", "Ajout dans")}</div>
+	                          <div className="mt-0.5 inline-flex items-center gap-2">
+	                            <span className="h-2.5 w-2.5 rounded-full bg-xcannes-green shrink-0 animate-pulse" aria-hidden />
+	                            <span className="text-[22px] leading-none text-white/92 font-light truncate">{walletLabel}</span>
+	                          </div>
+	                        </div>
+	                        <button
+	                          type="button"
+	                          onClick={() => {
+	                            setWalletInfoOpen((prev) => !prev);
+	                            setWalletAddressExpanded(false);
+	                            setWalletCopyNotice("");
+	                          }}
+	                          className="p-1 text-white/35 hover:text-white/60 transition-colors shrink-0"
+	                          aria-label={t("ui_account_address", "Adresse du compte")}
+	                          aria-expanded={walletInfoOpen}
+	                        >
+	                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className={`w-4 h-4 transition-transform ${walletInfoOpen ? "rotate-90" : ""}`} aria-hidden="true">
+	                            <polyline points="9 18 15 12 9 6" />
+	                          </svg>
+	                        </button>
 	                      </div>
-	                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-white/35 shrink-0" aria-hidden="true">
-	                        <polyline points="9 18 15 12 9 6" />
-	                      </svg>
+	                      {walletInfoOpen && walletAddress ? (
+	                        <div className="mt-3 pt-2.5 border-t border-white/10">
+	                          <p className="text-[12px] text-white/55 mb-1.5">{t("ui_account_address", "Adresse du compte")}</p>
+	                          <div className="flex items-center gap-1.5 min-w-0">
+	                            <button
+	                              type="button"
+	                              className={`min-w-0 flex-1 text-left text-xs text-white/55 font-mono font-light ${walletAddressExpanded ? "break-all whitespace-normal" : "truncate"}`}
+	                              title={walletAddress}
+	                              onClick={() => setWalletAddressExpanded((prev) => !prev)}
+	                              aria-label={t("ui_toggle_wallet_address_truncation", "Afficher l'adresse complète")}
+	                            >
+	                              {walletAddressExpanded ? walletAddress : `${walletAddress.slice(0, 8)}…${walletAddress.slice(-6)}`}
+	                            </button>
+	                            <button
+	                              type="button"
+	                              onClick={async () => {
+	                                if (!navigator?.clipboard?.writeText) {
+	                                  setWalletCopyNotice(t("ui_copy_unavailable", "Copie indisponible"));
+	                                  return;
+	                                }
+	                                await navigator.clipboard.writeText(walletAddress);
+	                                setWalletCopyNotice(t("ui_copied_address", "Adresse copiée"));
+	                                if (walletCopyNoticeTimerRef.current) clearTimeout(walletCopyNoticeTimerRef.current);
+	                                walletCopyNoticeTimerRef.current = window.setTimeout(() => {
+	                                  setWalletCopyNotice("");
+	                                }, 3000);
+	                              }}
+	                              className="shrink-0 text-white/40 hover:text-white/70 transition-colors p-0.5"
+	                              title={t("ui_copy_address", "Copier l'adresse")}
+	                              aria-label={t("ui_copy_address", "Copier l'adresse")}
+	                            >
+	                              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+	                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+	                                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
+	                              </svg>
+	                            </button>
+	                          </div>
+	                          <div className={`mt-1 text-[11px] text-xcannes-green/85 transition-opacity duration-200 ${walletCopyNotice ? "opacity-100" : "opacity-0"}`} role="status" aria-live="polite">
+	                            {walletCopyNotice || " "}
+	                          </div>
+	                        </div>
+	                      ) : null}
 	                    </div>
 	                  ) : (
 	                    <span className="text-[15px] font-light text-white/55">{t("ui_search_results", "Sélectionnez une devise.")}</span>

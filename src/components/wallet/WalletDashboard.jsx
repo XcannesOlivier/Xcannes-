@@ -258,6 +258,18 @@ export default function WalletDashboard({
     return Array.from(new Set(codes)).sort((a, b) => a.localeCompare(b));
   }, [augmentedCurrencyLines, preferredCurrency]);
 
+  const addedCurrencyCodes = useMemo(() => {
+    return (Array.isArray(currencyLines) ? currencyLines : [])
+      .filter((line) => {
+        if (!line) return false;
+        if (line.active === true) return true;
+        // Backward compatibility: old payloads may omit "active" for existing lines.
+        return line.active == null;
+      })
+      .map((line) => String(line?.currencyCode || "").trim().toUpperCase())
+      .filter(Boolean);
+  }, [currencyLines]);
+
   // ── Tokens (augmented with currency lines) ─────────────────
   const { augmentedTokens, allocatedRlusdByCurrency, swapCurrencyOptions } = useWalletTokens({
     displayTokens,
@@ -1110,6 +1122,8 @@ export default function WalletDashboard({
                       showQuickAdd={false}
                       closeSignal={activeAction}
                       walletLabel={walletLabel || null}
+                      walletAddress={backendWalletAddress || null}
+                      addedCurrencyCodes={addedCurrencyCodes}
                       fullscreenPortalTarget={
                         typeof document !== 'undefined' && isDesktopPanel
                           ? document.getElementById('wallet-desktop-inline-panel')
@@ -1169,6 +1183,8 @@ export default function WalletDashboard({
                   showQuickAdd={false}
                   closeSignal={activeAction}
                   walletLabel={walletLabel || null}
+                  walletAddress={backendWalletAddress || null}
+                  addedCurrencyCodes={addedCurrencyCodes}
                   fullscreenPortalTarget={
                     typeof document !== 'undefined' && isDesktopPanel
                       ? document.getElementById('wallet-desktop-inline-panel')
@@ -1240,6 +1256,8 @@ export default function WalletDashboard({
                   showQuickAdd={false}
                   fullscreen={true}
                   walletLabel={walletLabel || null}
+                  walletAddress={backendWalletAddress || null}
+                  addedCurrencyCodes={addedCurrencyCodes}
                 /></div>
               ) : null
             }
