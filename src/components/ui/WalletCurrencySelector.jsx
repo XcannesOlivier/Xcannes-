@@ -824,15 +824,27 @@ export default function WalletCurrencySelector({
                   )}
                 </div>
 
-	                <div className="px-6 py-3 sm:py-3 pb-6 sm:pb-3 bg-transparent border-t border-white/5 flex items-center justify-center gap-2 text-center">
+	                <div className="px-4 pt-3 pb-4 bg-transparent">
 	                  {walletLabel ? (
-	                    <span className="text-[15px] sm:text-[17px] text-white/55 inline-flex items-center justify-center gap-2.5">
-	                      <span className="text-[12px] sm:text-[13px] tracking-wide text-white/45">
-	                        {t("ui_current_account", "Compte actuel")}
-	                      </span>
-	                      <span className="h-2.5 w-2.5 rounded-full bg-xcannes-green shrink-0 animate-pulse" aria-hidden />
-	                      <span className="text-white/90 font-light">{walletLabel}</span>
-	                    </span>
+	                    <div className="w-full rounded-2xl ring-1 ring-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.05)_0%,rgba(255,255,255,0.02)_100%)] px-3.5 py-3 flex items-center gap-3">
+	                      <div className="h-9 w-9 rounded-xl bg-xcannes-green/10 ring-1 ring-xcannes-green/25 text-xcannes-green flex items-center justify-center shrink-0">
+	                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className="w-[18px] h-[18px]" aria-hidden="true">
+	                          <rect x="3.5" y="4" width="13" height="16" rx="2.2" />
+	                          <path d="M8 9h4.8" />
+	                          <path d="M8 12h6.8" />
+	                        </svg>
+	                      </div>
+	                      <div className="min-w-0 flex-1">
+	                        <div className="text-[11px] text-white/50">{t("ui_added_in_wallet", "Ajout dans")}</div>
+	                        <div className="mt-0.5 inline-flex items-center gap-2">
+	                          <span className="h-2.5 w-2.5 rounded-full bg-xcannes-green shrink-0 animate-pulse" aria-hidden />
+	                          <span className="text-[22px] leading-none text-white/92 font-light truncate">{walletLabel}</span>
+	                        </div>
+	                      </div>
+	                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-white/35 shrink-0" aria-hidden="true">
+	                        <polyline points="9 18 15 12 9 6" />
+	                      </svg>
+	                    </div>
 	                  ) : (
 	                    <span className="text-[15px] font-light text-white/55">{t("ui_search_results", "Sélectionnez une devise.")}</span>
 	                  )}
