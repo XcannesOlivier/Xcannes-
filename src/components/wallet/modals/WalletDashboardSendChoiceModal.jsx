@@ -54,9 +54,10 @@ export default function WalletDashboardSendChoiceModal({
   toast,
   renderWalletMeta,
   inline = false,
-  onQrScanResult, // callback appelé par le parent quand le scan caméra retourne un résultat
-  onQrPayreqScanResult, // callback pour injecter le résultat scan caméra dans le flow payreq
-  onChoosePayreqScan, // ouvrir le scanner depuis le sub-modal payreq
+  onQrScanResult,
+  onQrPayreqScanResult,
+  onChoosePayreqScan,
+  wallet,
 }) {
   const { t } = useTranslation('common');
   const shouldAnimate = !inline;
@@ -155,6 +156,15 @@ export default function WalletDashboardSendChoiceModal({
       setSavedAddressModes({});
     }
   }, [open]);
+
+  // ── Replay animation when wallet changes (inline/desktop only) ──
+  const prevWalletRef = useRef(wallet);
+  useEffect(() => {
+    if (!inline) return;
+    if (wallet === prevWalletRef.current) return;
+    prevWalletRef.current = wallet;
+    if (open) setAnimKey((k) => k + 1);
+  }, [wallet, inline, open]);
 
   const closeFlowSheet = useCallback(() => {
     setFlowSheet(null);

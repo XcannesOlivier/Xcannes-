@@ -641,7 +641,7 @@ export default function WalletDashboard({
     }
     swapState.setSwapDefaultView('convert');
     swapState.setSwapLockedView(null);
-    setActiveAction('swap');
+    setActiveAction('sendChoice');
     desktopDefaultActionSetRef.current = true;
   }, [
     activeAction,
@@ -1286,6 +1286,7 @@ export default function WalletDashboard({
           <WalletDesktopModals
             {...inlineFlags}
             {...modalProps}
+            wallet={wallet}
             signTransaction={signTransactionWithProgress}
             setDesktopSettingsPage={setDesktopSettingsPage}
           />

@@ -74,6 +74,7 @@ export default function WalletDesktopModals({
 
   // desktop cash uses wallet tokens compatible with MoonPay
   augmentedTokens,
+  wallet,
 }) {
   const [usdSwapPrefillAmount, setUsdSwapPrefillAmount] = useState("");
   const [usdSwapAccentVariant, setUsdSwapAccentVariant] = useState("");
@@ -178,6 +179,7 @@ export default function WalletDesktopModals({
         <WalletDashboardSendChoiceModal
           open
           inline
+          wallet={wallet}
           onClose={() => {
             setActiveAction(null);
           }}
