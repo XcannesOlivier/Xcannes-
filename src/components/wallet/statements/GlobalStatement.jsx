@@ -654,6 +654,396 @@ export default function GlobalStatement({
       })();
 
       const buildCardBlob = async () => {
+        if (isPaymentIn) {
+
+      // ── RECEIVED PAYMENT: dedicated design ──────────────────────────
+      const isPortrait = typeof window !== "undefined" && window.innerWidth < 768;
+      const w = isPortrait ? 1080 : 1600;
+      const h = isPortrait ? 1440 : 900;
+      const canvas = document.createElement("canvas");
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return null;
+
+      const accent = "#22c55e";
+      const accentDim = "rgba(34,197,94,0.12)";
+      const accentBorder = "rgba(34,197,94,0.28)";
+      const accentText = "#22c55e";
+      const textPrimary = "#ffffff";
+      const textSecondary = "rgba(255,255,255,0.50)";
+      const cardFill = "rgba(255,255,255,0.05)";
+      const cardBorder = "rgba(255,255,255,0.08)";
+
+      // Background: very dark green
+      ctx.fillStyle = "#061510";
+      ctx.fillRect(0, 0, w, h);
+      // Radial glow
+      const bg1 = ctx.createRadialGradient(w * 0.5, h * 0.38, 0, w * 0.5, h * 0.38, h * 0.75);
+      bg1.addColorStop(0, "rgba(34,197,94,0.18)");
+      bg1.addColorStop(0.6, "rgba(34,197,94,0.05)");
+      bg1.addColorStop(1, "rgba(34,197,94,0)");
+      ctx.fillStyle = bg1;
+      ctx.fillRect(0, 0, w, h);
+      if (isPortrait) {
+        // Extra glow bottom
+        const bg2 = ctx.createRadialGradient(w * 0.5, h * 0.85, 0, w * 0.5, h * 0.85, h * 0.3);
+        bg2.addColorStop(0, "rgba(34,197,94,0.07)");
+        bg2.addColorStop(1, "rgba(34,197,94,0)");
+        ctx.fillStyle = bg2;
+        ctx.fillRect(0, 0, w, h);
+      }
+
+      // ── Outer card ──────────────────────────────────────────────────
+      const pad = isPortrait ? 48 : 56;
+      const cardX = pad; const cardY = pad;
+      const cardW = w - pad * 2; const cardH = h - pad * 2;
+      const rr = (x, y, W, H, r) => {
+        const cr = Math.max(0, Math.min(r, W / 2, H / 2));
+        ctx.beginPath();
+        ctx.moveTo(x + cr, y);
+        ctx.arcTo(x + W, y, x + W, y + H, cr);
+        ctx.arcTo(x + W, y + H, x, y + H, cr);
+        ctx.arcTo(x, y + H, x, y, cr);
+        ctx.arcTo(x, y, x + W, y, cr);
+        ctx.closePath();
+      };
+      rr(cardX, cardY, cardW, cardH, 52);
+      ctx.fillStyle = "rgba(34,197,94,0.04)";
+      ctx.fill();
+      ctx.strokeStyle = accentBorder;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      // ── Helpers ─────────────────────────────────────────────────────
+      const ellipsize = (text, maxW) => {
+        const raw = String(text || "");
+        if (!raw || ctx.measureText(raw).width <= maxW) return raw;
+        const ell = "…";
+        let out = raw;
+        while (out.length > 0 && ctx.measureText(out + ell).width > maxW) out = out.slice(0, -1);
+        return out ? out + ell : ell;
+      };
+      const infoCard = (x, y, W, H) => {
+        rr(x, y, W, H, 20);
+        ctx.fillStyle = cardFill;
+        ctx.fill();
+        ctx.strokeStyle = cardBorder;
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      };
+
+      // Icon helpers
+      const drawCalendar = (cx, cy, s) => {
+        ctx.strokeStyle = accent; ctx.lineWidth = s * 0.09; ctx.fillStyle = accentDim;
+        rr(cx - s / 2, cy - s / 2, s, s, s * 0.18); ctx.fill(); ctx.stroke();
+        ctx.strokeStyle = accent; ctx.lineWidth = s * 0.07;
+        [0.42, 0.58, 0.72].forEach(r => {
+          ctx.beginPath(); ctx.moveTo(cx - s * 0.28, cy - s * 0.5 + s * r);
+          ctx.lineTo(cx + s * 0.28, cy - s * 0.5 + s * r); ctx.stroke();
+        });
+        ctx.beginPath(); ctx.moveTo(cx - s * 0.12, cy - s * 0.5 + s * 0.16);
+        ctx.lineTo(cx - s * 0.12, cy - s * 0.5 + s * 0.28); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(cx + s * 0.12, cy - s * 0.5 + s * 0.16);
+        ctx.lineTo(cx + s * 0.12, cy - s * 0.5 + s * 0.28); ctx.stroke();
+      };
+      const drawPerson = (cx, cy, s) => {
+        ctx.fillStyle = accentDim; ctx.strokeStyle = accent; ctx.lineWidth = s * 0.09;
+        rr(cx - s / 2, cy - s / 2, s, s, s * 0.18); ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.arc(cx, cy - s * 0.14, s * 0.18, 0, Math.PI * 2);
+        ctx.fillStyle = accent; ctx.fill();
+        ctx.beginPath(); ctx.arc(cx, cy + s * 0.42, s * 0.28, Math.PI, 0);
+        ctx.fillStyle = accent; ctx.fill();
+      };
+      const drawHash = (cx, cy, s) => {
+        ctx.fillStyle = accentDim; ctx.strokeStyle = accent; ctx.lineWidth = s * 0.09;
+        rr(cx - s / 2, cy - s / 2, s, s, s * 0.18); ctx.fill(); ctx.stroke();
+        ctx.strokeStyle = accent; ctx.lineWidth = s * 0.09;
+        const off = s * 0.12;
+        [cy - off, cy + off].forEach(ry => {
+          ctx.beginPath(); ctx.moveTo(cx - s * 0.25, ry); ctx.lineTo(cx + s * 0.25, ry); ctx.stroke();
+        });
+        [cx - off, cx + off].forEach(rx => {
+          ctx.beginPath(); ctx.moveTo(rx, cy - s * 0.3); ctx.lineTo(rx, cy + s * 0.3); ctx.stroke();
+        });
+      };
+      const drawCheckCircle = (cx, cy, R, big) => {
+        // Outer halo
+        const h1 = ctx.createRadialGradient(cx, cy, R * 0.5, cx, cy, R * 1.6);
+        h1.addColorStop(0, "rgba(34,197,94,0.20)"); h1.addColorStop(1, "rgba(34,197,94,0)");
+        ctx.fillStyle = h1; ctx.beginPath(); ctx.arc(cx, cy, R * 1.6, 0, Math.PI * 2); ctx.fill();
+        // Circle fill
+        ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(34,197,94,0.18)"; ctx.fill();
+        ctx.strokeStyle = accent; ctx.lineWidth = big ? 5 : 3;
+        ctx.stroke();
+        // Checkmark
+        const ck = R * 0.42;
+        ctx.beginPath();
+        ctx.moveTo(cx - ck * 0.9, cy);
+        ctx.lineTo(cx - ck * 0.22, cy + ck * 0.72);
+        ctx.lineTo(cx + ck * 0.9, cy - ck * 0.62);
+        ctx.strokeStyle = accent; ctx.lineWidth = big ? 7 : 4;
+        ctx.lineCap = "round"; ctx.lineJoin = "round"; ctx.stroke();
+      };
+      const drawLock = (cx, cy, s) => {
+        ctx.strokeStyle = textSecondary; ctx.lineWidth = s * 0.09;
+        ctx.beginPath(); ctx.arc(cx, cy - s * 0.12, s * 0.22, Math.PI, 0); ctx.stroke();
+        rr(cx - s * 0.26, cy, s * 0.52, s * 0.38, s * 0.08);
+        ctx.fillStyle = "rgba(255,255,255,0.08)"; ctx.fill(); ctx.strokeStyle = textSecondary; ctx.stroke();
+      };
+      const drawCheckSmall = (cx, cy, r) => {
+        ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(34,197,94,0.18)"; ctx.fill();
+        ctx.strokeStyle = accent; ctx.lineWidth = 2; ctx.stroke();
+        const ck = r * 0.45;
+        ctx.beginPath(); ctx.moveTo(cx - ck * 0.9, cy); ctx.lineTo(cx - ck * 0.2, cy + ck * 0.7); ctx.lineTo(cx + ck * 0.9, cy - ck * 0.6);
+        ctx.strokeStyle = accent; ctx.lineWidth = 2.5; ctx.lineCap = "round"; ctx.stroke();
+      };
+
+      const senderName = counterpartyLabel || "—";
+      const senderAddr = (() => {
+        const cp = String(detailMovement?.counterparty || "").trim();
+        if (!cp || cp.length <= 20) return cp;
+        return cp.slice(0, 8) + "…" + cp.slice(-6);
+      })();
+      const txHash = String(detailMovement?.txHash || "").trim();
+      const txHashShort = txHash.length > 22 ? txHash.slice(0, 10) + "…" + txHash.slice(-10) : txHash;
+      const wName = String(walletLabel || t("nav_wallet", "Wallet")).trim();
+      const wAddrRaw = String(walletAddress || "").trim();
+      const wAddrShort = wAddrRaw.length > 18 ? wAddrRaw.slice(0, 8) + "…" + wAddrRaw.slice(-6) : wAddrRaw;
+      const initial = wName.charAt(0).toUpperCase();
+      const secNote = t("ui_security_confirmation_note", "Chaque transaction nécessite une confirmation.");
+
+      if (isPortrait) {
+        // ── PORTRAIT ─────────────────────────────────────────────────
+        // Account block (top-left)
+        const avR = 40; const avCx = cardX + 44 + avR; const avCy = cardY + 52 + avR;
+        ctx.beginPath(); ctx.arc(avCx, avCy, avR, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(34,197,94,0.16)"; ctx.fill();
+        ctx.strokeStyle = accent; ctx.lineWidth = 2; ctx.stroke();
+        ctx.fillStyle = textPrimary; ctx.font = "700 34px system-ui, -apple-system, sans-serif";
+        ctx.textAlign = "center"; ctx.textBaseline = "middle";
+        ctx.fillText(initial, avCx, avCy);
+        // dot bottom-right of avatar
+        ctx.beginPath(); ctx.arc(avCx + avR * 0.68, avCy + avR * 0.68, 9, 0, Math.PI * 2);
+        ctx.fillStyle = "#061510"; ctx.fill();
+        ctx.beginPath(); ctx.arc(avCx + avR * 0.68, avCy + avR * 0.68, 7, 0, Math.PI * 2);
+        ctx.fillStyle = accent; ctx.fill();
+        // name + addr
+        ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
+        ctx.fillStyle = textPrimary; ctx.font = "600 28px system-ui, -apple-system, sans-serif";
+        ctx.fillText(ellipsize(wName, cardW - avCx - avR - 60), avCx + avR + 18, avCy - 6);
+        ctx.fillStyle = textSecondary; ctx.font = "400 20px system-ui, -apple-system, sans-serif";
+        ctx.fillText(ellipsize(wAddrShort, cardW - avCx - avR - 60), avCx + avR + 18, avCy + 22);
+
+        // Checkmark circle (center)
+        const bigR = 72; const bigCx = cardX + cardW / 2; const bigCy = cardY + 270;
+        drawCheckCircle(bigCx, bigCy, bigR, true);
+
+        // Title
+        ctx.fillStyle = textPrimary; ctx.font = "800 64px system-ui, -apple-system, sans-serif";
+        ctx.textAlign = "center"; ctx.textBaseline = "alphabetic";
+        ctx.fillText(title, bigCx, bigCy + bigR + 76);
+
+        // Amount (big green)
+        ctx.font = "800 100px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace";
+        ctx.fillStyle = accentText;
+        ctx.fillText(ellipsize(amountSigned, cardW - 80), bigCx, bigCy + bigR + 190);
+
+        // Sub-amount
+        ctx.font = "500 28px system-ui, -apple-system, sans-serif";
+        ctx.fillStyle = textSecondary;
+        ctx.fillText(`≈ ${amountLabel}`, bigCx, bigCy + bigR + 238);
+
+        // Divider
+        ctx.strokeStyle = "rgba(255,255,255,0.06)"; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(cardX + 44, bigCy + bigR + 268); ctx.lineTo(cardX + cardW - 44, bigCy + bigR + 268); ctx.stroke();
+
+        // Cards
+        let cy2 = bigCy + bigR + 300;
+        const cardGap = 18;
+        const halfW = (cardW - cardGap) / 2;
+        const cardH1 = 126;
+
+        // Row 1: Date | Statut
+        infoCard(cardX, cy2, halfW, cardH1);
+        const iconS1 = 44;
+        drawCalendar(cardX + 36, cy2 + cardH1 / 2, iconS1);
+        ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
+        ctx.fillStyle = textSecondary; ctx.font = "500 20px system-ui, -apple-system, sans-serif";
+        ctx.fillText(t("ui_date_label_7a2c1b9d5e", "Date"), cardX + 68, cy2 + 44);
+        ctx.fillStyle = textPrimary; ctx.font = "600 24px system-ui, -apple-system, sans-serif";
+        const dateParts = subtitle.split(/[,\n]/);
+        ctx.fillText(ellipsize(dateParts[0] || subtitle, halfW - 76), cardX + 68, cy2 + 74);
+        if (dateParts[1]) { ctx.fillStyle = textSecondary; ctx.font = "500 20px system-ui, -apple-system, sans-serif"; ctx.fillText(dateParts[1].trim(), cardX + 68, cy2 + 100); }
+
+        const sx = cardX + halfW + cardGap;
+        infoCard(sx, cy2, halfW, cardH1);
+        drawCheckSmall(sx + 36, cy2 + cardH1 / 2, 22);
+        ctx.fillStyle = textSecondary; ctx.font = "500 20px system-ui, -apple-system, sans-serif"; ctx.textBaseline = "alphabetic";
+        ctx.fillText(t("ui_status_label", "Statut"), sx + 68, cy2 + 44);
+        ctx.fillStyle = accentText; ctx.font = "700 26px system-ui, -apple-system, sans-serif";
+        ctx.fillText(ellipsize(statusLabel || "—", halfW - 80), sx + 68, cy2 + 80);
+
+        // Row 2: Expéditeur
+        cy2 += cardH1 + cardGap;
+        const cardH2 = 120;
+        infoCard(cardX, cy2, cardW, cardH2);
+        drawPerson(cardX + 36, cy2 + cardH2 / 2, iconS1);
+        ctx.fillStyle = textSecondary; ctx.font = "500 20px system-ui, -apple-system, sans-serif";
+        ctx.fillText(t("ui_sender_label", "Expéditeur"), cardX + 68, cy2 + 38);
+        ctx.fillStyle = textPrimary; ctx.font = "600 26px system-ui, -apple-system, sans-serif";
+        ctx.fillText(ellipsize(senderName, cardW - 84), cardX + 68, cy2 + 70);
+        ctx.fillStyle = textSecondary; ctx.font = "400 20px ui-monospace, SFMono-Regular, Menlo, Monaco, monospace";
+        ctx.fillText(ellipsize(senderAddr, cardW - 84), cardX + 68, cy2 + 98);
+
+        // Row 3: Transaction ID
+        cy2 += cardH2 + cardGap;
+        const cardH3 = 110;
+        infoCard(cardX, cy2, cardW, cardH3);
+        drawHash(cardX + 36, cy2 + cardH3 / 2, iconS1);
+        ctx.fillStyle = textSecondary; ctx.font = "500 20px system-ui, -apple-system, sans-serif";
+        ctx.fillText(t("ui_tx_id", "ID de transaction"), cardX + 68, cy2 + 38);
+        ctx.fillStyle = textPrimary; ctx.font = "500 22px ui-monospace, SFMono-Regular, Menlo, Monaco, monospace";
+        ctx.fillText(ellipsize(txHashShort || "—", cardW - 84), cardX + 68, cy2 + 68);
+        if (txHash) {
+          // "Copier" badge
+          const badgeW = 130; const badgeH = 40; const badgeX = cardX + cardW - badgeW - 12; const badgeY = cy2 + cardH3 - badgeH - 12;
+          rr(badgeX, badgeY, badgeW, badgeH, 20);
+          ctx.fillStyle = "rgba(34,197,94,0.14)"; ctx.fill();
+          ctx.strokeStyle = accentBorder; ctx.lineWidth = 1; ctx.stroke();
+          ctx.fillStyle = accentText; ctx.font = "600 22px system-ui, -apple-system, sans-serif";
+          ctx.textAlign = "center"; ctx.textBaseline = "middle";
+          ctx.fillText(t("ui_copy_action", "Copier"), badgeX + badgeW / 2, badgeY + badgeH / 2);
+          ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
+        }
+
+        // Security note (bottom)
+        const noteY = cardY + cardH - 40;
+        const lockS = 28; const lockCx = cardX + 36;
+        drawLock(lockCx, noteY - lockS * 0.1, lockS);
+        ctx.fillStyle = textSecondary; ctx.font = "400 20px system-ui, -apple-system, sans-serif";
+        ctx.textAlign = "left"; ctx.textBaseline = "middle";
+        ctx.fillText(ellipsize(secNote, cardW - 80), lockCx + lockS, noteY);
+
+      } else {
+        // ── LANDSCAPE ────────────────────────────────────────────────
+        const leftW = Math.round(cardW * 0.45);
+        const rightX = cardX + leftW + 48;
+        const rightW = cardX + cardW - rightX - 12;
+
+        // Account block (top-left inside card)
+        const avR = 36; const avCx = cardX + 44 + avR; const avCy = cardY + 50 + avR;
+        ctx.beginPath(); ctx.arc(avCx, avCy, avR, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(34,197,94,0.16)"; ctx.fill();
+        ctx.strokeStyle = accent; ctx.lineWidth = 2; ctx.stroke();
+        ctx.fillStyle = textPrimary; ctx.font = "700 28px system-ui, -apple-system, sans-serif";
+        ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText(initial, avCx, avCy);
+        ctx.beginPath(); ctx.arc(avCx + avR * 0.68, avCy + avR * 0.68, 8, 0, Math.PI * 2);
+        ctx.fillStyle = "#061510"; ctx.fill();
+        ctx.beginPath(); ctx.arc(avCx + avR * 0.68, avCy + avR * 0.68, 6, 0, Math.PI * 2);
+        ctx.fillStyle = accent; ctx.fill();
+        ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
+        ctx.fillStyle = textSecondary; ctx.font = "400 18px system-ui, -apple-system, sans-serif";
+        ctx.fillText(t("ui_source_account", "Compte source"), avCx + avR + 14, avCy - 14);
+        ctx.fillStyle = textPrimary; ctx.font = "600 26px system-ui, -apple-system, sans-serif";
+        ctx.fillText(ellipsize(wName, leftW - 60), avCx + avR + 14, avCy + 12);
+        ctx.fillStyle = textSecondary; ctx.font = "400 18px system-ui, -apple-system, sans-serif";
+        ctx.fillText(ellipsize(wAddrShort, leftW - 60), avCx + avR + 14, avCy + 36);
+
+        // Vertical divider
+        ctx.strokeStyle = "rgba(255,255,255,0.07)"; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(cardX + leftW + 24, cardY + 24); ctx.lineTo(cardX + leftW + 24, cardY + cardH - 24); ctx.stroke();
+
+        // Big checkmark (left)
+        const bigR = 64; const bigCx = cardX + leftW / 2; const bigCy = cardY + 200;
+        drawCheckCircle(bigCx, bigCy, bigR, true);
+        ctx.fillStyle = textPrimary; ctx.font = "800 56px system-ui, -apple-system, sans-serif";
+        ctx.textAlign = "center"; ctx.textBaseline = "alphabetic";
+        ctx.fillText(title, bigCx, bigCy + bigR + 64);
+        ctx.font = "800 80px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace";
+        ctx.fillStyle = accentText;
+        ctx.fillText(ellipsize(amountSigned, leftW - 40), bigCx, bigCy + bigR + 160);
+        ctx.font = "400 22px system-ui, -apple-system, sans-serif";
+        ctx.fillStyle = textSecondary;
+        ctx.fillText(`≈ ${amountLabel}`, bigCx, bigCy + bigR + 196);
+
+        // Right: 3 stacked cards
+        let ry = cardY + 44;
+        const rGap = 16;
+        const cardRH1 = 112; const cardRW = rightW;
+        const halfRW = (cardRW - rGap) / 2;
+
+        // Row 1: [Date | Statut] side by side
+        infoCard(rightX, ry, halfRW, cardRH1);
+        const iconS = 38;
+        drawCalendar(rightX + 28, ry + cardRH1 / 2, iconS);
+        ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
+        ctx.fillStyle = textSecondary; ctx.font = "500 17px system-ui, -apple-system, sans-serif";
+        ctx.fillText(t("ui_date_label_7a2c1b9d5e", "Date"), rightX + 56, ry + 36);
+        ctx.fillStyle = textPrimary; ctx.font = "600 20px system-ui, -apple-system, sans-serif";
+        const dp = subtitle.split(/[,\n]/);
+        ctx.fillText(ellipsize(dp[0] || subtitle, halfRW - 64), rightX + 56, ry + 62);
+        if (dp[1]) { ctx.fillStyle = textSecondary; ctx.font = "400 17px system-ui, -apple-system, sans-serif"; ctx.fillText(dp[1].trim(), rightX + 56, ry + 86); }
+
+        const sx2 = rightX + halfRW + rGap;
+        infoCard(sx2, ry, halfRW, cardRH1);
+        drawCheckSmall(sx2 + 28, ry + cardRH1 / 2, 18);
+        ctx.fillStyle = textSecondary; ctx.font = "500 17px system-ui, -apple-system, sans-serif";
+        ctx.fillText(t("ui_status_label", "Statut"), sx2 + 58, ry + 36);
+        ctx.fillStyle = accentText; ctx.font = "700 22px system-ui, -apple-system, sans-serif";
+        ctx.fillText(ellipsize(statusLabel || "—", halfRW - 70), sx2 + 58, ry + 68);
+
+        // Row 2: Expéditeur
+        ry += cardRH1 + rGap;
+        const cardRH2 = 104;
+        infoCard(rightX, ry, cardRW, cardRH2);
+        drawPerson(rightX + 28, ry + cardRH2 / 2, iconS);
+        ctx.fillStyle = textSecondary; ctx.font = "500 17px system-ui, -apple-system, sans-serif";
+        ctx.fillText(t("ui_sender_label", "Expéditeur"), rightX + 56, ry + 32);
+        ctx.fillStyle = textPrimary; ctx.font = "600 22px system-ui, -apple-system, sans-serif";
+        ctx.fillText(ellipsize(senderName, cardRW - 68), rightX + 56, ry + 60);
+        ctx.fillStyle = textSecondary; ctx.font = "400 17px ui-monospace, SFMono-Regular, Menlo, Monaco, monospace";
+        ctx.fillText(ellipsize(senderAddr, cardRW - 68), rightX + 56, ry + 84);
+
+        // Row 3: TX ID
+        ry += cardRH2 + rGap;
+        const cardRH3 = 100;
+        infoCard(rightX, ry, cardRW, cardRH3);
+        drawHash(rightX + 28, ry + cardRH3 / 2, iconS);
+        ctx.fillStyle = textSecondary; ctx.font = "500 17px system-ui, -apple-system, sans-serif";
+        ctx.fillText(t("ui_tx_id", "ID de transaction"), rightX + 56, ry + 32);
+        ctx.fillStyle = textPrimary; ctx.font = "500 18px ui-monospace, SFMono-Regular, Menlo, Monaco, monospace";
+        ctx.fillText(ellipsize(txHashShort || "—", cardRW - 160), rightX + 56, ry + 60);
+        if (txHash) {
+          const bW = 110; const bH = 34; const bX = rightX + cardRW - bW - 12; const bY = ry + (cardRH3 - bH) / 2;
+          rr(bX, bY, bW, bH, 17);
+          ctx.fillStyle = "rgba(34,197,94,0.14)"; ctx.fill();
+          ctx.strokeStyle = accentBorder; ctx.lineWidth = 1; ctx.stroke();
+          ctx.fillStyle = accentText; ctx.font = "600 18px system-ui, -apple-system, sans-serif";
+          ctx.textAlign = "center"; ctx.textBaseline = "middle";
+          ctx.fillText(t("ui_copy_action", "Copier"), bX + bW / 2, bY + bH / 2);
+          ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
+        }
+
+        // Security note (bottom of card)
+        const noteY2 = cardY + cardH - 36;
+        const lkS = 24; const lkCx = cardX + 36;
+        drawLock(lkCx, noteY2 - lkS * 0.1, lkS);
+        ctx.fillStyle = textSecondary; ctx.font = "400 18px system-ui, -apple-system, sans-serif";
+        ctx.textAlign = "left"; ctx.textBaseline = "middle";
+        ctx.fillText(ellipsize(secNote, cardW - 80), lkCx + lkS, noteY2);
+      }
+
+      if (typeof canvas.toBlob === "function") {
+        return await new Promise((resolve) => { canvas.toBlob((blob) => resolve(blob), "image/png", 0.92); });
+      }
+      const dataUrl = canvas.toDataURL("image/png");
+      const res = await fetch(dataUrl);
+      return await res.blob();
+
+        }
         const isPortrait = typeof window !== "undefined" && window.innerWidth < 768;
         const w = 1080;
         const h = isPortrait ? 1350 : 600;
