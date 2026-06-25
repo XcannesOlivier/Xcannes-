@@ -397,7 +397,7 @@ export default function WalletDashboardHeader({
                       <>
                         {/* Backdrop blur — mobile only */}
                         <div
-                          className={`fixed inset-0 z-40 md:hidden backdrop-blur-[3px] transition-opacity duration-200 ${isSwitcherVisible ? "opacity-100" : "opacity-0"}`}
+                          className={`fixed inset-0 z-[10] md:hidden backdrop-blur-[3px] transition-opacity duration-200 ${isSwitcherVisible ? "opacity-100" : "opacity-0"}`}
                           onClick={closeSwitcher}
                           aria-hidden="true"
                         />
