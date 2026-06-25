@@ -416,8 +416,8 @@ export default function WalletDashboardReceiveModal({
 
 	  const accountDropdownOpenPillClassName = "rounded-3xl rounded-b-none after:content-[''] after:absolute after:inset-0 after:rounded-3xl after:rounded-b-none after:border after:border-white/25 after:border-b-0 after:pointer-events-none after:z-[1]";
 	  const accountDropdownMenuClassName = inline
-      ? 'bg-[#0f1314] box-border !mt-0 flex flex-col border border-white/25 border-t-0 rounded-b-[20px] shadow-[0_0_0_1px_rgba(0,0,0,0.75),-14px_22px_42px_rgba(0,0,0,0.72),14px_22px_42px_rgba(0,0,0,0.72),0_28px_56px_rgba(0,0,0,0.78)] !z-[10020]'
-      : 'bg-[#0f1314] box-border !mt-0 flex flex-col border border-white/25 border-t-0 rounded-b-[20px] shadow-[0_0_0_1px_rgba(0,0,0,0.9),-12px_20px_40px_rgba(0,0,0,0.85),12px_20px_40px_rgba(0,0,0,0.85),0_28px_70px_rgba(0,0,0,0.90)] !z-[10020]';
+      ? 'bg-[#0f1314]/90 backdrop-blur-md box-border !mt-0 flex flex-col border border-white/25 border-t-0 rounded-b-[20px] shadow-[0_8px_32px_rgba(0,0,0,0.28)] !z-[10020]'
+      : 'bg-[#0f1314]/90 backdrop-blur-md box-border !mt-0 flex flex-col border border-white/25 border-t-0 rounded-b-[20px] shadow-[0_8px_32px_rgba(0,0,0,0.28)] !z-[10020]';
 
   const isFxRequest = useMemo(() => {
     if (!selectedRequestToken?.isTrustlineOnly) return false;
@@ -1462,12 +1462,16 @@ export default function WalletDashboardReceiveModal({
 
 	                    {/* ── Centered wallet pill (style "Depuis le compte") ── */}
                       <div className="flex justify-center pt-1 pb-1 relative z-[85]">
-	                      <div className={`relative wallet-account-selector-wrapper ${shareWalletDropdownOpen ? 'is-open' : ''}`} ref={shareWalletDropdownRef}>
+                        {/* Blur backdrop behind selector when open */}
+                        {shareWalletDropdownOpen && (
+                          <div className="fixed inset-0 z-[10018] backdrop-blur-[3px] bg-black/10 pointer-events-none" aria-hidden />
+                        )}
+	                      <div className={`relative wallet-account-selector-wrapper ${shareWalletDropdownOpen ? 'is-open' : ''}`} ref={shareWalletDropdownRef} style={shareWalletDropdownOpen ? { zIndex: 10019 } : undefined}>
 	                        {/* Visible pill */}
                           <button
                             type="button"
                             onClick={hasMultipleWallets ? () => setShareWalletDropdownOpen((prev) => !prev) : undefined}
-                            className={`shimmer-seq shimmer-seq-3 relative flex w-fit flex-col items-center gap-1 ${shareWalletDropdownOpen ? 'bg-[#0f1314]' : 'bg-[#232829]'} px-6 py-2 ${shareWalletDropdownOpen ? accountDropdownOpenPillClassName : 'rounded-[28px]'} ${shareWalletDropdownOpen ? 'ring-0' : 'ring-1 ring-white/[0.08]'} ring-inset ${hasMultipleWallets ? 'cursor-pointer' : ''} ${shareWalletDropdownOpen ? (inline ? 'shadow-[0_0_0_1px_rgba(0,0,0,0.75),-14px_-18px_36px_rgba(0,0,0,0.70),14px_-18px_36px_rgba(0,0,0,0.70),0_-10px_28px_rgba(0,0,0,0.68)]' : 'shadow-[0_0_0_1px_rgba(0,0,0,0.9),-12px_-16px_32px_rgba(0,0,0,0.85),12px_-16px_32px_rgba(0,0,0,0.85),0_-8px_24px_rgba(0,0,0,0.80)]') : ''}`}
+                            className={`shimmer-seq shimmer-seq-3 relative flex w-fit flex-col items-center gap-1 ${shareWalletDropdownOpen ? 'bg-[#0f1314]' : 'bg-[#232829]'} px-6 py-2 ${shareWalletDropdownOpen ? accountDropdownOpenPillClassName : 'rounded-[28px]'} ${shareWalletDropdownOpen ? 'ring-0' : 'ring-1 ring-white/[0.08]'} ring-inset ${hasMultipleWallets ? 'cursor-pointer' : ''}`}
                             aria-haspopup={hasMultipleWallets ? 'menu' : undefined}
                             aria-expanded={hasMultipleWallets ? shareWalletDropdownOpen : undefined}
                           >
@@ -1768,16 +1772,20 @@ export default function WalletDashboardReceiveModal({
 
 	                  {receiveView === 'request' ? (
 		                <>
-		                  {/* SECTION 2 — CREATE REQUEST */}
+	                  {/* SECTION 2 — CREATE REQUEST */}
                       <div className="flex flex-col gap-2 pt-[32px] flex-1">
 	                    {/* ── Centered wallet pill (style "Choisissez le compte") ── */}
                         <div className="flex justify-center pt-1 pb-[15px] relative z-[85]">
-	                      <div className={`relative wallet-account-selector-wrapper ${requestWalletDropdownOpen ? 'is-open' : ''}`} ref={requestWalletDropdownRef}>
+                          {/* Blur backdrop behind selector when open */}
+                          {requestWalletDropdownOpen && (
+                            <div className="fixed inset-0 z-[10018] backdrop-blur-[3px] bg-black/10 pointer-events-none" aria-hidden />
+                          )}
+	                      <div className={`relative wallet-account-selector-wrapper ${requestWalletDropdownOpen ? 'is-open' : ''}`} ref={requestWalletDropdownRef} style={requestWalletDropdownOpen ? { zIndex: 10019 } : undefined}>
 	                        {/* Visible pill */}
                             <button
                               type="button"
                               onClick={hasMultipleWallets ? () => setRequestWalletDropdownOpen((prev) => !prev) : undefined}
-                              className={`relative flex w-fit flex-col items-center gap-1 bg-[#0f1314] px-6 py-2 ${requestWalletDropdownOpen ? accountDropdownOpenPillClassName : 'rounded-[28px]'} ${requestWalletDropdownOpen ? 'ring-0' : 'ring-1 ring-white/[0.08]'} ring-inset ${hasMultipleWallets ? 'cursor-pointer' : ''} ${requestWalletDropdownOpen ? (inline ? 'shadow-[0_0_0_1px_rgba(0,0,0,0.75),-14px_-18px_36px_rgba(0,0,0,0.70),14px_-18px_36px_rgba(0,0,0,0.70),0_-10px_28px_rgba(0,0,0,0.68)]' : 'shadow-[0_0_0_1px_rgba(0,0,0,0.9),-12px_-16px_32px_rgba(0,0,0,0.85),12px_-16px_32px_rgba(0,0,0,0.85),0_-8px_24px_rgba(0,0,0,0.80)]') : ''}`}
+                              className={`relative flex w-fit flex-col items-center gap-1 bg-[#0f1314] px-6 py-2 ${requestWalletDropdownOpen ? accountDropdownOpenPillClassName : 'rounded-[28px]'} ${requestWalletDropdownOpen ? 'ring-0' : 'ring-1 ring-white/[0.08]'} ring-inset ${hasMultipleWallets ? 'cursor-pointer' : ''}`}
                               aria-haspopup={hasMultipleWallets ? 'menu' : undefined}
                               aria-expanded={hasMultipleWallets ? requestWalletDropdownOpen : undefined}
                             >
