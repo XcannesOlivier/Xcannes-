@@ -1539,12 +1539,22 @@ function setupWalletEmbedded() {
 	        break;
 
 	      case 'READY':
-	        // iframe loaded — send wallet identity
+	        // iframe loaded — send wallet identity then reveal iframe and hide spinner
 	        sendToIframe({
 	          type: 'INIT',
 	          address: currentWallet?.address || '',
           publicKey: currentWallet?.publicKey || '',
         });
+        // Reveal iframe
+        if (iframe) iframe.style.opacity = '1';
+        // Fade out and remove PWA spinner
+        {
+          const overlay = document.getElementById('pwa-loading-overlay');
+          if (overlay) {
+            overlay.style.opacity = '0';
+            setTimeout(() => { if (overlay.parentNode) overlay.style.display = 'none'; }, 420);
+          }
+        }
         break;
 
       case 'SIGN_TX':

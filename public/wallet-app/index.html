@@ -464,6 +464,15 @@
 
 	    <!-- ========== 10b. WALLET EMBEDDED SCREEN (iframe with full dashboard) ========== -->
 	    <div id="screen-wallet-embedded" class="screen hidden">
+	      <!-- Spinner PWA : visible pendant le chargement de l'iframe, masqué à réception de READY -->
+	      <div id="pwa-loading-overlay" style="position:absolute;inset:0;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--bg-elevated);pointer-events:none;transition:opacity 400ms ease;">
+	        <svg width="40" height="40" viewBox="0 0 40 40" fill="none" aria-hidden="true" style="margin-bottom:20px;">
+	          <circle cx="20" cy="20" r="16" stroke="rgba(255,255,255,0.1)" stroke-width="4"/>
+	          <circle cx="20" cy="20" r="16" stroke="#16a34a" stroke-width="4" stroke-linecap="round" stroke-dasharray="60 44" style="transform-origin:center;animation:pwa-spin 0.85s linear infinite;"/>
+	        </svg>
+	        <span style="font-size:15px;font-weight:300;color:rgba(255,255,255,0.45);letter-spacing:0.02em;">Chargement du compte…</span>
+	        <style>@keyframes pwa-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }</style>
+	      </div>
 	      <div class="embedded-container">
 	        <iframe
 	          id="wallet-iframe"
@@ -471,6 +480,7 @@
 	          sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"
 	          allow="camera 'self'; clipboard-write"
 	          title="Xcannes Wallet Dashboard"
+	          style="opacity:0;transition:opacity 300ms ease;"
 	        ></iframe>
 	      </div>
 	    </div>
