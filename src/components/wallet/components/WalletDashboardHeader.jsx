@@ -85,7 +85,6 @@ export default function WalletDashboardHeader({
   isScrolling = false,
   isScrolled = false,
   scrollTop = 0,
-  animReady = false,
 }) {
   const { t } = useTranslation("common");
   const [isSwitcherOpen, setIsSwitcherOpen] = useState(false);
@@ -119,13 +118,13 @@ export default function WalletDashboardHeader({
   useEffect(() => {
     if (wallet === prevWalletRef.current) return;
     prevWalletRef.current = wallet;
-    if (!animReady) return; // don't restart before initial animation is allowed
     const el = balanceAnimRef.current;
     if (!el) return;
+    el.style.animationDelay = '0ms';
     el.classList.remove('animate-slide-from-left');
-    void el.offsetWidth; // force reflow to restart animation
+    void el.offsetWidth;
     el.classList.add('animate-slide-from-left');
-  }, [wallet, animReady]);
+  }, [wallet]);
   const hasMultipleWallets = useMemo(() => {
     const set = new Set();
     for (const w of walletAddresses || []) {
@@ -737,7 +736,7 @@ export default function WalletDashboardHeader({
           </div>
         )}
 
-        <div ref={balanceAnimRef} className={animReady ? 'animate-slide-from-left' : ''}>
+        <div ref={balanceAnimRef} className="animate-slide-from-left" style={{ animationDelay: '1000ms' }}>
         <div className="text-[21px] md:text-[27px] text-white/55 mb-0.5 md:mb-0">
           {t("ui_total_balance_label_a91b6b8c1e", "Solde total")}
         </div>

@@ -119,11 +119,6 @@ export default function WalletDashboard({
   );
 
   // ── UI state ───────────────────────────────────────────────
-  const [animReady, setAnimReady] = useState(false);
-  useEffect(() => {
-    const t = setTimeout(() => setAnimReady(true), 1000);
-    return () => clearTimeout(t);
-  }, []);
   const [showActivationModal, setShowActivationModal] = useState(false);
   const [showActivationRequestModal, setShowActivationRequestModal] = useState(false);
   const [showGlobalStatement, setShowGlobalStatement] = useState(false);
@@ -600,11 +595,10 @@ export default function WalletDashboard({
         key={token.key}
         token={token}
         onClick={() => handleOpenCurrencyStatement(token)}
-        animationDelay={animReady ? index * 55 : 0}
-        animReady={animReady}
+        animationDelay={1000 + index * 55}
       />
     ),
-    [handleOpenCurrencyStatement, animReady],
+    [handleOpenCurrencyStatement],
   );
 
   const handleOpenXrplActivity = useCallback(() => {
@@ -822,7 +816,6 @@ export default function WalletDashboard({
             isScrolling={isScrolling}
             isScrolled={tokenListScrolled}
             scrollTop={tokenListScrollTop}
-            animReady={animReady}
           />
 
           {/* Reconciliation banner (external RLUSD spend detected) */}
@@ -867,7 +860,7 @@ export default function WalletDashboard({
                   <div className="w-full flex flex-col gap-y-0 sticky top-[92px] md:top-0 z-[5] bg-transparent relative" data-activity-hidden={activityCardHidden}>
                   {/* Mobile: clip container so card slides out without creating horizontal scroll */}
                   <div className="overflow-x-hidden md:overflow-x-visible">
-                  <div className={`activity-card-slide${animReady ? ' animate-slide-from-left' : ''}`}>
+                  <div className="activity-card-slide animate-slide-from-left" style={{ animationDelay: '1000ms' }}>
                   <div
                     className="w-full min-w-0 overflow-visible relative"
                     aria-live="polite"
