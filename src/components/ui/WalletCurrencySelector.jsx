@@ -15,13 +15,23 @@ const CURRENCY_FLAG_OVERRIDES = {
 // Petit set de devises les plus utilisées dans le monde
 // Limité à une courte liste pour rester simple et rapide à parcourir.
 const POPULAR_CURRENCIES = [
-{ code: "USD", name: "US Dollar" },
-{ code: "EUR", name: "Euro" },
-{ code: "JPY", name: "Japanese Yen" },
-{ code: "GBP", name: "British Pound" },
-{ code: "CHF", name: "Swiss Franc" },
-{ code: "AUD", name: "Australian Dollar" },
-{ code: "CAD", name: "Canadian Dollar" }];
+{ code: "CNY", name: "Yuan chinois" },
+{ code: "HKD", name: "Dollar de Hong Kong" },
+{ code: "NZD", name: "Dollar néo-zélandais" },
+{ code: "SEK", name: "Couronne suédoise" },
+{ code: "NOK", name: "Couronne norvégienne" }];
+
+const DEFAULT_WALLET_CURRENCIES = new Set([
+  "USD",
+  "EUR",
+  "CHF",
+  "GBP",
+  "CAD",
+  "JPY",
+  "AED",
+  "AUD",
+  "SGD",
+]);
 
 const normalizeCode = (code) => String(code || "").trim().toUpperCase();
 
@@ -586,7 +596,9 @@ export default function WalletCurrencySelector({
               </div>
             ) : (
               <ul className="divide-y divide-white/10">
-                {filtered.map((c) =>
+                {filtered.map((c) => {
+                  const isAlreadyAdded = DEFAULT_WALLET_CURRENCIES.has(normalizeCode(c.code));
+                  return (
                   <li key={c.code}>
                     <button
                       type="button"
@@ -602,10 +614,17 @@ export default function WalletCurrencySelector({
                           {c.name}
                         </span>
                       </div>
-                      <AddCurrencyLogo className="w-4 h-4 text-xcannes-green shrink-0" />
+                      {isAlreadyAdded ? (
+                        <span className="text-[12px] text-white/55 shrink-0">
+                          {t("ui_currency_already_added", "Déjà ajoutée")}
+                        </span>
+                      ) : (
+                        <AddCurrencyLogo className="w-4 h-4 text-xcannes-green shrink-0" />
+                      )}
                     </button>
                   </li>
-                )}
+                  );
+                })}
               </ul>
             )}
           </div>
@@ -669,7 +688,7 @@ export default function WalletCurrencySelector({
                           {t("ui_select_currency_title", "Ajouter une devise")}
                         </div>
                       </div>
-                      <div className="mt-2 text-[19px] md:text-[20px] font-light text-white/50 leading-relaxed max-w-[46ch] md:max-w-[60ch]">
+                      <div className="mt-2 text-[17px] md:text-[20px] font-light text-white/50 leading-relaxed max-w-[46ch] md:max-w-[60ch]">
                         {t(
                           "ui_select_currency_subtitle_add_currency",
                           "Choisissez une devise. Elle sera ajoutée automatiquement lors de votre première transaction.",
@@ -767,6 +786,7 @@ export default function WalletCurrencySelector({
                   ) : (
                     filtered.map((c) => {
                       const active = normalizeCode(c.code) === normalizeCode(value);
+                      const isAlreadyAdded = DEFAULT_WALLET_CURRENCIES.has(normalizeCode(c.code));
                       return (
                         <button
                           key={c.code}
@@ -791,7 +811,13 @@ export default function WalletCurrencySelector({
                               {c.name || c.code}
                             </span>
                           </div>
-                          <AddCurrencyLogo className="w-4 h-4 text-xcannes-green shrink-0" />
+                          {isAlreadyAdded ? (
+                            <span className="text-[12px] text-white/55 shrink-0">
+                              {t("ui_currency_already_added", "Déjà ajoutée")}
+                            </span>
+                          ) : (
+                            <AddCurrencyLogo className="w-4 h-4 text-xcannes-green shrink-0" />
+                          )}
                         </button>
                       );
                     })
