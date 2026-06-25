@@ -654,6 +654,762 @@ export default function GlobalStatement({
       })();
 
       const buildCardBlob = async () => {
+        if (isConversion) {
+
+        const convTitle = title;
+        const convAmount = amountSigned;
+        const convDate = subtitle;
+        const convStatus = statusLabel;
+        const convFrom = from || "—";
+        const convTo = to || "—";
+        const convFromAmt = fromLine;
+        const convToAmt = toLine;
+        const grossRlusdG = Number(detailMovement?.amountRlusdGross);
+        const netRlusdG = Number(detailMovement?.amountRlusd);
+        const baseRlusdG = Number.isFinite(grossRlusdG) ? grossRlusdG : netRlusdG;
+        const fxRateG = Number.isFinite(baseRlusdG) && Number.isFinite(netRlusdG) && baseRlusdG > 0
+          ? (netRlusdG / baseRlusdG).toFixed(4)
+          : (detailMovement?.fxRate ? Number(detailMovement.fxRate).toFixed(4) : "—");
+        const convRate = `1 ${convFrom} = ${fxRateG} ${convTo}`;
+        const convRateShort = fxRateG;
+        const convTxHash = String(detailMovement?.txHash || "").trim();
+        const walletLabelVar = walletLabel;
+
+      // ── CONVERSION: dedicated design ─────────────────────────────────
+      const isPortrait = typeof window !== "undefined" && window.innerWidth < 768;
+      const w = isPortrait ? 1080 : 1600;
+      const h = isPortrait ? 1560 : 900;
+      const canvas = document.createElement("canvas");
+      canvas.width = w; canvas.height = h;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return null;
+
+      const accent = "#3b82f6";
+      const accentDim = "rgba(59,130,246,0.13)";
+      const accentBorder = "rgba(59,130,246,0.30)";
+      const accentText = "#60a5fa";
+      const textPrimary = "#ffffff";
+      const textSecondary = "rgba(255,255,255,0.50)";
+      const cardFill = "rgba(255,255,255,0.05)";
+      const cardBorder = "rgba(255,255,255,0.08)";
+
+      ctx.fillStyle = "#080f1f";
+      ctx.fillRect(0, 0, w, h);
+      const bg1 = ctx.createRadialGradient(w*0.5, h*0.35, 0, w*0.5, h*0.35, h*0.75);
+      bg1.addColorStop(0, "rgba(59,130,246,0.16)");
+      bg1.addColorStop(0.6, "rgba(59,130,246,0.04)");
+      bg1.addColorStop(1, "rgba(59,130,246,0)");
+      ctx.fillStyle = bg1; ctx.fillRect(0, 0, w, h);
+
+      const pad = isPortrait ? 48 : 56;
+      const cardX = pad; const cardY = pad;
+      const cardW = w - pad * 2; const cardH = h - pad * 2;
+      const rr = (x, y, W, H, r) => {
+        const cr = Math.max(0, Math.min(r, W/2, H/2));
+        ctx.beginPath(); ctx.moveTo(x+cr, y);
+        ctx.arcTo(x+W,y,x+W,y+H,cr); ctx.arcTo(x+W,y+H,x,y+H,cr);
+        ctx.arcTo(x,y+H,x,y,cr); ctx.arcTo(x,y,x+W,y,cr);
+        ctx.closePath();
+      };
+      rr(cardX,cardY,cardW,cardH,52);
+      ctx.fillStyle="rgba(59,130,246,0.04)"; ctx.fill();
+      ctx.strokeStyle=accentBorder; ctx.lineWidth=1.5; ctx.stroke();
+
+      const ellipsize = (text, maxW) => {
+        const raw = String(text||"");
+        if(!raw || ctx.measureText(raw).width<=maxW) return raw;
+        const ell="…"; let out=raw;
+        while(out.length>0 && ctx.measureText(out+ell).width>maxW) out=out.slice(0,-1);
+        return out?out+ell:ell;
+      };
+      const infoCard=(x,y,W,H)=>{
+        rr(x,y,W,H,20); ctx.fillStyle=cardFill; ctx.fill();
+        ctx.strokeStyle=cardBorder; ctx.lineWidth=1; ctx.stroke();
+      };
+      const drawCalendar=(cx,cy,s)=>{
+        ctx.strokeStyle=accent; ctx.lineWidth=s*0.09; ctx.fillStyle=accentDim;
+        rr(cx-s/2,cy-s/2,s,s,s*0.18); ctx.fill(); ctx.stroke();
+        ctx.strokeStyle=accent; ctx.lineWidth=s*0.07;
+        [0.42,0.58,0.72].forEach(r=>{
+          ctx.beginPath(); ctx.moveTo(cx-s*0.28,cy-s*0.5+s*r);
+          ctx.lineTo(cx+s*0.28,cy-s*0.5+s*r); ctx.stroke();
+        });
+        [cx-s*0.12,cx+s*0.12].forEach(rx=>{
+          ctx.beginPath(); ctx.moveTo(rx,cy-s*0.5+s*0.16); ctx.lineTo(rx,cy-s*0.5+s*0.28); ctx.stroke();
+        });
+      };
+      const drawCheckShield=(cx,cy,r)=>{
+        // shield / checkmark
+        ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
+        ctx.fillStyle=accentDim; ctx.fill();
+        ctx.strokeStyle=accent; ctx.lineWidth=2; ctx.stroke();
+        const ck=r*0.45;
+        ctx.beginPath(); ctx.moveTo(cx-ck*0.9,cy); ctx.lineTo(cx-ck*0.2,cy+ck*0.7); ctx.lineTo(cx+ck*0.9,cy-ck*0.6);
+        ctx.strokeStyle=accent; ctx.lineWidth=2.5; ctx.lineCap="round"; ctx.stroke();
+      };
+      const drawCurrencyCircle=(cx,cy,r,label)=>{
+        ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
+        ctx.fillStyle=accentDim; ctx.fill();
+        ctx.strokeStyle=accent; ctx.lineWidth=2.5; ctx.stroke();
+        ctx.fillStyle=accentText; ctx.font=`700 ${Math.round(r*0.75)}px system-ui,-apple-system,sans-serif`;
+        ctx.textAlign="center"; ctx.textBaseline="middle";
+        ctx.fillText(label.slice(0,1), cx, cy);
+      };
+      const drawTrend=(cx,cy,s)=>{
+        ctx.fillStyle=accentDim; ctx.strokeStyle=accent; ctx.lineWidth=s*0.09;
+        rr(cx-s/2,cy-s/2,s,s,s*0.18); ctx.fill(); ctx.stroke();
+        ctx.strokeStyle=accentText; ctx.lineWidth=s*0.09; ctx.lineCap="round"; ctx.lineJoin="round";
+        ctx.beginPath();
+        ctx.moveTo(cx-s*0.28,cy+s*0.12);
+        ctx.lineTo(cx-s*0.08,cy-s*0.10);
+        ctx.lineTo(cx+s*0.08,cy+s*0.04);
+        ctx.lineTo(cx+s*0.28,cy-s*0.18);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(cx+s*0.28-s*0.14,cy-s*0.18);
+        ctx.lineTo(cx+s*0.28,cy-s*0.18);
+        ctx.lineTo(cx+s*0.28,cy-s*0.04);
+        ctx.stroke();
+      };
+      const drawInfoIcon=(cx,cy,r)=>{
+        ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
+        ctx.fillStyle=accentDim; ctx.fill();
+        ctx.strokeStyle=accent; ctx.lineWidth=1.5; ctx.stroke();
+        ctx.fillStyle=accentText; ctx.font=`700 ${Math.round(r*1.1)}px system-ui`;
+        ctx.textAlign="center"; ctx.textBaseline="middle";
+        ctx.fillText("i",cx,cy+1);
+      };
+      const drawLock=(cx,cy,s)=>{
+        ctx.strokeStyle=textSecondary; ctx.lineWidth=s*0.09;
+        ctx.beginPath(); ctx.arc(cx,cy-s*0.12,s*0.22,Math.PI,0); ctx.stroke();
+        rr(cx-s*0.26,cy,s*0.52,s*0.38,s*0.08);
+        ctx.fillStyle=accentDim; ctx.fill();
+        ctx.strokeStyle=accent; ctx.stroke();
+      };
+
+      const wName = String(walletLabelVar || t("nav_wallet","Wallet")).trim();
+      const wAddrRaw = String(walletAddress||"").trim();
+      const wAddrShort = wAddrRaw.length>18 ? wAddrRaw.slice(0,8)+"…"+wAddrRaw.slice(-6) : wAddrRaw;
+      const initial = wName.charAt(0).toUpperCase();
+      const secNote = t("ui_security_confirmation_note","Chaque transaction nécessite une confirmation.");
+      const discNote = t("ui_conversion_fx_note","Le montant final peut varier légèrement selon les fluctuations du taux de change.");
+
+      if (isPortrait) {
+        // ── PORTRAIT ──────────────────────────────────────────────────────
+        // Header: dot + name + addr
+        const dotR=7;
+        ctx.beginPath(); ctx.arc(cardX+44+dotR,cardY+52,dotR,0,Math.PI*2);
+        ctx.fillStyle=accent; ctx.fill();
+        ctx.fillStyle=textPrimary; ctx.font="600 26px system-ui,-apple-system,sans-serif";
+        ctx.textAlign="left"; ctx.textBaseline="middle";
+        ctx.fillText(ellipsize(wName,200),cardX+44+dotR*2+8,cardY+52);
+        ctx.fillStyle=textSecondary; ctx.font="400 22px system-ui,-apple-system,sans-serif";
+        ctx.fillText(ellipsize(" · "+wAddrShort,cardW-200),cardX+44+dotR*2+8+ctx.measureText(wName).width+4,cardY+52);
+
+        // Title
+        ctx.fillStyle=textPrimary; ctx.font="800 58px system-ui,-apple-system,sans-serif";
+        ctx.textAlign="left"; ctx.textBaseline="alphabetic";
+        ctx.fillText(ellipsize(convTitle,cardW-88),cardX+44,cardY+130);
+
+        // Amount
+        ctx.font="800 110px ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace";
+        ctx.fillStyle=accentText;
+        ctx.fillText(ellipsize(convAmount,cardW-88),cardX+44,cardY+260);
+
+        // Divider
+        ctx.strokeStyle="rgba(255,255,255,0.07)"; ctx.lineWidth=1;
+        ctx.beginPath(); ctx.moveTo(cardX+44,cardY+290); ctx.lineTo(cardX+cardW-44,cardY+290); ctx.stroke();
+
+        // Row 1: Date | Statut
+        let cy2=cardY+320;
+        const cardGap=18; const iconS=44; const halfW=(cardW-cardGap)/2;
+        const cardH1=110;
+        infoCard(cardX,cy2,halfW,cardH1);
+        drawCalendar(cardX+36,cy2+cardH1/2,iconS);
+        ctx.textAlign="left"; ctx.textBaseline="alphabetic";
+        ctx.fillStyle=textSecondary; ctx.font="500 20px system-ui,-apple-system,sans-serif";
+        ctx.fillText(t("ui_date_label_7a2c1b9d5e","Date"),cardX+68,cy2+38);
+        ctx.fillStyle=textPrimary; ctx.font="600 24px system-ui,-apple-system,sans-serif";
+        ctx.fillText(ellipsize(convDate,halfW-76),cardX+68,cy2+70);
+
+        const sx=cardX+halfW+cardGap;
+        infoCard(sx,cy2,halfW,cardH1);
+        drawCheckShield(sx+36,cy2+cardH1/2,22);
+        ctx.fillStyle=textSecondary; ctx.font="500 20px system-ui,-apple-system,sans-serif";
+        ctx.fillText(t("ui_status_label","Statut"),sx+68,cy2+38);
+        ctx.fillStyle=textPrimary; ctx.font="600 26px system-ui,-apple-system,sans-serif";
+        ctx.fillText(ellipsize(convStatus||"—",halfW-80),sx+68,cy2+76);
+
+        // Conversion pair card
+        cy2+=cardH1+cardGap;
+        const convCardH=116;
+        infoCard(cardX,cy2,cardW,convCardH);
+        const circR=34;
+        const leftCX=cardX+cardW*0.22; const rightCX=cardX+cardW*0.72; const midY=cy2+convCardH/2;
+        drawCurrencyCircle(leftCX,midY,circR,convFrom);
+        ctx.fillStyle=textPrimary; ctx.font="700 26px system-ui,-apple-system,sans-serif";
+        ctx.textAlign="center"; ctx.textBaseline="alphabetic";
+        ctx.fillText(convFrom,leftCX,midY-circR-10);
+        ctx.fillStyle=textSecondary; ctx.font="400 22px system-ui,-apple-system,sans-serif";
+        ctx.fillText(ellipsize(convFromAmt,cardW*0.35),leftCX,midY+circR+26);
+        // arrow
+        ctx.strokeStyle=textSecondary; ctx.lineWidth=2; ctx.lineCap="round";
+        const midX=cardX+cardW/2;
+        ctx.beginPath(); ctx.moveTo(midX-18,midY); ctx.lineTo(midX+18,midY); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(midX+6,midY-12); ctx.lineTo(midX+18,midY); ctx.lineTo(midX+6,midY+12); ctx.stroke();
+        drawCurrencyCircle(rightCX,midY,circR,convTo);
+        ctx.fillStyle=textPrimary; ctx.font="700 26px system-ui,-apple-system,sans-serif";
+        ctx.fillText(convTo,rightCX,midY-circR-10);
+        ctx.fillStyle=accentText; ctx.font="400 22px system-ui,-apple-system,sans-serif";
+        ctx.fillText(ellipsize(convToAmt,cardW*0.35),rightCX,midY+circR+26);
+
+        // Rate card
+        cy2+=convCardH+cardGap;
+        const rateCardH=100;
+        infoCard(cardX,cy2,cardW,rateCardH);
+        drawTrend(cardX+36,cy2+rateCardH/2,iconS);
+        ctx.textAlign="left"; ctx.textBaseline="alphabetic";
+        ctx.fillStyle=textSecondary; ctx.font="500 20px system-ui,-apple-system,sans-serif";
+        ctx.fillText(t("ui_fx_rate_used","Taux utilisé"),cardX+68,cy2+36);
+        ctx.fillStyle=textPrimary; ctx.font="600 28px system-ui,-apple-system,sans-serif";
+        ctx.fillText(ellipsize(convRate,cardW-84),cardX+68,cy2+72);
+
+        // Disclaimer card
+        cy2+=rateCardH+cardGap;
+        const discH=isPortrait?130:0;
+        infoCard(cardX,cy2,cardW,discH);
+        drawInfoIcon(cardX+36,cy2+discH/2,20);
+        ctx.fillStyle=textSecondary; ctx.font="400 21px system-ui,-apple-system,sans-serif";
+        ctx.textAlign="left"; ctx.textBaseline="top";
+        // wrap disc note
+        const discWords=discNote.split(" "); let discLine=""; let discY=cy2+22;
+        discWords.forEach(w=>{
+          const test=discLine?discLine+" "+w:w;
+          ctx.font="400 21px system-ui,-apple-system,sans-serif";
+          if(ctx.measureText(test).width>cardW-100){
+            ctx.fillText(discLine,cardX+68,discY); discY+=28; discLine=w;
+          } else discLine=test;
+        });
+        if(discLine) ctx.fillText(discLine,cardX+68,discY);
+
+        // Footer
+        ctx.fillStyle="rgba(255,255,255,0.22)"; ctx.font="600 20px system-ui,-apple-system,sans-serif";
+        ctx.textAlign="center"; ctx.textBaseline="alphabetic";
+        ctx.fillText("XCANNES",cardX+cardW/2,cardY+cardH-22);
+
+      } else {
+        // ── LANDSCAPE ──────────────────────────────────────────────────────
+        const leftW=Math.round(cardW*0.46);
+        const rightX=cardX+leftW+44; const rightW=cardX+cardW-rightX-12;
+
+        // Avatar top-left
+        const avR=36; const avCx=cardX+44+avR; const avCy=cardY+50+avR;
+        ctx.beginPath(); ctx.arc(avCx,avCy,avR,0,Math.PI*2);
+        ctx.fillStyle=accentDim; ctx.fill();
+        ctx.strokeStyle=accent; ctx.lineWidth=2; ctx.stroke();
+        ctx.fillStyle=textPrimary; ctx.font="700 28px system-ui,-apple-system,sans-serif";
+        ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText(initial,avCx,avCy);
+        ctx.beginPath(); ctx.arc(avCx+avR*0.68,avCy+avR*0.68,8,0,Math.PI*2);
+        ctx.fillStyle="#080f1f"; ctx.fill();
+        ctx.beginPath(); ctx.arc(avCx+avR*0.68,avCy+avR*0.68,6,0,Math.PI*2);
+        ctx.fillStyle=accent; ctx.fill();
+        ctx.textAlign="left"; ctx.textBaseline="alphabetic";
+        ctx.fillStyle=textPrimary; ctx.font="600 26px system-ui,-apple-system,sans-serif";
+        ctx.fillText(ellipsize(wName,leftW-60),avCx+avR+14,avCy+8);
+        ctx.fillStyle=textSecondary; ctx.font="400 18px system-ui,-apple-system,sans-serif";
+        ctx.fillText(ellipsize(wAddrShort,leftW-60),avCx+avR+14,avCy+34);
+
+        // Vertical divider
+        ctx.strokeStyle="rgba(255,255,255,0.07)"; ctx.lineWidth=1;
+        ctx.beginPath(); ctx.moveTo(cardX+leftW+22,cardY+24); ctx.lineTo(cardX+leftW+22,cardY+cardH-24); ctx.stroke();
+
+        // Left: title + amount
+        ctx.fillStyle=textPrimary; ctx.font="800 50px system-ui,-apple-system,sans-serif";
+        ctx.textAlign="left"; ctx.textBaseline="alphabetic";
+        ctx.fillText(ellipsize(convTitle,leftW-44),cardX+44,cardY+160);
+        ctx.font="800 88px ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace";
+        ctx.fillStyle=accentText;
+        ctx.fillText(ellipsize(convAmount,leftW-44),cardX+44,cardY+268);
+
+        // Divider left
+        ctx.strokeStyle="rgba(255,255,255,0.07)"; ctx.lineWidth=1;
+        ctx.beginPath(); ctx.moveTo(cardX+44,cardY+290); ctx.lineTo(cardX+leftW-12,cardY+290); ctx.stroke();
+
+        // Date | Statut
+        let ly=cardY+318;
+        const cardGapL=16; const iconSL=40; const halfLW=(leftW-cardGapL)/2;
+        const lCardH=106;
+        infoCard(cardX,ly,halfLW,lCardH);
+        drawCalendar(cardX+30,ly+lCardH/2,iconSL);
+        ctx.textAlign="left"; ctx.textBaseline="alphabetic";
+        ctx.fillStyle=textSecondary; ctx.font="500 17px system-ui,-apple-system,sans-serif";
+        ctx.fillText(t("ui_date_label_7a2c1b9d5e","Date"),cardX+60,ly+32);
+        ctx.fillStyle=textPrimary; ctx.font="600 20px system-ui,-apple-system,sans-serif";
+        ctx.fillText(ellipsize(convDate,halfLW-68),cardX+60,ly+60);
+
+        const lsx=cardX+halfLW+cardGapL;
+        infoCard(lsx,ly,halfLW,lCardH);
+        drawCheckShield(lsx+30,ly+lCardH/2,19);
+        ctx.fillStyle=textSecondary; ctx.font="500 17px system-ui,-apple-system,sans-serif";
+        ctx.fillText(t("ui_status_label","Statut"),lsx+58,ly+32);
+        ctx.fillStyle=textPrimary; ctx.font="700 22px system-ui,-apple-system,sans-serif";
+        ctx.fillText(ellipsize(convStatus||"—",halfLW-68),lsx+58,ly+68);
+        ly+=lCardH+cardGapL;
+
+        // Conversion pair card
+        const convCardH=108;
+        infoCard(cardX,ly,leftW,convCardH);
+        const circR=30;
+        const leftCX=cardX+leftW*0.22; const rightCX=cardX+leftW*0.72; const midY=ly+convCardH/2;
+        drawCurrencyCircle(leftCX,midY,circR,convFrom);
+        ctx.textAlign="center"; ctx.textBaseline="alphabetic";
+        ctx.fillStyle=textPrimary; ctx.font="700 22px system-ui,-apple-system,sans-serif";
+        ctx.fillText(convFrom,leftCX,midY-circR-8);
+        ctx.fillStyle=textSecondary; ctx.font="400 19px system-ui,-apple-system,sans-serif";
+        ctx.fillText(ellipsize(convFromAmt,leftW*0.35),leftCX,midY+circR+22);
+        const midX2=cardX+leftW/2;
+        ctx.strokeStyle=textSecondary; ctx.lineWidth=2; ctx.lineCap="round";
+        ctx.beginPath(); ctx.moveTo(midX2-16,midY); ctx.lineTo(midX2+16,midY); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(midX2+4,midY-10); ctx.lineTo(midX2+16,midY); ctx.lineTo(midX2+4,midY+10); ctx.stroke();
+        drawCurrencyCircle(rightCX,midY,circR,convTo);
+        ctx.fillStyle=textPrimary; ctx.font="700 22px system-ui,-apple-system,sans-serif";
+        ctx.fillText(convTo,rightCX,midY-circR-8);
+        ctx.fillStyle=accentText; ctx.font="400 19px system-ui,-apple-system,sans-serif";
+        ctx.fillText(ellipsize(convToAmt,leftW*0.35),rightCX,midY+circR+22);
+        ly+=convCardH+cardGapL;
+
+        // Rate card
+        const rateCardH=92;
+        infoCard(cardX,ly,leftW,rateCardH);
+        drawTrend(cardX+30,ly+rateCardH/2,iconSL);
+        ctx.textAlign="left"; ctx.textBaseline="alphabetic";
+        ctx.fillStyle=textSecondary; ctx.font="500 17px system-ui,-apple-system,sans-serif";
+        ctx.fillText(t("ui_fx_rate_used","Taux utilisé"),cardX+60,ly+30);
+        ctx.fillStyle=textPrimary; ctx.font="600 24px system-ui,-apple-system,sans-serif";
+        ctx.fillText(ellipsize(convRate,leftW-72),cardX+60,ly+62);
+
+        // Right: disclaimer + details table + TX ID
+        let ry=cardY+44; const rGap=16; const rCardW=rightW;
+
+        // Disclaimer
+        const discCardH=116;
+        infoCard(rightX,ry,rCardW,discCardH);
+        drawInfoIcon(rightX+28,ry+32,17);
+        ctx.textAlign="left"; ctx.textBaseline="top";
+        ctx.fillStyle=textSecondary; ctx.font="400 17px system-ui,-apple-system,sans-serif";
+        const discWords=discNote.split(" "); let discLine=""; let discY=ry+16;
+        discWords.forEach(w=>{
+          const test=discLine?discLine+" "+w:w;
+          if(ctx.measureText(test).width>rCardW-64){
+            ctx.fillText(discLine,rightX+52,discY); discY+=23; discLine=w;
+          } else discLine=test;
+        });
+        if(discLine) ctx.fillText(discLine,rightX+52,discY);
+        ry+=discCardH+rGap;
+
+        // Details table card
+        const detailH=186;
+        infoCard(rightX,ry,rCardW,detailH);
+        ctx.textAlign="left"; ctx.textBaseline="alphabetic";
+        ctx.fillStyle=textPrimary; ctx.font="700 22px system-ui,-apple-system,sans-serif";
+        ctx.fillText(t("ui_conversion_details","Détails de la conversion"),rightX+24,ry+34);
+        const rows=[
+          [t("ui_amount_in_from","Montant en "+convFrom), convFromAmt, textSecondary],
+          [t("ui_fx_rate_short","Taux de change"), convRateShort, textSecondary],
+          [t("ui_amount_in_to","Montant en "+convTo), convToAmt, accentText],
+        ];
+        let rowY=ry+62;
+        rows.forEach(([label,val,valColor])=>{
+          ctx.fillStyle=textSecondary; ctx.font="400 17px system-ui,-apple-system,sans-serif";
+          ctx.fillText(label,rightX+24,rowY);
+          ctx.textAlign="right";
+          ctx.fillStyle=valColor; ctx.font="600 18px system-ui,-apple-system,sans-serif";
+          ctx.fillText(ellipsize(val,rCardW-48),rightX+rCardW-20,rowY);
+          ctx.textAlign="left";
+          rowY+=38;
+        });
+        ry+=detailH+rGap;
+
+        // TX ID card
+        const txHash=convTxHash; const txHashShort=txHash.length>22?txHash.slice(0,10)+"…"+txHash.slice(-10):txHash;
+        const txCardH=96;
+        infoCard(rightX,ry,rCardW,txCardH);
+        ctx.fillStyle=textSecondary; ctx.font="500 17px system-ui,-apple-system,sans-serif"; ctx.textAlign="left"; ctx.textBaseline="alphabetic";
+        ctx.fillText(t("ui_tx_id","ID de transaction"),rightX+24,ry+30);
+        ctx.fillStyle=textPrimary; ctx.font="500 18px ui-monospace,SFMono-Regular,Menlo,Monaco,monospace";
+        ctx.fillText(ellipsize(txHashShort||"—",rCardW-160),rightX+24,ry+60);
+        if(txHash){
+          const bW=110; const bH=34; const bX=rightX+rCardW-bW-14; const bY=ry+(txCardH-bH)/2;
+          rr(bX,bY,bW,bH,17); ctx.fillStyle=accentDim; ctx.fill();
+          ctx.strokeStyle=accentBorder; ctx.lineWidth=1; ctx.stroke();
+          ctx.fillStyle=accentText; ctx.font="600 18px system-ui,-apple-system,sans-serif";
+          ctx.textAlign="center"; ctx.textBaseline="middle";
+          ctx.fillText(t("ui_copy_action","Copier"),bX+bW/2,bY+bH/2);
+          ctx.textAlign="left"; ctx.textBaseline="alphabetic";
+        }
+
+        // Security note bottom
+        const noteY2=cardY+cardH-36;
+        const lkS=24;
+        const noteCardH=56;
+        infoCard(cardX,noteY2-noteCardH+8,cardW,noteCardH);
+        drawLock(cardX+36,noteY2-noteCardH*0.1+8,lkS);
+        ctx.fillStyle=textSecondary; ctx.font="400 18px system-ui,-apple-system,sans-serif";
+        ctx.textAlign="left"; ctx.textBaseline="middle";
+        ctx.fillText(ellipsize(secNote,cardW-80),cardX+36+lkS+8,noteY2-noteCardH/2+8);
+      }
+
+      if(typeof canvas.toBlob==="function"){
+        return await new Promise((resolve)=>{canvas.toBlob((blob)=>resolve(blob),"image/png",0.92);});
+      }
+      const dataUrl=canvas.toDataURL("image/png");
+      const res=await fetch(dataUrl);
+      return await res.blob();
+
+        }
+        if (isPaymentOut) {
+
+      // ── SENT PAYMENT: dedicated design ──────────────────────────────
+      const isPortrait = typeof window !== "undefined" && window.innerWidth < 768;
+      const w = isPortrait ? 1080 : 1600;
+      const h = isPortrait ? 1440 : 900;
+      const canvas = document.createElement("canvas");
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return null;
+
+      const accent = "#f87171";
+      const accentDim = "rgba(248,113,113,0.12)";
+      const accentBorder = "rgba(248,113,113,0.28)";
+      const accentText = "#f87171";
+      const textPrimary = "#ffffff";
+      const textSecondary = "rgba(255,255,255,0.50)";
+      const cardFill = "rgba(255,255,255,0.05)";
+      const cardBorder = "rgba(255,255,255,0.08)";
+
+      // Background
+      ctx.fillStyle = "#150808";
+      ctx.fillRect(0, 0, w, h);
+      const bg1 = ctx.createRadialGradient(w * 0.5, h * 0.38, 0, w * 0.5, h * 0.38, h * 0.75);
+      bg1.addColorStop(0, "rgba(248,113,113,0.18)");
+      bg1.addColorStop(0.6, "rgba(248,113,113,0.05)");
+      bg1.addColorStop(1, "rgba(248,113,113,0)");
+      ctx.fillStyle = bg1;
+      ctx.fillRect(0, 0, w, h);
+      if (isPortrait) {
+        const bg2 = ctx.createRadialGradient(w * 0.5, h * 0.85, 0, w * 0.5, h * 0.85, h * 0.3);
+        bg2.addColorStop(0, "rgba(248,113,113,0.07)");
+        bg2.addColorStop(1, "rgba(248,113,113,0)");
+        ctx.fillStyle = bg2;
+        ctx.fillRect(0, 0, w, h);
+      }
+
+      // Outer card
+      const pad = isPortrait ? 48 : 56;
+      const cardX = pad; const cardY = pad;
+      const cardW = w - pad * 2; const cardH = h - pad * 2;
+      const rr = (x, y, W, H, r) => {
+        const cr = Math.max(0, Math.min(r, W / 2, H / 2));
+        ctx.beginPath();
+        ctx.moveTo(x + cr, y);
+        ctx.arcTo(x + W, y, x + W, y + H, cr);
+        ctx.arcTo(x + W, y + H, x, y + H, cr);
+        ctx.arcTo(x, y + H, x, y, cr);
+        ctx.arcTo(x, y, x + W, y, cr);
+        ctx.closePath();
+      };
+      rr(cardX, cardY, cardW, cardH, 52);
+      ctx.fillStyle = "rgba(248,113,113,0.04)";
+      ctx.fill();
+      ctx.strokeStyle = accentBorder;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      const ellipsize = (text, maxW) => {
+        const raw = String(text || "");
+        if (!raw || ctx.measureText(raw).width <= maxW) return raw;
+        const ell = "…";
+        let out = raw;
+        while (out.length > 0 && ctx.measureText(out + ell).width > maxW) out = out.slice(0, -1);
+        return out ? out + ell : ell;
+      };
+      const infoCard = (x, y, W, H) => {
+        rr(x, y, W, H, 20);
+        ctx.fillStyle = cardFill;
+        ctx.fill();
+        ctx.strokeStyle = cardBorder;
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      };
+
+      // Arrow down-right icon in circle
+      const drawArrowIcon = (cx, cy, R, big) => {
+        const h1 = ctx.createRadialGradient(cx, cy, R * 0.5, cx, cy, R * 1.6);
+        h1.addColorStop(0, "rgba(248,113,113,0.20)"); h1.addColorStop(1, "rgba(248,113,113,0)");
+        ctx.fillStyle = h1; ctx.beginPath(); ctx.arc(cx, cy, R * 1.6, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(248,113,113,0.18)"; ctx.fill();
+        ctx.strokeStyle = accent; ctx.lineWidth = big ? 5 : 3; ctx.stroke();
+        // Arrow ↘
+        const s = R * 0.38;
+        ctx.strokeStyle = accent; ctx.lineWidth = big ? 7 : 4;
+        ctx.lineCap = "round"; ctx.lineJoin = "round";
+        ctx.beginPath();
+        ctx.moveTo(cx - s, cy - s);
+        ctx.lineTo(cx + s, cy + s);
+        ctx.stroke();
+        const hw = big ? 4 : 3;
+        ctx.beginPath();
+        ctx.moveTo(cx + s, cy + s);
+        ctx.lineTo(cx + s - s * 0.85, cy + s);
+        ctx.moveTo(cx + s, cy + s);
+        ctx.lineTo(cx + s, cy + s - s * 0.85);
+        ctx.stroke();
+      };
+      const drawCalendar = (cx, cy, s) => {
+        ctx.strokeStyle = accent; ctx.lineWidth = s * 0.09; ctx.fillStyle = accentDim;
+        rr(cx - s / 2, cy - s / 2, s, s, s * 0.18); ctx.fill(); ctx.stroke();
+        ctx.strokeStyle = accent; ctx.lineWidth = s * 0.07;
+        [0.42, 0.58, 0.72].forEach(r => {
+          ctx.beginPath(); ctx.moveTo(cx - s * 0.28, cy - s * 0.5 + s * r);
+          ctx.lineTo(cx + s * 0.28, cy - s * 0.5 + s * r); ctx.stroke();
+        });
+        ctx.beginPath(); ctx.moveTo(cx - s * 0.12, cy - s * 0.5 + s * 0.16);
+        ctx.lineTo(cx - s * 0.12, cy - s * 0.5 + s * 0.28); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(cx + s * 0.12, cy - s * 0.5 + s * 0.16);
+        ctx.lineTo(cx + s * 0.12, cy - s * 0.5 + s * 0.28); ctx.stroke();
+      };
+      const drawCheckSmall = (cx, cy, r) => {
+        ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.fillStyle = accentDim; ctx.fill();
+        ctx.strokeStyle = accent; ctx.lineWidth = 2; ctx.stroke();
+        const ck = r * 0.45;
+        ctx.beginPath(); ctx.moveTo(cx - ck * 0.9, cy); ctx.lineTo(cx - ck * 0.2, cy + ck * 0.7); ctx.lineTo(cx + ck * 0.9, cy - ck * 0.6);
+        ctx.strokeStyle = accent; ctx.lineWidth = 2.5; ctx.lineCap = "round"; ctx.stroke();
+      };
+      const drawPerson = (cx, cy, s) => {
+        ctx.fillStyle = accentDim; ctx.strokeStyle = accent; ctx.lineWidth = s * 0.09;
+        rr(cx - s / 2, cy - s / 2, s, s, s * 0.18); ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.arc(cx, cy - s * 0.14, s * 0.18, 0, Math.PI * 2);
+        ctx.fillStyle = accent; ctx.fill();
+        ctx.beginPath(); ctx.arc(cx, cy + s * 0.42, s * 0.28, Math.PI, 0);
+        ctx.fillStyle = accent; ctx.fill();
+      };
+      const drawLock = (cx, cy, s) => {
+        ctx.strokeStyle = textSecondary; ctx.lineWidth = s * 0.09;
+        ctx.beginPath(); ctx.arc(cx, cy - s * 0.12, s * 0.22, Math.PI, 0); ctx.stroke();
+        rr(cx - s * 0.26, cy, s * 0.52, s * 0.38, s * 0.08);
+        ctx.fillStyle = "rgba(248,113,113,0.10)"; ctx.fill();
+        ctx.strokeStyle = accent; ctx.stroke();
+      };
+
+      const recipientName = counterpartyLabel || "—";
+      const recipientAddr = (() => {
+        const cp = String(detailMovement?.counterparty || "").trim();
+        if (!cp || cp.length <= 20) return cp;
+        return cp.slice(0, 8) + "…" + cp.slice(-6);
+      })();
+      const wName = String(walletLabel || t("nav_wallet", "Wallet")).trim();
+      const wAddrRaw = String(walletAddress || "").trim();
+      const wAddrShort = wAddrRaw.length > 18 ? wAddrRaw.slice(0, 8) + "…" + wAddrRaw.slice(-6) : wAddrRaw;
+      const initial = wName.charAt(0).toUpperCase();
+      const secNote = t("ui_security_confirmation_note", "Chaque transaction nécessite une confirmation.");
+
+      if (isPortrait) {
+        // ── PORTRAIT ─────────────────────────────────────────────────
+        const avR = 40; const avCx = cardX + 44 + avR; const avCy = cardY + 52 + avR;
+        ctx.beginPath(); ctx.arc(avCx, avCy, avR, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(248,113,113,0.16)"; ctx.fill();
+        ctx.strokeStyle = accent; ctx.lineWidth = 2; ctx.stroke();
+        ctx.fillStyle = textPrimary; ctx.font = "700 34px system-ui, -apple-system, sans-serif";
+        ctx.textAlign = "center"; ctx.textBaseline = "middle";
+        ctx.fillText(initial, avCx, avCy);
+        ctx.beginPath(); ctx.arc(avCx + avR * 0.68, avCy + avR * 0.68, 9, 0, Math.PI * 2);
+        ctx.fillStyle = "#150808"; ctx.fill();
+        ctx.beginPath(); ctx.arc(avCx + avR * 0.68, avCy + avR * 0.68, 7, 0, Math.PI * 2);
+        ctx.fillStyle = accent; ctx.fill();
+        ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
+        ctx.fillStyle = textPrimary; ctx.font = "600 28px system-ui, -apple-system, sans-serif";
+        ctx.fillText(ellipsize(wName, cardW - avCx - avR - 60), avCx + avR + 18, avCy - 6);
+        ctx.fillStyle = textSecondary; ctx.font = "400 20px system-ui, -apple-system, sans-serif";
+        ctx.fillText(ellipsize(wAddrShort, cardW - avCx - avR - 60), avCx + avR + 18, avCy + 22);
+
+        // Arrow icon
+        const bigR = 72; const bigCx = cardX + cardW / 2; const bigCy = cardY + 270;
+        drawArrowIcon(bigCx, bigCy, bigR, true);
+
+        // Title
+        ctx.fillStyle = textPrimary; ctx.font = "800 64px system-ui, -apple-system, sans-serif";
+        ctx.textAlign = "center"; ctx.textBaseline = "alphabetic";
+        ctx.fillText(title, bigCx, bigCy + bigR + 76);
+
+        // Amount
+        ctx.font = "800 100px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace";
+        ctx.fillStyle = accentText;
+        ctx.fillText(ellipsize(amountSigned, cardW - 80), bigCx, bigCy + bigR + 190);
+
+        // Status pill
+        const pillText = statusLabel || "—";
+        ctx.font = "600 26px system-ui, -apple-system, sans-serif";
+        const pillW = ctx.measureText(pillText).width + 60 + 28;
+        const pillH = 52; const pillX = bigCx - pillW / 2; const pillY = bigCy + bigR + 218;
+        rr(pillX, pillY, pillW, pillH, pillH / 2);
+        ctx.fillStyle = accentDim; ctx.fill();
+        ctx.strokeStyle = accentBorder; ctx.lineWidth = 1.5; ctx.stroke();
+        drawCheckSmall(pillX + 28, pillY + pillH / 2, 14);
+        ctx.fillStyle = accentText;
+        ctx.textAlign = "left"; ctx.textBaseline = "middle";
+        ctx.fillText(pillText, pillX + 52, pillY + pillH / 2);
+
+        // Divider
+        ctx.strokeStyle = "rgba(255,255,255,0.06)"; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(cardX + 44, bigCy + bigR + 296); ctx.lineTo(cardX + cardW - 44, bigCy + bigR + 296); ctx.stroke();
+
+        let cy2 = bigCy + bigR + 330;
+        const cardGap = 18; const iconS1 = 44; const cardH1 = 100;
+
+        // Date
+        infoCard(cardX, cy2, cardW, cardH1);
+        drawCalendar(cardX + 36, cy2 + cardH1 / 2, iconS1);
+        ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
+        ctx.fillStyle = textSecondary; ctx.font = "500 20px system-ui, -apple-system, sans-serif";
+        ctx.fillText(t("ui_date_label_7a2c1b9d5e", "Date"), cardX + 68, cy2 + 34);
+        ctx.fillStyle = textPrimary; ctx.font = "600 26px system-ui, -apple-system, sans-serif";
+        ctx.fillText(ellipsize(subtitle, cardW - 84), cardX + 68, cy2 + 68);
+        cy2 += cardH1 + cardGap;
+
+        // Statut
+        infoCard(cardX, cy2, cardW, cardH1);
+        drawCheckSmall(cardX + 36, cy2 + cardH1 / 2, 22);
+        ctx.fillStyle = textSecondary; ctx.font = "500 20px system-ui, -apple-system, sans-serif";
+        ctx.fillText(t("ui_status_label", "Statut"), cardX + 68, cy2 + 34);
+        ctx.fillStyle = accentText; ctx.font = "700 26px system-ui, -apple-system, sans-serif";
+        ctx.fillText(ellipsize(statusLabel || "—", cardW - 84), cardX + 68, cy2 + 68);
+        cy2 += cardH1 + cardGap;
+
+        // Destinataire
+        const cardH2 = 118;
+        infoCard(cardX, cy2, cardW, cardH2);
+        drawPerson(cardX + 36, cy2 + cardH2 / 2, iconS1);
+        ctx.fillStyle = textSecondary; ctx.font = "500 20px system-ui, -apple-system, sans-serif";
+        ctx.fillText(t("ui_recipient_label", "Destinataire"), cardX + 68, cy2 + 34);
+        ctx.fillStyle = textPrimary; ctx.font = "600 26px system-ui, -apple-system, sans-serif";
+        ctx.fillText(ellipsize(recipientName, cardW - 84), cardX + 68, cy2 + 68);
+        ctx.fillStyle = textSecondary; ctx.font = "400 20px ui-monospace, SFMono-Regular, Menlo, Monaco, monospace";
+        ctx.fillText(ellipsize(recipientAddr, cardW - 84), cardX + 68, cy2 + 98);
+
+        // Security note
+        const noteY = cardY + cardH - 40;
+        const lockS = 28;
+        drawLock(cardX + 36, noteY - lockS * 0.1, lockS);
+        ctx.fillStyle = textSecondary; ctx.font = "400 20px system-ui, -apple-system, sans-serif";
+        ctx.textAlign = "left"; ctx.textBaseline = "middle";
+        ctx.fillText(ellipsize(secNote, cardW - 80), cardX + 36 + lockS, noteY);
+
+      } else {
+        // ── LANDSCAPE ────────────────────────────────────────────────
+        const leftW = Math.round(cardW * 0.45);
+        const rightX = cardX + leftW + 48;
+        const rightW = cardX + cardW - rightX - 12;
+
+        const avR = 36; const avCx = cardX + 44 + avR; const avCy = cardY + 50 + avR;
+        ctx.beginPath(); ctx.arc(avCx, avCy, avR, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(248,113,113,0.16)"; ctx.fill();
+        ctx.strokeStyle = accent; ctx.lineWidth = 2; ctx.stroke();
+        ctx.fillStyle = textPrimary; ctx.font = "700 28px system-ui, -apple-system, sans-serif";
+        ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText(initial, avCx, avCy);
+        ctx.beginPath(); ctx.arc(avCx + avR * 0.68, avCy + avR * 0.68, 8, 0, Math.PI * 2);
+        ctx.fillStyle = "#150808"; ctx.fill();
+        ctx.beginPath(); ctx.arc(avCx + avR * 0.68, avCy + avR * 0.68, 6, 0, Math.PI * 2);
+        ctx.fillStyle = accent; ctx.fill();
+        ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
+        ctx.fillStyle = textPrimary; ctx.font = "600 26px system-ui, -apple-system, sans-serif";
+        ctx.fillText(ellipsize(wName, leftW - 60), avCx + avR + 14, avCy + 8);
+        ctx.fillStyle = textSecondary; ctx.font = "400 18px system-ui, -apple-system, sans-serif";
+        ctx.fillText(ellipsize(wAddrShort, leftW - 60), avCx + avR + 14, avCy + 34);
+
+        // Divider
+        ctx.strokeStyle = "rgba(255,255,255,0.07)"; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(cardX + leftW + 24, cardY + 24); ctx.lineTo(cardX + leftW + 24, cardY + cardH - 24); ctx.stroke();
+
+        // Arrow icon left
+        const bigR = 64; const bigCx = cardX + leftW / 2; const bigCy = cardY + 210;
+        drawArrowIcon(bigCx, bigCy, bigR, true);
+        ctx.fillStyle = textPrimary; ctx.font = "800 56px system-ui, -apple-system, sans-serif";
+        ctx.textAlign = "center"; ctx.textBaseline = "alphabetic";
+        ctx.fillText(title, bigCx, bigCy + bigR + 64);
+        ctx.font = "800 80px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace";
+        ctx.fillStyle = accentText;
+        ctx.fillText(ellipsize(amountSigned, leftW - 40), bigCx, bigCy + bigR + 158);
+
+        // Status pill below amount
+        const pillText = statusLabel || "—";
+        ctx.font = "600 24px system-ui, -apple-system, sans-serif";
+        const pillW = ctx.measureText(pillText).width + 52 + 24; const pillH = 46;
+        const pillX = bigCx - pillW / 2; const pillY = bigCy + bigR + 180;
+        rr(pillX, pillY, pillW, pillH, pillH / 2);
+        ctx.fillStyle = accentDim; ctx.fill();
+        ctx.strokeStyle = accentBorder; ctx.lineWidth = 1.5; ctx.stroke();
+        drawCheckSmall(pillX + 24, pillY + pillH / 2, 12);
+        ctx.fillStyle = accentText; ctx.textAlign = "left"; ctx.textBaseline = "middle";
+        ctx.fillText(pillText, pillX + 44, pillY + pillH / 2);
+
+        // Right: 3 cards
+        let ry = cardY + 44;
+        const rGap = 16; const iconS = 38; const rCardW = rightW;
+
+        // Date
+        const cardRH = 106;
+        infoCard(rightX, ry, rCardW, cardRH);
+        drawCalendar(rightX + 28, ry + cardRH / 2, iconS);
+        ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
+        ctx.fillStyle = textSecondary; ctx.font = "500 17px system-ui, -apple-system, sans-serif";
+        ctx.fillText(t("ui_date_label_7a2c1b9d5e", "Date"), rightX + 56, ry + 34);
+        ctx.fillStyle = textPrimary; ctx.font = "600 22px system-ui, -apple-system, sans-serif";
+        ctx.fillText(ellipsize(subtitle, rCardW - 68), rightX + 56, ry + 64);
+        ry += cardRH + rGap;
+
+        // Statut
+        infoCard(rightX, ry, rCardW, cardRH);
+        drawCheckSmall(rightX + 28, ry + cardRH / 2, 19);
+        ctx.fillStyle = textSecondary; ctx.font = "500 17px system-ui, -apple-system, sans-serif";
+        ctx.fillText(t("ui_status_label", "Statut"), rightX + 56, ry + 34);
+        ctx.fillStyle = accentText; ctx.font = "700 24px system-ui, -apple-system, sans-serif";
+        ctx.fillText(ellipsize(statusLabel || "—", rCardW - 68), rightX + 56, ry + 68);
+        ry += cardRH + rGap;
+
+        // Destinataire
+        const cardRH2 = 118;
+        infoCard(rightX, ry, rCardW, cardRH2);
+        drawPerson(rightX + 28, ry + cardRH2 / 2, iconS);
+        ctx.fillStyle = textSecondary; ctx.font = "500 17px system-ui, -apple-system, sans-serif";
+        ctx.fillText(t("ui_recipient_label", "Destinataire"), rightX + 56, ry + 30);
+        ctx.fillStyle = textPrimary; ctx.font = "600 24px system-ui, -apple-system, sans-serif";
+        ctx.fillText(ellipsize(recipientName, rCardW - 68), rightX + 56, ry + 62);
+        ctx.fillStyle = textSecondary; ctx.font = "400 18px ui-monospace, SFMono-Regular, Menlo, Monaco, monospace";
+        ctx.fillText(ellipsize(recipientAddr, rCardW - 68), rightX + 56, ry + 90);
+
+        // Security note bottom full width
+        const noteY2 = cardY + cardH - 36;
+        const lkS = 24; const lkCx = cardX + 36;
+        // Note card spanning full card width
+        const noteCardH = 56;
+        infoCard(cardX, noteY2 - noteCardH + 8, cardW, noteCardH);
+        drawLock(lkCx + lkS * 0.5, noteY2 - noteCardH * 0.1 + 8, lkS);
+        ctx.fillStyle = textSecondary; ctx.font = "400 18px system-ui, -apple-system, sans-serif";
+        ctx.textAlign = "left"; ctx.textBaseline = "middle";
+        ctx.fillText(ellipsize(secNote, cardW - 80), lkCx + lkS + 10, noteY2 - noteCardH / 2 + 8);
+      }
+
+      if (typeof canvas.toBlob === "function") {
+        return await new Promise((resolve) => { canvas.toBlob((blob) => resolve(blob), "image/png", 0.92); });
+      }
+      const dataUrl = canvas.toDataURL("image/png");
+      const res = await fetch(dataUrl);
+      return await res.blob();
+
+        }
         if (isPaymentIn) {
 
       // ── RECEIVED PAYMENT: dedicated design ──────────────────────────
