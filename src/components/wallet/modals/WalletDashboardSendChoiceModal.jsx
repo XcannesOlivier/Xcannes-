@@ -1740,7 +1740,7 @@ export default function WalletDashboardSendChoiceModal({
               }}
             >
 	              <div className={panelRect ? 'w-full' : 'mx-auto w-full md:max-w-lg'}>
-				<div className={`relative rounded-t-[22px] md:rounded-t-[22px] md:rounded-b-2xl bg-[#070a0b]/97 md:bg-black/80 md:backdrop-blur-md shadow-[0_-18px_44px_rgba(0,0,0,0.62)] px-5 md:px-6 pt-5 md:pt-6 pb-[max(env(safe-area-inset-bottom),28px)] md:pb-8 ${flowSheet === 'simple' ? 'xcannes-sheet-fade-border-green' : 'xcannes-sheet-fade-border-orange'}`}>
+				<div className={`relative rounded-t-[22px] md:rounded-t-[22px] md:rounded-b-2xl bg-elevated shadow-[0_-18px_44px_rgba(0,0,0,0.62)] px-5 md:px-6 pt-5 md:pt-6 pb-[max(env(safe-area-inset-bottom),28px)] md:pb-8 ${flowSheet === 'simple' ? 'xcannes-sheet-fade-border-green' : 'xcannes-sheet-fade-border-orange'}`}>
 				  {/* Drag handle + close button */}
 				  <div className="relative flex items-center justify-center" onPointerDown={handleFlowSheetPillDown}>
 				    <div className="md:hidden" aria-hidden>
