@@ -446,19 +446,10 @@ export default function WalletDashboardSendChoiceModal({
   // Envoi simple — two nodes connected by an arrow (direct transfer)
   const QuickScanIcon = () => (
     <svg viewBox="0 0 48 48" className="w-9 h-9 md:w-10 md:h-10" fill="none" aria-hidden>
-      {/* Source node */}
-      <circle cx="10" cy="24" r="4" className="stroke-xcannes-green/70" strokeWidth="1.6" fill="none" />
-      <circle cx="10" cy="24" r="1.6" className="fill-xcannes-green/55" />
-      {/* Arrow shaft */}
-      <line x1="15" y1="24" x2="31" y2="24" className="stroke-xcannes-green/60" strokeWidth="1.6" strokeLinecap="round" />
+      {/* Arrow shaft — bottom-left to top-right */}
+      <line x1="14" y1="34" x2="34" y2="14" className="stroke-xcannes-green/70" strokeWidth="2" strokeLinecap="round" />
       {/* Arrow head */}
-      <path d="M27 19.5L32.5 24L27 28.5" className="stroke-xcannes-green/90" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-      {/* Destination node */}
-      <circle cx="38" cy="24" r="4" className="stroke-xcannes-green/45" strokeWidth="1.6" fill="none" />
-      <circle cx="38" cy="24" r="1.6" className="fill-xcannes-green/30" />
-      {/* Speed lines above */}
-      <line x1="18" y1="18" x2="24" y2="18" className="stroke-xcannes-green/30" strokeWidth="1.3" strokeLinecap="round" />
-      <line x1="21" y1="14.5" x2="26" y2="14.5" className="stroke-xcannes-green/18" strokeWidth="1.1" strokeLinecap="round" />
+      <path d="M20 14H34V28" className="stroke-xcannes-green/90" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
     </svg>
   );
 
@@ -466,21 +457,18 @@ export default function WalletDashboardSendChoiceModal({
   const PayRequestIcon = () => (
     <svg viewBox="0 0 48 48" className="w-9 h-9 md:w-10 md:h-10" fill="none" aria-hidden>
       {/* QR corner brackets */}
-      {/* Top-left */}
-      <path d="M10 18V11h7" className="stroke-[#f5a623]/80" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-      {/* Top-right */}
-      <path d="M38 18V11h-7" className="stroke-[#f5a623]/80" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-      {/* Bottom-left */}
-      <path d="M10 30v7h7" className="stroke-[#f5a623]/80" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-      {/* Bottom-right */}
-      <path d="M38 30v7h-7" className="stroke-[#f5a623]/55" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-      {/* Inner QR dots — minimal grid hint */}
-      <rect x="17" y="17" width="4" height="4" rx="1" className="fill-[#f5a623]/50" />
-      <rect x="27" y="17" width="4" height="4" rx="1" className="fill-[#f5a623]/35" />
-      <rect x="17" y="27" width="4" height="4" rx="1" className="fill-[#f5a623]/35" />
-      {/* Center checkmark / confirm dot */}
-      <circle cx="29.5" cy="29.5" r="3.5" className="fill-[#f5a623]/15 stroke-[#f5a623]/60" strokeWidth="1.3" />
-      <path d="M27.8 29.5l1.2 1.4 2.2-2.2" className="stroke-[#f5a623]/90" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M8 17V8h9" className="stroke-[#f5a623]/55" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M40 17V8h-9" className="stroke-[#f5a623]/55" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M8 31v9h9" className="stroke-[#f5a623]/55" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M40 31v9h-9" className="stroke-[#f5a623]/55" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+      {/* Document body */}
+      <path d="M17 10h8.5L31 15.5V38H17V10z" className="stroke-[#f5a623]/80" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+      {/* Folded corner */}
+      <path d="M25.5 10v5.5H31" className="stroke-[#f5a623]/60" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+      {/* Text lines */}
+      <line x1="20" y1="21" x2="28" y2="21" className="stroke-[#f5a623]/55" strokeWidth="1.4" strokeLinecap="round" />
+      <line x1="20" y1="25" x2="28" y2="25" className="stroke-[#f5a623]/45" strokeWidth="1.4" strokeLinecap="round" />
+      <line x1="20" y1="29" x2="25" y2="29" className="stroke-[#f5a623]/35" strokeWidth="1.4" strokeLinecap="round" />
     </svg>
   );
 
@@ -1896,15 +1884,10 @@ export default function WalletDashboardSendChoiceModal({
 				            <div className="w-10 h-10 rounded-[10px] bg-white/[0.07] flex items-center justify-center flex-none shrink-0">
 				              {step.icon}
 				            </div>
-				            {/* Text + chevron */}
-				            <div className={`flex-1 min-w-0 flex items-center justify-between gap-2 ${idx < arr.length - 1 ? 'pb-5' : ''}`}>
-				              <div>
-				                <div className="text-[15px] font-light text-white leading-tight">{step.title}</div>
-				                <div className="mt-1 text-[12px] text-white/45 font-light leading-relaxed">{step.desc}</div>
-				              </div>
-				              <svg viewBox="0 0 24 24" className="w-4 h-4 text-white/25 flex-none" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-				                <polyline points="9 18 15 12 9 6" />
-				              </svg>
+				            {/* Text */}
+				            <div className={`flex-1 min-w-0 ${idx < arr.length - 1 ? 'pb-5' : ''}`}>
+				              <div className="text-[15px] font-light text-white leading-tight">{step.title}</div>
+				              <div className="mt-1 text-[12px] text-white/45 font-light leading-relaxed">{step.desc}</div>
 				            </div>
 				          </div>
 				        ))}
