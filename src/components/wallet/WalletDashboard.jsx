@@ -85,6 +85,8 @@ export default function WalletDashboard({
 
   // ── UI state (needs to exist before callbacks deps) ───────
   const [activeAction, setActiveAction] = useState(null);
+  // Nonce that bumps on every desktop navigation action to force-close currency selectors
+  const [desktopCsNonce, setDesktopCsNonce] = useState(0);
 
   // ── Transaction progress modal ─────────────────────────────
   const {
@@ -579,6 +581,19 @@ export default function WalletDashboard({
     setHighlightTransactionId(null);
     handleOpenGlobalStatement?.();
   }, [handleOpenGlobalStatement, setHighlightTransactionId]);
+
+  // ── Desktop currency selector close nonce ──────────────────
+  // Bumps on every navigation action so the desktop WalletCurrencySelector
+  // (Ajouter une devise) always closes, even when activeAction stays the same.
+  useEffect(() => {
+    if (!isDesktopPanel) return;
+    setDesktopCsNonce(n => n + 1);
+  }, [activeAction, desktopSettingsPage, showCurrencyStatement, walletInfoOpen, isDesktopPanel]);
+
+  const handleActionWithCsClose = useCallback((action) => {
+    if (isDesktopPanel) setDesktopCsNonce(n => n + 1);
+    handleAction(action);
+  }, [handleAction, isDesktopPanel]);
 
   const handleAddDevise = useCallback(
     async (code) => {
@@ -1181,7 +1196,7 @@ export default function WalletDashboard({
             </div>
             {/* Vertical action column — desktop only */}
             <div className="hidden lg:flex flex-col min-h-0 border-l border-white/5 w-[230px] shrink-0">
-              <WalletDashboardActionRow onAction={handleAction} vertical scrolled={tokenListScrolled} />
+              <WalletDashboardActionRow onAction={handleActionWithCsClose} vertical scrolled={tokenListScrolled} />
               <div className="border-t border-white/5 flex flex-col gap-1 px-5 py-5">
                 <WalletCurrencySelector
                   value=""
@@ -1197,7 +1212,7 @@ export default function WalletDashboard({
                   placeholder={t('ui_search_all_currencies_c5d6e7f8', 'Search currency...')}
                   excludeCodes={['USD', 'RLUSD', 'XRP']}
                   showQuickAdd={false}
-                  closeSignal={activeAction}
+                  closeSignal={desktopCsNonce}
                   walletLabel={walletLabel || null}
                   walletAddress={backendWalletAddress || null}
                   addedCurrencyCodes={addedCurrencyCodes}
