@@ -1835,7 +1835,7 @@ export default function WalletDashboardSendChoiceModal({
 				          <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
 				          <path d="M7 11V7a5 5 0 0 1 10 0v4" />
 				        </svg>
-				        <span>{t('ui_security_bank_note', 'Vos fonds sont protégés par un chiffrement de niveau bancaire.')}</span>
+				        <span>				        {t('ui_security_confirmation_note', 'Chaque transaction nécessite une confirmation.')}</span>
 				      </div>
 				    </>
 				  ) : (
