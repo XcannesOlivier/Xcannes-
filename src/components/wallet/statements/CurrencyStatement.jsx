@@ -1172,8 +1172,9 @@ export default function CurrencyStatement({
     const isConversionShare = detailIsConversion;
 
     const buildCardBlob = async () => {
+      const isPortrait = typeof window !== "undefined" && window.innerWidth < 768;
       const w = 1080;
-      const h = 720;
+      const h = isPortrait ? 1350 : 600;
       const canvas = document.createElement("canvas");
       canvas.width = w;
       canvas.height = h;
@@ -1203,110 +1204,194 @@ export default function CurrencyStatement({
         return out ? out + ell : ell;
       };
 
+      const txIsDebit = detailTx?.type === "debit";
+      const accentMain = txIsDebit ? "#f87171" : "#22c55e";
+      const accentGlowInner = txIsDebit ? "rgba(248,113,113,0.16)" : "rgba(34,197,94,0.16)";
+      const accentGlowOuter = txIsDebit ? "rgba(248,113,113,0)" : "rgba(34,197,94,0)";
+
       // Background
       ctx.fillStyle = "#0b0f10";
       ctx.fillRect(0, 0, w, h);
-      const glow = ctx.createRadialGradient(w * 0.5, h * 0.25, 0, w * 0.5, h * 0.25, h * 0.9);
-      glow.addColorStop(0, "rgba(34,197,94,0.22)");
-      glow.addColorStop(0.55, "rgba(34,197,94,0.08)");
-      glow.addColorStop(1, "rgba(34,197,94,0)");
+      const glow = ctx.createRadialGradient(w * 0.5, h * 0.28, 0, w * 0.5, h * 0.28, h * 0.85);
+      glow.addColorStop(0, accentGlowInner);
+      glow.addColorStop(1, accentGlowOuter);
       ctx.fillStyle = glow;
       ctx.fillRect(0, 0, w, h);
 
-      // Card
-      const pad = 56;
+      const pad = 52;
       const cardX = pad;
       const cardY = pad;
       const cardW = w - pad * 2;
       const cardH = h - pad * 2;
-      roundedRect(cardX, cardY, cardW, cardH, 42);
-      ctx.fillStyle = "rgba(255,255,255,0.06)";
+      roundedRect(cardX, cardY, cardW, cardH, 44);
+      ctx.fillStyle = "rgba(255,255,255,0.05)";
       ctx.fill();
-      ctx.strokeStyle = "rgba(255,255,255,0.10)";
-      ctx.lineWidth = 2;
+      ctx.strokeStyle = "rgba(255,255,255,0.09)";
+      ctx.lineWidth = 1.5;
       ctx.stroke();
 
-      // Header — "Votre compte: <nom> • <adresse tronquée à moitié>" at top-left
+      // Account header with accent dot
       {
-        const accountName = walletLabelText;
         const addrRaw = String(walletAddress || "").trim();
-        const half = addrRaw ? `${addrRaw.slice(0, Math.ceil(addrRaw.length / 2))}…` : "";
-        const accountHeader = `${t("ui_your_account_label", "Votre compte")}: ${accountName}${half ? " • " + half : ""}`;
-        ctx.fillStyle = "rgba(255,255,255,0.70)";
-        ctx.font = "600 26px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+        const addrShort = addrRaw ? `${addrRaw.slice(0, 8)}…${addrRaw.slice(-6)}` : "";
+        const accountLine = `${walletLabelText}${addrShort ? "  ·  " + addrShort : ""}`;
+        const dotR = 6;
+        const headerY = cardY + 50;
+        ctx.beginPath();
+        ctx.arc(cardX + 44 + dotR, headerY - 6, dotR, 0, Math.PI * 2);
+        ctx.fillStyle = accentMain;
+        ctx.fill();
+        ctx.fillStyle = "rgba(255,255,255,0.50)";
+        ctx.font = "500 22px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
         ctx.textAlign = "left";
         ctx.textBaseline = "alphabetic";
-        ctx.fillText(ellipsize(accountHeader, cardW - 88), cardX + 44, cardY + 62);
+        ctx.fillText(ellipsize(accountLine, cardW - 88), cardX + 44 + dotR * 2 + 8, headerY);
       }
 
-      ctx.fillStyle = "rgba(255,255,255,0.90)";
-      ctx.font = "700 44px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
-      ctx.fillText(typeLabel, cardX + 44, cardY + 120);
+      if (isPortrait) {
+        // === PORTRAIT (mobile) ===
+        ctx.fillStyle = "rgba(255,255,255,0.88)";
+        ctx.font = "700 50px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+        ctx.textAlign = "left";
+        ctx.fillText(ellipsize(typeLabel, cardW - 88), cardX + 44, cardY + 132);
 
-      // Amount
-      ctx.font = "800 86px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace";
-      ctx.fillStyle = detailTx?.type === "debit" ? "#f87171" : "#22c55e";
-      ctx.fillText(amountLabel, cardX + 44, cardY + 220);
+        ctx.font = "800 96px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace";
+        ctx.fillStyle = accentMain;
+        ctx.textAlign = "center";
+        ctx.fillText(ellipsize(amountLabel, cardW - 40), cardX + cardW / 2, cardY + 256);
 
-      // Meta
-      const metaY = cardY + 270;
-      ctx.fillStyle = "rgba(255,255,255,0.55)";
-      ctx.font = "600 22px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
-      ctx.fillText(t("ui_date_label_7a2c1b9d5e", "Date"), cardX + 44, metaY);
-      ctx.fillText(t("ui_status_label", "Statut"), cardX + 44, metaY + 64);
-      if (showTaux) {
-        ctx.fillText(t("ui_fx_rate", "Taux"), cardX + 44, metaY + 128);
-      }
-      if (isConversionShare) {
-        ctx.fillText(t("ui_account", "Compte"), cardX + 480, metaY);
-      }
+        ctx.strokeStyle = "rgba(255,255,255,0.09)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(cardX + 44, cardY + 286);
+        ctx.lineTo(cardX + cardW - 44, cardY + 286);
+        ctx.stroke();
 
-      ctx.fillStyle = "rgba(255,255,255,0.86)";
-      ctx.font = "600 26px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
-      ctx.fillText(dateLabel, cardX + 44, metaY + 34);
-      ctx.fillText(statusLabel || "—", cardX + 44, metaY + 98);
-      if (showTaux) {
-        ctx.fillText(tauxLabel || "—", cardX + 44, metaY + 162);
-      }
-      if (isConversionShare) {
-        ctx.fillText(walletLabelText || "—", cardX + 480, metaY + 34);
-      }
+        let my = cardY + 344;
+        const col1x = cardX + 44;
+        const col2x = cardX + cardW / 2 + 20;
+        ctx.textAlign = "left";
+        ctx.fillStyle = "rgba(255,255,255,0.42)";
+        ctx.font = "600 20px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+        ctx.fillText(t("ui_date_label_7a2c1b9d5e", "Date"), col1x, my);
+        ctx.fillText(t("ui_status_label", "Statut"), col2x, my);
+        ctx.fillStyle = "rgba(255,255,255,0.88)";
+        ctx.font = "600 26px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+        ctx.fillText(ellipsize(dateLabel, cardW / 2 - 44), col1x, my + 34);
+        ctx.fillText(ellipsize(statusLabel || "—", cardW / 2 - 44), col2x, my + 34);
+        my += 100;
 
-      if (!isConversionShare) {
-        // Counterparty
-        const cpTitle = counterpartyTitle || t("ui_counterparty", "Contrepartie");
-        const cpY = metaY + (showTaux ? 214 : 150);
-        ctx.fillStyle = "rgba(255,255,255,0.55)";
+        if (showTaux && tauxLabel) {
+          ctx.fillStyle = "rgba(255,255,255,0.42)";
+          ctx.font = "600 20px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+          ctx.fillText(t("ui_fx_rate", "Taux"), col1x, my);
+          ctx.fillStyle = "rgba(255,255,255,0.88)";
+          ctx.font = "600 26px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+          ctx.fillText(ellipsize(tauxLabel, cardW / 2 - 44), col1x, my + 34);
+          my += 100;
+        }
+        if (isConversionShare) {
+          ctx.fillStyle = "rgba(255,255,255,0.42)";
+          ctx.font = "600 20px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+          ctx.fillText(t("ui_account", "Compte"), col2x, my - 100);
+          ctx.fillStyle = "rgba(255,255,255,0.88)";
+          ctx.font = "600 26px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+          ctx.fillText(ellipsize(walletLabelText || "—", cardW / 2 - 44), col2x, my - 100 + 34);
+        } else {
+          const cpTitle = counterpartyTitle || t("ui_counterparty", "Contrepartie");
+          ctx.fillStyle = "rgba(255,255,255,0.42)";
+          ctx.font = "600 20px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+          ctx.fillText(cpTitle, col1x, my);
+          ctx.fillStyle = "rgba(255,255,255,0.88)";
+          ctx.font = "600 30px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+          ctx.fillText(ellipsize(nameLabel || t("ui_no_name_found", "Aucun nom trouvé"), cardW - 88), col1x, my + 38);
+          if (addressLabel) {
+            const addrDisp = addressLabel.length > 28 ? `${addressLabel.slice(0, 12)}…${addressLabel.slice(-8)}` : addressLabel;
+            ctx.fillStyle = "rgba(255,255,255,0.45)";
+            ctx.font = "500 20px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace";
+            ctx.fillText(addrDisp, col1x, my + 82);
+          }
+        }
+
+      } else {
+        // === LANDSCAPE (desktop) ===
+        const splitX = cardX + Math.round(cardW * 0.5);
+
+        ctx.fillStyle = "rgba(255,255,255,0.88)";
+        ctx.font = "700 44px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+        ctx.textAlign = "left";
+        ctx.fillText(ellipsize(typeLabel, splitX - cardX - 72), cardX + 44, cardY + 126);
+
+        ctx.font = "800 72px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace";
+        ctx.fillStyle = accentMain;
+        ctx.fillText(ellipsize(amountLabel, splitX - cardX - 44), cardX + 44, cardY + 232);
+
+        ctx.strokeStyle = "rgba(255,255,255,0.09)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(splitX, cardY + 24);
+        ctx.lineTo(splitX, cardY + cardH - 24);
+        ctx.stroke();
+
+        const rx = splitX + 44;
+        const rightW = cardX + cardW - rx - 16;
+        let ry = cardY + 92;
+
+        ctx.fillStyle = "rgba(255,255,255,0.42)";
+        ctx.font = "600 18px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+        ctx.fillText(t("ui_date_label_7a2c1b9d5e", "Date"), rx, ry);
+        ctx.fillStyle = "rgba(255,255,255,0.88)";
         ctx.font = "600 22px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
-        ctx.fillText(cpTitle, cardX + 44, cpY);
+        ctx.fillText(ellipsize(dateLabel, rightW), rx, ry + 28);
+        ry += 72;
 
-        ctx.fillStyle = "rgba(255,255,255,0.90)";
-        ctx.font = "650 28px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
-        ctx.fillText(
-          nameLabel || t("ui_no_name_found", "Aucun nom trouvé"),
-          cardX + 44,
-          cpY + 38,
-        );
+        ctx.fillStyle = "rgba(255,255,255,0.42)";
+        ctx.font = "600 18px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+        ctx.fillText(t("ui_status_label", "Statut"), rx, ry);
+        ctx.fillStyle = "rgba(255,255,255,0.88)";
+        ctx.font = "600 22px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+        ctx.fillText(ellipsize(statusLabel || "—", rightW), rx, ry + 28);
+        ry += 72;
 
-        if (addressLabel) {
-          const addr =
-            addressLabel.length > 26
-              ? `${addressLabel.slice(0, 10)}…${addressLabel.slice(-8)}`
-              : addressLabel;
-          ctx.fillStyle = "rgba(255,255,255,0.60)";
-          ctx.font =
-            "600 22px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace";
-          ctx.fillText(addr, cardX + 44, cpY + 78);
+        if (showTaux && tauxLabel) {
+          ctx.fillStyle = "rgba(255,255,255,0.42)";
+          ctx.font = "600 18px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+          ctx.fillText(t("ui_fx_rate", "Taux"), rx, ry);
+          ctx.fillStyle = "rgba(255,255,255,0.88)";
+          ctx.font = "600 22px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+          ctx.fillText(ellipsize(tauxLabel, rightW), rx, ry + 28);
+          ry += 72;
+        }
+        if (isConversionShare) {
+          ctx.fillStyle = "rgba(255,255,255,0.42)";
+          ctx.font = "600 18px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+          ctx.fillText(t("ui_account", "Compte"), rx, ry);
+          ctx.fillStyle = "rgba(255,255,255,0.88)";
+          ctx.font = "600 22px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+          ctx.fillText(ellipsize(walletLabelText || "—", rightW), rx, ry + 28);
+        } else {
+          const cpTitle = counterpartyTitle || t("ui_counterparty", "Contrepartie");
+          ctx.fillStyle = "rgba(255,255,255,0.42)";
+          ctx.font = "600 18px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+          ctx.fillText(cpTitle, rx, ry);
+          ctx.fillStyle = "rgba(255,255,255,0.88)";
+          ctx.font = "600 24px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+          ctx.fillText(ellipsize(nameLabel || t("ui_no_name_found", "Aucun nom trouvé"), rightW), rx, ry + 28);
+          if (addressLabel) {
+            const addrDisp = addressLabel.length > 20 ? `${addressLabel.slice(0, 8)}…${addressLabel.slice(-6)}` : addressLabel;
+            ctx.fillStyle = "rgba(255,255,255,0.40)";
+            ctx.font = "500 17px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace";
+            ctx.fillText(addrDisp, rx, ry + 60);
+          }
         }
       }
 
-      // Discreet centered brand footer
-      ctx.fillStyle = "rgba(255,255,255,0.35)";
-      ctx.font = "600 18px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+      // Brand footer
+      ctx.fillStyle = "rgba(255,255,255,0.25)";
+      ctx.font = "600 16px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
       ctx.textAlign = "center";
       ctx.textBaseline = "alphabetic";
-      ctx.fillText("xcannes", cardX + cardW / 2, cardY + cardH - 28);
-      ctx.textAlign = "left";
+      ctx.fillText("XCANNES", cardX + cardW / 2, cardY + cardH - 22);
 
       return await new Promise((resolve) =>
         canvas.toBlob((b) => resolve(b || null), "image/png", 0.92),

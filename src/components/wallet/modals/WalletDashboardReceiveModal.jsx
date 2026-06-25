@@ -719,21 +719,33 @@ export default function WalletDashboardReceiveModal({
       let ty = Math.round(titleGap / 2);
       ctx.textAlign = 'center';
       ctx.textBaseline = 'top';
+      const lastTitleIdx = titleLinesArr.length - 1;
+      const dotRadius = Math.max(6, Math.round(titleFontSize * 0.28));
+
       titleLinesArr.forEach((line, idx) => {
         ctx.font = line.font;
         ctx.fillStyle = line.color;
         ctx.fillText(line.text, exportWidth / 2, ty);
-        // Green dot to the right of the first title line only
-        if (idx === 0) {
-          const textW = ctx.measureText(line.text).width;
-          const dotRadius = Math.max(5, Math.round(titleFontSize * 0.22));
-          const dotX = exportWidth / 2 + textW / 2 + dotRadius + Math.round(titleFontSize * 0.18);
-          const dotY = ty + titleFontSize / 2;
+
+        // Dot placed just before the last word of the last title line
+        if (idx === lastTitleIdx) {
+          const words = line.text.split(' ');
+          const lastWord = words[words.length - 1];
+          const prefixText = words.slice(0, -1).join(' ');
+          const lineW = ctx.measureText(line.text).width;
+          const prefixW = prefixText ? ctx.measureText(prefixText + ' ').width : 0;
+          // x of left edge of last word
+          const lineLeft = exportWidth / 2 - lineW / 2;
+          const lastWordX = lineLeft + prefixW;
+          // dot centered vertically on the cap-height of the text
+          const dotX = lastWordX - dotRadius - Math.round(titleFontSize * 0.14);
+          const dotY = ty + titleFontSize * 0.5;
           ctx.beginPath();
           ctx.arc(dotX, dotY, dotRadius, 0, Math.PI * 2);
           ctx.fillStyle = accentColor;
           ctx.fill();
         }
+
         ty += line.lineHeight;
       });
     }
