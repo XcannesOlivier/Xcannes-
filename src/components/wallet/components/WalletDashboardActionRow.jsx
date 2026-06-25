@@ -15,7 +15,7 @@ function useTouchHover(delay = 300) {
 
 const CARD_CLASS = "rounded-[16px] bg-gradient-to-b from-[#101415] to-[#0d1214] ring-1 ring-white/[0.04] ring-inset shadow-[-3px_3px_10px_2px_rgba(255,255,255,0.06),0_4px_12px_rgba(0,0,0,0.50),inset_0_-12px_18px_rgba(0,0,0,0.75)]";
 
-export default function WalletDashboardActionRow({ onAction, vertical = false }) {
+export default function WalletDashboardActionRow({ onAction, vertical = false, scrolled = false }) {
   const { t } = useTranslation("common");
   const cashEnabled = MOONPAY_UI_ENABLED || TOPPER_UI_ENABLED;
 
@@ -26,8 +26,8 @@ export default function WalletDashboardActionRow({ onAction, vertical = false })
 
   if (vertical) {
     return (
-      <div className="flex flex-col gap-4 h-full py-5 px-8">
-        <div className={`flex-1 ${CARD_CLASS}`}>
+      <div className="flex flex-col gap-4 h-full py-5 px-8" data-scrolled={scrolled}>
+        <div className={`flex-1 wallet-action-grid-card ${CARD_CLASS}`}>
           <button type="button" onClick={() => onAction("sendChoice")} onTouchStart={sendTouch.onTouchStart} onTouchEnd={sendTouch.onTouchEnd} className={`wallet-action-btn wallet-action-send group w-full h-full justify-center${sendTouch.isTouched ? " is-touched" : ""}`}>
             <div className="wallet-action-icon">
               <svg className="w-[22px] h-[22px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -37,7 +37,7 @@ export default function WalletDashboardActionRow({ onAction, vertical = false })
             <span className="wallet-action-label !text-[15px] !font-light">{t("ui_send_bee4f9e2f5", "Envoyer")}</span>
           </button>
         </div>
-        <div className={`flex-1 ${CARD_CLASS}`}>
+        <div className={`flex-1 wallet-action-grid-card ${CARD_CLASS}`}>
           <button type="button" onClick={() => onAction("receive")} onTouchStart={receiveTouch.onTouchStart} onTouchEnd={receiveTouch.onTouchEnd} className={`wallet-action-btn wallet-action-receive group w-full h-full justify-center${receiveTouch.isTouched ? " is-touched" : ""}`}>
             <div className="wallet-action-icon">
               <svg className="w-[22px] h-[22px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -47,7 +47,7 @@ export default function WalletDashboardActionRow({ onAction, vertical = false })
             <span className="wallet-action-label !text-[15px] !font-light">{t("ui_receive_127eab0703", "Recevoir")}</span>
           </button>
         </div>
-        <div className={`flex-1 ${CARD_CLASS}`}>
+        <div className={`flex-1 wallet-action-grid-card ${CARD_CLASS}`}>
           <button type="button" onClick={() => onAction("swap")} onTouchStart={swapTouch.onTouchStart} onTouchEnd={swapTouch.onTouchEnd} className={`wallet-action-btn wallet-action-swap group w-full h-full justify-center${swapTouch.isTouched ? " is-touched" : ""}`}>
             <div className="wallet-action-icon">
               <svg className="w-[22px] h-[22px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -57,7 +57,7 @@ export default function WalletDashboardActionRow({ onAction, vertical = false })
             <span className="wallet-action-label !text-[15px] !font-light">{t("ui_convert_e0fbc97f15", "Convertir")}</span>
           </button>
         </div>
-        <div className={`flex-1 ${CARD_CLASS}`}>
+        <div className={`flex-1 wallet-action-grid-card ${CARD_CLASS}`}>
           <button type="button" onClick={() => { if (!cashEnabled) return; onAction("cashChoice"); }} onTouchStart={cashTouch.onTouchStart} onTouchEnd={cashTouch.onTouchEnd} disabled={!cashEnabled} aria-disabled={!cashEnabled} className={[`wallet-action-btn wallet-action-buysell group w-full h-full justify-center${cashTouch.isTouched ? " is-touched" : ""}`, !cashEnabled ? "opacity-40 cursor-not-allowed" : ""].join(" ")}>
             <div className="wallet-action-icon">
               <svg className="w-[22px] h-[22px]" viewBox="0 0 24 24" fill="none">

@@ -1165,7 +1165,7 @@ export default function WalletDashboard({
             </div>
             {/* Vertical action column — desktop only */}
             <div className="hidden lg:flex flex-col min-h-0 border-l border-white/5 w-[230px] shrink-0">
-              <WalletDashboardActionRow onAction={handleAction} vertical />
+              <WalletDashboardActionRow onAction={handleAction} vertical scrolled={tokenListScrolled} />
               <div className="border-t border-white/5 flex flex-col gap-1 px-5 py-5">
                 <WalletCurrencySelector
                   value=""
