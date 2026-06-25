@@ -395,7 +395,7 @@ export default function WalletDashboardHeader({
                     {/* Multi-wallet dropdown — smooth animated */}
                     {isSwitcherOpen && hasMultipleWallets && (
                       <div
-                        className={`absolute z-50 -left-px top-full mt-0 w-[260px] rounded-b-[12px] bg-white/[0.05] border-l border-r border-b border-white/[0.18] shadow-[0_12px_48px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.06),inset_1px_0_0_rgba(255,255,255,0.04),inset_-1px_0_0_rgba(255,255,255,0.04)] max-h-[70vh] md:max-h-[340px] overflow-y-auto overflow-x-hidden origin-top transition-all duration-[100ms] ${
+                        className={`absolute z-50 -left-px top-full mt-0 w-[260px] rounded-b-[12px] bg-[#171B1C] border-l border-r border-b border-white/[0.18] shadow-[0_12px_48px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.06),inset_1px_0_0_rgba(255,255,255,0.04),inset_-1px_0_0_rgba(255,255,255,0.04)] max-h-[70vh] md:max-h-[340px] overflow-y-auto overflow-x-hidden origin-top transition-all duration-[100ms] ${
                           isSwitcherVisible
                             ? "opacity-100 scale-y-100 translate-y-0 ease-[cubic-bezier(0.16,1,0.3,1)]"
                             : "opacity-0 scale-y-[0.92] -translate-y-1 ease-[cubic-bezier(0.4,0,1,1)]"
