@@ -1840,58 +1840,87 @@ export default function WalletDashboardSendChoiceModal({
 				    </>
 				  ) : (
 				    <>
-				      <div className="mt-3 pb-5 text-[19px] md:text-[21px] leading-tight text-white/95 font-light text-center tracking-tight">
-				        {t('ui_send_choice_pay_request_title', 'Payer une demande')}
-				      </div>
-				      <div className="h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent" aria-hidden />
-				      <div className="mt-7 md:mt-8 max-h-[62vh] md:max-h-[60vh] overflow-y-auto overscroll-contain pr-1">
-				        <div className="flex flex-col gap-5 md:gap-6">
-				          {[
-				            {
-				              title: t('home_v2_essentials_2_modal_flow_1_step_1_title', 'Recevoir la demande'),
-				              desc: t('home_v2_essentials_2_modal_flow_1_step_1_desc', 'Le destinataire vous envoie une demande contenant le montant, la devise, son compte.'),
-				              note: t('home_v2_essentials_2_modal_flow_1_step_1_note', 'Elle peut être reçue par message, e-mail, SMS, ou présentée en face à face via un QR code.'),
-				            },
-				            {
-				              title: t('home_v2_essentials_2_modal_flow_1_step_2_title', 'Charger la demande'),
-				              desc: t('home_v2_essentials_2_modal_flow_1_step_2_desc', 'Depuis votre compte, importez la demande en :'),
-				              details: [
-				                t('home_v2_essentials_2_modal_flow_1_step_2_detail_1', 'Scannant le QR code'),
-				                t('home_v2_essentials_2_modal_flow_1_step_2_detail_2', 'Chargeant une image du QR'),
-				                t('home_v2_essentials_2_modal_flow_1_step_2_detail_3', 'Ou collant le code reçu'),
-				              ],
-				            },
-				            {
-				              title: t('home_v2_essentials_2_modal_flow_1_step_3_title', 'Vérifier et confirmer'),
-				              desc: t('home_v2_essentials_2_modal_flow_1_step_3_desc', 'Les informations s’affichent automatiquement. Vérifiez-les, puis confirmez la transaction.'),
-				              note: t('home_v2_essentials_2_modal_flow_1_step_3_note', 'Chaque paiement nécessite une validation explicite pour garantir sécurité et contrôle.'),
-				            },
-				          ].map((step, idx) => (
-				            <div key={idx} className="rounded-[14px] bg-white/[0.05] px-4 py-4">
-				              <div className="flex items-start gap-3.5">
-				                <div className="mt-[1px] w-9 h-9 flex-none shrink-0 rounded-full ring-inset flex items-center justify-center text-[14px] font-light leading-none bg-white/[0.10] text-[#f5a623]/90 ring-1 ring-[#f5a623]/25">
-				                  {idx + 1}
-				                </div>
-				                <div className="min-w-0">
-				                  <div className="text-[13px] md:text-[14px] leading-snug text-white/90 font-light">{step.title}</div>
-				                  <div className="mt-1 text-[12px] md:text-[13px] leading-relaxed text-white/60 font-light">{step.desc}</div>
-				                  {step.details?.length ? (
-				                    <ul className="mt-2.5 space-y-1.5 list-disc pl-4 text-[12px] md:text-[13px] text-white/50 font-light">
-				                      {step.details.map((d, j) => <li key={j}>{d}</li>)}
-				                    </ul>
-				                  ) : null}
-				                  {step.note ? (
-				                    <div className="mt-2.5 text-[12px] md:text-[13px] leading-relaxed text-white/45 font-light">{step.note}</div>
-				                  ) : null}
-				                </div>
-				              </div>
-				            </div>
-				          ))}
+				      {/* Header: icon + title row + close is already above */}
+				      <div className="flex items-start gap-3.5 mt-4">
+				        <div className="w-10 h-10 rounded-full border border-[#f5a623]/40 bg-[#f5a623]/[0.08] flex items-center justify-center flex-none">
+				          <svg viewBox="0 0 24 24" className="w-5 h-5 text-[#f5a623]" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+				            <line x1="22" y1="2" x2="11" y2="13" />
+				            <polygon points="22 2 15 22 11 13 2 9 22 2" />
+				          </svg>
+				        </div>
+				        <div className="flex-1 min-w-0">
+				          <div className="text-[19px] md:text-[20px] font-semibold text-white leading-tight">
+				            {t('ui_send_choice_pay_request_title', 'Payer une demande')}
+				          </div>
+				          <div className="mt-1 text-[12px] text-white/40 font-light leading-snug">
+				            {t('ui_payreq_steps_subtitle', '3 étapes simples pour régler une demande en toute sécurité.')}
+				          </div>
 				        </div>
 				      </div>
-				      <div className="hidden md:flex pointer-events-none justify-center pt-6 pb-2" aria-hidden>
-				        <span className="block w-[120px] h-[4px] rounded-full bg-white/10" />
+				      {/* Steps with vertical dashed connector */}
+				      <div className="mt-6 flex flex-col">
+				        {[
+				          {
+				            title: t('home_v2_essentials_2_modal_flow_1_step_1_title', 'Recevoir la demande'),
+				            desc: t('ui_payreq_step1_desc_v3', 'Le destinataire vous envoie le montant, la devise et son compte.'),
+				            icon: (<svg viewBox="0 0 24 24" className="w-5 h-5 text-[#f5a623]/80" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" /></svg>),
+				          },
+				          {
+				            title: t('home_v2_essentials_2_modal_flow_1_step_2_title', 'Charger la demande'),
+				            desc: t('ui_payreq_step2_desc_v3', 'Importez la demande en scannant le QR code, une image ou en collant le code reçu.'),
+				            icon: (<svg viewBox="0 0 24 24" className="w-5 h-5 text-[#f5a623]/80" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>),
+				          },
+				          {
+				            title: t('home_v2_essentials_2_modal_flow_1_step_3_title', 'Vérifier et confirmer'),
+				            desc: t('ui_payreq_step3_desc_v3', 'Vérifiez les informations, puis confirmez la transaction en toute sécurité.'),
+				            icon: (<svg viewBox="0 0 24 24" className="w-5 h-5 text-[#f5a623]/80" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /><polyline points="9 12 11 14 15 10" /></svg>),
+				          },
+				        ].map((step, idx, arr) => (
+				          <div key={idx} className="flex gap-3 items-start">
+				            {/* Number + dashed line */}
+				            <div className="flex flex-col items-center flex-none" style={{ width: '32px' }}>
+				              <div className="w-8 h-8 rounded-full border border-[#f5a623]/50 bg-white/[0.05] flex items-center justify-center text-[13px] text-[#f5a623] font-light leading-none shrink-0">
+				                {idx + 1}
+				              </div>
+				              {idx < arr.length - 1 && (
+				                <div className="flex-1 w-px my-2" style={{ minHeight: '22px', background: 'repeating-linear-gradient(to bottom, rgba(245,166,35,0.35) 0px, rgba(245,166,35,0.35) 4px, transparent 4px, transparent 8px)' }} />
+				              )}
+				            </div>
+				            {/* Icon box */}
+				            <div className="w-10 h-10 rounded-[10px] bg-white/[0.07] flex items-center justify-center flex-none shrink-0">
+				              {step.icon}
+				            </div>
+				            {/* Text + chevron */}
+				            <div className={`flex-1 min-w-0 flex items-center justify-between gap-2 ${idx < arr.length - 1 ? 'pb-5' : ''}`}>
+				              <div>
+				                <div className="text-[15px] font-semibold text-white leading-tight">{step.title}</div>
+				                <div className="mt-1 text-[12px] text-white/45 font-light leading-relaxed">{step.desc}</div>
+				              </div>
+				              <svg viewBox="0 0 24 24" className="w-4 h-4 text-white/25 flex-none" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+				                <polyline points="9 18 15 12 9 6" />
+				              </svg>
+				            </div>
+				          </div>
+				        ))}
 				      </div>
+				      {/* Security note */}
+				      <div className="mt-5 flex items-start gap-2 rounded-[12px] bg-white/[0.04] px-4 py-3">
+				        <svg viewBox="0 0 24 24" className="w-4 h-4 text-white/30 flex-none mt-[1px]" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+				          <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+				          <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+				        </svg>
+				        <span className="text-[12px] text-white/35 font-light leading-relaxed">
+				          {t('home_v2_essentials_2_modal_flow_1_step_3_note', 'Chaque paiement nécessite une validation explicite pour garantir sécurité et contrôle.')}
+				        </span>
+				      </div>
+				      {/* CTA button */}
+				      <button
+				        type="button"
+				        onClick={closeFlowSheet}
+				        className="mt-5 w-full h-[52px] rounded-full bg-[#f5a623] hover:brightness-110 active:brightness-90 transition-all flex items-center justify-center text-black font-semibold text-[16px]"
+				      >
+				        {t('ui_understood', 'Compris')}
+				      </button>
 				    </>
 				  )}
 				</div>
