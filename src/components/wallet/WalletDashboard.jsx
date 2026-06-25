@@ -849,7 +849,7 @@ export default function WalletDashboard({
                 <WalletDashboardActionRow onAction={handleAction} />
               </div>
             </div>
-            <div className="flex-1 min-w-0 flex flex-col min-h-0 pb-[20px] md:pb-0">
+            <div key={wallet} className="flex-1 min-w-0 flex flex-col min-h-0 pb-[20px] md:pb-0">
             <WalletDashboardTokenList
               tokens={tokenListTokens}
               renderTokenRow={renderTokenRow}
