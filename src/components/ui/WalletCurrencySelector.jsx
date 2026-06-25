@@ -96,6 +96,7 @@ export default function WalletCurrencySelector({
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
+  const [entryAnimateReady, setEntryAnimateReady] = useState(false);
   const [walletInfoOpen, setWalletInfoOpen] = useState(false);
   const [walletAddressExpanded, setWalletAddressExpanded] = useState(false);
   const [walletCopyNotice, setWalletCopyNotice] = useState("");
@@ -169,6 +170,37 @@ export default function WalletCurrencySelector({
       .filter(Boolean);
     return new Set([...DEFAULT_WALLET_CURRENCIES, ...dynamicCodes]);
   }, [addedCurrencyCodes]);
+
+  const entryAnimationEnabled = open && fullscreen;
+
+  useEffect(() => {
+    if (!entryAnimationEnabled) {
+      setEntryAnimateReady(false);
+      return undefined;
+    }
+    setEntryAnimateReady(false);
+    const rafId = window.requestAnimationFrame(() => {
+      setEntryAnimateReady(true);
+    });
+    return () => {
+      window.cancelAnimationFrame(rafId);
+    };
+  }, [entryAnimationEnabled]);
+
+  const getEntryAnimationStyle = (index, direction = "left") => {
+    if (!entryAnimationEnabled) return undefined;
+    const delay = Math.max(0, Number(index) || 0) * 50;
+    const offset = direction === "right" ? 30 : -30;
+    return {
+      opacity: entryAnimateReady ? 1 : 0,
+      transform: `translate3d(${entryAnimateReady ? 0 : offset}px, 0, 0)`,
+      transitionProperty: "transform, opacity",
+      transitionDuration: "340ms",
+      transitionTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)",
+      transitionDelay: `${delay}ms`,
+      willChange: "transform, opacity",
+    };
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -644,8 +676,9 @@ export default function WalletCurrencySelector({
                         </span>
                       </div>
                       {isAlreadyAdded ? (
-                        <span className="text-[12px] text-white/55 shrink-0">
-                          {t("ui_currency_already_added", "Déjà ajoutée")}
+                        <span className="text-[12px] text-white/55 shrink-0 inline-flex items-center gap-1.5">
+                          <span className="text-xcannes-green text-[13px] leading-none" aria-hidden>✓</span>
+                          <span>{t("ui_currency_already_added_short", "ajoutée")}</span>
                         </span>
                       ) : (
                         <AddCurrencyLogo className="w-4 h-4 text-xcannes-green shrink-0" />
@@ -765,7 +798,7 @@ export default function WalletCurrencySelector({
                           {t("ui_popular_currencies", "Populaires")}
                         </div>
                         <div className="grid grid-cols-5 gap-2">
-                          {popularCurrencies.map((c) => {
+                          {popularCurrencies.map((c, index) => {
                             const active = normalizeCode(c.code) === normalizeCode(value);
                             return (
                               <button
@@ -781,6 +814,7 @@ export default function WalletCurrencySelector({
                                     ? "bg-xcannes-green/10 ring-xcannes-green/25 text-white"
                                     : "bg-white/[0.03] ring-white/[0.07] text-white/80 hover:bg-white/[0.06] hover:ring-white/15",
                                 ].join(" ")}
+                                style={getEntryAnimationStyle(index, "left")}
                               >
                                 <span className="text-xl leading-none">{getFlag(c.code)}</span>
                                 <span className="text-[13px] font-mono leading-tight">{c.code}</span>
@@ -813,7 +847,7 @@ export default function WalletCurrencySelector({
                       {t("ui_no_currencies_found_b70888825e", "No currencies found.")}
                     </div>
                   ) : (
-                    filtered.map((c) => {
+                    filtered.map((c, index) => {
                       const active = normalizeCode(c.code) === normalizeCode(value);
                       const isAlreadyAdded = addedCurrencySet.has(normalizeCode(c.code));
                       return (
@@ -830,6 +864,7 @@ export default function WalletCurrencySelector({
                               ? "bg-xcannes-green/10 text-white"
                               : "hover:bg-white/[0.06] text-white/80",
                           ].join(" ")}
+                          style={getEntryAnimationStyle(index, "right")}
                         >
                           <span className="text-lg">{getFlag(c.code)}</span>
                           <div className="min-w-0 flex-1 flex items-center gap-2">
@@ -841,8 +876,9 @@ export default function WalletCurrencySelector({
                             </span>
                           </div>
                           {isAlreadyAdded ? (
-                            <span className="text-[12px] text-white/55 shrink-0">
-                              {t("ui_currency_already_added", "Déjà ajoutée")}
+                            <span className="text-[12px] text-white/55 shrink-0 inline-flex items-center gap-1.5">
+                              <span className="text-xcannes-green text-[13px] leading-none" aria-hidden>✓</span>
+                              <span>{t("ui_currency_already_added_short", "ajoutée")}</span>
                             </span>
                           ) : (
                             <AddCurrencyLogo className="w-4 h-4 text-xcannes-green shrink-0" />
