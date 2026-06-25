@@ -706,6 +706,7 @@ export default function WalletCurrencySelector({
                   </li>
                   );
                 })}
+              </ul>
             )}
           </div>
         </div>
