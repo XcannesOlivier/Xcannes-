@@ -13,13 +13,15 @@ const CURRENCY_FLAG_OVERRIDES = {
 };
 
 // Petit set de devises les plus utilisées dans le monde
-// Limité à 7 pour rester simple et rapide à parcourir.
+// Limité à une courte liste pour rester simple et rapide à parcourir.
 const POPULAR_CURRENCIES = [
 { code: "USD", name: "US Dollar" },
 { code: "EUR", name: "Euro" },
 { code: "JPY", name: "Japanese Yen" },
 { code: "GBP", name: "British Pound" },
-{ code: "CHF", name: "Swiss Franc" }];
+{ code: "CHF", name: "Swiss Franc" },
+{ code: "AUD", name: "Australian Dollar" },
+{ code: "CAD", name: "Canadian Dollar" }];
 
 const normalizeCode = (code) => String(code || "").trim().toUpperCase();
 
@@ -444,7 +446,8 @@ export default function WalletCurrencySelector({
   }, [mergedCurrencies, search]);
 
   const popularCurrencies = useMemo(() => {
-    const source = normalizedQuickOptions.length > 0 ? normalizedQuickOptions : POPULAR_CURRENCIES;
+    const preferred = normalizedQuickOptions.length > 0 ? normalizedQuickOptions : POPULAR_CURRENCIES;
+    const source = [...preferred, ...POPULAR_CURRENCIES, ...mergedCurrencies];
     const seen = new Set();
     return source
       .map((item) => {
@@ -710,7 +713,7 @@ export default function WalletCurrencySelector({
                     </div>
                     {popularCurrencies.length > 0 ? (
                       <div className="mt-4">
-                        <div className="mb-2 text-[11px] tracking-[0.14em] uppercase text-white/45 font-medium">
+                        <div className="mb-2 text-[11px] tracking-[0.14em] text-white/45 font-medium">
                           {t("ui_popular_currencies", "Populaires")}
                         </div>
                         <div className="grid grid-cols-5 gap-2">
