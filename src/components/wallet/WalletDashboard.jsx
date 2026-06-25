@@ -653,6 +653,17 @@ export default function WalletDashboard({
     swapState,
   ]);
 
+  // ── Desktop: reset to sendChoice on wallet switch ──────────
+  const prevWalletForResetRef = useRef(wallet);
+  useEffect(() => {
+    if (!isLargeViewport) return;
+    if (wallet === prevWalletForResetRef.current) return;
+    prevWalletForResetRef.current = wallet;
+    desktopDefaultActionSetRef.current = false;
+    setActiveAction('sendChoice');
+    desktopDefaultActionSetRef.current = true;
+  }, [wallet, isLargeViewport]);
+
   // ── Desktop inline flags ───────────────────────────────────
   const inlineFlags = useDesktopInlineFlags({
     isDesktopPanel,
