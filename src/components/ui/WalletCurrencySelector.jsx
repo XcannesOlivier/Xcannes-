@@ -19,9 +19,7 @@ const POPULAR_CURRENCIES = [
 { code: "EUR", name: "Euro" },
 { code: "JPY", name: "Japanese Yen" },
 { code: "GBP", name: "British Pound" },
-{ code: "CHF", name: "Swiss Franc" },
-{ code: "AUD", name: "Australian Dollar" },
-{ code: "CAD", name: "Canadian Dollar" }];
+{ code: "CHF", name: "Swiss Franc" }];
 
 const normalizeCode = (code) => String(code || "").trim().toUpperCase();
 
@@ -445,6 +443,29 @@ export default function WalletCurrencySelector({
     });
   }, [mergedCurrencies, search]);
 
+  const popularCurrencies = useMemo(() => {
+    const source = normalizedQuickOptions.length > 0 ? normalizedQuickOptions : POPULAR_CURRENCIES;
+    const seen = new Set();
+    return source
+      .map((item) => {
+        const code = normalizeCode(item?.code);
+        if (!code) return null;
+        return { code, name: item?.name || code };
+      })
+      .filter(Boolean)
+      .filter((item) => {
+        if (excludedSet.has(item.code)) return false;
+        if (seen.has(item.code)) return false;
+        seen.add(item.code);
+        return true;
+      })
+      .slice(0, 5)
+      .map((item) => {
+        const fromList = mergedCurrencies.find((c) => normalizeCode(c.code) === item.code);
+        return fromList || item;
+      });
+  }, [excludedSet, mergedCurrencies, normalizedQuickOptions]);
+
   const selected = useMemo(() => {
     if (!value) return null;
     const upper = normalizeCode(value);
@@ -687,6 +708,40 @@ export default function WalletCurrencySelector({
                         className="w-full pl-11 pr-4 py-3 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white font-light focus:outline-none focus:ring-1 focus:ring-white/25 transition-all duration-150"
                       />
                     </div>
+                    {popularCurrencies.length > 0 ? (
+                      <div className="mt-4">
+                        <div className="mb-2 text-[11px] tracking-[0.14em] uppercase text-white/45 font-medium">
+                          {t("ui_popular_currencies", "Populaires")}
+                        </div>
+                        <div className="grid grid-cols-5 gap-2">
+                          {popularCurrencies.map((c) => {
+                            const active = normalizeCode(c.code) === normalizeCode(value);
+                            return (
+                              <button
+                                key={`popular-${c.code}`}
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleSelect(c.code);
+                                }}
+                                className={[
+                                  "rounded-xl px-2 py-2 ring-1 transition-colors flex flex-col items-center text-center gap-0.5 min-h-[78px]",
+                                  active
+                                    ? "bg-xcannes-green/10 ring-xcannes-green/35 text-white"
+                                    : "bg-white/[0.03] ring-white/10 text-white/80 hover:bg-white/[0.06] hover:ring-white/20",
+                                ].join(" ")}
+                              >
+                                <span className="text-xl leading-none">{getFlag(c.code)}</span>
+                                <span className="text-[13px] font-mono leading-tight">{c.code}</span>
+                                <span className="text-[11px] text-white/55 leading-tight truncate w-full">
+                                  {c.name || c.code}
+                                </span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ) : null}
                   </div>
                 </div>
 
