@@ -22,6 +22,7 @@ import {
   isVisibleMovement,
   sortMovementsDesc,
 } from "../utils/movementUtils";
+import SegmentedFilterControl from "@/components/ui/SegmentedFilterControl";
 
 /**
  * Composant de relevé bancaire global (toutes les devises consolidées).
@@ -1609,7 +1610,14 @@ export default function GlobalStatement({
             <div className="px-4 md:px-6 pt-3 pb-1">
               <div className="grid grid-cols-2 gap-2 rounded-[18px] ring-1 ring-white/[0.06] ring-inset bg-white/[0.025] px-4 py-3">
                 {/* Entrées */}
-                <div className="flex items-center gap-2.5">
+                <div
+                  className="flex items-center gap-2.5"
+                  style={{
+                    transition: "opacity 270ms ease, filter 270ms ease",
+                    opacity: txFilter === "debit" || txFilter === "conversion" ? 0.45 : 1,
+                    filter: txFilter === "credit" ? "brightness(1.25)" : "brightness(1)",
+                  }}
+                >
                   <div className="flex items-center justify-center w-8 h-8 rounded-full bg-emerald-500/10 shrink-0">
                     <svg className="w-4 h-4 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                       <line x1="12" y1="19" x2="12" y2="5" /><polyline points="5 12 12 5 19 12" />
@@ -1621,7 +1629,14 @@ export default function GlobalStatement({
                   </div>
                 </div>
                 {/* Sorties */}
-                <div className="flex items-center gap-2.5">
+                <div
+                  className="flex items-center gap-2.5"
+                  style={{
+                    transition: "opacity 270ms ease, filter 270ms ease",
+                    opacity: txFilter === "credit" || txFilter === "conversion" ? 0.45 : 1,
+                    filter: txFilter === "debit" ? "brightness(1.25)" : "brightness(1)",
+                  }}
+                >
                   <div className="flex items-center justify-center w-8 h-8 rounded-full bg-red-500/10 shrink-0">
                     <svg className="w-4 h-4 text-red-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                       <line x1="12" y1="5" x2="12" y2="19" /><polyline points="19 12 12 19 5 12" />
@@ -1633,7 +1648,14 @@ export default function GlobalStatement({
                   </div>
                 </div>
                 {/* Conversions */}
-                <div className="flex items-center gap-2.5">
+                <div
+                  className="flex items-center gap-2.5"
+                  style={{
+                    transition: "opacity 270ms ease, filter 270ms ease",
+                    opacity: txFilter === "credit" || txFilter === "debit" ? 0.45 : 1,
+                    filter: txFilter === "conversion" ? "brightness(1.25)" : "brightness(1)",
+                  }}
+                >
                   <div className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-500/10 shrink-0">
                     <svg className="w-4 h-4 text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                       <path d="M17 1l4 4-4 4" /><path d="M3 11V9a4 4 0 014-4h14" /><path d="M7 23l-4-4 4-4" /><path d="M21 13v2a4 4 0 01-4 4H3" />
@@ -1664,38 +1686,18 @@ export default function GlobalStatement({
 
         {/* Filtres */}
         <div className="px-4 md:px-6 pt-6 md:pt-7 pb-2 md:pb-3 flex flex-row items-stretch md:items-center gap-2">
-          <div className="flex flex-1 items-center rounded-[16px] p-1 ring-1 ring-white/[0.05] ring-inset bg-gradient-to-b from-[#101415] to-[#0d1214]">
-            {[
-              { key: "all", label: t("ui_all_0c90d41d71", "Tout") },
-              { key: "credit", label: t("ui_credits_b8166276a0", "Entrées") },
-              { key: "debit", label: t("ui_debits_38c870b18f", "Sorties") },
-              { key: "conversion", label: t("ui_conversions_b604b5ef8b", "Conversions") },
-            ].map((item) => (
-              <button
-                key={item.key}
-                type="button"
-                onClick={() => setTxFilter(item.key)}
-                  className={`px-3 py-3 flex-1 text-center rounded-[12px] text-sm font-light transition-colors whitespace-nowrap ${
-                    txFilter === item.key
-                      ? item.key === "all"
-                      ? "bg-[#14191c] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.12),inset_0_-14px_18px_rgba(0,0,0,0.6)]"
-                      : item.key === "credit"
-                        ? "bg-green-500/15 text-green-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]"
-                        : item.key === "debit"
-                          ? "bg-red-500/15 text-red-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]"
-                          : "bg-blue-500/15 text-blue-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]"
-                    : item.key === "all"
-                      ? "text-white/60 hover:text-white/80 bg-[#111518] hover:bg-[#0d1114]"
-                      : item.key === "credit"
-                        ? "text-white/60 hover:text-green-300 bg-[#111518] hover:bg-green-500/15"
-                        : item.key === "debit"
-                          ? "text-white/60 hover:text-red-300 bg-[#111518] hover:bg-red-500/15"
-                          : "text-white/60 hover:text-blue-300 bg-[#111518] hover:bg-blue-500/15"
-                }`}
-              >
-                {item.label}
-              </button>
-            ))}
+          <div className="flex flex-1 rounded-[16px] ring-1 ring-white/[0.05] ring-inset bg-gradient-to-b from-[#101415] to-[#0d1214]">
+            <SegmentedFilterControl
+              tabs={[
+                { key: "all",        label: t("ui_all_0c90d41d71", "Tout") },
+                { key: "credit",     label: t("ui_credits_b8166276a0", "Entrées") },
+                { key: "debit",      label: t("ui_debits_38c870b18f", "Sorties") },
+                { key: "conversion", label: t("ui_conversions_b604b5ef8b", "Conversions") },
+              ]}
+              value={txFilter}
+              onChange={setTxFilter}
+              className="w-full"
+            />
           </div>
         </div>
         </div>{/* fin conteneur header+filtres */}

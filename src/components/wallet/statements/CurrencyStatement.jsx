@@ -38,6 +38,7 @@ import useCurrencyStatementFormatters from "./useCurrencyStatementFormatters";
 import XrpNetworkStatement from "./XrpNetworkStatement";
 import { isXrplAddress } from "../utils/xrplAddress";
 import { useFlashNotice } from "../hooks/useFlashNotice";
+import SegmentedFilterControl from "@/components/ui/SegmentedFilterControl";
 
 /**
  * Composant de relevé bancaire pour une devise spécifique.
@@ -1554,38 +1555,18 @@ export default function CurrencyStatement({
           {/* Filtres */}
           <div className="flex flex-col">
             <div className="mx-4 h-px bg-white/[0.07] rounded-full" aria-hidden />
-            <div className="flex flex-1 items-center p-1 bg-transparent">
-              {[
-                { key: "all", label: stripCountSuffix(t("ui_all_0c90d41d71", "Tout")) },
-                { key: "credit", label: stripCountSuffix(t("ui_credits_b8166276a0", "Entrées")) },
-                { key: "debit", label: stripCountSuffix(t("ui_debits_38c870b18f", "Sorties")) },
-                { key: "conversion", label: stripCountSuffix(t("ui_conversions_b604b5ef8b", "Conversions")) },
-              ].map((item) => (
-                <button
-                  key={item.key}
-                  type="button"
-                  onClick={() => setFilter(item.key)}
-                  className={`px-3 py-3 flex-1 text-center rounded-[12px] text-sm font-light transition-colors whitespace-nowrap ${
-                    filter === item.key
-                      ? item.key === "all"
-                        ? "bg-[#14191c] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.12),inset_0_-14px_18px_rgba(0,0,0,0.6)]"
-                        : item.key === "credit"
-                          ? "bg-green-500/15 text-green-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]"
-                          : item.key === "debit"
-                            ? "bg-red-500/15 text-red-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]"
-                            : "bg-blue-500/15 text-blue-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]"
-                      : item.key === "all"
-                        ? "text-white/60 hover:text-white/80 bg-[#111518] hover:bg-[#0d1114]"
-                        : item.key === "credit"
-                          ? "text-white/60 hover:text-green-300 bg-[#111518] hover:bg-green-500/15"
-                          : item.key === "debit"
-                            ? "text-white/60 hover:text-red-300 bg-[#111518] hover:bg-red-500/15"
-                            : "text-white/60 hover:text-blue-300 bg-[#111518] hover:bg-blue-500/15"
-                  }`}
-                >
-                  {item.label}
-                </button>
-              ))}
+            <div className="flex flex-1 p-[3px]">
+              <SegmentedFilterControl
+                tabs={[
+                  { key: "all",        label: stripCountSuffix(t("ui_all_0c90d41d71", "Tout")) },
+                  { key: "credit",     label: stripCountSuffix(t("ui_credits_b8166276a0", "Entrées")) },
+                  { key: "debit",      label: stripCountSuffix(t("ui_debits_38c870b18f", "Sorties")) },
+                  { key: "conversion", label: stripCountSuffix(t("ui_conversions_b604b5ef8b", "Conversions")) },
+                ]}
+                value={filter}
+                onChange={setFilter}
+                className="w-full"
+              />
             </div>
           </div>
           </div>
