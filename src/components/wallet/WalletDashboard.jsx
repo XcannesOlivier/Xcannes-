@@ -937,7 +937,7 @@ export default function WalletDashboard({
 	                        <div className="lg:hidden flex flex-col justify-center gap-[4px] min-h-[52px]">
 	                          {/* Ligne 1 : "Dernière transaction" + date + heure */}
                           <div className="flex items-center justify-between gap-2">
-	                            <span className="text-[11px] font-light uppercase tracking-wider text-white/30">
+	                            <span className="text-[11px] font-light tracking-wider text-white/30">
 	                              {t('ui_last_transaction_title', 'Activités récentes')}
 	                            </span>
 	                            <div className="shrink-0 flex items-center gap-1.5">
@@ -989,7 +989,7 @@ export default function WalletDashboard({
                         {/* Desktop : une seule ligne */}
 	                        <div className="hidden lg:flex items-center justify-between gap-3 min-h-[38px]">
                           {/* Gauche : titre */}
-                          <span className="shrink-0 text-[11px] font-light uppercase tracking-wider text-white/30 whitespace-nowrap">
+                          <span className="shrink-0 text-[11px] font-light tracking-wider text-white/30 whitespace-nowrap">
                             {t('ui_last_transaction_title', 'Activités récentes')}
                           </span>
                           {/* Centre : icône + type + montant */}

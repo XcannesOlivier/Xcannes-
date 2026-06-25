@@ -364,7 +364,7 @@ export default function WalletDashboardHeader({
 	            <div className="relative flex items-center gap-2.5 w-full md:w-full">
 
 	              <div className={`flex-none min-w-0 rounded-[12px] px-2 md:px-3 py-1.5 md:py-2 relative z-[50] transition-all duration-150 ${isSwitcherVisible ? 'w-[260px] border-l border-r border-t border-white/[0.18] rounded-b-none bg-white/[0.05]' : 'max-w-[220px] md:max-w-[360px]'}`} ref={selectorContainerRef}>
-	                <div className="flex items-start justify-between gap-1.5" ref={switcherRef}>
+	                <div className="flex items-center justify-between gap-1.5" ref={switcherRef}>
                   <div className="min-w-0 flex-1">
                     {/* Wallet name + address — clickable when multi-wallet */}
                     <button
