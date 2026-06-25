@@ -1225,7 +1225,7 @@ export default function WalletDashboard({
                 />
                 <button
                   type="button"
-                  onClick={handleOpenGlobalStatementPlain}
+                  onClick={() => { if (isDesktopPanel) setDesktopCsNonce(n => n + 1); handleOpenGlobalStatementPlain(); }}
                   className="w-full flex items-center gap-2 text-base font-light text-white/45 hover:text-white/80 transition-colors px-3 py-2 rounded-lg"
                   aria-label={t('ui_open_statement', 'Ouvrir le relevé des transactions')}
                 >
@@ -1239,6 +1239,7 @@ export default function WalletDashboard({
                   <WalletSettingsDropdown
                     position="inline-column"
                     isDesktopPanel={isDesktopPanel}
+                    onOpen={() => setDesktopCsNonce(n => n + 1)}
                     onOpenInfo={handleOpenInfo}
                     onOpenXrplActivity={handleOpenXrplActivity}
                     onOpenSecurity={() => handleOpenDesktopSettingsPage('security')}

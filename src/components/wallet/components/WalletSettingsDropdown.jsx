@@ -61,6 +61,7 @@ function SettingsPageModal({ isOpen, onClose, ariaLabel, label, subtitle, conten
 export default function WalletSettingsDropdown({
   position = "header",
   isDesktopPanel = false,
+  onOpen,
   onOpenInfo,
   onOpenXrplActivity,
   onOpenSecurity,
@@ -262,7 +263,7 @@ export default function WalletSettingsDropdown({
   // Allow the PWA host to reopen the dropdown after returning from "add account" flow.
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const handler = () => setIsOpen(true);
+    const handler = () => { onOpen?.(); setIsOpen(true); };
     window.addEventListener("xcannes:wallet-settings-open", handler);
     return () => window.removeEventListener("xcannes:wallet-settings-open", handler);
   }, []);
@@ -574,7 +575,7 @@ export default function WalletSettingsDropdown({
     <div className={visibilityClass} ref={ref}>
       <button
         type="button"
-        onClick={() => setIsOpen((v) => !v)}
+        onClick={() => { if (!isOpen) onOpen?.(); setIsOpen((v) => !v); }}
         ref={buttonRef}
         className={[
           inlineButton
