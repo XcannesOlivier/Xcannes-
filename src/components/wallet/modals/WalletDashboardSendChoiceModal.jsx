@@ -462,13 +462,13 @@ export default function WalletDashboardSendChoiceModal({
       <path d="M8 31v9h9" className="stroke-[#f5a623]/55" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
       <path d="M40 31v9h-9" className="stroke-[#f5a623]/55" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
       {/* Document body */}
-      <path d="M17 10h8.5L31 15.5V38H17V10z" className="stroke-[#f5a623]/80" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M19 13h7.5L32 18.5V37H19V13z" className="stroke-[#f5a623]/80" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
       {/* Folded corner */}
-      <path d="M25.5 10v5.5H31" className="stroke-[#f5a623]/60" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M26.5 13v5.5H32" className="stroke-[#f5a623]/60" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
       {/* Text lines */}
-      <line x1="20" y1="21" x2="28" y2="21" className="stroke-[#f5a623]/55" strokeWidth="1.4" strokeLinecap="round" />
-      <line x1="20" y1="25" x2="28" y2="25" className="stroke-[#f5a623]/45" strokeWidth="1.4" strokeLinecap="round" />
-      <line x1="20" y1="29" x2="25" y2="29" className="stroke-[#f5a623]/35" strokeWidth="1.4" strokeLinecap="round" />
+      <line x1="22" y1="23" x2="29" y2="23" className="stroke-[#f5a623]/55" strokeWidth="1.4" strokeLinecap="round" />
+      <line x1="22" y1="27" x2="29" y2="27" className="stroke-[#f5a623]/45" strokeWidth="1.4" strokeLinecap="round" />
+      <line x1="22" y1="31" x2="27" y2="31" className="stroke-[#f5a623]/35" strokeWidth="1.4" strokeLinecap="round" />
     </svg>
   );
 
@@ -1743,7 +1743,7 @@ export default function WalletDashboardSendChoiceModal({
 				    <button
 				      type="button"
 				      onClick={closeFlowSheet}
-				      className="absolute right-0 h-9 w-9 rounded-full bg-white/[0.06] hover:bg-white/[0.09] active:bg-white/[0.05] transition-colors flex items-center justify-center"
+				      className="absolute right-0 h-9 w-9 rounded-full bg-white/[0.06] hover:bg-white/[0.09] active:bg-white/[0.05] transition-colors hidden md:flex items-center justify-center"
 				      aria-label={t('ui_close', 'Fermer')}
 				    >
 				      <svg viewBox="0 0 24 24" className="w-5 h-5 text-white/70" fill="none" aria-hidden>
