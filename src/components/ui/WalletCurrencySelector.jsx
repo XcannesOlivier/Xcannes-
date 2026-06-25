@@ -581,7 +581,7 @@ export default function WalletCurrencySelector({
             onClick={(e) => e.stopPropagation()}
             onFocus={(e) => e.stopPropagation()}
             placeholder={t("ui_search_currency_045b7c357f", "Rechercher une devise…")}
-            className="w-full rounded-2xl bg-transparent ring-1 ring-white/10 ring-inset px-2.5 py-2 text-[15px] font-light text-white/85 placeholder:text-white/35 outline-none focus:ring-1 focus:ring-white/20" />
+            className="w-full rounded-3xl bg-transparent ring-1 ring-white/7 ring-inset px-2.5 py-1.5 text-[15px] font-light text-white/85 placeholder:text-white/35 outline-none focus:ring-1 focus:ring-white/15" />
 
           </div>
           <div className="flex-1 min-h-0 overflow-y-auto">
@@ -606,7 +606,7 @@ export default function WalletCurrencySelector({
                         e.stopPropagation();
                         handleSelect(c.code);
                       }}
-                      className="w-full px-3 py-2 text-base text-white/80 hover:bg-white/[0.06] flex items-center gap-2 text-left active:scale-98">
+                      className="w-full px-3 py-2 text-base text-white/80 bg-white/[0.03] hover:bg-white/[0.06] flex items-center gap-2 text-left active:scale-98">
                       <span className="text-lg">{getFlag(c.code)}</span>
                       <div className="min-w-0 flex-1 flex items-center gap-2">
                         <span className="font-mono text-[15px] md:text-[17px] whitespace-nowrap">{c.code}</span>
@@ -727,7 +727,7 @@ export default function WalletCurrencySelector({
                         onClick={(e) => e.stopPropagation()}
                         onFocus={(e) => e.stopPropagation()}
                         placeholder={t("ui_search_currency_045b7c357f", "Rechercher une devise…")}
-                        className="w-full pl-11 pr-4 py-3 bg-transparent ring-1 ring-white/15 ring-inset rounded-2xl text-white font-light focus:outline-none focus:ring-1 focus:ring-white/25 transition-all duration-150"
+                        className="w-full pl-11 pr-4 py-2.5 bg-transparent ring-1 ring-white/10 ring-inset rounded-3xl text-white font-light focus:outline-none focus:ring-1 focus:ring-white/20 transition-all duration-150"
                       />
                     </div>
                     {popularCurrencies.length > 0 ? (
@@ -749,8 +749,8 @@ export default function WalletCurrencySelector({
                                 className={[
                                   "rounded-xl px-2 py-1.5 sm:py-2 ring-1 transition-colors flex flex-col items-center text-center gap-0.5 min-h-[64px] sm:min-h-[78px]",
                                   active
-                                    ? "bg-xcannes-green/10 ring-xcannes-green/35 text-white"
-                                    : "bg-white/[0.03] ring-white/10 text-white/80 hover:bg-white/[0.06] hover:ring-white/20",
+                                    ? "bg-xcannes-green/10 ring-xcannes-green/25 text-white"
+                                    : "bg-white/[0.03] ring-white/7 text-white/80 hover:bg-white/[0.06] hover:ring-white/15",
                                 ].join(" ")}
                               >
                                 <span className="text-xl leading-none">{getFlag(c.code)}</span>
@@ -796,10 +796,10 @@ export default function WalletCurrencySelector({
                             handleSelect(c.code);
                           }}
                           className={[
-                            "w-full flex items-center gap-3 px-4 py-3 text-left border-b border-white/5 last:border-b-0 shadow-[inset_0_-6px_10px_rgba(0,0,0,0.25)]",
+                            "w-full flex items-center gap-3 px-4 py-3 text-left border-b border-white/5 last:border-b-0 bg-white/[0.03]",
                             active
                               ? "bg-xcannes-green/10 text-white"
-                              : "hover:bg-white/[0.04] text-white/80",
+                              : "hover:bg-white/[0.06] text-white/80",
                           ].join(" ")}
                         >
                           <span className="text-lg">{getFlag(c.code)}</span>
