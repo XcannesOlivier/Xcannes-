@@ -43,6 +43,25 @@ function getFlag(code) {
   return countryCodeToFlag(countryGuess);
 }
 
+function AddCurrencyLogo({ className = "w-6 h-6 text-xcannes-green" }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.3"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <circle cx="12" cy="12" r="10" />
+      <line x1="12" y1="8" x2="12" y2="16" />
+      <line x1="8" y1="12" x2="16" y2="12" />
+    </svg>
+  );
+}
+
 export default function WalletCurrencySelector({
   value,
   onChange,
@@ -553,10 +572,13 @@ export default function WalletCurrencySelector({
                       }}
                       className="w-full px-3 py-2 text-base text-white/80 hover:bg-white/[0.06] flex items-center gap-2 text-left active:scale-98">
                       <span className="text-lg">{getFlag(c.code)}</span>
-                      <span className="font-mono text-[15px] md:text-[17px]">{c.code}</span>
-                      <span className="text-[15px] md:text-[17px] text-white/45 truncate">
-                        {c.name}
-                      </span>
+                      <div className="min-w-0 flex-1 flex items-center gap-2">
+                        <span className="font-mono text-[15px] md:text-[17px] whitespace-nowrap">{c.code}</span>
+                        <span className="text-[15px] md:text-[17px] text-white/45 truncate">
+                          {c.name}
+                        </span>
+                      </div>
+                      <AddCurrencyLogo className="w-4 h-4 text-xcannes-green shrink-0" />
                     </button>
                   </li>
                 )}
@@ -618,11 +640,7 @@ export default function WalletCurrencySelector({
                   <div className="relative flex items-center justify-between gap-3 px-4 py-4">
                     <div className="min-w-0 text-left">
                       <div className="flex items-center gap-3">
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-white/70" aria-hidden="true">
-                          <circle cx="12" cy="12" r="10" />
-                          <line x1="12" y1="8" x2="12" y2="16" />
-                          <line x1="8" y1="12" x2="16" y2="12" />
-                        </svg>
+                        <AddCurrencyLogo className="w-7 h-7 text-xcannes-green shrink-0" />
                         <div className="text-white/80 md:text-white font-light text-[30px] md:text-[34px] tracking-tight">
                           {t("ui_select_currency_title", "Ajouter une devise")}
                         </div>
@@ -630,7 +648,7 @@ export default function WalletCurrencySelector({
                       <div className="mt-2 text-[19px] md:text-[20px] font-light text-white/50 leading-relaxed max-w-[46ch] md:max-w-[60ch]">
                         {t(
                           "ui_select_currency_subtitle_add_currency",
-                          "Une transaction validera l’ajout, aucun montant minimum requis.",
+                          "Choisissez une devise. Elle sera ajoutée automatiquement lors de votre première transaction.",
                         )}
                       </div>
                     </div>
@@ -715,9 +733,7 @@ export default function WalletCurrencySelector({
                               {c.name || c.code}
                             </span>
                           </div>
-                          {active ? (
-                            <span className="text-xcannes-green font-light text-xs">✓</span>
-                          ) : null}
+                          <AddCurrencyLogo className="w-4 h-4 text-xcannes-green shrink-0" />
                         </button>
                       );
                     })
