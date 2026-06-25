@@ -722,6 +722,7 @@ export default function WalletDashboardHeader({
           </div>
         )}
 
+        <div className="animate-slide-from-left">
         <div className="text-[21px] md:text-[27px] text-white/55 mb-0.5 md:mb-0">
           {t("ui_total_balance_label_a91b6b8c1e", "Solde total")}
         </div>
@@ -743,6 +744,7 @@ export default function WalletDashboardHeader({
               Devises numériques
             </button>
           )}
+        </div>
 
         {/* ── Wallet setup dropdown (centralised activation steps) ── */}
         {isConnected && wallet && (

@@ -46,6 +46,8 @@ module.exports = {
       animation: {
         "fade-in": "fadeIn 0.6s ease-out forwards",
         fadeScale: "fadeScale 180ms ease-out forwards",
+        "slide-from-left": "slideFromLeft 0.45s cubic-bezier(0.16,1,0.3,1) both",
+        "slide-from-right": "slideFromRight 0.45s cubic-bezier(0.16,1,0.3,1) both",
       },
       keyframes: {
         fadeIn: {
@@ -55,6 +57,14 @@ module.exports = {
         fadeScale: {
           "0%": { opacity: 0, transform: "scale(0.98)" },
           "100%": { opacity: 1, transform: "scale(1)" },
+        },
+        slideFromLeft: {
+          "0%": { opacity: 0, transform: "translateX(-28px)" },
+          "100%": { opacity: 1, transform: "translateX(0)" },
+        },
+        slideFromRight: {
+          "0%": { opacity: 0, transform: "translateX(28px)" },
+          "100%": { opacity: 1, transform: "translateX(0)" },
         },
       },
       fontFamily: {

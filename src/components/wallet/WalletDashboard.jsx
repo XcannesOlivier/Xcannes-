@@ -590,8 +590,13 @@ export default function WalletDashboard({
 
   // ── Token row renderer ─────────────────────────────────────
   const renderTokenRow = useCallback(
-    token => (
-      <WalletDashboardTokenRow key={token.key} token={token} onClick={() => handleOpenCurrencyStatement(token)} />
+    (token, index) => (
+      <WalletDashboardTokenRow
+        key={token.key}
+        token={token}
+        onClick={() => handleOpenCurrencyStatement(token)}
+        animationDelay={index * 55}
+      />
     ),
     [handleOpenCurrencyStatement],
   );
@@ -855,7 +860,7 @@ export default function WalletDashboard({
                   <div className="w-full flex flex-col gap-y-0 sticky top-[92px] md:top-0 z-[5] bg-transparent relative" data-activity-hidden={activityCardHidden}>
                   {/* Mobile: clip container so card slides out without creating horizontal scroll */}
                   <div className="overflow-x-hidden md:overflow-x-visible">
-                  <div className="activity-card-slide">
+                  <div className="activity-card-slide animate-slide-from-left">
                   <div
                     className="w-full min-w-0 overflow-visible relative"
                     aria-live="polite"
