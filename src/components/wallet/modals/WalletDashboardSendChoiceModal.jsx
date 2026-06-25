@@ -90,6 +90,22 @@ export default function WalletDashboardSendChoiceModal({
     flowSheetSwipeMetaRef.current = null;
     setSubModal(name);
   }, []);
+
+  // Mesure panelRect synchronement dans le handler pour éviter le flash
+  // (un seul rendu grâce au batching React 18)
+  const openFlowSheet = useCallback((type) => {
+    setFlowSheetTranslateY(0);
+    setFlowSheetDragging(false);
+    flowSheetSwipeMetaRef.current = null;
+    const el = panelRef.current;
+    if (el && typeof window !== 'undefined' && window.matchMedia('(min-width: 768px)').matches) {
+      const r = el.getBoundingClientRect();
+      setPanelRect({ top: r.top, left: r.left, width: r.width, height: r.height });
+    } else {
+      setPanelRect(null);
+    }
+    setFlowSheet((v) => (v === type ? null : type));
+  }, []);
   const [payreqPasteValue, setPayreqPasteValue] = useState('');
   const [payreqSelfSendError, setPayreqSelfSendError] = useState(false);
   const [payreqDecodeError, setPayreqDecodeError] = useState(false);
@@ -901,12 +917,7 @@ export default function WalletDashboardSendChoiceModal({
 
 	                    <button
 	                      type="button"
-	                      onClick={() => {
-	                        setFlowSheetTranslateY(0);
-	                        setFlowSheetDragging(false);
-	                        flowSheetSwipeMetaRef.current = null;
-	                        setFlowSheet((v) => (v === 'simple' ? null : 'simple'));
-	                      }}
+	                      onClick={() => openFlowSheet('simple')}
 	                      className="relative mt-4 pt-3 flex items-center justify-between text-[13px] text-white/75 hover:text-white transition-colors duration-150 w-full"
 	                    >
                       <div className="absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-xcannes-green/45 to-transparent" aria-hidden />
@@ -990,12 +1001,7 @@ export default function WalletDashboardSendChoiceModal({
 
 	                    <button
 	                      type="button"
-	                      onClick={() => {
-	                        setFlowSheetTranslateY(0);
-	                        setFlowSheetDragging(false);
-	                        flowSheetSwipeMetaRef.current = null;
-	                        setFlowSheet((v) => (v === 'payreq' ? null : 'payreq'));
-	                      }}
+	                      onClick={() => openFlowSheet('payreq')}
 	                      className="relative mt-4 pt-3 flex items-center justify-between text-[13px] text-white/75 hover:text-white transition-colors duration-150 w-full"
 	                    >
                       <div className="absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-[#f5a623]/40 to-transparent" aria-hidden />
