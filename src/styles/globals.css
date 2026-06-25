@@ -491,10 +491,11 @@ body.wallet-page {
   50%       { transform: scale(0.7);  opacity: 0.2; }
 }
 
-/* 2-stop keyframe used on desktop with alternate direction — no loop boundary flash */
-@keyframes wallet-dot-pulse-alt {
-  0%   { transform: scale(1);   opacity: 1; }
-  100% { transform: scale(0.72); opacity: 0.2; }
+/* Desktop: opacity-only — no transform = no box-shadow repaint = GPU compositing pur */
+@keyframes wallet-dot-pulse-opacity {
+  0%   { opacity: 1; }
+  50%  { opacity: 0.2; }
+  100% { opacity: 1; }
 }
 
 .wallet-dot-active {
@@ -502,10 +503,10 @@ body.wallet-page {
   will-change: transform, opacity;
 }
 
-/* Desktop: alternate avoids the 1-frame GPU compositing glitch at the loop boundary */
 @media (min-width: 768px) {
   .wallet-dot-active {
-    animation: wallet-dot-pulse-alt 1.75s ease-in-out infinite alternate;
+    animation: wallet-dot-pulse-opacity 2.8s ease-in-out infinite;
+    will-change: opacity;
   }
 }
 
