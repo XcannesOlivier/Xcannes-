@@ -852,7 +852,7 @@ export default function WalletDashboard({
                 <>
                   {/* Spacer mobile : pousse la carte sous l'ActionRow flottant (≈88px) */}
                   <div className="md:hidden h-[92px] shrink-0" aria-hidden />
-                  <div className="w-full flex flex-col gap-y-0 sticky top-[92px] md:top-0 z-[10] bg-transparent relative" data-activity-hidden={activityCardHidden}>
+                  <div className="w-full flex flex-col gap-y-0 sticky top-[92px] md:top-0 z-[5] bg-transparent relative" data-activity-hidden={activityCardHidden}>
                   {/* Mobile: clip container so card slides out without creating horizontal scroll */}
                   <div className="overflow-x-hidden md:overflow-x-visible">
                   <div className="activity-card-slide">
