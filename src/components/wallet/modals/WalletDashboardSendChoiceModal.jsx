@@ -1777,7 +1777,7 @@ export default function WalletDashboardSendChoiceModal({
 				      </div>
 				      {/* Title + subtitle */}
 				      <div className="mt-4 text-center">
-				        <div className="text-[22px] md:text-[23px] font-semibold text-white leading-tight tracking-tight">
+				        <div className="text-[22px] md:text-[23px] font-light text-white leading-tight tracking-tight">
 				          {t('ui_send_simple_title', 'Envoi simple')}
 				        </div>
 				        <div className="mt-1.5 text-[13px] text-white/45 font-light">
@@ -1821,7 +1821,7 @@ export default function WalletDashboardSendChoiceModal({
 				              {step.icon}
 				            </div>
 				            <div className={`flex-1 min-w-0 ${idx < arr.length - 1 ? 'pb-5' : ''}`}>
-				              <div className="text-[15px] font-semibold text-white leading-tight">{step.title}</div>
+				              <div className="text-[15px] font-light text-white leading-tight">{step.title}</div>
 				              <div className="mt-1 text-[13px] text-white/50 font-light leading-relaxed">{step.desc}</div>
 				            </div>
 				          </div>
@@ -1831,7 +1831,7 @@ export default function WalletDashboardSendChoiceModal({
 				      <button
 				        type="button"
 				        onClick={closeFlowSheet}
-				        className="mt-7 w-full h-[52px] rounded-full bg-xcannes-green hover:brightness-110 active:brightness-90 transition-all flex items-center justify-center text-black font-semibold text-[16px]"
+				        className="mt-7 w-full h-[52px] rounded-full bg-xcannes-green hover:brightness-110 active:brightness-90 transition-all flex items-center justify-center text-black font-light text-[16px]"
 				      >
 				        {t('ui_understood', 'Compris')}
 				      </button>
@@ -1855,7 +1855,7 @@ export default function WalletDashboardSendChoiceModal({
 				          </svg>
 				        </div>
 				        <div className="flex-1 min-w-0">
-				          <div className="text-[19px] md:text-[20px] font-semibold text-white leading-tight">
+				          <div className="text-[19px] md:text-[20px] font-light text-white leading-tight">
 				            {t('ui_send_choice_pay_request_title', 'Payer une demande')}
 				          </div>
 				          <div className="mt-1 text-[12px] text-white/40 font-light leading-snug">
@@ -1899,7 +1899,7 @@ export default function WalletDashboardSendChoiceModal({
 				            {/* Text + chevron */}
 				            <div className={`flex-1 min-w-0 flex items-center justify-between gap-2 ${idx < arr.length - 1 ? 'pb-5' : ''}`}>
 				              <div>
-				                <div className="text-[15px] font-semibold text-white leading-tight">{step.title}</div>
+				                <div className="text-[15px] font-light text-white leading-tight">{step.title}</div>
 				                <div className="mt-1 text-[12px] text-white/45 font-light leading-relaxed">{step.desc}</div>
 				              </div>
 				              <svg viewBox="0 0 24 24" className="w-4 h-4 text-white/25 flex-none" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
@@ -1923,7 +1923,7 @@ export default function WalletDashboardSendChoiceModal({
 				      <button
 				        type="button"
 				        onClick={closeFlowSheet}
-				        className="mt-5 w-full h-[52px] rounded-full bg-[#f5a623] hover:brightness-110 active:brightness-90 transition-all flex items-center justify-center text-black font-semibold text-[16px]"
+				        className="mt-5 w-full h-[52px] rounded-full bg-[#f5a623] hover:brightness-110 active:brightness-90 transition-all flex items-center justify-center text-black font-light text-[16px]"
 				      >
 				        {t('ui_understood', 'Compris')}
 				      </button>
