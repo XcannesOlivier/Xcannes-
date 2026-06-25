@@ -461,14 +461,10 @@ export default function WalletDashboardSendChoiceModal({
       <path d="M40 17V8h-9" className="stroke-[#f5a623]/55" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
       <path d="M8 31v9h9" className="stroke-[#f5a623]/55" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
       <path d="M40 31v9h-9" className="stroke-[#f5a623]/55" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-      {/* Document body */}
-      <path d="M19 13h7.5L32 18.5V37H19V13z" className="stroke-[#f5a623]/80" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-      {/* Folded corner */}
-      <path d="M26.5 13v5.5H32" className="stroke-[#f5a623]/60" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
       {/* Text lines */}
-      <line x1="22" y1="23" x2="29" y2="23" className="stroke-[#f5a623]/55" strokeWidth="1.4" strokeLinecap="round" />
-      <line x1="22" y1="27" x2="29" y2="27" className="stroke-[#f5a623]/45" strokeWidth="1.4" strokeLinecap="round" />
-      <line x1="22" y1="31" x2="27" y2="31" className="stroke-[#f5a623]/35" strokeWidth="1.4" strokeLinecap="round" />
+      <line x1="15" y1="20" x2="33" y2="20" className="stroke-[#f5a623]/55" strokeWidth="1.4" strokeLinecap="round" />
+      <line x1="15" y1="24" x2="33" y2="24" className="stroke-[#f5a623]/45" strokeWidth="1.4" strokeLinecap="round" />
+      <line x1="15" y1="28" x2="26" y2="28" className="stroke-[#f5a623]/35" strokeWidth="1.4" strokeLinecap="round" />
     </svg>
   );
 
