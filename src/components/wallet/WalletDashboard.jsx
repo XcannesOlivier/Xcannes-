@@ -1160,7 +1160,7 @@ export default function WalletDashboard({
               }
               onScroll={handleTokenListScroll}
               className="relative z-[1] touch-pan-y"
-              style={{ WebkitOverflowScrolling: 'touch' }}
+              style={isLargeViewport ? undefined : { WebkitOverflowScrolling: 'touch' }}
             />
             </div>
             {/* Vertical action column — desktop only */}
