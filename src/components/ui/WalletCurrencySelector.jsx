@@ -879,7 +879,7 @@ export default function WalletCurrencySelector({
                             if (!isAlreadyAdded) handleSelect(c.code);
                           }}
                           className={[
-                            "w-full flex items-center gap-3 px-4 py-3 text-left border-b border-white/5 last:border-b-0 bg-white/[0.03]",
+                            "w-full flex items-center gap-3 px-2 py-3 text-left border-b border-white/5 last:border-b-0 bg-white/[0.03]",
                             isAlreadyAdded
                               ? "text-white/40 cursor-default"
                               : [
