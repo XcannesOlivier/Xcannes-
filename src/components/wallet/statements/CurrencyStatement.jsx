@@ -1188,18 +1188,18 @@ export default function CurrencyStatement({
       const convTxHash = String(detailTx?.txHash || "").trim();
       const walletLabelVar = walletLabelText;
 
-      // ── CONVERSION: dedicated design ─────────────────────────────────
+      // ── CONVERSION: dedicated design (aligned with sent/received) ───────
       const isPortrait = typeof window !== "undefined" && window.innerWidth < 768;
       const w = isPortrait ? 1080 : 1600;
-      const h = isPortrait ? 1560 : 900;
+      const h = isPortrait ? 1440 : 900;
       const canvas = document.createElement("canvas");
       canvas.width = w; canvas.height = h;
       const ctx = canvas.getContext("2d");
       if (!ctx) return null;
 
       const accent = "#3b82f6";
-      const accentDim = "rgba(59,130,246,0.13)";
-      const accentBorder = "rgba(59,130,246,0.30)";
+      const accentDim = "rgba(59,130,246,0.12)";
+      const accentBorder = "rgba(59,130,246,0.28)";
       const accentText = "#60a5fa";
       const textPrimary = "#ffffff";
       const textSecondary = "rgba(255,255,255,0.50)";
@@ -1234,6 +1234,23 @@ export default function CurrencyStatement({
         rr(x,y,W,H,20); ctx.fillStyle=cardFill; ctx.fill();
         ctx.strokeStyle=cardBorder; ctx.lineWidth=1; ctx.stroke();
       };
+      // Swap icon ⇄ in circle
+      const drawSwapIcon=(cx,cy,R,big)=>{
+        ctx.beginPath(); ctx.arc(cx,cy,R,0,Math.PI*2);
+        ctx.fillStyle="rgba(59,130,246,0.18)"; ctx.fill();
+        ctx.strokeStyle=accent; ctx.lineWidth=big?5:3; ctx.stroke();
+        const s=R*0.36; const gap=R*0.2;
+        ctx.strokeStyle=accent; ctx.lineWidth=big?7:4;
+        ctx.lineCap="round"; ctx.lineJoin="round";
+        ctx.beginPath(); ctx.moveTo(cx-s,cy-gap); ctx.lineTo(cx+s,cy-gap); ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(cx+s*0.4,cy-gap-s*0.45); ctx.lineTo(cx+s,cy-gap); ctx.lineTo(cx+s*0.4,cy-gap+s*0.45);
+        ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(cx+s,cy+gap); ctx.lineTo(cx-s,cy+gap); ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(cx-s*0.4,cy+gap-s*0.45); ctx.lineTo(cx-s,cy+gap); ctx.lineTo(cx-s*0.4,cy+gap+s*0.45);
+        ctx.stroke();
+      };
       const drawCalendar=(cx,cy,s)=>{
         ctx.strokeStyle=accent; ctx.lineWidth=s*0.09; ctx.fillStyle=accentDim;
         rr(cx-s/2,cy-s/2,s,s,s*0.18); ctx.fill(); ctx.stroke();
@@ -1242,17 +1259,16 @@ export default function CurrencyStatement({
           ctx.beginPath(); ctx.moveTo(cx-s*0.28,cy-s*0.5+s*r);
           ctx.lineTo(cx+s*0.28,cy-s*0.5+s*r); ctx.stroke();
         });
-        [cx-s*0.12,cx+s*0.12].forEach(rx=>{
-          ctx.beginPath(); ctx.moveTo(rx,cy-s*0.5+s*0.16); ctx.lineTo(rx,cy-s*0.5+s*0.28); ctx.stroke();
-        });
+        ctx.beginPath(); ctx.moveTo(cx-s*0.12,cy-s*0.5+s*0.16); ctx.lineTo(cx-s*0.12,cy-s*0.5+s*0.28); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(cx+s*0.12,cy-s*0.5+s*0.16); ctx.lineTo(cx+s*0.12,cy-s*0.5+s*0.28); ctx.stroke();
       };
-      const drawCheckShield=(cx,cy,r)=>{
-        // shield / checkmark
+      const drawCheckSmall=(cx,cy,r)=>{
         ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
         ctx.fillStyle=accentDim; ctx.fill();
         ctx.strokeStyle=accent; ctx.lineWidth=2; ctx.stroke();
         const ck=r*0.45;
-        ctx.beginPath(); ctx.moveTo(cx-ck*0.9,cy); ctx.lineTo(cx-ck*0.2,cy+ck*0.7); ctx.lineTo(cx+ck*0.9,cy-ck*0.6);
+        ctx.beginPath();
+        ctx.moveTo(cx-ck*0.9,cy); ctx.lineTo(cx-ck*0.2,cy+ck*0.7); ctx.lineTo(cx+ck*0.9,cy-ck*0.6);
         ctx.strokeStyle=accent; ctx.lineWidth=2.5; ctx.lineCap="round"; ctx.stroke();
       };
       const drawCurrencyCircle=(cx,cy,r,label)=>{
@@ -1261,7 +1277,7 @@ export default function CurrencyStatement({
         ctx.strokeStyle=accent; ctx.lineWidth=2.5; ctx.stroke();
         ctx.fillStyle=accentText; ctx.font=`700 ${Math.round(r*0.75)}px system-ui,-apple-system,sans-serif`;
         ctx.textAlign="center"; ctx.textBaseline="middle";
-        ctx.fillText(label.slice(0,1), cx, cy);
+        ctx.fillText(label.slice(0,3), cx, cy);
       };
       const drawTrend=(cx,cy,s)=>{
         ctx.fillStyle=accentDim; ctx.strokeStyle=accent; ctx.lineWidth=s*0.09;
@@ -1279,13 +1295,17 @@ export default function CurrencyStatement({
         ctx.lineTo(cx+s*0.28,cy-s*0.04);
         ctx.stroke();
       };
-      const drawInfoIcon=(cx,cy,r)=>{
-        ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
-        ctx.fillStyle=accentDim; ctx.fill();
-        ctx.strokeStyle=accent; ctx.lineWidth=1.5; ctx.stroke();
-        ctx.fillStyle=accentText; ctx.font=`700 ${Math.round(r*1.1)}px system-ui`;
-        ctx.textAlign="center"; ctx.textBaseline="middle";
-        ctx.fillText("i",cx,cy+1);
+      const drawHash=(cx,cy,s)=>{
+        ctx.fillStyle=accentDim; ctx.strokeStyle=accent; ctx.lineWidth=s*0.09;
+        rr(cx-s/2,cy-s/2,s,s,s*0.18); ctx.fill(); ctx.stroke();
+        ctx.strokeStyle=accent; ctx.lineWidth=s*0.09;
+        const off=s*0.12;
+        [cy-off,cy+off].forEach(ry2=>{
+          ctx.beginPath(); ctx.moveTo(cx-s*0.25,ry2); ctx.lineTo(cx+s*0.25,ry2); ctx.stroke();
+        });
+        [cx-off,cx+off].forEach(rx2=>{
+          ctx.beginPath(); ctx.moveTo(rx2,cy-s*0.3); ctx.lineTo(rx2,cy+s*0.3); ctx.stroke();
+        });
       };
       const drawLock=(cx,cy,s)=>{
         ctx.strokeStyle=textSecondary; ctx.lineWidth=s*0.09;
@@ -1299,57 +1319,82 @@ export default function CurrencyStatement({
       const wAddrRaw = String(walletAddress||"").trim();
       const wAddrShort = wAddrRaw.length>18 ? wAddrRaw.slice(0,8)+"…"+wAddrRaw.slice(-6) : wAddrRaw;
       const initial = wName.charAt(0).toUpperCase();
+      const txHash = convTxHash;
+      const txHashShort = txHash.length>22 ? txHash.slice(0,10)+"…"+txHash.slice(-10) : txHash;
       const secNote = t("ui_security_confirmation_note","Chaque transaction nécessite une confirmation.");
-      const discNote = t("ui_conversion_fx_note","Le montant final peut varier légèrement selon les fluctuations du taux de change.");
 
       if (isPortrait) {
-        // ── PORTRAIT ──────────────────────────────────────────────────────
-        // Header: dot + name + addr
-        const dotR=7;
-        ctx.beginPath(); ctx.arc(cardX+44+dotR,cardY+52,dotR,0,Math.PI*2);
+        // ── PORTRAIT ─────────────────────────────────────────────────
+        // Avatar
+        const avR=40; const avCx=cardX+44+avR; const avCy=cardY+52+avR;
+        ctx.beginPath(); ctx.arc(avCx,avCy,avR,0,Math.PI*2);
+        ctx.fillStyle="rgba(59,130,246,0.16)"; ctx.fill();
+        ctx.strokeStyle=accent; ctx.lineWidth=2; ctx.stroke();
+        ctx.fillStyle=textPrimary; ctx.font="700 34px system-ui,-apple-system,sans-serif";
+        ctx.textAlign="center"; ctx.textBaseline="middle";
+        ctx.fillText(initial,avCx,avCy);
+        ctx.beginPath(); ctx.arc(avCx+avR*0.68,avCy+avR*0.68,9,0,Math.PI*2);
+        ctx.fillStyle="#0b0f10"; ctx.fill();
+        ctx.beginPath(); ctx.arc(avCx+avR*0.68,avCy+avR*0.68,7,0,Math.PI*2);
         ctx.fillStyle=accent; ctx.fill();
-        ctx.fillStyle=textPrimary; ctx.font="600 26px system-ui,-apple-system,sans-serif";
-        ctx.textAlign="left"; ctx.textBaseline="middle";
-        ctx.fillText(ellipsize(wName,200),cardX+44+dotR*2+8,cardY+52);
-        ctx.fillStyle=textSecondary; ctx.font="400 22px system-ui,-apple-system,sans-serif";
-        ctx.fillText(ellipsize(" · "+wAddrShort,cardW-200),cardX+44+dotR*2+8+ctx.measureText(wName).width+4,cardY+52);
+        ctx.textAlign="left"; ctx.textBaseline="alphabetic";
+        ctx.fillStyle=textPrimary; ctx.font="600 28px system-ui,-apple-system,sans-serif";
+        ctx.fillText(ellipsize(wName,cardW-avCx-avR-60),avCx+avR+18,avCy-6);
+        ctx.fillStyle=textSecondary; ctx.font="400 20px system-ui,-apple-system,sans-serif";
+        ctx.fillText(ellipsize(wAddrShort,cardW-avCx-avR-60),avCx+avR+18,avCy+22);
+
+        // Big swap icon centered
+        const bigR=72; const bigCx=cardX+cardW/2; const bigCy=cardY+270;
+        drawSwapIcon(bigCx,bigCy,bigR,true);
 
         // Title
-        ctx.fillStyle=textPrimary; ctx.font="800 58px system-ui,-apple-system,sans-serif";
-        ctx.textAlign="left"; ctx.textBaseline="alphabetic";
-        ctx.fillText(ellipsize(convTitle,cardW-88),cardX+44,cardY+130);
+        ctx.fillStyle=textPrimary; ctx.font="800 64px system-ui,-apple-system,sans-serif";
+        ctx.textAlign="center"; ctx.textBaseline="alphabetic";
+        ctx.fillText(ellipsize(convTitle,cardW-80),bigCx,bigCy+bigR+76);
 
         // Amount
-        ctx.font="800 110px ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace";
+        ctx.font="800 100px ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace";
         ctx.fillStyle=accentText;
-        ctx.fillText(ellipsize(convAmount,cardW-88),cardX+44,cardY+260);
+        ctx.fillText(ellipsize(convAmount,cardW-80),bigCx,bigCy+bigR+190);
+
+        // Status pill
+        const pillText=convStatus||"—";
+        ctx.font="600 26px system-ui,-apple-system,sans-serif";
+        const pillW=ctx.measureText(pillText).width+60+28;
+        const pillH=52; const pillX=bigCx-pillW/2; const pillY=bigCy+bigR+218;
+        rr(pillX,pillY,pillW,pillH,pillH/2);
+        ctx.fillStyle=accentDim; ctx.fill();
+        ctx.strokeStyle=accentBorder; ctx.lineWidth=1.5; ctx.stroke();
+        drawCheckSmall(pillX+28,pillY+pillH/2,14);
+        ctx.fillStyle=accentText; ctx.textAlign="left"; ctx.textBaseline="middle";
+        ctx.fillText(pillText,pillX+52,pillY+pillH/2);
 
         // Divider
-        ctx.strokeStyle="rgba(255,255,255,0.07)"; ctx.lineWidth=1;
-        ctx.beginPath(); ctx.moveTo(cardX+44,cardY+290); ctx.lineTo(cardX+cardW-44,cardY+290); ctx.stroke();
+        ctx.strokeStyle="rgba(255,255,255,0.06)"; ctx.lineWidth=1;
+        ctx.beginPath(); ctx.moveTo(cardX+44,bigCy+bigR+296); ctx.lineTo(cardX+cardW-44,bigCy+bigR+296); ctx.stroke();
 
-        // Row 1: Date | Statut
-        let cy2=cardY+320;
-        const cardGap=18; const iconS=44; const halfW=(cardW-cardGap)/2;
-        const cardH1=110;
+        let cy2=bigCy+bigR+330;
+        const cardGap=18; const iconS=44;
+        const halfW=(cardW-cardGap)/2; const cardH1=100;
+
+        // Date | Status
         infoCard(cardX,cy2,halfW,cardH1);
         drawCalendar(cardX+36,cy2+cardH1/2,iconS);
         ctx.textAlign="left"; ctx.textBaseline="alphabetic";
         ctx.fillStyle=textSecondary; ctx.font="500 20px system-ui,-apple-system,sans-serif";
-        ctx.fillText(t("ui_date_label_7a2c1b9d5e","Date"),cardX+68,cy2+38);
+        ctx.fillText(t("ui_date_label_7a2c1b9d5e","Date"),cardX+68,cy2+34);
         ctx.fillStyle=textPrimary; ctx.font="600 24px system-ui,-apple-system,sans-serif";
-        ctx.fillText(ellipsize(convDate,halfW-76),cardX+68,cy2+70);
-
+        ctx.fillText(ellipsize(convDate,halfW-76),cardX+68,cy2+66);
         const sx=cardX+halfW+cardGap;
         infoCard(sx,cy2,halfW,cardH1);
-        drawCheckShield(sx+36,cy2+cardH1/2,22);
+        drawCheckSmall(sx+36,cy2+cardH1/2,22);
         ctx.fillStyle=textSecondary; ctx.font="500 20px system-ui,-apple-system,sans-serif";
-        ctx.fillText(t("ui_status_label","Statut"),sx+68,cy2+38);
-        ctx.fillStyle=textPrimary; ctx.font="600 26px system-ui,-apple-system,sans-serif";
-        ctx.fillText(ellipsize(convStatus||"—",halfW-80),sx+68,cy2+76);
+        ctx.fillText(t("ui_status_label","Statut"),sx+68,cy2+34);
+        ctx.fillStyle=accentText; ctx.font="700 24px system-ui,-apple-system,sans-serif";
+        ctx.fillText(ellipsize(convStatus||"—",halfW-80),sx+68,cy2+68);
+        cy2+=cardH1+cardGap;
 
         // Conversion pair card
-        cy2+=cardH1+cardGap;
         const convCardH=116;
         infoCard(cardX,cy2,cardW,convCardH);
         const circR=34;
@@ -1360,7 +1405,6 @@ export default function CurrencyStatement({
         ctx.fillText(convFrom,leftCX,midY-circR-10);
         ctx.fillStyle=textSecondary; ctx.font="400 22px system-ui,-apple-system,sans-serif";
         ctx.fillText(ellipsize(convFromAmt,cardW*0.35),leftCX,midY+circR+26);
-        // arrow
         ctx.strokeStyle=textSecondary; ctx.lineWidth=2; ctx.lineCap="round";
         const midX=cardX+cardW/2;
         ctx.beginPath(); ctx.moveTo(midX-18,midY); ctx.lineTo(midX+18,midY); ctx.stroke();
@@ -1370,55 +1414,59 @@ export default function CurrencyStatement({
         ctx.fillText(convTo,rightCX,midY-circR-10);
         ctx.fillStyle=accentText; ctx.font="400 22px system-ui,-apple-system,sans-serif";
         ctx.fillText(ellipsize(convToAmt,cardW*0.35),rightCX,midY+circR+26);
+        cy2+=convCardH+cardGap;
 
         // Rate card
-        cy2+=convCardH+cardGap;
         const rateCardH=100;
         infoCard(cardX,cy2,cardW,rateCardH);
         drawTrend(cardX+36,cy2+rateCardH/2,iconS);
         ctx.textAlign="left"; ctx.textBaseline="alphabetic";
         ctx.fillStyle=textSecondary; ctx.font="500 20px system-ui,-apple-system,sans-serif";
         ctx.fillText(t("ui_fx_rate_used","Taux utilisé"),cardX+68,cy2+36);
-        ctx.fillStyle=textPrimary; ctx.font="600 28px system-ui,-apple-system,sans-serif";
-        ctx.fillText(ellipsize(convRate,cardW-84),cardX+68,cy2+72);
-
-        // Disclaimer card
+        ctx.fillStyle=textPrimary; ctx.font="600 26px system-ui,-apple-system,sans-serif";
+        ctx.fillText(ellipsize(convRate,cardW-84),cardX+68,cy2+70);
         cy2+=rateCardH+cardGap;
-        const discH=isPortrait?130:0;
-        infoCard(cardX,cy2,cardW,discH);
-        drawInfoIcon(cardX+36,cy2+discH/2,20);
-        ctx.fillStyle=textSecondary; ctx.font="400 21px system-ui,-apple-system,sans-serif";
-        ctx.textAlign="left"; ctx.textBaseline="top";
-        // wrap disc note
-        const discWords=discNote.split(" "); let discLine=""; let discY=cy2+22;
-        discWords.forEach(w=>{
-          const test=discLine?discLine+" "+w:w;
-          ctx.font="400 21px system-ui,-apple-system,sans-serif";
-          if(ctx.measureText(test).width>cardW-100){
-            ctx.fillText(discLine,cardX+68,discY); discY+=28; discLine=w;
-          } else discLine=test;
-        });
-        if(discLine) ctx.fillText(discLine,cardX+68,discY);
 
-        // Footer
-        ctx.fillStyle="rgba(255,255,255,0.22)"; ctx.font="600 20px system-ui,-apple-system,sans-serif";
-        ctx.textAlign="center"; ctx.textBaseline="alphabetic";
-        ctx.fillText("XCANNES",cardX+cardW/2,cardY+cardH-22);
+        // TX ID card
+        const txCardH=110;
+        infoCard(cardX,cy2,cardW,txCardH);
+        drawHash(cardX+36,cy2+txCardH/2,iconS);
+        ctx.fillStyle=textSecondary; ctx.font="500 20px system-ui,-apple-system,sans-serif"; ctx.textAlign="left"; ctx.textBaseline="alphabetic";
+        ctx.fillText(t("ui_tx_id","ID de transaction"),cardX+68,cy2+38);
+        ctx.fillStyle=textPrimary; ctx.font="500 22px ui-monospace,SFMono-Regular,Menlo,Monaco,monospace";
+        ctx.fillText(ellipsize(txHashShort||"—",cardW-84),cardX+68,cy2+68);
+        if(txHash){
+          const badgeW=130; const badgeH=40; const badgeX=cardX+cardW-badgeW-12; const badgeY=cy2+txCardH-badgeH-12;
+          rr(badgeX,badgeY,badgeW,badgeH,20);
+          ctx.fillStyle=accentDim; ctx.fill();
+          ctx.strokeStyle=accentBorder; ctx.lineWidth=1; ctx.stroke();
+          ctx.fillStyle=accentText; ctx.font="600 22px system-ui,-apple-system,sans-serif";
+          ctx.textAlign="center"; ctx.textBaseline="middle";
+          ctx.fillText(t("ui_copy_action","Copier"),badgeX+badgeW/2,badgeY+badgeH/2);
+          ctx.textAlign="left"; ctx.textBaseline="alphabetic";
+        }
+
+        // Security note
+        const noteY=cardY+cardH-40; const lockS=28;
+        drawLock(cardX+36,noteY-lockS*0.1,lockS);
+        ctx.fillStyle=textSecondary; ctx.font="400 20px system-ui,-apple-system,sans-serif";
+        ctx.textAlign="left"; ctx.textBaseline="middle";
+        ctx.fillText(ellipsize(secNote,cardW-80),cardX+36+lockS,noteY);
 
       } else {
-        // ── LANDSCAPE ──────────────────────────────────────────────────────
-        const leftW=Math.round(cardW*0.46);
-        const rightX=cardX+leftW+44; const rightW=cardX+cardW-rightX-12;
+        // ── LANDSCAPE ────────────────────────────────────────────────
+        const leftW=Math.round(cardW*0.45);
+        const rightX=cardX+leftW+48; const rightW=cardX+cardW-rightX-12;
 
         // Avatar top-left
         const avR=36; const avCx=cardX+44+avR; const avCy=cardY+50+avR;
         ctx.beginPath(); ctx.arc(avCx,avCy,avR,0,Math.PI*2);
-        ctx.fillStyle=accentDim; ctx.fill();
+        ctx.fillStyle="rgba(59,130,246,0.16)"; ctx.fill();
         ctx.strokeStyle=accent; ctx.lineWidth=2; ctx.stroke();
         ctx.fillStyle=textPrimary; ctx.font="700 28px system-ui,-apple-system,sans-serif";
         ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText(initial,avCx,avCy);
         ctx.beginPath(); ctx.arc(avCx+avR*0.68,avCy+avR*0.68,8,0,Math.PI*2);
-        ctx.fillStyle="#080f1f"; ctx.fill();
+        ctx.fillStyle="#0b0f10"; ctx.fill();
         ctx.beginPath(); ctx.arc(avCx+avR*0.68,avCy+avR*0.68,6,0,Math.PI*2);
         ctx.fillStyle=accent; ctx.fill();
         ctx.textAlign="left"; ctx.textBaseline="alphabetic";
@@ -1429,125 +1477,94 @@ export default function CurrencyStatement({
 
         // Vertical divider
         ctx.strokeStyle="rgba(255,255,255,0.07)"; ctx.lineWidth=1;
-        ctx.beginPath(); ctx.moveTo(cardX+leftW+22,cardY+24); ctx.lineTo(cardX+leftW+22,cardY+cardH-24); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(cardX+leftW+24,cardY+24); ctx.lineTo(cardX+leftW+24,cardY+cardH-24); ctx.stroke();
 
-        // Left: title + amount
-        ctx.fillStyle=textPrimary; ctx.font="800 50px system-ui,-apple-system,sans-serif";
-        ctx.textAlign="left"; ctx.textBaseline="alphabetic";
-        ctx.fillText(ellipsize(convTitle,leftW-44),cardX+44,cardY+160);
-        ctx.font="800 88px ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace";
+        // Big swap icon left-centered
+        const bigR=64; const bigCx=cardX+leftW/2; const bigCy=cardY+210;
+        drawSwapIcon(bigCx,bigCy,bigR,true);
+        ctx.fillStyle=textPrimary; ctx.font="800 56px system-ui,-apple-system,sans-serif";
+        ctx.textAlign="center"; ctx.textBaseline="alphabetic";
+        ctx.fillText(ellipsize(convTitle,leftW-40),bigCx,bigCy+bigR+64);
+        ctx.font="800 80px ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace";
         ctx.fillStyle=accentText;
-        ctx.fillText(ellipsize(convAmount,leftW-44),cardX+44,cardY+268);
+        ctx.fillText(ellipsize(convAmount,leftW-40),bigCx,bigCy+bigR+158);
 
-        // Divider left
-        ctx.strokeStyle="rgba(255,255,255,0.07)"; ctx.lineWidth=1;
-        ctx.beginPath(); ctx.moveTo(cardX+44,cardY+290); ctx.lineTo(cardX+leftW-12,cardY+290); ctx.stroke();
+        // Status pill
+        const pillText=convStatus||"—";
+        ctx.font="600 24px system-ui,-apple-system,sans-serif";
+        const pillW=ctx.measureText(pillText).width+52+24; const pillH=46;
+        const pillX=bigCx-pillW/2; const pillY=bigCy+bigR+180;
+        rr(pillX,pillY,pillW,pillH,pillH/2);
+        ctx.fillStyle=accentDim; ctx.fill();
+        ctx.strokeStyle=accentBorder; ctx.lineWidth=1.5; ctx.stroke();
+        drawCheckSmall(pillX+24,pillY+pillH/2,12);
+        ctx.fillStyle=accentText; ctx.textAlign="left"; ctx.textBaseline="middle";
+        ctx.fillText(pillText,pillX+44,pillY+pillH/2);
 
-        // Date | Statut
-        let ly=cardY+318;
-        const cardGapL=16; const iconSL=40; const halfLW=(leftW-cardGapL)/2;
-        const lCardH=106;
-        infoCard(cardX,ly,halfLW,lCardH);
-        drawCalendar(cardX+30,ly+lCardH/2,iconSL);
+        // Right panel cards
+        let ry=cardY+44; const rGap=16; const iconS=38; const rCardW=rightW;
+
+        // Date | Status
+        const halfRW=(rCardW-rGap)/2; const cardRH1=106;
+        infoCard(rightX,ry,halfRW,cardRH1);
+        drawCalendar(rightX+28,ry+cardRH1/2,iconS);
         ctx.textAlign="left"; ctx.textBaseline="alphabetic";
         ctx.fillStyle=textSecondary; ctx.font="500 17px system-ui,-apple-system,sans-serif";
-        ctx.fillText(t("ui_date_label_7a2c1b9d5e","Date"),cardX+60,ly+32);
+        ctx.fillText(t("ui_date_label_7a2c1b9d5e","Date"),rightX+56,ry+34);
         ctx.fillStyle=textPrimary; ctx.font="600 20px system-ui,-apple-system,sans-serif";
-        ctx.fillText(ellipsize(convDate,halfLW-68),cardX+60,ly+60);
-
-        const lsx=cardX+halfLW+cardGapL;
-        infoCard(lsx,ly,halfLW,lCardH);
-        drawCheckShield(lsx+30,ly+lCardH/2,19);
+        ctx.fillText(ellipsize(convDate,halfRW-64),rightX+56,ry+62);
+        const sx2=rightX+halfRW+rGap;
+        infoCard(sx2,ry,halfRW,cardRH1);
+        drawCheckSmall(sx2+28,ry+cardRH1/2,18);
         ctx.fillStyle=textSecondary; ctx.font="500 17px system-ui,-apple-system,sans-serif";
-        ctx.fillText(t("ui_status_label","Statut"),lsx+58,ly+32);
-        ctx.fillStyle=textPrimary; ctx.font="700 22px system-ui,-apple-system,sans-serif";
-        ctx.fillText(ellipsize(convStatus||"—",halfLW-68),lsx+58,ly+68);
-        ly+=lCardH+cardGapL;
+        ctx.fillText(t("ui_status_label","Statut"),sx2+56,ry+34);
+        ctx.fillStyle=accentText; ctx.font="700 22px system-ui,-apple-system,sans-serif";
+        ctx.fillText(ellipsize(convStatus||"—",halfRW-68),sx2+56,ry+68);
+        ry+=cardRH1+rGap;
 
         // Conversion pair card
         const convCardH=108;
-        infoCard(cardX,ly,leftW,convCardH);
-        const circR=30;
-        const leftCX=cardX+leftW*0.22; const rightCX=cardX+leftW*0.72; const midY=ly+convCardH/2;
+        infoCard(rightX,ry,rCardW,convCardH);
+        const circR=28;
+        const leftCX=rightX+rCardW*0.22; const rightCX=rightX+rCardW*0.72; const midY=ry+convCardH/2;
         drawCurrencyCircle(leftCX,midY,circR,convFrom);
         ctx.textAlign="center"; ctx.textBaseline="alphabetic";
-        ctx.fillStyle=textPrimary; ctx.font="700 22px system-ui,-apple-system,sans-serif";
-        ctx.fillText(convFrom,leftCX,midY-circR-8);
-        ctx.fillStyle=textSecondary; ctx.font="400 19px system-ui,-apple-system,sans-serif";
-        ctx.fillText(ellipsize(convFromAmt,leftW*0.35),leftCX,midY+circR+22);
-        const midX2=cardX+leftW/2;
+        ctx.fillStyle=textPrimary; ctx.font="700 20px system-ui,-apple-system,sans-serif";
+        ctx.fillText(convFrom,leftCX,midY-circR-7);
+        ctx.fillStyle=textSecondary; ctx.font="400 18px system-ui,-apple-system,sans-serif";
+        ctx.fillText(ellipsize(convFromAmt,rCardW*0.35),leftCX,midY+circR+20);
         ctx.strokeStyle=textSecondary; ctx.lineWidth=2; ctx.lineCap="round";
+        const midX2=rightX+rCardW/2;
         ctx.beginPath(); ctx.moveTo(midX2-16,midY); ctx.lineTo(midX2+16,midY); ctx.stroke();
         ctx.beginPath(); ctx.moveTo(midX2+4,midY-10); ctx.lineTo(midX2+16,midY); ctx.lineTo(midX2+4,midY+10); ctx.stroke();
         drawCurrencyCircle(rightCX,midY,circR,convTo);
-        ctx.fillStyle=textPrimary; ctx.font="700 22px system-ui,-apple-system,sans-serif";
-        ctx.fillText(convTo,rightCX,midY-circR-8);
-        ctx.fillStyle=accentText; ctx.font="400 19px system-ui,-apple-system,sans-serif";
-        ctx.fillText(ellipsize(convToAmt,leftW*0.35),rightCX,midY+circR+22);
-        ly+=convCardH+cardGapL;
+        ctx.fillStyle=textPrimary; ctx.font="700 20px system-ui,-apple-system,sans-serif";
+        ctx.fillText(convTo,rightCX,midY-circR-7);
+        ctx.fillStyle=accentText; ctx.font="400 18px system-ui,-apple-system,sans-serif";
+        ctx.fillText(ellipsize(convToAmt,rCardW*0.35),rightCX,midY+circR+20);
+        ry+=convCardH+rGap;
 
         // Rate card
-        const rateCardH=92;
-        infoCard(cardX,ly,leftW,rateCardH);
-        drawTrend(cardX+30,ly+rateCardH/2,iconSL);
+        const rateCardH=90;
+        infoCard(rightX,ry,rCardW,rateCardH);
+        drawTrend(rightX+28,ry+rateCardH/2,iconS);
         ctx.textAlign="left"; ctx.textBaseline="alphabetic";
         ctx.fillStyle=textSecondary; ctx.font="500 17px system-ui,-apple-system,sans-serif";
-        ctx.fillText(t("ui_fx_rate_used","Taux utilisé"),cardX+60,ly+30);
-        ctx.fillStyle=textPrimary; ctx.font="600 24px system-ui,-apple-system,sans-serif";
-        ctx.fillText(ellipsize(convRate,leftW-72),cardX+60,ly+62);
-
-        // Right: disclaimer + details table + TX ID
-        let ry=cardY+44; const rGap=16; const rCardW=rightW;
-
-        // Disclaimer
-        const discCardH=116;
-        infoCard(rightX,ry,rCardW,discCardH);
-        drawInfoIcon(rightX+28,ry+32,17);
-        ctx.textAlign="left"; ctx.textBaseline="top";
-        ctx.fillStyle=textSecondary; ctx.font="400 17px system-ui,-apple-system,sans-serif";
-        const discWords=discNote.split(" "); let discLine=""; let discY=ry+16;
-        discWords.forEach(w=>{
-          const test=discLine?discLine+" "+w:w;
-          if(ctx.measureText(test).width>rCardW-64){
-            ctx.fillText(discLine,rightX+52,discY); discY+=23; discLine=w;
-          } else discLine=test;
-        });
-        if(discLine) ctx.fillText(discLine,rightX+52,discY);
-        ry+=discCardH+rGap;
-
-        // Details table card
-        const detailH=186;
-        infoCard(rightX,ry,rCardW,detailH);
-        ctx.textAlign="left"; ctx.textBaseline="alphabetic";
-        ctx.fillStyle=textPrimary; ctx.font="700 22px system-ui,-apple-system,sans-serif";
-        ctx.fillText(t("ui_conversion_details","Détails de la conversion"),rightX+24,ry+34);
-        const rows=[
-          [t("ui_amount_in_from","Montant en "+convFrom), convFromAmt, textSecondary],
-          [t("ui_fx_rate_short","Taux de change"), convRateShort, textSecondary],
-          [t("ui_amount_in_to","Montant en "+convTo), convToAmt, accentText],
-        ];
-        let rowY=ry+62;
-        rows.forEach(([label,val,valColor])=>{
-          ctx.fillStyle=textSecondary; ctx.font="400 17px system-ui,-apple-system,sans-serif";
-          ctx.fillText(label,rightX+24,rowY);
-          ctx.textAlign="right";
-          ctx.fillStyle=valColor; ctx.font="600 18px system-ui,-apple-system,sans-serif";
-          ctx.fillText(ellipsize(val,rCardW-48),rightX+rCardW-20,rowY);
-          ctx.textAlign="left";
-          rowY+=38;
-        });
-        ry+=detailH+rGap;
+        ctx.fillText(t("ui_fx_rate_used","Taux utilisé"),rightX+56,ry+30);
+        ctx.fillStyle=textPrimary; ctx.font="600 22px system-ui,-apple-system,sans-serif";
+        ctx.fillText(ellipsize(convRate,rCardW-72),rightX+56,ry+60);
+        ry+=rateCardH+rGap;
 
         // TX ID card
-        const txHash=convTxHash; const txHashShort=txHash.length>22?txHash.slice(0,10)+"…"+txHash.slice(-10):txHash;
         const txCardH=96;
         infoCard(rightX,ry,rCardW,txCardH);
+        drawHash(rightX+28,ry+txCardH/2,iconS);
         ctx.fillStyle=textSecondary; ctx.font="500 17px system-ui,-apple-system,sans-serif"; ctx.textAlign="left"; ctx.textBaseline="alphabetic";
-        ctx.fillText(t("ui_tx_id","ID de transaction"),rightX+24,ry+30);
+        ctx.fillText(t("ui_tx_id","ID de transaction"),rightX+56,ry+32);
         ctx.fillStyle=textPrimary; ctx.font="500 18px ui-monospace,SFMono-Regular,Menlo,Monaco,monospace";
-        ctx.fillText(ellipsize(txHashShort||"—",rCardW-160),rightX+24,ry+60);
+        ctx.fillText(ellipsize(txHashShort||"—",rCardW-160),rightX+56,ry+60);
         if(txHash){
-          const bW=110; const bH=34; const bX=rightX+rCardW-bW-14; const bY=ry+(txCardH-bH)/2;
+          const bW=110; const bH=34; const bX=rightX+rCardW-bW-12; const bY=ry+(txCardH-bH)/2;
           rr(bX,bY,bW,bH,17); ctx.fillStyle=accentDim; ctx.fill();
           ctx.strokeStyle=accentBorder; ctx.lineWidth=1; ctx.stroke();
           ctx.fillStyle=accentText; ctx.font="600 18px system-ui,-apple-system,sans-serif";
@@ -1556,15 +1573,13 @@ export default function CurrencyStatement({
           ctx.textAlign="left"; ctx.textBaseline="alphabetic";
         }
 
-        // Security note bottom
-        const noteY2=cardY+cardH-36;
-        const lkS=24;
-        const noteCardH=56;
+        // Security note full-width bottom
+        const noteY2=cardY+cardH-36; const lkS=24; const lkCx=cardX+36; const noteCardH=56;
         infoCard(cardX,noteY2-noteCardH+8,cardW,noteCardH);
-        drawLock(cardX+36,noteY2-noteCardH*0.1+8,lkS);
+        drawLock(lkCx+lkS*0.5,noteY2-noteCardH*0.1+8,lkS);
         ctx.fillStyle=textSecondary; ctx.font="400 18px system-ui,-apple-system,sans-serif";
         ctx.textAlign="left"; ctx.textBaseline="middle";
-        ctx.fillText(ellipsize(secNote,cardW-80),cardX+36+lkS+8,noteY2-noteCardH/2+8);
+        ctx.fillText(ellipsize(secNote,cardW-80),lkCx+lkS+10,noteY2-noteCardH/2+8);
       }
 
       if(typeof canvas.toBlob==="function"){
