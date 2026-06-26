@@ -1208,11 +1208,6 @@ export default function CurrencyStatement({
 
       ctx.fillStyle = "#080f1f";
       ctx.fillRect(0, 0, w, h);
-      const bg1 = ctx.createRadialGradient(w*0.5, h*0.35, 0, w*0.5, h*0.35, h*0.75);
-      bg1.addColorStop(0, "rgba(59,130,246,0.16)");
-      bg1.addColorStop(0.6, "rgba(59,130,246,0.04)");
-      bg1.addColorStop(1, "rgba(59,130,246,0)");
-      ctx.fillStyle = bg1; ctx.fillRect(0, 0, w, h);
 
       const pad = isPortrait ? 48 : 56;
       const cardX = pad; const cardY = pad;
@@ -1605,19 +1600,6 @@ export default function CurrencyStatement({
       // Background
       ctx.fillStyle = "#150808";
       ctx.fillRect(0, 0, w, h);
-      const bg1 = ctx.createRadialGradient(w * 0.5, h * 0.38, 0, w * 0.5, h * 0.38, h * 0.75);
-      bg1.addColorStop(0, "rgba(248,113,113,0.18)");
-      bg1.addColorStop(0.6, "rgba(248,113,113,0.05)");
-      bg1.addColorStop(1, "rgba(248,113,113,0)");
-      ctx.fillStyle = bg1;
-      ctx.fillRect(0, 0, w, h);
-      if (isPortrait) {
-        const bg2 = ctx.createRadialGradient(w * 0.5, h * 0.85, 0, w * 0.5, h * 0.85, h * 0.3);
-        bg2.addColorStop(0, "rgba(248,113,113,0.07)");
-        bg2.addColorStop(1, "rgba(248,113,113,0)");
-        ctx.fillStyle = bg2;
-        ctx.fillRect(0, 0, w, h);
-      }
 
       // Outer card
       const pad = isPortrait ? 48 : 56;
@@ -1949,21 +1931,6 @@ export default function CurrencyStatement({
       // Background: very dark green
       ctx.fillStyle = "#061510";
       ctx.fillRect(0, 0, w, h);
-      // Radial glow
-      const bg1 = ctx.createRadialGradient(w * 0.5, h * 0.38, 0, w * 0.5, h * 0.38, h * 0.75);
-      bg1.addColorStop(0, "rgba(34,197,94,0.18)");
-      bg1.addColorStop(0.6, "rgba(34,197,94,0.05)");
-      bg1.addColorStop(1, "rgba(34,197,94,0)");
-      ctx.fillStyle = bg1;
-      ctx.fillRect(0, 0, w, h);
-      if (isPortrait) {
-        // Extra glow bottom
-        const bg2 = ctx.createRadialGradient(w * 0.5, h * 0.85, 0, w * 0.5, h * 0.85, h * 0.3);
-        bg2.addColorStop(0, "rgba(34,197,94,0.07)");
-        bg2.addColorStop(1, "rgba(34,197,94,0)");
-        ctx.fillStyle = bg2;
-        ctx.fillRect(0, 0, w, h);
-      }
 
       // ── Outer card ──────────────────────────────────────────────────
       const pad = isPortrait ? 48 : 56;
@@ -2349,16 +2316,8 @@ export default function CurrencyStatement({
 
       const txIsDebit = detailTx?.type === "debit";
       const accentMain = txIsDebit ? "#f87171" : "#22c55e";
-      const accentGlowInner = txIsDebit ? "rgba(248,113,113,0.16)" : "rgba(34,197,94,0.16)";
-      const accentGlowOuter = txIsDebit ? "rgba(248,113,113,0)" : "rgba(34,197,94,0)";
-
       // Background
       ctx.fillStyle = "#0b0f10";
-      ctx.fillRect(0, 0, w, h);
-      const glow = ctx.createRadialGradient(w * 0.5, h * 0.28, 0, w * 0.5, h * 0.28, h * 0.85);
-      glow.addColorStop(0, accentGlowInner);
-      glow.addColorStop(1, accentGlowOuter);
-      ctx.fillStyle = glow;
       ctx.fillRect(0, 0, w, h);
 
       const pad = 52;
