@@ -151,7 +151,7 @@ export default function CurrencyTransactionDetailModal({
         <span className="block w-36 h-1.5 rounded-full bg-white/80" />
       </div>
       <div
-        className={`relative w-full max-w-md rounded-[20px] ${modalBgClass} px-4 pt-3 pb-5 ring-1 ring-white/10 ring-inset shadow-[0_24px_60px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-26px_46px_rgba(0,0,0,0.55)] wallet-modal-lift-in overflow-y-auto max-h-[92vh]`}
+        className={`relative w-full max-w-md rounded-[20px] ${modalBgClass} px-4 pt-2 pb-3 ring-1 ring-white/10 ring-inset shadow-[0_24px_60px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-26px_46px_rgba(0,0,0,0.55)] wallet-modal-lift-in overflow-y-auto max-h-[92dvh]`}
         style={{
           transform: dragY ? `translateY(${dragY}px)` : undefined,
           opacity: dragY ? fadeOpacity : undefined,
@@ -165,12 +165,12 @@ export default function CurrencyTransactionDetailModal({
         onPointerCancel={onPointerEnd}
       >
         {/* Swipe handle (mobile) */}
-        <div className="md:hidden mb-3 flex justify-center" aria-hidden>
+        <div className="md:hidden mb-2 flex justify-center" aria-hidden>
           <span className="block w-12 h-1.5 rounded-full bg-white/20" />
         </div>
 
         {/* Account header: avatar + nom + adresse */}
-        <div className="flex items-center gap-2.5 mb-5">
+        <div className="flex items-center gap-2.5 mb-2">
           <div className="relative shrink-0">
             <div className={`w-10 h-10 rounded-full border-2 ${accentBorder} ${accentBg} flex items-center justify-center text-white font-bold text-base`}>
               {initial}
@@ -184,18 +184,18 @@ export default function CurrencyTransactionDetailModal({
         </div>
 
         {/* Grand icône central */}
-        <div className="flex justify-center mb-3">
-          <div className={`w-16 h-16 rounded-full border-[3px] ${accentBorder} ${accentBg} flex items-center justify-center`}>
+        <div className="flex justify-center mb-1.5">
+          <div className={`w-12 h-12 rounded-full border-2 ${accentBorder} ${accentBg} flex items-center justify-center`}>
             {detailIsConversion ? (
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`w-7 h-7 ${accentText}`} aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`w-5 h-5 ${accentText}`} aria-hidden="true">
                 <path d="M7 16V4m0 0L3 8m4-4l4 4" /><path d="M17 8v12m0 0l4-4m-4 4l-4-4" />
               </svg>
             ) : isCredit ? (
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`w-7 h-7 ${accentText}`} aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`w-5 h-5 ${accentText}`} aria-hidden="true">
                 <polyline points="20 6 9 17 4 12" />
               </svg>
             ) : (
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`w-7 h-7 ${accentText}`} aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`w-5 h-5 ${accentText}`} aria-hidden="true">
                 <line x1="12" y1="19" x2="12" y2="5" /><polyline points="5 12 12 5 19 12" />
               </svg>
             )}
@@ -203,24 +203,24 @@ export default function CurrencyTransactionDetailModal({
         </div>
 
         {/* Titre */}
-        <div className="text-center text-2xl font-extrabold text-white mb-2">
+        <div className="text-center text-xl font-extrabold text-white mb-1">
           {detailTypeLabel || t("ui_transaction", "Transaction")}
         </div>
 
         {/* Montant large */}
-        <div className={`text-center text-[2.2rem] font-extrabold font-mono ${accentText} leading-tight mb-4`}>
+        <div className={`text-center text-[1.75rem] font-extrabold font-mono ${accentText} leading-tight mb-2`}>
           {amountDisplay}
         </div>
 
         {/* Divider */}
-        <div className="h-px bg-white/[0.07] mb-4" />
+        <div className="h-px bg-white/[0.07] mb-2" />
 
         {/* Statut & date */}
-        <div className="mb-1.5 text-[11px] tracking-[0.08em] text-[#8B98A5]">
+        <div className="mb-1 text-[11px] tracking-[0.08em] text-[#8B98A5]">
           {t("ui_status_and_date", "Statut & date")}
         </div>
-        <div className="grid grid-cols-2 gap-3 mb-4">
-          <div className={`rounded-[16px] border ${accentBorder} bg-white/[0.03] px-3 py-3 flex items-center gap-2`}>
+        <div className="grid grid-cols-2 gap-2 mb-2">
+          <div className={`rounded-[14px] border ${accentBorder} bg-white/[0.03] px-3 py-2 flex items-center gap-2`}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`w-4 h-4 shrink-0 ${accentText}`} aria-hidden="true">
               <polyline points="20 6 9 17 4 12" />
             </svg>
@@ -229,7 +229,7 @@ export default function CurrencyTransactionDetailModal({
               <div className={`text-sm font-bold ${accentText} truncate`}>{detailStatusLabel || "—"}</div>
             </div>
           </div>
-          <div className="rounded-[16px] border border-white/[0.06] bg-white/[0.03] px-3 py-3 flex items-center gap-2">
+          <div className="rounded-[14px] border border-white/[0.06] bg-white/[0.03] px-3 py-2 flex items-center gap-2">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 shrink-0 text-white/50" aria-hidden="true">
               <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
               <line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" />
@@ -244,8 +244,8 @@ export default function CurrencyTransactionDetailModal({
         {/* Expéditeur / Destinataire */}
         {!detailIsConversion && counterpartyAddress ? (
           <>
-            <div className="mb-1.5 text-[11px] tracking-[0.08em] text-[#8B98A5]">{counterpartyTitle}</div>
-            <div className="rounded-[16px] border border-white/[0.06] bg-white/[0.03] px-3 py-3 mb-4">
+            <div className="mb-1 text-[11px] tracking-[0.08em] text-[#8B98A5]">{counterpartyTitle}</div>
+            <div className="rounded-[14px] border border-white/[0.06] bg-white/[0.03] px-3 py-2 mb-2">
               <div className="flex items-center justify-between gap-3">
                 <div className="min-w-0">
                   <div className="text-[15px] font-bold text-white truncate">{counterpartyName}</div>
@@ -281,8 +281,8 @@ export default function CurrencyTransactionDetailModal({
         ) : null}
 
         {/* Détails: Montant + Frais (conversion) + Solde après */}
-        <div className="mb-1.5 text-[11px] tracking-[0.08em] text-[#8B98A5]">{t("ui_details_label", "Détails")}</div>
-        <div className="rounded-[16px] border border-white/[0.06] bg-white/[0.03] px-3 py-3 mb-4 space-y-2.5">
+        <div className="mb-1 text-[11px] tracking-[0.08em] text-[#8B98A5]">{t("ui_details_label", "Détails")}</div>
+        <div className="rounded-[14px] border border-white/[0.06] bg-white/[0.03] px-3 py-2 mb-2 space-y-1.5">
           <div className="flex items-center justify-between gap-3">
             <span className="text-xs text-white/60">{t("ui_amount_52cea2dd3d", "Montant")}</span>
             <span className={`text-sm font-bold font-mono ${accentText}`}>{amountDisplay}</span>
@@ -311,7 +311,7 @@ export default function CurrencyTransactionDetailModal({
 
         {/* TX ID */}
         {txHash ? (
-          <div className="rounded-[16px] border border-white/[0.06] bg-white/[0.03] px-3 py-3 mb-4">
+          <div className="rounded-[14px] border border-white/[0.06] bg-white/[0.03] px-3 py-2 mb-2">
             <div className="flex items-center justify-between gap-3">
               <div className="min-w-0 flex items-center gap-2">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 shrink-0 text-white/50" aria-hidden="true">
@@ -343,7 +343,7 @@ export default function CurrencyTransactionDetailModal({
         ) : null}
 
         {/* Note de sécurité */}
-        <div className="flex items-center gap-2 mb-4">
+        <div className="flex items-center gap-2 mb-1">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 shrink-0 text-white/30" aria-hidden="true">
             <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
             <path d="M7 11V7a5 5 0 0 1 10 0v4" />
@@ -352,11 +352,11 @@ export default function CurrencyTransactionDetailModal({
         </div>
 
         {/* Bouton Partager */}
-        <div className="flex flex-col items-end gap-2">
+        <div className="flex flex-col items-end gap-1">
           <button
             type="button"
             onClick={handleShare}
-            className="inline-flex items-center gap-2 px-2 h-9 bg-transparent text-white/80 hover:text-white transition-colors text-sm font-semibold"
+            className="inline-flex items-center gap-2 px-2 h-8 bg-transparent text-white/80 hover:text-white transition-colors text-sm font-semibold"
             aria-label={t("ui_share", "Partager")}
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4" aria-hidden="true">
@@ -374,7 +374,7 @@ export default function CurrencyTransactionDetailModal({
         </div>
 
         {/* Footer XCANNES */}
-        <div className="mt-3 text-center text-[11px] tracking-[0.08em] text-white/30">
+        <div className="mt-1.5 text-center text-[11px] tracking-[0.08em] text-white/30">
           XCANNES
         </div>
       </div>
