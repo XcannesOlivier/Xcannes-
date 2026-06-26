@@ -9,7 +9,7 @@ export default function StatementPreviewModal({ html, title, onClose, onPrint, p
   if (typeof document === "undefined") return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-[10400] flex items-center justify-center p-3 md:p-10">
+    <div className="fixed inset-0 z-[10400] flex items-center justify-center p-2 md:p-6 lg:p-8">
       {/* Backdrop semi-transparent — modal principal visible sur les côtés */}
       <div
         className="absolute inset-0 bg-black/55"
@@ -18,8 +18,8 @@ export default function StatementPreviewModal({ html, title, onClose, onPrint, p
 
       {/* Panel : plus étroit que le modal parent */}
       <div
-        className="relative z-10 w-full max-w-2xl flex flex-col rounded-[16px] overflow-hidden shadow-[0_32px_80px_rgba(0,0,0,0.7)]"
-        style={{ maxHeight: "88dvh" }}
+        className="relative z-10 w-full md:max-w-4xl lg:max-w-5xl flex flex-col rounded-[16px] overflow-hidden shadow-[0_32px_80px_rgba(0,0,0,0.7)]"
+        style={{ maxHeight: "94dvh", height: "94dvh" }}
       >
         {/* Header blanc */}
         <div className="flex items-center justify-between gap-3 px-4 py-3 bg-white border-b border-gray-200 shrink-0">
@@ -65,7 +65,7 @@ export default function StatementPreviewModal({ html, title, onClose, onPrint, p
           srcDoc={html}
           title="Aperçu du relevé"
           className="w-full flex-1 bg-white"
-          style={{ border: "none", minHeight: "300px" }}
+          style={{ border: "none", minHeight: "400px" }}
         />
       </div>
     </div>,
