@@ -556,21 +556,33 @@ export default function WalletDashboardReceiveModal({
     const safeScale = Math.min(baseScale, maxExportWidth / (srcWidth + margin * 2));
     const scale = Math.max(1.8, safeScale);
     const exportCanvas = document.createElement('canvas');
+    // Portrait width (used as QR panel width in landscape too)
     const exportWidth = Math.round((srcWidth + margin * 2) * scale);
     const baseHeight = (srcHeight + margin * 2) * scale;
-    exportCanvas.width = exportWidth;
     const ctx = exportCanvas.getContext('2d');
     if (!ctx) return null;
 
-    const maxTextWidth = exportWidth - margin * scale * 2;
+    // Landscape mode on desktop: QR on the left, text panel on the right.
+    // Portrait mode on mobile: same as before (QR top, text below).
+    const landscape = isDesktop;
+
+    // In landscape the text panel is as wide as the QR panel; total image width doubles.
+    const landscapeTextPanelWidth = exportWidth;
+    const totalWidth = landscape ? exportWidth + landscapeTextPanelWidth : exportWidth;
+    exportCanvas.width = totalWidth;
+
+    // Font sizes are derived from exportWidth (the QR panel width) so they stay
+    // proportional regardless of the total canvas width.
+    const maxTextWidth = landscape
+      ? landscapeTextPanelWidth - margin * scale * 2
+      : exportWidth - margin * scale * 2;
     const titleFontSize = Math.max(28, Math.round(exportWidth * 0.052));
     const labelFontSize = Math.max(28, Math.round(exportWidth * 0.052));
     const addressFontSize = Math.max(13, Math.round(exportWidth * 0.026));
     const metaFontSize = Math.max(16, Math.round(exportWidth * 0.032));
     const amountFontSize = Math.max(36, Math.round(exportWidth * 0.064));
     const brandFontSize = Math.max(11, Math.round(exportWidth * 0.022));
-    // Accent color used for all text: green for the address QR, orange for the
-    // payment request QR.
+    // Accent color: green for address QR, orange for payment request QR.
     const accentColor = useRequest ? '#f97316' : '#16a34a';
     const titleFont = `700 ${titleFontSize}px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif`;
     const labelFont = `600 ${labelFontSize}px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif`;
@@ -627,7 +639,7 @@ export default function WalletDashboardReceiveModal({
       });
     };
 
-    // Title at the top of the exported image (different label for payment requests)
+    // Title (different label for payment requests)
     const titleText = useRequest
       ? t('ui_qr_share_title_request', 'QR code de demande de paiement')
       : t('ui_qr_share_title', "QR code d'adresse du compte");
@@ -670,117 +682,195 @@ export default function WalletDashboardReceiveModal({
     const textGap = textLines.length ? Math.round(labelFontSize * 0.8) : 0;
     const textBlockHeight = textLines.reduce((sum, line) => sum + line.lineHeight, 0);
 
-    // Brand footer "XCANNES" — discreet under the address
+    // Brand footer "XCANNES"
     const brandLineHeight = Math.round(brandFontSize * 1.4);
     const brandGap = Math.round(brandFontSize * 1.2);
 
-    exportCanvas.height = titleBlockHeight + titleGap + baseHeight + textGap + textBlockHeight + brandGap + brandLineHeight;
+    // ── Canvas height ────────────────────────────────────────────────────────
+    // Portrait: title band + QR + text block + brand footer stacked vertically.
+    // Landscape: title is in the right panel, so the height is only the QR height
+    //            plus enough room for the right-panel content.
+    const portraitHeight = titleBlockHeight + titleGap + baseHeight + textGap + textBlockHeight + brandGap + brandLineHeight;
+    const rightPanelContentHeight = titleBlockHeight + titleGap + textGap + textBlockHeight + brandGap + brandLineHeight;
+    const landscapeHeight = Math.max(baseHeight, rightPanelContentHeight + margin * scale * 2);
+    exportCanvas.height = landscape ? Math.round(landscapeHeight) : portraitHeight;
 
     ctx.imageSmoothingEnabled = false;
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
 
-    const qrTopOffset = titleBlockHeight + titleGap;
     const offset = margin * scale;
-    const qrDrawX = offset;
-    const qrDrawY = qrTopOffset + offset;
     const qrDrawW = srcWidth * scale;
     const qrDrawH = srcHeight * scale;
 
-    // Solid dark-grey background filling everything around the QR (right up to
-    // its canvas edge). The QR canvas already includes its own white quiet zone,
-    // so scanners can still detect it.
-    {
-      const qrLeft = qrDrawX;
-      const qrRight = qrDrawX + qrDrawW;
-      const qrTop = qrDrawY;
-      const qrBottom = qrDrawY + qrDrawH;
-      ctx.fillStyle = 'rgba(70, 70, 70, 1)';
-      // Top band
-      if (qrTop > 0) {
-        ctx.fillRect(0, 0, exportCanvas.width, qrTop);
-      }
-      // Bottom band
-      if (qrBottom < exportCanvas.height) {
-        ctx.fillRect(0, qrBottom, exportCanvas.width, exportCanvas.height - qrBottom);
-      }
-      // Left band (between top and bottom of QR)
-      if (qrLeft > 0) {
-        ctx.fillRect(0, qrTop, qrLeft, qrBottom - qrTop);
-      }
-      // Right band (between top and bottom of QR)
-      if (qrRight < exportCanvas.width) {
-        ctx.fillRect(qrRight, qrTop, exportCanvas.width - qrRight, qrBottom - qrTop);
-      }
-    }
+    if (landscape) {
+      // ── Landscape layout ─────────────────────────────────────────────────
+      // Left panel (dark): QR code centred vertically.
+      // Right panel (dark): title + text lines + brand footer, left-aligned.
+      const totalH = exportCanvas.height;
+      const qrDrawX = offset;
+      const qrDrawY = Math.round((totalH - qrDrawH) / 2);
 
-    // Draw title at the top (on white background)
-    if (titleLinesArr.length > 0) {
-      let ty = Math.round(titleGap / 2);
-      ctx.textAlign = 'center';
+      // Fill entire canvas dark grey
+      ctx.fillStyle = 'rgba(70, 70, 70, 1)';
+      ctx.fillRect(0, 0, totalWidth, totalH);
+
+      // Draw QR
+      ctx.drawImage(canvas, qrDrawX, qrDrawY, qrDrawW, qrDrawH);
+      try {
+        const srcCtx = canvas.getContext('2d');
+        const srcPixel = srcCtx?.getImageData(0, 0, 1, 1)?.data;
+        const isDarkBg = srcPixel && srcPixel.length >= 3 ? srcPixel[0] + srcPixel[1] + srcPixel[2] < 128 * 3 : false;
+        if (isDarkBg) {
+          const imageData = ctx.getImageData(qrDrawX, qrDrawY, qrDrawW, qrDrawH);
+          const data = imageData.data;
+          for (let i = 0; i < data.length; i += 4) {
+            data[i] = 255 - data[i];
+            data[i + 1] = 255 - data[i + 1];
+            data[i + 2] = 255 - data[i + 2];
+          }
+          ctx.putImageData(imageData, qrDrawX, qrDrawY);
+        }
+      } catch {
+        ctx.drawImage(canvas, qrDrawX, qrDrawY, qrDrawW, qrDrawH);
+      }
+
+      // Vertical separator
+      const sepX = exportWidth;
+      ctx.fillStyle = 'rgba(255,255,255,0.08)';
+      ctx.fillRect(sepX, 0, 1, totalH);
+
+      // Right panel text — left-aligned, starting at sepX + offset
+      const textX = sepX + offset;
+      ctx.textAlign = 'left';
       ctx.textBaseline = 'top';
 
+      // Title
+      let ty = offset;
       titleLinesArr.forEach(line => {
         ctx.font = line.font;
         ctx.fillStyle = line.color;
-        ctx.fillText(line.text, exportWidth / 2, ty);
-
+        ctx.fillText(line.text, textX, ty);
         ty += line.lineHeight;
       });
-    }
+      ty += titleGap;
 
-    // Accent dot in the top-right corner of the exported image.
-    {
-      const dotRadius = Math.max(8, Math.round(titleFontSize * 0.34));
-      const dotInset = Math.max(16, Math.round(titleFontSize * 0.38));
-      const dotX = exportWidth - dotInset - dotRadius;
-      const dotY = dotInset + dotRadius;
-      ctx.beginPath();
-      ctx.arc(dotX, dotY, dotRadius, 0, Math.PI * 2);
-      ctx.fillStyle = accentColor;
-      ctx.fill();
-    }
-
-    ctx.drawImage(canvas, qrDrawX, qrDrawY, qrDrawW, qrDrawH);
-    try {
-      const srcCtx = canvas.getContext('2d');
-      const srcPixel = srcCtx?.getImageData(0, 0, 1, 1)?.data;
-      const isDarkBg = srcPixel && srcPixel.length >= 3 ? srcPixel[0] + srcPixel[1] + srcPixel[2] < 128 * 3 : false;
-      if (isDarkBg) {
-        const imageData = ctx.getImageData(qrDrawX, qrDrawY, qrDrawW, qrDrawH);
-        const data = imageData.data;
-        for (let i = 0; i < data.length; i += 4) {
-          data[i] = 255 - data[i];
-          data[i + 1] = 255 - data[i + 1];
-          data[i + 2] = 255 - data[i + 2];
-        }
-        ctx.putImageData(imageData, qrDrawX, qrDrawY);
+      // Text lines (label, address, amount, memo, date)
+      if (textLines.length > 0) {
+        ty += textGap;
+        textLines.forEach(line => {
+          ctx.font = line.font;
+          ctx.fillStyle = line.color;
+          ctx.fillText(line.text, textX, ty);
+          ty += line.lineHeight;
+        });
       }
-    } catch {
-      // fallback to raw canvas if pixel access fails
-      ctx.drawImage(canvas, qrDrawX, qrDrawY, qrDrawW, qrDrawH);
-    }
 
-    if (textLines.length > 0) {
-      let y = qrTopOffset + offset + qrDrawH + textGap;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'top';
-      textLines.forEach(line => {
-        ctx.font = line.font;
-        ctx.fillStyle = line.color;
-        ctx.fillText(line.text, exportWidth / 2, y);
-        y += line.lineHeight;
-      });
-    }
+      // Brand footer pinned to bottom of right panel
+      {
+        const by = totalH - brandLineHeight - Math.round(brandGap / 3);
+        ctx.font = brandFont;
+        ctx.fillStyle = 'rgba(255,255,255,0.55)';
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'top';
+        ctx.fillText('XCANNES', textX, by);
+      }
 
-    // Brand footer
-    {
-      const by = exportCanvas.height - brandLineHeight - Math.round(brandGap / 3);
-      ctx.font = brandFont;
+      // Accent dot in the top-right corner of the whole image
+      {
+        const dotRadius = Math.max(8, Math.round(titleFontSize * 0.34));
+        const dotInset = Math.max(16, Math.round(titleFontSize * 0.38));
+        const dotX = totalWidth - dotInset - dotRadius;
+        const dotY = dotInset + dotRadius;
+        ctx.beginPath();
+        ctx.arc(dotX, dotY, dotRadius, 0, Math.PI * 2);
+        ctx.fillStyle = accentColor;
+        ctx.fill();
+      }
+    } else {
+      // ── Portrait layout (mobile) — unchanged ─────────────────────────────
       ctx.fillStyle = '#ffffff';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'top';
-      ctx.fillText('XCANNES', exportWidth / 2, by);
+      ctx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
+
+      const qrTopOffset = titleBlockHeight + titleGap;
+      const qrDrawX = offset;
+      const qrDrawY = qrTopOffset + offset;
+
+      {
+        const qrLeft = qrDrawX;
+        const qrRight = qrDrawX + qrDrawW;
+        const qrTop = qrDrawY;
+        const qrBottom = qrDrawY + qrDrawH;
+        ctx.fillStyle = 'rgba(70, 70, 70, 1)';
+        if (qrTop > 0) ctx.fillRect(0, 0, exportCanvas.width, qrTop);
+        if (qrBottom < exportCanvas.height) ctx.fillRect(0, qrBottom, exportCanvas.width, exportCanvas.height - qrBottom);
+        if (qrLeft > 0) ctx.fillRect(0, qrTop, qrLeft, qrBottom - qrTop);
+        if (qrRight < exportCanvas.width) ctx.fillRect(qrRight, qrTop, exportCanvas.width - qrRight, qrBottom - qrTop);
+      }
+
+      // Title
+      if (titleLinesArr.length > 0) {
+        let ty = Math.round(titleGap / 2);
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+        titleLinesArr.forEach(line => {
+          ctx.font = line.font;
+          ctx.fillStyle = line.color;
+          ctx.fillText(line.text, exportWidth / 2, ty);
+          ty += line.lineHeight;
+        });
+      }
+
+      ctx.drawImage(canvas, qrDrawX, qrDrawY, qrDrawW, qrDrawH);
+      try {
+        const srcCtx = canvas.getContext('2d');
+        const srcPixel = srcCtx?.getImageData(0, 0, 1, 1)?.data;
+        const isDarkBg = srcPixel && srcPixel.length >= 3 ? srcPixel[0] + srcPixel[1] + srcPixel[2] < 128 * 3 : false;
+        if (isDarkBg) {
+          const imageData = ctx.getImageData(qrDrawX, qrDrawY, qrDrawW, qrDrawH);
+          const data = imageData.data;
+          for (let i = 0; i < data.length; i += 4) {
+            data[i] = 255 - data[i];
+            data[i + 1] = 255 - data[i + 1];
+            data[i + 2] = 255 - data[i + 2];
+          }
+          ctx.putImageData(imageData, qrDrawX, qrDrawY);
+        }
+      } catch {
+        ctx.drawImage(canvas, qrDrawX, qrDrawY, qrDrawW, qrDrawH);
+      }
+
+      if (textLines.length > 0) {
+        let y = qrTopOffset + offset + qrDrawH + textGap;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+        textLines.forEach(line => {
+          ctx.font = line.font;
+          ctx.fillStyle = line.color;
+          ctx.fillText(line.text, exportWidth / 2, y);
+          y += line.lineHeight;
+        });
+      }
+
+      // Brand footer
+      {
+        const by = exportCanvas.height - brandLineHeight - Math.round(brandGap / 3);
+        ctx.font = brandFont;
+        ctx.fillStyle = '#ffffff';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+        ctx.fillText('XCANNES', exportWidth / 2, by);
+      }
+
+      // Accent dot in the top-right corner
+      {
+        const dotRadius = Math.max(8, Math.round(titleFontSize * 0.34));
+        const dotInset = Math.max(16, Math.round(titleFontSize * 0.38));
+        const dotX = exportWidth - dotInset - dotRadius;
+        const dotY = dotInset + dotRadius;
+        ctx.beginPath();
+        ctx.arc(dotX, dotY, dotRadius, 0, Math.PI * 2);
+        ctx.fillStyle = accentColor;
+        ctx.fill();
+      }
     }
 
     const dataUrl = exportCanvas.toDataURL('image/png');
