@@ -693,7 +693,7 @@ export default function GlobalStatement({
       const cardFill = "rgba(255,255,255,0.05)";
       const cardBorder = "rgba(255,255,255,0.08)";
 
-      ctx.fillStyle = "#080f1f";
+      ctx.fillStyle = "#0b0f10";
       ctx.fillRect(0, 0, w, h);
 
       const pad = isPortrait ? 48 : 56;
@@ -1084,7 +1084,7 @@ export default function GlobalStatement({
       const cardBorder = "rgba(255,255,255,0.08)";
 
       // Background
-      ctx.fillStyle = "#150808";
+      ctx.fillStyle = "#0b0f10";
       ctx.fillRect(0, 0, w, h);
 
       // Outer card
@@ -1413,8 +1413,8 @@ export default function GlobalStatement({
       const cardFill = "rgba(255,255,255,0.05)";
       const cardBorder = "rgba(255,255,255,0.08)";
 
-      // Background: very dark green
-      ctx.fillStyle = "#061510";
+      // Background
+      ctx.fillStyle = "#0b0f10";
       ctx.fillRect(0, 0, w, h);
 
       // ── Outer card ──────────────────────────────────────────────────
