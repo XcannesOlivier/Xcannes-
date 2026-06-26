@@ -4,7 +4,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "next-i18next";
 import GlobalMovementDetailModal from "./GlobalMovementDetailModal";
-import { escapeHtml, openPrintWindow } from "@/utils/statementExport";
+import StatementPreviewModal from "./StatementPreviewModal";
+import { escapeHtml, openPrintWindow, buildFullHtml } from "@/utils/statementExport";
 import { apiUrl } from "@/lib/runtimeConfig";
 import {
   formatAmountWithSymbol,
@@ -62,6 +63,7 @@ export default function GlobalStatement({
 
   /* ── local state ───────────────────────────────────────── */
   const [exportFormat, setExportFormat] = useState(null);
+  const [statementPreview, setStatementPreview] = useState(null);
   const [accountDropdownOpen, setAccountDropdownOpen] = useState(false);
   const [accountAddressExpanded, setAccountAddressExpanded] = useState(false);
   const [accountCopyNotice, setAccountCopyNotice] = useState("");
@@ -2292,6 +2294,13 @@ export default function GlobalStatement({
     }
   }, [buildPrintHtml, docHash, globalTitle, t, toast]);
 
+  const handleOpenPreview = useCallback(() => {
+    const suffix = docHash ? docHash.slice(0, 12) : "draft";
+    const title = `XCANNES ${globalTitle} ${suffix}`;
+    const html = buildFullHtml({ title, bodyHtml: buildPrintHtml() });
+    setStatementPreview({ html, title });
+  }, [buildPrintHtml, docHash, globalTitle]);
+
   /* ── layout (GlobalStatement uses wider max-widths) ────── */
   const STATEMENT_LAYOUTS = {
     full: {
@@ -2760,13 +2769,12 @@ export default function GlobalStatement({
                   ) : null}
                 </div>
                 <button
-                  onClick={handleExportPdf}
-                  disabled={exportFormat === "pdf"}
-                  className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[10px] text-sm font-light transition-colors disabled:opacity-50 text-white/50 hover:text-white/80 bg-transparent hover:bg-white/[0.04]"
+                  onClick={handleOpenPreview}
+                  className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[10px] text-sm font-light transition-colors text-white/50 hover:text-white/80 bg-transparent hover:bg-white/[0.04]"
                   aria-label={t("ui_export_pdf_9c8d16b4fe", "Télécharger")}
                 >
-                  <ShareIcon className={`w-3.5 h-3.5 ${exportFormat === "pdf" ? "opacity-40" : ""}`} />
-                  <span>{exportFormat === "pdf" ? t("ui_loading_1386baebe9", "Loading…") : t("ui_export_pdf_9c8d16b4fe", "Télécharger")}</span>
+                  <ShareIcon className="w-3.5 h-3.5" />
+                  <span>{t("ui_export_pdf_9c8d16b4fe", "Télécharger")}</span>
                 </button>
               </div>
             </div>
@@ -3142,6 +3150,15 @@ export default function GlobalStatement({
     <>
       {detailOnly ? null : content}
       {transactionDetailModal}
+      {statementPreview ? (
+        <StatementPreviewModal
+          html={statementPreview.html}
+          title={statementPreview.title}
+          onClose={() => setStatementPreview(null)}
+          onPrint={handleExportPdf}
+          printing={exportFormat === "pdf"}
+        />
+      ) : null}
     </>
   );
 

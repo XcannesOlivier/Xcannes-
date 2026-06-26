@@ -10,10 +10,11 @@ import {
 import { createPortal } from "react-dom";
 import Image from "next/image";
 import CurrencyTransactionDetailModal from "./CurrencyTransactionDetailModal";
+import StatementPreviewModal from "./StatementPreviewModal";
 import { ChevronLeftIcon } from "@heroicons/react/24/outline";
 import { getCurrencyDescription } from "@/utils/currencyDescriptions";
 import { CRYPTO_ICONS } from "@/utils/marketConstants";
-import { escapeHtml, openPrintWindow } from "@/utils/statementExport";
+import { escapeHtml, openPrintWindow, buildFullHtml } from "@/utils/statementExport";
 import { useTranslation } from "next-i18next";
 import StatementMonthSelect from "./StatementMonthSelect";
 import { apiUrl } from "@/lib/runtimeConfig";
@@ -136,6 +137,7 @@ export default function CurrencyStatement({
   /* ── local state ───────────────────────────────────────── */
   const [filter, setFilter] = useState("all");
   const [exportFormat, setExportFormat] = useState(null);
+  const [statementPreview, setStatementPreview] = useState(null);
   const [selectedMonth, setSelectedMonth] = useState(0);
   const [accountDropdownOpen, setAccountDropdownOpen] = useState(false);
   const [accountAddressExpanded, setAccountAddressExpanded] = useState(false);
@@ -900,6 +902,13 @@ export default function CurrencyStatement({
       setExportFormat(null);
     }
   }, [buildPrintHtml, docHash, normalizedCurrency, t, toast]);
+
+  const handleOpenPreview = useCallback(() => {
+    const suffix = docHash ? docHash.slice(0, 12) : "draft";
+    const title = `XCANNES ${normalizedCurrency || "Statement"} ${suffix}`;
+    const html = buildFullHtml({ title, bodyHtml: buildPrintHtml() });
+    setStatementPreview({ html, title });
+  }, [buildPrintHtml, docHash, normalizedCurrency]);
 
   /* ── layout ────────────────────────────────────────────── */
   const resolvedLayout =
@@ -2855,14 +2864,13 @@ export default function CurrencyStatement({
             {/* Droite : bouton télécharger */}
             <div className="flex items-center justify-end flex-1">
               <button
-                onClick={handleExportPdf}
-                disabled={exportFormat === "pdf"}
-                className="shrink-0 inline-flex items-center gap-2 px-4 py-1.5 md:py-2 rounded-[10px] text-sm font-medium transition-colors disabled:opacity-50 text-white/70 hover:text-white bg-transparent hover:bg-white/[0.04]"
+                onClick={handleOpenPreview}
+                className="shrink-0 inline-flex items-center gap-2 px-4 py-1.5 md:py-2 rounded-[10px] text-sm font-medium transition-colors text-white/70 hover:text-white bg-transparent hover:bg-white/[0.04]"
                 aria-label={t("ui_export_pdf_9c8d16b4fe", "Télécharger")}
                 title={t("ui_export_pdf_9c8d16b4fe", "Télécharger")}
               >
-                <ShareIcon className={`w-4 h-4 ${exportFormat === "pdf" ? "opacity-40" : ""}`} />
-                <span>{exportFormat === "pdf" ? t("ui_loading_1386baebe9", "Loading…") : t("ui_export_pdf_9c8d16b4fe", "Télécharger")}</span>
+                <ShareIcon className="w-4 h-4" />
+                <span>{t("ui_export_pdf_9c8d16b4fe", "Télécharger")}</span>
               </button>
             </div>
           </div>
@@ -3030,6 +3038,15 @@ export default function CurrencyStatement({
     <>
       {createPortal(content, document.body)}
       {transactionDetailModal}
+      {statementPreview ? (
+        <StatementPreviewModal
+          html={statementPreview.html}
+          title={statementPreview.title}
+          onClose={() => setStatementPreview(null)}
+          onPrint={handleExportPdf}
+          printing={exportFormat === "pdf"}
+        />
+      ) : null}
     </>
   );
 }

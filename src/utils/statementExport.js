@@ -48,6 +48,19 @@ export async function sha256Hex(input) {
   return fallbackHash(String(input || ""));
 }
 
+export function buildFullHtml({ title, bodyHtml, styles = "" }) {
+  const safeTitle = escapeHtml(title || "XCANNES Statement");
+  return `<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>${safeTitle}</title>
+    <style>${BASE_PRINT_STYLES}${styles}</style>
+  </head>
+  <body>${bodyHtml}</body>
+</html>`;
+}
+
 export function openPrintWindow({ title, bodyHtml, styles = "" }) {
   if (typeof window === "undefined") return false;
   const win = window.open("", "_blank", "height=720,width=960,noopener,noreferrer");
