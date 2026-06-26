@@ -233,7 +233,7 @@ export default function WalletDesktopModals({
           inline
           onClose={() => {
             resetReceiveForm?.();
-            setActiveAction("send");
+            setActiveAction(null);
           }}
           {...receiveModalProps}
         />
