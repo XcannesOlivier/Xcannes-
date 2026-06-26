@@ -662,11 +662,11 @@ export default function GlobalStatement({
         const convStatus = statusLabel;
         const convFrom = from || "—";
         const convTo = to || "—";
-        const convFromAmt = fromLine;
-        const convToAmt = toLine;
         const grossRlusdG = Number(detailMovement?.amountRlusdGross);
         const netRlusdG = Number(detailMovement?.amountRlusd);
         const baseRlusdG = Number.isFinite(grossRlusdG) ? grossRlusdG : netRlusdG;
+        const convFromAmt = formatConversionUnits(rlusdToLocal(baseRlusdG, from), from) || amountSigned;
+        const convToAmt = formatConversionUnits(rlusdToLocal(netRlusdG, to), to) || "—";
         const fxRateG = Number.isFinite(baseRlusdG) && Number.isFinite(netRlusdG) && baseRlusdG > 0
           ? (netRlusdG / baseRlusdG).toFixed(4)
           : (detailMovement?.fxRate ? Number(detailMovement.fxRate).toFixed(4) : "—");
