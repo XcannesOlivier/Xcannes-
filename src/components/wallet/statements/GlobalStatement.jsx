@@ -2238,7 +2238,6 @@ export default function GlobalStatement({
         <div><strong>${escapeHtml(t("ui_statement_period_label_3f6c1a9b5e", "Period"))}:</strong> ${escapeHtml(currentPeriod || fallbackPeriod)}</div>
         <div><strong>${escapeHtml(t("ui_total_balance_label_2c7a1d9b5e", "Total balance (USD)").replace("USD", displayCurrencyCode))}:</strong> ${escapeHtml(totalBalanceDisplay)}</div>
         <div><strong>${escapeHtml(t("ui_ledger_status_label_0f7c1a9b5e", "Ledger status"))}:</strong> ${escapeHtml(ledgerStatusLabel)}</div>
-        <div><strong>${escapeHtml(t("ui_document_hash_label_9b5c1a2d7e", "Document hash"))}:</strong> <span class="small">${escapeHtml(docHashLabel)}</span></div>
       </div>
       <h2>${escapeHtml(t("ui_recent_activity_de80b9813c", "Recent activity"))}</h2>
       <table>
