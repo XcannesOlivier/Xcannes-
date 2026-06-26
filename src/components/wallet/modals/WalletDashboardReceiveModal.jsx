@@ -719,34 +719,26 @@ export default function WalletDashboardReceiveModal({
       let ty = Math.round(titleGap / 2);
       ctx.textAlign = 'center';
       ctx.textBaseline = 'top';
-      const lastTitleIdx = titleLinesArr.length - 1;
-      const dotRadius = Math.max(6, Math.round(titleFontSize * 0.28));
 
-      titleLinesArr.forEach((line, idx) => {
+      titleLinesArr.forEach(line => {
         ctx.font = line.font;
         ctx.fillStyle = line.color;
         ctx.fillText(line.text, exportWidth / 2, ty);
 
-        // Dot placed just after the last word of the last title line, centered on it
-        if (idx === lastTitleIdx) {
-          const words = line.text.split(' ');
-          const lastWord = words[words.length - 1];
-          const lineW = ctx.measureText(line.text).width;
-          const lastWordW = ctx.measureText(lastWord).width;
-          // x of right edge of last word
-          const lineLeft = exportWidth / 2 - lineW / 2;
-          const lastWordRight = lineLeft + lineW;
-          const dotX = lastWordRight + dotRadius + Math.round(titleFontSize * 0.14);
-          // center on the cap-height of the last word: ~0.72 of fontSize from baseline, baseline at ty+fontSize
-          const dotY = ty + titleFontSize * 0.42;
-          ctx.beginPath();
-          ctx.arc(dotX, dotY, dotRadius, 0, Math.PI * 2);
-          ctx.fillStyle = accentColor;
-          ctx.fill();
-        }
-
         ty += line.lineHeight;
       });
+    }
+
+    // Accent dot in the top-right corner of the exported image.
+    {
+      const dotRadius = Math.max(8, Math.round(titleFontSize * 0.34));
+      const dotInset = Math.max(16, Math.round(titleFontSize * 0.38));
+      const dotX = exportWidth - dotInset - dotRadius;
+      const dotY = dotInset + dotRadius;
+      ctx.beginPath();
+      ctx.arc(dotX, dotY, dotRadius, 0, Math.PI * 2);
+      ctx.fillStyle = accentColor;
+      ctx.fill();
     }
 
     ctx.drawImage(canvas, qrDrawX, qrDrawY, qrDrawW, qrDrawH);
