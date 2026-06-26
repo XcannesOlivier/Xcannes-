@@ -1117,7 +1117,7 @@ export default function GlobalStatement({
         ctx.closePath();
       };
       rr(cardX, cardY, cardW, cardH, 52);
-      ctx.fillStyle = "rgba(248,113,113,0.04)";
+      ctx.fillStyle = "rgba(255,255,255,0.04)";
       ctx.fill();
       ctx.strokeStyle = accentBorder;
       ctx.lineWidth = 1.5;
@@ -1142,11 +1142,8 @@ export default function GlobalStatement({
 
       // Arrow down-right icon in circle
       const drawArrowIcon = (cx, cy, R, big) => {
-        const h1 = ctx.createRadialGradient(cx, cy, R * 0.5, cx, cy, R * 1.6);
-        h1.addColorStop(0, "rgba(248,113,113,0.20)"); h1.addColorStop(1, "rgba(248,113,113,0)");
-        ctx.fillStyle = h1; ctx.beginPath(); ctx.arc(cx, cy, R * 1.6, 0, Math.PI * 2); ctx.fill();
         ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2);
-        ctx.fillStyle = "rgba(248,113,113,0.18)"; ctx.fill();
+        ctx.fillStyle = accentDim; ctx.fill();
         ctx.strokeStyle = accent; ctx.lineWidth = big ? 5 : 3; ctx.stroke();
         // Arrow ↘
         const s = R * 0.38;
@@ -1197,7 +1194,7 @@ export default function GlobalStatement({
         ctx.strokeStyle = textSecondary; ctx.lineWidth = s * 0.09;
         ctx.beginPath(); ctx.arc(cx, cy - s * 0.12, s * 0.22, Math.PI, 0); ctx.stroke();
         rr(cx - s * 0.26, cy, s * 0.52, s * 0.38, s * 0.08);
-        ctx.fillStyle = "rgba(248,113,113,0.10)"; ctx.fill();
+        ctx.fillStyle = accentDim; ctx.fill();
         ctx.strokeStyle = accent; ctx.stroke();
       };
 
@@ -1223,7 +1220,7 @@ export default function GlobalStatement({
         ctx.textAlign = "center"; ctx.textBaseline = "middle";
         ctx.fillText(initial, avCx, avCy);
         ctx.beginPath(); ctx.arc(avCx + avR * 0.68, avCy + avR * 0.68, 9, 0, Math.PI * 2);
-        ctx.fillStyle = "#150808"; ctx.fill();
+        ctx.fillStyle = "#0b0f10"; ctx.fill();
         ctx.beginPath(); ctx.arc(avCx + avR * 0.68, avCy + avR * 0.68, 7, 0, Math.PI * 2);
         ctx.fillStyle = accent; ctx.fill();
         ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
@@ -1317,7 +1314,7 @@ export default function GlobalStatement({
         ctx.fillStyle = textPrimary; ctx.font = "700 28px system-ui, -apple-system, sans-serif";
         ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText(initial, avCx, avCy);
         ctx.beginPath(); ctx.arc(avCx + avR * 0.68, avCy + avR * 0.68, 8, 0, Math.PI * 2);
-        ctx.fillStyle = "#150808"; ctx.fill();
+        ctx.fillStyle = "#0b0f10"; ctx.fill();
         ctx.beginPath(); ctx.arc(avCx + avR * 0.68, avCy + avR * 0.68, 6, 0, Math.PI * 2);
         ctx.fillStyle = accent; ctx.fill();
         ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
@@ -1447,7 +1444,7 @@ export default function GlobalStatement({
         ctx.closePath();
       };
       rr(cardX, cardY, cardW, cardH, 52);
-      ctx.fillStyle = "rgba(34,197,94,0.04)";
+      ctx.fillStyle = "rgba(255,255,255,0.04)";
       ctx.fill();
       ctx.strokeStyle = accentBorder;
       ctx.lineWidth = 1.5;
@@ -1506,13 +1503,8 @@ export default function GlobalStatement({
         });
       };
       const drawCheckCircle = (cx, cy, R, big) => {
-        // Outer halo
-        const h1 = ctx.createRadialGradient(cx, cy, R * 0.5, cx, cy, R * 1.6);
-        h1.addColorStop(0, "rgba(34,197,94,0.20)"); h1.addColorStop(1, "rgba(34,197,94,0)");
-        ctx.fillStyle = h1; ctx.beginPath(); ctx.arc(cx, cy, R * 1.6, 0, Math.PI * 2); ctx.fill();
-        // Circle fill
         ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2);
-        ctx.fillStyle = "rgba(34,197,94,0.18)"; ctx.fill();
+        ctx.fillStyle = accentDim; ctx.fill();
         ctx.strokeStyle = accent; ctx.lineWidth = big ? 5 : 3;
         ctx.stroke();
         // Checkmark
@@ -1565,7 +1557,7 @@ export default function GlobalStatement({
         ctx.fillText(initial, avCx, avCy);
         // dot bottom-right of avatar
         ctx.beginPath(); ctx.arc(avCx + avR * 0.68, avCy + avR * 0.68, 9, 0, Math.PI * 2);
-        ctx.fillStyle = "#061510"; ctx.fill();
+        ctx.fillStyle = "#0b0f10"; ctx.fill();
         ctx.beginPath(); ctx.arc(avCx + avR * 0.68, avCy + avR * 0.68, 7, 0, Math.PI * 2);
         ctx.fillStyle = accent; ctx.fill();
         // name + addr
@@ -1679,7 +1671,7 @@ export default function GlobalStatement({
         ctx.fillStyle = textPrimary; ctx.font = "700 28px system-ui, -apple-system, sans-serif";
         ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText(initial, avCx, avCy);
         ctx.beginPath(); ctx.arc(avCx + avR * 0.68, avCy + avR * 0.68, 8, 0, Math.PI * 2);
-        ctx.fillStyle = "#061510"; ctx.fill();
+        ctx.fillStyle = "#0b0f10"; ctx.fill();
         ctx.beginPath(); ctx.arc(avCx + avR * 0.68, avCy + avR * 0.68, 6, 0, Math.PI * 2);
         ctx.fillStyle = accent; ctx.fill();
         ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
