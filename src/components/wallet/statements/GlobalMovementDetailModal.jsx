@@ -407,8 +407,6 @@ export default function GlobalMovementDetailModal({
     document.body,
   );
 }
-                          </span>
-                        ) : null}
                       </div>
                     ) : null}
                   </div>
