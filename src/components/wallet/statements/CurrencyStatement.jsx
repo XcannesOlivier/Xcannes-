@@ -1220,7 +1220,7 @@ export default function CurrencyStatement({
         ctx.closePath();
       };
       rr(cardX,cardY,cardW,cardH,52);
-      ctx.fillStyle="rgba(59,130,246,0.04)"; ctx.fill();
+      ctx.fillStyle="rgba(255,255,255,0.04)"; ctx.fill();
       ctx.strokeStyle=accentBorder; ctx.lineWidth=1.5; ctx.stroke();
 
       const ellipsize = (text, maxW) => {
