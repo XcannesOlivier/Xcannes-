@@ -2218,14 +2218,13 @@ export default function GlobalStatement({
               ? `${amount.toLocaleString(locale, { maximumFractionDigits: 2 })} ${escapeHtml(currency)}`
               : "-",
           )}</td>
-          <td>${escapeHtml(m?.txHash || "")}</td>
         </tr>
       `;
       })
       .join("");
     const movementsEmpty = `
       <tr>
-        <td colspan="6" class="muted">${escapeHtml(
+        <td colspan="5" class="muted">${escapeHtml(
           t("ui_no_movements_found_2b7c1a9d5e", "No movements available"),
         )}</td>
       </tr>
@@ -2248,7 +2247,6 @@ export default function GlobalStatement({
             <th>${escapeHtml(t("ui_from_label_2c7a1d9b5e", "From"))}</th>
             <th>${escapeHtml(t("ui_to_label_7b2c1a9d5e", "To"))}</th>
             <th class="right">${escapeHtml(t("ui_amount_label_2c7a1d9b5e", "Amount"))}</th>
-            <th>${escapeHtml(t("ui_tx_hash_label_2b7c1a9d5e", "Tx hash"))}</th>
           </tr>
         </thead>
         <tbody>

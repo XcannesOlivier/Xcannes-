@@ -3030,6 +3030,15 @@ export default function CurrencyStatement({
       <>
         {content}
         {transactionDetailModal}
+        {statementPreview ? (
+          <StatementPreviewModal
+            html={statementPreview.html}
+            title={statementPreview.title}
+            onClose={() => setStatementPreview(null)}
+            onPrint={handleExportPdf}
+            printing={exportFormat === "pdf"}
+          />
+        ) : null}
       </>
     );
   if (typeof document === "undefined") return null;
