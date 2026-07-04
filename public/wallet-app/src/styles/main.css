@@ -649,9 +649,14 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
 }
 
 .choice-btn-icon-muted {
-  background: rgba(255, 255, 255, 0.05);
+  background: transparent;
   border-color: rgba(255, 255, 255, 0.08);
   color: rgba(0, 200, 83, 0.92);
+}
+
+.btn-choice-primary .choice-btn-icon {
+  background: rgba(0, 200, 83, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.16);
 }
 
 .choice-btn-text {
@@ -664,7 +669,7 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
 }
 
 .choice-btn-title {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   line-height: 1.2;
   white-space: normal;
@@ -691,7 +696,10 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
 
 .choice-security-note {
   margin-top: 16px;
-  width: 100%;
+  width: fit-content;
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
   padding-top: 14px;
   display: flex;
   align-items: flex-start;
@@ -732,7 +740,7 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
   }
 
   .choice-btn-title {
-    font-size: 14px;
+    font-size: 13px;
   }
 
   .choice-btn-desc {
