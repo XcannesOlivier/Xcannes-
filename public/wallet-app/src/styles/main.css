@@ -965,6 +965,7 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
 
 #screen-pin-unlock .auth-card {
   min-height: min(74vh, 630px);
+  padding-top: 64px;
 }
 
 #screen-unlock .auth-card::before,
@@ -1067,9 +1068,10 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
   background: transparent;
   border: none;
   box-shadow: none;
+  margin-top: 0;
   margin-left: auto;
   margin-right: auto;
-  margin-bottom: 24px;
+  margin-bottom: 54px;
 }
 
 #screen-pin-unlock h2 {
@@ -1105,13 +1107,7 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
 
 .pin-unlock-box::before,
 .pin-unlock-box::after {
-  content: "";
-  position: absolute;
-  left: 22px;
-  right: 22px;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, rgba(0, 200, 83, 0.55), transparent);
-  opacity: 0.9;
+  display: none;
 }
 
 .pin-unlock-box::before { top: -10px; }
