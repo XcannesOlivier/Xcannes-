@@ -1999,30 +1999,31 @@ textarea.error {
 }
 
 #screen-backup .screen-header .btn-back {
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.15);
   background: rgba(8, 14, 18, 0.52);
   color: rgba(255, 255, 255, 0.88);
-  font-size: 28px;
+  font-size: 25px;
   line-height: 1;
   display: grid;
   place-items: center;
   margin: 0;
   padding: 0;
+  text-indent: -1px;
   z-index: 1;
   -webkit-tap-highlight-color: transparent;
 }
 
 .backup-close-btn {
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.15);
   background: rgba(8, 14, 18, 0.52);
   color: rgba(255, 255, 255, 0.88);
-  font-size: 24px;
+  font-size: 22px;
   line-height: 1;
   display: grid;
   place-items: center;
