@@ -875,7 +875,7 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
 }
 
 #screen-pin-unlock .logo {
-  width: min(220px, 72vw);
+  width: min(250px, 78vw);
   height: auto;
   background: transparent;
   border: none;
@@ -957,12 +957,12 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
 }
 
 #screen-unlock .logo {
-  width: min(220px, 72vw);
+  width: min(250px, 78vw);
   height: auto;
   background: transparent;
   border: none;
   box-shadow: none;
-  margin-bottom: 18px;
+  margin-bottom: 34px;
 }
 
 #screen-unlock #unlock-status.status {
