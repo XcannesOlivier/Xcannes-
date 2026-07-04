@@ -941,7 +941,7 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
 
 #screen-unlock .auth-card {
   min-height: min(74vh, 630px);
-  padding-top: 52px;
+  padding-top: 60px;
 }
 
 #screen-pin-unlock .auth-card {
