@@ -491,9 +491,9 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
 
 #screen-choice .choice-card {
   width: min(360px, 100%);
-  min-height: min(72vh, 620px);
+  min-height: min(70vh, 590px);
   border-radius: 24px;
-  padding: 34px 20px 22px;
+  padding: 34px 18px 20px;
   background: #0b0f10;
   border: 1px solid rgba(148, 163, 184, 0.16);
   box-shadow:
@@ -510,8 +510,8 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
   background: transparent;
   border: none;
   box-shadow: none;
-  margin-bottom: 26px;
-  width: min(200px, 70vw);
+  margin-bottom: 24px;
+  width: min(188px, 66vw);
   height: auto;
 }
 
@@ -528,20 +528,26 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
 }
 
 #screen-choice .choice-title {
-  max-width: 320px;
-  font-size: 22px;
+  max-width: 310px;
+  font-size: 20px;
   font-weight: 800;
   letter-spacing: -0.02em;
-  line-height: 1.05;
-  margin-bottom: 14px;
+  line-height: 1.06;
+  margin-bottom: 10px;
 }
 
 #screen-choice .choice-subtitle {
-  max-width: 300px;
-  color: rgba(255, 255, 255, 0.46);
+  max-width: 285px;
+  color: rgba(255, 255, 255, 0.64);
   font-size: 15px;
-  line-height: 1.4;
-  margin-bottom: 24px;
+  line-height: 1.38;
+  margin-bottom: 14px;
+}
+
+#screen-choice .choice-subtitle-muted {
+  color: rgba(255, 255, 255, 0.50);
+  font-size: 14px;
+  margin-bottom: 22px;
 }
 
 #screen-choice .button-group {
@@ -584,7 +590,7 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
 
 .btn-choice-primary {
   border-radius: 12px;
-  padding: 16px 16px;
+  padding: 14px 14px;
   font-size: 15px;
   justify-content: flex-start;
   text-align: left;
@@ -603,7 +609,7 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
 
 .btn-choice-secondary {
   border-radius: 12px;
-  padding: 16px 16px;
+  padding: 14px 14px;
   font-size: 15px;
   justify-content: flex-start;
   text-align: left;
@@ -621,15 +627,15 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
 }
 
 .choice-btn-icon {
-  width: 46px;
-  height: 46px;
+  width: 42px;
+  height: 42px;
   display: grid;
   place-items: center;
   border-radius: 999px;
   background: rgba(0, 200, 83, 0.22);
   border: 1px solid rgba(0, 200, 83, 0.18);
   color: rgba(255, 255, 255, 0.95);
-  font-size: 28px;
+  font-size: 24px;
   line-height: 1;
   margin-right: 12px;
   flex-shrink: 0;
@@ -651,20 +657,20 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
 }
 
 .choice-btn-title {
-  font-size: 17px;
+  font-size: 15px;
   font-weight: 700;
   line-height: 1.2;
-  white-space: nowrap;
+  white-space: normal;
 }
 
 .choice-btn-desc {
-  font-size: 13px;
+  font-size: 12px;
   line-height: 1.3;
-  color: rgba(255, 255, 255, 0.72);
+  color: rgba(255, 255, 255, 0.74);
 }
 
 .choice-btn-arrow {
-  font-size: 30px;
+  font-size: 24px;
   line-height: 1;
   margin-left: 10px;
   color: rgba(255, 255, 255, 0.9);
@@ -676,9 +682,9 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
 }
 
 .choice-security-note {
-  margin-top: auto;
+  margin-top: 14px;
   width: 100%;
-  padding-top: 16px;
+  padding-top: 12px;
   display: flex;
   align-items: flex-start;
   justify-content: center;
@@ -687,7 +693,7 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
   font-size: 13px;
   line-height: 1.45;
   text-align: left;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-top: none;
 }
 
 .choice-security-icon {
@@ -701,15 +707,20 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
   flex-shrink: 0;
 }
 
+.choice-security-icon svg {
+  width: 15px;
+  height: 15px;
+}
+
 @media (max-width: 360px) {
   #screen-choice .choice-card {
-    min-height: min(74vh, 610px);
+    min-height: min(72vh, 580px);
     border-radius: 20px;
-    padding: 30px 14px 18px;
+    padding: 28px 14px 16px;
   }
 
   #screen-choice .choice-title {
-    font-size: 20px;
+    font-size: 19px;
   }
 
   .choice-btn-title {
