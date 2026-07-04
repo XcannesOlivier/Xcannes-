@@ -807,11 +807,11 @@ function setupBackupScreen(walletData) {
   if (btnClose) {
     const freshBtnClose = btnClose.cloneNode(true);
     btnClose.replaceWith(freshBtnClose);
-    document.getElementById('btn-backup-close')?.addEventListener('click', () => {
+    document.getElementById('btn-backup-close')?.addEventListener('click', async () => {
       if (pendingWalletData) clearWalletFromMemory(pendingWalletData);
       pendingMnemonic = null;
       pendingWalletData = null;
-      goToChoice();
+      await goToHome();
     }, { once: true });
   }
 

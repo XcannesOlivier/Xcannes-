@@ -1999,19 +1999,20 @@ textarea.error {
 }
 
 #screen-backup .screen-header .btn-back {
-  background: transparent;
-  border: none;
-  backdrop-filter: none;
-  box-shadow: none;
-  width: 52px;
-  height: 52px;
-  font-size: 34px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(8, 14, 18, 0.52);
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 28px;
+  line-height: 1;
+  display: grid;
+  place-items: center;
   margin: 0;
   padding: 0;
   z-index: 1;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .backup-close-btn {
@@ -2025,6 +2026,9 @@ textarea.error {
   line-height: 1;
   display: grid;
   place-items: center;
+  margin: 0;
+  padding: 0;
+  z-index: 1;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
@@ -2045,7 +2049,7 @@ textarea.error {
 }
 
 .backup-intro p {
-  font-size: 14px;
+  font-size: 12px;
   line-height: 1.45;
   color: rgba(255, 255, 255, 0.60);
 }
@@ -2901,7 +2905,7 @@ textarea.error {
 
 #screen-backup .button-group {
   max-width: 360px;
-  margin-bottom: 14px;
+  margin-bottom: 24px;
 }
 
 #screen-backup .btn-primary {
@@ -2942,25 +2946,25 @@ textarea.error {
   align-items: center;
   gap: 8px;
   color: rgba(0, 200, 83, 0.95);
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 600;
   margin-bottom: 5px;
 }
 
 .backup-help-icon {
-  width: 15px;
-  height: 15px;
+  width: 17px;
+  height: 17px;
   display: inline-grid;
   place-items: center;
 }
 
 .backup-help-icon svg {
-  width: 15px;
-  height: 15px;
+  width: 17px;
+  height: 17px;
 }
 
 .backup-help p {
-  color: rgba(255, 255, 255, 0.58);
+  color: rgba(255, 255, 255, 0.72);
   font-size: 11px;
   line-height: 1.35;
 }
