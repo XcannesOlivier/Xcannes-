@@ -436,7 +436,7 @@ export default function Header({ fixed = true }) {
             <img
               src="/symbols/logoxcannestransaparent.png"
               alt={t("ui_xcannes_43b38baa2c", "XCANNES")}
-              className="h-7 sm:h-8 md:h-10 w-auto object-contain"
+              className="h-8 sm:h-9 md:h-11 w-auto object-contain"
               loading="eager"
               decoding="async"
             />
