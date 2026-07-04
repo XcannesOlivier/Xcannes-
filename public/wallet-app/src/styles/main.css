@@ -797,7 +797,7 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
 #screen-pin-unlock .auth-card {
   width: min(360px, 100%);
   border-radius: 24px;
-  min-height: min(74vh, 620px);
+  min-height: min(66vh, 560px);
   padding: 36px 22px 24px;
   display: flex;
   flex-direction: column;
@@ -816,7 +816,7 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
 }
 
 #screen-unlock .auth-card {
-  padding-top: 66px;
+  padding-top: 52px;
 }
 
 #screen-unlock .auth-card::before,
@@ -1038,7 +1038,7 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
 }
 
 #screen-unlock #btn-unlock-use-pin.btn-link {
-  margin-top: 22px;
+  margin-top: 16px;
   padding-top: 10px;
   width: 100%;
   border-top: none;
@@ -1070,8 +1070,8 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
   #screen-unlock .auth-card,
   #screen-pin-unlock .auth-card {
     border-radius: 20px;
-    min-height: min(76vh, 600px);
-    padding: 30px 16px 20px;
+    min-height: min(68vh, 540px);
+    padding: 28px 16px 18px;
   }
 
   #screen-unlock .logo,
