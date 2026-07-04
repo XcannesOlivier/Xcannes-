@@ -491,7 +491,7 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
 
 #screen-choice .choice-card {
   width: min(360px, 100%);
-  min-height: min(76vh, 640px);
+  min-height: min(77vh, 650px);
   border-radius: 24px;
   padding: 34px 18px 20px;
   background: #0b0f10;
@@ -529,7 +529,7 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
 
 #screen-choice .choice-title {
   max-width: 310px;
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 800;
   letter-spacing: -0.02em;
   line-height: 1.08;
@@ -722,13 +722,13 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
 
 @media (max-width: 360px) {
   #screen-choice .choice-card {
-    min-height: min(74vh, 600px);
+    min-height: min(75vh, 610px);
     border-radius: 20px;
     padding: 28px 14px 16px;
   }
 
   #screen-choice .choice-title {
-    font-size: 19px;
+    font-size: 21px;
   }
 
   .choice-btn-title {
