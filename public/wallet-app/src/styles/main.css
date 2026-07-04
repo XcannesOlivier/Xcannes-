@@ -816,7 +816,7 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
 }
 
 #screen-unlock .auth-card {
-  padding-top: 48px;
+  padding-top: 60px;
 }
 
 #screen-unlock .auth-card::before,
@@ -1007,7 +1007,7 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
 }
 
 #screen-unlock .logo {
-  width: min(220px, 72vw);
+  width: min(245px, 78vw);
   height: auto;
   display: block;
   background: transparent;
@@ -1076,7 +1076,7 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
 
   #screen-unlock .logo,
   #screen-pin-unlock .logo {
-    width: min(200px, 70vw);
+    width: min(214px, 74vw);
   }
 
   #screen-pin-unlock h2 {
