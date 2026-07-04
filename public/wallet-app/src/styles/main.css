@@ -978,7 +978,7 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
   letter-spacing: 0;
   color: rgba(255, 255, 255, 0.45);
   margin-bottom: 42px;
-  max-width: 280px;
+  max-width: 240px;
 }
 
 .btn-biometric--hero {
@@ -1066,7 +1066,7 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
   font-size: 15px;
   line-height: 1.42;
   margin-bottom: 22px;
-  max-width: 280px;
+  max-width: 240px;
 }
 
 .pin-unlock-box {
