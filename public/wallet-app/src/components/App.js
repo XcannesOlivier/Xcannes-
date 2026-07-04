@@ -1304,7 +1304,7 @@ function confirmWithAuth(title, subtitle) {
         // Auto-trigger Face ID
         setTimeout(async () => {
           try {
-            updateStatus(statusEl, 'Authentification biométrique…');
+            updateStatus(statusEl, '');
             const prfOutput = await promptBiometric(authConfig.credentialId);
             updateStatus(statusEl, '✅ Confirmé');
             await delay(600);
@@ -1319,7 +1319,7 @@ function confirmWithAuth(title, subtitle) {
         // Manual retry
         newBio.addEventListener('click', async () => {
           try {
-            updateStatus(statusEl, 'Authentification biométrique…');
+            updateStatus(statusEl, '');
             const prfOutput = await promptBiometric(authConfig.credentialId);
             updateStatus(statusEl, '✅ Confirmé');
             await delay(600);
@@ -2135,7 +2135,7 @@ function showRetryButton() {
 async function doUnlock() {
   const statusEl = document.getElementById('unlock-status');
   try {
-    updateStatus(statusEl, 'Authentification biométrique…');
+    updateStatus(statusEl, '');
 
     const authConfig = await getAuthConfig();
     if (!authConfig?.credentialId || !authConfig?.wrappedMasterKey) {
