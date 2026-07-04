@@ -202,21 +202,34 @@
 	    <div id="screen-choice" class="screen hidden">
 	      <button id="btn-choice-close" class="choice-close" type="button" aria-label="Fermer">✕</button>
 	      <div class="screen-content center">
-	        <img src="../symbols/logoxcannestransaparent.png" alt="Xcannes" class="logo choice-logo" style="background:transparent;object-fit:contain;" />
-		        <h2 class="choice-title">Créez un nouveau compte<br>ou importez un compte existant</h2>
+	        <div class="choice-card">
+	          <img src="../symbols/logoxcannestransaparent.png" alt="Xcannes" class="logo choice-logo" style="background:transparent;object-fit:contain;" />
+		          <h2 class="choice-title">Créez un nouveau compte<br>ou importez un compte existant</h2>
+	          <p class="choice-subtitle">Choisissez une option pour commencer à utiliser XCANNES.</p>
 
-	        <div class="button-group">
-		          <button id="btn-create-wallet" class="btn btn-primary btn-choice-primary">
-		            <span class="choice-btn-icon" aria-hidden="true">＋</span>
-		            Créer un nouveau compte
-		          </button>
-		          <button id="btn-import-wallet" class="btn btn-secondary btn-choice-secondary">
-		            <span class="choice-btn-icon choice-btn-icon-muted" aria-hidden="true">↩︎</span>
-		            Importer un compte existant
-		          </button>
+	          <div class="button-group">
+		            <button id="btn-create-wallet" class="btn btn-primary btn-choice-primary">
+		              <span class="choice-btn-icon" aria-hidden="true">＋</span>
+	              <span class="choice-btn-text">
+	                <span class="choice-btn-title">Créer un nouveau compte</span>
+	                <span class="choice-btn-desc">Créez un nouveau portefeuille et commencez à l'utiliser.</span>
+	              </span>
+	              <span class="choice-btn-arrow" aria-hidden="true">›</span>
+		            </button>
+		            <button id="btn-import-wallet" class="btn btn-secondary btn-choice-secondary">
+		              <span class="choice-btn-icon choice-btn-icon-muted" aria-hidden="true">↩︎</span>
+	              <span class="choice-btn-text">
+	                <span class="choice-btn-title">Importer un compte existant</span>
+	                <span class="choice-btn-desc">Importez votre portefeuille existant avec votre phrase de récupération.</span>
+	              </span>
+	              <span class="choice-btn-arrow" aria-hidden="true">›</span>
+		            </button>
+	          </div>
+
+	          <p class="choice-security-note"><span class="choice-security-icon" aria-hidden="true">🛡️</span>Vos clés privées restent sécurisées et ne quittent jamais votre appareil.</p>
 	        </div>
 
-		        <div class="choice-bottom-bar" aria-hidden="true"><span></span></div>
+		      <div class="choice-bottom-bar" aria-hidden="true"><span></span></div>
 	      </div>
 	    </div>
 
