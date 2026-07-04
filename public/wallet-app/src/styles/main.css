@@ -913,8 +913,8 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
 
 #screen-unlock .screen-content,
 #screen-pin-unlock .screen-content {
-  padding-left: 22px;
-  padding-right: 22px;
+  padding-left: 24px;
+  padding-right: 24px;
 }
 
 #screen-unlock .auth-card,
