@@ -433,9 +433,13 @@ export default function Header({ fixed = true }) {
         <>
           {/* Logo simple texte style banque suisse */}
           <div className="flex items-center gap-2 whitespace-nowrap min-w-0">
-            <span className="text-lg sm:text-xl md:text-3xl font-orbitron font-bold tracking-tight text-white">
-              {t("ui_xcannes_43b38baa2c", "XCANNES")}
-            </span>
+            <img
+              src="/symbols/logoxcannestransaparent.png"
+              alt={t("ui_xcannes_43b38baa2c", "XCANNES")}
+              className="h-6 sm:h-7 md:h-9 w-auto object-contain"
+              loading="eager"
+              decoding="async"
+            />
             <span className="hidden sm:inline text-[10px] sm:text-[11px] md:text-[13px] text-white/40 font-light">
               |
             </span>
