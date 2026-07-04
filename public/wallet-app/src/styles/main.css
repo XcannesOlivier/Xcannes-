@@ -1038,7 +1038,7 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
 }
 
 #screen-unlock #btn-unlock-use-pin.btn-link {
-  margin-top: auto;
+  margin-top: 14px;
   padding-top: 10px;
   width: 100%;
   border-top: none;
