@@ -907,8 +907,27 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
   pointer-events: none;
 }
 
-#screen-unlock .choice-bottom-bar {
-  display: none;
+#screen-unlock .choice-bottom-bar,
+#screen-pin-unlock .choice-bottom-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  padding-top: 24px;
+  padding-bottom: calc(env(safe-area-inset-bottom, 16px) + 16px);
+  pointer-events: none;
+  z-index: 2;
+}
+
+#screen-unlock .choice-bottom-bar > span,
+#screen-pin-unlock .choice-bottom-bar > span {
+  display: block;
+  width: 144px;
+  height: 6px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.8);
 }
 
 #screen-unlock .screen-content,
