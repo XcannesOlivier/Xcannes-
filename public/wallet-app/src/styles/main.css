@@ -533,7 +533,7 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
   font-weight: 800;
   letter-spacing: -0.02em;
   line-height: 1.08;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
 }
 
 #screen-choice .choice-subtitle {
@@ -541,7 +541,7 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
   color: rgba(255, 255, 255, 0.64);
   font-size: 15px;
   line-height: 1.38;
-  margin-bottom: 14px;
+  margin-bottom: 28px;
 }
 
 #screen-choice .choice-subtitle-muted {
