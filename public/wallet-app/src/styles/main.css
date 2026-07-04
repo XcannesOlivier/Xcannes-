@@ -803,8 +803,7 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  background:
-    linear-gradient(180deg, rgba(14, 23, 29, 0.86) 0%, rgba(10, 17, 23, 0.88) 100%);
+  background: #0b0f10;
   border: 1px solid rgba(148, 163, 184, 0.16);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.05),
