@@ -2077,7 +2077,7 @@ textarea.error {
   margin: 0 auto 14px;
   display: flex;
   gap: 12px;
-  align-items: flex-start;
+  align-items: center;
   padding: 14px 14px;
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -2094,8 +2094,8 @@ textarea.error {
 }
 
 .backup-warning-icon {
-  width: 28px;
-  height: 28px;
+  width: 34px;
+  height: 34px;
   border-radius: 999px;
   display: grid;
   place-items: center;
@@ -2104,12 +2104,12 @@ textarea.error {
   color: rgba(0, 200, 83, 0.95);
   line-height: 1;
   flex-shrink: 0;
-  margin-top: 2px;
+  margin-top: 0;
 }
 
 .backup-warning-icon svg {
-  width: 14px;
-  height: 14px;
+  width: 18px;
+  height: 18px;
 }
 
 .backup-warning-text {
@@ -2123,7 +2123,7 @@ textarea.error {
 }
 
 .backup-warning-text strong {
-  color: rgba(255, 255, 255, 0.86);
+  color: rgba(0, 200, 83, 0.95);
 }
 
 .wakelock-hint {
