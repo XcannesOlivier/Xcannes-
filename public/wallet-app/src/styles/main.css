@@ -1988,10 +1988,10 @@ textarea.error {
 }
 
 #screen-backup .screen-header {
-  justify-content: flex-start;
+  justify-content: space-between;
   align-items: center;
   gap: 10px;
-  margin-bottom: 18px;
+  margin-bottom: 8px;
 }
 
 #screen-backup .screen-header span {
@@ -2014,13 +2014,40 @@ textarea.error {
   z-index: 1;
 }
 
-#screen-backup .screen-header h2 {
-  flex: 0 1 auto;
-  text-align: left;
+.backup-close-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(8, 14, 18, 0.52);
+  color: rgba(255, 255, 255, 0.88);
   font-size: 24px;
-  font-weight: 500;
-  letter-spacing: -0.2px;
-  line-height: 1.15;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.backup-intro {
+  width: 100%;
+  max-width: 360px;
+  margin: 0 auto 14px;
+}
+
+.backup-intro h2 {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  color: rgba(255, 255, 255, 0.95);
+  margin-bottom: 12px;
+}
+
+.backup-intro p {
+  font-size: 14px;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.60);
 }
 
 #screen-backup .choice-bottom-bar {
@@ -2047,14 +2074,14 @@ textarea.error {
 .backup-warning {
   width: 100%;
   max-width: 360px;
-  margin: 0 auto 18px;
+  margin: 0 auto 14px;
   display: flex;
   gap: 12px;
   align-items: flex-start;
-  padding: 16px 16px;
+  padding: 14px 14px;
   background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
   backdrop-filter: blur(16px);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.06),
@@ -2075,15 +2102,19 @@ textarea.error {
   background: rgba(0, 200, 83, 0.12);
   border: 1px solid rgba(0, 200, 83, 0.20);
   color: rgba(0, 200, 83, 0.95);
-  font-weight: 900;
   line-height: 1;
   flex-shrink: 0;
   margin-top: 2px;
 }
 
+.backup-warning-icon svg {
+  width: 14px;
+  height: 14px;
+}
+
 .backup-warning-text {
-  color: rgba(255, 255, 255, 0.60);
-  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.57);
+  font-size: 12px;
   line-height: 1.45;
 }
 
@@ -2138,10 +2169,10 @@ textarea.error {
 .mnemonic-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 26px 20px;
+  gap: 10px 10px;
   width: 100%;
   max-width: 360px;
-  margin: 10px auto 18px;
+  margin: 6px auto 16px;
   padding: 0;
   background: transparent;
   border: none;
@@ -2160,10 +2191,10 @@ textarea.error {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 12px;
+  padding: 9px 10px;
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 14px;
+  border-radius: 12px;
   transition: all 0.2s ease;
 }
 
@@ -2173,21 +2204,21 @@ textarea.error {
 }
 
 .mnemonic-num {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 700;
   color: rgba(0, 200, 83, 0.95);
-  min-width: 26px;
-  height: 26px;
+  min-width: 24px;
+  height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: rgba(0, 200, 83, 0.12);
-  border-radius: 7px;
+  border-radius: 6px;
   flex-shrink: 0;
 }
 
 .mnemonic-text {
-  font-size: 1.15rem;
+  font-size: 1rem;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.92);
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
@@ -2870,17 +2901,68 @@ textarea.error {
 
 #screen-backup .button-group {
   max-width: 360px;
+  margin-bottom: 14px;
 }
 
 #screen-backup .btn-primary {
   border-radius: 14px;
-  padding: 18px 26px;
+  padding: 16px 22px;
   font-size: 15px;
   background: linear-gradient(180deg, rgba(0, 200, 83, 0.85), rgba(0, 168, 70, 0.78));
   box-shadow:
     0 0 26px rgba(0, 200, 83, 0.14),
     0 18px 36px rgba(0, 0, 0, 0.55),
     0 38px 90px rgba(0, 0, 0, 0.85);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.backup-continue-icon {
+  width: 18px;
+  height: 18px;
+  display: inline-grid;
+  place-items: center;
+}
+
+.backup-continue-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.backup-help {
+  width: 100%;
+  max-width: 360px;
+  margin: 0 auto;
+}
+
+.backup-help-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: rgba(0, 200, 83, 0.95);
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.backup-help-icon {
+  width: 15px;
+  height: 15px;
+  display: inline-grid;
+  place-items: center;
+}
+
+.backup-help-icon svg {
+  width: 15px;
+  height: 15px;
+}
+
+.backup-help p {
+  color: rgba(255, 255, 255, 0.58);
+  font-size: 11px;
+  line-height: 1.35;
 }
 
 #screen-backup .btn-primary:hover:not(:disabled) {

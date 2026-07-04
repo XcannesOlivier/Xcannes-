@@ -787,6 +787,7 @@ function setupBackupScreen(walletData) {
   const grid = document.getElementById('mnemonic-grid');
   const addressEl = document.getElementById('backup-address');
   const btnBack = document.getElementById('btn-backup-back');
+  const btnClose = document.getElementById('btn-backup-close');
   const btnContinue = document.getElementById('btn-backup-continue');
   const btnRegenerate = document.getElementById('btn-backup-regenerate');
 
@@ -796,6 +797,17 @@ function setupBackupScreen(walletData) {
     const freshBtnBack = btnBack.cloneNode(true);
     btnBack.replaceWith(freshBtnBack);
     document.getElementById('btn-backup-back')?.addEventListener('click', () => {
+      if (pendingWalletData) clearWalletFromMemory(pendingWalletData);
+      pendingMnemonic = null;
+      pendingWalletData = null;
+      goToChoice();
+    }, { once: true });
+  }
+
+  if (btnClose) {
+    const freshBtnClose = btnClose.cloneNode(true);
+    btnClose.replaceWith(freshBtnClose);
+    document.getElementById('btn-backup-close')?.addEventListener('click', () => {
       if (pendingWalletData) clearWalletFromMemory(pendingWalletData);
       pendingMnemonic = null;
       pendingWalletData = null;

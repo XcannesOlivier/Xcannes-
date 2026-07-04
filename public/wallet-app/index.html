@@ -324,14 +324,24 @@
 		      <div class="screen-content">
 		        <div class="screen-header">
 		          <button class="btn-back" id="btn-backup-back">‹</button>
-		          <h2>Sauvegardez votre phrase</h2>
+		          <button id="btn-backup-close" class="backup-close-btn" type="button" aria-label="Fermer">✕</button>
 		        </div>
 
+	        <div class="backup-intro">
+	          <h2>Sauvegardez votre<br>phrase de récupération</h2>
+	          <p>Notez ces 12 mots dans l'ordre, sur un support hors ligne et dans un endroit sûr.</p>
+	        </div>
+
 	        <div class="backup-warning">
-	          <div class="backup-warning-icon" aria-hidden="true">!</div>
+	          <div class="backup-warning-icon" aria-hidden="true">
+	            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+	              <path d="M12 3l7 3v5c0 5-3.5 8.5-7 10c-3.5-1.5-7-5-7-10V6l7-3z"/>
+	              <path d="M9.5 12.2l1.8 1.8l3.4-3.4"/>
+	            </svg>
+	          </div>
 	          <div class="backup-warning-text">
-	            <p>Notez ces <strong>12 mots</strong> dans l'ordre, dans un endroit sûr.</p>
-	            <p>C'est le <strong>seul moyen</strong> de récupérer votre compte.</p>
+	            <p>C'est le <strong>seul moyen</strong> de récupérer votre portefeuille.</p>
+	            <p><strong>Ne la partagez jamais.</strong></p>
 	            <p>Ils ne seront <strong>plus affichés</strong>.</p>
 	          </div>
 	        </div>
@@ -347,7 +357,12 @@
 	        </div>
 
 	        <div class="button-group">
-	          <button id="btn-backup-continue" class="btn btn-primary">J'ai noté mes 12 mots</button>
+	          <button id="btn-backup-continue" class="btn btn-primary"><span class="backup-continue-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M8.7 12.2l2.1 2.1l4.5-4.5"></path></svg></span>J'ai noté mes 12 mots</button>
+	        </div>
+
+	        <div class="backup-help" role="note" aria-label="Aide sauvegarde phrase de récupération">
+	          <div class="backup-help-title"><span class="backup-help-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 5-3.5 8.5-7 10c-3.5-1.5-7-5-7-10V6l7-3z"></path><path d="M12 8v4"></path><path d="M12 16h.01"></path></svg></span>Besoin d'aide ?</div>
+	          <p>Conseils pour stocker votre phrase de récupération</p>
 	        </div>
 
 	        <div class="choice-bottom-bar" aria-hidden="true"><span></span></div>
