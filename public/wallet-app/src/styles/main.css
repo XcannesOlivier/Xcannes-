@@ -957,12 +957,12 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
 }
 
 #screen-unlock .logo {
-  width: min(250px, 78vw);
+  width: min(270px, 82vw);
   height: auto;
   background: transparent;
   border: none;
   box-shadow: none;
-  margin-bottom: 34px;
+  margin-bottom: 48px;
 }
 
 #screen-unlock #unlock-status.status {
