@@ -985,7 +985,7 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
   width: 100%;
   max-width: 100%;
   font-size: 17px;
-  padding: 19px 24px;
+  padding: 21px 24px;
   border-radius: 10px;
   background: linear-gradient(180deg, rgba(26, 196, 95, 0.96), rgba(18, 165, 79, 0.96));
   border: 1px solid rgba(120, 245, 174, 0.24);
@@ -1159,7 +1159,7 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
 }
 
 #screen-unlock .unlock-helper {
-  margin-top: 12px;
+  margin-top: 16px;
   margin-bottom: 6px;
   color: rgba(255, 255, 255, 0.38);
   font-size: 13px;
@@ -1168,18 +1168,20 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
 
 #screen-unlock #btn-unlock-use-pin.btn-link {
   margin-top: 20px;
-  padding-top: 20px;
+  padding-top: 26px;
   width: 100%;
   border-top: 1px solid rgba(255, 255, 255, 0.04);
   text-align: center;
   color: rgba(0, 200, 83, 0.70);
   text-decoration-color: rgba(0, 200, 83, 0.40);
+  font-size: 16px;
 }
 
 #screen-unlock #btn-reset-wallet.btn-link {
-  margin-top: 10px;
+  margin-top: 20px;
   color: rgba(255, 255, 255, 0.35);
   text-decoration-color: rgba(255, 255, 255, 0.22);
+  font-size: 16px;
 }
 
 #screen-pin-unlock #pin-unlock-status.status {
@@ -1195,7 +1197,7 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
   text-align: center;
 }
 
-@media (max-width: 360px) {
+  font-size: 18px;
   #screen-unlock .auth-card,
   #screen-pin-unlock .auth-card {
     border-radius: 20px;
@@ -1272,7 +1274,7 @@ h3 {
   margin-top: 28px;
   padding: 14px 16px;
   background: rgba(255, 255, 255, 0.02);
-  border-radius: var(--radius);
+  font-size: 18px;
   border: 1px solid var(--border);
 }
 
