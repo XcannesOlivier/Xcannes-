@@ -491,7 +491,7 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
 
 #screen-choice .choice-card {
   width: min(360px, 100%);
-  min-height: min(70vh, 590px);
+  min-height: min(74vh, 620px);
   border-radius: 24px;
   padding: 34px 18px 20px;
   background: #0b0f10;
@@ -939,7 +939,12 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
 }
 
 #screen-unlock .auth-card {
+  min-height: min(70vh, 590px);
   padding-top: 52px;
+}
+
+#screen-pin-unlock .auth-card {
+  min-height: min(70vh, 590px);
 }
 
 #screen-unlock .auth-card::before,
@@ -1195,6 +1200,14 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
     border-radius: 20px;
     min-height: min(68vh, 540px);
     padding: 28px 16px 18px;
+  }
+
+  #screen-unlock .auth-card {
+    min-height: min(72vh, 560px);
+  }
+
+  #screen-pin-unlock .auth-card {
+    min-height: min(72vh, 560px);
   }
 
   #screen-unlock .logo,
