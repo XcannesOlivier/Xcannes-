@@ -939,12 +939,12 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
 }
 
 #screen-unlock .auth-card {
-  min-height: min(70vh, 590px);
+  min-height: min(72vh, 610px);
   padding-top: 52px;
 }
 
 #screen-pin-unlock .auth-card {
-  min-height: min(70vh, 590px);
+  min-height: min(72vh, 610px);
 }
 
 #screen-unlock .auth-card::before,
@@ -1203,11 +1203,11 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
   }
 
   #screen-unlock .auth-card {
-    min-height: min(72vh, 560px);
+    min-height: min(74vh, 580px);
   }
 
   #screen-pin-unlock .auth-card {
-    min-height: min(72vh, 560px);
+    min-height: min(74vh, 580px);
   }
 
   #screen-unlock .logo,
