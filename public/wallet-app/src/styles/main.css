@@ -1061,7 +1061,7 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
 }
 
 #screen-pin-unlock .logo {
-  width: min(200px, 68vw);
+  width: min(210px, 68vw);
   height: auto;
   display: block;
   background: transparent;
@@ -1155,7 +1155,7 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
 }
 
 #screen-unlock .logo {
-  width: min(245px, 78vw);
+  width: min(255px, 78vw);
   height: auto;
   display: block;
   background: transparent;
@@ -1235,7 +1235,7 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
 
   #screen-unlock .logo,
   #screen-pin-unlock .logo {
-    width: min(214px, 74vw);
+    width: min(220px, 74vw);
   }
 
   #screen-pin-unlock h2 {
