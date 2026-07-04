@@ -984,8 +984,8 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
 .btn-biometric--hero {
   width: 100%;
   max-width: 100%;
-  font-size: 16px;
-  padding: 17px 24px;
+  font-size: 17px;
+  padding: 19px 24px;
   border-radius: 10px;
   background: linear-gradient(180deg, rgba(26, 196, 95, 0.96), rgba(18, 165, 79, 0.96));
   border: 1px solid rgba(120, 245, 174, 0.24);
@@ -1012,14 +1012,14 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   transform: translateY(-1px);
 }
 
 .unlock-btn-icon svg {
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
 }
 
 #screen-pin-unlock {
