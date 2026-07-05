@@ -315,6 +315,7 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
 }
 
 #screen-confirm-secure .confirm-secure-card {
+  --confirm-swipe-y: 0px;
   width: 100%;
   max-width: 360px;
   border-radius: 24px;
@@ -324,6 +325,12 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
     inset 0 1px 0 rgba(255, 255, 255, 0.04),
     0 28px 80px rgba(0, 0, 0, 0.62);
   padding: 28px 22px 24px;
+  transform: translateY(var(--confirm-swipe-y));
+  transition: transform 220ms ease;
+}
+
+#screen-confirm-secure .confirm-secure-card.is-swipe-dragging {
+  transition: none;
 }
 
 #screen-confirm-secure .logo {
@@ -965,7 +972,8 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
 }
 
 #screen-unlock .choice-bottom-bar,
-#screen-pin-unlock .choice-bottom-bar {
+#screen-pin-unlock .choice-bottom-bar,
+#screen-confirm-secure .choice-bottom-bar {
   position: absolute;
   left: 0;
   right: 0;
@@ -979,7 +987,8 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
 }
 
 #screen-unlock .choice-bottom-bar > span,
-#screen-pin-unlock .choice-bottom-bar > span {
+#screen-pin-unlock .choice-bottom-bar > span,
+#screen-confirm-secure .choice-bottom-bar > span {
   display: block;
   width: 144px;
   height: 6px;

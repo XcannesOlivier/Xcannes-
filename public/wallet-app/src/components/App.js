@@ -1432,6 +1432,79 @@ function confirmWithAuth(title, subtitle) {
     const pinSection = document.getElementById('confirm-pin-section');
     const pinDots = document.getElementById('confirm-pin-dots');
     const pinInput = document.getElementById('confirm-pin-input');
+    const confirmCard = document.querySelector('#screen-confirm-secure .confirm-secure-card');
+
+    let settled = false;
+    let swipeActive = false;
+    let swipeStartX = 0;
+    let swipeStartY = 0;
+
+    const safeResolve = (value) => {
+      if (settled) return;
+      settled = true;
+      cleanupSwipeHandlers();
+      resolve(value);
+    };
+
+    const onSwipeStart = (e) => {
+      if (settled) return;
+      const point = e.touches ? e.touches[0] : e;
+      swipeStartX = point.clientX;
+      swipeStartY = point.clientY;
+      swipeActive = true;
+      confirmCard?.classList.add('is-swipe-dragging');
+    };
+
+    const onSwipeMove = (e) => {
+      if (!swipeActive || settled) return;
+      const point = e.touches ? e.touches[0] : e;
+      const dx = point.clientX - swipeStartX;
+      const dy = point.clientY - swipeStartY;
+      if (dy <= 0) {
+        confirmCard?.style.setProperty('--confirm-swipe-y', '0px');
+        return;
+      }
+      if (Math.abs(dx) > Math.abs(dy)) return;
+      confirmCard?.style.setProperty('--confirm-swipe-y', `${Math.min(dy, 120)}px`);
+    };
+
+    const onSwipeEnd = (e) => {
+      if (!swipeActive || settled) return;
+      swipeActive = false;
+      confirmCard?.classList.remove('is-swipe-dragging');
+      const point = e.changedTouches ? e.changedTouches[0] : e;
+      const dx = point.clientX - swipeStartX;
+      const dy = point.clientY - swipeStartY;
+
+      confirmCard?.style.setProperty('--confirm-swipe-y', '0px');
+
+      // Close gesture: mostly vertical downward swipe.
+      if (dy > 85 && Math.abs(dx) < 60) {
+        safeResolve(false);
+      }
+    };
+
+    const cleanupSwipeHandlers = () => {
+      if (!confirmCard) return;
+      confirmCard.removeEventListener('touchstart', onSwipeStart);
+      confirmCard.removeEventListener('touchmove', onSwipeMove);
+      confirmCard.removeEventListener('touchend', onSwipeEnd);
+      confirmCard.removeEventListener('mousedown', onSwipeStart);
+      window.removeEventListener('mousemove', onSwipeMove);
+      window.removeEventListener('mouseup', onSwipeEnd);
+      confirmCard.classList.remove('is-swipe-dragging');
+      confirmCard.style.setProperty('--confirm-swipe-y', '0px');
+    };
+
+    if (confirmCard) {
+      confirmCard.style.setProperty('--confirm-swipe-y', '0px');
+      confirmCard.addEventListener('touchstart', onSwipeStart, { passive: true });
+      confirmCard.addEventListener('touchmove', onSwipeMove, { passive: true });
+      confirmCard.addEventListener('touchend', onSwipeEnd);
+      confirmCard.addEventListener('mousedown', onSwipeStart);
+      window.addEventListener('mousemove', onSwipeMove);
+      window.addEventListener('mouseup', onSwipeEnd);
+    }
 
     if (titleEl) titleEl.textContent = title || 'Sécurisez ce compte';
     if (subtitleEl) subtitleEl.textContent = subtitle || '';
@@ -1456,13 +1529,16 @@ function confirmWithAuth(title, subtitle) {
 
         // Auto-trigger Face ID
         setTimeout(async () => {
+          if (settled) return;
           try {
             updateStatus(statusEl, '');
             const prfOutput = await promptBiometric(authConfig.credentialId);
+            if (settled) return;
             updateStatus(statusEl, '✅ Confirmé');
             await delay(600);
-            resolve(true);
+            safeResolve(true);
           } catch {
+            if (settled) return;
             updateStatus(statusEl, 'Face ID échoué. Utilisez votre code PIN.', true);
             newPIN.classList.remove('hidden');
             showPINFallback();
@@ -1471,13 +1547,16 @@ function confirmWithAuth(title, subtitle) {
 
         // Manual retry
         newBio.addEventListener('click', async () => {
+          if (settled) return;
           try {
             updateStatus(statusEl, '');
             const prfOutput = await promptBiometric(authConfig.credentialId);
+            if (settled) return;
             updateStatus(statusEl, '✅ Confirmé');
             await delay(600);
-            resolve(true);
+            safeResolve(true);
           } catch {
+            if (settled) return;
             updateStatus(statusEl, 'Face ID échoué. Utilisez votre code PIN.', true);
             newPIN.classList.remove('hidden');
             showPINFallback();
@@ -1519,7 +1598,7 @@ function confirmWithAuth(title, subtitle) {
       if (pinOk) {
         updateStatus(statusEl, '✅ Confirmé');
         await delay(600);
-        resolve(true);
+        safeResolve(true);
       } else {
         const dots = document.getElementById('confirm-pin-dots');
         const inp = document.getElementById('confirm-pin-input');
