@@ -6,8 +6,8 @@ import { createPortal } from "react-dom";
 // ── Variant styling ─────────────────────────────────────────────────
 const VARIANT_CLASSES = {
   success: "bg-emerald-600/95 text-white",
-  error: "bg-black/90 text-[#f3dfb2] border border-white/20",
-  warning: "bg-black/90 text-[#f3dfb2] border border-white/20",
+  error: "bg-black/90 text-white border border-white/20",
+  warning: "bg-black/90 text-white border border-white/20",
   info: "bg-[#1a2233]/95 text-white border border-white/10",
 };
 

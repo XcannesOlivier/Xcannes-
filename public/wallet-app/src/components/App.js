@@ -1898,13 +1898,39 @@ async function handleSwitchWalletFromIframe(address) {
   }
 }
 
+function truncateWalletAddress(address) {
+  const addr = String(address || '').trim();
+  if (!addr) return '';
+  if (addr.length <= 14) return addr;
+  return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
+}
+
+function buildAuthSubtitle(action, progressDetails, txjson) {
+  const defaultLabel = action || txjson?.TransactionType || 'Transaction';
+
+  if (action === 'wallet:send') {
+    const amountLabel = String(progressDetails?.amountLabel || '').trim();
+    const amountLabelLowerCurrency = amountLabel.replace(/\s+([A-Za-z]{2,10})$/, (_, code) => ` ${code.toLowerCase()}`);
+    const beneficiaryName = String(progressDetails?.beneficiaryLabel || '').trim();
+    const beneficiaryAddress = String(progressDetails?.beneficiaryAddress || txjson?.Destination || '').trim();
+    const recipient = beneficiaryName || truncateWalletAddress(beneficiaryAddress) || 'le destinataire';
+
+    if (amountLabelLowerCurrency) {
+      return `Vous envoyez ${amountLabelLowerCurrency} à ${recipient}.`;
+    }
+    return `Vous envoyez des fonds à ${recipient}.`;
+  }
+
+  return defaultLabel;
+}
+
 /**
  * Handle a SIGN_TX request from the iframe.
  * Signs the transaction locally using the decrypted seed, then sends back
  * the tx_blob. The seed NEVER leaves this PWA.
  */
 async function handleSignFromIframe(data) {
-  const { txjson, requestId, action } = data;
+  const { txjson, requestId, action, progressDetails } = data;
 
   if (!currentWallet?.wallet) {
     sendToIframe({ type: 'SIGN_ERROR', error: 'no_wallet', requestId });
@@ -1913,7 +1939,7 @@ async function handleSignFromIframe(data) {
 
   try {
     // Require Face ID / Touch ID or PIN confirmation for every signature
-    const label = action || txjson?.TransactionType || 'Transaction';
+    const label = buildAuthSubtitle(action, progressDetails, txjson);
     const confirmed = await confirmWithAuth(
       'Confirmer la signature',
       label

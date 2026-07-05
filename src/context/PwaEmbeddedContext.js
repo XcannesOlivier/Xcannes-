@@ -188,7 +188,7 @@ export const PwaEmbeddedProvider = ({ children }) => {
 
   // ─── Sign Transaction via PWA bridge ──────────────────────────────
   const signTransaction = useCallback(
-    async (txjson, { action } = {}) => {
+    async (txjson, { action, progressDetails } = {}) => {
       if (!walletRef.current) {
         console.error("[PwaEmbedded] Cannot sign — no wallet connected");
         return null;
@@ -205,6 +205,7 @@ export const PwaEmbeddedProvider = ({ children }) => {
           type: "SIGN_TX",
           txjson: filledTx,
           action: action || null,
+          progressDetails: progressDetails || null,
           requestId,
           address: walletRef.current,
         });
