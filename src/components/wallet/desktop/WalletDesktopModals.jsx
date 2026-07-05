@@ -76,6 +76,7 @@ export default function WalletDesktopModals({
   augmentedTokens,
   wallet,
 }) {
+  const actionSwitchTimerRef = useRef(null);
   const [usdSwapPrefillAmount, setUsdSwapPrefillAmount] = useState("");
   const [usdSwapAccentVariant, setUsdSwapAccentVariant] = useState("");
   const [usdSwapSourceSelectionMode, setUsdSwapSourceSelectionMode] = useState("");
@@ -88,6 +89,29 @@ export default function WalletDesktopModals({
   const qrScanResultCallbackRef = useRef(null);
   const scanFromPayreqRef = useRef(false);
   const qrPayreqResultCallbackRef = useRef(null);
+
+  const transitionInlineAction = useCallback(
+    (nextAction, delayMs = 110) => {
+      if (actionSwitchTimerRef.current) {
+        window.clearTimeout(actionSwitchTimerRef.current);
+        actionSwitchTimerRef.current = null;
+      }
+      actionSwitchTimerRef.current = window.setTimeout(() => {
+        setActiveAction(nextAction);
+        actionSwitchTimerRef.current = null;
+      }, delayMs);
+    },
+    [setActiveAction],
+  );
+
+  useEffect(() => {
+    return () => {
+      if (actionSwitchTimerRef.current) {
+        window.clearTimeout(actionSwitchTimerRef.current);
+        actionSwitchTimerRef.current = null;
+      }
+    };
+  }, []);
 
   const openUsdSwapOut = useCallback(
     (amount, options = {}) => {
@@ -151,18 +175,32 @@ export default function WalletDesktopModals({
                 scanFromPayreqRef.current = false;
                 setQrScannerOpen(false);
                 setActiveAction?.('sendChoice');
-                setTimeout(() => {
+                const inject = () => {
                   qrPayreqResultCallbackRef.__inject?.(data);
-                }, 120);
+                };
+                if (typeof window !== "undefined" && window.requestAnimationFrame) {
+                  window.requestAnimationFrame(() => {
+                    window.requestAnimationFrame(inject);
+                  });
+                } else {
+                  inject();
+                }
                 return;
               }
               if (scanFromSendChoiceRef.current) {
                 scanFromSendChoiceRef.current = false;
                 setQrScannerOpen(false);
                 setActiveAction?.('sendChoice');
-                setTimeout(() => {
+                const inject = () => {
                   qrScanResultCallbackRef.__inject?.(data);
-                }, 120);
+                };
+                if (typeof window !== "undefined" && window.requestAnimationFrame) {
+                  window.requestAnimationFrame(() => {
+                    window.requestAnimationFrame(inject);
+                  });
+                } else {
+                  inject();
+                }
                 return;
               }
               handleAddressScan?.(data);
@@ -185,19 +223,17 @@ export default function WalletDesktopModals({
           }}
           onChooseQuickScan={() => {
             scanFromSendChoiceRef.current = true;
-            setActiveAction(null);
             setQrScannerOpen(true);
           }}
           onChoosePayreqScan={() => {
             scanFromPayreqRef.current = true;
-            setActiveAction(null);
             setQrScannerOpen(true);
           }}
           onChooseSimpleSend={() => {
-            setActiveAction("send");
+            transitionInlineAction("send");
           }}
           onChoosePayRequest={() => {
-            setActiveAction("send");
+            transitionInlineAction("send");
           }}
           handlePaymentRequestScan={sendModalProps?.handlePaymentRequestScan}
           setSendDestination={sendModalProps?.setSendDestination}
@@ -221,7 +257,7 @@ export default function WalletDesktopModals({
           }}
           onBack={() => {
             resetSendForm?.();
-            setActiveAction("sendChoice");
+            transitionInlineAction("sendChoice");
           }}
           {...sendModalProps}
         />

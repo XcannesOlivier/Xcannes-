@@ -67,9 +67,12 @@ export default function WalletDashboardSendChoiceModal({
 
   // ── Sub-modal state ──────────────────────────────────────────
   const [subModal, setSubModal] = useState(null); // 'quickscan' | 'payreq' | null
+  const [subModalClosing, setSubModalClosing] = useState(false);
+  const [modalAnimMs, setModalAnimMs] = useState(400);
   // Staggered entrance animation key — bumped each time modal opens
   const [animKey, setAnimKey] = useState(0);
   const [flowSheet, setFlowSheet] = useState(null); // 'simple' | 'payreq' | null
+  const [flowSheetClosing, setFlowSheetClosing] = useState(false);
   const flowSheetRef = useRef(null);
   const [flowSheetTranslateY, setFlowSheetTranslateY] = useState(0);
   const [flowSheetDragging, setFlowSheetDragging] = useState(false);
@@ -84,6 +87,7 @@ export default function WalletDashboardSendChoiceModal({
   const openSubModal = useCallback((name) => {
     setOverlayTranslateY(0);
     setOverlayDragging(false);
+    setSubModalClosing(false);
     setFlowSheet(null);
     setFlowSheetTranslateY(0);
     setFlowSheetDragging(false);
@@ -91,11 +95,36 @@ export default function WalletDashboardSendChoiceModal({
     setSubModal(name);
   }, []);
 
+  const closeSubModal = useCallback(() => {
+    if (!subModal || subModalClosing) return;
+    setSubModalClosing(true);
+    window.setTimeout(() => {
+      setSubModal(null);
+      setSubModalClosing(false);
+    }, modalAnimMs);
+  }, [subModal, subModalClosing, modalAnimMs]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return undefined;
+    const mq = window.matchMedia('(max-width: 767px)');
+    const syncDuration = () => {
+      setModalAnimMs(mq.matches ? 500 : 400);
+    };
+    syncDuration();
+    if (typeof mq.addEventListener === 'function') {
+      mq.addEventListener('change', syncDuration);
+      return () => mq.removeEventListener('change', syncDuration);
+    }
+    mq.addListener(syncDuration);
+    return () => mq.removeListener(syncDuration);
+  }, []);
+
   // Mesure panelRect synchronement dans le handler pour éviter le flash
   // (un seul rendu grâce au batching React 18)
   const openFlowSheet = useCallback((type) => {
     setFlowSheetTranslateY(0);
     setFlowSheetDragging(false);
+    setFlowSheetClosing(false);
     flowSheetSwipeMetaRef.current = null;
     const el = panelRef.current;
     if (el && typeof window !== 'undefined' && window.matchMedia('(min-width: 768px)').matches) {
@@ -153,7 +182,9 @@ export default function WalletDashboardSendChoiceModal({
     }
     if (!open) {
       setSubModal(null);
+      setSubModalClosing(false);
       setFlowSheet(null);
+      setFlowSheetClosing(false);
       setFlowSheetTranslateY(0);
       setFlowSheetDragging(false);
       flowSheetSwipeMetaRef.current = null;
@@ -182,12 +213,29 @@ export default function WalletDashboardSendChoiceModal({
     if (open) setAnimKey((k) => k + 1);
   }, [wallet, inline, open]);
 
-  const closeFlowSheet = useCallback(() => {
-    setFlowSheet(null);
-    setFlowSheetTranslateY(0);
+  const closeFlowSheet = useCallback(({ immediate = false, exitTranslate = 26 } = {}) => {
+    if (!flowSheet) return;
+    if (immediate) {
+      setFlowSheet(null);
+      setFlowSheetClosing(false);
+      setFlowSheetTranslateY(0);
+      setFlowSheetDragging(false);
+      flowSheetSwipeMetaRef.current = null;
+      return;
+    }
+    if (flowSheetClosing) return;
+    setFlowSheetClosing(true);
     setFlowSheetDragging(false);
+    setFlowSheetTranslateY((prev) => Math.max(prev, exitTranslate));
     flowSheetSwipeMetaRef.current = null;
-  }, []);
+    window.setTimeout(() => {
+      setFlowSheet(null);
+      setFlowSheetClosing(false);
+      setFlowSheetTranslateY(0);
+      setFlowSheetDragging(false);
+      flowSheetSwipeMetaRef.current = null;
+    }, modalAnimMs);
+  }, [flowSheet, flowSheetClosing, modalAnimMs]);
 
   // Mesure les bornes du panneau de la modale pendant que le flowSheet est ouvert
   // (desktop uniquement) afin d'y ancrer la bottom-sheet. Sur mobile / petits
@@ -236,6 +284,7 @@ export default function WalletDashboardSendChoiceModal({
       pointerId: event.pointerId,
       lastDeltaY: 0,
     };
+    setFlowSheetClosing(false);
 
     const onMove = (e) => {
       const meta = flowSheetSwipeMetaRef.current;
@@ -264,17 +313,19 @@ export default function WalletDashboardSendChoiceModal({
       setFlowSheetDragging(false);
       flowSheetSwipeMetaRef.current = null;
       if (shouldClose) {
+        setFlowSheetClosing(true);
         setFlowSheetTranslateY(Math.max(delta, height));
-        window.setTimeout(() => closeFlowSheet(), 160);
+        window.setTimeout(() => closeFlowSheet({ immediate: true }), modalAnimMs);
         return;
       }
+      setFlowSheetClosing(false);
       setFlowSheetTranslateY(0);
     };
 
     window.addEventListener('pointermove', onMove);
     window.addEventListener('pointerup', onEnd);
     window.addEventListener('pointercancel', onEnd);
-  }, [flowSheet, closeFlowSheet]);
+  }, [flowSheet, closeFlowSheet, modalAnimMs]);
 
   useEffect(() => {
     if (!flowSheet) return;
@@ -569,7 +620,7 @@ export default function WalletDashboardSendChoiceModal({
       if (shouldClose) {
         setOverlayTranslateY(Math.max(delta, height));
         closeRequestedRef.current = true;
-        window.setTimeout(() => { onClose?.(); }, 180);
+        window.setTimeout(() => { onClose?.(); }, modalAnimMs);
       } else {
         setOverlayTranslateY(0);
       }
@@ -675,7 +726,7 @@ export default function WalletDashboardSendChoiceModal({
       if (!closeRequestedRef.current) {
         closeRequestedRef.current = true;
         setOverlayTranslateY(Math.max(delta, height));
-        window.setTimeout(() => { onClose?.(); }, 180);
+        window.setTimeout(() => { onClose?.(); }, modalAnimMs);
       }
       return;
     }
@@ -729,11 +780,15 @@ export default function WalletDashboardSendChoiceModal({
           ref={overlayRef}
           className={inline ? 'w-full h-full flex' : 'pointer-events-auto w-full'}
           style={{
-            transform: `translateY(${Math.max(0, overlayTranslateY)}px)`,
-            transition: overlayDragging ? 'none' : 'transform 220ms cubic-bezier(0.2,0,0,1)',
-            opacity: overlayTranslateY > 0 ? Math.max(0, Math.min(1, 1 - overlayTranslateY / 420)) : undefined,
+            transform: `translateY(${Math.max(0, overlayTranslateY)}px) scale(${subModal ? 0.985 : 1})`,
+            transition: overlayDragging ? 'none' : `transform ${modalAnimMs}ms cubic-bezier(0.2,0,0,1), opacity ${modalAnimMs}ms cubic-bezier(0.2,0,0,1)`,
+            opacity: subModal
+              ? 0
+              : overlayTranslateY > 0
+                ? Math.max(0, Math.min(1, 1 - overlayTranslateY / 420))
+                : undefined,
             willChange: overlayTranslateY ? 'transform' : undefined,
-            visibility: subModal ? 'hidden' : undefined,
+            pointerEvents: subModal ? 'none' : undefined,
           }}
           onPointerMove={handleOverlayPointerMove}
           onPointerUp={handleOverlayPointerEnd}
@@ -1012,12 +1067,12 @@ export default function WalletDashboardSendChoiceModal({
       {/* ═══ Sub-modal: Envoi simple ═══ */}
       {subModal === 'quickscan' ? (
         <div className={inline ? 'absolute inset-0 z-50 flex' : 'fixed inset-0 z-[10100] flex items-end md:items-center justify-center md:px-4 pointer-events-none'}>
-          {!inline ? <div className="fixed inset-0 bg-black/70 md:backdrop-blur-sm pointer-events-auto wallet-modal-backdrop-in" onClick={() => setSubModal(null)} style={overlayTranslateY > 0 ? { opacity: Math.max(0, 1 - overlayTranslateY / 420) } : undefined} /> : null}
-          <div className={inline ? 'w-full h-full' : 'relative z-10 pointer-events-auto w-full md:max-w-lg wallet-modal-lift-in'} style={!inline ? { boxShadow: '8px 16px 48px rgba(255,255,255,0.07), 0 0 0 1px rgba(255,255,255,0.06)' } : undefined}>
+          {!inline ? <div className={`fixed inset-0 bg-black/70 md:backdrop-blur-sm pointer-events-auto ${subModalClosing ? 'wallet-modal-backdrop-out' : 'wallet-modal-backdrop-in'}`} onClick={closeSubModal} style={overlayTranslateY > 0 ? { opacity: Math.max(0, 1 - overlayTranslateY / 420) } : undefined} /> : null}
+          <div className={inline ? 'w-full h-full' : `relative z-10 pointer-events-auto w-full md:max-w-lg ${subModalClosing ? 'wallet-modal-lift-out' : 'wallet-modal-lift-in'}`} style={!inline ? { boxShadow: '8px 16px 48px rgba(255,255,255,0.07), 0 0 0 1px rgba(255,255,255,0.06)' } : undefined}>
             <div
               ref={subModalRef}
               className={inline ? 'relative w-full h-full overflow-hidden flex flex-col bg-elevated rounded-xl' : 'relative w-full wallet-modal-panel wallet-cash-modal border-white/10 md:border overflow-hidden flex flex-col bg-elevated h-screen md:h-auto md:max-h-[80vh] rounded-none md:rounded-2xl pb-[env(safe-area-inset-bottom)]'}
-              style={!inline && overlayTranslateY ? { transform: `translateY(${Math.max(0, overlayTranslateY)}px)`, transition: overlayDragging ? 'none' : 'transform 220ms cubic-bezier(0.2,0,0,1)', opacity: Math.max(0, Math.min(1, 1 - overlayTranslateY / 420)) } : undefined}
+              style={!inline && overlayTranslateY ? { transform: `translateY(${Math.max(0, overlayTranslateY)}px)`, transition: overlayDragging ? 'none' : `transform ${modalAnimMs}ms cubic-bezier(0.2,0,0,1)`, opacity: Math.max(0, Math.min(1, 1 - overlayTranslateY / 420)) } : undefined}
               onPointerDown={handleSubModalPillDown}
             >
               {/* Glow */}
@@ -1437,11 +1492,11 @@ export default function WalletDashboardSendChoiceModal({
       {/* ═══ Sub-modal: Payer une demande ═══ */}
       {subModal === 'payreq' ? (
         <div className={inline ? 'absolute inset-0 z-50 flex' : 'fixed inset-0 z-[10100] flex items-end md:items-center justify-center md:px-4 pointer-events-none'}>
-          {!inline ? <div className="fixed inset-0 bg-black/70 md:backdrop-blur-sm pointer-events-auto wallet-modal-backdrop-in" onClick={() => setSubModal(null)} style={overlayTranslateY > 0 ? { opacity: Math.max(0, 1 - overlayTranslateY / 420) } : undefined} /> : null}
-          <div className={inline ? 'w-full h-full' : 'relative z-10 pointer-events-auto w-full md:max-w-lg wallet-modal-lift-in'} style={!inline ? { boxShadow: '8px 16px 48px rgba(255,255,255,0.07), 0 0 0 1px rgba(255,255,255,0.06)' } : undefined}>
+          {!inline ? <div className={`fixed inset-0 bg-black/70 md:backdrop-blur-sm pointer-events-auto ${subModalClosing ? 'wallet-modal-backdrop-out' : 'wallet-modal-backdrop-in'}`} onClick={closeSubModal} style={overlayTranslateY > 0 ? { opacity: Math.max(0, 1 - overlayTranslateY / 420) } : undefined} /> : null}
+          <div className={inline ? 'w-full h-full' : `relative z-10 pointer-events-auto w-full md:max-w-lg ${subModalClosing ? 'wallet-modal-lift-out' : 'wallet-modal-lift-in'}`} style={!inline ? { boxShadow: '8px 16px 48px rgba(255,255,255,0.07), 0 0 0 1px rgba(255,255,255,0.06)' } : undefined}>
             <div
               className={inline ? 'relative w-full h-full overflow-hidden flex flex-col bg-elevated rounded-xl' : 'relative w-full wallet-modal-panel wallet-cash-modal border-white/10 md:border overflow-hidden flex flex-col bg-elevated h-screen md:h-auto md:max-h-[80vh] rounded-none md:rounded-2xl pb-[env(safe-area-inset-bottom)]'}
-              style={!inline && overlayTranslateY ? { transform: `translateY(${Math.max(0, overlayTranslateY)}px)`, transition: overlayDragging ? 'none' : 'transform 220ms cubic-bezier(0.2,0,0,1)', opacity: Math.max(0, Math.min(1, 1 - overlayTranslateY / 420)) } : undefined}
+              style={!inline && overlayTranslateY ? { transform: `translateY(${Math.max(0, overlayTranslateY)}px)`, transition: overlayDragging ? 'none' : `transform ${modalAnimMs}ms cubic-bezier(0.2,0,0,1)`, opacity: Math.max(0, Math.min(1, 1 - overlayTranslateY / 420)) } : undefined}
               onPointerDown={handleSubModalPillDown}
             >
 	              {/* Glow */}
@@ -1717,7 +1772,14 @@ export default function WalletDashboardSendChoiceModal({
           >
             <div
               className="absolute inset-0 bg-black/35 md:bg-black/20 pointer-events-auto"
-              style={flowSheetTranslateY > 0 ? { opacity: Math.max(0, Math.min(1, 1 - flowSheetTranslateY / 320)) } : undefined}
+              style={{
+                opacity: flowSheetClosing
+                  ? 0
+                  : flowSheetTranslateY > 0
+                    ? Math.max(0, Math.min(1, 1 - flowSheetTranslateY / 320))
+                    : undefined,
+                transition: flowSheetDragging ? 'none' : `opacity ${modalAnimMs}ms cubic-bezier(0.2,0,0,1)`,
+              }}
             />
             <div
               ref={flowSheetRef}
@@ -1725,7 +1787,7 @@ export default function WalletDashboardSendChoiceModal({
               style={{
                 transform: flowSheetTranslateY ? `translateY(${Math.max(0, flowSheetTranslateY)}px)` : undefined,
                 opacity: flowSheetTranslateY > 0 ? Math.max(0, Math.min(1, 1 - flowSheetTranslateY / 320)) : undefined,
-                transition: flowSheetDragging ? 'none' : 'transform 220ms cubic-bezier(0.2,0,0,1)',
+                transition: flowSheetDragging ? 'none' : `transform ${modalAnimMs}ms cubic-bezier(0.2,0,0,1), opacity ${modalAnimMs}ms cubic-bezier(0.2,0,0,1)`,
                 willChange: flowSheetTranslateY ? 'transform' : undefined,
               }}
             >
