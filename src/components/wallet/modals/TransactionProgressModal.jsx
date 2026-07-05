@@ -269,8 +269,8 @@ export default function TransactionProgressModal({
                       className="drop-shadow-[0_0_12px_rgba(18,198,104,0.45)]"
                     />
                   </svg>
-                  <div className="absolute inset-[20px] rounded-full bg-[#010307] border border-white/6 flex items-center justify-center">
-                    <img src="/symbols/xlogovert.png" alt="XCANNES" className="h-8 w-8 opacity-95" draggable={false} />
+                  <div className="absolute inset-[20px] rounded-full bg-[#010307] flex items-center justify-center">
+                    <img src="/symbols/xlogovert.png" alt="XCANNES" className="h-12 w-12 opacity-95" draggable={false} />
                   </div>
                 </div>
               </div>
@@ -430,6 +430,10 @@ export default function TransactionProgressModal({
       <style jsx global>{`
         /* keep file local: no keyframes needed beyond tailwind's spin */
       `}</style>
+
+      <div className="pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 z-[10210]">
+        <span className="block h-[5px] w-[132px] rounded-full bg-white/95" aria-hidden="true" />
+      </div>
     </div>
   );
 }
