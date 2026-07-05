@@ -133,7 +133,7 @@ export default function TransactionProgressModal({
 
       <div className="relative h-full w-full flex flex-col items-center px-6 pt-6 pb-8">
         {/* main */}
-        <div className="mt-2.5 w-full max-w-[440px] flex-1 flex flex-col items-center">
+        <div className="mt-[30px] w-full max-w-[440px] flex-1 flex flex-col items-center">
           {isPending ? (
             <>
               <img
