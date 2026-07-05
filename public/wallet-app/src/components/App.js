@@ -1968,9 +1968,6 @@ async function handleSignFromIframe(data) {
       return;
     }
 
-    // Return to embedded view immediately
-    showScreen('wallet-embedded');
-
     // Sign locally — seed is in memory, never sent to iframe
     const { tx_blob, hash } = signTransaction(currentWallet.wallet, txjson);
 
@@ -1980,6 +1977,10 @@ async function handleSignFromIframe(data) {
       hash,
       requestId,
     });
+
+    // Switch back to embedded view only after TX_SIGNED is posted,
+    // so the iframe can enter its "transaction in progress" state first.
+    showScreen('wallet-embedded');
   } catch (err) {
     console.error('[handleSignFromIframe] Error:', err);
     showScreen('wallet-embedded');

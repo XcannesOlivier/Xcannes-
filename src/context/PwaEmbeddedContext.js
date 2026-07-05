@@ -216,42 +216,39 @@ export const PwaEmbeddedProvider = ({ children }) => {
         if (reply.type === "TX_SIGNED" && reply.tx_blob) {
           setIsConnecting(false);
 
-          // Submit the signed tx_blob to XRPL via our backend
-          try {
-            const submitRes = await fetch(apiUrl("/wallet-relay/submit-blob"), {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                tx_blob: reply.tx_blob,
-                hash: reply.hash,
-                address: walletRef.current,
-              }),
-            });
-            const submitData = await submitRes.json().catch(() => ({}));
+          // Return immediately so UI can display "transaction in progress"
+          // without flashing the wallet screen.
+          const immediateResult = {
+            signed: true,
+            tx_blob: reply.tx_blob,
+            hash: reply.hash,
+            txResult: null,
+            uuid: requestId,
+          };
 
-            // Refresh balance after tx
+          // Submit the signed tx_blob in background.
+          (async () => {
+            try {
+              await fetch(apiUrl("/wallet-relay/submit-blob"), {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  tx_blob: reply.tx_blob,
+                  hash: reply.hash,
+                  address: walletRef.current,
+                }),
+              });
+            } catch (submitError) {
+              console.error("[PwaEmbedded] Submit error:", submitError);
+            }
+
             setTimeout(() => {
               fetchBalance(walletRef.current);
               refreshCachedStatementsForAddress(walletRef.current);
             }, 2000);
+          })();
 
-            return {
-              signed: true,
-              tx_blob: reply.tx_blob,
-              hash: reply.hash,
-              txResult: submitData?.txResult || submitData,
-              uuid: requestId,
-            };
-          } catch (submitError) {
-            console.error("[PwaEmbedded] Submit error:", submitError);
-            return {
-              signed: true,
-              tx_blob: reply.tx_blob,
-              hash: reply.hash,
-              txResult: null,
-              uuid: requestId,
-            };
-          }
+          return immediateResult;
         }
 
         // Signature refused or error
