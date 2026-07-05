@@ -3298,7 +3298,7 @@ textarea.error {
 #screen-import .tab-desc {
   max-width: 360px;
   margin: 0 0 18px;
-  font-size: 10px;
+  font-size: 11px;
   color: rgba(255, 255, 255, 0.60);
   text-align: left;
   line-height: 1.45;
@@ -3339,24 +3339,24 @@ textarea.error {
 }
 
 .import-security-icon {
-  width: 18px;
-  height: 18px;
+  width: 19px;
+  height: 19px;
   color: rgba(0, 200, 83, 0.95);
   display: inline-grid;
   place-items: center;
   flex: 0 0 auto;
-  margin-top: 1px;
+  align-self: center;
 }
 
 .import-security-icon svg {
-  width: 18px;
-  height: 18px;
+  width: 19px;
+  height: 19px;
 }
 
 .import-security-note p {
   margin: 0;
   color: rgba(255, 255, 255, 0.60);
-  font-size: 12px;
+  font-size: 10px;
   line-height: 1.55;
 }
 
