@@ -1432,7 +1432,7 @@ function confirmWithAuth(title, subtitle) {
     const pinSection = document.getElementById('confirm-pin-section');
     const pinDots = document.getElementById('confirm-pin-dots');
     const pinInput = document.getElementById('confirm-pin-input');
-    const confirmCard = document.querySelector('#screen-confirm-secure .confirm-secure-card');
+    const swipeSurface = document.querySelector('#screen-confirm-secure .screen-content');
 
     let settled = false;
     let swipeActive = false;
@@ -1464,7 +1464,7 @@ function confirmWithAuth(title, subtitle) {
       swipeLastX = point.clientX;
       swipeLastY = point.clientY;
       swipeActive = true;
-      confirmCard?.classList.add('is-swipe-dragging');
+      swipeSurface?.classList.add('is-swipe-dragging');
     };
 
     const moveSwipe = (e) => {
@@ -1479,24 +1479,24 @@ function confirmWithAuth(title, subtitle) {
       const dy = swipeLastY - swipeStartY;
 
       if (dy <= 0) {
-        confirmCard?.style.setProperty('--confirm-swipe-y', '0px');
+        swipeSurface?.style.setProperty('--confirm-swipe-y', '0px');
         return;
       }
 
       // Ignore mostly horizontal drags.
       if (Math.abs(dx) > dy * 1.25) return;
-      confirmCard?.style.setProperty('--confirm-swipe-y', `${Math.min(dy, 140)}px`);
+      swipeSurface?.style.setProperty('--confirm-swipe-y', `${Math.min(dy, 140)}px`);
     };
 
     const endSwipe = () => {
       if (!swipeActive || settled) return;
       swipeActive = false;
-      confirmCard?.classList.remove('is-swipe-dragging');
+      swipeSurface?.classList.remove('is-swipe-dragging');
 
       const dx = swipeLastX - swipeStartX;
       const dy = swipeLastY - swipeStartY;
 
-      confirmCard?.style.setProperty('--confirm-swipe-y', '0px');
+      swipeSurface?.style.setProperty('--confirm-swipe-y', '0px');
 
       // Close gesture: downward swipe with tolerant threshold.
       if (dy > 58 && dy > Math.abs(dx) * 0.9) {
@@ -1529,39 +1529,39 @@ function confirmWithAuth(title, subtitle) {
     const onMouseUp = () => endSwipe();
 
     const cleanupSwipeHandlers = () => {
-      if (!confirmCard) return;
-      confirmCard.removeEventListener('pointerdown', onPointerDown);
+      if (!swipeSurface) return;
+      swipeSurface.removeEventListener('pointerdown', onPointerDown);
       window.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('pointerup', onPointerUp);
       window.removeEventListener('pointercancel', onPointerUp);
 
-      confirmCard.removeEventListener('touchstart', onTouchStart);
+      swipeSurface.removeEventListener('touchstart', onTouchStart);
       window.removeEventListener('touchmove', onTouchMove);
       window.removeEventListener('touchend', onTouchEnd);
       window.removeEventListener('touchcancel', onTouchEnd);
 
-      confirmCard.removeEventListener('mousedown', onMouseDown);
+      swipeSurface.removeEventListener('mousedown', onMouseDown);
       window.removeEventListener('mousemove', onMouseMove);
       window.removeEventListener('mouseup', onMouseUp);
 
       activePointerId = null;
-      confirmCard.classList.remove('is-swipe-dragging');
-      confirmCard.style.setProperty('--confirm-swipe-y', '0px');
+      swipeSurface.classList.remove('is-swipe-dragging');
+      swipeSurface.style.setProperty('--confirm-swipe-y', '0px');
     };
 
-    if (confirmCard) {
-      confirmCard.style.setProperty('--confirm-swipe-y', '0px');
+    if (swipeSurface) {
+      swipeSurface.style.setProperty('--confirm-swipe-y', '0px');
       if ('PointerEvent' in window) {
-        confirmCard.addEventListener('pointerdown', onPointerDown);
+        swipeSurface.addEventListener('pointerdown', onPointerDown);
         window.addEventListener('pointermove', onPointerMove);
         window.addEventListener('pointerup', onPointerUp);
         window.addEventListener('pointercancel', onPointerUp);
       } else {
-        confirmCard.addEventListener('touchstart', onTouchStart, { passive: true });
+        swipeSurface.addEventListener('touchstart', onTouchStart, { passive: true });
         window.addEventListener('touchmove', onTouchMove, { passive: true });
         window.addEventListener('touchend', onTouchEnd);
         window.addEventListener('touchcancel', onTouchEnd);
-        confirmCard.addEventListener('mousedown', onMouseDown);
+        swipeSurface.addEventListener('mousedown', onMouseDown);
         window.addEventListener('mousemove', onMouseMove);
         window.addEventListener('mouseup', onMouseUp);
       }
