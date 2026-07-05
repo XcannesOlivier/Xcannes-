@@ -866,14 +866,22 @@ function setupBackupVerifyScreen(words) {
   const progressText = document.getElementById('verify-progress-text');
   const progressFill = document.getElementById('verify-progress-fill');
   const progressBar = document.querySelector('#screen-backup-verify .verify-progress-bar');
-  const btnConfirm = document.getElementById('btn-verify-confirm');
-  const btnConfirmLabel = document.getElementById('btn-verify-confirm-label');
+  let btnConfirm = document.getElementById('btn-verify-confirm');
+  let btnConfirmLabel = document.getElementById('btn-verify-confirm-label');
   const btnBack = document.getElementById('btn-verify-back');
   const btnClose = document.getElementById('btn-verify-close');
   const btnShowWords = document.getElementById('btn-verify-show-words');
   const overlay = document.getElementById('verify-words-overlay');
   const overlayGrid = document.getElementById('verify-mnemonic-grid');
   const btnOverlayClose = document.getElementById('btn-verify-words-close');
+
+  // Re-arm confirm button on every screen setup to avoid stale one-shot listeners.
+  if (btnConfirm) {
+    const freshBtnConfirm = btnConfirm.cloneNode(true);
+    btnConfirm.replaceWith(freshBtnConfirm);
+    btnConfirm = document.getElementById('btn-verify-confirm');
+    btnConfirmLabel = document.getElementById('btn-verify-confirm-label');
+  }
 
   let currentIndex = 0;
   let currentInput = null;
@@ -884,10 +892,23 @@ function setupBackupVerifyScreen(words) {
   }
 
   function updateProgress(stepIndex) {
-    const completed = Math.max(0, Math.min(stepIndex, 12));
     const current = Math.min(stepIndex + 1, 12);
+    const step = Math.max(0, Math.min(stepIndex, 11));
     progressText.innerHTML = `<span class="verify-progress-current">${current}</span><span class="verify-progress-total">/12</span>`;
-    progressBar?.style.setProperty('--verify-step', `${Math.max(0, Math.min(stepIndex, 11))}`);
+
+    // Compute segment position in px for reliable rendering across browsers.
+    if (progressBar && progressFill) {
+      const segmentGap = 4;
+      const segmentWidth = (progressBar.clientWidth - (11 * segmentGap)) / 12;
+      if (segmentWidth > 0) {
+        progressFill.style.width = `${segmentWidth}px`;
+        progressFill.style.transform = `translateX(${step * (segmentWidth + segmentGap)}px)`;
+        return;
+      }
+    }
+
+    // Fallback if bar width is not measurable yet.
+    progressBar?.style.setProperty('--verify-step', `${step}`);
     progressFill.style.width = 'var(--segment-w)';
   }
 
@@ -1127,7 +1148,7 @@ function setupBackupVerifyScreen(words) {
     } catch (err) {
       showError(`Erreur lors de la sauvegarde : ${err.message}`);
     }
-  }, { once: true });
+  });
 }
 
 // ==========================================
