@@ -2002,7 +2002,7 @@ textarea.error {
   width: 34px;
   height: 34px;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.07);
   background: transparent;
   color: rgba(255, 255, 255, 0.88);
   font-size: 25px;
@@ -2020,7 +2020,7 @@ textarea.error {
   width: 34px;
   height: 34px;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.07);
   background: transparent;
   color: rgba(255, 255, 255, 0.88);
   font-size: 22px;
