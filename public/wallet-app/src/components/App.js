@@ -1145,7 +1145,9 @@ function setupBackupVerifyScreen(words) {
 
 function setupImportScreen() {
   const btnBack = document.getElementById('btn-import-back');
+  const btnClose = document.getElementById('btn-import-close');
   const btnConfirm = document.getElementById('btn-import-confirm');
+  const btnHelp = document.getElementById('btn-import-help');
   const statusEl = document.getElementById('import-status');
 
   // Clear any previous status message
@@ -1159,7 +1161,16 @@ function setupImportScreen() {
     setupChoiceScreen();
   }, { once: true });
 
+  btnClose?.addEventListener('click', () => {
+    showScreen('choice');
+    setupChoiceScreen();
+  }, { once: true });
+
   btnConfirm?.addEventListener('click', () => handleImport(statusEl), { once: true });
+
+  btnHelp?.addEventListener('click', () => {
+    updateStatus(statusEl, 'Vérifiez votre sauvegarde initiale de 12 mots. Cette phrase a été affichée lors de la création du portefeuille.');
+  });
 }
 
 function buildMnemonicImportGrid(count) {
@@ -1173,7 +1184,7 @@ function buildMnemonicImportGrid(count) {
       <span class="import-word-num">${i + 1}</span>
       <input class="import-word-input" type="text"
              autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
-             placeholder="mot ${i + 1}" data-index="${i}">
+              placeholder="Mot ${i + 1}" data-index="${i}">
     `;
     grid.appendChild(cell);
   }

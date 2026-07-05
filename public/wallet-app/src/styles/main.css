@@ -3257,56 +3257,118 @@ textarea.error {
 }
 
 #screen-import .screen-header {
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  min-height: 52px;
-  gap: 0;
+  min-height: 44px;
+  gap: 10px;
   position: relative;
+  margin-bottom: 10px;
 }
 
 #screen-import .screen-header .btn-back {
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  background: transparent;
-  border: none;
-  backdrop-filter: none;
-  box-shadow: none;
-  width: 52px;
-  height: 52px;
-  font-size: 34px;
+  position: static;
+  transform: none;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  width: 34px;
+  height: 34px;
+  font-size: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0;
   padding: 0;
-  z-index: 1;
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.88);
+  flex: 0 0 auto;
 }
 
 #screen-import .screen-header h2 {
-  flex: none;
-  text-align: center;
-  font-size: 28px;
-  font-weight: 400;
+  flex: 1;
+  text-align: left;
+  font-size: 42px;
+  font-weight: 500;
   letter-spacing: -0.2px;
-  line-height: 1.15;
-  margin: 0 auto;
+  line-height: 1.04;
+  margin: 0;
+  max-width: 320px;
 }
 
 #screen-import .tab-desc {
   max-width: 360px;
-  margin: 6px auto 30px;
+  margin: 0 0 16px;
   font-size: 15px;
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(255, 255, 255, 0.62);
   text-align: left;
+  line-height: 1.35;
+}
+
+#screen-import .btn-close {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  color: rgba(255, 255, 255, 0.85);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  font-size: 15px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex: 0 0 auto;
+}
+
+.import-security-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  max-width: 360px;
+  margin: 0 0 16px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.015));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 14px 34px rgba(0, 0, 0, 0.44);
+}
+
+.import-security-icon {
+  width: 18px;
+  height: 18px;
+  color: rgba(0, 200, 83, 0.95);
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  margin-top: 1px;
+}
+
+.import-security-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.import-security-note p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.import-security-note strong {
+  color: rgba(0, 200, 83, 0.95);
+  font-weight: 700;
 }
 
 .import-mnemonic-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 18px 28px;
-  margin-bottom: 20px;
+  gap: 12px 10px;
+  margin-bottom: 16px;
   padding: 0;
   background: transparent;
   border: none;
@@ -3320,10 +3382,13 @@ textarea.error {
   align-items: center;
   gap: 8px;
   background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 14px;
-  padding: 10px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  padding: 8px;
   transition: all 0.2s ease;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.03),
+    0 10px 22px rgba(0, 0, 0, 0.30);
 }
 
 .import-word-cell:focus-within {
@@ -3334,28 +3399,28 @@ textarea.error {
 .import-word-num {
   font-size: 0.75rem;
   color: rgba(0, 200, 83, 0.95);
-  min-width: 22px;
-  height: 22px;
+  min-width: 24px;
+  height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 200, 83, 0.12);
+  background: rgba(0, 200, 83, 0.10);
   border-radius: 6px;
-  font-weight: 700;
+  font-weight: 600;
   flex-shrink: 0;
 }
 
 .import-word-input {
   width: 100%;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  background: rgba(0, 0, 0, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.24);
   color: rgba(255, 255, 255, 0.88);
-  font-size: 0.95rem;
+  font-size: 0.98rem;
   font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial;
-  font-weight: 600;
+  font-weight: 500;
   outline: none;
-  padding: 10px 12px;
-  border-radius: 12px;
+  padding: 10px 11px;
+  border-radius: 9px;
   letter-spacing: 0.01em;
   appearance: none;
   -webkit-appearance: none;
@@ -3364,25 +3429,27 @@ textarea.error {
 }
 
 .import-word-input::placeholder {
-  color: rgba(148, 163, 184, 0.4);
-  font-size: 0.85rem;
+  color: rgba(148, 163, 184, 0.48);
+  font-size: 0.95rem;
   font-family: inherit;
-  font-weight: 400;
+  font-weight: 500;
 }
 
 .import-word-cell:focus-within .import-word-input {
-  border-color: rgba(0, 200, 83, 0.38);
-  background: rgba(0, 200, 83, 0.06);
+  border-color: rgba(0, 200, 83, 0.42);
+  background: rgba(0, 200, 83, 0.08);
 }
 
 #screen-import .button-group {
   max-width: 360px;
+  margin-top: 12px;
 }
 
 #screen-import .btn-primary {
-  border-radius: 14px;
-  padding: 18px 26px;
+  border-radius: 16px;
+  padding: 16px 22px;
   font-size: 15px;
+  font-weight: 700;
   background: linear-gradient(180deg, rgba(0, 200, 83, 0.85), rgba(0, 168, 70, 0.78));
   box-shadow:
     0 0 26px rgba(0, 200, 83, 0.14),
@@ -3390,15 +3457,48 @@ textarea.error {
     0 38px 90px rgba(0, 0, 0, 0.85);
 }
 
+.import-help-link {
+  width: 100%;
+  margin-top: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: none;
+  background: transparent;
+  color: rgba(0, 200, 83, 0.90);
+  font-family: var(--font-manrope);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 0;
+  cursor: pointer;
+}
+
+.import-help-icon {
+  width: 14px;
+  height: 14px;
+  display: inline-grid;
+  place-items: center;
+}
+
+.import-help-icon svg {
+  width: 14px;
+  height: 14px;
+}
+
 #screen-import .btn-primary:hover:not(:disabled) {
   background: linear-gradient(180deg, rgba(0, 200, 83, 0.92), rgba(0, 200, 83, 0.72));
 }
 
 @media (max-width: 340px) {
+  #screen-import .screen-header h2 {
+    font-size: 34px;
+  }
+
   .import-mnemonic-grid {
     grid-template-columns: 1fr;
     gap: 8px;
-    padding: 12px;
+    padding: 0;
   }
   
   .import-word-cell {

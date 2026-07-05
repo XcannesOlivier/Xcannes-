@@ -421,11 +421,26 @@
       <div class="screen-content">
         <div class="screen-header">
           <button class="btn-back" id="btn-import-back">‹</button>
-          <h2>Importer un compte</h2>
+					<h2>Importer un portefeuille</h2>
+					<button class="btn-close" id="btn-import-close" type="button" aria-label="Fermer">✕</button>
         </div>
 
         <!-- Import method: BIP39 Mnemonic (12 words) -->
-        <p class="tab-desc">Entrez votre phrase de récupération (12 mots)</p>
+
+				<p class="tab-desc">Entrez votre phrase de récupération composée de 12 mots.</p>
+
+				<div class="import-security-note" role="note" aria-label="Conseil de sécurité">
+					<span class="import-security-icon" aria-hidden="true">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+							<path d="M12 3l7 3v5c0 5-3.5 8.5-7 10c-3.5-1.5-7-5-7-10V6l7-3z"/>
+							<path d="M9.5 12.2l1.8 1.8l3.4-3.4"/>
+						</svg>
+					</span>
+					<p>
+						Votre phrase de récupération est la seule clé d'accès à votre portefeuille.
+						<strong>Ne la partagez jamais.</strong>
+					</p>
+				</div>
 
         <!-- Wake lock hint (shown by JS when needed) -->
         <div class="wakelock-hint hidden" data-wakelock-hint role="status" aria-live="polite">
@@ -441,7 +456,17 @@
           <button id="btn-import-confirm" class="btn btn-primary">Importer</button>
         </div>
 
-        <div class="choice-bottom-bar" aria-hidden="true"><span></span></div>
+				<button id="btn-import-help" class="import-help-link" type="button">
+					<span class="import-help-icon" aria-hidden="true">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+							<path d="M12 3l7 3v5c0 5-3.5 8.5-7 10c-3.5-1.5-7-5-7-10V6l7-3z"/>
+							<path d="M9.5 12.2l1.8 1.8l3.4-3.4"/>
+						</svg>
+					</span>
+					<span>Besoin d'aide pour trouver votre phrase ?</span>
+				</button>
+
+				<div class="choice-bottom-bar" aria-hidden="true"><span></span></div>
       </div>
     </div>
 
