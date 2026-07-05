@@ -382,8 +382,8 @@ export default function TransactionProgressModal({
                     Votre paiement a été confirmé sur le réseau <span className="text-xcannes-green">{networkLabel}</span>.
                   </p>
 
-                  <div className="mt-7 w-full rounded-2xl border border-white/3 bg-[#070b10]/86 px-5 py-4 backdrop-blur-sm max-w-[560px]">
-                    <div className="flex items-start gap-3 pb-3 border-b border-white/4">
+                  <div className="mt-7 w-full rounded-2xl border border-white/2 bg-[#070b10]/86 px-5 py-4 backdrop-blur-sm max-w-[560px]">
+                    <div className="flex items-start gap-3 pb-3 border-b border-white/3">
                       <span className="mt-0.5 h-9 w-9 shrink-0 rounded-full bg-[#061a12] border border-xcannes-green/45 flex items-center justify-center text-xcannes-green">
                         ↗
                       </span>
@@ -393,7 +393,7 @@ export default function TransactionProgressModal({
                       </div>
                     </div>
 
-                    <div className="flex items-start gap-3 py-3 border-b border-white/4">
+                    <div className="flex items-start gap-3 py-3 border-b border-white/3">
                       <span className="mt-0.5 h-9 w-9 shrink-0 rounded-full bg-[#061a12] border border-xcannes-green/45 flex items-center justify-center text-xcannes-green">
                         <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                           <path d="M20 21a8 8 0 0 0-16 0" />
@@ -409,7 +409,7 @@ export default function TransactionProgressModal({
                       </div>
                     </div>
 
-                    <div className="flex items-start gap-3 py-3 border-b border-white/4">
+                    <div className="flex items-start gap-3 py-3 border-b border-white/3">
                       <span className="mt-0.5 h-9 w-9 shrink-0 rounded-full bg-[#0f1317] border border-white/20 flex items-center justify-center text-white/80">
                         <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                           <circle cx="12" cy="12" r="8" />
@@ -486,8 +486,8 @@ export default function TransactionProgressModal({
                     Votre conversion a été confirmée sur le réseau <span className="text-xcannes-green">{networkLabel}</span>.
                   </p>
 
-                  <div className="mt-7 w-full rounded-2xl border border-white/3 bg-[#070b10]/86 px-5 py-4 backdrop-blur-sm max-w-[560px]">
-                    <div className="pb-3 border-b border-white/4">
+                  <div className="mt-7 w-full rounded-2xl border border-white/2 bg-[#070b10]/86 px-5 py-4 backdrop-blur-sm max-w-[560px]">
+                    <div className="pb-3 border-b border-white/3">
                       <p className="text-center text-[14px] text-white/55">Vous avez converti</p>
                       <div className="mt-3 grid grid-cols-[1fr_auto_1fr] items-center gap-3">
                         <div className="min-w-0 text-center">
@@ -502,7 +502,7 @@ export default function TransactionProgressModal({
                       </div>
                     </div>
 
-                    <div className="flex items-start gap-3 py-3 border-b border-white/4">
+                    <div className="flex items-start gap-3 py-3 border-b border-white/3">
                       <span className="mt-0.5 h-9 w-9 shrink-0 rounded-full bg-[#061a12] border border-xcannes-green/45 flex items-center justify-center text-xcannes-green">
                         <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                           <circle cx="12" cy="12" r="8" />
@@ -520,7 +520,7 @@ export default function TransactionProgressModal({
                       ) : null}
                     </div>
 
-                    <div className="flex items-start gap-3 py-3 border-b border-white/4">
+                    <div className="flex items-start gap-3 py-3 border-b border-white/3">
                       <span className="mt-0.5 h-9 w-9 shrink-0 rounded-full bg-[#061a12] border border-xcannes-green/45 flex items-center justify-center text-xcannes-green">
                         <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                           <path d="M5 12h14" />
@@ -536,7 +536,7 @@ export default function TransactionProgressModal({
                       </span>
                     </div>
 
-                    <div className="flex items-start gap-3 py-3 border-b border-white/4">
+                    <div className="flex items-start gap-3 py-3 border-b border-white/3">
                       <span className="mt-0.5 h-9 w-9 shrink-0 rounded-full bg-[#0f1317] border border-white/20 flex items-center justify-center text-white/80">
                         <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                           <circle cx="12" cy="12" r="8" />
