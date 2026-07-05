@@ -413,7 +413,7 @@ export function useSwapConversion({
         },
       });
       if (!result?.signed) {
-        toast?.error("Conversion cancelled or expired.");
+        toast?.error("Conversion annulée. Vous pouvez reprendre la validation quand vous voulez.");
         return;
       }
 

@@ -689,7 +689,7 @@ export function useSendTransaction({
       // Balance refresh is handled automatically via WebSocket wallet:address channel
       return { ok: true };
     } else {
-      toast.warn("Transaction cancelled or expired.");
+      toast.warn("Paiement annulé. Vous pouvez reprendre la validation quand vous voulez.");
       return { ok: false };
     }
   }
@@ -860,7 +860,7 @@ export function useSendTransaction({
       // Balance refresh is handled automatically via WebSocket wallet:address channel
       return { ok: true };
     } else {
-      toast.warn("Transaction cancelled or expired.");
+      toast.warn("Paiement annulé. Vous pouvez reprendre la validation quand vous voulez.");
       return { ok: false };
     }
   }
