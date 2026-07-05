@@ -3634,16 +3634,18 @@ textarea.error {
 /* ===== BACKUP VERIFY — CARD FLOW (design refresh) ===== */
 
 #screen-backup-verify .screen-header {
-  justify-content: center;
+  display: grid;
+  grid-template-columns: 36px 1fr 36px;
+  justify-content: unset;
   align-items: center;
-  min-height: 52px;
+  min-height: 44px;
   position: relative;
+  gap: 10px;
 }
 
 #screen-backup-verify .screen-header .btn-back,
 #screen-backup-verify .screen-header .btn-close {
-  position: absolute;
-  top: 8px;
+  position: static;
   width: 36px;
   height: 36px;
   border-radius: 999px;
@@ -3658,22 +3660,24 @@ textarea.error {
 }
 
 #screen-backup-verify .screen-header .btn-back {
-  left: 0;
+  grid-column: 1;
   font-size: 24px;
 }
 
 #screen-backup-verify .screen-header .btn-close {
-  right: 0;
+  grid-column: 3;
   font-size: 18px;
   cursor: pointer;
 }
 
 #screen-backup-verify .screen-header h2 {
-  font-size: 44px;
-  font-weight: 500;
-  line-height: 1;
-  letter-spacing: -0.7px;
-  margin: 0 auto 10px;
+  grid-column: 2;
+  font-size: 30px;
+  font-weight: 550;
+  line-height: 1.05;
+  letter-spacing: -0.3px;
+  margin: 0;
+  text-align: center;
 }
 
 #screen-backup-verify .verify-intro {
@@ -3748,7 +3752,8 @@ textarea.error {
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.06),
     0 20px 48px rgba(0, 0, 0, 0.50);
-  padding: 18px 16px;
+  padding: 20px 16px;
+  min-height: 370px;
 }
 
 #screen-backup-verify .verify-step-pill {
@@ -3767,7 +3772,7 @@ textarea.error {
 
 #screen-backup-verify .verify-step-title {
   margin: 0;
-  font-size: 42px;
+  font-size: 34px;
   font-weight: 600;
   line-height: 1;
   letter-spacing: -0.6px;
@@ -3791,7 +3796,7 @@ textarea.error {
   border: 1px solid rgba(0, 200, 83, 0.55);
   background: rgba(5, 11, 8, 0.65);
   padding: 0 14px;
-  min-height: 66px;
+  min-height: 82px;
   transition: border-color 0.18s ease, box-shadow 0.18s ease;
 }
 
@@ -3813,10 +3818,10 @@ textarea.error {
   border: none;
   background: transparent;
   color: rgba(255, 255, 255, 0.92);
-  font-size: 20px;
+  font-size: 16px;
   font-weight: 500;
   outline: none;
-  padding: 20px 0;
+  padding: 26px 0;
 }
 
 #screen-backup-verify .verify-step-input::placeholder {
@@ -3928,7 +3933,7 @@ textarea.error {
 
 @media (max-width: 420px) {
   #screen-backup-verify .screen-header h2 {
-    font-size: 38px;
+    font-size: 27px;
   }
 
   #screen-backup-verify #verify-progress-text {
