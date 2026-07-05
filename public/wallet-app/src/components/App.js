@@ -1907,10 +1907,13 @@ function truncateWalletAddress(address) {
 
 function buildAuthSubtitle(action, progressDetails, txjson) {
   const defaultLabel = action || txjson?.TransactionType || 'Transaction';
+  const lowerTrailingCurrency = (label) =>
+    String(label || '')
+      .trim()
+      .replace(/\s+([A-Za-z]{2,10})$/, (_, code) => ` ${code.toLowerCase()}`);
 
   if (action === 'wallet:send') {
-    const amountLabel = String(progressDetails?.amountLabel || '').trim();
-    const amountLabelLowerCurrency = amountLabel.replace(/\s+([A-Za-z]{2,10})$/, (_, code) => ` ${code.toLowerCase()}`);
+    const amountLabelLowerCurrency = lowerTrailingCurrency(progressDetails?.amountLabel);
     const beneficiaryName = String(progressDetails?.beneficiaryLabel || '').trim();
     const beneficiaryAddress = String(progressDetails?.beneficiaryAddress || txjson?.Destination || '').trim();
     const recipient = beneficiaryName || truncateWalletAddress(beneficiaryAddress) || 'le destinataire';
@@ -1919,6 +1922,20 @@ function buildAuthSubtitle(action, progressDetails, txjson) {
       return `Vous envoyez ${amountLabelLowerCurrency} à ${recipient}.`;
     }
     return `Vous envoyez des fonds à ${recipient}.`;
+  }
+
+  if (action === 'wallet:convert') {
+    const fromLabel = lowerTrailingCurrency(progressDetails?.fromLabel);
+    const toLabel = lowerTrailingCurrency(progressDetails?.toLabel);
+
+    if (fromLabel && toLabel) {
+      const toWithoutNumber = toLabel.replace(/^\s*[0-9][0-9\s.,]*\s*/, '').trim();
+      return `Vous convertissez ${fromLabel} en ${toWithoutNumber}. Montant estimé reçu: ${toLabel}.`;
+    }
+
+    if (fromLabel) {
+      return `Vous convertissez ${fromLabel}.`;
+    }
   }
 
   return defaultLabel;
