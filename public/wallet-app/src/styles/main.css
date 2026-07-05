@@ -2544,6 +2544,37 @@ textarea.error {
   text-align: center;
 }
 
+.verify-exit-card {
+  width: 100%;
+  max-width: 390px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(14, 18, 20, 0.98);
+  box-shadow: 0 26px 70px rgba(0, 0, 0, 0.65);
+  padding: 16px;
+}
+
+.verify-exit-title {
+  margin: 0 0 8px;
+  font-size: 18px;
+  font-weight: 750;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.verify-exit-text {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.verify-exit-actions {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
 .verify-progress {
   margin-bottom: 20px;
 }

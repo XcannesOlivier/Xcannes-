@@ -869,11 +869,14 @@ function setupBackupVerifyScreen(words) {
   let btnConfirm = document.getElementById('btn-verify-confirm');
   let btnConfirmLabel = document.getElementById('btn-verify-confirm-label');
   const btnBack = document.getElementById('btn-verify-back');
-  const btnClose = document.getElementById('btn-verify-close');
+  let btnClose = document.getElementById('btn-verify-close');
   const btnShowWords = document.getElementById('btn-verify-show-words');
   const overlay = document.getElementById('verify-words-overlay');
   const overlayGrid = document.getElementById('verify-mnemonic-grid');
   const btnOverlayClose = document.getElementById('btn-verify-words-close');
+  const exitOverlay = document.getElementById('verify-exit-overlay');
+  let btnExitNo = document.getElementById('btn-verify-exit-no');
+  let btnExitYes = document.getElementById('btn-verify-exit-yes');
 
   // Re-arm confirm button on every screen setup to avoid stale one-shot listeners.
   if (btnConfirm) {
@@ -881,6 +884,24 @@ function setupBackupVerifyScreen(words) {
     btnConfirm.replaceWith(freshBtnConfirm);
     btnConfirm = document.getElementById('btn-verify-confirm');
     btnConfirmLabel = document.getElementById('btn-verify-confirm-label');
+  }
+
+  if (btnClose) {
+    const freshBtnClose = btnClose.cloneNode(true);
+    btnClose.replaceWith(freshBtnClose);
+    btnClose = document.getElementById('btn-verify-close');
+  }
+
+  if (btnExitNo) {
+    const freshBtnExitNo = btnExitNo.cloneNode(true);
+    btnExitNo.replaceWith(freshBtnExitNo);
+    btnExitNo = document.getElementById('btn-verify-exit-no');
+  }
+
+  if (btnExitYes) {
+    const freshBtnExitYes = btnExitYes.cloneNode(true);
+    btnExitYes.replaceWith(freshBtnExitYes);
+    btnExitYes = document.getElementById('btn-verify-exit-yes');
   }
 
   let currentIndex = 0;
@@ -1053,6 +1074,18 @@ function setupBackupVerifyScreen(words) {
     setTimeout(() => currentInput?.focus(), 80);
   }
 
+  function openVerifyExitOverlay() {
+    if (!exitOverlay) return;
+    currentInput?.blur();
+    exitOverlay.classList.remove('hidden');
+  }
+
+  function closeVerifyExitOverlay() {
+    if (!exitOverlay) return;
+    exitOverlay.classList.add('hidden');
+    setTimeout(() => currentInput?.focus(), 80);
+  }
+
   if (btnShowWords) {
     const freshBtn = btnShowWords.cloneNode(true);
     btnShowWords.replaceWith(freshBtn);
@@ -1083,9 +1116,28 @@ function setupBackupVerifyScreen(words) {
     setupBackupScreen(pendingWalletData);
   }, { once: true });
 
-  btnClose?.addEventListener('click', async () => {
+  btnClose?.addEventListener('click', (e) => {
+    e.preventDefault();
+    openVerifyExitOverlay();
+  });
+
+  btnExitNo?.addEventListener('click', (e) => {
+    e.preventDefault();
+    closeVerifyExitOverlay();
+  });
+
+  btnExitYes?.addEventListener('click', async (e) => {
+    e.preventDefault();
+    closeVerifyExitOverlay();
     await goToHome();
-  }, { once: true });
+  });
+
+  if (exitOverlay && !exitOverlay.dataset.bound) {
+    exitOverlay.dataset.bound = '1';
+    exitOverlay.addEventListener('click', (e) => {
+      if (e.target === exitOverlay) closeVerifyExitOverlay();
+    });
+  }
 
   btnConfirm?.addEventListener('click', async () => {
     try {
@@ -1159,10 +1211,41 @@ function setupBackupVerifyScreen(words) {
 
 function setupImportScreen() {
   const btnBack = document.getElementById('btn-import-back');
-  const btnClose = document.getElementById('btn-import-close');
+  let btnClose = document.getElementById('btn-import-close');
   const btnConfirm = document.getElementById('btn-import-confirm');
   const btnHelp = document.getElementById('btn-import-help');
   const statusEl = document.getElementById('import-status');
+  const exitOverlay = document.getElementById('import-exit-overlay');
+  let btnExitNo = document.getElementById('btn-import-exit-no');
+  let btnExitYes = document.getElementById('btn-import-exit-yes');
+
+  if (btnClose) {
+    const freshBtnClose = btnClose.cloneNode(true);
+    btnClose.replaceWith(freshBtnClose);
+    btnClose = document.getElementById('btn-import-close');
+  }
+
+  if (btnExitNo) {
+    const freshBtnExitNo = btnExitNo.cloneNode(true);
+    btnExitNo.replaceWith(freshBtnExitNo);
+    btnExitNo = document.getElementById('btn-import-exit-no');
+  }
+
+  if (btnExitYes) {
+    const freshBtnExitYes = btnExitYes.cloneNode(true);
+    btnExitYes.replaceWith(freshBtnExitYes);
+    btnExitYes = document.getElementById('btn-import-exit-yes');
+  }
+
+  function openImportExitOverlay() {
+    if (!exitOverlay) return;
+    exitOverlay.classList.remove('hidden');
+  }
+
+  function closeImportExitOverlay() {
+    if (!exitOverlay) return;
+    exitOverlay.classList.add('hidden');
+  }
 
   // Clear any previous status message
   if (statusEl) statusEl.textContent = '';
@@ -1175,9 +1258,28 @@ function setupImportScreen() {
     setupChoiceScreen();
   }, { once: true });
 
-  btnClose?.addEventListener('click', async () => {
+  btnClose?.addEventListener('click', (e) => {
+    e.preventDefault();
+    openImportExitOverlay();
+  });
+
+  btnExitNo?.addEventListener('click', (e) => {
+    e.preventDefault();
+    closeImportExitOverlay();
+  });
+
+  btnExitYes?.addEventListener('click', async (e) => {
+    e.preventDefault();
+    closeImportExitOverlay();
     await goToHome();
-  }, { once: true });
+  });
+
+  if (exitOverlay && !exitOverlay.dataset.bound) {
+    exitOverlay.dataset.bound = '1';
+    exitOverlay.addEventListener('click', (e) => {
+      if (e.target === exitOverlay) closeImportExitOverlay();
+    });
+  }
 
   btnConfirm?.addEventListener('click', () => handleImport(statusEl), { once: true });
 
