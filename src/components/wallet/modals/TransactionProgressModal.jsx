@@ -165,18 +165,6 @@ export default function TransactionProgressModal({
     });
     return `${date}, ${time}`;
   }, [visible, renderStatus]);
-  const [copiedTx, setCopiedTx] = useState(false);
-
-  const handleCopyTx = useCallback(async () => {
-    if (!txHash) return;
-    try {
-      await navigator.clipboard.writeText(txHash);
-      setCopiedTx(true);
-      setTimeout(() => setCopiedTx(false), 1400);
-    } catch {
-      setCopiedTx(false);
-    }
-  }, [txHash]);
 
   if (!visible) return null;
 
@@ -193,7 +181,7 @@ export default function TransactionProgressModal({
 
       <div className="relative h-full w-full flex flex-col items-center px-6 pt-6 pb-8">
         {/* main */}
-        <div className="mt-[30px] w-full max-w-[440px] flex-1 flex flex-col items-center">
+        <div className="mt-1.5 w-full max-w-[440px] flex-1 flex flex-col items-center">
           {isPending ? (
             <>
               <img
@@ -363,7 +351,7 @@ export default function TransactionProgressModal({
                   <div className="mt-6 relative w-full flex items-center justify-center">
                     {/* Keep existing check animation/illustration style */}
                     <svg
-                      className="h-40 w-40 text-xcannes-green drop-shadow-[0_0_22px_rgba(0,255,166,0.22)]"
+                      className="h-[120px] w-[120px] text-xcannes-green drop-shadow-[0_0_22px_rgba(0,255,166,0.22)] tx-check-pop"
                       viewBox="0 0 120 120"
                       fill="none"
                     >
@@ -373,6 +361,8 @@ export default function TransactionProgressModal({
                         strokeWidth="10"
                         strokeLinecap="round"
                         strokeLinejoin="round"
+                        pathLength="1"
+                        className="tx-check-draw"
                       />
                       <path
                         d="M60 10a50 50 0 1 0 0 100a50 50 0 1 0 0-100Z"
@@ -383,7 +373,7 @@ export default function TransactionProgressModal({
                     </svg>
                   </div>
 
-                  <h1 className="mt-2 text-center text-[50px] max-md:text-[36px] leading-[0.95] font-bold text-xcannes-green tracking-[-0.02em]">
+                  <h1 className="mt-2 text-center text-[35px] max-md:text-[24px] leading-[0.95] font-bold text-xcannes-green tracking-[-0.02em]">
                     Paiement envoyé
                     <br />
                     avec succès
@@ -392,8 +382,8 @@ export default function TransactionProgressModal({
                     Votre paiement a été confirmé sur le réseau <span className="text-xcannes-green">{networkLabel}</span>.
                   </p>
 
-                  <div className="mt-7 w-full rounded-2xl border border-white/8 bg-[#070b10]/86 px-5 py-4 backdrop-blur-sm max-w-[560px]">
-                    <div className="flex items-start gap-3 pb-3 border-b border-white/8">
+                  <div className="mt-7 w-full rounded-2xl border border-white/3 bg-[#070b10]/86 px-5 py-4 backdrop-blur-sm max-w-[560px]">
+                    <div className="flex items-start gap-3 pb-3 border-b border-white/4">
                       <span className="mt-0.5 h-9 w-9 shrink-0 rounded-full bg-[#061a12] border border-xcannes-green/45 flex items-center justify-center text-xcannes-green">
                         ↗
                       </span>
@@ -403,8 +393,8 @@ export default function TransactionProgressModal({
                       </div>
                     </div>
 
-                    <div className="flex items-start gap-3 py-3 border-b border-white/8">
-                      <span className="mt-0.5 h-9 w-9 shrink-0 rounded-full bg-[#08101a] border border-sky-300/35 flex items-center justify-center text-sky-300">
+                    <div className="flex items-start gap-3 py-3 border-b border-white/4">
+                      <span className="mt-0.5 h-9 w-9 shrink-0 rounded-full bg-[#061a12] border border-xcannes-green/45 flex items-center justify-center text-xcannes-green">
                         <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                           <path d="M20 21a8 8 0 0 0-16 0" />
                           <circle cx="12" cy="8" r="4" />
@@ -412,14 +402,14 @@ export default function TransactionProgressModal({
                       </span>
                       <div className="min-w-0">
                         <p className="text-[12px] text-white/55">Bénéficiaire</p>
-                        <p className="mt-0.5 text-[26px] max-md:text-[22px] font-semibold text-sky-300 leading-none">{beneficiaryLabel || t("ui_no_name_found", "Aucun nom trouvé")}</p>
+                        <p className="mt-0.5 text-[26px] max-md:text-[22px] font-semibold text-xcannes-green leading-none">{beneficiaryLabel || t("ui_no_name_found", "Aucun nom trouvé")}</p>
                         {beneficiaryAddress ? (
                           <p className="mt-1 font-mono text-[12px] text-white/50 break-all">{beneficiaryAddress}</p>
                         ) : null}
                       </div>
                     </div>
 
-                    <div className="flex items-start gap-3 py-3 border-b border-white/8">
+                    <div className="flex items-start gap-3 py-3 border-b border-white/4">
                       <span className="mt-0.5 h-9 w-9 shrink-0 rounded-full bg-[#0f1317] border border-white/20 flex items-center justify-center text-white/80">
                         <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                           <circle cx="12" cy="12" r="8" />
@@ -443,15 +433,6 @@ export default function TransactionProgressModal({
                         <p className="text-[12px] text-white/55">Transaction ID</p>
                         <p className="mt-0.5 text-[15px] text-white/85 font-mono">{txHashShort || "-"}</p>
                       </div>
-                      {txHash ? (
-                        <button
-                          type="button"
-                          onClick={handleCopyTx}
-                          className="h-9 px-4 rounded-full border border-xcannes-green/45 bg-[#061a12] text-xcannes-green text-[14px] font-medium hover:bg-[#0a2319] transition-colors"
-                        >
-                          {copiedTx ? "Copié" : "Copier"}
-                        </button>
-                      ) : null}
                     </div>
                   </div>
 
@@ -476,7 +457,7 @@ export default function TransactionProgressModal({
 
                   <div className="mt-6 relative w-full flex items-center justify-center">
                     <svg
-                      className="h-40 w-40 text-xcannes-green drop-shadow-[0_0_22px_rgba(0,255,166,0.22)]"
+                      className="h-[120px] w-[120px] text-xcannes-green drop-shadow-[0_0_22px_rgba(0,255,166,0.22)] tx-check-pop"
                       viewBox="0 0 120 120"
                       fill="none"
                     >
@@ -486,6 +467,8 @@ export default function TransactionProgressModal({
                         strokeWidth="10"
                         strokeLinecap="round"
                         strokeLinejoin="round"
+                        pathLength="1"
+                        className="tx-check-draw"
                       />
                       <path
                         d="M60 10a50 50 0 1 0 0 100a50 50 0 1 0 0-100Z"
@@ -496,15 +479,15 @@ export default function TransactionProgressModal({
                     </svg>
                   </div>
 
-                  <h1 className="mt-2 text-center text-[50px] max-md:text-[36px] leading-[0.95] font-bold text-xcannes-green tracking-[-0.02em]">
+                  <h1 className="mt-2 text-center text-[35px] max-md:text-[24px] leading-[0.95] font-bold text-xcannes-green tracking-[-0.02em]">
                     Conversion réussie !
                   </h1>
                   <p className="mt-4 text-center text-[18px] max-md:text-[14px] text-white/75 leading-snug max-w-[520px]">
                     Votre conversion a été confirmée sur le réseau <span className="text-xcannes-green">{networkLabel}</span>.
                   </p>
 
-                  <div className="mt-7 w-full rounded-2xl border border-white/8 bg-[#070b10]/86 px-5 py-4 backdrop-blur-sm max-w-[560px]">
-                    <div className="pb-3 border-b border-white/8">
+                  <div className="mt-7 w-full rounded-2xl border border-white/3 bg-[#070b10]/86 px-5 py-4 backdrop-blur-sm max-w-[560px]">
+                    <div className="pb-3 border-b border-white/4">
                       <p className="text-center text-[14px] text-white/55">Vous avez converti</p>
                       <div className="mt-3 grid grid-cols-[1fr_auto_1fr] items-center gap-3">
                         <div className="min-w-0 text-center">
@@ -519,7 +502,7 @@ export default function TransactionProgressModal({
                       </div>
                     </div>
 
-                    <div className="flex items-start gap-3 py-3 border-b border-white/8">
+                    <div className="flex items-start gap-3 py-3 border-b border-white/4">
                       <span className="mt-0.5 h-9 w-9 shrink-0 rounded-full bg-[#061a12] border border-xcannes-green/45 flex items-center justify-center text-xcannes-green">
                         <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                           <circle cx="12" cy="12" r="8" />
@@ -537,7 +520,7 @@ export default function TransactionProgressModal({
                       ) : null}
                     </div>
 
-                    <div className="flex items-start gap-3 py-3 border-b border-white/8">
+                    <div className="flex items-start gap-3 py-3 border-b border-white/4">
                       <span className="mt-0.5 h-9 w-9 shrink-0 rounded-full bg-[#061a12] border border-xcannes-green/45 flex items-center justify-center text-xcannes-green">
                         <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                           <path d="M5 12h14" />
@@ -553,7 +536,7 @@ export default function TransactionProgressModal({
                       </span>
                     </div>
 
-                    <div className="flex items-start gap-3 py-3 border-b border-white/8">
+                    <div className="flex items-start gap-3 py-3 border-b border-white/4">
                       <span className="mt-0.5 h-9 w-9 shrink-0 rounded-full bg-[#0f1317] border border-white/20 flex items-center justify-center text-white/80">
                         <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                           <circle cx="12" cy="12" r="8" />
@@ -577,15 +560,6 @@ export default function TransactionProgressModal({
                         <p className="text-[12px] text-white/55">Transaction ID</p>
                         <p className="mt-0.5 text-[15px] text-white/85 font-mono">{txHashShort || "-"}</p>
                       </div>
-                      {txHash ? (
-                        <button
-                          type="button"
-                          onClick={handleCopyTx}
-                          className="h-9 px-4 rounded-full border border-xcannes-green/45 bg-[#061a12] text-xcannes-green text-[14px] font-medium hover:bg-[#0a2319] transition-colors"
-                        >
-                          {copiedTx ? "Copié" : "Copier"}
-                        </button>
-                      ) : null}
                     </div>
                   </div>
 
@@ -632,7 +606,33 @@ export default function TransactionProgressModal({
 
       {/* ── Keyframes ──────────────────────────────────────────── */}
       <style jsx global>{`
-        /* keep file local: no keyframes needed beyond tailwind's spin */
+        .tx-check-draw {
+          stroke-dasharray: 1;
+          stroke-dashoffset: 1;
+          animation: tx-check-write 560ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        .tx-check-pop {
+          animation: tx-check-pop 320ms ease-out;
+          transform-origin: center;
+        }
+
+        @keyframes tx-check-write {
+          to {
+            stroke-dashoffset: 0;
+          }
+        }
+
+        @keyframes tx-check-pop {
+          0% {
+            transform: scale(0.92);
+            opacity: 0.7;
+          }
+          100% {
+            transform: scale(1);
+            opacity: 1;
+          }
+        }
       `}</style>
 
       <div className="pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 z-[10210]">
