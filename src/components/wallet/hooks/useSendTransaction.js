@@ -274,10 +274,6 @@ export function useSendTransaction({
   // useSavedAddresses()
   savedAddresses,
   saveAddress,
-  // Local UI state setters
-  setActiveAction,
-  // Layout
-  isDesktopPanel,
   // useRlusdPerUnitRates()
   rlusdPerUnitRates,
   rlusdPerUnitSources,
@@ -386,9 +382,8 @@ export function useSendTransaction({
       currency !== "USD";
 
     setSendProcessing(true);
-    if (!isDesktopPanel) {
-      setActiveAction(null);
-    }
+    // Keep the originating modal/action open during auth. If the user cancels
+    // biometric/PIN in the embedded PWA, we must return to this same context.
 
     try {
       if (shouldPrepareMoonpaySwap) {
