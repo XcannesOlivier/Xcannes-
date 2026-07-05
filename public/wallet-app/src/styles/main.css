@@ -3859,6 +3859,13 @@ textarea.error {
   padding: 26px 0;
 }
 
+#screen-backup-verify .verify-step-input:focus,
+#screen-backup-verify .verify-step-input:focus-visible {
+  border: none;
+  box-shadow: none;
+  outline: none;
+}
+
 #screen-backup-verify .verify-step-input::placeholder {
   font-size: 14px;
   color: rgba(255, 255, 255, 0.38);
