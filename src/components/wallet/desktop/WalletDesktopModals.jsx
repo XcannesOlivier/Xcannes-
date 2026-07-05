@@ -7,7 +7,7 @@
  */
 
 import QRScanner from "../components/QRScanner";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import WalletDashboardSendModal from "../modals/WalletDashboardSendModal";
 import WalletDashboardReceiveModal from "../modals/WalletDashboardReceiveModal";
 import WalletDashboardSwapModal from "../modals/WalletDashboardSwapModal";
