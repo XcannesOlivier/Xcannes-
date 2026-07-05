@@ -131,9 +131,9 @@ export default function TransactionProgressModal({
         <div className="absolute -bottom-24 left-1/2 h-72 w-[520px] -translate-x-1/2 rounded-full bg-white/5 blur-3xl" />
       </div>
 
-      <div className="relative h-full w-full flex flex-col items-center px-6 pt-14 pb-8">
+      <div className="relative h-full w-full flex flex-col items-center px-6 pt-6 pb-8">
         {/* main */}
-        <div className="mt-7 w-full max-w-[440px] flex-1 flex flex-col items-center">
+        <div className="mt-2.5 w-full max-w-[440px] flex-1 flex flex-col items-center">
           {isPending ? (
             <>
               <img
@@ -143,11 +143,11 @@ export default function TransactionProgressModal({
                 draggable={false}
               />
 
-              <h1 className="mt-6 text-center text-[52px] max-md:text-[42px] leading-[0.95] font-bold text-white tracking-[-0.02em]">
+              <h1 className="mt-6 text-center text-[40px] max-md:text-[30px] leading-[0.95] font-bold text-white tracking-[-0.02em]">
                 {pendingTitle}
               </h1>
 
-              <p className="mt-5 text-center text-[22px] max-md:text-[18px] text-white/75 leading-snug max-w-[520px]">
+              <p className="mt-5 text-center text-[18px] max-md:text-[14px] text-white/75 leading-snug max-w-[520px]">
                 {isConversionAction ? (
                   <>
                     Votre conversion est en cours de traitement sur le réseau{" "}
@@ -161,13 +161,13 @@ export default function TransactionProgressModal({
                 )}
               </p>
 
-              <div className="mt-9 w-full rounded-2xl border border-white/12 bg-[#070b10]/82 px-5 py-5 backdrop-blur-sm max-w-[560px]">
+              <div className="mt-9 w-full rounded-2xl border border-white/5 bg-[#070b10]/82 px-5 py-5 backdrop-blur-sm max-w-[560px]">
                 <div className="relative">
                   <div className="absolute left-[12px] top-[16px] bottom-[16px] w-px bg-white/16" />
 
                   <div className="relative flex items-start gap-4 pb-4">
                     {pendingStep > 0 ? (
-                      <div className="mt-0.5 h-6 w-6 rounded-full bg-xcannes-green/25 border border-xcannes-green/50 flex items-center justify-center text-[12px] text-xcannes-green">
+                      <div className="mt-0.5 h-7 w-7 rounded-full bg-xcannes-green border border-xcannes-green flex items-center justify-center text-[14px] font-bold text-white">
                         ✓
                       </div>
                     ) : (
@@ -175,12 +175,12 @@ export default function TransactionProgressModal({
                     )}
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between gap-3">
-                        <p className="text-[19px] max-md:text-[16px] font-semibold text-white">Signature</p>
-                        <span className="text-[14px] max-md:text-[12px] text-white/50">
+                        <p className="text-[15px] max-md:text-[12px] font-semibold text-white">Signature</p>
+                        <span className="text-[12px] max-md:text-[10px] text-white/50">
                           {pendingStep > 0 ? timelineTimes.signedAt : "..."}
                         </span>
                       </div>
-                      <p className={`mt-0.5 text-[15px] max-md:text-[13px] ${pendingStep > 0 ? "text-white/60" : "text-xcannes-green"}`}>
+                      <p className={`mt-0.5 text-[13px] max-md:text-[11px] ${pendingStep > 0 ? "text-white/60" : "text-xcannes-green"}`}>
                         Transaction signée avec succès
                       </p>
                     </div>
@@ -188,7 +188,7 @@ export default function TransactionProgressModal({
 
                   <div className="relative flex items-start gap-4 pb-4">
                     {pendingStep > 1 ? (
-                      <div className="mt-0.5 h-6 w-6 rounded-full bg-xcannes-green/25 border border-xcannes-green/50 flex items-center justify-center text-[12px] text-xcannes-green">
+                      <div className="mt-0.5 h-7 w-7 rounded-full bg-xcannes-green border border-xcannes-green flex items-center justify-center text-[14px] font-bold text-white">
                         ✓
                       </div>
                     ) : pendingStep === 1 ? (
@@ -198,12 +198,12 @@ export default function TransactionProgressModal({
                     )}
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between gap-3">
-                        <p className="text-[19px] max-md:text-[16px] font-semibold text-white">Vérification</p>
-                        <span className="text-[14px] max-md:text-[12px] text-white/50">
+                        <p className="text-[15px] max-md:text-[12px] font-semibold text-white">Vérification</p>
+                        <span className="text-[12px] max-md:text-[10px] text-white/50">
                           {pendingStep > 1 ? timelineTimes.checkedAt : pendingStep === 1 ? "..." : ""}
                         </span>
                       </div>
-                      <p className={`mt-0.5 text-[15px] max-md:text-[13px] ${pendingStep === 1 ? "text-xcannes-green" : "text-white/60"}`}>
+                      <p className={`mt-0.5 text-[13px] max-md:text-[11px] ${pendingStep === 1 ? "text-xcannes-green" : "text-white/60"}`}>
                         Vérification des paramètres
                       </p>
                     </div>
@@ -211,7 +211,7 @@ export default function TransactionProgressModal({
 
                   <div className="relative flex items-start gap-4 pb-4">
                     {pendingStep > 2 ? (
-                      <div className="mt-0.5 h-6 w-6 rounded-full bg-xcannes-green/25 border border-xcannes-green/50 flex items-center justify-center text-[12px] text-xcannes-green">
+                      <div className="mt-0.5 h-7 w-7 rounded-full bg-xcannes-green border border-xcannes-green flex items-center justify-center text-[14px] font-bold text-white">
                         ✓
                       </div>
                     ) : pendingStep === 2 ? (
@@ -221,12 +221,12 @@ export default function TransactionProgressModal({
                     )}
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between gap-3">
-                        <p className="text-[19px] max-md:text-[16px] font-semibold text-white">Diffusion sur le XRPL</p>
-                        <span className={`text-[20px] leading-none tracking-[0.2em] ${pendingStep === 2 ? "text-xcannes-green animate-pulse" : "text-white/30"}`}>
+                        <p className="text-[15px] max-md:text-[12px] font-semibold text-white">Diffusion sur le XRPL</p>
+                        <span className={`text-[20px] font-black leading-none tracking-[0.2em] ${pendingStep === 2 ? "text-xcannes-green animate-pulse" : "text-white/30"}`}>
                           {pendingStep === 2 ? "..." : ""}
                         </span>
                       </div>
-                      <p className={`mt-0.5 text-[15px] max-md:text-[13px] ${pendingStep === 2 ? "text-xcannes-green" : "text-white/60"}`}>
+                      <p className={`mt-0.5 text-[13px] max-md:text-[11px] ${pendingStep === 2 ? "text-xcannes-green" : "text-white/60"}`}>
                         Envoi de la transaction au réseau
                       </p>
                     </div>
@@ -234,7 +234,7 @@ export default function TransactionProgressModal({
 
                   <div className="relative flex items-start gap-4">
                     {pendingStep >= 4 ? (
-                      <div className="mt-0.5 h-6 w-6 rounded-full bg-xcannes-green/25 border border-xcannes-green/50 flex items-center justify-center text-[12px] text-xcannes-green">
+                      <div className="mt-0.5 h-7 w-7 rounded-full bg-xcannes-green border border-xcannes-green flex items-center justify-center text-[14px] font-bold text-white">
                         ✓
                       </div>
                     ) : pendingStep >= 3 ? (
@@ -243,8 +243,8 @@ export default function TransactionProgressModal({
                       <div className="mt-0.5 h-6 w-6 rounded-full border border-white/35 bg-transparent" />
                     )}
                     <div className="min-w-0 flex-1">
-                      <p className="text-[19px] max-md:text-[16px] font-semibold text-white/88">Confirmation</p>
-                      <p className={`mt-0.5 text-[15px] max-md:text-[13px] ${pendingStep >= 3 ? "text-xcannes-green" : "text-white/52"}`}>
+                      <p className="text-[15px] max-md:text-[12px] font-semibold text-white/88">Confirmation</p>
+                      <p className={`mt-0.5 text-[13px] max-md:text-[11px] ${pendingStep >= 3 ? "text-xcannes-green" : "text-white/52"}`}>
                         {pendingStep >= 4 ? "Validation réseau confirmée" : "En attente de validation par le réseau"}
                       </p>
                     </div>
