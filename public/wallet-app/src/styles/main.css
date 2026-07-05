@@ -3258,6 +3258,8 @@ textarea.error {
 
 #screen-import .screen-content {
   padding-top: calc(env(safe-area-inset-top, 44px) + 2px);
+  padding-left: 24px;
+  padding-right: 24px;
 }
 
 #screen-import .screen-header {
@@ -3372,7 +3374,7 @@ textarea.error {
 .import-mnemonic-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 11px 10px;
+  gap: 9px 8px;
   margin-bottom: 16px;
   padding: 0;
   background: transparent;
