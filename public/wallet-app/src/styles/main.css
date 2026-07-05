@@ -3333,9 +3333,9 @@ textarea.error {
   gap: 10px;
   max-width: 100%;
   margin: 0 0 14px;
-  padding: 13px 14px;
+  padding: 10px 14px;
   border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.04);
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.028), rgba(255, 255, 255, 0.012));
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.05),
@@ -3442,12 +3442,16 @@ textarea.error {
 
 .import-word-cell:focus-within .import-word-input {
   border-color: rgba(0, 200, 83, 0.42);
-  background: rgba(0, 200, 83, 0.08);
+  background: rgba(0, 0, 0, 0.24);
 }
 
 #screen-import .button-group {
   max-width: 100%;
-  margin-top: 10px;
+  margin-top: 0;
+}
+
+#screen-import #import-status {
+  min-height: 10px;
 }
 
 #screen-import .btn-primary {
