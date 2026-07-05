@@ -1438,6 +1438,9 @@ function confirmWithAuth(title, subtitle) {
     let swipeActive = false;
     let swipeStartX = 0;
     let swipeStartY = 0;
+    let swipeLastX = 0;
+    let swipeLastY = 0;
+    let activePointerId = null;
 
     const safeResolve = (value) => {
       if (settled) return;
@@ -1446,64 +1449,122 @@ function confirmWithAuth(title, subtitle) {
       resolve(value);
     };
 
-    const onSwipeStart = (e) => {
+    const getPoint = (e) => {
+      if (e.touches && e.touches.length) return e.touches[0];
+      if (e.changedTouches && e.changedTouches.length) return e.changedTouches[0];
+      return e;
+    };
+
+    const startSwipe = (e) => {
       if (settled) return;
-      const point = e.touches ? e.touches[0] : e;
+      const point = getPoint(e);
+      if (!point) return;
       swipeStartX = point.clientX;
       swipeStartY = point.clientY;
+      swipeLastX = point.clientX;
+      swipeLastY = point.clientY;
       swipeActive = true;
       confirmCard?.classList.add('is-swipe-dragging');
     };
 
-    const onSwipeMove = (e) => {
+    const moveSwipe = (e) => {
       if (!swipeActive || settled) return;
-      const point = e.touches ? e.touches[0] : e;
-      const dx = point.clientX - swipeStartX;
-      const dy = point.clientY - swipeStartY;
+      const point = getPoint(e);
+      if (!point) return;
+
+      swipeLastX = point.clientX;
+      swipeLastY = point.clientY;
+
+      const dx = swipeLastX - swipeStartX;
+      const dy = swipeLastY - swipeStartY;
+
       if (dy <= 0) {
         confirmCard?.style.setProperty('--confirm-swipe-y', '0px');
         return;
       }
-      if (Math.abs(dx) > Math.abs(dy)) return;
-      confirmCard?.style.setProperty('--confirm-swipe-y', `${Math.min(dy, 120)}px`);
+
+      // Ignore mostly horizontal drags.
+      if (Math.abs(dx) > dy * 1.25) return;
+      confirmCard?.style.setProperty('--confirm-swipe-y', `${Math.min(dy, 140)}px`);
     };
 
-    const onSwipeEnd = (e) => {
+    const endSwipe = () => {
       if (!swipeActive || settled) return;
       swipeActive = false;
       confirmCard?.classList.remove('is-swipe-dragging');
-      const point = e.changedTouches ? e.changedTouches[0] : e;
-      const dx = point.clientX - swipeStartX;
-      const dy = point.clientY - swipeStartY;
+
+      const dx = swipeLastX - swipeStartX;
+      const dy = swipeLastY - swipeStartY;
 
       confirmCard?.style.setProperty('--confirm-swipe-y', '0px');
 
-      // Close gesture: mostly vertical downward swipe.
-      if (dy > 85 && Math.abs(dx) < 60) {
+      // Close gesture: downward swipe with tolerant threshold.
+      if (dy > 58 && dy > Math.abs(dx) * 0.9) {
         safeResolve(false);
       }
     };
 
+    const onPointerDown = (e) => {
+      if (activePointerId !== null) return;
+      activePointerId = e.pointerId;
+      startSwipe(e);
+    };
+
+    const onPointerMove = (e) => {
+      if (activePointerId === null || e.pointerId !== activePointerId) return;
+      moveSwipe(e);
+    };
+
+    const onPointerUp = (e) => {
+      if (activePointerId === null || e.pointerId !== activePointerId) return;
+      activePointerId = null;
+      endSwipe();
+    };
+
+    const onTouchStart = (e) => startSwipe(e);
+    const onTouchMove = (e) => moveSwipe(e);
+    const onTouchEnd = () => endSwipe();
+    const onMouseDown = (e) => startSwipe(e);
+    const onMouseMove = (e) => moveSwipe(e);
+    const onMouseUp = () => endSwipe();
+
     const cleanupSwipeHandlers = () => {
       if (!confirmCard) return;
-      confirmCard.removeEventListener('touchstart', onSwipeStart);
-      confirmCard.removeEventListener('touchmove', onSwipeMove);
-      confirmCard.removeEventListener('touchend', onSwipeEnd);
-      confirmCard.removeEventListener('mousedown', onSwipeStart);
-      window.removeEventListener('mousemove', onSwipeMove);
-      window.removeEventListener('mouseup', onSwipeEnd);
+      confirmCard.removeEventListener('pointerdown', onPointerDown);
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerup', onPointerUp);
+      window.removeEventListener('pointercancel', onPointerUp);
+
+      confirmCard.removeEventListener('touchstart', onTouchStart);
+      window.removeEventListener('touchmove', onTouchMove);
+      window.removeEventListener('touchend', onTouchEnd);
+      window.removeEventListener('touchcancel', onTouchEnd);
+
+      confirmCard.removeEventListener('mousedown', onMouseDown);
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+
+      activePointerId = null;
       confirmCard.classList.remove('is-swipe-dragging');
       confirmCard.style.setProperty('--confirm-swipe-y', '0px');
     };
 
     if (confirmCard) {
       confirmCard.style.setProperty('--confirm-swipe-y', '0px');
-      confirmCard.addEventListener('touchstart', onSwipeStart, { passive: true });
-      confirmCard.addEventListener('touchmove', onSwipeMove, { passive: true });
-      confirmCard.addEventListener('touchend', onSwipeEnd);
-      confirmCard.addEventListener('mousedown', onSwipeStart);
-      window.addEventListener('mousemove', onSwipeMove);
-      window.addEventListener('mouseup', onSwipeEnd);
+      if ('PointerEvent' in window) {
+        confirmCard.addEventListener('pointerdown', onPointerDown);
+        window.addEventListener('pointermove', onPointerMove);
+        window.addEventListener('pointerup', onPointerUp);
+        window.addEventListener('pointercancel', onPointerUp);
+      } else {
+        confirmCard.addEventListener('touchstart', onTouchStart, { passive: true });
+        window.addEventListener('touchmove', onTouchMove, { passive: true });
+        window.addEventListener('touchend', onTouchEnd);
+        window.addEventListener('touchcancel', onTouchEnd);
+        confirmCard.addEventListener('mousedown', onMouseDown);
+        window.addEventListener('mousemove', onMouseMove);
+        window.addEventListener('mouseup', onMouseUp);
+      }
     }
 
     if (titleEl) titleEl.textContent = title || 'Sécurisez ce compte';

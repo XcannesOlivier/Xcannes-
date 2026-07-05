@@ -333,6 +333,22 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
   transition: none;
 }
 
+#screen-confirm-secure .confirm-swipe-handle {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin: -4px 0 18px;
+  pointer-events: none;
+}
+
+#screen-confirm-secure .confirm-swipe-handle > span {
+  display: block;
+  width: 52px;
+  height: 5px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.45);
+}
+
 #screen-confirm-secure .logo {
   background: transparent;
   border: none;
