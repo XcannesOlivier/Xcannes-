@@ -675,42 +675,44 @@
 	    <!-- ========== 13. CONFIRM SECURE SCREEN ========== -->
 		    <div id="screen-confirm-secure" class="screen hidden">
 		      <div class="screen-content center keyboard-avoid">
-		        <img src="../symbols/logoxcannestransaparent.png" alt="Xcannes" class="logo logo-sm" style="background:transparent;object-fit:contain;" />
-		        <h2 id="confirm-secure-title">Sécurisez ce compte</h2>
-		        <p id="confirm-secure-subtitle" class="subtitle">Confirmez votre identité pour chiffrer et sauvegarder ce compte.</p>
+		        <div class="confirm-secure-card">
+		          <img src="../symbols/logoxcannestransaparent.png" alt="Xcannes" class="logo logo-sm" style="background:transparent;object-fit:contain;" />
+		          <h2 id="confirm-secure-title">Sécurisez ce compte</h2>
+		          <p id="confirm-secure-subtitle" class="subtitle">Confirmez votre identité pour chiffrer et sauvegarder ce compte.</p>
 
-	        <button id="btn-confirm-biometric" class="btn btn-primary btn-confirm-hero">
-	          <span class="confirm-hero-icon" aria-hidden="true">
-	            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-	              <path d="M8 3H7a4 4 0 0 0-4 4v1" />
-	              <path d="M16 3h1a4 4 0 0 1 4 4v1" />
-	              <path d="M8 21H7a4 4 0 0 1-4-4v-1" />
-	              <path d="M16 21h1a4 4 0 0 0 4-4v-1" />
-	              <path d="M9 10a3 3 0 0 0 6 0" opacity="0.9" />
-	              <path d="M10 14h4" opacity="0.7" />
-	            </svg>
-	          </span>
-	          Face ID / Touch ID
-	        </button>
+		          <button id="btn-confirm-biometric" class="btn btn-primary btn-confirm-hero">
+		            <span class="confirm-hero-icon" aria-hidden="true">
+		              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+		                <path d="M8 3H7a4 4 0 0 0-4 4v1" />
+		                <path d="M16 3h1a4 4 0 0 1 4 4v1" />
+		                <path d="M8 21H7a4 4 0 0 1-4-4v-1" />
+		                <path d="M16 21h1a4 4 0 0 0 4-4v-1" />
+		                <path d="M9 10a3 3 0 0 0 6 0" opacity="0.9" />
+		                <path d="M10 14h4" opacity="0.7" />
+		              </svg>
+		            </span>
+		            Face ID / Touch ID
+		          </button>
 
-	        <button id="btn-confirm-pin" class="btn-link hidden">Utiliser mon code PIN</button>
+		          <button id="btn-confirm-pin" class="btn-link hidden">Utiliser mon code PIN</button>
 
-        <!-- Inline PIN entry -->
-        <div id="confirm-pin-section" class="hidden" style="margin-top:20px">
-          <div class="pin-dots" id="confirm-pin-dots">
-            <span class="pin-dot"></span>
-            <span class="pin-dot"></span>
-            <span class="pin-dot"></span>
-            <span class="pin-dot"></span>
-            <span class="pin-dot"></span>
-            <span class="pin-dot"></span>
-          </div>
-          <input type="text" id="confirm-pin-input" class="pin-hidden-input"
-                 maxlength="6" inputmode="numeric" pattern="[0-9]*"
-                 autocomplete="off" autocorrect="off" autocapitalize="off">
-        </div>
+	          <!-- Inline PIN entry -->
+	          <div id="confirm-pin-section" class="hidden" style="margin-top:20px">
+	            <div class="pin-dots" id="confirm-pin-dots">
+	              <span class="pin-dot"></span>
+	              <span class="pin-dot"></span>
+	              <span class="pin-dot"></span>
+	              <span class="pin-dot"></span>
+	              <span class="pin-dot"></span>
+	              <span class="pin-dot"></span>
+	            </div>
+	            <input type="text" id="confirm-pin-input" class="pin-hidden-input"
+	                   maxlength="6" inputmode="numeric" pattern="[0-9]*"
+	                   autocomplete="off" autocorrect="off" autocapitalize="off">
+	          </div>
 
-	        <p id="confirm-secure-status" class="status"></p>
+		          <p id="confirm-secure-status" class="status"></p>
+		        </div>
 	      </div>
 	    </div>
 
