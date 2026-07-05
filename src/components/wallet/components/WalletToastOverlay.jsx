@@ -6,8 +6,8 @@ import { createPortal } from "react-dom";
 // ── Variant styling ─────────────────────────────────────────────────
 const VARIANT_CLASSES = {
   success: "bg-emerald-600/95 text-white",
-  error: "bg-[#2a2418]/95 text-[#f6ecd4] border border-[#c7a467]/45",
-  warning: "bg-[#2a2418]/95 text-[#f6ecd4] border border-[#c7a467]/45",
+  error: "bg-black/90 text-[#f3dfb2] border border-white/20",
+  warning: "bg-black/90 text-[#f3dfb2] border border-white/20",
   info: "bg-[#1a2233]/95 text-white border border-white/10",
 };
 
@@ -24,7 +24,7 @@ function ToastItem({ toast, onDismiss }) {
   const icon = VARIANT_ICONS[toast.variant] || "";
   const iconTone =
     toast.variant === "error" || toast.variant === "warning"
-      ? "text-[#f3dfb2] bg-[#c7a467]/18"
+      ? "text-[#f3dfb2] bg-white/10"
       : "text-white/90 bg-white/15";
 
   return (
