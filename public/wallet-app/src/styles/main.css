@@ -3256,6 +3256,10 @@ textarea.error {
   pointer-events: none;
 }
 
+#screen-import .screen-content {
+  padding-top: calc(env(safe-area-inset-top, 44px) + 2px);
+}
+
 #screen-import .screen-header {
   min-height: 94px;
   align-items: flex-start;
@@ -3265,7 +3269,7 @@ textarea.error {
 
 #screen-import .screen-header .btn-back {
   position: absolute;
-  top: 0;
+  top: 10px;
   left: 0;
   background: rgba(255, 255, 255, 0.015);
   border: 1px solid rgba(255, 255, 255, 0.045);
@@ -3319,7 +3323,7 @@ textarea.error {
   justify-content: center;
   cursor: pointer;
   position: absolute;
-  top: 0;
+  top: 10px;
   right: 0;
 }
 
