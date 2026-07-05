@@ -1161,9 +1161,8 @@ function setupImportScreen() {
     setupChoiceScreen();
   }, { once: true });
 
-  btnClose?.addEventListener('click', () => {
-    showScreen('choice');
-    setupChoiceScreen();
+  btnClose?.addEventListener('click', async () => {
+    await goToHome();
   }, { once: true });
 
   btnConfirm?.addEventListener('click', () => handleImport(statusEl), { once: true });

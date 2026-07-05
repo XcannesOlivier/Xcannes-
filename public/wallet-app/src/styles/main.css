@@ -3499,10 +3499,6 @@ textarea.error {
   background: linear-gradient(180deg, rgba(0, 200, 83, 0.92), rgba(0, 200, 83, 0.72));
 }
 
-#screen-import .choice-bottom-bar {
-  display: none;
-}
-
 @media (max-width: 340px) {
   #screen-import .screen-header h2 {
     font-size: 22px;
