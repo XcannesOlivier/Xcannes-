@@ -3267,27 +3267,27 @@ textarea.error {
   position: absolute;
   top: 0;
   left: 0;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.015);
+  border: 1px solid rgba(255, 255, 255, 0.045);
   backdrop-filter: blur(10px);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.025);
   width: 34px;
   height: 34px;
-  font-size: 22px;
+  font-size: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0;
   padding: 0;
   border-radius: 999px;
-  color: rgba(255, 255, 255, 0.88);
+  color: rgba(255, 255, 255, 0.96);
   flex: 0 0 auto;
 }
 
 #screen-import .screen-header h2 {
   width: 100%;
   text-align: left;
-  font-size: 24px;
+  font-size: 23px;
   font-weight: 500;
   letter-spacing: -0.3px;
   line-height: 1.08;
@@ -3298,7 +3298,7 @@ textarea.error {
 #screen-import .tab-desc {
   max-width: 360px;
   margin: 0 0 18px;
-  font-size: 13px;
+  font-size: 10px;
   color: rgba(255, 255, 255, 0.60);
   text-align: left;
   line-height: 1.45;
@@ -3308,11 +3308,11 @@ textarea.error {
   width: 34px;
   height: 34px;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.03);
-  color: rgba(255, 255, 255, 0.85);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
-  font-size: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.045);
+  background: rgba(255, 255, 255, 0.015);
+  color: rgba(255, 255, 255, 0.94);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.025);
+  font-size: 18px;
   line-height: 1;
   display: inline-flex;
   align-items: center;
