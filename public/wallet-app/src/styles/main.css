@@ -3287,7 +3287,7 @@ textarea.error {
 #screen-import .screen-header h2 {
   width: 100%;
   text-align: left;
-  font-size: 47px;
+  font-size: 28px;
   font-weight: 500;
   letter-spacing: -0.3px;
   line-height: 1.08;
@@ -3497,7 +3497,7 @@ textarea.error {
 
 @media (max-width: 340px) {
   #screen-import .screen-header h2 {
-    font-size: 38px;
+    font-size: 24px;
   }
 
   .import-mnemonic-grid {

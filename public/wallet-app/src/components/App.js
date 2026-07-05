@@ -1169,7 +1169,7 @@ function setupImportScreen() {
   btnConfirm?.addEventListener('click', () => handleImport(statusEl), { once: true });
 
   btnHelp?.addEventListener('click', () => {
-    updateStatus(statusEl, 'Vérifiez votre sauvegarde initiale de 12 mots. Cette phrase a été affichée lors de la création du portefeuille.');
+    updateStatus(statusEl, 'Vérifiez votre sauvegarde initiale de 12 mots. Cette phrase a été affichée lors de la création du compte.');
   });
 }
 

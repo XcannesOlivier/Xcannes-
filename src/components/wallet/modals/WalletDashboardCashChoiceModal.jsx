@@ -28,7 +28,7 @@ export default function WalletDashboardCashChoiceModal({
   };
   const swapOutHintText = t('ui_funds_swap_out_hint', 'Créditer votre compte XCannes');
   const swapOutSubhintText = t('ui_funds_swap_out_subhint', 'Ajoutés automatiquement à votre solde');
-  const swapInHintText = t('ui_funds_swap_in_hint', 'Envoyer à vos portefeuilles externes');
+  const swapInHintText = t('ui_funds_swap_in_hint', 'Envoyer à vos comptes externes');
   const swapInSubhintText = t('ui_funds_swap_in_subhint', 'Conversion automatique si nécessaire');
   const stablecoinLiquidityNote = t(
     'ui_funds_stablecoin_liquidity_note',
