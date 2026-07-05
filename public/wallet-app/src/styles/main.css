@@ -2514,6 +2514,15 @@ textarea.error {
   margin-bottom: 10px;
 }
 
+#btn-verify-words-close {
+  color: #ffffff;
+}
+
+#btn-verify-words-close:hover,
+#btn-verify-words-close:active {
+  color: #ffffff;
+}
+
 .verify-words-title {
   font-size: 15px;
   font-weight: 800;
@@ -3685,7 +3694,7 @@ textarea.error {
 }
 
 #screen-backup-verify .verify-intro {
-  max-width: 300px;
+  max-width: 264px;
   margin: 0 auto 16px;
   font-size: 14px;
   line-height: 1.4;
@@ -3764,7 +3773,7 @@ textarea.error {
   min-height: auto;
   border: none;
   max-height: none;
-  overflow: visible;
+  overflow: hidden;
 }
 
 #screen-backup-verify .verify-step-card {
@@ -3775,7 +3784,19 @@ textarea.error {
     inset 0 1px 0 rgba(255, 255, 255, 0.06),
     0 20px 48px rgba(0, 0, 0, 0.50);
   padding: 20px 16px;
-  min-height: 370px;
+  min-height: 330px;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  will-change: transform, opacity;
+}
+
+#screen-backup-verify .verify-step-card.is-leaving-left {
+  transform: translateX(-20px);
+  opacity: 0;
+}
+
+#screen-backup-verify .verify-step-card.is-entering-right {
+  transform: translateX(20px);
+  opacity: 0;
 }
 
 #screen-backup-verify .verify-step-pill {
@@ -3794,7 +3815,7 @@ textarea.error {
 
 #screen-backup-verify .verify-step-title {
   margin: 0;
-  font-size: 30px;
+  font-size: 26px;
   font-weight: 600;
   line-height: 1;
   letter-spacing: -0.6px;
@@ -3803,9 +3824,9 @@ textarea.error {
 
 #screen-backup-verify .verify-step-subtitle {
   margin: 10px auto 16px;
-  max-width: 300px;
+  max-width: 248px;
   text-align: center;
-  font-size: 15px;
+  font-size: 14px;
   line-height: 1.45;
   color: rgba(255, 255, 255, 0.58);
 }
@@ -3827,14 +3848,6 @@ textarea.error {
   box-shadow: 0 0 0 1px rgba(245, 158, 11, 0.12);
 }
 
-#screen-backup-verify .verify-step-input-accent {
-  width: 2px;
-  height: 24px;
-  border-radius: 999px;
-  background: rgba(0, 200, 83, 0.92);
-  flex-shrink: 0;
-}
-
 #screen-backup-verify .verify-step-input {
   width: 100%;
   border: none;
@@ -3847,6 +3860,7 @@ textarea.error {
 }
 
 #screen-backup-verify .verify-step-input::placeholder {
+  font-size: 14px;
   color: rgba(255, 255, 255, 0.38);
 }
 
@@ -3975,7 +3989,7 @@ textarea.error {
   }
 
   #screen-backup-verify .verify-step-title {
-    font-size: 27px;
+    font-size: 23px;
   }
 
   #screen-backup-verify .btn-primary {

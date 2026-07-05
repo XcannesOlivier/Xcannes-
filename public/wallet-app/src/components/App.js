@@ -877,6 +877,7 @@ function setupBackupVerifyScreen(words) {
 
   let currentIndex = 0;
   let currentInput = null;
+  let isStepTransitioning = false;
 
   function normalized(value) {
     return (value || '').trim().toLowerCase();
@@ -891,6 +892,10 @@ function setupBackupVerifyScreen(words) {
   }
 
   function updateContinueState() {
+    if (isStepTransitioning) {
+      btnConfirm.disabled = true;
+      return;
+    }
     if (!currentInput) {
       btnConfirm.disabled = true;
       return;
@@ -904,57 +909,83 @@ function setupBackupVerifyScreen(words) {
     }
   }
 
-  function renderCurrentStep() {
+  function renderCurrentStep({ animateFromRight = false } = {}) {
     const step = currentIndex + 1;
-    container.innerHTML = `
-      <div class="verify-step-card">
-        <div class="verify-step-pill">${step}</div>
-        <h3 class="verify-step-title">Mot n°${step}</h3>
-        <p class="verify-step-subtitle">Entrez le mot n°${step} de votre phrase de récupération.</p>
-        <label class="verify-step-input-wrap" for="verify-current-word">
-          <span class="verify-step-input-accent" aria-hidden="true"></span>
-          <input
-            id="verify-current-word"
-            class="verify-step-input"
-            type="text"
-            autocomplete="off"
-            autocorrect="off"
-            autocapitalize="off"
-            spellcheck="false"
-            placeholder="Entrez le mot"
-          >
-        </label>
-        <div class="verify-step-note">
-          <span class="verify-step-note-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 3l7 3v5c0 5-3.5 8.5-7 10c-3.5-1.5-7-5-7-10V6l7-3"></path>
-              <path d="M9.5 12.2l1.8 1.8l3.4-3.4"></path>
-            </svg>
-          </span>
-          <span>Vérifiez bien l’orthographe et l’ordre du mot.</span>
+    const mountStepCard = () => {
+      container.innerHTML = `
+        <div class="verify-step-card">
+          <div class="verify-step-pill">${step}</div>
+          <h3 class="verify-step-title">Mot n°${step}</h3>
+          <p class="verify-step-subtitle">Entrez le mot n°${step} de votre phrase de récupération.</p>
+          <label class="verify-step-input-wrap" for="verify-current-word">
+            <input
+              id="verify-current-word"
+              class="verify-step-input"
+              type="text"
+              autocomplete="off"
+              autocorrect="off"
+              autocapitalize="off"
+              spellcheck="false"
+              placeholder="Entrez le mot"
+            >
+          </label>
+          <div class="verify-step-note">
+            <span class="verify-step-note-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 3l7 3v5c0 5-3.5 8.5-7 10c-3.5-1.5-7-5-7-10V6l7-3"></path>
+                <path d="M9.5 12.2l1.8 1.8l3.4-3.4"></path>
+              </svg>
+            </span>
+            <span>Vérifiez bien l’orthographe et l’ordre du mot.</span>
+          </div>
         </div>
-      </div>
-    `;
+      `;
 
-    currentInput = document.getElementById('verify-current-word');
-    updateProgress(currentIndex);
-    updateStatus(statusEl, '', false);
-    updateContinueState();
-
-    currentInput?.addEventListener('input', () => {
-      currentInput.closest('.verify-step-input-wrap')?.classList.remove('is-warn');
-      updateStatus(statusEl, '', false);
-      updateContinueState();
-    });
-
-    currentInput?.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && !btnConfirm.disabled) {
-        e.preventDefault();
-        btnConfirm.click();
+      const card = container.querySelector('.verify-step-card');
+      if (animateFromRight) {
+        card?.classList.add('is-entering-right');
       }
-    });
 
-    setTimeout(() => currentInput?.focus(), 120);
+      currentInput = document.getElementById('verify-current-word');
+      updateProgress(currentIndex);
+      updateStatus(statusEl, '', false);
+
+      currentInput?.addEventListener('input', () => {
+        currentInput.closest('.verify-step-input-wrap')?.classList.remove('is-warn');
+        updateStatus(statusEl, '', false);
+        updateContinueState();
+      });
+
+      currentInput?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !btnConfirm.disabled) {
+          e.preventDefault();
+          btnConfirm.click();
+        }
+      });
+
+      if (animateFromRight) {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            card?.classList.remove('is-entering-right');
+          });
+        });
+      }
+
+      setTimeout(() => {
+        isStepTransitioning = false;
+        updateContinueState();
+        currentInput?.focus();
+      }, animateFromRight ? 220 : 120);
+    };
+
+    const previousCard = container.querySelector('.verify-step-card');
+    if (animateFromRight && previousCard) {
+      previousCard.classList.add('is-leaving-left');
+      setTimeout(mountStepCard, 180);
+      return;
+    }
+
+    mountStepCard();
   }
 
   function validateCurrentStep() {
@@ -1040,8 +1071,10 @@ function setupBackupVerifyScreen(words) {
       if (!validateCurrentStep()) return;
 
       if (currentIndex < 11) {
+        isStepTransitioning = true;
+        btnConfirm.disabled = true;
         currentIndex += 1;
-        renderCurrentStep();
+        renderCurrentStep({ animateFromRight: true });
         return;
       }
 
