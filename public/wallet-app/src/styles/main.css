@@ -3646,6 +3646,10 @@ textarea.error {
 #screen-backup-verify .screen-header .btn-back,
 #screen-backup-verify .screen-header .btn-close {
   position: static;
+  top: auto;
+  left: auto;
+  right: auto;
+  transform: none;
   width: 36px;
   height: 36px;
   border-radius: 999px;
