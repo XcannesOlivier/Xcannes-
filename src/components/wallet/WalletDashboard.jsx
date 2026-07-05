@@ -306,6 +306,7 @@ export default function WalletDashboard({
     allocatedRlusdByCurrency,
     refreshCurrencyLines,
     toast,
+    setActiveAction,
   });
   const { setCashModalTab } = swapState;
 

@@ -274,6 +274,8 @@ export function useSendTransaction({
   // useSavedAddresses()
   savedAddresses,
   saveAddress,
+  // Local UI state setters
+  setActiveAction,
   // useRlusdPerUnitRates()
   rlusdPerUnitRates,
   rlusdPerUnitSources,
@@ -314,6 +316,19 @@ export function useSendTransaction({
     });
     if (match) removePayreq(match.id);
   }
+
+  function hideSendActionDuringSigning() {
+    if (typeof setActiveAction === "function") {
+      setActiveAction(null);
+    }
+  }
+
+  function restoreSendActionAfterCancelledSigning() {
+    if (typeof setActiveAction === "function") {
+      setActiveAction("send");
+    }
+  }
+
   const handleSendSubmit = async ({
     saveDestination = "",
     saveLabel = "",
@@ -418,6 +433,7 @@ export function useSendTransaction({
       });
     } catch (err) {
       console.error("Send payment error:", err);
+      restoreSendActionAfterCancelledSigning();
       toast.error(
         "Error while preparing payment: " + (err?.message || String(err)),
       );
@@ -455,6 +471,7 @@ export function useSendTransaction({
       throw new Error("MoonPay swap preparation returned an invalid XRP amount.");
     }
 
+    hideSendActionDuringSigning();
     const swapResult = await signTransaction(preparedSwap.txjson, {
       action: "wallet:swap",
       progressDetails: {
@@ -466,6 +483,7 @@ export function useSendTransaction({
       },
     });
     if (!swapResult?.signed) {
+      restoreSendActionAfterCancelledSigning();
       toast.warn("Swap XRPL annulé ou expiré.");
       return { ok: false };
     }
@@ -484,6 +502,7 @@ export function useSendTransaction({
       throw new Error("Failed to build MoonPay XRP payment.");
     }
 
+    hideSendActionDuringSigning();
     const result = await signTransaction(paymentTx, {
       action: "moonpay:sell",
       progressDetails: {
@@ -506,6 +525,7 @@ export function useSendTransaction({
       return { ok: true };
     }
 
+    restoreSendActionAfterCancelledSigning();
     toast.warn("Paiement MoonPay annulé ou expiré après le swap XRPL.");
     return { ok: false };
   }
@@ -659,7 +679,8 @@ export function useSendTransaction({
       String(savedEntry?.onChainLabel || savedEntry?.label || "").trim() ||
       "";
 
-	    const payResult = await signTransaction(payTx, {
+      hideSendActionDuringSigning();
+      const payResult = await signTransaction(payTx, {
 	      action: isMoonpaySell ? "moonpay:sell" : "wallet:send",
 	      progressDetails: {
 	        amountLabel: `${amountNum.toLocaleString("en-US", {
@@ -689,6 +710,7 @@ export function useSendTransaction({
       // Balance refresh is handled automatically via WebSocket wallet:address channel
       return { ok: true };
     } else {
+      restoreSendActionAfterCancelledSigning();
       toast.warn("Paiement annulé. Vous pouvez reprendre la validation quand vous voulez.");
       return { ok: false };
     }
@@ -832,6 +854,7 @@ export function useSendTransaction({
       })} ${currency}`;
     })();
 
+    hideSendActionDuringSigning();
     const result = await signTransaction(txjson, {
       action: isMoonpaySell ? "moonpay:sell" : "wallet:send",
       progressDetails: {
@@ -860,6 +883,7 @@ export function useSendTransaction({
       // Balance refresh is handled automatically via WebSocket wallet:address channel
       return { ok: true };
     } else {
+      restoreSendActionAfterCancelledSigning();
       toast.warn("Paiement annulé. Vous pouvez reprendre la validation quand vous voulez.");
       return { ok: false };
     }

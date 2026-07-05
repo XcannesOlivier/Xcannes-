@@ -35,6 +35,7 @@ export function useSwapConversion({
   refreshCurrencyLines,
   onDemoConvert,
   toast,
+  setActiveAction,
 }) {
   useEffect(() => {
     if (!swapCurrencyOptions?.length) return;
@@ -265,6 +266,16 @@ export function useSwapConversion({
     }
 
     setConvertProcessing(true);
+    const hideConvertActionDuringSigning = () => {
+      if (typeof setActiveAction === "function") {
+        setActiveAction(null);
+      }
+    };
+    const restoreConvertActionAfterCancelledSigning = () => {
+      if (typeof setActiveAction === "function") {
+        setActiveAction("swap");
+      }
+    };
     try {
       const rlusdPerBase = await getRlusdPerUnit(base);
       const rlusdPerQuote =
@@ -395,6 +406,7 @@ export function useSwapConversion({
       }
       txjson.Memos = memos;
 
+      hideConvertActionDuringSigning();
       const result = await signTransaction(txjson, {
         action: "wallet:convert",
         progressDetails: {
@@ -413,6 +425,7 @@ export function useSwapConversion({
         },
       });
       if (!result?.signed) {
+        restoreConvertActionAfterCancelledSigning();
         toast?.error("Conversion annulée. Vous pouvez reprendre la validation quand vous voulez.");
         return;
       }
@@ -421,6 +434,7 @@ export function useSwapConversion({
       if (refreshBalance) setTimeout(() => refreshBalance(), 10000);
       if (refreshCurrencyLines) setTimeout(() => refreshCurrencyLines({ bustCache: true }), 10000);
     } catch (error) {
+      restoreConvertActionAfterCancelledSigning();
       console.error("Convert error:", error);
       const message = error?.message || String(error);
       toast?.error("Conversion error: " + message);
@@ -447,6 +461,7 @@ export function useSwapConversion({
     setConvertProcessing,
     setDemoLines,
     signTransaction,
+    setActiveAction,
     toast,
     walletAddress,
   ]);
