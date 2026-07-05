@@ -3257,24 +3257,23 @@ textarea.error {
 }
 
 #screen-import .screen-header {
-  justify-content: space-between;
-  align-items: center;
-  min-height: 44px;
-  gap: 10px;
+  min-height: 94px;
+  align-items: flex-start;
   position: relative;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 #screen-import .screen-header .btn-back {
-  position: static;
-  transform: none;
+  position: absolute;
+  top: 0;
+  left: 0;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(10px);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
-  width: 34px;
-  height: 34px;
-  font-size: 24px;
+  width: 42px;
+  height: 42px;
+  font-size: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -3286,55 +3285,57 @@ textarea.error {
 }
 
 #screen-import .screen-header h2 {
-  flex: 1;
+  width: 100%;
   text-align: left;
-  font-size: 42px;
+  font-size: 47px;
   font-weight: 500;
-  letter-spacing: -0.2px;
-  line-height: 1.04;
-  margin: 0;
-  max-width: 320px;
+  letter-spacing: -0.3px;
+  line-height: 1.08;
+  margin: 52px 0 0;
+  color: rgba(255, 255, 255, 0.94);
 }
 
 #screen-import .tab-desc {
   max-width: 360px;
-  margin: 0 0 16px;
-  font-size: 15px;
-  color: rgba(255, 255, 255, 0.62);
+  margin: 0 0 18px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.60);
   text-align: left;
-  line-height: 1.35;
+  line-height: 1.45;
 }
 
 #screen-import .btn-close {
-  width: 34px;
-  height: 34px;
+  width: 42px;
+  height: 42px;
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: rgba(255, 255, 255, 0.03);
   color: rgba(255, 255, 255, 0.85);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
-  font-size: 15px;
+  font-size: 20px;
   line-height: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  flex: 0 0 auto;
+  position: absolute;
+  top: 0;
+  right: 0;
 }
 
 .import-security-note {
   display: flex;
   align-items: flex-start;
   gap: 10px;
-  max-width: 360px;
-  margin: 0 0 16px;
-  padding: 12px 14px;
+  max-width: 100%;
+  margin: 0 0 14px;
+  padding: 13px 14px;
   border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.015));
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.028), rgba(255, 255, 255, 0.012));
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.05),
-    0 14px 34px rgba(0, 0, 0, 0.44);
+    0 10px 24px rgba(0, 0, 0, 0.35);
 }
 
 .import-security-icon {
@@ -3354,9 +3355,9 @@ textarea.error {
 
 .import-security-note p {
   margin: 0;
-  color: rgba(255, 255, 255, 0.62);
-  font-size: 13px;
-  line-height: 1.35;
+  color: rgba(255, 255, 255, 0.60);
+  font-size: 12px;
+  line-height: 1.55;
 }
 
 .import-security-note strong {
@@ -3367,7 +3368,7 @@ textarea.error {
 .import-mnemonic-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px 10px;
+  gap: 11px 10px;
   margin-bottom: 16px;
   padding: 0;
   background: transparent;
@@ -3383,12 +3384,12 @@ textarea.error {
   gap: 8px;
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: 12px;
+  border-radius: 13px;
   padding: 8px;
   transition: all 0.2s ease;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.03),
-    0 10px 22px rgba(0, 0, 0, 0.30);
+    0 8px 18px rgba(0, 0, 0, 0.28);
 }
 
 .import-word-cell:focus-within {
@@ -3412,15 +3413,15 @@ textarea.error {
 
 .import-word-input {
   width: 100%;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.07);
   background: rgba(0, 0, 0, 0.24);
   color: rgba(255, 255, 255, 0.88);
-  font-size: 0.98rem;
+  font-size: 0.94rem;
   font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial;
-  font-weight: 500;
+  font-weight: 400;
   outline: none;
   padding: 10px 11px;
-  border-radius: 9px;
+  border-radius: 10px;
   letter-spacing: 0.01em;
   appearance: none;
   -webkit-appearance: none;
@@ -3429,8 +3430,8 @@ textarea.error {
 }
 
 .import-word-input::placeholder {
-  color: rgba(148, 163, 184, 0.48);
-  font-size: 0.95rem;
+  color: rgba(148, 163, 184, 0.52);
+  font-size: 0.90rem;
   font-family: inherit;
   font-weight: 500;
 }
@@ -3441,13 +3442,13 @@ textarea.error {
 }
 
 #screen-import .button-group {
-  max-width: 360px;
-  margin-top: 12px;
+  max-width: 100%;
+  margin-top: 10px;
 }
 
 #screen-import .btn-primary {
-  border-radius: 16px;
-  padding: 16px 22px;
+  border-radius: 15px;
+  padding: 17px 22px;
   font-size: 15px;
   font-weight: 700;
   background: linear-gradient(180deg, rgba(0, 200, 83, 0.85), rgba(0, 168, 70, 0.78));
@@ -3459,7 +3460,7 @@ textarea.error {
 
 .import-help-link {
   width: 100%;
-  margin-top: 12px;
+  margin-top: 18px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -3468,7 +3469,7 @@ textarea.error {
   background: transparent;
   color: rgba(0, 200, 83, 0.90);
   font-family: var(--font-manrope);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
   padding: 0;
   cursor: pointer;
@@ -3490,9 +3491,13 @@ textarea.error {
   background: linear-gradient(180deg, rgba(0, 200, 83, 0.92), rgba(0, 200, 83, 0.72));
 }
 
+#screen-import .choice-bottom-bar {
+  display: none;
+}
+
 @media (max-width: 340px) {
   #screen-import .screen-header h2 {
-    font-size: 34px;
+    font-size: 38px;
   }
 
   .import-mnemonic-grid {
