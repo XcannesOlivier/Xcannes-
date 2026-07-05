@@ -1129,6 +1129,21 @@ function setupBackupVerifyScreen(words) {
   btnExitYes?.addEventListener('click', async (e) => {
     e.preventDefault();
     closeVerifyExitOverlay();
+
+    // Cancel creation flow cleanly: wipe in-memory pending wallet before leaving.
+    if (pendingWalletData) clearWalletFromMemory(pendingWalletData);
+    pendingMnemonic = null;
+    pendingWalletData = null;
+
+    // If a wallet is already active (opened from dashboard settings),
+    // go back directly to embedded view to avoid transient wallet switches.
+    if (currentWallet) {
+      showScreen('wallet-embedded');
+      setupWalletEmbedded();
+      resetInactivityTimer();
+      return;
+    }
+
     await goToHome();
   });
 
@@ -1655,8 +1670,23 @@ function setupWalletEmbedded() {
 
   // Load the wallet dashboard
   const dashboardUrl = getWalletDashboardUrl();
-  if (iframe.src !== dashboardUrl) {
-    iframe.src = dashboardUrl;
+  const expectedUrl = new URL(dashboardUrl, window.location.href);
+  let shouldReloadIframe = true;
+  try {
+    if (iframe.src) {
+      const currentUrl = new URL(iframe.src, window.location.href);
+      shouldReloadIframe = !(
+        currentUrl.origin === expectedUrl.origin
+        && currentUrl.pathname === expectedUrl.pathname
+        && currentUrl.search === expectedUrl.search
+      );
+    }
+  } catch {
+    shouldReloadIframe = true;
+  }
+
+  if (shouldReloadIframe) {
+    iframe.src = expectedUrl.toString();
   }
 
   // --- postMessage bridge ---
@@ -1745,6 +1775,16 @@ function setupWalletEmbedded() {
   }
 
   window.addEventListener('message', handleIframeMessage);
+
+  // If iframe is already loaded, push current wallet identity immediately
+  // to avoid transient UI showing another wallet before sync.
+  if (!shouldReloadIframe && iframe?.contentWindow && currentWallet?.address) {
+    sendToIframe({
+      type: 'INIT',
+      address: currentWallet.address,
+      publicKey: currentWallet.publicKey || '',
+    });
+  }
 
   // Store cleanup function
   _bridgeCleanup = () => {
