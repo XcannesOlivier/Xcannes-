@@ -310,15 +310,8 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
 }
 
 #screen-confirm-secure .screen-content {
-  --confirm-swipe-y: 0px;
   justify-content: center;
   align-items: center;
-  transform: translateY(var(--confirm-swipe-y));
-  transition: transform 220ms ease;
-}
-
-#screen-confirm-secure .screen-content.is-swipe-dragging {
-  transition: none;
 }
 
 #screen-confirm-secure .confirm-secure-card {
@@ -333,20 +326,22 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
   padding: 28px 22px 24px;
 }
 
-#screen-confirm-secure .confirm-swipe-handle {
-  width: min(360px, 100%);
-  display: flex;
+#screen-confirm-secure .confirm-page-close {
+  position: absolute;
+  top: calc(env(safe-area-inset-top, 12px) + 8px);
+  right: 20px;
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: rgba(255, 255, 255, 0.03);
+  color: rgba(255, 255, 255, 0.95);
+  display: inline-flex;
+  align-items: center;
   justify-content: center;
-  margin: 0 auto 12px;
-  pointer-events: none;
-}
-
-#screen-confirm-secure .confirm-swipe-handle > span {
-  display: block;
-  width: 52px;
-  height: 5px;
-  border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.45);
+  font-size: 18px;
+  line-height: 1;
+  z-index: 3;
 }
 
 #screen-confirm-secure .logo {

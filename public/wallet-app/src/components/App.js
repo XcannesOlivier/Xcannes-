@@ -1422,149 +1422,41 @@ function rearmImport(statusEl) {
  */
 function confirmWithAuth(title, subtitle) {
   return new Promise((resolve) => {
+    const previousScreenEl = document.querySelector('.screen:not(.hidden)');
+    const previousScreen = previousScreenEl?.id?.startsWith('screen-')
+      ? previousScreenEl.id.replace('screen-', '')
+      : 'wallet-embedded';
+
     showScreen('confirm-secure');
 
     const titleEl = document.getElementById('confirm-secure-title');
     const subtitleEl = document.getElementById('confirm-secure-subtitle');
     const statusEl = document.getElementById('confirm-secure-status');
+    const btnClose = document.getElementById('btn-confirm-close');
     const btnBio = document.getElementById('btn-confirm-biometric');
     const btnPIN = document.getElementById('btn-confirm-pin');
     const pinSection = document.getElementById('confirm-pin-section');
     const pinDots = document.getElementById('confirm-pin-dots');
     const pinInput = document.getElementById('confirm-pin-input');
-    const swipeSurface = document.querySelector('#screen-confirm-secure .screen-content');
 
     let settled = false;
-    let swipeActive = false;
-    let swipeStartX = 0;
-    let swipeStartY = 0;
-    let swipeLastX = 0;
-    let swipeLastY = 0;
-    let activePointerId = null;
 
     const safeResolve = (value) => {
       if (settled) return;
       settled = true;
-      cleanupSwipeHandlers();
       resolve(value);
     };
 
-    const getPoint = (e) => {
-      if (e.touches && e.touches.length) return e.touches[0];
-      if (e.changedTouches && e.changedTouches.length) return e.changedTouches[0];
-      return e;
-    };
-
-    const startSwipe = (e) => {
-      if (settled) return;
-      const point = getPoint(e);
-      if (!point) return;
-      swipeStartX = point.clientX;
-      swipeStartY = point.clientY;
-      swipeLastX = point.clientX;
-      swipeLastY = point.clientY;
-      swipeActive = true;
-      swipeSurface?.classList.add('is-swipe-dragging');
-    };
-
-    const moveSwipe = (e) => {
-      if (!swipeActive || settled) return;
-      const point = getPoint(e);
-      if (!point) return;
-
-      swipeLastX = point.clientX;
-      swipeLastY = point.clientY;
-
-      const dx = swipeLastX - swipeStartX;
-      const dy = swipeLastY - swipeStartY;
-
-      if (dy <= 0) {
-        swipeSurface?.style.setProperty('--confirm-swipe-y', '0px');
-        return;
-      }
-
-      // Ignore mostly horizontal drags.
-      if (Math.abs(dx) > dy * 1.25) return;
-      swipeSurface?.style.setProperty('--confirm-swipe-y', `${Math.min(dy, 140)}px`);
-    };
-
-    const endSwipe = () => {
-      if (!swipeActive || settled) return;
-      swipeActive = false;
-      swipeSurface?.classList.remove('is-swipe-dragging');
-
-      const dx = swipeLastX - swipeStartX;
-      const dy = swipeLastY - swipeStartY;
-
-      swipeSurface?.style.setProperty('--confirm-swipe-y', '0px');
-
-      // Close gesture: downward swipe with tolerant threshold.
-      if (dy > 58 && dy > Math.abs(dx) * 0.9) {
+    if (btnClose) {
+      const freshClose = btnClose.cloneNode(true);
+      btnClose.replaceWith(freshClose);
+      document.getElementById('btn-confirm-close')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (previousScreen && previousScreen !== 'confirm-secure') {
+          showScreen(previousScreen);
+        }
         safeResolve(false);
-      }
-    };
-
-    const onPointerDown = (e) => {
-      if (activePointerId !== null) return;
-      activePointerId = e.pointerId;
-      startSwipe(e);
-    };
-
-    const onPointerMove = (e) => {
-      if (activePointerId === null || e.pointerId !== activePointerId) return;
-      moveSwipe(e);
-    };
-
-    const onPointerUp = (e) => {
-      if (activePointerId === null || e.pointerId !== activePointerId) return;
-      activePointerId = null;
-      endSwipe();
-    };
-
-    const onTouchStart = (e) => startSwipe(e);
-    const onTouchMove = (e) => moveSwipe(e);
-    const onTouchEnd = () => endSwipe();
-    const onMouseDown = (e) => startSwipe(e);
-    const onMouseMove = (e) => moveSwipe(e);
-    const onMouseUp = () => endSwipe();
-
-    const cleanupSwipeHandlers = () => {
-      if (!swipeSurface) return;
-      swipeSurface.removeEventListener('pointerdown', onPointerDown);
-      window.removeEventListener('pointermove', onPointerMove);
-      window.removeEventListener('pointerup', onPointerUp);
-      window.removeEventListener('pointercancel', onPointerUp);
-
-      swipeSurface.removeEventListener('touchstart', onTouchStart);
-      window.removeEventListener('touchmove', onTouchMove);
-      window.removeEventListener('touchend', onTouchEnd);
-      window.removeEventListener('touchcancel', onTouchEnd);
-
-      swipeSurface.removeEventListener('mousedown', onMouseDown);
-      window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('mouseup', onMouseUp);
-
-      activePointerId = null;
-      swipeSurface.classList.remove('is-swipe-dragging');
-      swipeSurface.style.setProperty('--confirm-swipe-y', '0px');
-    };
-
-    if (swipeSurface) {
-      swipeSurface.style.setProperty('--confirm-swipe-y', '0px');
-      if ('PointerEvent' in window) {
-        swipeSurface.addEventListener('pointerdown', onPointerDown);
-        window.addEventListener('pointermove', onPointerMove);
-        window.addEventListener('pointerup', onPointerUp);
-        window.addEventListener('pointercancel', onPointerUp);
-      } else {
-        swipeSurface.addEventListener('touchstart', onTouchStart, { passive: true });
-        window.addEventListener('touchmove', onTouchMove, { passive: true });
-        window.addEventListener('touchend', onTouchEnd);
-        window.addEventListener('touchcancel', onTouchEnd);
-        swipeSurface.addEventListener('mousedown', onMouseDown);
-        window.addEventListener('mousemove', onMouseMove);
-        window.addEventListener('mouseup', onMouseUp);
-      }
+      }, { once: true });
     }
 
     if (titleEl) titleEl.textContent = title || 'Sécurisez ce compte';
