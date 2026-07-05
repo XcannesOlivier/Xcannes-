@@ -91,6 +91,7 @@ export function useTransactionProgress({ signTransaction, t, setActiveAction }) 
 
       try {
         const result = await signTransaction(txjson, options);
+        const txHash = result?.hash || '';
 
         if (result?.signed) {
           setTxProgress({
@@ -99,10 +100,12 @@ export function useTransactionProgress({ signTransaction, t, setActiveAction }) 
             actionLabel: label,
             actionKey: actionKey,
             errorMessage: '',
-            details: options?.progressDetails || null,
+            details: {
+              ...(options?.progressDetails || {}),
+              txHash: txHash || null,
+            },
           });
 
-          const txHash = result.hash || '';
           (async () => {
             if (txHash) {
               await waitForTxValidation(txHash);
