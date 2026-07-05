@@ -137,7 +137,7 @@ export default function TransactionProgressModal({
           {isPending ? (
             <>
               <img
-                src="/symbols/logoxcannestransaparent4.png"
+                src="/symbols/logoxcannestransaparent.png"
                 alt="XCANNES"
                 className="w-[168px] max-w-[72%] h-auto opacity-95"
                 draggable={false}
