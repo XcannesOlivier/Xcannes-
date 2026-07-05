@@ -255,7 +255,7 @@ export default function TransactionProgressModal({
               <div className="mt-10 flex items-center justify-center">
                 <div className="relative h-[120px] w-[120px]">
                   <svg className="h-full w-full -rotate-90" viewBox="0 0 120 120" fill="none" aria-hidden="true">
-                    <circle cx="60" cy="60" r="48" stroke="rgba(255,255,255,0.09)" strokeWidth="10" />
+                    <circle cx="60" cy="60" r="48" stroke="rgba(255,255,255,0.04)" strokeWidth="10" />
                     <circle
                       cx="60"
                       cy="60"
@@ -269,13 +269,13 @@ export default function TransactionProgressModal({
                       className="drop-shadow-[0_0_12px_rgba(18,198,104,0.45)]"
                     />
                   </svg>
-                  <div className="absolute inset-[20px] rounded-full bg-[#03070b] border border-white/8 flex items-center justify-center">
-                    <img src="/symbols/xcs.svg" alt="XCANNES" className="h-8 w-8 opacity-95" draggable={false} />
+                  <div className="absolute inset-[20px] rounded-full bg-[#010307] border border-white/6 flex items-center justify-center">
+                    <img src="/symbols/xlogovert.png" alt="XCANNES" className="h-8 w-8 opacity-95" draggable={false} />
                   </div>
                 </div>
               </div>
 
-              <p className="mt-7 text-center text-[20px] max-md:text-[16px] text-white/75 leading-snug max-w-[560px]">
+              <p className="mt-7 text-center text-[16px] max-md:text-[12px] text-white/75 leading-snug max-w-[560px]">
                 {isConversionAction ? (
                   <>
                     Diffusion de votre conversion sur le réseau <span className="text-xcannes-green">{networkLabel}</span>. Cela prend quelques secondes...
