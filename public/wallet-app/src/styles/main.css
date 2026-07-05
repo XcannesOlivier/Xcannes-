@@ -3296,7 +3296,7 @@ textarea.error {
 }
 
 #screen-import .tab-desc {
-  max-width: 170px;
+  max-width: 300px;
   margin: 0 0 18px;
   font-size: 12px;
   color: rgba(255, 255, 255, 0.60);
@@ -3398,7 +3398,7 @@ textarea.error {
 }
 
 .import-word-num {
-  font-size: 0.75rem;
+  font-size: 10px;
   color: rgba(0, 200, 83, 0.95);
   min-width: 24px;
   height: 24px;
@@ -3416,7 +3416,7 @@ textarea.error {
   border: 1px solid rgba(255, 255, 255, 0.07);
   background: rgba(0, 0, 0, 0.24);
   color: rgba(255, 255, 255, 0.88);
-  font-size: 0.94rem;
+  font-size: 13px;
   font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial;
   font-weight: 400;
   outline: none;
@@ -3431,7 +3431,7 @@ textarea.error {
 
 .import-word-input::placeholder {
   color: rgba(148, 163, 184, 0.52);
-  font-size: 0.90rem;
+  font-size: 12px;
   font-family: inherit;
   font-weight: 500;
 }
