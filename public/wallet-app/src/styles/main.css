@@ -3685,9 +3685,9 @@ textarea.error {
 }
 
 #screen-backup-verify .verify-intro {
-  max-width: 320px;
+  max-width: 300px;
   margin: 0 auto 16px;
-  font-size: 16px;
+  font-size: 14px;
   line-height: 1.4;
   color: rgba(255, 255, 255, 0.62);
   text-align: center;
@@ -3712,13 +3712,26 @@ textarea.error {
 }
 
 #screen-backup-verify #verify-progress-text {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 650;
-  color: rgba(0, 200, 83, 0.95);
+  color: rgba(255, 255, 255, 0.70);
   line-height: 1;
 }
 
+#screen-backup-verify #verify-progress-text .verify-progress-current {
+  color: rgba(0, 200, 83, 0.95);
+}
+
+#screen-backup-verify #verify-progress-text .verify-progress-total {
+  color: rgba(255, 255, 255, 0.70);
+}
+
 #screen-backup-verify .verify-progress-bar {
+  --segments: 12;
+  --segment-gap: 4px;
+  --segment-w: calc((100% - (11 * var(--segment-gap))) / var(--segments));
+  --verify-step: 0;
+  position: relative;
   height: 6px;
   border-radius: 999px;
   background:
@@ -3733,11 +3746,16 @@ textarea.error {
 }
 
 #screen-backup-verify .verify-progress-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
   height: 100%;
+  width: var(--segment-w);
   background: linear-gradient(90deg, rgba(0, 200, 83, 0.95), rgba(0, 222, 96, 0.95));
   box-shadow: 0 0 14px rgba(0, 200, 83, 0.25);
   border-radius: 999px;
-  transition: width 0.25s ease;
+  transform: translateX(calc(var(--verify-step) * (var(--segment-w) + var(--segment-gap))));
+  transition: transform 0.2s ease;
 }
 
 #screen-backup-verify .verify-sequential {
@@ -3761,22 +3779,22 @@ textarea.error {
 }
 
 #screen-backup-verify .verify-step-pill {
-  width: 36px;
-  height: 36px;
+  width: 30px;
+  height: 30px;
   margin: 0 auto 14px;
-  border-radius: 12px;
+  border-radius: 10px;
   display: grid;
   place-items: center;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
   color: rgba(0, 200, 83, 0.96);
-  background: rgba(0, 200, 83, 0.12);
-  border: 1px solid rgba(0, 200, 83, 0.28);
+  background: transparent;
+  border: 1px solid rgba(0, 200, 83, 0.35);
 }
 
 #screen-backup-verify .verify-step-title {
   margin: 0;
-  font-size: 34px;
+  font-size: 30px;
   font-weight: 600;
   line-height: 1;
   letter-spacing: -0.6px;
@@ -3844,14 +3862,15 @@ textarea.error {
 #screen-backup-verify .verify-step-note-icon {
   width: 16px;
   height: 16px;
-  border-radius: 999px;
   display: grid;
   place-items: center;
   color: rgba(0, 200, 83, 0.96);
-  border: 1px solid rgba(0, 200, 83, 0.35);
-  font-size: 10px;
-  font-weight: 700;
   flex-shrink: 0;
+}
+
+#screen-backup-verify .verify-step-note-icon svg {
+  width: 16px;
+  height: 16px;
 }
 
 #screen-backup-verify .verify-words-trigger {
@@ -3879,6 +3898,11 @@ textarea.error {
   background: rgba(0, 200, 83, 0.12);
   border: 1px solid rgba(0, 200, 83, 0.28);
   flex-shrink: 0;
+}
+
+#screen-backup-verify .verify-words-trigger-icon svg {
+  width: 16px;
+  height: 16px;
 }
 
 #screen-backup-verify .verify-words-trigger-texts {
@@ -3935,17 +3959,23 @@ textarea.error {
   box-shadow: none;
 }
 
+#screen-backup-verify .verify-confirm-arrow {
+  font-size: 18px;
+  line-height: 1;
+  transform: translateY(1px);
+}
+
 @media (max-width: 420px) {
   #screen-backup-verify .screen-header h2 {
     font-size: 27px;
   }
 
   #screen-backup-verify #verify-progress-text {
-    font-size: 16px;
+    font-size: 14px;
   }
 
   #screen-backup-verify .verify-step-title {
-    font-size: 36px;
+    font-size: 27px;
   }
 
   #screen-backup-verify .btn-primary {

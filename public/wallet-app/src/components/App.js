@@ -865,7 +865,9 @@ function setupBackupVerifyScreen(words) {
   const statusEl = document.getElementById('verify-status');
   const progressText = document.getElementById('verify-progress-text');
   const progressFill = document.getElementById('verify-progress-fill');
+  const progressBar = document.querySelector('#screen-backup-verify .verify-progress-bar');
   const btnConfirm = document.getElementById('btn-verify-confirm');
+  const btnConfirmLabel = document.getElementById('btn-verify-confirm-label');
   const btnBack = document.getElementById('btn-verify-back');
   const btnClose = document.getElementById('btn-verify-close');
   const btnShowWords = document.getElementById('btn-verify-show-words');
@@ -882,8 +884,10 @@ function setupBackupVerifyScreen(words) {
 
   function updateProgress(stepIndex) {
     const completed = Math.max(0, Math.min(stepIndex, 12));
-    progressText.textContent = `${Math.min(stepIndex + 1, 12)} / 12`;
-    progressFill.style.width = `${(completed / 12) * 100}%`;
+    const current = Math.min(stepIndex + 1, 12);
+    progressText.innerHTML = `<span class="verify-progress-current">${current}</span><span class="verify-progress-total">/12</span>`;
+    progressBar?.style.setProperty('--verify-step', `${Math.max(0, Math.min(stepIndex, 11))}`);
+    progressFill.style.width = 'var(--segment-w)';
   }
 
   function updateContinueState() {
@@ -895,7 +899,9 @@ function setupBackupVerifyScreen(words) {
     const entered = normalized(currentInput.value);
     const isValid = entered === expected;
     btnConfirm.disabled = !isValid;
-    btnConfirm.textContent = currentIndex === 11 ? 'Confirmer' : 'Continuer';
+    if (btnConfirmLabel) {
+      btnConfirmLabel.textContent = currentIndex === 11 ? 'Confirmer' : 'Continuer';
+    }
   }
 
   function renderCurrentStep() {
@@ -919,7 +925,12 @@ function setupBackupVerifyScreen(words) {
           >
         </label>
         <div class="verify-step-note">
-          <span class="verify-step-note-icon" aria-hidden="true">✓</span>
+          <span class="verify-step-note-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 3l7 3v5c0 5-3.5 8.5-7 10c-3.5-1.5-7-5-7-10V6l7-3"></path>
+              <path d="M9.5 12.2l1.8 1.8l3.4-3.4"></path>
+            </svg>
+          </span>
           <span>Vérifiez bien l’orthographe et l’ordre du mot.</span>
         </div>
       </div>

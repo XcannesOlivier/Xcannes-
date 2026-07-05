@@ -409,7 +409,12 @@
         </div>
 
 				<button id="btn-verify-show-words" class="verify-words-trigger" type="button">
-					<span class="verify-words-trigger-icon" aria-hidden="true">◉</span>
+					<span class="verify-words-trigger-icon" aria-hidden="true">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+							<path d="M2 12s3.6-6 10-6s10 6 10 6s-3.6 6-10 6s-10-6-10-6z"></path>
+							<circle cx="12" cy="12" r="2.8"></circle>
+						</svg>
+					</span>
 					<span class="verify-words-trigger-texts">
 						<span class="verify-words-trigger-title">Voir la phrase de récupération</span>
 						<span class="verify-words-trigger-subtitle">Affiche vos 12 mots pour les vérifier.</span>
@@ -420,7 +425,10 @@
         <p id="verify-status" class="status"></p>
 
         <div class="button-group">
-					<button id="btn-verify-confirm" class="btn btn-primary" disabled>Continuer</button>
+					<button id="btn-verify-confirm" class="btn btn-primary" disabled>
+						<span id="btn-verify-confirm-label">Continuer</span>
+						<span class="verify-confirm-arrow" aria-hidden="true">→</span>
+					</button>
         </div>
 
         <div class="choice-bottom-bar" aria-hidden="true"><span></span></div>
