@@ -372,6 +372,7 @@
       <div class="screen-content">
         <div class="screen-header">
           <button class="btn-back" id="btn-verify-back">‹</button>
+					<button class="btn-close" id="btn-verify-close" type="button" aria-label="Fermer">✕</button>
           <h2>Vérification</h2>
         </div>
         <p class="verify-intro">Confirmez chaque mot, un par un, dans l’ordre.</p>
@@ -381,8 +382,6 @@
           <div class="wakelock-hint-icon" aria-hidden="true">i</div>
           <div class="wakelock-hint-text" data-wakelock-hint-text></div>
         </div>
-
-        <button id="btn-verify-show-words" class="btn-link btn-verify-show-words">Voir les 12 mots</button>
 
         <div id="verify-words-overlay" class="verify-words-overlay hidden" role="dialog" aria-modal="true">
           <div class="verify-words-card" role="document">
@@ -396,20 +395,32 @@
         </div>
 
         <div class="verify-progress">
-          <span id="verify-progress-text">Mot 1 / 12</span>
+					<div class="verify-progress-head">
+						<span class="verify-progress-label">Progression</span>
+						<span id="verify-progress-text">1 / 12</span>
+					</div>
           <div class="verify-progress-bar">
             <div class="verify-progress-fill" id="verify-progress-fill"></div>
           </div>
         </div>
 
         <div class="verify-sequential" id="verify-sequential">
-          <!-- 12 rows rendered by JS -->
+					<!-- Current step card rendered by JS -->
         </div>
+
+				<button id="btn-verify-show-words" class="verify-words-trigger" type="button">
+					<span class="verify-words-trigger-icon" aria-hidden="true">◉</span>
+					<span class="verify-words-trigger-texts">
+						<span class="verify-words-trigger-title">Voir la phrase de récupération</span>
+						<span class="verify-words-trigger-subtitle">Affiche vos 12 mots pour les vérifier.</span>
+					</span>
+					<span class="verify-words-trigger-arrow" aria-hidden="true">›</span>
+				</button>
 
         <p id="verify-status" class="status"></p>
 
         <div class="button-group">
-          <button id="btn-verify-confirm" class="btn btn-primary" disabled>Confirmer</button>
+					<button id="btn-verify-confirm" class="btn btn-primary" disabled>Continuer</button>
         </div>
 
         <div class="choice-bottom-bar" aria-hidden="true"><span></span></div>

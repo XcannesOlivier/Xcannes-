@@ -867,164 +867,101 @@ function setupBackupVerifyScreen(words) {
   const progressFill = document.getElementById('verify-progress-fill');
   const btnConfirm = document.getElementById('btn-verify-confirm');
   const btnBack = document.getElementById('btn-verify-back');
+  const btnClose = document.getElementById('btn-verify-close');
   const btnShowWords = document.getElementById('btn-verify-show-words');
   const overlay = document.getElementById('verify-words-overlay');
   const overlayGrid = document.getElementById('verify-mnemonic-grid');
   const btnOverlayClose = document.getElementById('btn-verify-words-close');
 
   let currentIndex = 0;
-  container.innerHTML = '';
-  const rows = [];
-  const inputs = [];
+  let currentInput = null;
 
-  words.forEach((word, i) => {
-    const row = document.createElement('div');
-    row.className = `verify-row ${i === 0 ? 'active' : 'locked'}`;
-    row.innerHTML = `
-      <span class="row-num">${i + 1}</span>
-      <input class="row-input" type="text" autocomplete="off" autocorrect="off"
-             autocapitalize="off" spellcheck="false"
-             placeholder="Mot #${i + 1}" ${i !== 0 ? 'disabled' : ''}>
-      <span class="row-status"></span>
-      <span class="row-hint">
-        <span class="row-hint-text">Mot différent</span>
-        <button type="button" class="row-retry-btn">Recommencer</button>
-      </span>
+  function normalized(value) {
+    return (value || '').trim().toLowerCase();
+  }
+
+  function updateProgress(stepIndex) {
+    const completed = Math.max(0, Math.min(stepIndex, 12));
+    progressText.textContent = `${Math.min(stepIndex + 1, 12)} / 12`;
+    progressFill.style.width = `${(completed / 12) * 100}%`;
+  }
+
+  function updateContinueState() {
+    if (!currentInput) {
+      btnConfirm.disabled = true;
+      return;
+    }
+    const expected = normalized(words[currentIndex]);
+    const entered = normalized(currentInput.value);
+    const isValid = entered === expected;
+    btnConfirm.disabled = !isValid;
+    btnConfirm.textContent = currentIndex === 11 ? 'Confirmer' : 'Continuer';
+  }
+
+  function renderCurrentStep() {
+    const step = currentIndex + 1;
+    container.innerHTML = `
+      <div class="verify-step-card">
+        <div class="verify-step-pill">${step}</div>
+        <h3 class="verify-step-title">Mot n°${step}</h3>
+        <p class="verify-step-subtitle">Entrez le mot n°${step} de votre phrase de récupération.</p>
+        <label class="verify-step-input-wrap" for="verify-current-word">
+          <span class="verify-step-input-accent" aria-hidden="true"></span>
+          <input
+            id="verify-current-word"
+            class="verify-step-input"
+            type="text"
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="off"
+            spellcheck="false"
+            placeholder="Entrez le mot"
+          >
+        </label>
+        <div class="verify-step-note">
+          <span class="verify-step-note-icon" aria-hidden="true">✓</span>
+          <span>Vérifiez bien l’orthographe et l’ordre du mot.</span>
+        </div>
+      </div>
     `;
-    container.appendChild(row);
-    rows.push(row);
-    inputs.push(row.querySelector('.row-input'));
-  });
 
-  updateProgress(0);
+    currentInput = document.getElementById('verify-current-word');
+    updateProgress(currentIndex);
+    updateStatus(statusEl, '', false);
+    updateContinueState();
 
-  function updateProgress(validated) {
-    progressText.textContent = validated === 12
-      ? '✅ 12 / 12 — Tous les mots sont corrects !'
-      : `Mot ${validated + 1} / 12`;
-    progressFill.style.width = `${(validated / 12) * 100}%`;
+    currentInput?.addEventListener('input', () => {
+      currentInput.closest('.verify-step-input-wrap')?.classList.remove('is-warn');
+      updateStatus(statusEl, '', false);
+      updateContinueState();
+    });
+
+    currentInput?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !btnConfirm.disabled) {
+        e.preventDefault();
+        btnConfirm.click();
+      }
+    });
+
+    setTimeout(() => currentInput?.focus(), 120);
   }
 
-  function activateRow(idx) {
-    currentIndex = idx;
-    rows.forEach((r, i) => {
-      if (i < idx) {
-        r.className = 'verify-row done';
-        r.querySelector('.row-status').textContent = '✔';
-      } else if (i === idx) {
-        r.className = 'verify-row active';
-        r.querySelector('.row-status').textContent = '';
-        const inp = inputs[i];
-        inp.disabled = false;
-        inp.value = '';
-        inp.focus();
-        r.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      } else {
-        r.className = 'verify-row locked';
-        r.querySelector('.row-status').textContent = '';
-        inputs[i].disabled = true;
-      }
-    });
-    updateProgress(idx);
-    updateStatus(statusEl, '');
-    btnConfirm.disabled = true;
+  function validateCurrentStep() {
+    if (!currentInput) return false;
+    const expected = normalized(words[currentIndex]);
+    const entered = normalized(currentInput.value);
+    if (!entered || entered !== expected) {
+      currentInput.closest('.verify-step-input-wrap')?.classList.add('is-warn');
+      updateStatus(statusEl, 'Mot incorrect. Vérifiez l’orthographe.', true);
+      currentInput.focus();
+      currentInput.select();
+      btnConfirm.disabled = true;
+      return false;
+    }
+    return true;
   }
 
-  inputs.forEach((inp, i) => {
-    const expectedLower = words[i].toLowerCase();
-    const retryBtn = rows[i].querySelector('.row-retry-btn');
-
-    inp.addEventListener('input', () => {
-      const row = rows[i];
-      if (row.classList.contains('warn')) {
-        row.classList.remove('warn');
-        row.querySelector('.row-status').textContent = '';
-      }
-
-      // Auto-validate when the word matches exactly (mobile-friendly flow).
-      if (i !== currentIndex) return;
-      const raw = inp.value || '';
-      const val = raw.trim().toLowerCase();
-      if (!val) return;
-
-      // Gentle inline feedback while typing: show a hint as soon as the input
-      // diverges from the expected word (prefix mismatch) or is too long.
-      const isPrefix = expectedLower.startsWith(val);
-      if (!isPrefix || val.length > expectedLower.length) {
-        row.classList.add('warn');
-        row.querySelector('.row-status').textContent = '!';
-      }
-
-      if (val === expectedLower) {
-        // Let the UI paint the last keystroke before moving on.
-        setTimeout(() => handleValidate(), 0);
-      }
-    });
-
-    const handleValidate = () => {
-      if (i !== currentIndex) return;
-      const val = inp.value.trim().toLowerCase();
-      const expected = expectedLower;
-      const row = rows[i];
-      if (!val) return;
-
-      if (val === expected) {
-        row.className = 'verify-row done';
-        row.querySelector('.row-status').textContent = '✔';
-        // Mask the validated word with asterisks
-        inp.value = '•'.repeat(expected.length);
-        inp.disabled = true;
-
-        if (i === 11) {
-          updateProgress(12);
-          btnConfirm.disabled = false;
-          updateStatus(statusEl, '');
-        } else {
-          activateRow(i + 1);
-        }
-      } else {
-        // If the user hasn't finished typing yet (still a valid prefix),
-        // don't show an error — just keep them on the same word.
-        if (expected.startsWith(val) && val.length < expected.length) return;
-
-        // Keep the user on the same row; show a gentle hint + quick reset.
-        row.classList.add('warn');
-        row.querySelector('.row-status').textContent = '!';
-        updateStatus(statusEl, '', false);
-        inp.focus();
-        inp.select();
-      }
-    };
-
-    inp.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') { e.preventDefault(); handleValidate(); }
-      // Convenience: validate and advance on space (no spaces allowed in words).
-      if (e.key === ' ') { e.preventDefault(); handleValidate(); }
-    });
-
-    // Fallback: if the keyboard is dismissed, validate the current word.
-    inp.addEventListener('blur', () => {
-      setTimeout(() => {
-        // If the word was already validated, we mask+disable the input which can
-        // trigger a blur; never re-validate masked/disabled fields.
-        if (inp.disabled) return;
-        if (i !== currentIndex) return;
-        if (!inp.value.trim()) return;
-        handleValidate();
-      }, 120);
-    });
-
-    retryBtn?.addEventListener('click', (e) => {
-      e.preventDefault();
-      if (i !== currentIndex) return;
-      inp.value = '';
-      rows[i].classList.remove('warn');
-      rows[i].querySelector('.row-status').textContent = '';
-      inp.focus();
-    });
-  });
-
-  setTimeout(() => inputs[0]?.focus(), 200);
+  renderCurrentStep();
 
   // Overlay showing the 12 words again (helps correcting a single typo without restarting).
   if (overlayGrid) {
@@ -1043,14 +980,14 @@ function setupBackupVerifyScreen(words) {
   function openVerifyWordsOverlay() {
     if (!overlay) return;
     // Hide keyboard while reading the words.
-    inputs[currentIndex]?.blur();
+    currentInput?.blur();
     overlay.classList.remove('hidden');
   }
 
   function closeVerifyWordsOverlay() {
     if (!overlay) return;
     overlay.classList.add('hidden');
-    setTimeout(() => inputs[currentIndex]?.focus(), 80);
+    setTimeout(() => currentInput?.focus(), 80);
   }
 
   if (btnShowWords) {
@@ -1083,8 +1020,20 @@ function setupBackupVerifyScreen(words) {
     setupBackupScreen(pendingWalletData);
   }, { once: true });
 
+  btnClose?.addEventListener('click', async () => {
+    await goToHome();
+  }, { once: true });
+
   btnConfirm?.addEventListener('click', async () => {
     try {
+      if (!validateCurrentStep()) return;
+
+      if (currentIndex < 11) {
+        currentIndex += 1;
+        renderCurrentStep();
+        return;
+      }
+
       // Ask for Face ID or PIN confirmation before saving
       const addr = pendingWalletData?.address;
       const confirmed = await confirmWithAuth(
