@@ -1999,11 +1999,11 @@ textarea.error {
 }
 
 #screen-backup .screen-header .btn-back {
-  width: 40px;
-  height: 40px;
+  width: 34px;
+  height: 34px;
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.15);
-  background: rgba(8, 14, 18, 0.52);
+  background: transparent;
   color: rgba(255, 255, 255, 0.88);
   font-size: 25px;
   line-height: 1;
@@ -2017,11 +2017,11 @@ textarea.error {
 }
 
 .backup-close-btn {
-  width: 40px;
-  height: 40px;
+  width: 34px;
+  height: 34px;
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.15);
-  background: rgba(8, 14, 18, 0.52);
+  background: transparent;
   color: rgba(255, 255, 255, 0.88);
   font-size: 22px;
   line-height: 1;
